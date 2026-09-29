@@ -154,6 +154,6 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** nothing. Surfaced by the milestone closure test.
 
-- [ ] `tests/harness/test_dev_graph_t03_end_to_end.py::test_blind_package_around_a_new_version_excludes_the_superseded_version` passes and its `xfail` marker is removed.
-- [ ] The controlled-revision view still sees the previous version.
-- [ ] Decision log entry records the choice.
+- [x] `tests/harness/test_dev_graph_t03_end_to_end.py::test_blind_package_around_a_new_version_excludes_the_superseded_version` passes and its `xfail` marker is removed.
+- [x] The controlled-revision view still sees the previous version.
+- [x] Decision log entry records the choice.

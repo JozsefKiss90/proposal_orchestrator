@@ -534,11 +534,11 @@ def test_t03_scenario_end_to_end(tmp_path: Path) -> None:
     assert not any(i["type"] in ("assessment", "finding", "change_request") for i in blind_evidence.package.items)
     blind_included = {i["id"] for i in blind_evidence.package.manifest["included"]}
     assert {f"{created['id']}#S1", f"{created['id']}#S2", f"{created['id']}#S3"} <= blind_included
-    # What the assessor grades is the new version alone. The package itself
-    # still reaches the superseded version's passages through the shared
-    # objective node; that gap is pinned red by
-    # ``test_blind_package_around_a_new_version_excludes_the_superseded_version``
-    # below and is a follow-up ticket, not a pass.
+    # What the assessor grades is the new version alone, and so is what the
+    # package carries: the blind view hides every node derived from the
+    # superseded version, so nothing of it re-enters through the shared
+    # objective node. Pinned by
+    # ``test_blind_package_around_a_new_version_excludes_the_superseded_version``.
     materialised = {p.name: p.read_text(encoding="utf-8") for p in blind_evidence.candidate_dir.glob("*.json")}
     assert set(materialised) == {"S1.json", "S2.json", "S3.json"}
     assert "Participant C leads" in materialised["S2.json"] or "led by Participant C" in materialised["S2.json"]
@@ -640,15 +640,10 @@ def test_t03_scenario_end_to_end(tmp_path: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# The open gap the walk surfaced, pinned red
+# The gap the walk surfaced, now closed: the blind view hides superseded versions
 # --------------------------------------------------------------------------- #
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="blind view forbids the supersedes traversal but the superseded version's passages "
-    "re-enter through the shared objective node; follow-up ticket in tickets.md",
-)
 def test_blind_package_around_a_new_version_excludes_the_superseded_version(tmp_path: Path) -> None:
     root = tmp_path / "repo"
     shutil.copytree(FIXTURE, root)

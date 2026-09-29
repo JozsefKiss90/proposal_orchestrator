@@ -13,7 +13,13 @@ policy forbids assessment, finding and change request nodes and any node
 tagged as historical feedback (a node's tags are the ``tags`` list in its
 content). Tags for historical scores, target scores and repair plans are
 forbidden with it, so the leakage guard in the harness is a second check,
-not the only one.
+not the only one. It also hides superseded document versions
+(``hide_superseded_versions``): every node derived from a snapshot that a
+later version ``supersedes``, or whose state is ``superseded``, is refused
+before expansion. The policy only says whether a view hides them. The
+package builder decides which snapshots are superseded, because that is
+a fact of the whole graph and not a tag on one node (decision record
+``dev-graph-blind-view-superseded-versions``).
 
 ``POLICY_VERSION`` is the content hash of every policy in canonical form. A
 package built under one version is refused under another, so a policy edit
@@ -63,7 +69,7 @@ _ALL_PREDICATES: frozenset[str] = frozenset(RELATIONSHIPS)
 
 @dataclass(frozen=True)
 class ViewPolicy:
-    """What one view may see. Every field is a closed-vocabulary set."""
+    """What one view may see: closed-vocabulary sets, a depth and one switch."""
 
     view: str
     permitted_types: frozenset[str]
@@ -71,6 +77,9 @@ class ViewPolicy:
     max_depth: int
     forbidden_types: frozenset[str] = frozenset()
     forbidden_tags: frozenset[str] = frozenset()
+    #: Refuse every node derived from a superseded document version
+    #: (:func:`runner.dev_graph.builder.superseded_versions`).
+    hide_superseded_versions: bool = False
 
     def __post_init__(self) -> None:
         if self.view not in VIEWS:
@@ -94,6 +103,7 @@ class ViewPolicy:
             "max_depth": self.max_depth,
             "forbidden_types": sorted(self.forbidden_types),
             "forbidden_tags": sorted(self.forbidden_tags),
+            "hide_superseded_versions": self.hide_superseded_versions,
         }
 
     def node_tags(self, node: Mapping[str, Any]) -> frozenset[str]:
@@ -147,6 +157,7 @@ VIEW_POLICIES: Mapping[str, ViewPolicy] = {
             max_depth=3,
             forbidden_types=_FEEDBACK_TYPES | {"change_request"},
             forbidden_tags=HISTORICAL_FEEDBACK_TAGS,
+            hide_superseded_versions=True,
         ),
         ViewPolicy(
             "historical_feedback_analysis",

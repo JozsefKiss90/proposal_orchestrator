@@ -6,12 +6,12 @@
   "milestone": "Dev Graph milestone 1, ticket 'Bounded evidence package builder with view policies'",
   "authority": "CLAUDE.md §9.4, §10.5 (traceable inputs), §11.5 and §13.8 (a gap is flagged, never filled). Not a constitutional amendment. The policies are data in runner/dev_graph/policies.py; changing one changes the policy version and needs a test.",
   "decision": "An evidence package is built for one task under one view policy and one budget. The policy is applied before graph expansion. Six views exist, one policy each. The manifest records every inclusion with its reason, every exclusion with its reason, every unresolved item, and a completeness status. Over-budget required evidence yields incomplete, never a silent drop.",
-  "policy_version": "sha256:61b1c31497b998d7a46069636089d368482633b862068be26180a9ad39de807c",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
   "views": {
     "engineering": "all types, all traversals, depth 3, nothing forbidden.",
     "controlled_revision": "project, evidence and change types; no validated_by traversal; depth 2; assessment and finding forbidden.",
     "integrity_audit": "all types, all traversals, depth 3, nothing forbidden.",
-    "blind_pre_evaluation": "project and evidence types; no validated_by or supersedes traversal; depth 3; assessment, finding and change_request forbidden; any node tagged historical_feedback, historical_score, target_score or repair_plan forbidden.",
+    "blind_pre_evaluation": "project and evidence types; no validated_by or supersedes traversal; depth 3; assessment, finding and change_request forbidden; any node tagged historical_feedback, historical_score, target_score or repair_plan forbidden. Superseded document versions hidden (hide_superseded_versions, added 2026-09-29; see dev-graph-blind-view-superseded-versions).",
     "historical_feedback_analysis": "project, evidence, assessment and finding types; all traversals; depth 2; change_request and revision_contract forbidden.",
     "change_impact_planning": "all types, all traversals, depth 4, nothing forbidden."
   },
@@ -40,5 +40,17 @@
     "assessment, finding and change_request nodes from records: the builder does not produce them yet, so the tests add them to a built snapshot through Snapshot.from_graph.",
     "binding the writer to a manifest node (§16.5). Like dev_graph_snapshot_writer it is registered but unbound; nothing dispatches it inside a run yet."
   ],
-  "verification": "tests/runner/test_dev_graph_packages.py: mandatory items survive a budget that excludes ranked items; a forbidden type reachable only by expansion is excluded policy_forbidden and a permitted node behind it is never reached; a tagged source is forbidden for the blind view and visible to the audit view; required over budget yields incomplete and a listed item; stale snapshot and stale policy are refused; unresolved claims and both contradictions appear; identical inputs share hash and id; byte-equal replay through the registry; the lint covers the new modules."
+  "verification": "tests/runner/test_dev_graph_packages.py: mandatory items survive a budget that excludes ranked items; a forbidden type reachable only by expansion is excluded policy_forbidden and a permitted node behind it is never reached; a tagged source is forbidden for the blind view and visible to the audit view; required over budget yields incomplete and a listed item; stale snapshot and stale policy are refused; unresolved claims and both contradictions appear; identical inputs share hash and id; byte-equal replay through the registry; the lint covers the new modules.",
+  "policy_version_history": [
+    {
+      "date": "2026-09-24",
+      "policy_version": "sha256:61b1c31497b998d7a46069636089d368482633b862068be26180a9ad39de807c",
+      "change": "initial six policies"
+    },
+    {
+      "date": "2026-09-29",
+      "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+      "change": "hide_superseded_versions field; true for blind_pre_evaluation"
+    }
+  ]
 }

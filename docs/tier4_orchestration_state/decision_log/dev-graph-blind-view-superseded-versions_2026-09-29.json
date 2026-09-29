@@ -1,0 +1,19 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-blind-view-superseded-versions",
+  "date": "2026-09-29",
+  "branch": "dev_graph",
+  "milestone": "Dev Graph milestone 1, follow-up ticket 'blind view excludes superseded candidate versions'",
+  "authority": "CLAUDE.md §9.4 (durable decision), §11.5 and §13.8 (a gap is flagged, never filled), §12.1 (reviewable outputs). Not a constitutional amendment. Supplements dev-graph-view-policies; that entry's policy_version field is updated to the new hash and its policy_version_history keeps the prior one.",
+  "problem": "The blind pre-evaluation policy forbade the supersedes traversal, but the superseded version's passages still entered a blind package built around the new version, through the objective node both versions address. The milestone closure test pinned the gap as a strict xfail.",
+  "options": {
+    "view_policy_marker": "the builder stamps a superseded marker (a tag) on every node derived from a superseded snapshot, and the blind policy forbids the tag. Rejected: dev-graph-view-policies rules that the graph never adds a tag; a stamp would change every snapshot id that carries a supersession and would copy a relational fact onto each node.",
+    "package_builder_exclusion": "the package builder computes the superseded snapshot ids from the graph and refuses every node derived from one, when the view asks for it. Chosen."
+  },
+  "decision": "ViewPolicy gains a boolean field hide_superseded_versions, true for blind_pre_evaluation only. When it is set, the package builder computes the superseded snapshot ids before expansion and refuses every node derived from one, exactly as it refuses a forbidden type or tag: the node is never a step in a traversal, and where it is adjacent to an included node it is recorded as an exclusion with reason policy_forbidden and detail superseded_version:<snapshot id>. A superseded version cannot be a blind seed (policy_forbidden). The manifest vocabulary is unchanged; POLICY_VERSION moves.",
+  "superseded_means": "an artifact_version node that is the target of a supersedes edge, or whose state field is superseded. Both are declared fields; nothing is inferred. Every superseded version is hidden, not only versions of the seed's own document: an evaluator of a blind package sees current wording only.",
+  "derived_from_a_version": "the artifact_version node itself, and every passage, claim and commitment whose content.document names it. Source spans belong to sources, not documents, and are not affected.",
+  "other_views": "controlled_revision, engineering, integrity_audit, historical_feedback_analysis and change_impact_planning keep hide_superseded_versions false and still see the previous version; the revision workflow needs it.",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+  "verification": "tests/runner/test_dev_graph_packages.py: only the blind view hides superseded versions; a blind package around the new version carries nothing of the old one and records its nodes as policy_forbidden superseded_version:<id>; a superseded version is refused as a blind seed; controlled_revision still includes both versions; a state-superseded snapshot without an edge is hidden. tests/harness/test_dev_graph_t03_end_to_end.py::test_blind_package_around_a_new_version_excludes_the_superseded_version passes with its xfail marker removed."
+}

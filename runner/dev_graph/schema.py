@@ -190,6 +190,9 @@ DOCUMENT_STATES: frozenset[str] = frozenset(
 #: a current commitment.
 CURRENT_DOCUMENT_STATES: frozenset[str] = frozenset({"imported", "draft"})
 
+#: The state a snapshot carries once a later version has replaced it.
+SUPERSEDED_STATE: str = "superseded"
+
 #: A claim's declared status: the CLAUDE.md §12.2 vocabulary. Fed by the
 #: evidence-strength lookup (``runner.graph_schema.EVIDENCE_TO_STATUS``) and,
 #: for ``Assumed``, by an explicit declaration over an ``Unresolved`` lookup.

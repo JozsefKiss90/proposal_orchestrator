@@ -13,6 +13,11 @@ Selection, in order, all deterministic:
 2. **Apply the policy before expansion.** Every node is classified once by
    :meth:`ViewPolicy.refusal`; a refused node is never a step in a traversal,
    and an edge whose predicate the view does not permit is never followed.
+   A view that hides superseded versions also refuses every node derived
+   from one, with detail ``superseded_version:<snapshot id>``. Which
+   snapshots are superseded is a fact of the whole graph, so the builder
+   computes it here (:func:`runner.dev_graph.builder.superseded_versions`)
+   rather than in the per-node policy lookup.
 3. **Expand** from the seed over the permitted graph, breadth first, to the
    view's maximum depth. Each reached node records the edges traversed.
 4. **Mark mandatory** the nodes reached from the seed through the mandatory
@@ -56,7 +61,12 @@ from typing import Any, Mapping
 
 from runner.atomic_write import atomic_write_json
 from runner.claim_status import worst_status
-from runner.dev_graph.builder import Snapshot, build_snapshot
+from runner.dev_graph.builder import (
+    Snapshot,
+    build_snapshot,
+    derived_from_version,
+    superseded_versions,
+)
 from runner.dev_graph.identity import HASH_PREFIX, canonical_json, content_hash
 from runner.dev_graph.policies import POLICY_VERSION, VIEW_POLICIES, ViewPolicy
 from runner.dev_graph.schema import CURRENT_DOCUMENT_STATES, DevGraphError, edge_label
@@ -296,6 +306,12 @@ def build_package(
     )
     nodes = {n["id"]: n for n in snapshot.nodes}
     refusals = {nid: policy.refusal(n) for nid, n in nodes.items()}
+    if policy.hide_superseded_versions:
+        stale = superseded_versions(snapshot)
+        for nid, n in nodes.items():
+            origin = derived_from_version(n)
+            if refusals[nid] is None and origin in stale:
+                refusals[nid] = f"superseded_version:{origin}"
     if refusals[task] is not None:
         raise _refuse(
             "policy_forbidden", task, f"task {task!r} is not visible under view {view!r}: {refusals[task]}"

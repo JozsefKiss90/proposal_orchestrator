@@ -33,15 +33,19 @@ from runner.dev_graph import (
     Snapshot,
     build_package,
     build_snapshot,
+    create_candidate_version,
     import_document,
+    record_change,
     write_package,
 )
+from runner.dev_graph.builder import WP_SEED_REL
 from runner.dev_graph.identity import content_hash
 from runner.paths import find_repo_root
 
 FIXTURE = find_repo_root() / "tests" / "fixtures" / "dev_graph_synthetic"
 CANDIDATE = Path("docs/tier5_deliverables/candidates/synthetic_candidate.json")
 SOURCES = Path("docs/tier3_project_instantiation/source_materials/sources.json")
+CANDIDATE_V2 = Path("docs/tier5_deliverables/candidates/synthetic_candidate_v2.json")
 
 BIG = 100_000
 
@@ -116,6 +120,21 @@ def _edge(snap_nodes: list[dict], src: str, pred: str, dst: str) -> dict:
     }
 
 
+def _supersede(root: Path) -> tuple[str, str]:
+    """Import the fixture candidate, then a second version that supersedes it.
+    Returns ``(first_id, second_id)``."""
+    first = import_document(root, CANDIDATE)
+    seed = _load(root, WP_SEED_REL)
+    t03 = next(t for t in seed["work_packages"][0]["tasks"] if t["task_id"] == "T03")
+    t03["responsible_partner"] = "P-C"
+    change = record_change(root, WP_SEED_REL, seed, change_id="CR-1")
+    doc = _load(root, CANDIDATE)
+    doc["commitments"][0]["text"] = "Participant C leads Task three."
+    _dump(root, CANDIDATE_V2, doc)
+    second = create_candidate_version(root, CANDIDATE_V2, supersedes=first.id, change_id=change.change_id)
+    return first.id, second.id
+
+
 # --------------------------------------------------------------------------- #
 # View policies are closed configuration data
 # --------------------------------------------------------------------------- #
@@ -148,6 +167,11 @@ class TestViewPolicies:
         p = VIEW_POLICIES["blind_pre_evaluation"]
         assert {"assessment", "finding", "change_request"} <= p.forbidden_types
         assert "historical_feedback" in p.forbidden_tags
+
+    def test_only_the_blind_view_hides_superseded_versions(self):
+        hidden = {v for v, p in VIEW_POLICIES.items() if p.hide_superseded_versions}
+        assert hidden == {"blind_pre_evaluation"}
+        assert all("hide_superseded_versions" in p.to_dict() for p in VIEW_POLICIES.values())
 
     def test_policy_version_is_a_content_hash_of_the_policies(self):
         assert POLICY_VERSION.startswith("sha256:")
@@ -374,6 +398,75 @@ class TestPolicy:
         pkg = _pkg(snap)
         depth = VIEW_POLICIES["engineering"].max_depth
         assert all(len(i["path"]) <= depth for i in pkg.manifest["included"])
+
+
+
+    def test_blind_view_excludes_every_node_derived_from_a_superseded_version(self, tmp_path: Path):
+        """A blind package around the new version must not carry the old
+        version's passages, claims or commitments, even though the shared
+        objective node still links to them. The old version's nodes are
+        refused before expansion and recorded as exclusions naming the
+        superseded snapshot."""
+        root = tmp_path / "repo"
+        shutil.copytree(FIXTURE, root)
+        first_id, second_id = _supersede(root)
+        snap = build_snapshot(root)
+        pkg = _pkg(snap, task=second_id, view="blind_pre_evaluation")
+        included = _included_ids(pkg)
+        assert f"{second_id}#S1" in included
+        assert not any(i.startswith(first_id) for i in included), sorted(included)
+        stale = [e for e in pkg.manifest["exclusions"] if e["id"].startswith(first_id)]
+        assert stale, "the superseded version's nodes are adjacent to the objective; they must be recorded"
+        assert {e["reason"] for e in stale} == {"policy_forbidden"}
+        assert {e["detail"] for e in stale} == {f"superseded_version:{first_id}"}
+        assert not any(i["id"].startswith(first_id) for i in pkg.items)
+
+    def test_a_superseded_version_is_not_a_blind_seed(self, tmp_path: Path):
+        root = tmp_path / "repo"
+        shutil.copytree(FIXTURE, root)
+        first_id, _ = _supersede(root)
+        snap = build_snapshot(root)
+        with pytest.raises(DevGraphError) as exc:
+            _pkg(snap, task=first_id, view="blind_pre_evaluation")
+        assert exc.value.kind == "policy_forbidden"
+        assert first_id in str(exc.value)
+
+    def test_controlled_revision_still_sees_the_superseded_version(self, tmp_path: Path):
+        root = tmp_path / "repo"
+        shutil.copytree(FIXTURE, root)
+        first_id, second_id = _supersede(root)
+        snap = build_snapshot(root)
+        pkg = _pkg(snap, task="T03", view="controlled_revision")
+        included = _included_ids(pkg)
+        assert any(i.startswith(first_id) for i in included), sorted(included)
+        assert any(i.startswith(second_id) for i in included), sorted(included)
+        assert not any(e["detail"].startswith("superseded_version") for e in pkg.manifest["exclusions"])
+        # And the old version can still be a seed under a view that sees it.
+        assert first_id in _included_ids(_pkg(snap, task=first_id, view="engineering"))
+
+    def test_a_state_superseded_snapshot_is_hidden_without_an_edge(self, snap: Snapshot):
+        """The state field alone marks a version as history."""
+        doc = next(n for n in snap.nodes if n["type"] == "artifact_version")
+        stale_content = {**doc["content"], "state": "superseded", "content_version": "sha256:" + "1" * 64}
+        stale_id = f"{doc['content']['document_id']}@1111111111111111"
+        stale = _node(stale_id, "artifact_version", stale_content)
+        passage = _node(
+            f"{stale_id}#S1",
+            "passage",
+            {"section_id": "S1", "content": "old", "document": stale_id, "addresses": ["OBJ-1"]},
+        )
+        nodes = [stale, passage]
+        all_nodes = list(snap.nodes) + nodes
+        edges = [
+            _edge(all_nodes, passage["id"], "expressed_in", stale_id),
+            _edge(all_nodes, passage["id"], "addresses", "OBJ-1"),
+        ]
+        widened = _with_extra(snap, nodes, edges)
+        pkg = _pkg(widened, task="OBJ-1", view="blind_pre_evaluation")
+        assert not any(i.startswith(stale_id) for i in _included_ids(pkg))
+        hit = next(e for e in pkg.manifest["exclusions"] if e["id"] == passage["id"])
+        assert hit["detail"] == f"superseded_version:{stale_id}"
+        assert passage["id"] in _included_ids(_pkg(widened, task="OBJ-1", view="engineering"))
 
 
 # --------------------------------------------------------------------------- #

@@ -61,7 +61,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, Sequence
+from typing import Any, Iterator, Mapping, Sequence
 
 from runner.dev_graph.documents import (
     document_node_id,
@@ -73,6 +73,7 @@ from runner.dev_graph.documents import (
 from runner.dev_graph.identity import content_hash, snapshot_id
 from runner.dev_graph.schema import (
     CURRENT_DOCUMENT_STATES,
+    SUPERSEDED_STATE,
     DevGraphError,
     validate_graph,
 )
@@ -530,7 +531,7 @@ def current_commitments(snapshot: Snapshot) -> list[dict[str, Any]]:
         for n in snapshot.nodes
         if n["type"] == "artifact_version"
     }
-    superseded = {e["target"]["id"] for e in snapshot.edges if e["predicate"] == "supersedes"}
+    superseded = superseded_versions(snapshot)
     return [
         n
         for n in snapshot.nodes
@@ -538,3 +539,37 @@ def current_commitments(snapshot: Snapshot) -> list[dict[str, Any]]:
         and states.get(n["content"].get("document")) in CURRENT_DOCUMENT_STATES
         and n["content"].get("document") not in superseded
     ]
+
+
+def superseded_versions(snapshot: Snapshot) -> frozenset[str]:
+    """The document snapshot ids that are history.
+
+    A snapshot is superseded when a later version ``supersedes`` it (the
+    edge) or when its own state says so. Pure lookup over declared fields.
+    """
+    by_state = {
+        n["id"]
+        for n in snapshot.nodes
+        if n["type"] == "artifact_version" and n["content"].get("state") == SUPERSEDED_STATE
+    }
+    by_edge = {e["target"]["id"] for e in snapshot.edges if e["predicate"] == "supersedes"}
+    return frozenset(by_state | by_edge)
+
+
+#: Node types derived from one document snapshot. Each names the snapshot
+#: under ``content.document``.
+DOCUMENT_DERIVED_TYPES: frozenset[str] = frozenset({"passage", "claim", "commitment"})
+
+
+def derived_from_version(node: Mapping[str, Any]) -> str | None:
+    """The document snapshot id *node* is derived from, or ``None``.
+
+    The snapshot node is its own origin. Source spans belong to sources,
+    not documents, and return ``None``.
+    """
+    if node["type"] == "artifact_version":
+        return node["id"]
+    if node["type"] in DOCUMENT_DERIVED_TYPES:
+        doc = node["content"].get("document")
+        return doc if isinstance(doc, str) else None
+    return None
