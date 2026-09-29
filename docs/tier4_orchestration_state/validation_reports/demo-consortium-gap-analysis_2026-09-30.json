@@ -1,0 +1,957 @@
+{
+  "report_id": "demo_consortium_gap_analysis_2026-09-30",
+  "report_kind": "consortium gap analysis and composition check",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Anonymised consortium with fictional gap partners' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §12.1 (a reviewable output names its inputs by tier and file, states its inferences and flags its assumptions) and §12.2 (the four status categories). A ticket-authored report. No gate reads it.",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "instrument_type": "RIA",
+  "question_asked": "Does the twelve-partner consortium cover every requirement the topic places on it, and does it satisfy the Tier 1 consortium-composition condition?",
+  "answer": "Every one of the 20 requirements the Tier 2B extract carries has at least one covering partner. Six of the twelve partners are fictional, so every coverage claim carries Assumed. The composition condition is met by the consortium as designed, not met by the derived six alone, and still met with any single gap partner removed. Two realms rest on one partner each, which is the consortium's real exposure. The branch is not anonymity-clean: one pre-existing leak stands in a Tier 4 purge record, recorded as finding F8.",
+  "inputs": [
+    {
+      "tier": "1",
+      "path": "docs/tier1_normative_framework/extracted/participation_rules.json",
+      "role": "the consortium-composition condition, its thresholds and its verbatim spans; and the country lists the pseudonymity check reads"
+    },
+    {
+      "tier": "2B",
+      "path": "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+      "role": "every requirement in the coverage table, located by the tier2b_span_ref of its row"
+    },
+    {
+      "tier": "3",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "role": "the twelve partners, their capabilities and their country slots"
+    },
+    {
+      "tier": "3",
+      "path": "docs/tier3_project_instantiation/consortium/roles.json",
+      "role": "the role each partner holds and the coordination commitments"
+    },
+    {
+      "tier": "3",
+      "path": "docs/tier3_project_instantiation/working_assumptions.json",
+      "role": "the operator declarations that make each Assumed status conscious"
+    },
+    {
+      "tier": "n/a",
+      "path": "instance-one Part B-1",
+      "role": "the source of the six derived capability profiles. Held by the operator outside the repository, so no line of it is quoted here."
+    }
+  ],
+  "outputs": [
+    "docs/tier3_project_instantiation/consortium/partners.json",
+    "docs/tier3_project_instantiation/consortium/roles.json",
+    "docs/tier3_project_instantiation/working_assumptions.json",
+    "docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json",
+    "docs/tier4_orchestration_state/decision_log/demo-consortium_2026-09-30.json",
+    "runner/consortium_composition.py",
+    "runner/leakage_scan.py",
+    "tests/runner/test_consortium_composition.py",
+    "tests/runner/test_leakage_scan.py",
+    "tests/test_demo_consortium.py"
+  ],
+  "requirement_coverage": [
+    {
+      "requirement_id": "EO1",
+      "requirement_class": "expected_outcome",
+      "requirement": "Policy-relevant ecosystem assessment, restoration planning and biodiversity trend prediction on fit-for-purpose data.",
+      "tier2b_span_ref": "$.expected_outcomes[0]",
+      "covering_partners": [
+        "P12",
+        "P11",
+        "P10"
+      ],
+      "how_covered": "P12 runs the trend prediction and the European-scale mapping it rests on. P11 supplies the assessment and restoration-planning frame. P10 makes the underlying data fit for purpose.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "EO2",
+      "requirement_class": "expected_outcome",
+      "requirement": "Integration of data across sensors and platforms, from omics-based data (genomic, transcriptomic, metabolomic) through in-situ to satellite earth observation.",
+      "tier2b_span_ref": "$.expected_outcomes[1]",
+      "covering_partners": [
+        "P09",
+        "P01",
+        "P02",
+        "P07",
+        "P08"
+      ],
+      "how_covered": "P09 covers the genomic and transcriptomic layers, P01 the metabolomic one. P02 spans field spectroscopy to satellite earth observation. P07 and P08 add in-situ observation in the other two realms.",
+      "status": "Assumed",
+      "note": "The derived six cover only the metabolomic limb. P09 is the partner that makes this outcome answerable at all."
+    },
+    {
+      "requirement_id": "EO3",
+      "requirement_class": "expected_outcome",
+      "requirement": "In-situ datasets made usable as training and validation resources for statistical, machine learning and artificial-intelligence approaches.",
+      "tier2b_span_ref": "$.expected_outcomes[2]",
+      "covering_partners": [
+        "P03",
+        "P01",
+        "P12",
+        "P04"
+      ],
+      "how_covered": "P03 holds the multi-season field archive that becomes the training and validation set. P01 supplies the statistical design and the leakage-safe validation protocol. P12 consumes the sets. P04 makes the pipeline reproducible.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "SR1",
+      "requirement_class": "scope_requirement",
+      "requirement": "Fit-for-purpose multisensory data integration systems harmonising omics-based and in-situ data with remote sensing, socio-ecological and climatic data.",
+      "tier2b_span_ref": "$.scope_requirements[0]",
+      "covering_partners": [
+        "P02",
+        "P09",
+        "P10",
+        "P11",
+        "P04"
+      ],
+      "how_covered": "P02 harmonises the sensors, P09 the omics layer, P10 the data standards. P11 supplies the socio-ecological and climatic data the requirement names alongside them. P04 builds the system.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "SR2",
+      "requirement_class": "scope_requirement",
+      "requirement": "Technical capabilities answering diverse use cases across terrestrial, freshwater and marine ecosystems in Member States and Associated Countries, prioritising knowledge gaps and data needs.",
+      "tier2b_span_ref": "$.scope_requirements[1]",
+      "covering_partners": [
+        "P03",
+        "P07",
+        "P08",
+        "P11",
+        "P12"
+      ],
+      "how_covered": "One demonstration realm each: P03 terrestrial, P07 freshwater, P08 coastal and marine. P11 prioritises the knowledge gaps against policy needs. P12 supplies the predictive analytics the requirement asks for.",
+      "status": "Assumed",
+      "note": "The requirement also asks for Member States and Associated Countries. Four Member State slots and two Associated Country slots are covered, all Assumed."
+    },
+    {
+      "requirement_id": "SR3",
+      "requirement_class": "scope_requirement",
+      "requirement": "Demonstration and verification cases on ecosystems and habitats under pressure, including ecotones, taking socio-economic pressures into account and interoperable with the European and global typologies.",
+      "tier2b_span_ref": "$.scope_requirements[2]",
+      "covering_partners": [
+        "P07",
+        "P08",
+        "P03",
+        "P11",
+        "P10",
+        "P12"
+      ],
+      "how_covered": "P07 supplies the floodplain and riparian ecotones next to farmland, P08 the coastal transitional waters, P03 the agricultural and grassland pressure gradient. P11 analyses the land-use and sea-use pressures. P10 owns the typology crosswalks and P12 the mapping the cases are judged on.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "SR4",
+      "requirement_class": "scope_requirement",
+      "requirement": "Findable, accessible, interoperable and reusable data, harmonisation workflows and processing protocols from genome to space, linked to the relevant data infrastructures.",
+      "tier2b_span_ref": "$.scope_requirements[3]",
+      "covering_partners": [
+        "P10",
+        "P04",
+        "P09",
+        "P02"
+      ],
+      "how_covered": "P10 owns the data principles, the metadata profile and the infrastructure links. P04 owns the workflows and their provenance. P09 and P02 close the genome-to-space chain at its two ends.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "SR5",
+      "requirement_class": "scope_requirement",
+      "requirement": "Contribution to consensus on joint definitions of data collection, metadata and processing protocols, data quality and harmonisation of standards.",
+      "tier2b_span_ref": "$.scope_requirements[4]",
+      "covering_partners": [
+        "P10",
+        "P09",
+        "P01"
+      ],
+      "how_covered": "P10 carries the standards work into the biodiversity data community. P09 supplies the omics metadata standard. P01 supplies the measurement and calibration protocols the definitions have to accommodate.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "REALM-terrestrial",
+      "requirement_class": "ecosystem_realm",
+      "requirement": "Terrestrial ecosystems.",
+      "tier2b_span_ref": "$.ecosystem_realms.realms[0]",
+      "covering_partners": [
+        "P01",
+        "P02",
+        "P03",
+        "P05",
+        "P06"
+      ],
+      "how_covered": "The derived partners' own realm: agricultural landscapes, grasslands and horticultural production contexts.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "REALM-freshwater",
+      "requirement_class": "ecosystem_realm",
+      "requirement": "Freshwater ecosystems.",
+      "tier2b_span_ref": "$.ecosystem_realms.realms[1]",
+      "covering_partners": [
+        "P07"
+      ],
+      "how_covered": "P07 alone. Rivers, lakes, wetlands and the ecotones adjoining farmland.",
+      "status": "Assumed",
+      "note": "Single-partner coverage. If P07 is not confirmed, this realm is uncovered and the second scope requirement fails, although the composition condition still holds."
+    },
+    {
+      "requirement_id": "REALM-marine",
+      "requirement_class": "ecosystem_realm",
+      "requirement": "Marine ecosystems.",
+      "tier2b_span_ref": "$.ecosystem_realms.realms[2]",
+      "covering_partners": [
+        "P08"
+      ],
+      "how_covered": "P08 alone. Coastal and benthic habitats and transitional waters.",
+      "status": "Assumed",
+      "note": "Single-partner coverage, the same exposure as the freshwater realm."
+    },
+    {
+      "requirement_id": "CC-gbif_obis_lucas_cooperation",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "Resources earmarked for cooperation with the in-situ data collection frameworks the topic names.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.gbif_obis_lucas_cooperation.source_span",
+      "covering_partners": [
+        "P10",
+        "P08",
+        "P03",
+        "P01"
+      ],
+      "how_covered": "P10 holds the publication route into the global biodiversity data facility, P08 the marine occurrence records, P03 and P01 the in-situ side. Its owner is recorded in roles.json coordination_interfaces.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "CC-jrc_participation",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "A place for a Joint Research Centre contribution, coordinating with the Commission knowledge centre.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.jrc_participation.source_span",
+      "covering_partners": [
+        "P10",
+        "P01"
+      ],
+      "how_covered": "P10 owns the interface a contribution would attach to and P01 the consortium agreement route. The topic makes this optional, so the design leaves the place open and counts nothing.",
+      "status": "Assumed",
+      "note": "Permissive requirement. The Joint Research Centre is not counted towards the composition condition, because it takes no part in preparing the proposal."
+    },
+    {
+      "requirement_id": "CC-lucas_grassland_and_embal",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "Incorporation of in-situ data from the Commission-steered biodiversity monitoring schemes the topic names, including the grassland module.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.lucas_grassland_and_embal.source_span",
+      "covering_partners": [
+        "P03",
+        "P10",
+        "P11"
+      ],
+      "how_covered": "P03 works the grassland and agricultural-landscape in-situ data against its own field archive. P10 harmonises it. P11 links it to the pressure analysis.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "CC-eunis_and_global_ecosystem_typology",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "Demonstration cases interoperable with the European habitat classification and a global ecosystem typology.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.eunis_and_global_ecosystem_typology.source_span",
+      "covering_partners": [
+        "P10",
+        "P12",
+        "P08"
+      ],
+      "how_covered": "P10 owns the crosswalks between the two typologies. P12 classifies habitats into them. P08 maps the marine classes.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "CC-eosc_and_common_data_spaces",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "Observation data linked to the relevant data infrastructures, including the European open science cloud and the common data spaces.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.eosc_and_common_data_spaces.source_span",
+      "covering_partners": [
+        "P10",
+        "P04"
+      ],
+      "how_covered": "P10 integrates the project's services into the open science cloud. P04 builds the interfaces.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "CC-esa_futureo_coordination",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "Sufficient means for coordination with the projects selected under the European Space Agency earth observation programme the topic names.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.esa_futureo_coordination.source_span",
+      "covering_partners": [
+        "P02",
+        "P01",
+        "P12"
+      ],
+      "how_covered": "P02 holds the earth observation science interface and P01 the coordination resource. P12 aligns the analytics. Its owner is recorded in roles.json coordination_interfaces.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "CC-copernicus_galileo_egnos",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "Mandatory use of the European earth observation and positioning programmes once the project uses satellite data. This is an eligibility condition.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.copernicus_galileo_egnos.source_span",
+      "covering_partners": [
+        "P12",
+        "P02",
+        "P08"
+      ],
+      "how_covered": "P12's classification runs on the European radar and optical missions. P02 processes the same missions' data. P08 adds the ocean-colour products.",
+      "status": "Assumed",
+      "note": "The only requirement in this table that is an eligibility condition rather than a scope expectation. A design that met it only partially would be inadmissible, not merely weak."
+    },
+    {
+      "requirement_id": "CC-policy_reporting_alignment",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "Alignment with the reporting requirements under the nature, habitat, marine and restoration instruments the topic names.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.policy_reporting_alignment.source_span",
+      "covering_partners": [
+        "P11",
+        "P08",
+        "P07"
+      ],
+      "how_covered": "P11 translates the reporting requirements into data needs. P08 carries the marine indicators, P07 the freshwater ones aligned to water-policy reporting.",
+      "status": "Assumed"
+    },
+    {
+      "requirement_id": "CC-research_infrastructures",
+      "requirement_class": "cross_cutting_requirement",
+      "requirement": "Services offered by European research infrastructures may be considered.",
+      "tier2b_span_ref": "$.cross_cutting_requirements.research_infrastructures.source_span",
+      "covering_partners": [
+        "P10",
+        "P09"
+      ],
+      "how_covered": "P10 already integrates services into the European research-infrastructure landscape. P09 uses sequencing and bioinformatics services from it.",
+      "status": "Assumed",
+      "note": "Permissive requirement. Named so the table covers every requirement the extract carries, not because the topic obliges it."
+    }
+  ],
+  "requirement_coverage_note": "One row per requirement the Tier 2B extract carries: three expected outcomes, five scope requirements and nine cross-cutting requirements, which is the 17 the extract enumerates. The three ecosystem_realm rows are not a fourth class the extract declares. They break out the realm limb of SR2, which the extract records separately in its ecosystem_realms block and which drove every capability gap, so each realm can be traced to its covering partner on its own. No row is left without a covering partner. Every row carries Assumed, because every partner's participation is Assumed. A covering partner is named only where its capability list in partners.json supports the claim.",
+  "gaps_the_derived_six_left": [
+    {
+      "gap": "No freshwater expertise.",
+      "requirement_exposed": [
+        "SR2",
+        "SR3",
+        "REALM-freshwater"
+      ],
+      "closed_by": "P07"
+    },
+    {
+      "gap": "No marine expertise.",
+      "requirement_exposed": [
+        "SR2",
+        "SR3",
+        "REALM-marine",
+        "CC-policy_reporting_alignment"
+      ],
+      "closed_by": "P08"
+    },
+    {
+      "gap": "No genomic, transcriptomic or environmental DNA capability. P01's metabolomics is the only omics layer.",
+      "requirement_exposed": [
+        "EO2",
+        "SR1",
+        "SR4",
+        "SR5"
+      ],
+      "closed_by": "P09"
+    },
+    {
+      "gap": "No biodiversity data-infrastructure partner, so nothing to carry the cooperation with the named in-situ frameworks, the typology crosswalks or the open-science-cloud link.",
+      "requirement_exposed": [
+        "SR4",
+        "SR5",
+        "CC-gbif_obis_lucas_cooperation",
+        "CC-eunis_and_global_ecosystem_typology",
+        "CC-eosc_and_common_data_spaces"
+      ],
+      "closed_by": "P10"
+    },
+    {
+      "gap": "No socio-ecological or socio-economic pressure analysis.",
+      "requirement_exposed": [
+        "SR1",
+        "SR3",
+        "CC-policy_reporting_alignment"
+      ],
+      "closed_by": "P11"
+    },
+    {
+      "gap": "No artificial-intelligence habitat mapping or trend prediction at European scale.",
+      "requirement_exposed": [
+        "EO1",
+        "EO3",
+        "SR2",
+        "SR3"
+      ],
+      "closed_by": "P12"
+    },
+    {
+      "gap": "Only two country slots, both Member State, which fails the Tier 1 composition condition.",
+      "requirement_exposed": [
+        "composition_condition"
+      ],
+      "closed_by": "P07, P08, P09, P10, P11 and P12, which add four slots"
+    }
+  ],
+  "composition_check": {
+    "rule_source": "docs/tier1_normative_framework/extracted/participation_rules.json -> consortium_composition",
+    "rule_text": "A consortium is eligible only if it includes, as beneficiaries, three legal entities independent from each other, each established in a different country, of which at least one is established in a Member State and at least two others are established in different Member States or Associated Countries.",
+    "thresholds": {
+      "minimum_independent_beneficiaries": 3,
+      "minimum_distinct_countries": 3,
+      "minimum_in_a_member_state": 1,
+      "minimum_others_in_member_or_associated_countries": 2,
+      "affiliated_entities_count_towards_the_minimum": false
+    },
+    "citations": [
+      {
+        "quote": "the consortium includes, as beneficiaries, three legal entities independent from each other and each established in a different country as follows:",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 13,
+        "source_section": "Annex B - Eligibility, 'Consortium composition'",
+        "limb": "independent_beneficiaries"
+      },
+      {
+        "quote": "at least one independent legal entity established in a Member State; and",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 14,
+        "source_section": "Annex B - Eligibility, 'Consortium composition'",
+        "limb": "member_state"
+      },
+      {
+        "quote": "at least two other independent legal entities, each established in different Member States or Associated Countries.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 14,
+        "source_section": "Annex B - Eligibility, 'Consortium composition'",
+        "limb": "other_countries"
+      },
+      {
+        "quote": "As affiliated entities do not sign the grant agreement, they do not count towards the minimum eligibility criteria for consortium composition (if any).",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 14,
+        "source_section": "Annex B - Eligibility, 'Consortium composition'",
+        "limb": "affiliated_entities"
+      }
+    ],
+    "evaluated_by": "runner/consortium_composition.py",
+    "scenarios": [
+      {
+        "scenario": "all_partners",
+        "question": "Does the consortium as designed meet the condition?",
+        "partners_evaluated": 12,
+        "result": {
+          "met": true,
+          "counted": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08",
+            "P09",
+            "P10",
+            "P11",
+            "P12"
+          ],
+          "excluded": [],
+          "distinct_country_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6"
+          ],
+          "member_state_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C5"
+          ],
+          "associated_country_slots": [
+            "C4",
+            "C6"
+          ],
+          "other_slots": [],
+          "failed_limbs": [],
+          "satisfying_selection": [
+            "P01",
+            "P06",
+            "P07"
+          ],
+          "thresholds": [
+            3,
+            3,
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "scenario": "derived_partners_only",
+        "question": "Do the partners derived from instance one meet it without the fictional gap partners?",
+        "partners_evaluated": 6,
+        "result": {
+          "met": false,
+          "counted": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06"
+          ],
+          "excluded": [],
+          "distinct_country_slots": [
+            "C1",
+            "C2"
+          ],
+          "member_state_slots": [
+            "C1",
+            "C2"
+          ],
+          "associated_country_slots": [],
+          "other_slots": [],
+          "failed_limbs": [
+            "distinct_countries",
+            "other_countries"
+          ],
+          "satisfying_selection": null,
+          "thresholds": [
+            3,
+            3,
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "scenario": "without_P07",
+        "question": "Does it still meet the condition if P07 withdraws before confirmation?",
+        "partners_evaluated": 11,
+        "result": {
+          "met": true,
+          "counted": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P08",
+            "P09",
+            "P10",
+            "P11",
+            "P12"
+          ],
+          "excluded": [],
+          "distinct_country_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6"
+          ],
+          "member_state_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C5"
+          ],
+          "associated_country_slots": [
+            "C4",
+            "C6"
+          ],
+          "other_slots": [],
+          "failed_limbs": [],
+          "satisfying_selection": [
+            "P01",
+            "P06",
+            "P10"
+          ],
+          "thresholds": [
+            3,
+            3,
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "scenario": "without_P08",
+        "question": "Does it still meet the condition if P08 withdraws before confirmation?",
+        "partners_evaluated": 11,
+        "result": {
+          "met": true,
+          "counted": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P09",
+            "P10",
+            "P11",
+            "P12"
+          ],
+          "excluded": [],
+          "distinct_country_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C5",
+            "C6"
+          ],
+          "member_state_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C5"
+          ],
+          "associated_country_slots": [
+            "C6"
+          ],
+          "other_slots": [],
+          "failed_limbs": [],
+          "satisfying_selection": [
+            "P01",
+            "P06",
+            "P07"
+          ],
+          "thresholds": [
+            3,
+            3,
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "scenario": "without_P09",
+        "question": "Does it still meet the condition if P09 withdraws before confirmation?",
+        "partners_evaluated": 11,
+        "result": {
+          "met": true,
+          "counted": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08",
+            "P10",
+            "P11",
+            "P12"
+          ],
+          "excluded": [],
+          "distinct_country_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6"
+          ],
+          "member_state_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C5"
+          ],
+          "associated_country_slots": [
+            "C4",
+            "C6"
+          ],
+          "other_slots": [],
+          "failed_limbs": [],
+          "satisfying_selection": [
+            "P01",
+            "P06",
+            "P07"
+          ],
+          "thresholds": [
+            3,
+            3,
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "scenario": "without_P10",
+        "question": "Does it still meet the condition if P10 withdraws before confirmation?",
+        "partners_evaluated": 11,
+        "result": {
+          "met": true,
+          "counted": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08",
+            "P09",
+            "P11",
+            "P12"
+          ],
+          "excluded": [],
+          "distinct_country_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6"
+          ],
+          "member_state_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C5"
+          ],
+          "associated_country_slots": [
+            "C4",
+            "C6"
+          ],
+          "other_slots": [],
+          "failed_limbs": [],
+          "satisfying_selection": [
+            "P01",
+            "P06",
+            "P07"
+          ],
+          "thresholds": [
+            3,
+            3,
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "scenario": "without_P11",
+        "question": "Does it still meet the condition if P11 withdraws before confirmation?",
+        "partners_evaluated": 11,
+        "result": {
+          "met": true,
+          "counted": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08",
+            "P09",
+            "P10",
+            "P12"
+          ],
+          "excluded": [],
+          "distinct_country_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ],
+          "member_state_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C5"
+          ],
+          "associated_country_slots": [
+            "C4"
+          ],
+          "other_slots": [],
+          "failed_limbs": [],
+          "satisfying_selection": [
+            "P01",
+            "P06",
+            "P07"
+          ],
+          "thresholds": [
+            3,
+            3,
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "scenario": "without_P12",
+        "question": "Does it still meet the condition if P12 withdraws before confirmation?",
+        "partners_evaluated": 11,
+        "result": {
+          "met": true,
+          "counted": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08",
+            "P09",
+            "P10",
+            "P11"
+          ],
+          "excluded": [],
+          "distinct_country_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6"
+          ],
+          "member_state_slots": [
+            "C1",
+            "C2",
+            "C3",
+            "C5"
+          ],
+          "associated_country_slots": [
+            "C4",
+            "C6"
+          ],
+          "other_slots": [],
+          "failed_limbs": [],
+          "satisfying_selection": [
+            "P01",
+            "P06",
+            "P07"
+          ],
+          "thresholds": [
+            3,
+            3,
+            1,
+            2
+          ]
+        }
+      }
+    ],
+    "verdict": "Met only under assumption. The derived six span two Member State slots and fail the distinct-country and other-country limbs. Every partner that adds a third slot is fictional and Assumed. The design carries redundancy: two gap partners sit in each of C3 and C5, so removing any single gap partner leaves at least five slots and the condition still holds. That redundancy does not make the condition Confirmed, because the partners supplying it do not exist.",
+    "not_counted": "The optional Joint Research Centre contribution the topic allows. Tier 1 deems it established in a Member State other than the other participants', so it would add a slot, but it takes no part in preparing the proposal and the consortium cannot rely on it at submission."
+  },
+  "anonymity_check": {
+    "constraint": "No real organisation name, person name, place, web address, grant or project identifier from instance one appears in Tier 3, Tier 4, Tier 5 or the vault.",
+    "mechanisms": [
+      "runner/leakage_scan.py word scan over the identity nouns",
+      "runner/leakage_scan.py pseudonymity check over the partner records"
+    ],
+    "denylist_basis": "Derived, not re-typed: LEAKAGE_NOUNS is runner/agnosticism_lint.py PROJECT_NOUNS minus the scoped-out set, plus PROJECT_IDENTIFIERS for the project acronym that denylist never held. Derivation means a noun added to PROJECT_NOUNS later is scanned from that moment. The partition into identity, re-identifying and scoped-out nouns is total and disjoint, asserted by tests/runner/test_leakage_scan.py, and records why each retained noun is a leak. Neither property makes the denylist complete: completeness is a claim about instance one's name set, which lives outside this repository.",
+    "result": "Not clean. No new leak: nothing this ticket authored, and nothing else in Tier 3, Tier 4 or Tier 5, carries an instance-one identity noun. One pre-existing leak stands, recorded as finding F8: instance one's project acronym appears eleven times in the 22 September purge record under Tier 4. The scan reports 'OK, NOT CLEAN' and exits 0, so it stays usable as a regression guard without ever calling the branch clean.",
+    "coverage": {
+      "word_scan": "Tier 3, Tier 4, Tier 5 and every discovered vault. 30 files on this tree.",
+      "pseudonymity_check": "Every Tier 3 artifact that describes the project: the consortium files, working_assumptions.json, the project brief and the architecture inputs. Not the partner registry alone, because country and nationality names are scoped out of the word scan and this is the only mechanism that catches one.",
+      "vault": "Zero files. No vault exists on this branch, so the vault leg has never run against real notes. Finding F9.",
+      "out_of_scope": "Tier 1 and Tier 2 are source documents and their extracts. plans/ is not scanned, and four files under plans/purge/ carry the same project acronym as finding F8's Tier 4 record."
+    }
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "finding": "The agnosticism-lint denylist cannot be reused verbatim as the leakage denylist. Eight of its nouns are not identity nouns: four Member State and nationality names the General Annexes enumerate, one instrument name, and three generic domain words.",
+      "evidence": "Scanning the current tree with the raw denylist returns 46 hits across six files, none of them a leak: 'Hungary', 'Hungarian' and 'Bulgaria' from the Tier 1 coverage report's account of the eligibility rules, 'MSCA' from references to harness/profiles/msca_pf_default.json and the purge record, and 'crop' and 'hyperspectral' from the scope record's own finding F2.",
+      "resolution": "The partition in runner/leakage_scan.py. Each scoped-out noun carries its reason. This confirms finding F9 of the Tier 1 coverage report and follows finding F2 of the demo scope record, which had already concluded that the leakage test scopes proper nouns and not domain nouns.",
+      "disposition": "resolved",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F2",
+      "finding": "The ticket asks for the denylist to be extended with instance-one organisation names, people and places. Writing further real names into runner/leakage_scan.py would put the very nouns the constraint forbids onto the branch.",
+      "resolution": "The extension is a parameter, not a literal: leakage_denylist(extra_nouns=...) and the CLI's --extra-nouns file, which the operator keeps outside the repository. The standing denylist's proper nouns are already instance one's identity set, taken from its confirmed Tier 3 data, so the in-repository half of the extension is satisfied by reuse.",
+      "disposition": "resolved",
+      "status": "Assumed",
+      "residual": "The operator supplies any further noun at scan time. If a name is known only to the operator, an unsupplied extension file means the scan checks less than it could, which is a residual risk this report records rather than hides."
+    },
+    {
+      "id": "F3",
+      "finding": "partners.json cannot carry a real legal name or a real country, but the artifact schema requires both fields.",
+      "resolution": "Both carry the pseudonym: legal_name is the partner token and country is the slot token. The artifact says so in its anonymisation block, so no reader mistakes either for a registered fact. country_slot_class carries the only country fact any rule on this branch needs.",
+      "disposition": "resolved",
+      "status": "Confirmed",
+      "residual": "Recorded because a later schema revision that tightens either field would break the anonymity constraint, not just the artifact."
+    },
+    {
+      "id": "F4",
+      "finding": "The freshwater and marine realms rest on one partner each, and both partners are fictional.",
+      "resolution": "Not resolved, and not resolvable by design. It is the honest consequence of a derived consortium that is terrestrial. Recorded so the concept ticket weighs it when it sets out the gap options: the composition condition survives losing P07 or P08, but the second scope requirement does not.",
+      "disposition": "open",
+      "status": "Unresolved"
+    },
+    {
+      "id": "F5",
+      "finding": "The derived six collapse into two country slots, five of them in C1.",
+      "resolution": "Recorded as the ticket designed it: P01 to P05 in C1 and P06 in C2. The slot assignment is Assumed and declared, because an anonymised consortium cannot evidence a country without naming one.",
+      "disposition": "open",
+      "status": "Unresolved",
+      "residual": "A proposal-quality point, not a compliance one. A consortium with ten of twelve partners in three slots is geographically thin for a topic that asks for use cases across Member States and Associated Countries. The concept ticket decides whether that matters for the demo."
+    },
+    {
+      "id": "F6",
+      "finding": "The pseudonymity check's web-address pattern requires a scheme or a 'www.' prefix, so a bare domain with neither passes.",
+      "evidence": "runner/leakage_scan.py _URL_RE. The pattern is anchored that way on purpose: the partner records and the reports cite file paths such as partners.json, and a bare-domain pattern would flag every one of them.",
+      "resolution": "Not resolved by the pattern. It is resolved structurally instead: no partner record carries an address field at all, and the country and legal-name fields carry slot and pseudonym tokens the record-level checks pin.",
+      "disposition": "open",
+      "status": "Assumed",
+      "residual": "A known limit, recorded rather than papered over. Worth revisiting only if a later ticket adds a free-text field to a partner record."
+    },
+    {
+      "id": "F7",
+      "finding": "A stale test couples to the content of Tier 3 partners.json from a project that has been purged. Writing the demo's registry changes how it fails, but not that it fails.",
+      "evidence": "tests/runner/test_gate10d_consistency_fix.py TestImplementationPartnerLegalNames::test_partners_json_has_correct_legal_names reads the repository's real partners.json and asserts two partner legal names by a short_name key. Before this ticket it failed with FileNotFoundError, because the 22 September purge emptied Tier 3. It now fails with KeyError 'short_name'. Verified by running it against the stashed tree and again against this one.",
+      "resolution": "Not fixed here. The test asserts a purged project's data, and the names it expects belong to neither instance. Repairing it means deciding what it should assert, which is outside this ticket. The failure set is unchanged: 27 failures before and after, the same test names.",
+      "disposition": "open",
+      "status": "Unresolved",
+      "residual": "A candidate Milestone 2 ticket: retarget the test at a fixture repository, or retire it with the project whose data it asserts."
+    },
+    {
+      "id": "F8",
+      "finding": "The first version of the leakage scan reported the branch clean while instance one's project acronym stood in Tier 4 eleven times. A false clean.",
+      "evidence": "The acronym appears in docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json, which is inside SCAN_GLOBS. The standing agnosticism denylist never held it: that denylist was built from instance one's Tier 3 identity spine, which names the fellow, the host and the partners, not the project. So the first version's claim that reuse of the denylist already covered the ticket's 'extended with the instance-one organisation names, people and places' was wrong.",
+      "resolution": "Three changes. LEAKAGE_NOUNS is now derived from PROJECT_NOUNS rather than re-typed, so a noun added there is scanned at once. PROJECT_IDENTIFIERS carries the project acronym the denylist never held. LeakageReport separates ok (no new leak, the regression guard) from clean (no leak at all, the constraint), and the CLI prints 'OK, NOT CLEAN' while a recorded leak stands. The purge record itself is not redacted: it names the purged project because that is what it records, and rewriting a Tier 4 decision record to suit a later constraint is an operator decision, not an implementing ticket's (CLAUDE.md §9.1).",
+      "disposition": "resolved",
+      "status": "Unresolved",
+      "residual": "The leak itself stands. The branch is not clean, and anonymity is recorded as Unresolved below rather than Confirmed. The operator decides whether to rewrite or retire the purge record. Four files under plans/purge/ carry the same acronym and are outside this scan's declared scope, which covers Tier 3 to Tier 5 and the vault."
+    },
+    {
+      "id": "F9",
+      "finding": "The vault leg of the scan has never run against a real vault. No vault exists on this branch.",
+      "evidence": "iter_vault_roots() returns an empty list on this tree: the only graph.config.yaml is the generic template, which is excluded as instance-agnostic by construction. All 30 files the scan reads are Tier 3 and Tier 4. The discovery path and its conservative fallback are exercised only by fixtures in tests/runner/test_leakage_scan.py.",
+      "resolution": "Not resolvable here. The architecture seeds ticket scaffolds the vault, and the scan discovers it from its graph.config.yaml vault_path rather than from a guessed path, so it will be covered when it exists.",
+      "disposition": "open",
+      "status": "Unresolved",
+      "residual": "Whoever scaffolds the vault should re-run the scan and confirm it reports more than zero vault files."
+    }
+  ],
+  "findings_review": {
+    "note": "Findings F8 and F9 were found by an adversarial review of this ticket's own output, after the artifacts were written. They are recorded here rather than quietly fixed, because F8 is the more serious kind of defect this repository can produce: a check reporting a clean result it had not earned."
+  },
+  "status_summary": {
+    "requirement_coverage": "Assumed",
+    "composition_condition": "Assumed",
+    "derived_capabilities": "Assumed",
+    "fictional_capabilities": "Assumed",
+    "anonymity": "Unresolved"
+  },
+  "status_summary_note": "Anonymity is Confirmed because it is checked mechanically against the tree, not asserted. Everything resting on a partner is Assumed, because half the partners do not exist and no partner's participation is confirmed. Nothing in this report is Confirmed on the strength of the demo's own design (CLAUDE.md §12.2, §13.3).",
+  "authored_by": "Ticket 'Anonymised consortium with fictional gap partners', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "The composition_check block is emitted by runner/consortium_composition.py, not transcribed. tests/test_demo_consortium.py holds it to a fresh evaluator run, so a change to the partner set that is not reflected here fails."
+}

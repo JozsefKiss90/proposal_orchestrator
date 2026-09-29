@@ -1,0 +1,128 @@
+{
+  "record_type": "working_assumptions",
+  "provenance_class": "manually_placed",
+  "_note": "Operator declarations for instance two. Each declaration turns an Unresolved fact into a conscious Assumed, never a Confirmed (CLAUDE.md §12.2). Written by the 'Anonymised consortium with fictional gap partners' ticket in plans/dev_graph_demo_tickets.md; later tickets append the duration, the effort shares and anything else they leave open. The engine reads this file and never writes it. Schema: .claude/workflows/system_orchestration/artifact_schema_specification.yaml -> tier3_source_schemas.working_assumptions.",
+  "declarations": [
+    {
+      "key": "P01_participation",
+      "value": "beneficiary, research_institute, country slot C1 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Derived partner, anonymised from the instance-one consortium. Its capabilities trace to the instance-one Part B-1, held outside the repository, but nobody has confirmed its participation in instance two. Public research organisation, agricultural institute; country slot C1 (Member State); declared coordinator.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "P02_participation",
+      "value": "beneficiary, university, country slot C1 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Derived partner. University, geoinformatics institute; country slot C1 (Member State). Capability evidenced by the instance-one Part B-1, participation unconfirmed.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "P03_participation",
+      "value": "beneficiary, university, country slot C1 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Derived partner. University, agriculture; country slot C1 (Member State). Capability evidenced by the instance-one Part B-1, participation unconfirmed.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "P04_participation",
+      "value": "beneficiary, sme, country slot C1 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Derived partner. SME, software engineering; country slot C1 (Member State). Capability evidenced by the instance-one Part B-1, participation unconfirmed.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "P05_participation",
+      "value": "beneficiary, sme, country slot C1 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Derived partner. SME, farm-management information systems; country slot C1 (Member State). Capability evidenced by the instance-one Part B-1, participation unconfirmed.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "P06_participation",
+      "value": "beneficiary, research_institute, country slot C2 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Derived partner, and the second country slot. Public research institute, vegetable crops; country slot C2 (Member State). It held no in-action role in instance one, so its role here is designed rather than carried over.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "P07_participation",
+      "value": "beneficiary, research_institute, country slot C3 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Fictional gap partner. It does not exist. Public research organisation, freshwater ecology; country slot C3 (Member State). Closes the freshwater gap: the derived six have no freshwater expertise, and the scope asks for capabilities across terrestrial, freshwater and marine ecosystems.",
+      "checklist_ref": "CONSORTIUM_GAP"
+    },
+    {
+      "key": "P08_participation",
+      "value": "beneficiary, university, country slot C4 (AC)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Fictional gap partner. It does not exist. University, marine and coastal science; country slot C4 (Associated Country). Closes the marine gap and supplies the only route to a marine occurrence data facility.",
+      "checklist_ref": "CONSORTIUM_GAP"
+    },
+    {
+      "key": "P09_participation",
+      "value": "beneficiary, university, country slot C5 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Fictional gap partner. It does not exist. University, biodiversity genomics; country slot C5 (Member State). Closes the omics gap: the second expected outcome names genomic, transcriptomic and metabolomic data, and the derived six carry only metabolomics.",
+      "checklist_ref": "CONSORTIUM_GAP"
+    },
+    {
+      "key": "P10_participation",
+      "value": "beneficiary, ngo, country slot C3 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Fictional gap partner. It does not exist. Non-profit research organisation, biodiversity data infrastructure; country slot C3 (Member State). Closes the data-infrastructure gap: nothing in the derived six can carry the cooperation with the named in-situ data frameworks, the typology crosswalks or the open-science-cloud link.",
+      "checklist_ref": "CONSORTIUM_GAP"
+    },
+    {
+      "key": "P11_participation",
+      "value": "beneficiary, university, country slot C6 (AC)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Fictional gap partner. It does not exist. University institute, socio-ecological systems; country slot C6 (Associated Country). Closes the socio-ecological gap the third scope requirement opens.",
+      "checklist_ref": "CONSORTIUM_GAP"
+    },
+    {
+      "key": "P12_participation",
+      "value": "beneficiary, sme, country slot C5 (MS)",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Fictional gap partner. It does not exist. SME, earth observation analytics and artificial intelligence; country slot C5 (Member State). Closes the European-scale artificial-intelligence mapping and trend-prediction gap the first and third expected outcomes both open.",
+      "checklist_ref": "CONSORTIUM_GAP"
+    },
+    {
+      "key": "coordinator",
+      "value": "P01",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "P01 holds the science spine of the derived capability set. The artifact schema requires exactly one coordinator and Phase 6 needs one to attach a management structure to. Declared so it can move without contradicting a Confirmed fact.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "country_slot_assignment",
+      "value": "C1 MS, C2 MS, C3 MS, C4 AC, C5 MS, C6 AC",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Six pseudonymous country slots, four Member State and two Associated Country. A slot records nothing but its class, which is all the Tier 1 composition condition asks about. The mapping from slots to real countries is held outside the repository, and for the six fictional partners there is nothing to map.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "composition_condition",
+      "value": "met only under assumption",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "The Tier 1 condition needs three independent beneficiaries in three countries, one in a Member State. The derived six span two slots and fail it. Every partner that adds a third country is fictional and Assumed, so the condition is met only on the strength of these declarations. Evaluated by runner/consortium_composition.py and reported in docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json.",
+      "checklist_ref": "CONSORTIUM"
+    }
+  ],
+  "_value_note": "A declaration's 'value' carries the fact the operator declares, not its status. The status is Assumed for every declaration and the shared reader stamps it (runner/working_assumptions.py DECLARED_STATUS), so writing 'Assumed' into 'value' would both duplicate it and break the schema's contract: the W1 predicate compares 'value' against a claim's claim_summary. Each *_participation value is derived from the partner's own record in partners.json, so a declaration cannot drift from the registry."
+}

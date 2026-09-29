@@ -1,0 +1,168 @@
+{
+  "schema_ref": "No declared schema. roles.json is a declared *input* of Phases 3, 4 and 6 in .claude/workflows/system_orchestration/workflow_phases/, and artifact_schema_specification.yaml declares no shape for it. The shape here is therefore authored, and no schema_id is coined for it (CLAUDE.md §16.3). It answers what those phases read it for: the role each partner holds, and which partner owns each coordination interface.",
+  "record_type": "consortium_roles",
+  "provenance_class": "manually_placed",
+  "artifact_purpose": "The role each partner of instance two holds in the action. Read by Phases 3, 4 and 6 as the basis for work package lead, task lead and management assignments. Written by the 'Anonymised consortium with fictional gap partners' ticket in plans/dev_graph_demo_tickets.md.",
+  "design_note": "Instance one was a single-fellow action. Instance two is a multi-partner Research and Innovation Action, so the roles are designed for this consortium rather than carried over. What is reused from instance one is capability, not structure.",
+  "anonymisation": "Every role names a partner pseudonym and, where a person is meant, a role descriptor. No individual is named. The mapping from pseudonyms to real entities is held by the operator outside the repository.",
+  "management_roles": [
+    {
+      "role": "coordinator",
+      "partner_id": "P01",
+      "responsibility": "Legal and financial coordination, consortium governance, and the interface to the granting authority.",
+      "status": "Assumed"
+    },
+    {
+      "role": "scientific_and_technical_coordinator",
+      "partner_id": "P02",
+      "responsibility": "Owns the observation chain from in-situ measurement through aerial survey to satellite earth observation, and the sensor harmonisation the integration rests on.",
+      "status": "Assumed"
+    },
+    {
+      "role": "data_management_and_interoperability_lead",
+      "partner_id": "P10",
+      "responsibility": "Data management plan, metadata profile, standard crosswalks, and publication of the project's occurrence and habitat data.",
+      "status": "Assumed"
+    },
+    {
+      "role": "omics_integration_lead",
+      "partner_id": "P09",
+      "responsibility": "Integrates the genomic, transcriptomic and environmental DNA layers into the harmonisation workflow, and owns the omics metadata standard.",
+      "status": "Assumed"
+    },
+    {
+      "role": "analytics_and_prediction_lead",
+      "partner_id": "P12",
+      "responsibility": "Habitat and ecosystem classification, scaling to European coverage, and biodiversity trend prediction.",
+      "status": "Assumed"
+    },
+    {
+      "role": "demonstration_case_lead_terrestrial",
+      "partner_id": "P03",
+      "responsibility": "Runs the agricultural and grassland demonstration case, and converts the field archive into documented training and validation sets.",
+      "status": "Assumed"
+    },
+    {
+      "role": "demonstration_case_lead_freshwater",
+      "partner_id": "P07",
+      "responsibility": "Runs the freshwater demonstration case and the floodplain and riparian ecotone observations.",
+      "status": "Assumed"
+    },
+    {
+      "role": "demonstration_case_lead_marine",
+      "partner_id": "P08",
+      "responsibility": "Runs the coastal and transitional-waters demonstration case and the marine habitat mapping.",
+      "status": "Assumed"
+    },
+    {
+      "role": "software_and_reproducibility_lead",
+      "partner_id": "P04",
+      "responsibility": "Processing pipelines, provenance tracking and reproducible inference across the demonstration cases.",
+      "status": "Assumed"
+    },
+    {
+      "role": "exploitation_and_uptake_lead",
+      "partner_id": "P05",
+      "responsibility": "Carries the biodiversity indicators into farm-management tools and runs the uptake channel into the agricultural sector.",
+      "status": "Assumed"
+    },
+    {
+      "role": "policy_and_stakeholder_lead",
+      "partner_id": "P11",
+      "responsibility": "Translates the reporting requirements into data needs, analyses the pressures the demonstration cases address, and runs stakeholder engagement.",
+      "status": "Assumed"
+    },
+    {
+      "role": "protocol_transfer_lead",
+      "partner_id": "P06",
+      "responsibility": "Transfers the measurement protocols to a second production context and a second country.",
+      "status": "Assumed"
+    }
+  ],
+  "management_roles_note": "Twelve roles, twelve partners, one role each. The roles are non-overlapping, which is what the Phase 6 gate condition asks of a management structure. Every role carries Assumed, because every partner's participation is Assumed.",
+  "personnel_roles": {
+    "convention": "A capability that rests on a person is recorded as a role at a partner. No individual is named anywhere in Tier 3.",
+    "roles": [
+      "senior plant physiologist, P01",
+      "metabolomics platform scientist, P01",
+      "statistician, P01",
+      "remote sensing scientist, P02",
+      "field spectroscopy technician, P02",
+      "field experiment manager, P03",
+      "agronomic modeller, P03",
+      "software architect, P04",
+      "data engineer, P04",
+      "product manager, P05",
+      "user research lead, P05",
+      "horticultural researcher, P06",
+      "freshwater ecologist, P07",
+      "monitoring network coordinator, P07",
+      "marine habitat scientist, P08",
+      "coastal earth observation analyst, P08",
+      "biodiversity genomicist, P09",
+      "bioinformatician, P09",
+      "data infrastructure lead, P10",
+      "metadata standards specialist, P10",
+      "socio-ecological systems researcher, P11",
+      "policy analyst, P11",
+      "machine learning engineer, P12",
+      "earth observation data scientist, P12"
+    ]
+  },
+  "work_package_leads": {
+    "status": "not assigned here",
+    "reason": "Work packages do not exist yet. Phase 3 designs them and assigns leads, reading this file for the role each partner holds. Assigning a work package lead before the work package exists would invent a structure the architecture seeds ticket has not authored."
+  },
+  "field_status": {
+    "management_roles": "Assumed",
+    "coordination_commitments": "Assumed",
+    "personnel_roles": "Assumed",
+    "work_package_leads": "Unresolved"
+  },
+  "field_status_note": "Every role is Assumed because it rests on a partner whose participation is Assumed (CLAUDE.md §12.2). Work package leads are Unresolved until Phase 3 assigns them, which is the honest status for a fact no tier yet carries.",
+  "authored_by": "Ticket 'Anonymised consortium with fictional gap partners', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Verified by tests/test_demo_consortium.py: every role names a partner in partners.json, no partner holds two management roles, and every coordination commitment names a Tier 2B requirement key that exists in the call extract.",
+  "coordination_interfaces": [
+    {
+      "owning_partner": "P10",
+      "contributing_partners": [
+        "P03",
+        "P08",
+        "P01"
+      ],
+      "tier2b_requirement": "gbif_obis_lucas_cooperation",
+      "note": "P10 holds the data-facility interface, P08 the marine occurrence records, P03 and P01 the in-situ measurement side.",
+      "interface": "Cooperation with the in-situ data collection frameworks the topic names"
+    },
+    {
+      "owning_partner": "P10",
+      "contributing_partners": [
+        "P01",
+        "P03"
+      ],
+      "tier2b_requirement": "jrc_participation",
+      "note": "Optional at topic level, and the Joint Research Centre takes no part in preparing the proposal. The consortium leaves the interface open rather than counting the contribution. It is not counted towards the composition condition.",
+      "interface": "A place for a Joint Research Centre contribution"
+    },
+    {
+      "owning_partner": "P03",
+      "contributing_partners": [
+        "P10",
+        "P11"
+      ],
+      "tier2b_requirement": "lucas_grassland_and_embal",
+      "interface": "Incorporation of in-situ data from the Commission-steered monitoring schemes the topic names"
+    },
+    {
+      "owning_partner": "P02",
+      "contributing_partners": [
+        "P01",
+        "P12"
+      ],
+      "tier2b_requirement": "esa_futureo_coordination",
+      "note": "The scope asks for sufficient means for effective coordination. Phase 6 resources it; this record names its owner.",
+      "interface": "Coordination with the projects selected under the European Space Agency earth observation programme the topic names"
+    }
+  ],
+  "coordination_interfaces_note": "Who owns each interface, not what it costs. The topic requires resources to be earmarked for some of these, and that earmarking is Phase 3 and Phase 6 work against a budget this repository does not yet hold. Recording the owner here is role data, which is what this file is for, and it is what the gap analysis reads to name a covering partner for each cross-cutting requirement."
+}

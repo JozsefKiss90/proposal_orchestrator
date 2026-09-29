@@ -1,0 +1,148 @@
+{
+  "record_type": "decision",
+  "id": "demo-consortium",
+  "date": "2026-09-30",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Anonymised consortium with fictional gap partners' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §12.2 (the four status categories), §13.3 (no invented project fact) and §10.5 (a material claim names its tier source). Not a constitutional amendment. §14.5 is not engaged.",
+  "decision": "Instance two has a twelve-partner consortium, P01 to P12. Six profiles are anonymised from the instance-one consortium and six are fictional, invented to close the gaps the topic scope opens. Every partner carries participation status Assumed and is declared in working_assumptions.json. P01 is the declared coordinator.",
+  "operator_decisions": [
+    {
+      "question": "The ticket sets Assumed for P07 to P12 and leaves the status of the derived six to the operator. What status do P01 to P06 carry?",
+      "options_put": [
+        "Assumed for all twelve",
+        "Confirmed for P01 to P06",
+        "Inferred for P01 to P06"
+      ],
+      "decision": "Assumed for all twelve.",
+      "reasoning": "Nobody has confirmed any partner's participation in instance two. The derived six collaborated on a different project. That evidences their capability, not their membership here. A Confirmed participation status would assert a project fact no Tier 3 evidence supports (§13.3). Inferred would state an inference chain reading 'they worked together elsewhere', which does not carry the weight of a membership claim.",
+      "consequence": "The composition condition is met only under assumption, and the change scenarios gain a partner-confirmation step to exercise: scenario 3 of the change-scenarios ticket removes a declaration from working_assumptions.json when a gap partner is confirmed."
+    },
+    {
+      "question": "partners.json requires exactly one coordinator. Who coordinates?",
+      "options_put": [
+        "P01, Assumed",
+        "P10, Assumed",
+        "No coordinator assigned"
+      ],
+      "decision": "P01, Assumed.",
+      "reasoning": "P01 holds the science spine of the derived capability set: physiology, statistical design, calibration and validation. Phase 6 needs a coordinator to attach a management structure to, and the schema requires one. A fictional partner as coordinator would make the coordinator an invented entity. An unset field would block Phase 6 on a gap the operator can resolve by declaration.",
+      "consequence": "Declared under key 'coordinator' in working_assumptions.json, so the choice can move without contradicting a Confirmed fact."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "A capability is separated from a participation. A derived capability is Confirmed, because it traces to a line of the instance-one Part B-1 held by the operator outside the repository. The partner's participation in instance two is Assumed.",
+      "reasoning": "The two facts have different evidence. Collapsing them would either overstate the membership or discard the capability provenance the ticket asks for in capability_basis.",
+      "recorded_in": "partners.json field_status; the capability_basis field of each partner record."
+    },
+    {
+      "id": "D2",
+      "decision": "Country is a pseudonymous slot with a class of Member State or Associated Country. No real country name appears in any partner record, and the slot-to-country mapping is not stored in the repository.",
+      "reasoning": "The Tier 1 composition condition asks only whether a country is distinct and whether it is a Member State or an Associated Country. Recording nothing more is both sufficient for the rule and structurally incapable of re-identifying a derived partner. For the six fictional partners there is nothing to map.",
+      "recorded_in": "partners.json country_slots; runner/consortium_composition.py, which reads slot classes and never a country name."
+    },
+    {
+      "id": "D3",
+      "decision": "The leakage denylist is derived from runner/agnosticism_lint.py PROJECT_NOUNS by a total, disjoint partition into identity nouns, re-identifying nouns and scoped-out nouns. Only the first two are scanned, and every scoped-out noun carries its reason.",
+      "reasoning": "Finding F9 of the Tier 1 coverage report said the denylist cannot be reused as it stands. A scan of the current tree confirms it. The raw denylist returns 46 hits across six files, and none of them is a leak. Four are Member State and nationality names the General Annexes enumerate, one is an instrument name, and three are generic domain words the topic's own scope and the derived capability profiles use. None is an organisation, person, place, address or identifier, which is what the branch constraint names. Finding F2 of the demo scope record had already reached the same conclusion.",
+      "reasoning_for_the_partition_rather_than_a_new_list": "A fresh hand-written list would drift from the agnosticism denylist silently. A partition cannot: a noun added to PROJECT_NOUNS later lands in no set, and tests/runner/test_leakage_scan.py fails until someone classifies it.",
+      "recorded_in": "runner/leakage_scan.py IDENTITY_NOUNS, REIDENTIFYING_NOUNS and SCOPED_OUT; validation report finding F1."
+    },
+    {
+      "id": "D4",
+      "decision": "The instance-one noun extension the ticket asks for is a parameter, not a literal. Further names are supplied through leakage_denylist(extra_nouns=...) or the CLI's --extra-nouns file, which the operator keeps outside the repository.",
+      "reasoning": "Hard-coding further instance-one organisation names, people or places into runner/leakage_scan.py would write onto the branch the very nouns the constraint forbids. The standing denylist's proper nouns are already instance one's identity set, taken from its confirmed Tier 3 data, so the in-repository half of the extension is satisfied by reuse. The same principle already governs the pseudonym mapping.",
+      "residual_risk": "A name known only to the operator is checked only when the operator supplies the extension file. The validation report records this as finding F2 rather than claiming the scan is exhaustive.",
+      "recorded_in": "runner/leakage_scan.py module docstring and CLI; validation report finding F2."
+    },
+    {
+      "id": "D5",
+      "decision": "Work package leads are not assigned in roles.json. They stay Unresolved until Phase 3 designs the work packages.",
+      "reasoning": "There are no work packages yet. Assigning a lead to a work package that does not exist would invent a structure the architecture seeds ticket has not authored (§13.3), and Phase 3 reads roles.json precisely to make those assignments.",
+      "recorded_in": "roles.json work_package_leads."
+    },
+    {
+      "id": "D6",
+      "decision": "The optional Joint Research Centre contribution the topic allows is not counted towards the composition condition. The consortium leaves an interface open for it and relies on nothing.",
+      "reasoning": "Tier 1 deems the Joint Research Centre established in a Member State other than the other participants', so a contribution would add a country slot. But it takes no part in preparing or submitting the proposal, so the consortium cannot rely on it at submission. Counting it would buy a composition limb with a participant the proposal cannot name as a beneficiary.",
+      "recorded_in": "roles.json coordination_interfaces; the not_counted field of the validation report's composition_check."
+    },
+    {
+      "id": "D7",
+      "decision": "The composition condition is recorded as met only under assumption, and the redundancy the design carries does not change that.",
+      "reasoning": "runner/consortium_composition.py evaluates the condition eight ways. All twelve partners: met, six slots. The derived six alone: not met, two slots, failing the distinct-country and other-country limbs. Each gap partner removed in turn: met in all six cases, because two gap partners sit in each of C3 and C5. Redundancy against a single withdrawal is a design property. It is not evidence that the partners supplying it exist.",
+      "recorded_in": "the composition_check block of docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json."
+    },
+    {
+      "id": "D8",
+      "decision": "The leakage scan separates two questions. `ok` means no new leak and keeps the scan usable as a regression guard. `clean` means no leak at all and answers the branch constraint. The CLI prints 'OK, NOT CLEAN' while a recorded pre-existing leak stands, and exits 0.",
+      "reasoning": "The first version of the scan reported the branch clean. It was not. Instance one's project acronym stands eleven times in the 22 September purge record under Tier 4, inside the scan's own scope. The standing agnosticism denylist never held that acronym, because it was built from instance one's Tier 3 identity spine, which names people and partners rather than the project. A single boolean forced a choice between two bad answers: call the branch clean when it is not, or fail every future run until an operator decision is made. Two properties answer both questions honestly.",
+      "why_the_record_is_not_redacted": "The purge record names the purged project because that is what it records. Rewriting a Tier 4 decision record to suit a constraint adopted later is not an implementing ticket's call (§9.1). Finding F1 of the scope record made the same call about stray Tier 4 byproducts: recorded, not removed.",
+      "recorded_in": "runner/leakage_scan.py KNOWN_PRE_EXISTING_LEAKS and LeakageReport; findings F8 and F9 of the gap analysis; the anonymity_check block, whose status is Unresolved.",
+      "operator_decision_needed": "Whether to rewrite or retire docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json, and the four files under plans/purge/ that carry the same acronym outside this scan's scope."
+    },
+    {
+      "id": "D9",
+      "decision": "The pseudonymity check reads every Tier 3 artifact that describes the project, not the partner registry alone.",
+      "reasoning": "Country and nationality names are scoped out of the word scan under D3, so the structural check is the only mechanism that catches a country at all. Reading one file left a hole: a real country written into a role, a declaration or an architecture seed would have passed.",
+      "recorded_in": "runner/leakage_scan.py PSEUDONYMITY_GLOBS and PSEUDONYMITY_EXEMPT."
+    }
+  ],
+  "artifacts_written": [
+    "docs/tier3_project_instantiation/consortium/partners.json",
+    "docs/tier3_project_instantiation/consortium/roles.json",
+    "docs/tier3_project_instantiation/working_assumptions.json",
+    "docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json",
+    "runner/consortium_composition.py",
+    "runner/leakage_scan.py",
+    "tests/runner/test_consortium_composition.py",
+    "tests/runner/test_leakage_scan.py",
+    "tests/test_demo_consortium.py"
+  ],
+  "unmodified": {
+    "claim": "No component the branch constraints protect is touched.",
+    "components": [
+      "runner/dag_scheduler.py",
+      "runner/gate_evaluator.py",
+      "runner/predicates/",
+      "the budget-before-Phase-8 block",
+      "the whole-Tier-3 reuse fingerprint",
+      "runner/agnosticism_lint.py"
+    ],
+    "note": "runner/agnosticism_lint.py is read, not changed. runner/leakage_scan.py imports its PROJECT_NOUNS and partitions the set locally, so the standing lint keeps its own scope and behaviour."
+  },
+  "tier_3_freeze": {
+    "status": "not frozen here",
+    "reason": "The consortium is two of the Tier 3 artifacts. The concept ticket needs partners.json to draft against, and the architecture seeds ticket freezes Tier 3 as a whole and records its fingerprint. Freezing two files early would make the freeze record partial and misleading."
+  },
+  "open_items_carried_forward": [
+    {
+      "id": "F4",
+      "item": "The freshwater and marine realms rest on one fictional partner each. The composition condition survives losing P07 or P08; the second scope requirement does not.",
+      "carried_to": "Project concept for operator approval, which sets out the gap options."
+    },
+    {
+      "id": "F5",
+      "item": "Ten of the twelve partners sit in three slots, and five of them in C1. Geographically thin for a topic that asks for use cases across Member States and Associated Countries.",
+      "carried_to": "Project concept for operator approval."
+    },
+    {
+      "id": "F2",
+      "item": "The leakage scan checks a name known only to the operator only when the operator supplies --extra-nouns.",
+      "carried_to": "Demo report, as a standing residual risk of the anonymity constraint."
+    },
+    {
+      "id": "F8",
+      "item": "One pre-existing anonymity leak stands in Tier 4, and four more files under plans/purge/ carry the same acronym outside the scan's scope. The branch is not anonymity-clean.",
+      "carried_to": "An operator decision, and the demo report's whole-branch leakage check."
+    },
+    {
+      "id": "F9",
+      "item": "The vault leg of the leakage scan has never run against a real vault.",
+      "carried_to": "Architecture seeds and the uncertainty ledger, which scaffolds the vault."
+    }
+  ],
+  "verification": "runner/consortium_composition.py evaluates the Tier 1 condition over the committed partners.json. Its CLI exits 0 with all twelve partners and reports the derived six as not met. runner/leakage_scan.py exits 0 over Tier 3, Tier 4, Tier 5 and the vault, 30 files scanned, reporting 'OK, NOT CLEAN' for the one recorded pre-existing leak. The shared reader runner/working_assumptions.py loads working_assumptions.json with 15 declarations, six under checklist_ref CONSORTIUM_GAP. tests/test_demo_consortium.py, tests/runner/test_leakage_scan.py and tests/runner/test_consortium_composition.py hold the artifacts to these results: 128 tests. They pin the pseudonym set and the capability bases. They check that every role names a partner that exists, and that every coordination commitment names a Tier 2B key the call extract carries. They check that each gap partner carries a declaration whose value agrees with the registry. They hold the report's composition block equal to a fresh evaluator run."
+}

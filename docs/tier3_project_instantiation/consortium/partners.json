@@ -1,0 +1,376 @@
+{
+  "schema_ref": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml -> tier3_source_schemas.partners. No schema_id is coined here: docs/index/schema_registry.json registers run_produced artifacts under orch.* ids, and no Tier 3 source artifact carries one. Every field the declared schema requires is present. The extra fields carry the anonymisation, the country slot and the capability basis, which the declared schema does not model.",
+  "record_type": "consortium_partners",
+  "provenance_class": "manually_placed",
+  "artifact_purpose": "The twelve-partner consortium of instance two, fully anonymised. Written by the 'Anonymised consortium with fictional gap partners' ticket in plans/dev_graph_demo_tickets.md. Each partner is a pseudonym described only by type, sector and capability. People appear as roles, never as names. Country is a pseudonymous slot recording only whether it is a Member State or an Associated Country, because that is the only thing the Tier 1 composition condition asks about.",
+  "anonymisation": {
+    "rule": "No real organisation name, person name, place, web address, grant or project identifier appears in this file.",
+    "pseudonym_mapping": "Held by the operator outside the repository. P01 to P06 map to real entities; P07 to P12 map to nothing, because they are fictional.",
+    "legal_name_note": "legal_name carries the pseudonym, not a legal name. The field is required by the artifact schema, and a real legal name would breach the branch's anonymity constraint. A reader must not treat it as a registered name.",
+    "country_note": "country carries the pseudonymous slot token, the same value as country_slot. The schema requires a country field; a real country name would re-identify a derived partner. country_slot_class carries the only country fact any rule on this branch needs.",
+    "people_note": "Named individuals appear nowhere. Where a capability rests on a person, the record names the role, for example 'senior plant physiologist'. Phase 6 assigns management roles to partners, not to people.",
+    "enforcement": "runner/leakage_scan.py, exercised by tests/runner/test_leakage_scan.py and tests/test_demo_consortium.py."
+  },
+  "capability_basis_vocabulary": {
+    "derived": "Anonymised from the instance-one consortium. The capability traces to a line of the instance-one Part B-1, recorded in the operator-held mapping outside the repository. The capability is evidenced; the partner's participation in instance two is not.",
+    "fictional": "Invented to close a gap against the topic scope. The partner does not exist. It has no name, acronym, city or web address, and is described by capability class rather than by any profile that would match a single real organisation."
+  },
+  "participation_status": {
+    "value": "Assumed",
+    "applies_to": "all twelve partners",
+    "reason": "No partner's participation in instance two has been confirmed by anyone. Instance two is a new project: the derived six collaborated on a different one, which evidences their capability and not their membership here. Every partner is therefore declared in working_assumptions.json and carries Assumed (CLAUDE.md §12.2).",
+    "operator_decision": "Recorded in docs/tier4_orchestration_state/decision_log/demo-consortium_2026-09-30.json. The ticket left the status of P01 to P06 to the operator; the operator set Assumed for all twelve."
+  },
+  "coordinator": {
+    "partner_id": "P01",
+    "status": "Assumed",
+    "reason": "P01 holds the science spine of the derived capability set: physiology, statistical design, calibration and validation. The artifact schema requires exactly one coordinator and Phase 6 needs one to attach a management structure to. The choice is the operator's and is declared in working_assumptions.json, so it can move without contradicting a Confirmed fact."
+  },
+  "partners": [
+    {
+      "partner_id": "P01",
+      "legal_name": "P01",
+      "country": "C1",
+      "country_slot": "C1",
+      "country_slot_class": "MS",
+      "organisation_type": "research_institute",
+      "organisation_description": "Public research organisation, agricultural institute",
+      "sector": "agricultural research",
+      "is_coordinator": true,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "derived",
+      "participation_status": "Assumed",
+      "capabilities": [
+        "plant physiology and stress metabolomics",
+        "plant phenotyping under controlled and field conditions",
+        "statistical experimental design",
+        "instrument and model calibration",
+        "leakage-safe predictive validation"
+      ],
+      "role_in_the_action": "Coordinator. Owns the in-situ physiological and metabolomic measurement chain, and the statistical design and validation protocol the whole data-integration chain is tested against.",
+      "personnel_roles": [
+        "senior plant physiologist, P01",
+        "metabolomics platform scientist, P01",
+        "statistician, P01"
+      ]
+    },
+    {
+      "partner_id": "P02",
+      "legal_name": "P02",
+      "country": "C1",
+      "country_slot": "C1",
+      "country_slot_class": "MS",
+      "organisation_type": "university",
+      "organisation_description": "University, geoinformatics institute",
+      "sector": "higher education, geoinformatics",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "derived",
+      "participation_status": "Assumed",
+      "capabilities": [
+        "hyperspectral imaging",
+        "field spectroscopy",
+        "sensor harmonisation across platforms",
+        "satellite earth observation data processing",
+        "uncrewed aerial vehicle survey support"
+      ],
+      "role_in_the_action": "Leads sensor harmonisation from field spectroscopy through aerial survey to satellite earth observation, which is the technical spine of the integration the topic asks for.",
+      "personnel_roles": [
+        "remote sensing scientist, P02",
+        "field spectroscopy technician, P02"
+      ]
+    },
+    {
+      "partner_id": "P03",
+      "legal_name": "P03",
+      "country": "C1",
+      "country_slot": "C1",
+      "country_slot_class": "MS",
+      "organisation_type": "university",
+      "organisation_description": "University, agriculture",
+      "sector": "higher education, agriculture",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "derived",
+      "participation_status": "Assumed",
+      "capabilities": [
+        "multi-season controlled field-experiment archive covering physiological, spectral, soil-water and weather measurements",
+        "crop and water-balance modelling",
+        "precision agriculture instrumentation"
+      ],
+      "role_in_the_action": "Supplies the long-run field archive that is reworked into documented training and validation sets, and the agricultural pressure gradient the demonstration cases run along.",
+      "personnel_roles": [
+        "field experiment manager, P03",
+        "agronomic modeller, P03"
+      ]
+    },
+    {
+      "partner_id": "P04",
+      "legal_name": "P04",
+      "country": "C1",
+      "country_slot": "C1",
+      "country_slot_class": "MS",
+      "organisation_type": "sme",
+      "organisation_description": "SME, software engineering",
+      "sector": "software engineering",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "derived",
+      "participation_status": "Assumed",
+      "capabilities": [
+        "web decision-support engineering",
+        "provenance tracking",
+        "reproducible inference pipelines"
+      ],
+      "role_in_the_action": "Engineers the reproducible processing and provenance layer, and the decision-support surface the harmonisation workflows are delivered through.",
+      "personnel_roles": [
+        "software architect, P04",
+        "data engineer, P04"
+      ]
+    },
+    {
+      "partner_id": "P05",
+      "legal_name": "P05",
+      "country": "C1",
+      "country_slot": "C1",
+      "country_slot_class": "MS",
+      "organisation_type": "sme",
+      "organisation_description": "SME, farm-management information systems",
+      "sector": "agricultural software and advisory",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "derived",
+      "participation_status": "Assumed",
+      "capabilities": [
+        "requirements elicitation",
+        "usability and interoperability evaluation",
+        "multi-country user network of agricultural holdings as an uptake channel"
+      ],
+      "role_in_the_action": "Carries biodiversity indicators into farm-management tools, which is how the project mainstreams biodiversity data into the agricultural sector the scope names.",
+      "personnel_roles": [
+        "product manager, P05",
+        "user research lead, P05"
+      ]
+    },
+    {
+      "partner_id": "P06",
+      "legal_name": "P06",
+      "country": "C2",
+      "country_slot": "C2",
+      "country_slot_class": "MS",
+      "organisation_type": "research_institute",
+      "organisation_description": "Public research institute, vegetable crops",
+      "sector": "horticultural research",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "derived",
+      "participation_status": "Assumed",
+      "capabilities": [
+        "crop-specific transfer of measurement protocols",
+        "production-context data from horticultural systems"
+      ],
+      "role_in_the_action": "Transfers the measurement protocols to a second production context and a second country, so the harmonisation is tested outside the setting it was built in. P06 held no in-action role in instance one and is a beneficiary here.",
+      "personnel_roles": [
+        "horticultural researcher, P06"
+      ]
+    },
+    {
+      "partner_id": "P07",
+      "legal_name": "P07",
+      "country": "C3",
+      "country_slot": "C3",
+      "country_slot_class": "MS",
+      "organisation_type": "research_institute",
+      "organisation_description": "Public research organisation, freshwater ecology",
+      "sector": "freshwater ecology",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "fictional",
+      "participation_status": "Assumed",
+      "gap_closed": "No freshwater expertise among the derived six, although the scope asks for capabilities across terrestrial, freshwater and marine ecosystems.",
+      "capabilities": [
+        "river, lake and wetland ecology",
+        "environmental DNA sampling networks",
+        "freshwater monitoring aligned with water-policy reporting",
+        "in-situ observation of floodplain and riparian ecotones adjoining farmland"
+      ],
+      "role_in_the_action": "Runs the freshwater demonstration case and the ecotone observations that connect the farmland pressure gradient to the water bodies receiving it.",
+      "personnel_roles": [
+        "freshwater ecologist, P07",
+        "monitoring network coordinator, P07"
+      ]
+    },
+    {
+      "partner_id": "P08",
+      "legal_name": "P08",
+      "country": "C4",
+      "country_slot": "C4",
+      "country_slot_class": "AC",
+      "organisation_type": "university",
+      "organisation_description": "University, marine and coastal science",
+      "sector": "marine and coastal science",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "fictional",
+      "participation_status": "Assumed",
+      "gap_closed": "No marine expertise among the derived six, and no partner able to contribute occurrence data to a marine data facility.",
+      "capabilities": [
+        "coastal and benthic habitat mapping, including submerged vegetation meadows",
+        "marine indicator assessment for policy reporting",
+        "sub-orbital and ocean-colour earth observation of transitional waters",
+        "contribution of occurrence records to a global marine biodiversity data facility"
+      ],
+      "role_in_the_action": "Runs the marine demonstration case in coastal transitional waters, the downstream end of the catchment-to-coast chain, and carries the marine reporting indicators.",
+      "personnel_roles": [
+        "marine habitat scientist, P08",
+        "coastal earth observation analyst, P08"
+      ]
+    },
+    {
+      "partner_id": "P09",
+      "legal_name": "P09",
+      "country": "C5",
+      "country_slot": "C5",
+      "country_slot_class": "MS",
+      "organisation_type": "university",
+      "organisation_description": "University, biodiversity genomics",
+      "sector": "higher education, genomics",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "fictional",
+      "participation_status": "Assumed",
+      "gap_closed": "No genomic, transcriptomic or environmental DNA capability among the derived six. P01's metabolomics is their only omics layer, and the second expected outcome names all three.",
+      "capabilities": [
+        "genomic and transcriptomic sequencing",
+        "environmental DNA metabarcoding",
+        "reference sequence libraries",
+        "bioinformatics pipelines",
+        "standardised omics metadata"
+      ],
+      "role_in_the_action": "Supplies the genomic and transcriptomic layer of the genome-to-space chain, and the omics metadata standard the integration is built on.",
+      "personnel_roles": [
+        "biodiversity genomicist, P09",
+        "bioinformatician, P09"
+      ]
+    },
+    {
+      "partner_id": "P10",
+      "legal_name": "P10",
+      "country": "C3",
+      "country_slot": "C3",
+      "country_slot_class": "MS",
+      "organisation_type": "ngo",
+      "organisation_description": "Non-profit research organisation, biodiversity data infrastructure",
+      "sector": "biodiversity data infrastructure",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_status": "Assumed",
+      "participation_role": "beneficiary",
+      "capability_basis": "fictional",
+      "gap_closed": "No biodiversity data-infrastructure partner among the derived six, so nothing to carry the cooperation with in-situ data collection frameworks, the typology crosswalks or the open-science-cloud link the scope requires.",
+      "capabilities": [
+        "operation of a national species-occurrence data facility that publishes to a global biodiversity data facility",
+        "biodiversity data-standard crosswalks between occurrence standards, the European habitat classification and a global ecosystem typology",
+        "findable, accessible, interoperable and reusable metadata practice",
+        "integration of services into the European open science cloud"
+      ],
+      "role_in_the_action": "Owns the interoperability and data-publication layer: the crosswalks, the metadata profile, the cooperation with the named in-situ data frameworks, and the interface a Joint Research Centre contribution would attach to.",
+      "personnel_roles": [
+        "data infrastructure lead, P10",
+        "metadata standards specialist, P10"
+      ]
+    },
+    {
+      "partner_id": "P11",
+      "legal_name": "P11",
+      "country": "C6",
+      "country_slot": "C6",
+      "country_slot_class": "AC",
+      "organisation_type": "university",
+      "organisation_description": "University institute, socio-ecological systems",
+      "sector": "higher education, socio-ecological research",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "fictional",
+      "participation_status": "Assumed",
+      "gap_closed": "No socio-ecological or socio-economic analysis among the derived six, although the third scope requirement asks demonstration cases to take socio-economic pressures into account.",
+      "capabilities": [
+        "land-use and sea-use pressure analysis",
+        "socio-economic driver analysis for agriculture and aquaculture",
+        "policy-reporting needs assessment under the nature and habitat directives and the nature restoration regulation",
+        "stakeholder engagement design"
+      ],
+      "role_in_the_action": "Analyses the pressures the demonstration cases are selected against, and translates the reporting requirements the scope names into data needs.",
+      "personnel_roles": [
+        "socio-ecological systems researcher, P11",
+        "policy analyst, P11"
+      ]
+    },
+    {
+      "partner_id": "P12",
+      "legal_name": "P12",
+      "country": "C5",
+      "country_slot": "C5",
+      "country_slot_class": "MS",
+      "organisation_type": "sme",
+      "organisation_description": "SME, earth observation analytics and artificial intelligence",
+      "sector": "earth observation analytics",
+      "is_coordinator": false,
+      "independent_legal_entity": true,
+      "participation_role": "beneficiary",
+      "capability_basis": "fictional",
+      "participation_status": "Assumed",
+      "gap_closed": "No partner among the derived six runs artificial-intelligence habitat mapping or trend prediction at European scale, which the first and third expected outcomes both require.",
+      "capabilities": [
+        "deep-learning habitat and ecosystem classification from the European radar and optical earth observation missions",
+        "scalable cloud processing",
+        "predictive biodiversity trend modelling at European scale"
+      ],
+      "role_in_the_action": "Scales the habitat and ecosystem classification from the demonstration cases to European coverage, and runs the trend prediction the first expected outcome names.",
+      "personnel_roles": [
+        "machine learning engineer, P12",
+        "earth observation data scientist, P12"
+      ]
+    }
+  ],
+  "country_slots": {
+    "C1": "MS",
+    "C2": "MS",
+    "C3": "MS",
+    "C4": "AC",
+    "C5": "MS",
+    "C6": "AC",
+    "note": "Six slots: four Member State, two Associated Country. A slot is a pseudonym. It records nothing but its class, because the Tier 1 composition condition asks for nothing else. Slot assignment is Assumed and declared in working_assumptions.json.",
+    "derived_partner_slots": "P01 to P05 sit in C1 and P06 in C2, as the consortium ticket sets out. The derived six therefore span two slots, both Member State, which is one short of the condition."
+  },
+  "composition_condition": {
+    "rule_source": "docs/tier1_normative_framework/extracted/participation_rules.json -> consortium_composition",
+    "status": "met only under assumption",
+    "reason": "Every partner that adds a third country is fictional and Assumed. The derived six span two slots and do not meet the condition on their own. The optional Joint Research Centre contribution the topic allows is not counted, because the Joint Research Centre takes no part in preparing the proposal.",
+    "evaluated_by": "runner/consortium_composition.py, reported in docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json",
+    "affiliated_entities": "None. Every partner is recorded as an independent legal entity and a beneficiary, because an affiliated entity does not sign the grant agreement and counts nothing towards the minimum."
+  },
+  "field_status": {
+    "partner_pseudonyms": "Confirmed",
+    "derived_capabilities": "Assumed",
+    "fictional_capabilities": "Assumed",
+    "participation_status": "Assumed",
+    "country_slot_assignment": "Assumed",
+    "coordinator": "Assumed",
+    "organisation_types": "Confirmed",
+    "composition_condition": "Assumed"
+  },
+  "field_status_note": "A derived capability is Assumed, not Confirmed. CLAUDE.md §12.2 reserves Confirmed for a fact directly evidenced by a named source in Tier 1 to Tier 3, and the instance-one Part B-1 is held outside the repository, so no reader of this branch can check the trace. Participation, slot assignment, the coordinator and every fictional capability are Assumed for their own reasons and declared in working_assumptions.json. Nothing here is Confirmed on the strength of the demo's own design.",
+  "authored_by": "Ticket 'Anonymised consortium with fictional gap partners', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Verified by tests/test_demo_consortium.py: the pseudonym set, the capability bases, the absence of any real country name, address or identifier, and the composition condition evaluated three ways."
+}
