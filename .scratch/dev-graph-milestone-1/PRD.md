@@ -1,6 +1,6 @@
 # Dev Graph milestone 1 — operational graph index, bounded evidence packages, shadow impact planner, blind pre-evaluation
 
-Status: ready-for-agent
+Status: complete (2026-09-29, branch `dev_graph`; closure test `tests/harness/test_dev_graph_t03_end_to_end.py`; one follow-up ticket open, blind view and superseded versions)
 Source: `plans/Dev_Graph_Orchestrator_Implementation_Handoff.md` (23 September 2026), sections 11 and 12, stages 1 to 6
 Branch: `engine-base` at `69b62d9`
 Written: 2026-09-23

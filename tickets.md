@@ -143,7 +143,17 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** Shadow comparison and gate invariant pins; Revision contracts, candidate versioning and assessment applicability; ESR intake record and leakage guard.
 
-- [ ] The end-to-end test passes and each handoff section 11 item is referenced by an assertion comment.
-- [ ] The full test suite shows no new failures against the recorded pre-existing baseline.
-- [ ] The decision log holds all six entries named by the spec.
-- [ ] The PRD status line is updated to reflect completion.
+- [x] The end-to-end test passes and each handoff section 11 item is referenced by an assertion comment.
+- [x] The full test suite shows no new failures against the recorded pre-existing baseline.
+- [x] The decision log holds all six entries named by the spec.
+- [x] The PRD status line is updated to reflect completion.
+
+## Follow-up: blind view excludes superseded candidate versions
+
+**What to build:** The blind pre-evaluation package built around a new candidate version must not include any node derived from a superseded version of the same document. Today the policy forbids the `supersedes` traversal, but the old version's passages re-enter through a shared objective node. Decide whether the exclusion lives in the view policy (a superseded marker the builder stamps on derived nodes) or in the package builder (an exclusion reason for superseded documents). Either choice moves `POLICY_VERSION` or the manifest vocabulary and needs a decision log entry.
+
+**Blocked by:** nothing. Surfaced by the milestone closure test.
+
+- [ ] `tests/harness/test_dev_graph_t03_end_to_end.py::test_blind_package_around_a_new_version_excludes_the_superseded_version` passes and its `xfail` marker is removed.
+- [ ] The controlled-revision view still sees the previous version.
+- [ ] Decision log entry records the choice.
