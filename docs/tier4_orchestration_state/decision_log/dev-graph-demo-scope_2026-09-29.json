@@ -1,0 +1,69 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-demo-scope",
+  "date": "2026-09-29",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Branch baseline and demo scope record' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a state transition a later reader cannot reconstruct from the tree is recorded durably in Tier 4. Applies §5 Tier 3 (an empty Tier 3 leaves the engine generic), §9.1 (docs/ is authoritative) and §12.1 (a reviewable output names its inputs). Not a constitutional amendment. §14.5 is not engaged.",
+  "decision": "The dev_graph_demo branch opens instance two: a second, separate project that exercises the Milestone 1 dev graph on a full-size real call instead of the synthetic fixture. Instance two is a demonstration. It is never submitted. Its consortium is anonymised.",
+  "scope": {
+    "instance": "two",
+    "purpose": "demonstration of the Milestone 1 dev graph on real records",
+    "submission": "never submitted",
+    "consortium": "anonymised",
+    "topic": "HORIZON-CL6-2027-01-BIODIV-01",
+    "topic_title": "Integrating Remote Sensing and in-situ observations of Biodiversity, towards a fully interoperable observation and data framework",
+    "work_programme": "Horizon Europe 2026-2027, Part 9 (Cluster 6)",
+    "instrument": "RIA (to be confirmed against Tier 2B by the intake ticket; not Confirmed here)",
+    "handoff_stage": "stage 7, real-document integration, which the Milestone 1 PRD left out of scope"
+  },
+  "questions": {
+    "snapshot_on_real_records": "Does the snapshot builder build on real Tier 2B and Tier 3 records, and does it build the same snapshot id twice?",
+    "packages_within_budget": "Do evidence packages stay within the default budget on a full-size world, and which packages go incomplete and why?",
+    "planner_agrees_with_reruns": "Does the shadow impact planner agree with real reruns? Every case where the planner is narrower than the rerun is the unsafe direction and is investigated.",
+    "blind_lane_stays_leak_free": "Does the blind pre-evaluation lane stay leak-free when the candidate and its history are real?"
+  },
+  "baseline": {
+    "base_commit": "f40753dfd9cb19eaaa1999a68aaea36d0f2a0379",
+    "base_commit_subject": "implemented dev graph ms1",
+    "milestone_1_closure_commit": "0e734aa843d8399ce162c946475a05ab66382afe",
+    "milestone_1_closure_subject": "dev-graph: milestone closure, the T03 scenario end to end",
+    "milestone_1_followup_commit": "bb8240e37e0734533375f2490860bd67e11065a3",
+    "milestone_1_followup_subject": "dev-graph: blind view hides superseded candidate versions",
+    "branch_point": "dev_graph_demo and dev_graph both point at f40753d. The merge base of the two branches is f40753d, so instance two starts from the dev_graph tip, two commits after the Milestone 1 closure.",
+    "tier3_state": "Empty since the 22 September purge. Seven tracked paths: six .gitkeep files under architecture_inputs, call_binding, consortium, integration, project_brief and source_materials, plus working_assumptions.example.json. No untracked file.",
+    "tier5_state": "Empty. Six tracked .gitkeep files and nothing else.",
+    "working_tree": "At the base commit the tree was clean: no modified tracked file and no untracked file. Nothing under .agents/skills/ is touched, so no unrelated change is mixed into a demo commit. This ticket adds three files and nothing else: plans/dev_graph_demo_tickets.md, this record, and tests/test_dev_graph_demo_scope.py.",
+    "test_suite": {
+      "before": "27 failed, 4899 passed, 111 skipped in 119s, measured at the base commit with py -3.10 -m pytest -q. Identical to the Milestone 1 baseline recorded after bb8240e.",
+      "after": "27 failed, 4911 passed, 111 skipped in 137s, measured on the finished change. The passed count rises by the 12 tests in tests/test_dev_graph_demo_scope.py and by nothing else. No new failure.",
+      "families": "The 27 are pre-existing and unchanged: transport_openai_compatible x10, skill_applicability x3, phase8_consistency_layer x3, drafting_skill_hygiene x3, and six singles. None touches dev-graph code.",
+      "no_new_failures": "The failing test names before and after are the same set, compared line by line. The passed count rises only by the tests this ticket adds."
+    }
+  },
+  "baseline_findings": [
+    {
+      "id": "F1",
+      "finding": "The base commit f40753d carries six Tier 4 artifacts that are not instance-two decisions: decision-log-update_854fd6e8.json, decision-log-update_c084e3dd.json, topic-scope-check_854fd6e8.json, topic-scope-check_c084e3dd.json and topic-scope-check_ec190493.json in decision_log/, and milestone-consistency-check_cb3ad20d.json in validation_reports/.",
+      "cause": "They are byproducts of a full test-suite run. Their content belongs to the archived MAESTRO demo run against topic HORIZON-CL4-2026-05-DIGITAL-EMERGING-02, not to this branch.",
+      "consequence": "They put a second topic in the decision log a later reader of Tier 4 must distinguish from the demo's own record. They carry no instance-one proper noun, so they do not breach the leakage constraint.",
+      "status": "Recorded, not removed. Removing them rewrites the baseline this record fixes. The operator decides whether to delete them in a separate commit before the intake ticket writes selected_call.json."
+    },
+    {
+      "id": "F2",
+      "finding": "plans/dev_graph_demo_tickets.md carries five hits against the standing agnosticism-lint denylist: 'hyperspectral' twice, 'crop' twice and 'MSCA' once.",
+      "cause": "Four are domain nouns the consortium ticket uses to describe the derived partner capabilities. The fifth names harness/profiles/msca_pf_default.json, an engine artifact that already exists under that name.",
+      "consequence": "None is an organisation, person, place, web address or identifier, so none breaches the branch's anonymity constraint. The standing lint does not fire either: GENERIC_LAYER_GLOBS in runner/agnosticism_lint.py scans runner/, templates/ and one skill file, never plans/.",
+      "status": "Checked and cleared, not a breach. Recorded because the consortium ticket builds a leakage test over Tier 3, Tier 4, Tier 5 and the vault, and whoever writes it will meet the same denylist. That test scopes proper nouns, not domain nouns. No change is made to runner/agnosticism_lint.py."
+    }
+  ],
+  "constraints_for_the_branch": {
+    "source": "Copied from the standing constraints in the preamble of plans/dev_graph_demo_tickets.md, so a later reader of Tier 4 need not read plans/. The ticket file is the origin. Where the two diverge, the ticket file is corrected, not this record.",
+    "anonymity": "No real organisation name, person name, place, web address, grant or project identifier from instance one appears anywhere on this branch, including Tier 3-5, Tier 4 logs, vault notes, commit messages and the ticket file. The instance-one Part B-1 stays outside the repository.",
+    "unmodified_components": "The DAG scheduler, gate evaluator, gate library, budget-before-Phase-8 block and the whole-Tier-3 reuse fingerprint are not modified. The impact planner stays in shadow mode.",
+    "fabrication": "No call constraint is invented outside Tier 2B (§13.2). No project fact is invented outside Tier 3 (§13.3). A gap is flagged, declared in working_assumptions.json, or left as an honest gate failure.",
+    "style": "The proposal-prose profile governs Tier 5 text, which is its documented scope. The internal-docs profile governs plans/**/*.md. The operator extends it to decision log entries for this branch; docs/style/internal-docs-profile.md §2 does not claim Tier 1-5 content itself, so this is an operator extension, not the profile's own scope.",
+    "execution": "Tests run with py -3.10. Runner phases are dispatched only by the tickets that say so."
+  },
+  "verification": "Branch, base commit and ancestry read from git: git rev-parse on both branches, git merge-base dev_graph_demo dev_graph, and git log -1 --format=%s on each recorded SHA. Tier 3 and Tier 5 contents read from git ls-files and from disk; both agree. Working tree read from git status --untracked-files=all. The topic code and title are read from docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/cluster_CL6.grouped.json, the only Tier 2B source on this branch that carries the topic; every other field of the call is left to the Tier 2B intake ticket and is not asserted here. The denylist scan of F2 ran the compiled PROJECT_NOUNS alternation from runner/agnosticism_lint.py over the three added files. tests/test_dev_graph_demo_scope.py pins this record's identity, binds each recorded SHA to its subject line, checks ancestry, and cross-checks the topic against the ticket file."
+}
