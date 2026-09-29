@@ -37,11 +37,11 @@ Three facts need resolving against the downloaded sources, not against memory:
 
 **Blocked by:** None — can start immediately.
 
-- [ ] `call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json` and `.slice.json` exist and cite the Part 9 PDF by page.
-- [ ] The Part 9 PDF and the portal topic JSON are stored under Tier 2B `work_programmes/` and registered in `docs/index/document_registry.json`.
-- [ ] `selected_call.json` names the topic, the action type (RIA), the per-project contribution (EUR 5,000,000) and the confirmed dates. It is marked Confirmed only for fields traced to a source.
-- [ ] The date contradiction and the grant-type finding each have a decision log entry naming the prevailing source.
-- [ ] Tier 2B `extracted/` is **not** hand-written. Phase 1 writes it.
+- [x] `call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json` and `.slice.json` exist and cite the Part 9 PDF by page.
+- [x] The Part 9 PDF and the portal topic JSON are stored under Tier 2B `work_programmes/` and registered in `docs/index/document_registry.json`.
+- [x] `selected_call.json` names the topic, the action type (RIA), the per-project contribution (EUR 5,000,000) and the confirmed dates. It is marked Confirmed only for fields traced to a source.
+- [x] The date contradiction and the grant-type finding each have a decision log entry naming the prevailing source.
+- [x] Tier 2B `extracted/` is **not** hand-written. Phase 1 writes it.
 
 ## Tier 1 and Tier 2A coverage check for an RIA
 

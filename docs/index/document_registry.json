@@ -1,1 +1,48 @@
-{}
+{
+  "registry_scope": "Partially populated. The Tier 2B intake ticket (plans/dev_graph_demo_tickets.md, branch dev_graph_demo) registers the three sources for topic HORIZON-CL6-2027-01-BIODIV-01, which is what that ticket adds and cites. Tier 1, Tier 2A and the remaining Tier 2B work programmes are unregistered and are the scope of their own tickets. CLAUDE.md §9.6 requires the registry to reflect repository state; this entry records how far it does, so a reader is not misled into treating an absent path as an absent document.",
+  "entry_schema": "Required on every entry: document_id, path (repo-relative POSIX), tier, media_type, bytes, sha256, digest_basis, title, role, retrieved_on, registered_by. Optional: retrieved_from (absent when the document predates this branch and its retrieval is unrecorded), pages (paginated documents only). bytes and sha256 are measured on the digest_basis, not on the raw file: raw_bytes for a binary document, lf_normalised_bytes for a text one. Text documents are normalised because core.autocrlf is true in this repository, so a text file checks out CRLF on Windows and LF elsewhere, and a raw digest would identify the platform rather than the content.",
+  "document_registry": [
+    {
+      "document_id": "tier2b.wp9.horizon-2026-2027",
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+      "tier": "2B",
+      "media_type": "application/pdf",
+      "bytes": 2643258,
+      "sha256": "aab38e64e213323ada661ba452ac69d3d42d4a4eb91f365aa7bc25e3e41f6ace",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9 - Food, Bioeconomy, Natural Resources, Agriculture and Environment",
+      "role": "Prevailing source for every call fact of topic HORIZON-CL6-2027-01-BIODIV-01. The topic occupies pages 73 to 76; the call timetable is on page 34; the 2027 budget table is on page 35.",
+      "retrieved_from": "https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/horizon/wp-call/2026-2027/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+      "retrieved_on": "2026-09-29",
+      "pages": 360,
+      "registered_by": "Tier 2B intake ticket",
+      "digest_basis": "raw_bytes"
+    },
+    {
+      "document_id": "tier2b.portal.horizon-cl6-2027-01-biodiv-01",
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/HORIZON-CL6-2027-01-BIODIV-01.portal.json",
+      "tier": "2B",
+      "media_type": "application/json",
+      "bytes": 45385,
+      "sha256": "f5a52a409c1754d57b466a8225005a358e612a1b2e79f762d1b1c7f1d3b8325c",
+      "title": "EU Funding and Tenders Portal topic record for HORIZON-CL6-2027-01-BIODIV-01",
+      "role": "Corroborating source. Carries the planned opening date, the deadline and the lump-sum MGA (HORIZON-AG-LS) independently of the work programme PDF. It is the second reading that settles the date contradiction and the grant-type finding.",
+      "retrieved_from": "https://api.tech.ec.europa.eu/search-api/prod/rest/search (SEDIA, reference 50143905TOPICSen)",
+      "retrieved_on": "2026-09-29",
+      "registered_by": "Tier 2B intake ticket",
+      "digest_basis": "lf_normalised_bytes"
+    },
+    {
+      "document_id": "tier2b.grouped.cl6",
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/cluster_CL6.grouped.json",
+      "tier": "2B",
+      "media_type": "application/json",
+      "bytes": 675639,
+      "sha256": "ae19a7108acc7e4a355acef1bab0e88520349548472d23e9481921694f46e66e",
+      "title": "Cluster 6 grouped work programme JSON",
+      "role": "Input to runner/call_slicer.py, which slices the topic entry into call_extracts/HORIZON-CL6-2027-01-BIODIV-01.slice.json. Registered as a derived aggregation, not as a prevailing source: six of the topic's condition fields are empty, including legal_and_financial_setup and eligibility_conditions, so the grant type and the Copernicus condition cannot be read from it. See finding I2 of validation_reports/tier2b-biodiv-intake_2026-09-29.json.",
+      "retrieved_on": "unknown, present in the repository before this branch",
+      "registered_by": "Tier 2B intake ticket",
+      "digest_basis": "lf_normalised_bytes"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "record_type": "decision",
+  "id": "tier2b-biodiv-intake-grant-type",
+  "date": "2026-09-29",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Tier 2B intake for the selected topic' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §12.3 (a cross-source finding is resolved explicitly and its prevailing source named), §8.1 and §8.4 (the budget gate's source is instrument-conditional), §13.2 (no call constraint is invented outside Tier 2B). Not a constitutional amendment; §14.5 is not engaged.",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "question": "One portal read reported a lump-sum grant. The grouped work programme JSON leaves legal_and_financial_setup empty for this topic. Which budget-gate route does Phase 7 take?",
+  "evidence": [
+    {
+      "source": "wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+      "tier": "2B",
+      "locator": "page 73, 'Legal and financial set-up of the Grant Agreements', continuing on page 74",
+      "quote": "The rules are described in General Annex G. The following exceptions apply: Eligible costs will take the form of a lump sum as defined in the Decision of 7 July 2021 authorising the use of lump sum contributions under the Horizon Europe Programme",
+      "reading": "lump_sum"
+    },
+    {
+      "source": "HORIZON-CL6-2027-01-BIODIV-01.portal.json",
+      "tier": "2B",
+      "locator": "record.metadata.actions[0].types[0].typeOfMGA[0]; corroborated by record.metadata.typeOfMGAs and by the topicConditions section 6",
+      "quote": "HORIZON-AG-LS, HORIZON Lump Sum Grant",
+      "reading": "lump_sum"
+    },
+    {
+      "source": "cluster_CL6.grouped.json",
+      "tier": "2B",
+      "locator": "destinations[0].calls[], entry with call_id HORIZON-CL6-2027-01-BIODIV-01, field legal_and_financial_setup",
+      "quote": "",
+      "reading": "silent, not contradictory"
+    },
+    {
+      "source": "docs/tier2a_instrument_schemas/extracted/instrument_registry.json",
+      "tier": "2A",
+      "locator": "instruments[], entry with instrument_type RIA, field budget_regime",
+      "quote": "lump_sum",
+      "reading": "lump_sum"
+    }
+  ],
+  "resolution": {
+    "budget_regime": "lump_sum",
+    "status": "Confirmed",
+    "phase_7_route": "External Lump Sum Budget Planner. The repository prepares a request from docs/integrations/lump_sum_budget_planner/request_templates/ using the Phase 3, 4 and 6 outputs, the operator runs the planner, and the response is placed in received/ and validated against interface_contract.json before gate_09 can pass. The repository computes no lump-sum figure (CLAUDE.md §8.1).",
+    "deterministic_derivation_route": "Not available. The §8.1 internal unit-cost derivation is sanctioned for unit-cost instruments only. runner/unit_cost_budget.py is not in scope for this topic."
+  },
+  "prevailing_source": {
+    "document": "wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+    "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+    "locator": "pages 73 to 74",
+    "why": "The lump-sum regime is a topic-level exception to General Annex G, and the work programme is where that exception is enacted. The portal record renders the same decision as an MGA type, which corroborates it without being its source."
+  },
+  "reasoning": "The empty grouped-JSON field is an extraction gap, not a competing reading, so no §12.3 arbitration between Tier 2B sources is needed. The Tier 2A and Tier 2B readings agree, so the §3 hierarchy is not engaged either: had Tier 2A recorded RIA as anything other than lump_sum, that would have been a genuine cross-tier contradiction, because gate_09 resolves budget_regime from the Tier 2A instrument registry while the lump-sum decision for this topic is made at call level. It does not arise here, and the coincidence is recorded so a later reader knows the two paths were checked against each other rather than assumed equal.",
+  "consequences": [
+    "Phase 7 is the lump-sum route. The budget ticket prepares a request and waits for an operator-supplied response.",
+    "Phase 8 is hard-blocked until a validated response exists in received/. This block is unconditional (CLAUDE.md §8.4, §13.4), so the demo runs its non-Phase-8 scenarios while it holds. The candidate-Part-B and blind-baseline ticket depends on it clearing.",
+    "runner/instrument_profile.py resolves budget_regime from the Tier 2A instrument registry, which already carries lump_sum for RIA. No engine change is needed for this topic, and none is made."
+  ],
+  "additional_finding": {
+    "finding": "The topic carries a second eligibility exception the ticket did not name: a project that uses satellite earth observation, positioning, navigation or timing data must use Copernicus or Galileo/EGNOS.",
+    "quote": "If projects use satellite-based earth observation, positioning, navigation and/or related timing data and services, beneficiaries must make use of Copernicus and/or Galileo/EGNOS (other data and services may additionally be used).",
+    "locator": "page 73, 'Eligibility conditions'",
+    "why_it_matters": "This is an eligibility condition, not a preference, and the topic is about satellite remote sensing. It is recorded in the call extract's cross_cutting_requirements and eligibility_restrictions so the concept and work-package tickets treat it as binding."
+  },
+  "recorded_in": [
+    "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+    "docs/tier3_project_instantiation/call_binding/selected_call.json"
+  ],
+  "verification": "The page-73 and page-74 quotes are re-read from the stored PDF by tests/test_tier2b_biodiv_intake.py. The same tests check the portal record's MGA abbreviation and assert that selected_call.json's budget_regime equals the Tier 2A instrument registry's value for RIA, so the two tiers cannot silently diverge later."
+}

@@ -1,0 +1,166 @@
+{
+  "report_id": "tier2b_biodiv_intake_2026-09-29",
+  "report_kind": "tier intake validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Tier 2B intake for the selected topic' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §12.1 (a phase output is reviewable: it names its inputs by tier and file, states its inferences and flags its assumptions) and §12.2 (the four status categories). This is a ticket-authored report, not a skill-produced one. No gate reads it.",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "inputs": [
+    {
+      "tier": "2B",
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+      "role": "prevailing source",
+      "pages_read": [
+        34,
+        35,
+        73,
+        74,
+        75,
+        76
+      ]
+    },
+    {
+      "tier": "2B",
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/HORIZON-CL6-2027-01-BIODIV-01.portal.json",
+      "role": "corroborating source"
+    },
+    {
+      "tier": "2B",
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/cluster_CL6.grouped.json",
+      "role": "slicer input"
+    },
+    {
+      "tier": "2A",
+      "path": "docs/tier2a_instrument_schemas/extracted/instrument_registry.json",
+      "role": "budget regime cross-check for RIA"
+    }
+  ],
+  "outputs": [
+    "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+    "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.slice.json",
+    "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "docs/index/document_registry.json",
+    "docs/tier4_orchestration_state/decision_log/tier2b-biodiv-intake-dates_2026-09-29.json",
+    "docs/tier4_orchestration_state/decision_log/tier2b-biodiv-intake-grant-type_2026-09-29.json",
+    "tests/test_tier2b_biodiv_intake.py"
+  ],
+  "element_status": [
+    {
+      "element": "opening date and submission deadline",
+      "value": "2027-04-20 and 2027-09-22",
+      "status": "Confirmed",
+      "evidence": "Part 9 PDF page 34, call timetable; corroborated by the portal record's actions block and by the grouped JSON."
+    },
+    {
+      "element": "budget regime",
+      "value": "lump_sum",
+      "status": "Confirmed",
+      "evidence": "Part 9 PDF pages 73 to 74, topic-level exception to General Annex G; corroborated by the portal MGA type HORIZON-AG-LS and by the Tier 2A instrument registry entry for RIA."
+    },
+    {
+      "element": "type of action",
+      "value": "RIA",
+      "status": "Confirmed",
+      "evidence": "Part 9 PDF page 73, 'Type of Action: Research and Innovation Actions'; page 35 budget table; portal typesOfAction."
+    },
+    {
+      "element": "expected EU contribution per project and indicative budget",
+      "value": "EUR 5,000,000 and EUR 10,000,000, two projects expected",
+      "status": "Confirmed",
+      "evidence": "Part 9 PDF page 73 specific conditions; page 35 budget table; portal budgetOverview."
+    },
+    {
+      "element": "three expected outcomes, binding as 'all'",
+      "value": "carried verbatim",
+      "status": "Confirmed",
+      "evidence": "Part 9 PDF page 74."
+    },
+    {
+      "element": "five scope requirements",
+      "value": "carried verbatim",
+      "status": "Confirmed",
+      "evidence": "Part 9 PDF pages 74 and 75."
+    },
+    {
+      "element": "nine cross-cutting requirements",
+      "value": "each carries a source span",
+      "status": "Confirmed",
+      "evidence": "Part 9 PDF pages 73, 75 and 76. The LUCAS grassland and EMBAL requirement straddles the page break and is recorded as two spans."
+    },
+    {
+      "element": "two topic-level eligibility exceptions",
+      "value": "optional JRC participation; mandatory Copernicus or Galileo/EGNOS use",
+      "status": "Confirmed",
+      "evidence": "Part 9 PDF page 73; corroborated by the portal topicConditions section 3."
+    },
+    {
+      "element": "project duration",
+      "value": "absent",
+      "status": "Unresolved",
+      "evidence": "No duration condition appears on pages 73 to 76, and the portal record carries none. Duration is an operator choice made by the concept ticket. project_duration_months is absent from selected_call.json rather than assumed (CLAUDE.md §13.3)."
+    },
+    {
+      "element": "date stability",
+      "value": "envisaged, not fixed",
+      "status": "Inferred",
+      "evidence": "Part 9 PDF page 34 footnote 55 reserves a shift of the opening by up to one month and a delay of the deadline by up to two months. The dates themselves stay Confirmed; their permanence does not."
+    }
+  ],
+  "findings": [
+    {
+      "id": "I1",
+      "severity": "blocking for Phase 1, unfixed here",
+      "finding": "The twelve Tier 2B predicates of phase_01_gate all pass right now, before Phase 1 has run for this topic, on Tier 2B extracted/ content belonging to a different call.",
+      "evidence": "docs/tier2b_topic_and_call_sources/extracted/ holds seven files written by an earlier MSCA-PF run. Their only topic code is HORIZON-MSCA-2026-PF-01-01. g02_p01 to g02_p06 are non_empty_json and g02_p07 to g02_p12 are source_refs_present; all twelve were evaluated against the current tree and all twelve returned passed. No predicate compares the extracted content to selected_call.json's topic_code.",
+      "consequence": "Phase 1 could write nothing for HORIZON-CL6-2027-01-BIODIV-01 and phase_01_gate would still release n01, letting Phase 2 consume MSCA expected outcomes as if they were this topic's. That is a fail-open gate, and CLAUDE.md §15 requires the system to prefer explicit gate failure over fabricated completion.",
+      "not_fixed_here": "The branch constraint holds the gate library, gate evaluator and DAG scheduler unmodified, and this ticket is an intake. The fix belongs to the runner ticket or to Milestone 2: either a topic-consistency predicate over Tier 2B extracted/, or an explicit clearing of extracted/ before Phase 1 runs for a new topic.",
+      "recommended_owner": "Runner Phases 1 to 6 on the demo; carried into the demo report as a candidate Milestone 2 ticket.",
+      "status": "Unresolved"
+    },
+    {
+      "id": "I2",
+      "finding": "cluster_CL6.grouped.json leaves six of the topic's condition fields empty, including legal_and_financial_setup, which is the field the Phase 7 route turns on.",
+      "evidence": "The grouped entry's legal_and_financial_setup, admissibility_conditions, eligibility_conditions, technology_readiness_level, procedure and exceptional_page_limits are all empty strings. Counted directly on the file.",
+      "consequence": "The grouped JSON alone cannot establish the grant type. A skill that reads only the slice sees a topic with no legal or financial set-up and no eligibility conditions, so it would miss both the lump-sum regime and the mandatory Copernicus or Galileo/EGNOS condition. The call extract carries both with their own spans, so the slice is not the sole path to them.",
+      "not_fixed_here": "The grouped JSON is a source aggregation. Repairing it would modify a Tier 2B source to suit this project, which §13.11 forbids. It is registered in the document registry as a derived aggregation rather than a prevailing source.",
+      "status": "Confirmed as a source limitation",
+      "correction": "An earlier draft of this report also claimed the grouped JSON carried U+FFFD replacement characters where the PDF carried typographic quotation marks. That claim was false. The file contains zero U+FFFD; the replacement characters were an artefact of the console encoding used to inspect it, not of the data. Recorded here rather than deleted, because the registry entry for the grouped JSON repeated the same false claim and a reader of either artifact's history deserves to know it was withdrawn."
+    },
+    {
+      "id": "I3",
+      "finding": "The work programme directory names do not match their cluster numbers. cluster_CL6.grouped.json and the Part 9 PDF both live under work_programmes/cluster_climate/, although Part 9 is Cluster 6, Food, Bioeconomy, Natural Resources, Agriculture and Environment.",
+      "evidence": "GROUPED_JSON_MAP in runner/call_slicer.py maps cluster_climate to cluster_CL6.grouped.json and cluster_food to cluster_CL5.grouped.json.",
+      "consequence": "selected_call.json must record work_programme as 'cluster_climate' for the Call Slicer to resolve, which reads as wrong to a human and is right to the engine. The Part 9 PDF is stored beside its grouped JSON so a topic's sources stay together.",
+      "not_fixed_here": "Renaming the directories changes GROUPED_JSON_MAP and every call binding that names a work programme area. That is an engine change, outside an intake ticket.",
+      "recommended_owner": "Candidate Milestone 2 ticket.",
+      "status": "Confirmed as a naming defect"
+    },
+    {
+      "id": "I4",
+      "finding": "The ticket's first acceptance criterion reads 'call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json and .slice.json exist and cite the Part 9 PDF by page'. The slice cites no PDF and no page. It names only cluster_CL6.grouped.json.",
+      "evidence": "The slice is written by runner/call_slicer.py, whose output shape is fixed: topic_code, source_grouped_json, source_destination, call_entry, sliced_by, slice_timestamp. It has no field for a page reference and no access to the PDF.",
+      "consequence": "The criterion is met by the pair, not by each file. The call extract cites the PDF by page; the slice cites the grouped JSON it was sliced from, which is its own honest provenance. Hand-adding a PDF page to the slice would break the byte-equal replay check that proves it was not hand-written, so it was not done.",
+      "not_fixed_here": "Changing the slicer's output shape is an engine change and would alter the existing CL4 and MSCA slices. The criterion is ticked on the reading above, and that reading is recorded here so the tick is not taken for more than it is.",
+      "status": "Confirmed, criterion met by the pair"
+    }
+  ],
+  "boundaries_respected": {
+    "tier_2b_extracted": "Not written. Phase 1 owns it (CLAUDE.md §7 Phase 1). No file under docs/tier2b_topic_and_call_sources/extracted/ was created or edited.",
+    "tier_1_and_tier_2_sources": "Not modified (§13.11). The Part 9 PDF is stored as downloaded; its sha256 is recorded in the document registry.",
+    "engine": "No change to runner/, .claude/gates, the gate rules library, the manifest or the DAG scheduler.",
+    "budget": "No budget figure is computed, estimated or substituted (§8.3). The Phase 7 route is recorded, not run."
+  },
+  "verification": "tests/test_tier2b_biodiv_intake.py, 46 checks, all passing. Every source span in the call extract is re-read from the stored PDF and matched against the page it names; mutating one character of one quote turns the check red, which was tried. The three expected outcomes, the five scope requirements and the scope summary are plain strings rather than span objects, so each is separately matched against the topic's pages: a length check alone would have passed on fabricated text. The slice is regenerated by runner/call_slicer.py into a throwaway root and compared field by field, timestamp aside, so the check cannot rewrite the tracked artifact. Each registered document's sha256 and byte count are recomputed on the basis its entry declares: raw bytes for the PDF, LF-normalised bytes for the two JSON sources, because core.autocrlf is true here and a raw digest of a text file would identify the platform rather than the content. Every registry row is checked against the schema the registry declares. The reader is a hard import, not an importorskip, so an environment without pymupdf fails rather than reporting green on checks that never ran. The full suite reports 27 failed and 4957 passed; the 27 are the pre-existing baseline, and the twelve files carrying them were re-run with and without selected_call.json present with identical results, which is what establishes that none is caused by this change.",
+  "scope_beyond_the_ticket": {
+    "note": "The ticket named six cross-cutting requirements. The extract records nine. The three additions are call constraints present on the same pages, and leaving them out would have left the extract incomplete against its own source while claiming to carry the topic's conditions.",
+    "additions": [
+      "copernicus_galileo_egnos, an eligibility condition on page 73 and the one with teeth for a remote-sensing topic",
+      "policy_reporting_alignment, the Habitats, Birds, Marine Strategy Framework and Nature Restoration reporting requirements on page 75",
+      "research_infrastructures, the permissive ESFRI clause on page 76",
+      "timetable_discretion and ecosystem_realms, both recorded because a later ticket depends on them: the change-scenarios ticket uses a date change, and the consortium ticket measures its capability gaps against the three ecosystem realms",
+      "cluster_CL6.grouped.json registered as a third document, because the slice cites it and an unregistered cited source defeats the registry's purpose"
+    ],
+    "engine_observations": "Findings I1 and I3 are about the engine, not the intake. They are recorded because the intake is what surfaced them and because the demo report is asked for the fail-closed errors real records expose. Neither is fixed here.",
+    "requirements_change": "requirements.txt gains pymupdf. The verification reads the stored PDF, and an undeclared reader would have let the suite skip every span check and still report green."
+  }
+}

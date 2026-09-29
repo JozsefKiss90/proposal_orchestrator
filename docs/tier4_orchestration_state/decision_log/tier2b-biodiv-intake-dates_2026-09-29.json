@@ -1,0 +1,58 @@
+{
+  "record_type": "decision",
+  "id": "tier2b-biodiv-intake-dates",
+  "date": "2026-09-29",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Tier 2B intake for the selected topic' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4 is the operative rule: this is a durable finding a later reader could not reconstruct from the tree. §12.3 is cited because the ticket asked for the contradiction to be logged under it, and because the record names a prevailing source in the form §12.3 requires — but §12.3 governs the resolution of a contradiction, and what the reading found was agreement, so §12.3 is not what makes this record necessary. Also applies §10.6 (source documents govern over prior knowledge) and §13.2 (no call constraint is invented outside Tier 2B). Not a constitutional amendment; §14.5 is not engaged.",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "question": "The ticket records that two automated reads of the EU Funding and Tenders Portal returned dates differing from the grouped work programme JSON, which gives an opening of 20 April 2027 and a deadline of 22 September 2027. Which value is in the downloaded source?",
+  "evidence": [
+    {
+      "source": "wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+      "tier": "2B",
+      "locator": "page 34, call timetable for Call 01 - single stage (2027), HORIZON-CL6-2027-01",
+      "quote": "Opening: 20 Apr 2027 Deadline(s): 22 Sep 2027",
+      "reading": "2027-04-20 and 2027-09-22"
+    },
+    {
+      "source": "HORIZON-CL6-2027-01-BIODIV-01.portal.json",
+      "tier": "2B",
+      "locator": "record.metadata.actions[0], plannedOpeningDate and deadlineDates; corroborated by record.metadata.startDate and record.metadata.deadlineDate",
+      "quote": "plannedOpeningDate 2027-04-20, deadlineDates [2027-09-22]",
+      "reading": "2027-04-20 and 2027-09-22"
+    },
+    {
+      "source": "cluster_CL6.grouped.json",
+      "tier": "2B",
+      "locator": "destinations[0].calls[], entry with call_id HORIZON-CL6-2027-01-BIODIV-01",
+      "quote": "opening_date 2027-04-20, deadline 2027-09-22",
+      "reading": "2027-04-20 and 2027-09-22"
+    }
+  ],
+  "resolution": {
+    "opening_date": "2027-04-20",
+    "submission_deadline": "2027-09-22",
+    "submission_deadline_time": "17.00.00 Brussels local time",
+    "deadline_model": "single-stage",
+    "status": "Confirmed"
+  },
+  "prevailing_source": {
+    "document": "wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+    "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+    "locator": "page 34",
+    "why": "The work programme is the adopted legal instrument that sets the call timetable. The portal renders it and the grouped JSON aggregates it, so both are downstream of it."
+  },
+  "reasoning": "There is no contradiction left to arbitrate. Three sources were read and all three give the same two dates. The divergence the ticket reports came from the earlier automated portal reads, not from any stored source, and no artifact on this branch carries the divergent values. The resolution is therefore agreement, not a choice between sources. The earlier reads are treated as read errors and are not preserved as a competing reading, because nothing records what they returned.",
+  "residual_uncertainty": {
+    "finding": "Both dates are envisaged, not fixed. The work programme reserves discretion to move them.",
+    "quote": "The Director-General responsible for the call may decide to open the call up to one month prior to or after the envisaged date(s) of opening. The Director-General responsible may delay the deadline(s) by up to two months.",
+    "locator": "page 34, footnote 55",
+    "consequence": "The dates stay Confirmed as the published values. Any project plan that depends on the deadline holding to the day is an inference, not a confirmed fact. Scenario 5 of the change-scenarios ticket uses a date correction as its Tier 2B change, and this footnote is why that scenario is realistic rather than contrived."
+  },
+  "recorded_in": [
+    "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+    "docs/tier3_project_instantiation/call_binding/selected_call.json"
+  ],
+  "verification": "The page-34 quote is re-read from the stored PDF by tests/test_tier2b_biodiv_intake.py, which also checks the portal record's actions block and the dates written into both artifacts. A later edit that changes a date in either artifact without changing the source fails those checks."
+}
