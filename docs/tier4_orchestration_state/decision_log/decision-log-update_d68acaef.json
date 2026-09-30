@@ -1,16 +1,17 @@
 {
-  "decision_id": "scope_check_concept_refiner_2026-09-30T14-45-00Z",
-  "decision_type": "scope_check",
-  "invoking_agent": "concept_refiner",
-  "phase_context": "phase_02_concept_refinement",
+  "decision_id": "gap_risk_flagged_gantt_designer_2026-09-30T18-06-00Z",
+  "decision_type": "gap_risk_flagged",
+  "invoking_agent": "gantt_designer",
+  "phase_context": "phase_04_gantt_milestones",
   "run_id_reference": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
-  "decision_description": "Resolves the single flagged item left open by the phase 2 scope check recorded in docs/tier4_orchestration_state/decision_log/topic-scope-check_d68acaef.json. That check loaded only scope_requirements.json and call_constraints.json and flagged concept claim C22 (the work package holds an open place for the Joint Research Centre as a zero-funding beneficiary or associated partner) as not covered by any loaded Tier 2B scope element or constraint, with resolution_status unresolved. Review of Tier 2B eligibility_conditions.json confirms EC-02 addresses JRC participation directly: the Joint Research Centre may participate as a member of the selected consortium as a beneficiary with zero funding, or as an associated partner, and does not participate in preparation and submission. C22 is therefore in-scope and grounded in Tier 2B. The flag arose from an incomplete file set at scope-check time, not from an absent or conflicting source. With this resolution the concept_refinement_summary scope_conflict_log is empty, satisfying the phase 2 gate condition that no unresolved scope conflicts remain.",
+  "decision_description": "The milestone-consistency-check flagged MS3 ('All three campaigns running under the joint protocol', due_month 22) as a heuristic. The check compared MS3 against its responsible WP in gantt.json (WP4, whose latest task ends month 40) and found the due_month precedes that WP's completion, with no depends_on_tasks recorded on the Gantt milestone entry. This decision records that MS3's month-22 due date is retained as designed. MS3 is an intermediate checkpoint. Its verifiable criterion requires each of the three campaigns to have collected at least one field round, the omics sampling protocol to be delivered, and the reporting-needs assessment to be complete. It does not require WP4 to finish. In milestones_seed.json MS3 gathers deliverables D1.2 (month 12), D5.1 (month 20) and D7.1 (month 22) across WP1, WP5 and WP7, and its due_month equals the latest of those, month 22. The flag is a false positive of the WP-completion heuristic, which fired because the Gantt milestone record labelled MS3 with responsible_wp WP4 and carried no depends_on_tasks list.",
   "alternatives_considered": [
-    "Drop claim C22 from the concept to remove the flagged item. Rejected: EC-02 shows JRC participation is a named call-level eligibility exception, so the claim is admissible and removing it would discard a topic-supported provision.",
-    "Leave the item unresolved and carry it forward. Rejected: the phase 2 gate condition requires no unresolved scope conflicts, and CLAUDE.md 12.3 requires explicit resolution rather than deferral once the governing source is identified."
+    "Move MS3 to month 40 to satisfy the WP4-completion heuristic. Rejected: this would misrepresent an intermediate campaign-start checkpoint as a full-WP4 completion event and contradict its verifiable criterion.",
+    "Add depends_on_tasks to the MS3 Gantt entry (the tasks producing D1.2, D5.1, D7.1) so the consistency check evaluates it against those tasks rather than the WP4 heuristic. Retained as the recommended Gantt correction; it does not change the milestone design or its month-22 date.",
+    "Suppress the consistency-check finding. Rejected: the finding is a valid heuristic flag and must remain visible per CLAUDE.md §12.1."
   ],
-  "tier_authority_applied": "Tier 2B eligibility_conditions.json EC-02",
-  "rationale": "The prior scope check evaluated C22 against only two of the Tier 2B extracted files and could not confirm it, so it flagged the claim rather than asserting it, per CLAUDE.md 13.2. The correct authority for JRC participation is the eligibility condition set, not scope_requirements.json or call_constraints.json. EC-02 (traceable to work programme page 73, source SRC-WP9-P73) names the JRC open place as a topic-level eligibility exception, which grounds C22 in Tier 2B and removes the flag. Recording the resolution here, naming the governing file, keeps the decision durable and reviewable under CLAUDE.md 9.4 rather than resting only in agent memory.",
+  "tier_authority_applied": "CLAUDE.md §7 — Phase 4 gate condition ('All milestones have a defined verifiable criterion'); the retained MS3 criterion satisfies it, and the flag is heuristic, not a gate failure",
+  "rationale": "MS3 has a defined verifiable criterion and a due_month grounded in the deliverables it actually gathers (D1.2 month 12, D5.1 month 20, D7.1 month 22). The consistency check's flag_class is 'heuristic', not 'task_dependency', and its own flag_reason states no depends_on_tasks or milestone_type was specified. The Phase 4 gate condition asks for a defined verifiable criterion and a timeline that fits the duration, both of which MS3 meets. Recording this keeps the reasoning durable rather than resolving the heuristic silently, per CLAUDE.md §9.4.",
   "resolution_status": "resolved",
-  "timestamp": "2026-09-30T14:45:00Z"
+  "timestamp": "2026-09-30T18:06:00Z"
 }

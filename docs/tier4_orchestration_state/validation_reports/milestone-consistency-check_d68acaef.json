@@ -1,82 +1,91 @@
 {
-  "report_id": "milestone_consistency_wp_designer_2026-09-30T18:00:00Z",
+  "report_id": "milestone_consistency_gantt_designer_2026-09-30T18:05:00+00:00",
   "skill_id": "milestone-consistency-check",
-  "invoking_agent": "wp_designer",
+  "invoking_agent": "gantt_designer",
   "run_id_reference": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
-  "mode": "DEGRADED",
+  "mode": "FULL",
   "validated_scope": [
-    "wp_structure"
+    "wp_structure",
+    "gantt"
   ],
   "findings": [
     {
       "milestone_id": "MS1",
       "due_month": 9,
-      "task_completion_month": null,
+      "task_completion_month": 9,
       "verifiable_criterion_present": true,
       "consistency_status": "consistent",
-      "flag_reason": null
+      "flag_reason": null,
+      "flag_class": "task_dependency"
     },
     {
       "milestone_id": "MS2",
       "due_month": 16,
-      "task_completion_month": null,
+      "task_completion_month": 16,
       "verifiable_criterion_present": true,
       "consistency_status": "consistent",
-      "flag_reason": null
+      "flag_reason": null,
+      "flag_class": "task_dependency"
     },
     {
       "milestone_id": "MS3",
       "due_month": 22,
-      "task_completion_month": null,
+      "task_completion_month": 40,
       "verifiable_criterion_present": true,
-      "consistency_status": "consistent",
-      "flag_reason": null
+      "consistency_status": "flagged",
+      "flag_reason": "Milestone due_month (22) precedes completion of all tasks in responsible WP (max task end_month: 40); no depends_on_tasks or milestone_type specified — flagged as heuristic",
+      "flag_class": "heuristic"
     },
     {
       "milestone_id": "MS4",
       "due_month": 28,
-      "task_completion_month": null,
+      "task_completion_month": 28,
       "verifiable_criterion_present": true,
       "consistency_status": "consistent",
-      "flag_reason": null
+      "flag_reason": null,
+      "flag_class": "task_dependency"
     },
     {
       "milestone_id": "MS5",
       "due_month": 38,
-      "task_completion_month": null,
+      "task_completion_month": 38,
       "verifiable_criterion_present": true,
       "consistency_status": "consistent",
-      "flag_reason": null
+      "flag_reason": null,
+      "flag_class": "task_dependency"
     },
     {
       "milestone_id": "MS6",
       "due_month": 38,
-      "task_completion_month": null,
+      "task_completion_month": 38,
       "verifiable_criterion_present": true,
       "consistency_status": "consistent",
-      "flag_reason": null
+      "flag_reason": null,
+      "flag_class": "task_dependency"
     },
     {
       "milestone_id": "MS7",
       "due_month": 40,
-      "task_completion_month": null,
+      "task_completion_month": 40,
       "verifiable_criterion_present": true,
       "consistency_status": "consistent",
-      "flag_reason": null
+      "flag_reason": null,
+      "flag_class": "task_dependency"
     },
     {
       "milestone_id": "MS8",
       "due_month": 48,
-      "task_completion_month": null,
+      "task_completion_month": 48,
       "verifiable_criterion_present": true,
       "consistency_status": "consistent",
-      "flag_reason": null
+      "flag_reason": null,
+      "flag_class": "task_dependency"
     }
   ],
   "summary": {
     "total_milestones_checked": 8,
-    "passed": 8,
-    "flagged": 0
+    "passed": 7,
+    "flagged": 1
   },
-  "timestamp": "2026-09-30T18:00:00Z"
+  "timestamp": "2026-09-30T18:05:00+00:00"
 }
