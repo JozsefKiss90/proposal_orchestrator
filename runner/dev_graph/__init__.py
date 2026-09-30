@@ -13,7 +13,12 @@ Public API (the one entry point plus its vocabulary and writers):
   commitments of current (not submitted, not superseded) snapshots.
 * :func:`build_package`, :data:`VIEW_POLICIES`, :data:`POLICY_VERSION` — a
   bounded evidence package for a task under a view policy and a budget;
-  :func:`write_package` — the deterministic manifest writer.
+  :data:`DEFAULT_PACKAGE_BUDGET` — the budget a caller defaults to;
+  :func:`write_package` — the deterministic manifest writer;
+  :func:`package_dir` — where one package lands.
+* :data:`DECLARED_STATUS_FIELDS`, :func:`declared_status` — where each node
+  type declares its §12.2 status, and the pure read of it the manifest rolls
+  up. Declared per type, never sniffed from a value.
 * :func:`record_change`, :func:`load_snapshot`, :func:`read_record_version`
   — record an approved new version of a Tier 3 record with the old version
   kept, both snapshots stored content-addressed.
@@ -99,6 +104,7 @@ from runner.dev_graph.intake import (
 )
 from runner.dev_graph.packages import (
     COMPLETENESS,
+    DEFAULT_PACKAGE_BUDGET,
     EXCLUSION_REASONS,
     MANDATORY_PREDICATES,
     MANIFEST_SCHEMA_ID,
@@ -108,6 +114,7 @@ from runner.dev_graph.packages import (
     SELECTION_REASONS,
     Package,
     build_package,
+    package_dir,
     write_package,
 )
 from runner.dev_graph.policies import (
@@ -154,6 +161,7 @@ from runner.dev_graph.schema import (
     APPROVALS,
     CURRENT_DOCUMENT_STATES,
     DECLARED_STATUSES,
+    DECLARED_STATUS_FIELDS,
     DOCUMENT_STATES,
     DOMAIN_LINK,
     EXECUTION_DEPENDENCY,
@@ -161,6 +169,7 @@ from runner.dev_graph.schema import (
     RELATIONSHIPS,
     DevGraphError,
     RelationshipSpec,
+    declared_status,
     edge_label,
     validate_graph,
 )
@@ -178,6 +187,8 @@ __all__ = [
     "CONTRACT_VERDICTS",
     "CURRENT_DOCUMENT_STATES",
     "DECLARED_STATUSES",
+    "DECLARED_STATUS_FIELDS",
+    "DEFAULT_PACKAGE_BUDGET",
     "DIAGNOSTICS",
     "DOCUMENTS_REL",
     "DOCUMENT_SCHEMA_ID",
@@ -248,12 +259,14 @@ __all__ = [
     "content_hash",
     "create_candidate_version",
     "current_commitments",
+    "declared_status",
     "edge_label",
     "import_document",
     "load_snapshot",
     "normalise_contract",
     "normalise_intake",
     "normalise_run_records",
+    "package_dir",
     "plan_impact",
     "read_change_record",
     "read_esr_intake",

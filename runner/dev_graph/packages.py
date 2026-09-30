@@ -38,9 +38,14 @@ Selection, in order, all deterministic:
    not itself included: ``policy_forbidden`` (with the refusal detail) or
    ``not_relevant`` (beyond the depth). Every exclusion names the record
    path the node came from, so an operator can find what was kept out.
-7. **List unresolved items** from the whole snapshot: claims whose declared
-   status is Unresolved, and two rule-based contradictions (two current
-   versions of one document; an approved claim that is Unresolved).
+7. **List unresolved items** in two scopes. Package-scoped: every included
+   item whose own declared status (:func:`runner.dev_graph.schema.declared_status`)
+   is not Confirmed, so an Assumed partner or an Unresolved task is visible in
+   the manifest of the package that carries it. Snapshot-scoped: claims whose
+   declared status is Unresolved, and two rule-based contradictions (two
+   current versions of one document; an approved claim that is Unresolved).
+   ``worst_declared_status`` rolls up every included item that declares a
+   status, not claims alone.
 
 The package hash is the content hash of the items. The package id hashes the
 request and the package hash. No wall-clock field anywhere.
@@ -69,7 +74,12 @@ from runner.dev_graph.builder import (
 )
 from runner.dev_graph.identity import HASH_PREFIX, canonical_json, content_hash
 from runner.dev_graph.policies import POLICY_VERSION, VIEW_POLICIES, ViewPolicy
-from runner.dev_graph.schema import CURRENT_DOCUMENT_STATES, DevGraphError, edge_label
+from runner.dev_graph.schema import (
+    CURRENT_DOCUMENT_STATES,
+    DevGraphError,
+    declared_status,
+    edge_label,
+)
 
 PACKAGE_SCHEMA_ID = "orch.dev_graph.evidence_package.v1"
 MANIFEST_SCHEMA_ID = "orch.dev_graph.package_manifest.v1"
@@ -78,6 +88,16 @@ MANIFEST_SCHEMA_ID = "orch.dev_graph.package_manifest.v1"
 PACKAGES_REL = "docs/tier4_orchestration_state/dev_graph/packages"
 #: Repo-relative operator request the writer component reads.
 PACKAGE_REQUEST_REL = "docs/tier4_orchestration_state/dev_graph/package_request.json"
+
+#: The budget a package is built under when the caller names none. A caller
+#: always passes a budget explicitly; this is the value the operator request
+#: and the demo driver default to, so "the default budget" names one number in
+#: the repository rather than one per run. The value was taken from the
+#: harness pack budget, which bounds the same thing — the prompt one consumer
+#: may be handed — in the same ``chars/4`` estimate. That is its provenance,
+#: not a tie: the one-way ``harness`` import boundary forbids binding them, and
+#: either may move without the other.
+DEFAULT_PACKAGE_BUDGET: int = 3000
 
 COMPLETENESS: frozenset[str] = frozenset({"complete", "incomplete"})
 EXCLUSION_REASONS: frozenset[str] = frozenset({"policy_forbidden", "over_budget", "not_relevant"})
@@ -278,6 +298,28 @@ def _unresolved_items(snapshot: Snapshot) -> list[dict[str, Any]]:
     return out
 
 
+def _declared_status_items(included: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Every included item whose declared status is not ``Confirmed``.
+
+    Package-scoped, and so distinct from the whole-snapshot claim scan in
+    :func:`_unresolved_items`: this answers "what in the package I am holding
+    is not confirmed", which on a Tier 3 world is the only honesty signal
+    there is until a candidate exists. The entry keeps the §12.2 spelling, so
+    an Assumed partner and an Unresolved claim stay distinguishable while both
+    appear in the list.
+    """
+    return [
+        {
+            "kind": "declared_status",
+            "id": i["id"],
+            "type": i["type"],
+            "declared_status": i["declared_status"],
+        }
+        for i in included
+        if i.get("declared_status") not in (None, "Confirmed")
+    ]
+
+
 # ---------------------------------------------------------------------------
 # Public entry point
 # ---------------------------------------------------------------------------
@@ -386,8 +428,9 @@ def build_package(
         span = _item_span(node)
         if span is not None:
             item["span"] = span
-        if node["type"] == "claim":
-            item["declared_status"] = node["content"].get("declared_status")
+        status = declared_status(node)
+        if status is not None:
+            item["declared_status"] = status
         included.append(item)
         items.append(
             {"id": nid, "type": node["type"], "version": node["version"], "content": node["content"]}
@@ -420,6 +463,7 @@ def build_package(
             seen_excluded.add(other)
     exclusions.sort(key=lambda e: (e["reason"], e["id"]))
 
+    unresolved += _declared_status_items(included)
     unresolved += _unresolved_items(snapshot)
     unresolved.sort(key=lambda u: (u["kind"], u.get("id", ""), json.dumps(u.get("ids", []))))
 
@@ -445,9 +489,11 @@ def build_package(
         "exclusions": exclusions,
         "unresolved": unresolved,
         # worst_status returns the runtime's lowercase form; the manifest
-        # keeps the §12.2 title-case spelling the claims themselves carry.
+        # keeps the §12.2 title-case spelling the records themselves carry.
+        # Every included item that declares a status counts, not claims alone:
+        # a package of Assumed Tier 3 records is not a Confirmed package.
         "worst_declared_status": worst_status(
-            i["declared_status"] for i in included if i["type"] == "claim"
+            i["declared_status"] for i in included if "declared_status" in i
         ).capitalize(),
         "completeness": (
             "incomplete"
@@ -484,6 +530,16 @@ def read_package_request(repo_root: Path) -> dict[str, Any]:
     return {k: raw[k] for k in _REQUEST_KEYS}
 
 
+def package_dir(repo_root: Path, package_id: str) -> Path:
+    """The directory one package lands in: ``PACKAGES_REL/<short package id>``.
+
+    The one place the naming convention lives, so the registered writer and
+    any authoring driver agree. The same request over the same records lands
+    on the same path with the same bytes.
+    """
+    return Path(repo_root) / PACKAGES_REL / package_id[len(HASH_PREFIX):][:_SHORT_HEX]
+
+
 def write_package(repo_root: Path) -> list[Path]:
     """Build the snapshot and the requested package; write manifest and package.
 
@@ -504,7 +560,7 @@ def write_package(repo_root: Path) -> list[Path]:
         project=req["project"],
         profile_version=req["profile_version"],
     )
-    base = root / PACKAGES_REL / pkg.package_id[len(HASH_PREFIX):][:_SHORT_HEX]
+    base = package_dir(root, pkg.package_id)
     manifest_path = base / "manifest.json"
     package_path = base / "package.json"
     atomic_write_json(pkg.manifest, manifest_path)

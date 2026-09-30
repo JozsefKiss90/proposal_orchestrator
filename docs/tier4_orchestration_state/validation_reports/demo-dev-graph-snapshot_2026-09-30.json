@@ -1,0 +1,217 @@
+{
+  "report_id": "demo-dev-graph-snapshot_2026-09-30",
+  "report_kind": "dev_graph_build_validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "authority": [
+    "CLAUDE.md §9.5 reproducibility, §12.1 reviewability, §12.2 status categories, §13.3 no fabricated project facts, §15 explicit failure over fabricated completion, §17.5.3 deterministic components",
+    "plans/dev_graph_demo_tickets.md, ticket 'First dev-graph snapshot on the demo world'"
+  ],
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "question_asked": "Does the dev-graph snapshot builder run on a full-size world of real records, before any runner phase, and do bounded evidence packages built from it report honestly what they contain and what they leave out?",
+  "answer": "The snapshot builds at the first attempt and raises no fail-closed error. It indexes 116 nodes and 305 edges from five Tier 3 records, and two builds agree byte for byte. Eighteen packages were then built, one per view policy for each of three named tasks. All eighteen are incomplete under the default budget of 3000 estimated tokens: the mandatory set alone needs between 5,411 and 21,885, and full completeness between 9,597 and 25,495. One defect surfaced, in the index rather than in the records. A manifest read a declared status from document claims alone, and Tier 5 is empty, so every package of wholly Assumed Tier 3 records rolled up to Confirmed. The manifest now reads each node type's own declared status field, and 248 not-confirmed items are listed across the eighteen manifests.",
+  "inputs": [
+    "docs/tier3_project_instantiation/consortium/partners.json",
+    "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+    "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+    "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+    "docs/tier3_project_instantiation/source_materials/sources.json",
+    "docs/tier4_orchestration_state/validation_reports/demo-architecture-seeds_2026-09-30.json"
+  ],
+  "outputs": [
+    "docs/tier4_orchestration_state/dev_graph/snapshot.json",
+    "docs/tier4_orchestration_state/dev_graph/demo_snapshot_summary.json",
+    "docs/tier4_orchestration_state/dev_graph/packages/ (18 packages, manifest.json and package.json each)",
+    "docs/tier4_orchestration_state/decision_log/demo-dev-graph-snapshot_2026-09-30.json",
+    "tools/build_demo_dev_graph.py",
+    "tests/test_demo_dev_graph_snapshot.py"
+  ],
+  "snapshot": {
+    "snapshot_id": "sha256:6d76fd3065c4f7d933d0fefa5c125aec80891f0c416a5f2b3e965fcda7b92f70",
+    "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+    "node_count": 116,
+    "edge_count": 305,
+    "nodes_by_type": {
+      "task": 35,
+      "deliverable": 24,
+      "source": 24,
+      "participant": 12,
+      "milestone": 8,
+      "work_package": 7,
+      "objective": 6
+    },
+    "edges_by_predicate": {
+      "contributes_to": 122,
+      "produces": 59,
+      "assigned_to": 42,
+      "consumes": 36,
+      "validated_by": 24,
+      "constrained_by": 22
+    },
+    "records_read": 5,
+    "records_not_read": [
+      "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+      "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+      "docs/tier3_project_instantiation/architecture_inputs/risks.json",
+      "docs/tier3_project_instantiation/consortium/roles.json",
+      "docs/tier3_project_instantiation/working_assumptions.json"
+    ]
+  },
+  "acceptance_criteria": [
+    {
+      "criterion": "The snapshot builds, and two builds give the same snapshot ID.",
+      "disposition": "met",
+      "evidence": "build_snapshot(repo_root) returns 116 nodes and 305 edges. Two in-process builds agree on the snapshot id and on to_json_bytes(). The committed snapshot.json reloads through Snapshot.from_dict, which recomputes the id from the stored content and refuses a mismatch. The whole 38-artifact run replays byte-equal through the tool's --check mode. TestTheSnapshot in tests/test_demo_dev_graph_snapshot.py.",
+      "status": "Confirmed"
+    },
+    {
+      "criterion": "Every fail-closed error hit on the way is listed with its cause and the record fix.",
+      "disposition": "met, with nothing to list",
+      "evidence": "The builder raised no DevGraphError. Every edge endpoint resolved, no node id was declared twice, no endpoint type or cardinality was violated, and every claim span would have been range-checked had a claim existed. The honest reading is that the seeds ticket's own tests had already held the records to the shapes the builder requires, so the failures this criterion anticipates were spent earlier. TestTheBuildWasClean pins the five records read, so a later widening of the node-type set fails there before it reaches a build.",
+      "status": "Confirmed"
+    },
+    {
+      "criterion": "Each package manifest reports completeness. Any package marked incomplete under the default budget is listed with the item that did not fit.",
+      "disposition": "met",
+      "evidence": "Eighteen manifests, each carrying completeness from the closed COMPLETENESS set. All eighteen are incomplete. Each names its over-budget exclusions in order, and the summary carries the first id and the full id list for each. TestThePackages.",
+      "status": "Confirmed"
+    },
+    {
+      "criterion": "Assumed partners and Unresolved claims appear in the manifests' unresolved lists.",
+      "disposition": "met for the Assumed half; the Unresolved-claim half is not exercisable on this world",
+      "evidence": "This criterion failed on the first build and is finding F1. Every included item that is not Confirmed is now listed under kind declared_status with its §12.2 spelling: 248 entries across the eighteen manifests, including every Assumed partner each package carries. The claim half has nothing to exercise, because Tier 5 is empty and the snapshot holds no claim node; it is checked against the synthetic fixture in tests/runner/test_dev_graph_packages.py and recorded as an explicit gap here. TestHonesty.",
+      "status": "Unresolved"
+    },
+    {
+      "criterion": "Node and edge counts are recorded so later scenarios can be compared against them.",
+      "disposition": "met",
+      "evidence": "demo_snapshot_summary.json records 116 nodes and 305 edges, the breakdown by node type and by predicate, the snapshot id, the policy version, the budget and the five inputs. Three tests hold the recorded counts to the live build and the breakdowns to their totals. TestTheCounts.",
+      "status": "Confirmed"
+    }
+  ],
+  "packages": {
+    "count": 18,
+    "seed_tasks": [
+      "T3.1",
+      "T4.1",
+      "T1.1"
+    ],
+    "seed_task_rule": "T3.1 is the task the most other tasks consume; T4.1 both consumes upstream work and is consumed downstream, so its mandatory walk crosses work package boundaries in both directions; T1.1 is a coordination task at the sparse end of the same range.",
+    "views": [
+      "blind_pre_evaluation",
+      "change_impact_planning",
+      "controlled_revision",
+      "engineering",
+      "historical_feedback_analysis",
+      "integrity_audit"
+    ],
+    "budget": 3000,
+    "completeness": "incomplete, all 18",
+    "included_items_per_package": "9 to 17",
+    "mandatory_items_per_package": "7 to 68",
+    "minimum_budget_for_the_mandatory_set": "5,411 to 21,885",
+    "minimum_budget_for_completeness": "9,597 to 25,495",
+    "worst_declared_status": "Assumed, all 18",
+    "not_confirmed_items_listed": 248,
+    "note": "The two depth-2 views, controlled_revision and historical_feedback_analysis, need roughly half the budget of the depth-3 and depth-4 views on the same seed, so the policies do bite. Under the default budget, though, the manifests are dominated by the budget rather than by the view: 1,224 over_budget exclusions against 38 not_relevant and 5 policy_forbidden, the last falling in three packages only and none of them on the densest seed (finding F8).",
+    "exclusions_by_reason_total": {
+      "not_relevant": 38,
+      "over_budget": 1224,
+      "policy_forbidden": 5
+    },
+    "packages_with_a_policy_exclusion": [
+      [
+        "T1.1",
+        "controlled_revision"
+      ],
+      [
+        "T4.1",
+        "blind_pre_evaluation"
+      ],
+      [
+        "T4.1",
+        "controlled_revision"
+      ]
+    ]
+  },
+  "what_was_checked_and_how": [
+    "The build is deterministic. Two in-process builds are compared on the snapshot id and on the serialised bytes, and the whole run of 38 artifacts is replayed through --check and compared byte for byte against what is on disk.",
+    "The committed snapshot is this build. Snapshot.from_dict recomputes the id from the stored nodes and edges and refuses a mismatch, so a hand edit to snapshot.json fails rather than passes.",
+    "The recorded counts are the live counts. The summary's node_count, edge_count and per-type breakdown are compared against a fresh build, and each breakdown is summed against its total.",
+    "Each manifest is compared against its summary row on task, view, package id, budget, policy version, snapshot id, project and included count.",
+    "Each incomplete package's first over-budget id and its full over-budget id list are compared against the manifest's own exclusions.",
+    "No manifest over-states its records: where the included items carry any status other than Confirmed, the roll-up is asserted not to be Confirmed.",
+    "Every Assumed partner a package includes is asserted to appear in that manifest's unresolved list.",
+    "The three unindexed seeds are asserted to exist on disk and to be absent from the snapshot's inputs, so the gap is pinned rather than assumed.",
+    "runner/leakage_scan.py scans all 38 new artifacts and is asserted to report ok with every violation pre-existing.",
+    "Every exclusion count this report cites is derived into demo_snapshot_summary.json and read back from the manifests by TestWhatThePolicyKeptOut, which also asserts that some package records a policy exclusion and that most do not. The first draft of finding F8 asserted the wrong half of that."
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "title": "A package manifest reported Confirmed over records that every one declared Assumed",
+      "detail": "worst_declared_status was computed over the included claim items alone, and the unresolved list scanned the snapshot for claims declared Unresolved. Tier 5 is empty on this world, so the snapshot holds no claim node, the roll-up ran over an empty set and returned Confirmed, and the unresolved list carried nothing but over-budget entries. All eighteen packages reported Confirmed while carrying twelve Assumed partners, Assumed tasks, Assumed deliverables and Assumed milestones. The machinery was built against the synthetic fixture, where a document existed and a claim carried the only status in the graph.",
+      "disposition": "Fixed in the index, not in the records, which were already honest (decision D1). runner/dev_graph/schema.py gains DECLARED_STATUS_FIELDS, a per-node-type lookup of where a status is declared, and declared_status(), a pure read of it. A manifest item now carries its own declared status, the roll-up covers every included item that declares one, and every included item that is not Confirmed is listed under kind declared_status. The roll-up is now Assumed on all eighteen.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F2",
+      "title": "All eighteen packages are incomplete under the default budget",
+      "detail": "A real work plan of 7 work packages, 35 tasks, 24 deliverables and 8 milestones costs far more than the synthetic fixture. The mandatory set alone needs 5,411 to 21,885 estimated tokens against a default of 3000, and full completeness 9,597 to 25,495. Between 1 and 53 required items are dropped per package. Incompleteness is reported correctly in every case, so this is a measurement of the budget, not a defect in the builder. The starvation also hides the view policies: see finding F8.",
+      "disposition": "Recorded, not absorbed (decision D5). The default stays at 3000 and the summary records the measured minimum budget per package, bisected against the builder, so the ticket that first consumes a package chooses its budget from a number rather than an estimate.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F3",
+      "title": "Three of the six Tier 3 architecture seeds are not indexed",
+      "detail": "outcomes.json, impacts.json and risks.json are present and populated, and the builder reads none of them. The milestone 1 node-type set has no outcome, impact or risk type, so there is nothing for those records to become. The snapshot therefore indexes the work plan and the consortium but not the impact pathway or the risk register, and a consumer reading the graph alone would not know the three exist.",
+      "disposition": "Left open (decision D7). Adding node types changes the closed vocabulary, changes POLICY_VERSION and changes every package id already written; that is a milestone-scope decision this ticket has no authority to take. TestTheBuildWasClean pins the five records read, so the ticket that widens the set fails there first.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F4",
+      "title": "The blind pre-evaluation lane cannot be shown leak-free on this world",
+      "detail": "The blind policy forbids assessment, finding and change request nodes, hides superseded document versions, and refuses any node tagged as historical feedback. This world holds none of those: seven node types are present, none is among them, and no node carries a tag. The blind view therefore selects exactly the same items as the engineering view on every seed, and a test that the blind lane leaks nothing would pass because there is nothing to leak.",
+      "disposition": "Recorded. The policy is applied rather than bypassed even at the default budget: the blind view refuses the validated_by traversal, and one of its three packages records that refusal (T4.1, one exclusion detailed traversal_not_permitted:validated_by). What it cannot show is a node hidden for being feedback or superseded, because no such node exists. Raising T3.1 to 60,000 makes the wider difference visible: 93 included items against engineering's 99, and 8 policy exclusions. The demo's blind-lane question is answerable only once the change-scenario ticket introduces a superseded version, and it is left to that ticket.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F5",
+      "title": "The builder does not read working_assumptions.json",
+      "detail": "The uncertainty ledger holds 22 declarations, including every partner's unconfirmed participation and the duration. The builder reads the records, not the ledger, and takes each status from the record's own field. A record that declared Confirmed while the ledger declared the same fact Assumed would build cleanly and produce a Confirmed manifest entry. On this world no such contradiction exists, because every record declares Assumed and the ledger agrees.",
+      "disposition": "Recorded, not closed. Cross-checking the two is a check over Tier 3, not a graph index concern, and it belongs wherever the freeze fingerprint is verified rather than in the builder.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F6",
+      "title": "The builder does not read roles.json",
+      "detail": "A work package lead reaches the graph as an assigned_to edge derived from the seed's lead_partner field. roles.json, which the seeds ticket left recording those same leads as Unresolved, is not an input. The graph therefore shows the leads as facts of the work plan with no trace of the roles registry that disagrees.",
+      "disposition": "Recorded. The seeds ticket's decision D8 already explains why roles.json still says Unresolved: it was frozen and it was honest when written, and the leads live in the ledger. The graph reflects the seed, which is the record that owns the lead. Nothing is fixed here.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F7",
+      "title": "No default package budget existed",
+      "detail": "build_package requires a budget and refuses a missing or non-positive one. Nothing in the repository declared what 'the default budget' this criterion names would be, so each run would have chosen its own and no two measurements would have compared.",
+      "disposition": "Fixed (decision D4). runner/dev_graph/packages.py declares DEFAULT_PACKAGE_BUDGET at 3000, the harness pack budget, since both bound the same thing in the same chars/4 estimate. It does not enter POLICY_VERSION and changes no existing package.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F8",
+      "title": "The default budget nearly hides the view policies",
+      "detail": "Across the eighteen manifests there are 1,224 over_budget exclusions, 38 not_relevant and 5 policy_forbidden. All five are detailed traversal_not_permitted:validated_by, and they fall in three packages: T1.1 controlled_revision (MS2, MS3, MS8), T4.1 controlled_revision (MS6) and T4.1 blind_pre_evaluation (MS6). The densest seed records none at all: on T3.1 the budget is exhausted before expansion reaches a node any view would refuse, under every one of the six policies. So a manifest built at this budget shows what the budget kept out and almost nothing of what the view kept out. Raising T3.1's budget to 60,000 changes that at once: the blind view then records 8 policy exclusions and controlled_revision 6.",
+      "disposition": "Recorded, not fixed. It follows from F2 and resolves with it: a budget that admits the mandatory set also reaches the policy boundary. It matters for the pre-evaluation ticket, because a blind package built at the default budget carries almost no evidence that the policy was applied — on the densest seed, none. The counts are now derived into demo_snapshot_summary.json per package and in total, and read back by TestWhatThePolicyKeptOut, so this finding's numbers cannot drift from the artifacts.",
+      "status": "Confirmed",
+      "correction": "The first draft of this finding said no manifest records a policy exclusion. That was generalised from T3.1, which records none, and is false for three of the eighteen. The two-axis review caught it on the spec axis. The fix is the derived count and the test, not the corrected sentence: the seeds ticket recorded the same lesson as its D9, and this repeated it."
+    }
+  ],
+  "status_summary": {
+    "Confirmed": "The snapshot and its counts, the determinism of both the build and the whole run, the eighteen manifests and their completeness, the measured minimum budgets, and the Assumed half of the honesty criterion.",
+    "Inferred": "None. Every number in this report is read from an artifact on disk or recomputed from one.",
+    "Assumed": "That 3000 is the right default budget. It is the harness value adopted for want of a second one, and the measurement says it is too small for this work plan.",
+    "Unresolved": "The Unresolved-claim half of the fourth criterion, which has nothing to exercise until a candidate exists in Tier 5; the blind lane's leak-freedom (F4 and F8); and whether the graph should index outcomes, impacts and risks (F3)."
+  },
+  "recorded_in": "docs/tier4_orchestration_state/decision_log/demo-dev-graph-snapshot_2026-09-30.json",
+  "authored_by": "Ticket 'First dev-graph snapshot on the demo world', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Anonymity: runner/leakage_scan.py scans all 38 artifacts this run wrote and reports the branch OK and NOT CLEAN, unchanged. The single remaining violation is instance one's acronym in the 22 September purge record, left in place by the consortium ticket."
+}

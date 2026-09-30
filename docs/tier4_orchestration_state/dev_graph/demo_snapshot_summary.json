@@ -1,0 +1,3037 @@
+{
+  "schema_id": "orch.dev_graph.demo_snapshot_summary.v1",
+  "project": "DEMO-BIODIV-2027",
+  "profile_version": "ria-2026-2027",
+  "snapshot_id": "sha256:6d76fd3065c4f7d933d0fefa5c125aec80891f0c416a5f2b3e965fcda7b92f70",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+  "budget": 3000,
+  "inputs": [
+    "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+    "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+    "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+    "docs/tier3_project_instantiation/consortium/partners.json",
+    "docs/tier3_project_instantiation/source_materials/sources.json"
+  ],
+  "node_count": 116,
+  "edge_count": 305,
+  "nodes_by_type": {
+    "deliverable": 24,
+    "milestone": 8,
+    "objective": 6,
+    "participant": 12,
+    "source": 24,
+    "task": 35,
+    "work_package": 7
+  },
+  "edges_by_predicate": {
+    "assigned_to": 42,
+    "constrained_by": 22,
+    "consumes": 36,
+    "contributes_to": 122,
+    "produces": 59,
+    "validated_by": 24
+  },
+  "seed_tasks": [
+    "T3.1",
+    "T4.1",
+    "T1.1"
+  ],
+  "views": [
+    "blind_pre_evaluation",
+    "change_impact_planning",
+    "controlled_revision",
+    "engineering",
+    "historical_feedback_analysis",
+    "integrity_audit"
+  ],
+  "exclusions_by_reason_total": {
+    "not_relevant": 38,
+    "over_budget": 1224,
+    "policy_forbidden": 5
+  },
+  "packages_with_a_policy_exclusion": [
+    [
+      "T1.1",
+      "controlled_revision"
+    ],
+    [
+      "T4.1",
+      "blind_pre_evaluation"
+    ],
+    [
+      "T4.1",
+      "controlled_revision"
+    ]
+  ],
+  "packages": [
+    {
+      "task": "T3.1",
+      "view": "blind_pre_evaluation",
+      "package_id": "sha256:c5f7e74bcb061cee33c10ba6f0f661e25c6fd49c05ec151550b1b85c6fbe1547",
+      "package_hash": "sha256:15d2ecd12e7d5ab856c6d6da68fa01fb1bdad3c102c3d9ccf24112f3e868abc9",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/c5f7e74bcb061cee",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 16,
+      "mandatory_count": 54,
+      "exclusion_count": 77,
+      "over_budget_count": 77,
+      "over_budget_required_count": 39,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.3",
+        "D7.4",
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5",
+        "P01",
+        "P02",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P11",
+        "P12",
+        "SRC-COPERNICUS",
+        "SRC-EMBAL",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-LUCAS",
+        "SRC-WP9-P73",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.3",
+        "T1.5",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.3",
+        "T5.4",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.4",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 77
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P04",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P09",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "SRC-EOSC",
+          "type": "source",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP3",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 19258,
+      "minimum_budget_for_completeness": 22632
+    },
+    {
+      "task": "T3.1",
+      "view": "change_impact_planning",
+      "package_id": "sha256:7b29ad2f750bb550ae1c115bc156feebcd0366315cbf3f876c9b4574a5c4ab05",
+      "package_hash": "sha256:15d2ecd12e7d5ab856c6d6da68fa01fb1bdad3c102c3d9ccf24112f3e868abc9",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/7b29ad2f750bb550",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 16,
+      "mandatory_count": 68,
+      "exclusion_count": 91,
+      "over_budget_count": 91,
+      "over_budget_required_count": 53,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.2",
+        "D7.3",
+        "D7.4",
+        "MS1",
+        "MS2",
+        "MS3",
+        "MS4",
+        "MS5",
+        "MS6",
+        "MS7",
+        "MS8",
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5",
+        "O6",
+        "P01",
+        "P02",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P11",
+        "P12",
+        "SRC-BIRDS-DIR",
+        "SRC-COPERNICUS",
+        "SRC-EMBAL",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-HABITATS-DIR",
+        "SRC-LUCAS",
+        "SRC-MSFD",
+        "SRC-NRR",
+        "SRC-WP9-P73",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.3",
+        "T1.5",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.3",
+        "T5.4",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.4",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 91
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P04",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P09",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "SRC-EOSC",
+          "type": "source",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP3",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 21885,
+      "minimum_budget_for_completeness": 25495
+    },
+    {
+      "task": "T3.1",
+      "view": "controlled_revision",
+      "package_id": "sha256:8dc78f4e7305d64db5dd33ce4b56b82d754c8298c2c6068e4f71a2182d177d6a",
+      "package_hash": "sha256:15d2ecd12e7d5ab856c6d6da68fa01fb1bdad3c102c3d9ccf24112f3e868abc9",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/8dc78f4e7305d64d",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 16,
+      "mandatory_count": 34,
+      "exclusion_count": 50,
+      "over_budget_count": 46,
+      "over_budget_required_count": 19,
+      "over_budget_ids": [
+        "D1.1",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D5.1",
+        "D6.1",
+        "O2",
+        "P01",
+        "P02",
+        "P06",
+        "P07",
+        "P08",
+        "P11",
+        "P12",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.5",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.3",
+        "T5.4",
+        "T6.2",
+        "T6.3",
+        "T6.5",
+        "T7.1",
+        "T7.4",
+        "T7.5",
+        "WP1",
+        "WP4",
+        "WP5",
+        "WP6"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "not_relevant": 4,
+        "over_budget": 46
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P04",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P09",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "SRC-EOSC",
+          "type": "source",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP3",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 11428,
+      "minimum_budget_for_completeness": 14698
+    },
+    {
+      "task": "T3.1",
+      "view": "engineering",
+      "package_id": "sha256:2836386f9fa13a3fb3c7ff483403d1da9b6566eb6b62279883caa910d6df390a",
+      "package_hash": "sha256:15d2ecd12e7d5ab856c6d6da68fa01fb1bdad3c102c3d9ccf24112f3e868abc9",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/2836386f9fa13a3f",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 16,
+      "mandatory_count": 54,
+      "exclusion_count": 83,
+      "over_budget_count": 83,
+      "over_budget_required_count": 39,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.3",
+        "D7.4",
+        "MS2",
+        "MS3",
+        "MS4",
+        "MS5",
+        "MS6",
+        "MS8",
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5",
+        "P01",
+        "P02",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P11",
+        "P12",
+        "SRC-COPERNICUS",
+        "SRC-EMBAL",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-LUCAS",
+        "SRC-WP9-P73",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.3",
+        "T1.5",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.3",
+        "T5.4",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.4",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 83
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P04",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P09",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "SRC-EOSC",
+          "type": "source",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP3",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 19258,
+      "minimum_budget_for_completeness": 23402
+    },
+    {
+      "task": "T3.1",
+      "view": "historical_feedback_analysis",
+      "package_id": "sha256:14c31a2f097977b85683a26f9f67b67387a793d7203bbb7893663f188dea8a6e",
+      "package_hash": "sha256:15d2ecd12e7d5ab856c6d6da68fa01fb1bdad3c102c3d9ccf24112f3e868abc9",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/14c31a2f097977b8",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 16,
+      "mandatory_count": 34,
+      "exclusion_count": 51,
+      "over_budget_count": 47,
+      "over_budget_required_count": 19,
+      "over_budget_ids": [
+        "D1.1",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D5.1",
+        "D6.1",
+        "MS2",
+        "O2",
+        "P01",
+        "P02",
+        "P06",
+        "P07",
+        "P08",
+        "P11",
+        "P12",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.5",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.3",
+        "T5.4",
+        "T6.2",
+        "T6.3",
+        "T6.5",
+        "T7.1",
+        "T7.4",
+        "T7.5",
+        "WP1",
+        "WP4",
+        "WP5",
+        "WP6"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "not_relevant": 4,
+        "over_budget": 47
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P04",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P09",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "SRC-EOSC",
+          "type": "source",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP3",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 11428,
+      "minimum_budget_for_completeness": 14848
+    },
+    {
+      "task": "T3.1",
+      "view": "integrity_audit",
+      "package_id": "sha256:aceddf1c684893b33f66dea1288455c9d24385680516214f85c5a8b8d47bcc38",
+      "package_hash": "sha256:15d2ecd12e7d5ab856c6d6da68fa01fb1bdad3c102c3d9ccf24112f3e868abc9",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/aceddf1c684893b3",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 16,
+      "mandatory_count": 54,
+      "exclusion_count": 83,
+      "over_budget_count": 83,
+      "over_budget_required_count": 39,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.3",
+        "D7.4",
+        "MS2",
+        "MS3",
+        "MS4",
+        "MS5",
+        "MS6",
+        "MS8",
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5",
+        "P01",
+        "P02",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P11",
+        "P12",
+        "SRC-COPERNICUS",
+        "SRC-EMBAL",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-LUCAS",
+        "SRC-WP9-P73",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.3",
+        "T1.5",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.3",
+        "T5.4",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.4",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 83
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P04",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P09",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "SRC-EOSC",
+          "type": "source",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP3",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 19258,
+      "minimum_budget_for_completeness": 23402
+    },
+    {
+      "task": "T4.1",
+      "view": "blind_pre_evaluation",
+      "package_id": "sha256:c9b119a61301834d2d7da1c440f3e108e636f05831c5f63671e960fd2c516c40",
+      "package_hash": "sha256:96a93e1e6efc2a22e607e0818b4af333f7d5f93c2d6569986cf266d89b909f63",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/c9b119a61301834d",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 17,
+      "mandatory_count": 58,
+      "exclusion_count": 80,
+      "over_budget_count": 79,
+      "over_budget_required_count": 43,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.2",
+        "D7.3",
+        "D7.4",
+        "O1",
+        "O2",
+        "O4",
+        "O6",
+        "P02",
+        "P04",
+        "P05",
+        "P08",
+        "P09",
+        "P12",
+        "SRC-BIRDS-DIR",
+        "SRC-EMBAL",
+        "SRC-EOSC",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-HABITATS-DIR",
+        "SRC-LUCAS",
+        "SRC-MSFD",
+        "SRC-NRR",
+        "SRC-WP9-P73",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.3",
+        "T1.4",
+        "T1.5",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T3.5",
+        "T3.6",
+        "T4.3",
+        "T4.4",
+        "T5.1",
+        "T5.2",
+        "T5.4",
+        "T6.1",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 79,
+        "policy_forbidden": 1
+      },
+      "policy_forbidden_count": 1,
+      "policy_forbidden": [
+        {
+          "id": "MS6",
+          "type": "milestone",
+          "detail": "traversal_not_permitted:validated_by"
+        }
+      ],
+      "not_confirmed": [
+        {
+          "id": "D4.1",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P06",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P07",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P11",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T7.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP4",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 19067,
+      "minimum_budget_for_completeness": 23666
+    },
+    {
+      "task": "T4.1",
+      "view": "change_impact_planning",
+      "package_id": "sha256:11f59acc071ce6873183417bfb633a4d0caf902ab62a106151f6a978a6b028f8",
+      "package_hash": "sha256:4ff411a2beb3640b0b0d035bfe7f71e45e044526dd4b81d00f0f9e2ab7435df5",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/11f59acc071ce687",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 17,
+      "mandatory_count": 67,
+      "exclusion_count": 90,
+      "over_budget_count": 90,
+      "over_budget_required_count": 51,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.2",
+        "D7.3",
+        "D7.4",
+        "MS1",
+        "MS2",
+        "MS3",
+        "MS4",
+        "MS5",
+        "MS6",
+        "MS7",
+        "MS8",
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5",
+        "O6",
+        "P02",
+        "P04",
+        "P05",
+        "P08",
+        "P09",
+        "P12",
+        "SRC-BIRDS-DIR",
+        "SRC-COPERNICUS",
+        "SRC-EMBAL",
+        "SRC-EOSC",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-HABITATS-DIR",
+        "SRC-LUCAS",
+        "SRC-MSFD",
+        "SRC-NRR",
+        "SRC-WP9-P73",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.3",
+        "T1.4",
+        "T1.5",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T3.5",
+        "T3.6",
+        "T4.3",
+        "T4.4",
+        "T5.1",
+        "T5.2",
+        "T5.4",
+        "T6.1",
+        "T6.2",
+        "T6.3",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 90
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P06",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P07",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P11",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T7.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP4",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 21797,
+      "minimum_budget_for_completeness": 25495
+    },
+    {
+      "task": "T4.1",
+      "view": "controlled_revision",
+      "package_id": "sha256:ad2161b1903007986ca86eca08c656cc4a3c068f538ab4f37d43c6867174b670",
+      "package_hash": "sha256:96a93e1e6efc2a22e607e0818b4af333f7d5f93c2d6569986cf266d89b909f63",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/ad2161b190300798",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 17,
+      "mandatory_count": 29,
+      "exclusion_count": 49,
+      "over_budget_count": 42,
+      "over_budget_required_count": 14,
+      "over_budget_ids": [
+        "D2.3",
+        "D3.1",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.2",
+        "D7.3",
+        "O4",
+        "P02",
+        "P05",
+        "P08",
+        "P09",
+        "SRC-EMBAL",
+        "SRC-LUCAS",
+        "SRC-WP9-P75",
+        "T1.1",
+        "T1.3",
+        "T1.4",
+        "T1.5",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T4.3",
+        "T4.4",
+        "T5.1",
+        "T5.4",
+        "T6.1",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.3",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP5",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D2.3",
+      "exclusions_by_reason": {
+        "not_relevant": 6,
+        "over_budget": 42,
+        "policy_forbidden": 1
+      },
+      "policy_forbidden_count": 1,
+      "policy_forbidden": [
+        {
+          "id": "MS6",
+          "type": "milestone",
+          "detail": "traversal_not_permitted:validated_by"
+        }
+      ],
+      "not_confirmed": [
+        {
+          "id": "D4.1",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P06",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P07",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P11",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T7.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP4",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 9492,
+      "minimum_budget_for_completeness": 13016
+    },
+    {
+      "task": "T4.1",
+      "view": "engineering",
+      "package_id": "sha256:68e351819fcafe447ecfbc1bcbe19a93560b87328406d2d14116eda7f4b6f8a4",
+      "package_hash": "sha256:96a93e1e6efc2a22e607e0818b4af333f7d5f93c2d6569986cf266d89b909f63",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/68e351819fcafe44",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 17,
+      "mandatory_count": 58,
+      "exclusion_count": 84,
+      "over_budget_count": 84,
+      "over_budget_required_count": 43,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.2",
+        "D7.3",
+        "D7.4",
+        "MS2",
+        "MS5",
+        "MS6",
+        "MS7",
+        "MS8",
+        "O1",
+        "O2",
+        "O4",
+        "O6",
+        "P02",
+        "P04",
+        "P05",
+        "P08",
+        "P09",
+        "P12",
+        "SRC-BIRDS-DIR",
+        "SRC-EMBAL",
+        "SRC-EOSC",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-HABITATS-DIR",
+        "SRC-LUCAS",
+        "SRC-MSFD",
+        "SRC-NRR",
+        "SRC-WP9-P73",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.3",
+        "T1.4",
+        "T1.5",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T3.5",
+        "T3.6",
+        "T4.3",
+        "T4.4",
+        "T5.1",
+        "T5.2",
+        "T5.4",
+        "T6.1",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 84
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "D4.1",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P06",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P07",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P11",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T7.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP4",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 19067,
+      "minimum_budget_for_completeness": 24316
+    },
+    {
+      "task": "T4.1",
+      "view": "historical_feedback_analysis",
+      "package_id": "sha256:c978e5d8a8a51579dceb094d77b6e39de7a342f045daa49873bf6bae18f616b8",
+      "package_hash": "sha256:96a93e1e6efc2a22e607e0818b4af333f7d5f93c2d6569986cf266d89b909f63",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/c978e5d8a8a51579",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 17,
+      "mandatory_count": 29,
+      "exclusion_count": 49,
+      "over_budget_count": 43,
+      "over_budget_required_count": 14,
+      "over_budget_ids": [
+        "D2.3",
+        "D3.1",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.2",
+        "D7.3",
+        "MS6",
+        "O4",
+        "P02",
+        "P05",
+        "P08",
+        "P09",
+        "SRC-EMBAL",
+        "SRC-LUCAS",
+        "SRC-WP9-P75",
+        "T1.1",
+        "T1.3",
+        "T1.4",
+        "T1.5",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T4.3",
+        "T4.4",
+        "T5.1",
+        "T5.4",
+        "T6.1",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.3",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP5",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D2.3",
+      "exclusions_by_reason": {
+        "not_relevant": 6,
+        "over_budget": 43
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "D4.1",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P06",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P07",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P11",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T7.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP4",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 9492,
+      "minimum_budget_for_completeness": 13162
+    },
+    {
+      "task": "T4.1",
+      "view": "integrity_audit",
+      "package_id": "sha256:207adbc70b40ad19028c17768aea3d37ac43ea0e70e3b9e0592e57f990858aba",
+      "package_hash": "sha256:96a93e1e6efc2a22e607e0818b4af333f7d5f93c2d6569986cf266d89b909f63",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/207adbc70b40ad19",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 17,
+      "mandatory_count": 58,
+      "exclusion_count": 84,
+      "over_budget_count": 84,
+      "over_budget_required_count": 43,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.2",
+        "D7.3",
+        "D7.4",
+        "MS2",
+        "MS5",
+        "MS6",
+        "MS7",
+        "MS8",
+        "O1",
+        "O2",
+        "O4",
+        "O6",
+        "P02",
+        "P04",
+        "P05",
+        "P08",
+        "P09",
+        "P12",
+        "SRC-BIRDS-DIR",
+        "SRC-EMBAL",
+        "SRC-EOSC",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-HABITATS-DIR",
+        "SRC-LUCAS",
+        "SRC-MSFD",
+        "SRC-NRR",
+        "SRC-WP9-P73",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.1",
+        "T1.3",
+        "T1.4",
+        "T1.5",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T3.5",
+        "T3.6",
+        "T4.3",
+        "T4.4",
+        "T5.1",
+        "T5.2",
+        "T5.4",
+        "T6.1",
+        "T6.2",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.5",
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 84
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "D4.1",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P03",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P06",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P07",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P10",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P11",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T2.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T3.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T7.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP4",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 19067,
+      "minimum_budget_for_completeness": 24316
+    },
+    {
+      "task": "T1.1",
+      "view": "blind_pre_evaluation",
+      "package_id": "sha256:1e12ca6bb44ee32f8446f64fea1d622ab49784d93615a9b7b87865d5cf6e9129",
+      "package_hash": "sha256:9f1f134d5dcf6f68c1d7cd10a54d9c154b7c02d65f2f61ac77275f629edd143d",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/1e12ca6bb44ee32f",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 9,
+      "mandatory_count": 16,
+      "exclusion_count": 72,
+      "over_budget_count": 72,
+      "over_budget_required_count": 8,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.3",
+        "D4.4",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.4",
+        "O1",
+        "O2",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12",
+        "SRC-EOSC",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.2",
+        "T1.3",
+        "T1.4",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.1",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.1",
+        "T5.2",
+        "T6.1",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.2",
+        "T7.4",
+        "T7.5",
+        "WP2",
+        "WP3",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 72
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP1",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 9696,
+      "minimum_budget_for_completeness": 20438
+    },
+    {
+      "task": "T1.1",
+      "view": "change_impact_planning",
+      "package_id": "sha256:47baeae68af3585a5dc2e41da111d1d58cae7192139dc8edf1b60e1afa9f6c9c",
+      "package_hash": "sha256:9f1f134d5dcf6f68c1d7cd10a54d9c154b7c02d65f2f61ac77275f629edd143d",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/47baeae68af3585a",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 9,
+      "mandatory_count": 45,
+      "exclusion_count": 98,
+      "over_budget_count": 98,
+      "over_budget_required_count": 37,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.2",
+        "D4.3",
+        "D4.4",
+        "D5.1",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.1",
+        "D7.2",
+        "D7.3",
+        "D7.4",
+        "MS1",
+        "MS2",
+        "MS3",
+        "MS4",
+        "MS5",
+        "MS6",
+        "MS7",
+        "MS8",
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5",
+        "O6",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12",
+        "SRC-BIRDS-DIR",
+        "SRC-COPERNICUS",
+        "SRC-EMBAL",
+        "SRC-EOSC",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-HABITATS-DIR",
+        "SRC-LUCAS",
+        "SRC-MSFD",
+        "SRC-NRR",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.2",
+        "T1.3",
+        "T1.4",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.1",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.1",
+        "T5.2",
+        "T6.1",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.1",
+        "T7.2",
+        "T7.3",
+        "T7.4",
+        "T7.5",
+        "WP2",
+        "WP3",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 98
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP1",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 19177,
+      "minimum_budget_for_completeness": 25495
+    },
+    {
+      "task": "T1.1",
+      "view": "controlled_revision",
+      "package_id": "sha256:a7288882d134e46fc05738e5631a56e852ae6102743cfcd833311fec37265ad5",
+      "package_hash": "sha256:4785463f52ec55b99a6162b4dc3c1b6d8306db53ce4ee0bc4ec1037e322a48bf",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/a7288882d134e46f",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 10,
+      "mandatory_count": 7,
+      "exclusion_count": 37,
+      "over_budget_count": 26,
+      "over_budget_required_count": 1,
+      "over_budget_ids": [
+        "O2",
+        "P02",
+        "P10",
+        "SRC-WP9-P75",
+        "T1.2",
+        "T1.3",
+        "T1.4",
+        "T2.2",
+        "T2.3",
+        "T3.1",
+        "T3.2",
+        "T3.3",
+        "T3.5",
+        "T3.6",
+        "T4.1",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.4",
+        "T6.1",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.5",
+        "WP2",
+        "WP3"
+      ],
+      "first_item_that_did_not_fit": "O2",
+      "exclusions_by_reason": {
+        "not_relevant": 8,
+        "over_budget": 26,
+        "policy_forbidden": 3
+      },
+      "policy_forbidden_count": 3,
+      "policy_forbidden": [
+        {
+          "id": "MS2",
+          "type": "milestone",
+          "detail": "traversal_not_permitted:validated_by"
+        },
+        {
+          "id": "MS3",
+          "type": "milestone",
+          "detail": "traversal_not_permitted:validated_by"
+        },
+        {
+          "id": "MS8",
+          "type": "milestone",
+          "detail": "traversal_not_permitted:validated_by"
+        }
+      ],
+      "not_confirmed": [
+        {
+          "id": "D1.1",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "D1.2",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "D1.3",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP1",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 5411,
+      "minimum_budget_for_completeness": 9597
+    },
+    {
+      "task": "T1.1",
+      "view": "engineering",
+      "package_id": "sha256:0a8ff37db967477cf74dc1a47274cfdbebc61f17a2601e8a4d33ff0fa60bfb5e",
+      "package_hash": "sha256:9f1f134d5dcf6f68c1d7cd10a54d9c154b7c02d65f2f61ac77275f629edd143d",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/0a8ff37db967477c",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 9,
+      "mandatory_count": 16,
+      "exclusion_count": 76,
+      "over_budget_count": 76,
+      "over_budget_required_count": 8,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.3",
+        "D4.4",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.3",
+        "D7.4",
+        "MS2",
+        "MS3",
+        "MS8",
+        "O1",
+        "O2",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12",
+        "SRC-EOSC",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.2",
+        "T1.3",
+        "T1.4",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.1",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.1",
+        "T5.2",
+        "T6.1",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.2",
+        "T7.4",
+        "T7.5",
+        "WP2",
+        "WP3",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 76
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP1",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 9696,
+      "minimum_budget_for_completeness": 20886
+    },
+    {
+      "task": "T1.1",
+      "view": "historical_feedback_analysis",
+      "package_id": "sha256:e9af8547c4536ab66ce8c18964991bb6c275cb93886112a6f7bd83a16b653a49",
+      "package_hash": "sha256:4785463f52ec55b99a6162b4dc3c1b6d8306db53ce4ee0bc4ec1037e322a48bf",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/e9af8547c4536ab6",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 10,
+      "mandatory_count": 7,
+      "exclusion_count": 37,
+      "over_budget_count": 27,
+      "over_budget_required_count": 1,
+      "over_budget_ids": [
+        "MS8",
+        "O2",
+        "P02",
+        "P10",
+        "SRC-WP9-P75",
+        "T1.2",
+        "T1.3",
+        "T1.4",
+        "T2.2",
+        "T2.3",
+        "T3.1",
+        "T3.2",
+        "T3.3",
+        "T3.5",
+        "T3.6",
+        "T4.1",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.4",
+        "T6.1",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.5",
+        "WP2",
+        "WP3"
+      ],
+      "first_item_that_did_not_fit": "MS8",
+      "exclusions_by_reason": {
+        "not_relevant": 10,
+        "over_budget": 27
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "D1.1",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "D1.2",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "D1.3",
+          "type": "deliverable",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP1",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 5411,
+      "minimum_budget_for_completeness": 9721
+    },
+    {
+      "task": "T1.1",
+      "view": "integrity_audit",
+      "package_id": "sha256:026bbea80796ffa38019c3d3f1fad6f72eb546eef4fed60e81790fef8401ad28",
+      "package_hash": "sha256:9f1f134d5dcf6f68c1d7cd10a54d9c154b7c02d65f2f61ac77275f629edd143d",
+      "path": "docs/tier4_orchestration_state/dev_graph/packages/026bbea80796ffa3",
+      "completeness": "incomplete",
+      "worst_declared_status": "Assumed",
+      "included_count": 9,
+      "mandatory_count": 16,
+      "exclusion_count": 76,
+      "over_budget_count": 76,
+      "over_budget_required_count": 8,
+      "over_budget_ids": [
+        "D1.1",
+        "D1.2",
+        "D1.3",
+        "D2.1",
+        "D2.2",
+        "D2.3",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4",
+        "D4.1",
+        "D4.3",
+        "D4.4",
+        "D5.2",
+        "D5.3",
+        "D6.1",
+        "D6.2",
+        "D6.3",
+        "D7.3",
+        "D7.4",
+        "MS2",
+        "MS3",
+        "MS8",
+        "O1",
+        "O2",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12",
+        "SRC-EOSC",
+        "SRC-EUNIS",
+        "SRC-FAIR",
+        "SRC-GET",
+        "SRC-WP9-P74",
+        "SRC-WP9-P75",
+        "SRC-WP9-P76",
+        "T1.2",
+        "T1.3",
+        "T1.4",
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4",
+        "T2.5",
+        "T3.1",
+        "T3.2",
+        "T3.3",
+        "T3.4",
+        "T3.5",
+        "T3.6",
+        "T4.2",
+        "T4.3",
+        "T4.4",
+        "T4.5",
+        "T5.1",
+        "T5.2",
+        "T6.1",
+        "T6.3",
+        "T6.4",
+        "T6.5",
+        "T7.2",
+        "T7.4",
+        "T7.5",
+        "WP2",
+        "WP3",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "first_item_that_did_not_fit": "D1.1",
+      "exclusions_by_reason": {
+        "over_budget": 76
+      },
+      "policy_forbidden_count": 0,
+      "policy_forbidden": [],
+      "not_confirmed": [
+        {
+          "id": "P01",
+          "type": "participant",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T1.5",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T4.1",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.3",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T5.4",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "T6.2",
+          "type": "task",
+          "declared_status": "Assumed"
+        },
+        {
+          "id": "WP1",
+          "type": "work_package",
+          "declared_status": "Assumed"
+        }
+      ],
+      "minimum_budget_for_mandatory": 9696,
+      "minimum_budget_for_completeness": 20886
+    }
+  ]
+}

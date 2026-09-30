@@ -21,7 +21,23 @@ import tempfile
 from pathlib import Path
 from typing import Any, Callable
 
-__all__ = ["atomic_write_json", "atomic_write_text", "atomic_write_via"]
+__all__ = [
+    "atomic_write_json",
+    "atomic_write_text",
+    "atomic_write_via",
+    "canonical_json_bytes",
+]
+
+
+def canonical_json_bytes(obj: Any) -> bytes:
+    """*obj* as the canonical pretty UTF-8 JSON this module writes.
+
+    ``indent=2, ensure_ascii=False`` — the serialisation every byte-equal
+    replay check depends on. Exposed so a caller that compares bytes against
+    an artifact on disk compares against the same function that wrote it,
+    rather than a second copy of the options that could drift from this one.
+    """
+    return json.dumps(obj, indent=2, ensure_ascii=False).encode("utf-8")
 
 
 def _finalize(tmp_path: str, output_path: Path) -> None:
@@ -44,7 +60,7 @@ def atomic_write_json(
     Raises on any failure, leaving no partial output.
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    data = json.dumps(obj, indent=2, ensure_ascii=False).encode("utf-8")
+    data = canonical_json_bytes(obj)
 
     fd, tmp_path = tempfile.mkstemp(
         dir=str(output_path.parent), suffix=".tmp", prefix=prefix

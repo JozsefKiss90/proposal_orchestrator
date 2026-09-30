@@ -1,0 +1,1059 @@
+{
+  "schema_id": "orch.dev_graph.package_manifest.v1",
+  "package_id": "sha256:026bbea80796ffa38019c3d3f1fad6f72eb546eef4fed60e81790fef8401ad28",
+  "project": "DEMO-BIODIV-2027",
+  "task": "T1.1",
+  "view": "integrity_audit",
+  "profile_version": "ria-2026-2027",
+  "snapshot_id": "sha256:6d76fd3065c4f7d933d0fefa5c125aec80891f0c416a5f2b3e965fcda7b92f70",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+  "budget": 3000,
+  "included": [
+    {
+      "id": "T1.1",
+      "type": "task",
+      "version": "sha256:e251e508029f2b257bca1700fc83ce29107a8aea44ee1aea5c5d264fcbe0f2eb",
+      "reason": "seed",
+      "path": [],
+      "depth": 0,
+      "cost": 59,
+      "declared_status": "Assumed"
+    },
+    {
+      "id": "P01",
+      "type": "participant",
+      "version": "sha256:bc1bd341f95ed6a7f99220399291e0809994a02b7d265415c2d968642bc6341e",
+      "reason": "mandatory",
+      "path": [
+        "T1.1 -assigned_to-> P01"
+      ],
+      "depth": 1,
+      "cost": 237,
+      "declared_status": "Assumed"
+    },
+    {
+      "id": "WP1",
+      "type": "work_package",
+      "version": "sha256:3ca98580604d846367bd9e2f9b7d5cf26095bb7e8f9a200c0d16e0f0b1be99d1",
+      "reason": "mandatory",
+      "path": [
+        "T1.1 -contributes_to-> WP1"
+      ],
+      "depth": 1,
+      "cost": 727,
+      "declared_status": "Assumed"
+    },
+    {
+      "id": "SRC-WP9-P73",
+      "type": "source",
+      "version": "sha256:4514bf2163280de50cfe4d2d8a582333e36273e23cb52a17956d69f89a307469",
+      "reason": "mandatory",
+      "path": [
+        "T1.1 -contributes_to-> WP1",
+        "WP1 -constrained_by-> SRC-WP9-P73"
+      ],
+      "depth": 2,
+      "cost": 1597,
+      "declared_status": "Confirmed"
+    },
+    {
+      "id": "T1.5",
+      "type": "task",
+      "version": "sha256:bab52e90f0c9b71f67fc183b8afa7a7b4b447ecd9f146dc453af08e47e41fafb",
+      "reason": "mandatory",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T1.5 -assigned_to-> P01"
+      ],
+      "depth": 2,
+      "cost": 56,
+      "declared_status": "Assumed"
+    },
+    {
+      "id": "T5.3",
+      "type": "task",
+      "version": "sha256:6e69d34736e8fcce01030a671e4dcfef115600a60366bd8dfa84e533e1575798",
+      "reason": "mandatory",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T5.3 -assigned_to-> P01"
+      ],
+      "depth": 2,
+      "cost": 63,
+      "declared_status": "Assumed"
+    },
+    {
+      "id": "T6.2",
+      "type": "task",
+      "version": "sha256:c14ff1517bb4897c615c71b3bd724dd302b35e5087ac396ede3ddfe234bbfa14",
+      "reason": "mandatory",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T6.2 -assigned_to-> P01"
+      ],
+      "depth": 2,
+      "cost": 96,
+      "declared_status": "Assumed"
+    },
+    {
+      "id": "T4.1",
+      "type": "task",
+      "version": "sha256:56354d8abf35fdee4786d8946f4898f00ba5d553f00a5be07dc947bf940ec9c7",
+      "reason": "mandatory",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T5.3 -assigned_to-> P01",
+        "T5.3 -consumes-> T4.1"
+      ],
+      "depth": 3,
+      "cost": 68,
+      "declared_status": "Assumed"
+    },
+    {
+      "id": "T5.4",
+      "type": "task",
+      "version": "sha256:92379a3843360c2af575b112e3654a4fdba209f0ae7931e68ba22f17124a898d",
+      "reason": "mandatory",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T5.3 -assigned_to-> P01",
+        "T5.4 -consumes-> T5.3"
+      ],
+      "depth": 3,
+      "cost": 95,
+      "declared_status": "Assumed"
+    }
+  ],
+  "mandatory_dependencies": [
+    {
+      "id": "P01",
+      "type": "participant",
+      "version": "sha256:bc1bd341f95ed6a7f99220399291e0809994a02b7d265415c2d968642bc6341e",
+      "path": [
+        "T1.1 -assigned_to-> P01"
+      ]
+    },
+    {
+      "id": "WP1",
+      "type": "work_package",
+      "version": "sha256:3ca98580604d846367bd9e2f9b7d5cf26095bb7e8f9a200c0d16e0f0b1be99d1",
+      "path": [
+        "T1.1 -contributes_to-> WP1"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P73",
+      "type": "source",
+      "version": "sha256:4514bf2163280de50cfe4d2d8a582333e36273e23cb52a17956d69f89a307469",
+      "path": [
+        "T1.1 -contributes_to-> WP1",
+        "WP1 -constrained_by-> SRC-WP9-P73"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P75",
+      "type": "source",
+      "version": "sha256:5d2ed5a56a6962a29c79daf15ee0b87879ee727e0d27ce2967648a0a178a93ca",
+      "path": [
+        "T1.1 -contributes_to-> WP1",
+        "WP1 -constrained_by-> SRC-WP9-P75"
+      ]
+    },
+    {
+      "id": "T1.5",
+      "type": "task",
+      "version": "sha256:bab52e90f0c9b71f67fc183b8afa7a7b4b447ecd9f146dc453af08e47e41fafb",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T1.5 -assigned_to-> P01"
+      ]
+    },
+    {
+      "id": "T5.3",
+      "type": "task",
+      "version": "sha256:6e69d34736e8fcce01030a671e4dcfef115600a60366bd8dfa84e533e1575798",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T5.3 -assigned_to-> P01"
+      ]
+    },
+    {
+      "id": "T6.2",
+      "type": "task",
+      "version": "sha256:c14ff1517bb4897c615c71b3bd724dd302b35e5087ac396ede3ddfe234bbfa14",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T6.2 -assigned_to-> P01"
+      ]
+    },
+    {
+      "id": "T4.1",
+      "type": "task",
+      "version": "sha256:56354d8abf35fdee4786d8946f4898f00ba5d553f00a5be07dc947bf940ec9c7",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T5.3 -assigned_to-> P01",
+        "T5.3 -consumes-> T4.1"
+      ]
+    },
+    {
+      "id": "T5.4",
+      "type": "task",
+      "version": "sha256:92379a3843360c2af575b112e3654a4fdba209f0ae7931e68ba22f17124a898d",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T5.3 -assigned_to-> P01",
+        "T5.4 -consumes-> T5.3"
+      ]
+    },
+    {
+      "id": "T6.3",
+      "type": "task",
+      "version": "sha256:d621da4d8c8da63dd1fb0d2f6ddb1f5574cfd59bb3dd481faab4a41a1233457c",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T6.2 -assigned_to-> P01",
+        "T6.3 -consumes-> T6.2"
+      ]
+    },
+    {
+      "id": "WP2",
+      "type": "work_package",
+      "version": "sha256:5da1b1f707c891001982035a42e1de8d68aae98100da525d1ee8e32c0dd55994",
+      "path": [
+        "T1.1 -contributes_to-> WP1",
+        "WP1 -constrained_by-> SRC-WP9-P75",
+        "WP2 -constrained_by-> SRC-WP9-P75"
+      ]
+    },
+    {
+      "id": "WP3",
+      "type": "work_package",
+      "version": "sha256:43b1ba1b972518d30e731d39ab1190a53b2299ab842e326a4f46929b93cbc0de",
+      "path": [
+        "T1.1 -contributes_to-> WP1",
+        "WP1 -constrained_by-> SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-WP9-P75"
+      ]
+    },
+    {
+      "id": "WP4",
+      "type": "work_package",
+      "version": "sha256:c7d6952b024f7ebfc92be26641a10846c2d162972097fd09ae011904bc9deccb",
+      "path": [
+        "T1.1 -contributes_to-> WP1",
+        "WP1 -constrained_by-> SRC-WP9-P75",
+        "WP4 -constrained_by-> SRC-WP9-P75"
+      ]
+    },
+    {
+      "id": "WP5",
+      "type": "work_package",
+      "version": "sha256:9de66f9c6ff788d10c06f08514e4285e25fc71a97916212dccf8240657c335e9",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T5.3 -assigned_to-> P01",
+        "T5.3 -contributes_to-> WP5"
+      ]
+    },
+    {
+      "id": "WP6",
+      "type": "work_package",
+      "version": "sha256:41d02dada2549ca3fdb24cb01810b5f80b80b6bc4b37258c793508003799ec0b",
+      "path": [
+        "T1.1 -assigned_to-> P01",
+        "T6.2 -assigned_to-> P01",
+        "T6.2 -contributes_to-> WP6"
+      ]
+    },
+    {
+      "id": "WP7",
+      "type": "work_package",
+      "version": "sha256:7cbc871399cee87ebbba0628aea40c0f232512fa88c63f39499b1af86019cde2",
+      "path": [
+        "T1.1 -contributes_to-> WP1",
+        "WP1 -constrained_by-> SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-WP9-P75"
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "D1.1",
+      "type": "deliverable",
+      "version": "sha256:68952a7ec2eeda5c6e446ef2ffd69ee4e0d5d69619241c2797c0a8fa38957e23",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 42 exceeds remaining budget 2"
+    },
+    {
+      "id": "D1.2",
+      "type": "deliverable",
+      "version": "sha256:a6ed5f83ffd7a87bdc029aad6c20266963f68310f6edf69d6c3e3ffc74f989c2",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 55 exceeds remaining budget 2"
+    },
+    {
+      "id": "D1.3",
+      "type": "deliverable",
+      "version": "sha256:a0187a59d4cac39e6f23def0a9bcf90f5724e252abe6193b65a9cd6c05cd5a72",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 37 exceeds remaining budget 2"
+    },
+    {
+      "id": "D2.1",
+      "type": "deliverable",
+      "version": "sha256:2048c6e65789465ebb3f2a7ce7b71ca1b6006d48bd7cc56cf80869acb25e38b5",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 44 exceeds remaining budget 2"
+    },
+    {
+      "id": "D2.2",
+      "type": "deliverable",
+      "version": "sha256:7efdfc22b3c31db66107f056a942a44ad5cc266ab580099b57e251b4414e4f01",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 47 exceeds remaining budget 2"
+    },
+    {
+      "id": "D2.3",
+      "type": "deliverable",
+      "version": "sha256:2d980bcff3cf6f03cee367b13b455b5839fe80aa4d152785bc564f18f1c01932",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 39 exceeds remaining budget 2"
+    },
+    {
+      "id": "D3.1",
+      "type": "deliverable",
+      "version": "sha256:565c825fa6b4f661f994e60066e47dae03fba84eec69d638baea2c504758cd09",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 46 exceeds remaining budget 2"
+    },
+    {
+      "id": "D3.2",
+      "type": "deliverable",
+      "version": "sha256:efe00639d9b1a6a8a39c01eb31c470334cee2cc608d058a08ffd32d12b47fdd0",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 54 exceeds remaining budget 2"
+    },
+    {
+      "id": "D3.3",
+      "type": "deliverable",
+      "version": "sha256:e3d2d634d570fdbaa62ca0e58584e28b9c2230d1580422d4744fa86f16d302f1",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 42 exceeds remaining budget 2"
+    },
+    {
+      "id": "D3.4",
+      "type": "deliverable",
+      "version": "sha256:77eb30bcb1ded3099c8b7dc530bbbff5c0b2bf7bd2dac034462cbf8e71f39182",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 45 exceeds remaining budget 2"
+    },
+    {
+      "id": "D4.1",
+      "type": "deliverable",
+      "version": "sha256:ab8d2e522ac9620be7634954a2cbcffd7168e56199c567bdf2f943fa192217e6",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 40 exceeds remaining budget 2"
+    },
+    {
+      "id": "D4.3",
+      "type": "deliverable",
+      "version": "sha256:aec007843c9b3b55755e38ba1f67757a438aeed55251dfc8b2c8ef3ff265118a",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 54 exceeds remaining budget 2"
+    },
+    {
+      "id": "D4.4",
+      "type": "deliverable",
+      "version": "sha256:7050e30f3a847b1cf52561441ec07bcbca7f85aaa101024c6ba031752081282d",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 38 exceeds remaining budget 2"
+    },
+    {
+      "id": "D5.2",
+      "type": "deliverable",
+      "version": "sha256:9fa70c726cbb785c6f8cf7fa78d6c69da775f9e29bfad761ae356c7ef49f0579",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 46 exceeds remaining budget 2"
+    },
+    {
+      "id": "D5.3",
+      "type": "deliverable",
+      "version": "sha256:c001d7496065248729cb394c6b34f2e6f74d6b9f84cce15916a6c1e73edbb338",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 38 exceeds remaining budget 2"
+    },
+    {
+      "id": "D6.1",
+      "type": "deliverable",
+      "version": "sha256:f41c14b135fbd77e418f3a16908ef019079056932a4500480d87530f5b814b51",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 49 exceeds remaining budget 2"
+    },
+    {
+      "id": "D6.2",
+      "type": "deliverable",
+      "version": "sha256:7081743d4046d04d1d3cd8a338bb297aa98ec692578af2886e4bceac376e2356",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 48 exceeds remaining budget 2"
+    },
+    {
+      "id": "D6.3",
+      "type": "deliverable",
+      "version": "sha256:86f0bc1e5fae0a63dd44d9e5304c1a102e91f390113c5c82a3e137e373a232ab",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 46 exceeds remaining budget 2"
+    },
+    {
+      "id": "D7.3",
+      "type": "deliverable",
+      "version": "sha256:0b8beb5e527e97a5765197443fa128806b5a46f43332d4de422d90d8e8053bdc",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 56 exceeds remaining budget 2"
+    },
+    {
+      "id": "D7.4",
+      "type": "deliverable",
+      "version": "sha256:a94c4e899210306e5cb893cfe6ec4192be880fbed41ae642f4393933ecdbfe4c",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 42 exceeds remaining budget 2"
+    },
+    {
+      "id": "MS2",
+      "type": "milestone",
+      "version": "sha256:7bef8be3fa19b4507732ccbda211949452542b4acd7da6faa53b47727d6ca9f3",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 150 exceeds remaining budget 2"
+    },
+    {
+      "id": "MS3",
+      "type": "milestone",
+      "version": "sha256:99f6ec97355eab457fd2208db9289bd6c4c0f327a10e04a0bdbdefb3b03bd9af",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 118 exceeds remaining budget 2"
+    },
+    {
+      "id": "MS8",
+      "type": "milestone",
+      "version": "sha256:d5ba28587a5d4266b55375b7c20bf47a8ab681d2821ed46801ac6fc3ebdb22b6",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 124 exceeds remaining budget 2"
+    },
+    {
+      "id": "O1",
+      "type": "objective",
+      "version": "sha256:eb5e53830ce8efe9068bddd8f695dfd91ce5eacffcf049c0eca062fd5f09bae2",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 271 exceeds remaining budget 2"
+    },
+    {
+      "id": "O2",
+      "type": "objective",
+      "version": "sha256:90a0aa96475d1deb130a6071d5bcf2a1a729fa2d16f1af1814cc0930585edde4",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 294 exceeds remaining budget 2"
+    },
+    {
+      "id": "P02",
+      "type": "participant",
+      "version": "sha256:9daf090345c7fae513c1ec313027d7255ad10fe9372ccf08fe48c65549abdf75",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 218 exceeds remaining budget 2"
+    },
+    {
+      "id": "P03",
+      "type": "participant",
+      "version": "sha256:74bb436140189bd170c8cf7fe20b17bd99b0f6deda72c18a5ae686383be966e8",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 217 exceeds remaining budget 2"
+    },
+    {
+      "id": "P04",
+      "type": "participant",
+      "version": "sha256:864b2c1443f38ea20fc35127dd834c0c0370415f35de7709154cb1b39c7b6bd8",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 177 exceeds remaining budget 2"
+    },
+    {
+      "id": "P05",
+      "type": "participant",
+      "version": "sha256:e31b3d9f582b6f9f042732b0464ed8122800acf495b662f7ffeda694c359ebd4",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 203 exceeds remaining budget 2"
+    },
+    {
+      "id": "P06",
+      "type": "participant",
+      "version": "sha256:4a1f5c363e83431d6bae6a7775175070aaa8d7fb9aac5b23f9d38f6ae9672583",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 206 exceeds remaining budget 2"
+    },
+    {
+      "id": "P07",
+      "type": "participant",
+      "version": "sha256:fb46b9cce999ec8cfc8594b4bf09cfc071b49cbae53fe7b27482f3ee946bc8f8",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 261 exceeds remaining budget 2"
+    },
+    {
+      "id": "P08",
+      "type": "participant",
+      "version": "sha256:6ea09862223135947d4816d9cf50f09b68f4ee50d2777a072ec67b0bd0998427",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 278 exceeds remaining budget 2"
+    },
+    {
+      "id": "P09",
+      "type": "participant",
+      "version": "sha256:49cb6cb31f6d884d69f4383c40ed86ab3a354693f126f4b82396f0273516257c",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 249 exceeds remaining budget 2"
+    },
+    {
+      "id": "P10",
+      "type": "participant",
+      "version": "sha256:274d8831cb4c9df6ad70c1deba2ac3ea948f96a0407aabfb84616b98438c936e",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 347 exceeds remaining budget 2"
+    },
+    {
+      "id": "P11",
+      "type": "participant",
+      "version": "sha256:d7bd5b743b23f0ca67550347cc260eb079a6e499395da756b99132548bf4e54b",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 284 exceeds remaining budget 2"
+    },
+    {
+      "id": "P12",
+      "type": "participant",
+      "version": "sha256:cabde32629ce77a156ba24f0dda3365064ca352e07b2f952c5d75479b887b122",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 275 exceeds remaining budget 2"
+    },
+    {
+      "id": "SRC-EOSC",
+      "type": "source",
+      "version": "sha256:b35c93537aa73b00e3395ed5397492d9604dc1582feda61163e9a85d3606e008",
+      "path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 357 exceeds remaining budget 2"
+    },
+    {
+      "id": "SRC-EUNIS",
+      "type": "source",
+      "version": "sha256:36c08650f07b0565566dfb76e7fa5e2ce03d4995758254972c1c95da012edf1d",
+      "path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 362 exceeds remaining budget 2"
+    },
+    {
+      "id": "SRC-FAIR",
+      "type": "source",
+      "version": "sha256:7aff19b54765cd6407ab8ec27dc339d4333b90d15c78261aa46616e0de231dde",
+      "path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 373 exceeds remaining budget 2"
+    },
+    {
+      "id": "SRC-GET",
+      "type": "source",
+      "version": "sha256:a334e5f6691ebad8c0f057489df78d5af02d36270312513970e543291023413a",
+      "path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 366 exceeds remaining budget 2"
+    },
+    {
+      "id": "SRC-WP9-P74",
+      "type": "source",
+      "version": "sha256:7d3075fe8de12c0396ec55c58c40010b69cbebb80791c8f2e2c569ca916d9a69",
+      "path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 1733 exceeds remaining budget 2"
+    },
+    {
+      "id": "SRC-WP9-P75",
+      "type": "source",
+      "version": "sha256:5d2ed5a56a6962a29c79daf15ee0b87879ee727e0d27ce2967648a0a178a93ca",
+      "path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "reason": "over_budget",
+      "required": true,
+      "detail": "cost 2576 exceeds remaining budget 380"
+    },
+    {
+      "id": "SRC-WP9-P76",
+      "type": "source",
+      "version": "sha256:b180ea022d36ebb206d1927fe1b45cae27092f88849123b50562db95d6e3d2a6",
+      "path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 1337 exceeds remaining budget 2"
+    },
+    {
+      "id": "T1.2",
+      "type": "task",
+      "version": "sha256:fe07bbba1a454d2eae8d799fd6547d044dd7c7adacebbe475ddbff18ae2d0540",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 94 exceeds remaining budget 2"
+    },
+    {
+      "id": "T1.3",
+      "type": "task",
+      "version": "sha256:3d2e4968445914ba63dc626417a5ed65c1c6c4344e468df298a7631b0cd09221",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 93 exceeds remaining budget 2"
+    },
+    {
+      "id": "T1.4",
+      "type": "task",
+      "version": "sha256:85d7b2837e9e0dae7e047690d012245413d0ab72ec35b9a654280f1fd4582049",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 147 exceeds remaining budget 2"
+    },
+    {
+      "id": "T2.1",
+      "type": "task",
+      "version": "sha256:c4f2c2120ee865cac63bb7add665f861a6a4f0c5a457c77b17d5b32d3ad7794c",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 83 exceeds remaining budget 2"
+    },
+    {
+      "id": "T2.2",
+      "type": "task",
+      "version": "sha256:bb7d3154b04c6f92e62fb7908683adf20976ea18db32cbbd273298b47f277b57",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 66 exceeds remaining budget 2"
+    },
+    {
+      "id": "T2.3",
+      "type": "task",
+      "version": "sha256:87e823e14fe73048252949a811464368b0b20270a8765a7167d8d81808cb4108",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 88 exceeds remaining budget 2"
+    },
+    {
+      "id": "T2.4",
+      "type": "task",
+      "version": "sha256:4d1a0649132916e3602af938fa3dc68a2b618a781b63b68fd22be0823d2faac1",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 63 exceeds remaining budget 2"
+    },
+    {
+      "id": "T2.5",
+      "type": "task",
+      "version": "sha256:bacd0b80c97a656364928fcae7c34d3ecc5d7f478bd9f6385e1d7caae69f7fe4",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 92 exceeds remaining budget 2"
+    },
+    {
+      "id": "T3.1",
+      "type": "task",
+      "version": "sha256:6f43db42afb8e87dfe6cb8cf485daf07c8a4a8af79aac237d6861b4a5eb7679f",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 88 exceeds remaining budget 2"
+    },
+    {
+      "id": "T3.2",
+      "type": "task",
+      "version": "sha256:2203c1a1b91561fca6606fcaf024dbf682cc78ba2fdb288e8dac9bdc9ed0459c",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 106 exceeds remaining budget 2"
+    },
+    {
+      "id": "T3.3",
+      "type": "task",
+      "version": "sha256:2b2b179ab1226353e247ff4e2fcf9df49662c8a12274207439974d338e36b9f0",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 62 exceeds remaining budget 2"
+    },
+    {
+      "id": "T3.4",
+      "type": "task",
+      "version": "sha256:d842619acbc61af57b42a2f106d0da54ed4a1778d05e058f771706c0ddd72e39",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 63 exceeds remaining budget 2"
+    },
+    {
+      "id": "T3.5",
+      "type": "task",
+      "version": "sha256:428009f367472429a6171723656fcd3cad407a652093919eb42380816bb38a78",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 96 exceeds remaining budget 2"
+    },
+    {
+      "id": "T3.6",
+      "type": "task",
+      "version": "sha256:80832d2e78b27bcdaafaee9d5b6e3a492619a81b1a7f02037d1cc3c89905b731",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 94 exceeds remaining budget 2"
+    },
+    {
+      "id": "T4.2",
+      "type": "task",
+      "version": "sha256:108a7842901a136395dbfc455b345c45eca01d85f0a10d5d64dc40e294bf6afd",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 65 exceeds remaining budget 2"
+    },
+    {
+      "id": "T4.3",
+      "type": "task",
+      "version": "sha256:1759c177dd2ff79d9ba6445148731bd4290840a1a0b6a34e3aabc44476938390",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 68 exceeds remaining budget 2"
+    },
+    {
+      "id": "T4.4",
+      "type": "task",
+      "version": "sha256:7002974e61632b81032f49b32682066544a44ed952fdd57304c9eca8407fb4c8",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 120 exceeds remaining budget 2"
+    },
+    {
+      "id": "T4.5",
+      "type": "task",
+      "version": "sha256:e4aed2bf46da129fd4cbe12dd465589fa18f2d4a11d8fc4abb7751986498a7c5",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 73 exceeds remaining budget 2"
+    },
+    {
+      "id": "T5.1",
+      "type": "task",
+      "version": "sha256:da95568f6805f198239e5e72c4a426ebdef9fadd258e83796cb862360953eb61",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 62 exceeds remaining budget 2"
+    },
+    {
+      "id": "T5.2",
+      "type": "task",
+      "version": "sha256:e780ec6d1262b51a890429c9ff83c3cddcc67168b9601e71c20ed9948eba80b5",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 59 exceeds remaining budget 2"
+    },
+    {
+      "id": "T6.1",
+      "type": "task",
+      "version": "sha256:54b2de8995d285dcf97e0b37e649ee65330c2d57bc0ad293a10860baa4887f4e",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 66 exceeds remaining budget 2"
+    },
+    {
+      "id": "T6.3",
+      "type": "task",
+      "version": "sha256:d621da4d8c8da63dd1fb0d2f6ddb1f5574cfd59bb3dd481faab4a41a1233457c",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": true,
+      "detail": "cost 72 exceeds remaining budget 2"
+    },
+    {
+      "id": "T6.4",
+      "type": "task",
+      "version": "sha256:587d97b17c75131544840b43dba2435ddc22ae002eb03a8e5523a551d1cb1680",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 55 exceeds remaining budget 2"
+    },
+    {
+      "id": "T6.5",
+      "type": "task",
+      "version": "sha256:d92eabd2c79076c018ad5f174225f95add96bc5eadc94dc8809185d0c636f89b",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 88 exceeds remaining budget 2"
+    },
+    {
+      "id": "T7.2",
+      "type": "task",
+      "version": "sha256:60e1535c8e46726461770316610dbed7c5716874bcfe4b52f0fe86decf2a3e3c",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 67 exceeds remaining budget 2"
+    },
+    {
+      "id": "T7.4",
+      "type": "task",
+      "version": "sha256:d304ce79fe8ef0db8b0cd58fd30bc1bfa860574e9bc593f0adbaa7ad531e7790",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 62 exceeds remaining budget 2"
+    },
+    {
+      "id": "T7.5",
+      "type": "task",
+      "version": "sha256:f1472f8b50187498ae7bbe1a9ef91a9493a5f1ce2eaf2264d2221f4afa34af01",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": false,
+      "detail": "cost 62 exceeds remaining budget 2"
+    },
+    {
+      "id": "WP2",
+      "type": "work_package",
+      "version": "sha256:5da1b1f707c891001982035a42e1de8d68aae98100da525d1ee8e32c0dd55994",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": true,
+      "detail": "cost 654 exceeds remaining budget 2"
+    },
+    {
+      "id": "WP3",
+      "type": "work_package",
+      "version": "sha256:43b1ba1b972518d30e731d39ab1190a53b2299ab842e326a4f46929b93cbc0de",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": true,
+      "detail": "cost 838 exceeds remaining budget 2"
+    },
+    {
+      "id": "WP4",
+      "type": "work_package",
+      "version": "sha256:c7d6952b024f7ebfc92be26641a10846c2d162972097fd09ae011904bc9deccb",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": true,
+      "detail": "cost 705 exceeds remaining budget 2"
+    },
+    {
+      "id": "WP5",
+      "type": "work_package",
+      "version": "sha256:9de66f9c6ff788d10c06f08514e4285e25fc71a97916212dccf8240657c335e9",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": true,
+      "detail": "cost 534 exceeds remaining budget 2"
+    },
+    {
+      "id": "WP6",
+      "type": "work_package",
+      "version": "sha256:41d02dada2549ca3fdb24cb01810b5f80b80b6bc4b37258c793508003799ec0b",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": true,
+      "detail": "cost 648 exceeds remaining budget 2"
+    },
+    {
+      "id": "WP7",
+      "type": "work_package",
+      "version": "sha256:7cbc871399cee87ebbba0628aea40c0f232512fa88c63f39499b1af86019cde2",
+      "path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "reason": "over_budget",
+      "required": true,
+      "detail": "cost 671 exceeds remaining budget 2"
+    }
+  ],
+  "unresolved": [
+    {
+      "kind": "declared_status",
+      "id": "P01",
+      "type": "participant",
+      "declared_status": "Assumed"
+    },
+    {
+      "kind": "declared_status",
+      "id": "T1.1",
+      "type": "task",
+      "declared_status": "Assumed"
+    },
+    {
+      "kind": "declared_status",
+      "id": "T1.5",
+      "type": "task",
+      "declared_status": "Assumed"
+    },
+    {
+      "kind": "declared_status",
+      "id": "T4.1",
+      "type": "task",
+      "declared_status": "Assumed"
+    },
+    {
+      "kind": "declared_status",
+      "id": "T5.3",
+      "type": "task",
+      "declared_status": "Assumed"
+    },
+    {
+      "kind": "declared_status",
+      "id": "T5.4",
+      "type": "task",
+      "declared_status": "Assumed"
+    },
+    {
+      "kind": "declared_status",
+      "id": "T6.2",
+      "type": "task",
+      "declared_status": "Assumed"
+    },
+    {
+      "kind": "declared_status",
+      "id": "WP1",
+      "type": "work_package",
+      "declared_status": "Assumed"
+    },
+    {
+      "kind": "required_over_budget",
+      "id": "SRC-WP9-P75",
+      "cost": 2576
+    },
+    {
+      "kind": "required_over_budget",
+      "id": "T6.3",
+      "cost": 72
+    },
+    {
+      "kind": "required_over_budget",
+      "id": "WP2",
+      "cost": 654
+    },
+    {
+      "kind": "required_over_budget",
+      "id": "WP3",
+      "cost": 838
+    },
+    {
+      "kind": "required_over_budget",
+      "id": "WP4",
+      "cost": 705
+    },
+    {
+      "kind": "required_over_budget",
+      "id": "WP5",
+      "cost": 534
+    },
+    {
+      "kind": "required_over_budget",
+      "id": "WP6",
+      "cost": 648
+    },
+    {
+      "kind": "required_over_budget",
+      "id": "WP7",
+      "cost": 671
+    }
+  ],
+  "worst_declared_status": "Assumed",
+  "completeness": "incomplete",
+  "package_hash": "sha256:9f1f134d5dcf6f68c1d7cd10a54d9c154b7c02d65f2f61ac77275f629edd143d"
+}

@@ -1,0 +1,140 @@
+{
+  "record_type": "decision",
+  "id": "demo-dev-graph-snapshot",
+  "date": "2026-09-30",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'First dev-graph snapshot on the demo world' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §9.5 (a reproducible output documents its inputs), §12.1 (reviewability), §12.2 (the four status categories), §13.3 (no invented project fact) and §17.5.3 (a deterministic component performs no domain reasoning). Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "The snapshot builds on the real records at the first attempt, and two builds agree byte for byte. No fail-closed error was raised, so nothing was fixed at a source record. One defect surfaced instead, and it was in the index, not in the records: a package manifest read a declared status from document claims alone, so eighteen packages of wholly Assumed Tier 3 records rolled up to Confirmed. The manifest now reads each node type's own declared status field. Every package on this world is incomplete under the default budget, and the shortfall is measured rather than absorbed.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-dev-graph-snapshot_2026-09-30.json",
+  "snapshot": {
+    "snapshot_id": "sha256:6d76fd3065c4f7d933d0fefa5c125aec80891f0c416a5f2b3e965fcda7b92f70",
+    "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+    "node_count": 116,
+    "edge_count": 305,
+    "nodes_by_type": {
+      "deliverable": 24,
+      "milestone": 8,
+      "objective": 6,
+      "participant": 12,
+      "source": 24,
+      "task": 35,
+      "work_package": 7
+    },
+    "edges_by_predicate": {
+      "assigned_to": 42,
+      "constrained_by": 22,
+      "consumes": 36,
+      "contributes_to": 122,
+      "produces": 59,
+      "validated_by": 24
+    },
+    "inputs": [
+      "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+      "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "docs/tier3_project_instantiation/consortium/partners.json",
+      "docs/tier3_project_instantiation/source_materials/sources.json"
+    ]
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "A package manifest rolls up the declared status of every included item, not of its claims alone. The fix goes in the index, because the records were already honest and the index was not.",
+      "reasoning": "The ticket's rule is that a fail-closed error is fixed at its source record, never by loosening the builder. This is the opposite case. Every Tier 3 record on this world declares Assumed and says so in its own field. The manifest read only a document claim's declared_status, and Tier 5 is empty, so worst_declared_status was computed over an empty set and returned Confirmed. A manifest that reports Confirmed over twelve Assumed partners is a fabricated completion under §15, and it is the manifest that fabricates it. Tightening the roll-up is the only fix that does not require writing a false status into a record.",
+      "recorded_in": "runner/dev_graph/packages.py build_package; tests/runner/test_dev_graph_packages.py TestTier3DeclaredStatus; tests/test_demo_dev_graph_snapshot.py TestHonesty."
+    },
+    {
+      "id": "D2",
+      "decision": "Where a node type declares its status is a lookup keyed by node type, not a scan for any string in the §12.2 vocabulary.",
+      "reasoning": "Four field names carry a status across the records the builder reads: participation_status, validation_status, status and declared_status. Sniffing a value would be a heuristic, and it would misfire on the first record that carries a §12.2 word for another reason. A declared map is checkable against the record schemas and fails visibly when a schema changes. It also returns nothing for a Phase 8 section's validation_status, which is an object rather than a status string, so the lookup never guesses at a shape it does not know.",
+      "recorded_in": "runner/dev_graph/schema.py DECLARED_STATUS_FIELDS and declared_status()."
+    },
+    {
+      "id": "D3",
+      "decision": "An item that is not Confirmed is listed in the manifest's unresolved list under its own kind, declared_status, keeping the §12.2 spelling. The existing whole-snapshot claim scan is left as it stands.",
+      "reasoning": "The two answer different questions. The claim scan asks what is unresolved anywhere in the snapshot. The new entry asks what in the package a consumer is holding is not confirmed, which on a Tier 3 world is the only honesty signal there is. Merging them would lose the package scope; relabelling an Assumed partner as unresolved would collapse two §12.2 categories the constitution keeps apart. The entry carries the status verbatim, so an Assumed partner and an Unresolved claim stay distinguishable while both appear in the list the criterion names.",
+      "recorded_in": "runner/dev_graph/packages.py _declared_status_items."
+    },
+    {
+      "id": "D4",
+      "decision": "The default package budget is a declared repository constant of 3000 estimated tokens, DEFAULT_PACKAGE_BUDGET, equal to the harness pack budget.",
+      "reasoning": "The ticket asks which packages are incomplete under the default budget. No default existed: build_package requires a budget and refuses a missing one, so 'the default' named nothing and every run would have picked its own number. Both budgets bound the same thing, the prompt one consumer is handed, in the same chars/4 estimate, so taking the harness value keeps one number in the repository rather than two. The constant does not enter POLICY_VERSION and changes no existing package.",
+      "recorded_in": "runner/dev_graph/packages.py DEFAULT_PACKAGE_BUDGET."
+    },
+    {
+      "id": "D5",
+      "decision": "The default budget is left at 3000 and the shortfall is measured, not raised to make the packages complete.",
+      "reasoning": "Every one of the eighteen packages is incomplete, and the mandatory set alone needs between 5,411 and 21,885 estimated tokens. Raising the default until the packages pass would answer the demo's own question by assumption. The number the next tickets need is how much a real work plan costs, so the summary records, per package, the smallest budget at which the mandatory set fits and the smallest at which the package is complete, each bisected against the builder.",
+      "recorded_in": "tools/build_demo_dev_graph.py _minimum_budget; docs/tier4_orchestration_state/dev_graph/demo_snapshot_summary.json."
+    },
+    {
+      "id": "D6",
+      "decision": "The three seed tasks are T3.1, T4.1 and T1.1, chosen by a structural rule stated in the tool.",
+      "reasoning": "T3.1 is the task the most other tasks consume, T4.1 both consumes upstream work and is consumed downstream so its mandatory walk crosses work package boundaries in both directions, and T1.1 is a coordination task at the sparse end of the same range. A reader can check each against the records. Picking three interesting-looking ids would have made the measurement unrepeatable.",
+      "recorded_in": "tools/build_demo_dev_graph.py SEED_TASKS and its module docstring."
+    },
+    {
+      "id": "D7",
+      "decision": "outcomes.json, impacts.json and risks.json stay unindexed. The gap is recorded as finding F3, not closed.",
+      "reasoning": "The milestone 1 node-type set has no outcome, impact or risk type, so indexing those three seeds means adding node types. That changes the closed vocabulary, changes POLICY_VERSION, and changes every package id already written. It is a milestone-scope decision and this ticket has no authority to take it. A test pins the five records the builder reads, so the ticket that widens the set fails there first and sees this finding.",
+      "recorded_in": "tests/test_demo_dev_graph_snapshot.py TestTheBuildWasClean."
+    },
+    {
+      "id": "D8",
+      "decision": "Every exclusion count the report cites is derived into the run summary and read back by a test. No count is typed into prose.",
+      "reasoning": "The first draft of finding F8 said no manifest records a policy exclusion. It was generalised from the densest seed, which records none, and it is false for three of the eighteen. The seeds ticket had already recorded this lesson as its D9 after the same kind of error, and repeating it means the rule was not yet mechanical here. The summary now carries exclusions_by_reason per package and in total, and the packages that record a policy exclusion by name; TestWhatThePolicyKeptOut holds all three to the manifests on disk and asserts both halves of the claim, that some package records one and that most do not.",
+      "recorded_in": "tools/build_demo_dev_graph.py _package_row and _totals; tests/test_demo_dev_graph_snapshot.py TestWhatThePolicyKeptOut."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "A package manifest reported Confirmed over records that every one declared Assumed.",
+      "see": "D1"
+    },
+    {
+      "id": "F2",
+      "summary": "All eighteen packages are incomplete under the default budget. The mandatory set of a real work plan costs three to eight times what the synthetic fixture's did.",
+      "see": "D5"
+    },
+    {
+      "id": "F3",
+      "summary": "Three of the six Tier 3 architecture seeds are not indexed, because no node type exists for an outcome, an impact or a risk.",
+      "see": "D7"
+    },
+    {
+      "id": "F4",
+      "summary": "The blind pre-evaluation policy cannot be shown leak-free on this world. It hides assessment, finding, change request and superseded document nodes, and the world contains none of them.",
+      "see": "the validation report, finding F4"
+    },
+    {
+      "id": "F5",
+      "summary": "The builder does not read working_assumptions.json, so a record whose status contradicts the ledger would pass unnoticed.",
+      "see": "the validation report, finding F5"
+    },
+    {
+      "id": "F6",
+      "summary": "The builder does not read roles.json. A work package lead reaches the graph from the seed's lead_partner field, and the roles registry, which still records those leads as Unresolved, is invisible to it.",
+      "see": "the validation report, finding F6"
+    },
+    {
+      "id": "F7",
+      "summary": "No default package budget existed, so 'the default budget' the ticket names would have been a different number on every run.",
+      "see": "D4"
+    },
+    {
+      "id": "F8",
+      "summary": "Under the default budget the manifests are dominated by the budget, not by the view: 1,224 over_budget exclusions against 5 policy_forbidden, and none at all on the densest seed. A manifest built at this budget shows almost nothing of what the view kept out.",
+      "see": "the validation report, finding F8"
+    }
+  ],
+  "what_this_decision_does_not_settle": [
+    "What the default budget should be for an agent actually consuming a package. 3000 is the harness value, and the measurement says it is too small for this work plan; choosing the working number is for the ticket that first consumes a package.",
+    "Whether the dev graph should index outcomes, impacts and risks. F3 records the gap; widening the node-type set is a milestone-scope decision.",
+    "Whether the blind lane is leak-free. F4 records that this world cannot answer it, because it holds nothing the policy would hide, and F8 records that the default budget would nearly hide the answer even if it did. The change-scenario ticket introduces superseded versions and can answer both.",
+    "Which of wp_id and id wins in the work package seed. The seeds ticket recorded the seam as its F1; both keys are still carried and still pinned equal."
+  ],
+  "authored_by": "Ticket 'First dev-graph snapshot on the demo world', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Anonymity: no organisation name, person name, place, grant or project identifier from instance one appears in this record or in any of the 38 artifacts the run wrote. runner/leakage_scan.py scans all 38 and reports the branch OK and NOT CLEAN, unchanged by this ticket: the one remaining violation is instance one's acronym in the 22 September purge record, left in place by the consortium ticket."
+}

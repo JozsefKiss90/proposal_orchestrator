@@ -205,6 +205,40 @@ DECLARED_STATUSES: frozenset[str] = frozenset(
 #: for a decision.
 APPROVALS: frozenset[str] = frozenset({"approved", "pending", "not_applicable"})
 
+#: Where each node type declares its CLAUDE.md §12.2 status: node type -> the
+#: field name in that record's own content. Declared data, never sniffed from
+#: a value: a Tier 3 seed writes ``validation_status``, the consortium
+#: registry writes ``participation_status``, the source index writes
+#: ``status``, and a document claim writes ``declared_status``. A type absent
+#: from this map declares no status of its own, and a node of that type is
+#: neither confirmed nor unresolved — it is simply silent.
+DECLARED_STATUS_FIELDS: Mapping[str, str] = {
+    "participant": "participation_status",
+    "objective": "validation_status",
+    "work_package": "validation_status",
+    "task": "validation_status",
+    "deliverable": "validation_status",
+    "milestone": "validation_status",
+    "source": "status",
+    "claim": "declared_status",
+}
+
+
+def declared_status(node: Mapping[str, Any]) -> str | None:
+    """The node's own declared §12.2 status, or ``None``.
+
+    Pure lookup through :data:`DECLARED_STATUS_FIELDS`. Returns ``None`` when
+    the type declares no status field, when the field is absent, or when its
+    value is outside :data:`DECLARED_STATUSES` — a Phase-8 section's
+    ``validation_status`` object, for instance, is not a Tier 3 seed's status
+    string, and this returns ``None`` for it rather than guessing.
+    """
+    field = DECLARED_STATUS_FIELDS.get(node["type"])
+    if field is None:
+        return None
+    value = node.get("content", {}).get(field)
+    return value if isinstance(value, str) and value in DECLARED_STATUSES else None
+
 
 # ---------------------------------------------------------------------------
 # Errors

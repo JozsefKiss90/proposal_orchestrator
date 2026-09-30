@@ -19,6 +19,8 @@ from runner.deterministic_components import COMPONENT_REGISTRY, invoke_component
 from runner.dev_graph import (
     COMPLETENESS,
     DECLARED_STATUSES,
+    DECLARED_STATUS_FIELDS,
+    DEFAULT_PACKAGE_BUDGET,
     EXCLUSION_REASONS,
     NODE_TYPES,
     PACKAGE_REQUEST_REL,
@@ -34,11 +36,12 @@ from runner.dev_graph import (
     build_package,
     build_snapshot,
     create_candidate_version,
+    declared_status,
     import_document,
     record_change,
     write_package,
 )
-from runner.dev_graph.builder import WP_SEED_REL
+from runner.dev_graph.builder import PARTNERS_REL, WP_SEED_REL
 from runner.dev_graph.identity import content_hash
 from runner.paths import find_repo_root
 
@@ -593,6 +596,108 @@ class TestUnresolved:
         pkg = _pkg(snap)
         contradictions = [u for u in pkg.manifest["unresolved"] if u["kind"] == "contradiction"]
         assert any(c["ids"][0].endswith("#CL-4") for c in contradictions)
+
+
+# --------------------------------------------------------------------------- #
+# Declared status of Tier 3 nodes (not only document claims)
+# --------------------------------------------------------------------------- #
+
+
+class TestTier3DeclaredStatus:
+    """A Tier 3 record declares its own §12.2 status in its own field name.
+
+    The manifest's honesty fields were built against document claims. On a real
+    world with no candidate yet, every node a package carries is a Tier 3
+    record, so a manifest that reads ``declared_status`` alone reports a
+    package of Assumed partners and tasks as ``Confirmed``. The lookup is
+    declared per node type, never sniffed from the value.
+    """
+
+    @pytest.fixture
+    def world(self, tmp_path: Path) -> Path:
+        """The fixture records with no candidate imported.
+
+        This is the demo world's condition: Tier 3 is populated, Tier 5 is
+        empty, so a package carries project records and no document claim at
+        all. A manifest that reads claims alone has nothing to report here.
+        """
+        root = tmp_path / "repo"
+        shutil.copytree(FIXTURE, root)
+        return root
+
+    def _assumed_partners(self, world: Path) -> None:
+        rec = _load(world, PARTNERS_REL)
+        for p in rec["partners"]:
+            p["participation_status"] = "Assumed"
+        _dump(world, PARTNERS_REL, rec)
+
+    def test_the_world_carries_no_claim(self, world: Path):
+        snap = build_snapshot(world)
+        assert not any(n["type"] == "claim" for n in snap.nodes)
+
+    def test_the_field_name_is_declared_per_node_type(self):
+        assert DECLARED_STATUS_FIELDS["participant"] == "participation_status"
+        assert DECLARED_STATUS_FIELDS["claim"] == "declared_status"
+        assert DECLARED_STATUS_FIELDS["task"] == "validation_status"
+        assert set(DECLARED_STATUS_FIELDS) <= NODE_TYPES
+
+    def test_a_value_outside_the_vocabulary_is_no_status(self):
+        node = {"type": "task", "content": {"validation_status": {"overall_status": "confirmed"}}}
+        assert declared_status(node) is None
+        assert declared_status({"type": "task", "content": {}}) is None
+        assert declared_status({"type": "source_span", "content": {"status": "Confirmed"}}) is None
+
+    def test_an_assumed_partner_reaches_the_worst_declared_status(self, world: Path):
+        self._assumed_partners(world)
+        snap = build_snapshot(world)
+        pkg = _pkg(snap, expected_snapshot_id=snap.snapshot_id)
+        assert any(i["type"] == "participant" for i in pkg.manifest["included"])
+        assert pkg.manifest["worst_declared_status"] == "Assumed"
+
+    def test_an_assumed_partner_is_listed_as_unresolved(self, world: Path):
+        self._assumed_partners(world)
+        snap = build_snapshot(world)
+        pkg = _pkg(snap, expected_snapshot_id=snap.snapshot_id)
+        listed = {
+            u["id"]: u for u in pkg.manifest["unresolved"] if u["kind"] == "declared_status"
+        }
+        partners = {i["id"] for i in pkg.manifest["included"] if i["type"] == "participant"}
+        assert partners and partners <= set(listed)
+        assert all(listed[p]["declared_status"] == "Assumed" for p in partners)
+
+    def test_only_included_items_are_listed(self, world: Path):
+        self._assumed_partners(world)
+        snap = build_snapshot(world)
+        pkg = _pkg(snap, expected_snapshot_id=snap.snapshot_id)
+        included = {i["id"] for i in pkg.manifest["included"]}
+        for u in pkg.manifest["unresolved"]:
+            if u["kind"] == "declared_status":
+                assert u["id"] in included
+
+    def test_a_confirmed_record_is_not_listed(self, world: Path):
+        rec = _load(world, PARTNERS_REL)
+        for p in rec["partners"]:
+            p["participation_status"] = "Confirmed"
+        _dump(world, PARTNERS_REL, rec)
+        snap = build_snapshot(world)
+        pkg = _pkg(snap, expected_snapshot_id=snap.snapshot_id)
+        listed = {u["id"] for u in pkg.manifest["unresolved"] if u["kind"] == "declared_status"}
+        partners = {i["id"] for i in pkg.manifest["included"] if i["type"] == "participant"}
+        assert partners and not (partners & listed)
+
+    def test_the_item_carries_its_own_declared_status(self, world: Path):
+        self._assumed_partners(world)
+        snap = build_snapshot(world)
+        pkg = _pkg(snap, expected_snapshot_id=snap.snapshot_id)
+        for i in pkg.manifest["included"]:
+            if i["type"] == "participant":
+                assert i["declared_status"] == "Assumed"
+
+
+class TestDefaultBudget:
+    def test_the_default_budget_is_a_declared_positive_constant(self):
+        assert isinstance(DEFAULT_PACKAGE_BUDGET, int)
+        assert DEFAULT_PACKAGE_BUDGET > 0
 
 
 # --------------------------------------------------------------------------- #

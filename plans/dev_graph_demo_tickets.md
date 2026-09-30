@@ -244,11 +244,34 @@ deliverables couple across work packages through milestones (F12).
 
 **Blocked by:** Source materials and the sources index; Architecture seeds and the uncertainty ledger.
 
-- [ ] The snapshot builds, and two builds give the same snapshot ID.
-- [ ] Every fail-closed error hit on the way is listed with its cause and the record fix, in a Tier 4 validation report.
-- [ ] Each package manifest reports completeness. Any package marked incomplete under the default budget is listed with the item that did not fit.
-- [ ] Assumed partners and Unresolved claims appear in the manifests' unresolved lists.
-- [ ] Node and edge counts are recorded so later scenarios can be compared against them.
+- [x] The snapshot builds, and two builds give the same snapshot ID.
+- [x] Every fail-closed error hit on the way is listed with its cause and the record fix, in a Tier 4 validation report.
+- [x] Each package manifest reports completeness. Any package marked incomplete under the default budget is listed with the item that did not fit.
+- [x] Assumed partners and Unresolved claims appear in the manifests' unresolved lists.
+- [x] Node and edge counts are recorded so later scenarios can be compared against them.
+
+**Outcome.** The snapshot builds at the first attempt: 116 nodes and 305 edges from five Tier 3
+records, deterministic across two builds and across a full replay of all 38 artifacts. Eighteen packages,
+one per view policy for T3.1, T4.1 and T1.1, all incomplete under a default budget of 3,000. The eight
+findings and the eight decisions are in this ticket's validation report,
+`demo-dev-graph-snapshot_2026-09-30.json`.
+
+**The builder raised no error, so nothing was fixed at a record.** The defect was in the index instead.
+A manifest rolled up a declared status from document claims alone, and Tier 5 is empty. All eighteen
+packages reported Confirmed over records that every one declared Assumed (F1).
+
+**Three numbers the next tickets need.** A real work plan's mandatory set costs 5,411 to 21,885 estimated
+tokens, so the default budget is three to eight times too small (F2). Under it the manifests are dominated
+by the budget rather than by the view: 1,224 over-budget exclusions against 5 policy exclusions, and none
+at all on the densest seed (F8). And the blind lane cannot be shown leak-free here, because the world holds
+nothing the policy would hide (F4).
+
+**The number that was wrong, again.** The first draft of F8 said no manifest records a policy exclusion.
+It was generalised from T3.1, which records none, and three of the eighteen do.
+
+The seeds ticket recorded this same lesson as its D9. Repeating it means the rule was not yet mechanical
+here. Every exclusion count is now derived into the run summary and read back by
+`TestWhatThePolicyKeptOut` (D8).
 
 ## Runner Phases 1 to 6 on the demo
 
