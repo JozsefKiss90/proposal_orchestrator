@@ -1,0 +1,550 @@
+{
+  "schema_id": "orch.dev_graph.evidence_package.v1",
+  "package_id": "sha256:2d2311273471851360d6d81817e5bc2080c1c28f3110fb7ceb684d808c410e87",
+  "package_hash": "sha256:15d2ecd12e7d5ab856c6d6da68fa01fb1bdad3c102c3d9ccf24112f3e868abc9",
+  "items": [
+    {
+      "id": "T3.1",
+      "type": "task",
+      "version": "sha256:6f43db42afb8e87dfe6cb8cf485daf07c8a4a8af79aac237d6861b4a5eb7679f",
+      "content": {
+        "task_id": "T3.1",
+        "title": "Agree joint definitions for data collection, metadata and processing protocols",
+        "responsible_partner": "P10",
+        "contributing_partners": [
+          "P01",
+          "P07",
+          "P08",
+          "P09"
+        ],
+        "dependencies": [
+          "T1.2"
+        ],
+        "start_month": 4,
+        "end_month": 16,
+        "validation_status": "Assumed",
+        "source_ref": "Call extract $.scope_requirements[4]; span SRC-WP9-P75#2080-2151"
+      }
+    },
+    {
+      "id": "P10",
+      "type": "participant",
+      "version": "sha256:274d8831cb4c9df6ad70c1deba2ac3ea948f96a0407aabfb84616b98438c936e",
+      "content": {
+        "partner_id": "P10",
+        "legal_name": "P10",
+        "country": "C3",
+        "country_slot": "C3",
+        "country_slot_class": "MS",
+        "organisation_type": "ngo",
+        "organisation_description": "Non-profit research organisation, biodiversity data infrastructure",
+        "sector": "biodiversity data infrastructure",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_status": "Assumed",
+        "participation_role": "beneficiary",
+        "capability_basis": "fictional",
+        "gap_closed": "No biodiversity data-infrastructure partner among the derived six, so nothing to carry the cooperation with in-situ data collection frameworks, the typology crosswalks or the open-science-cloud link the scope requires.",
+        "capabilities": [
+          "operation of a national species-occurrence data facility that publishes to a global biodiversity data facility",
+          "biodiversity data-standard crosswalks between occurrence standards, the European habitat classification and a global ecosystem typology",
+          "findable, accessible, interoperable and reusable metadata practice",
+          "integration of services into the European open science cloud"
+        ],
+        "role_in_the_action": "Owns the interoperability and data-publication layer: the crosswalks, the metadata profile, the cooperation with the named in-situ data frameworks, and the interface a Joint Research Centre contribution would attach to.",
+        "personnel_roles": [
+          "data infrastructure lead, P10",
+          "metadata standards specialist, P10"
+        ]
+      }
+    },
+    {
+      "id": "T1.2",
+      "type": "task",
+      "version": "sha256:fe07bbba1a454d2eae8d799fd6547d044dd7c7adacebbe475ddbff18ae2d0540",
+      "content": {
+        "task_id": "T1.2",
+        "title": "Write the data management plan and the metadata profile the three cases share",
+        "responsible_partner": "P10",
+        "contributing_partners": [
+          "P04",
+          "P09"
+        ],
+        "dependencies": [],
+        "start_month": 1,
+        "end_month": 6,
+        "validation_status": "Assumed",
+        "note": "Sits in the management work package because it is due at M6, before WP3 opens. WP3 then builds the protocols on it."
+      }
+    },
+    {
+      "id": "T3.2",
+      "type": "task",
+      "version": "sha256:2203c1a1b91561fca6606fcaf024dbf682cc78ba2fdb288e8dac9bdc9ed0459c",
+      "content": {
+        "task_id": "T3.2",
+        "title": "Build the crosswalks between occurrence standards, the European habitat classification and the global ecosystem typology",
+        "responsible_partner": "P10",
+        "contributing_partners": [
+          "P08",
+          "P12"
+        ],
+        "dependencies": [
+          "T3.1"
+        ],
+        "start_month": 10,
+        "end_month": 28,
+        "validation_status": "Assumed",
+        "source_ref": "Call extract $.cross_cutting_requirements.eunis_and_global_ecosystem_typology; span SRC-WP9-P75#1353-1395"
+      }
+    },
+    {
+      "id": "T3.3",
+      "type": "task",
+      "version": "sha256:2b2b179ab1226353e247ff4e2fcf9df49662c8a12274207439974d338e36b9f0",
+      "content": {
+        "task_id": "T3.3",
+        "title": "Define the omics metadata standard and bind it to the occurrence standard",
+        "responsible_partner": "P09",
+        "contributing_partners": [
+          "P10"
+        ],
+        "dependencies": [
+          "T3.1"
+        ],
+        "start_month": 10,
+        "end_month": 24,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T3.4",
+      "type": "task",
+      "version": "sha256:d842619acbc61af57b42a2f106d0da54ed4a1778d05e058f771706c0ddd72e39",
+      "content": {
+        "task_id": "T3.4",
+        "title": "Build the provenance-tracked, reproducible processing pipelines",
+        "responsible_partner": "P04",
+        "contributing_partners": [
+          "P09",
+          "P12"
+        ],
+        "dependencies": [
+          "T2.3",
+          "T3.1"
+        ],
+        "start_month": 12,
+        "end_month": 34,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T4.1",
+      "type": "task",
+      "version": "sha256:56354d8abf35fdee4786d8946f4898f00ba5d553f00a5be07dc947bf940ec9c7",
+      "content": {
+        "task_id": "T4.1",
+        "title": "Run the terrestrial campaign in farmland, grassland and field margins",
+        "responsible_partner": "P03",
+        "contributing_partners": [
+          "P01",
+          "P02",
+          "P06",
+          "P11"
+        ],
+        "dependencies": [
+          "T2.5",
+          "T3.1"
+        ],
+        "start_month": 16,
+        "end_month": 36,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T5.1",
+      "type": "task",
+      "version": "sha256:da95568f6805f198239e5e72c4a426ebdef9fadd258e83796cb862360953eb61",
+      "content": {
+        "task_id": "T5.1",
+        "title": "Design the environmental DNA sampling across the three cases",
+        "responsible_partner": "P09",
+        "contributing_partners": [
+          "P03",
+          "P07",
+          "P08"
+        ],
+        "dependencies": [
+          "T3.1"
+        ],
+        "start_month": 13,
+        "end_month": 20,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T6.1",
+      "type": "task",
+      "version": "sha256:54b2de8995d285dcf97e0b37e649ee65330c2d57bc0ad293a10860baa4887f4e",
+      "content": {
+        "task_id": "T6.1",
+        "title": "Rework the multi-season field archive into documented training and validation sets",
+        "responsible_partner": "P03",
+        "contributing_partners": [
+          "P01",
+          "P12"
+        ],
+        "dependencies": [
+          "T3.1"
+        ],
+        "start_month": 16,
+        "end_month": 28,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "WP3",
+      "type": "work_package",
+      "version": "sha256:43b1ba1b972518d30e731d39ab1190a53b2299ab842e326a4f46929b93cbc0de",
+      "content": {
+        "wp_id": "WP3",
+        "id": "WP3",
+        "title": "Joint protocols, metadata and interoperability crosswalks",
+        "lead_partner": "P10",
+        "start_month": 4,
+        "end_month": 42,
+        "objectives": [
+          "O2"
+        ],
+        "constraints": [
+          "SRC-WP9-P75",
+          "SRC-WP9-P76",
+          "SRC-EUNIS",
+          "SRC-GET",
+          "SRC-EOSC",
+          "SRC-FAIR"
+        ],
+        "validation_status": "Assumed",
+        "source_ref": "Concept note, 'The chain, from genome to space'; claims C08, C09, C15, C18 and C23; objectives O2",
+        "note": "The protocols precede the campaigns, because a case run under a protocol that changes later produces data the other cases cannot join.",
+        "tasks": [
+          {
+            "task_id": "T3.1",
+            "title": "Agree joint definitions for data collection, metadata and processing protocols",
+            "responsible_partner": "P10",
+            "contributing_partners": [
+              "P01",
+              "P07",
+              "P08",
+              "P09"
+            ],
+            "dependencies": [
+              "T1.2"
+            ],
+            "start_month": 4,
+            "end_month": 16,
+            "validation_status": "Assumed",
+            "source_ref": "Call extract $.scope_requirements[4]; span SRC-WP9-P75#2080-2151"
+          },
+          {
+            "task_id": "T3.2",
+            "title": "Build the crosswalks between occurrence standards, the European habitat classification and the global ecosystem typology",
+            "responsible_partner": "P10",
+            "contributing_partners": [
+              "P08",
+              "P12"
+            ],
+            "dependencies": [
+              "T3.1"
+            ],
+            "start_month": 10,
+            "end_month": 28,
+            "validation_status": "Assumed",
+            "source_ref": "Call extract $.cross_cutting_requirements.eunis_and_global_ecosystem_typology; span SRC-WP9-P75#1353-1395"
+          },
+          {
+            "task_id": "T3.3",
+            "title": "Define the omics metadata standard and bind it to the occurrence standard",
+            "responsible_partner": "P09",
+            "contributing_partners": [
+              "P10"
+            ],
+            "dependencies": [
+              "T3.1"
+            ],
+            "start_month": 10,
+            "end_month": 24,
+            "validation_status": "Assumed"
+          },
+          {
+            "task_id": "T3.4",
+            "title": "Build the provenance-tracked, reproducible processing pipelines",
+            "responsible_partner": "P04",
+            "contributing_partners": [
+              "P09",
+              "P12"
+            ],
+            "dependencies": [
+              "T2.3",
+              "T3.1"
+            ],
+            "start_month": 12,
+            "end_month": 34,
+            "validation_status": "Assumed"
+          },
+          {
+            "task_id": "T3.5",
+            "title": "Publish the datasets and services to the open science cloud and the common data spaces",
+            "responsible_partner": "P10",
+            "contributing_partners": [
+              "P04"
+            ],
+            "dependencies": [
+              "T3.2",
+              "T3.4"
+            ],
+            "start_month": 24,
+            "end_month": 42,
+            "validation_status": "Assumed",
+            "source_ref": "Call extract $.cross_cutting_requirements.eosc_and_common_data_spaces; span SRC-WP9-P75#1948-2018"
+          },
+          {
+            "task_id": "T3.6",
+            "title": "Take the harmonisation decisions to the standards bodies that maintain the classifications",
+            "responsible_partner": "P10",
+            "contributing_partners": [
+              "P08",
+              "P09"
+            ],
+            "dependencies": [
+              "T3.2"
+            ],
+            "start_month": 18,
+            "end_month": 42,
+            "validation_status": "Assumed",
+            "note": "The scope asks the project to contribute to consensus, which an internal protocol does not do."
+          }
+        ],
+        "deliverables": [
+          {
+            "deliverable_id": "D3.1",
+            "title": "Joint data collection, metadata and processing protocols",
+            "due_month": 16,
+            "type": "specification",
+            "produced_by": [
+              "T3.1"
+            ],
+            "validation_status": "Assumed"
+          },
+          {
+            "deliverable_id": "D3.2",
+            "title": "Interoperability crosswalk package for occurrence, habitat and ecosystem classifications",
+            "due_month": 28,
+            "type": "dataset",
+            "produced_by": [
+              "T3.2",
+              "T3.3"
+            ],
+            "validation_status": "Assumed"
+          },
+          {
+            "deliverable_id": "D3.3",
+            "title": "Provenance-tracked processing pipeline release",
+            "due_month": 34,
+            "type": "software",
+            "produced_by": [
+              "T3.4"
+            ],
+            "validation_status": "Assumed"
+          },
+          {
+            "deliverable_id": "D3.4",
+            "title": "FAIR publication and standards contribution report",
+            "due_month": 42,
+            "type": "report",
+            "produced_by": [
+              "T3.5",
+              "T3.6"
+            ],
+            "validation_status": "Assumed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P03",
+      "type": "participant",
+      "version": "sha256:74bb436140189bd170c8cf7fe20b17bd99b0f6deda72c18a5ae686383be966e8",
+      "content": {
+        "partner_id": "P03",
+        "legal_name": "P03",
+        "country": "C1",
+        "country_slot": "C1",
+        "country_slot_class": "MS",
+        "organisation_type": "university",
+        "organisation_description": "University, agriculture",
+        "sector": "higher education, agriculture",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "derived",
+        "participation_status": "Assumed",
+        "capabilities": [
+          "multi-season controlled field-experiment archive covering physiological, spectral, soil-water and weather measurements",
+          "crop and water-balance modelling",
+          "precision agriculture instrumentation"
+        ],
+        "role_in_the_action": "Supplies the long-run field archive that is reworked into documented training and validation sets, and the agricultural pressure gradient the demonstration cases run along.",
+        "personnel_roles": [
+          "field experiment manager, P03",
+          "agronomic modeller, P03"
+        ]
+      }
+    },
+    {
+      "id": "P04",
+      "type": "participant",
+      "version": "sha256:864b2c1443f38ea20fc35127dd834c0c0370415f35de7709154cb1b39c7b6bd8",
+      "content": {
+        "partner_id": "P04",
+        "legal_name": "P04",
+        "country": "C1",
+        "country_slot": "C1",
+        "country_slot_class": "MS",
+        "organisation_type": "sme",
+        "organisation_description": "SME, software engineering",
+        "sector": "software engineering",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "derived",
+        "participation_status": "Assumed",
+        "capabilities": [
+          "web decision-support engineering",
+          "provenance tracking",
+          "reproducible inference pipelines"
+        ],
+        "role_in_the_action": "Engineers the reproducible processing and provenance layer, and the decision-support surface the harmonisation workflows are delivered through.",
+        "personnel_roles": [
+          "software architect, P04",
+          "data engineer, P04"
+        ]
+      }
+    },
+    {
+      "id": "P09",
+      "type": "participant",
+      "version": "sha256:49cb6cb31f6d884d69f4383c40ed86ab3a354693f126f4b82396f0273516257c",
+      "content": {
+        "partner_id": "P09",
+        "legal_name": "P09",
+        "country": "C5",
+        "country_slot": "C5",
+        "country_slot_class": "MS",
+        "organisation_type": "university",
+        "organisation_description": "University, biodiversity genomics",
+        "sector": "higher education, genomics",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "fictional",
+        "participation_status": "Assumed",
+        "gap_closed": "No genomic, transcriptomic or environmental DNA capability among the derived six. P01's metabolomics is their only omics layer, and the second expected outcome names all three.",
+        "capabilities": [
+          "genomic and transcriptomic sequencing",
+          "environmental DNA metabarcoding",
+          "reference sequence libraries",
+          "bioinformatics pipelines",
+          "standardised omics metadata"
+        ],
+        "role_in_the_action": "Supplies the genomic and transcriptomic layer of the genome-to-space chain, and the omics metadata standard the integration is built on.",
+        "personnel_roles": [
+          "biodiversity genomicist, P09",
+          "bioinformatician, P09"
+        ]
+      }
+    },
+    {
+      "id": "SRC-EOSC",
+      "type": "source",
+      "version": "sha256:b35c93537aa73b00e3395ed5397492d9604dc1582feda61163e9a85d3606e008",
+      "content": {
+        "source_id": "SRC-EOSC",
+        "title": "European Open Science Cloud (EOSC)",
+        "kind": "external_reference",
+        "status": "Assumed",
+        "names": [
+          "EOSC",
+          "European Open Science Cloud"
+        ],
+        "citation": {
+          "cited_as": "The European Open Science Cloud (EOSC), the European federation of research data services."
+        },
+        "anchor": {
+          "via_source": "SRC-WP9-P75",
+          "span_id": "SRC-WP9-P75#1748-2031",
+          "verbatim": "EOSC",
+          "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+        },
+        "resolves_to": {
+          "class": "external_identifier",
+          "identifier": "https://eosc.eu",
+          "identifier_status": "Assumed",
+          "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+          "what_it_holds": "The EOSC portal, from which the service catalogue and onboarding requirements are obtained."
+        },
+        "transcription": {
+          "state": "cited_only",
+          "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+        },
+        "relied_on_for": [
+          {
+            "what": "The data-infrastructure linking duty, which P10 and P04 hold.",
+            "claim_refs": [],
+            "span_refs": [],
+            "status": "Assumed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T1.4",
+      "type": "task",
+      "version": "sha256:85d7b2837e9e0dae7e047690d012245413d0ab72ec35b9a654280f1fd4582049",
+      "content": {
+        "task_id": "T1.4",
+        "title": "Agree cooperation with the named in-situ data frameworks and hold the Joint Research Centre place open",
+        "responsible_partner": "P10",
+        "contributing_partners": [
+          "P03",
+          "P08"
+        ],
+        "dependencies": [],
+        "start_month": 1,
+        "end_month": 12,
+        "validation_status": "Assumed",
+        "source_ref": "Call extract $.cross_cutting_requirements.gbif_obis_lucas_cooperation and .jrc_participation; spans SRC-WP9-P75#2390-2407 and SRC-WP9-P73#1231-1289",
+        "note": "The topic asks for earmarked resources. The place for the Joint Research Centre is held open and counted towards no eligibility condition."
+      }
+    },
+    {
+      "id": "T5.2",
+      "type": "task",
+      "version": "sha256:e780ec6d1262b51a890429c9ff83c3cddcc67168b9601e71c20ed9948eba80b5",
+      "content": {
+        "task_id": "T5.2",
+        "title": "Run the metabarcoding, sequencing and reference library work",
+        "responsible_partner": "P09",
+        "contributing_partners": [
+          "P07"
+        ],
+        "dependencies": [
+          "T5.1"
+        ],
+        "start_month": 20,
+        "end_month": 34,
+        "validation_status": "Assumed"
+      }
+    }
+  ]
+}

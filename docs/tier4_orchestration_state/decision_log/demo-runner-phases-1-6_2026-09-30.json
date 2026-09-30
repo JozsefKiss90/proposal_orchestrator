@@ -1,0 +1,235 @@
+{
+  "record_type": "decision",
+  "id": "demo-runner-phases-1-6",
+  "date": "2026-09-30",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Runner Phases 1 to 6 on the demo' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §9.5 (a reproducible output documents its inputs), §12.1 (reviewability), §12.2 (the four status categories), §12.3 (a contradiction is resolved explicitly, naming the method, the source that prevailed and the reasoning), §12.4 (a missing mandatory input is a gate failure, not an optimistic inference), §13.2 (no invented call constraint), §10.6 (a source document governs over programme knowledge) and §15 (explicit failure over fabricated completion). Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "The operator dispatched Phases 1 to 6 under one run id and all six nodes reached released, every gate passing with no failed predicate. Two of the ticket's four acceptance criteria are met on that evidence. The third is partly met, because six dispatches shared one run id and the per-dispatch run summary survives only for the last of them. The fourth is met by the derivation this record introduces, after the benchmark layer's own roll-up was found to attribute the whole run to a single phase. One substantive defect surfaced and is not fixed here: the topic's expected impacts never entered Tier 2B, so Phase 1 wrote paraphrases of the topic's outcome and scope text in their place and marked them Confirmed. The ticket stays open on that.",
+  "validation_report": null,
+  "validation_report_status": "Not written. The ticket's validation report is due when the criteria it would report are all met; two are not. This record carries the dispositions in the meantime.",
+  "run": {
+    "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+    "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+    "instrument": "RIA, lump sum",
+    "nodes_released": [
+      "n01_call_analysis",
+      "n02_concept_refinement",
+      "n03_wp_design",
+      "n04_gantt_milestones",
+      "n05_impact_architecture",
+      "n06_implementation_architecture"
+    ],
+    "nodes_pending": [
+      "n07_budget_gate",
+      "n08a_excellence_drafting",
+      "n08b_impact_drafting",
+      "n08c_implementation_drafting",
+      "n08d_assembly",
+      "n08e_evaluator_review",
+      "n08f_revision"
+    ],
+    "dispatch_pattern": "Six single-phase dispatches, one per phase, all under one run id. The cumulative run manifest holds every node state; run_summary.json was overwritten by each dispatch and now describes n06 alone.",
+    "per_phase_cost_and_duration": {
+      "1": {
+        "invocations": 4,
+        "estimated_total_tokens": 76112,
+        "wall_clock_seconds": 714.921,
+        "gate_status": "pass"
+      },
+      "2": {
+        "invocations": 4,
+        "estimated_total_tokens": 105425,
+        "wall_clock_seconds": 458.687,
+        "gate_status": "pass"
+      },
+      "3": {
+        "invocations": 6,
+        "estimated_total_tokens": 144589,
+        "wall_clock_seconds": 716.639,
+        "gate_status": "pass"
+      },
+      "4": {
+        "invocations": 4,
+        "estimated_total_tokens": 87279,
+        "wall_clock_seconds": 290.549,
+        "gate_status": "pass"
+      },
+      "5": {
+        "invocations": 4,
+        "estimated_total_tokens": 34864,
+        "wall_clock_seconds": 534.405,
+        "gate_status": "pass"
+      },
+      "6": {
+        "invocations": 5,
+        "estimated_total_tokens": 126838,
+        "wall_clock_seconds": 392.811,
+        "gate_status": "pass"
+      }
+    },
+    "per_phase_cost_and_duration_source": "docs/tier4_orchestration_state/run_cost/d68acaef-e9b2-412e-bc09-4b34c386d5fd.json",
+    "totals": {
+      "invocations": 27,
+      "estimated_input_tokens": 491140,
+      "estimated_output_tokens": 83967,
+      "wall_clock_seconds": 3108.012,
+      "cost_usd": null,
+      "cost_usd_status": "Unresolved"
+    }
+  },
+  "acceptance_criteria": [
+    {
+      "criterion": "Phases 1-6 each reach released, or the blocking gate and reason are recorded in Tier 4.",
+      "disposition": "met",
+      "evidence": "The run manifest records n01 to n06 all released, each with failure_origin null and exit_gate_evaluated true. The six phase gates pass with no failed predicate and nothing skipped: phase_01_gate 17/17 deterministic, phase_02_gate 6/6 plus one semantic, phase_03_gate 8/8, phase_04_gate 11/11, phase_05_gate 9/9, phase_06_gate 10/10. gate_01_source_integrity passes 6/6. Every phase wrote its canonical artifact to its phase output directory. n07 and the n08 nodes remain pending, so the Phase 7 block on Phase 8 stands."
+    },
+    {
+      "criterion": "Tier 2B extracted/ holds the six files for this topic, traceable to the Part 9 source.",
+      "disposition": "not met, pending one rerun",
+      "evidence": "All six files are present and were rewritten by this run. Five carry source sections at pages 73 to 76, which resolve through the curated call extract to its declared source document, the Part 9 work programme PDF. The sixth, expected_impacts.json, traces to the wrong part of Part 9: its five entries paraphrase the topic's own Expected Outcome and Scope text at pages 73 to 74, while the topic's expected impacts are the destination's six at pages 47 to 48. The source-layer gap behind that is now closed — the curated extract carries the six, sliced from the PDF — so what stands between this criterion and met is a Phase 1 rerun, which only the operator dispatches. See F3, F4 and D2."
+    },
+    {
+      "criterion": "Run manifests with reuse decisions are preserved for every run.",
+      "disposition": "partly met",
+      "evidence": "One cumulative run_manifest.json survives with all six node states and their failure details. reuse_decisions is empty, and that is correct rather than missing: REUSE_SKIP_SKILLS covers only n08a, n08b and n08c, so a Phase 1 to 6 dispatch generates no reuse decision. What is not preserved is the per-dispatch run summary, overwritten five times under the shared run id, and none of it is in the repository, since .claude/runs/ is gitignored. See F2 and D4."
+    },
+    {
+      "criterion": "Run cost and duration per phase are recorded.",
+      "disposition": "met",
+      "evidence": "docs/tier4_orchestration_state/run_cost/d68acaef-e9b2-412e-bc09-4b34c386d5fd.json, derived by tools/derive_run_phase_costs.py and read back by tests/test_demo_runner_phase_costs.py. It replaces the benchmark layer's own roll-up, which attributed all 27 invocations of the run to phase 5. Duration and tokens are recorded per phase; a currency cost is Unresolved and written as null, because the provider projection priced no provider. See D1 and F1."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "Per-phase cost and duration is derived by partitioning the invocation ledger on the phase gates' evaluated_at times, and the status of that attribution is Inferred. The benchmark layer's phase_analytics.json is named superseded for this run rather than corrected in place.",
+      "reasoning": "The ledger cannot answer the question directly. runner/benchmark/transport_hook.py never sets node_id, so all 27 rows carry node_id null, and runner/benchmark/analytics.py falls back to inferring the node from the run summary's single dispatched node. The ledger is append-only across dispatches and a run summary names only the latest one, so on this dispatch pattern the inference hands the whole cumulative ledger to one phase. A phase is nonetheless bounded in time: it is dispatched after the previous phase's gate and its own gate is evaluated after its last invocation. Partitioning on those boundaries recovers the attribution without guessing, and the two structural facts it rests on, monotonic gate times and a single run id, are checked and fail closed. No artifact records which phase an invocation belonged to, so the result is Inferred under §12.2 and not Confirmed. A currency figure is not substituted: the provider projection evaluated zero providers, so cost_usd is null and Unresolved, which is the §8.3 discipline applied to a run cost.",
+      "recorded_in": "tools/derive_run_phase_costs.py; docs/tier4_orchestration_state/run_cost/d68acaef-e9b2-412e-bc09-4b34c386d5fd.json; tests/test_demo_runner_phase_costs.py TestEveryPhaseGotItsOwnNumbers, TestTheNumbersComeFromTheLedger, TestHonesty, TestDeterminism."
+    },
+    {
+      "id": "D2",
+      "decision": "This topic's expected impacts are the destination's six, at Part 9 pages 47 to 48. The five entries currently in Tier 2B expected_impacts.json are derivations from the topic's Expected Outcome and Scope text and cannot carry Confirmed. The fix is a Tier 2B intake, not a Tier 3 edit and not a relaxed gate: the destination's expected impacts must enter Tier 2B from the Part 9 PDF, after which Phase 1 and Phase 5 are rerun.",
+      "reasoning": "Method, per §12.3: both artifacts cite Part 9, so this is not a conflict of authority between tiers but one artifact citing the wrong section of a source both agree on. The source that prevails is the Part 9 PDF itself, whose pages 47 and 48 carry the destination narrative for Biodiversity and ecosystem services and its six expected impacts; the Tier 3 source materials record transcribes both pages byte for byte and declares them Confirmed. Pages 73 to 76 are the topic entry, and the sections cited there, Expected Outcome and Scope, describe outcomes and scope, not impacts. An impact statement paraphrased out of an outcome section is at best Inferred under §12.2, and four of the five entries assert Confirmed with no quote and no span reference. Tier 2B is the authority for call context under §5, so Tier 3's transcription cannot stand in for the Tier 2B extract; the extract must cite the PDF pages itself. Phase 5's gate condition reads Tier 2B's expected impacts, so correcting the extract is what makes that gate meaningful, and content-based staleness will re-trigger it once the file changes.",
+      "required_fix": {
+        "tier": "Tier 2B",
+        "step_1_intake": {
+          "state": "done",
+          "what": "The curated call extract now carries the destination's six expected impacts, each sliced from the Part 9 PDF with its page and character range, plus the binding clause and the pathway phrase. The extract is the only one of Phase 1's three declared inputs that can carry them: the slice has no impact text and the skill is forbidden from reading work_programmes/.",
+          "artifact": "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+          "written_by": "tools/author_biodiv_destination_impacts.py"
+        },
+        "step_2_rerun": {
+          "state": "pending",
+          "rerun_scope": [
+            "Phase 1 (n01_call_analysis) — must be scoped explicitly, because phase_01_gate fingerprints only selected_call.json and will not go stale on this change by itself",
+            "Phase 5 (n05_impact_architecture) — goes stale by itself, since phase_05_gate fingerprints expected_impacts.json"
+          ],
+          "not_in_scope": "Phases 2, 3, 4 and 6. No gate of theirs fingerprints any Tier 2B extracted file, so rewriting those files cascades no further than Phase 5.",
+          "dispatched_by": "The operator. This record does not dispatch a runner phase."
+        }
+      },
+      "recorded_in": "tools/author_biodiv_destination_impacts.py, which slices the six impacts out of the Part 9 PDF, cross-checks every quote against the Tier 3 transcription of pages 47 and 48, and refuses to write when the two reads disagree or the counts differ; the extract it writes; and tests/test_tier2b_biodiv_intake.py, whose existing verbatim sweep now covers pages 47 and 48."
+    },
+    {
+      "id": "D3",
+      "decision": "Phase 5's released state is neither retracted nor treated as evidence that the impact architecture addresses this call's expected impacts. It stands as the record of what ran, with F3 and F4 attached to it.",
+      "reasoning": "The gate did what it is specified to do. §7 Phase 5 requires each expected impact specified in Tier 2B to have at least one mapped project output, and every entry in Tier 2B's file got a pathway: the five pathways are keyed PW-EI-01 to PW-EI-05. The gate was sound and its input was wrong, which is a different failure from a gate that passed on incomplete evidence. Rewriting the node state by hand would put a false record over a true one, and §13.5 and §15 both point the other way: the honest artifact is the pass plus the finding that names what it did not check. Tier 3's impacts.json already maps a pathway to all six destination impacts and marks the valuation clause inside the fourth as only partly addressed, so the rerun has the material it needs.",
+      "recorded_in": "This record; docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/gate_result.json is left as written."
+    },
+    {
+      "id": "D4",
+      "decision": "The change scenarios do not repeat this run's dispatch pattern. Each rerun gets its own run id, so its run summary and its reuse decisions survive the next dispatch.",
+      "reasoning": "The ticket keeps each rerun's scheduler reuse decisions because the shadow comparison needs them. On Phases 1 to 6 there was nothing to keep, so the overwrite cost nothing. On the Phase 8 drafting nodes there will be: those are the only three nodes the reuse layer covers, and a reuse decision written under a shared run id would be overwritten by the next dispatch before the comparison reads it. Naming the rule now is cheaper than discovering it after a scenario pair has run.",
+      "recorded_in": "This record. The change-scenarios ticket carries it forward."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The benchmark layer attributed all 27 invocations, 575,107 estimated tokens and 3,108 seconds to phase 5 alone.",
+      "detail": "phase_analytics.json reports phases_observed [5] and nodes_observed n05_impact_architecture for a run that dispatched six phases. run_benchmark_summary.json contradicts itself in the same file, reporting 5 invocations and 393.5 seconds for n06 beside the stale 27-invocation phase 5 block. The cause is structural, not a bad run: transport_hook.py sets no node_id, so analytics.py infers the node from the run summary's single dispatched node, and an append-only ledger under one run id makes that inference wrong for every phase but the last. Any multi-dispatch run is affected.",
+      "disposition": "Worked around by D1 for this run. The benchmark layer is not changed here; this is a candidate Milestone 2 ticket.",
+      "see": "D1"
+    },
+    {
+      "id": "F2",
+      "summary": "Six dispatches shared one run id, so five run summaries were overwritten, and none of it is in the repository.",
+      "detail": "run_summary.json describes the n06 dispatch: phase_scope 6, dispatched_nodes [n06_implementation_architecture], started_at 18:30:12Z against the run manifest's created_at of 17:15:28Z. The cumulative run_manifest.json is intact and holds all six node states. .claude/runs/ is gitignored, so the ticket's preservation criterion is satisfied only on the operator's disk.",
+      "disposition": "D4 sets the rule for the reruns that will need it.",
+      "see": "D4"
+    },
+    {
+      "id": "F3",
+      "summary": "The destination's expected impacts are absent from Tier 2B altogether, at both layers the slicer reads.",
+      "detail": "A destination record in cluster_CL6.grouped.json holds only destination_title and calls, so the 646 KB grouped file carries no destination narrative to slice. The Step 0 slice is 7,937 bytes and its destination field is the bare string 'Biodiversity and Ecosystem Services (2026-27)'; none of the six impact sentences appears in it. The curated extract has no expected_impacts field and declares source_pages 73-76. The source itself is present: the Part 9 PDF sits in work_programmes/cluster_climate/, and the Tier 3 source materials record transcribes pages 47 and 48, which it describes as carrying the destination's six expected impacts.",
+      "disposition": "Closed at Tier 2B. The curated extract now carries the six impacts, sliced from the PDF and cross-checked against the Tier 3 transcription; all nine spans replay byte-equal and every character offset agrees with the independent transcription. The gap is out of Tier 2B's source layer. It remains in Tier 2B extracted/ until Phase 1 is rerun, which only the operator does.",
+      "see": "D2"
+    },
+    {
+      "id": "F10",
+      "summary": "The near-miss span sweep is blind on any document with a top-level source_document field, which this extract has.",
+      "detail": "iter_malformed_spans in tests/_tier_sources.py exists to catch a span that dropped one of its three keys, because such a span leaves the verbatim sweep silently rather than failing it. On the call extract the root object itself holds source_document and neither quote nor source_page, so the helper reports the root as a near miss and returns without descending. It therefore inspects nothing. The behaviour is identical before and after this ticket's edit, and no test in test_tier2b_biodiv_intake.py calls the helper at all; only test_tier1_tier2a_ria_coverage.py does. The verbatim sweep itself is unaffected: iter_spans descends normally and checked all 33 spans in the extract, including the nine added on pages 47 and 48.",
+      "disposition": "Pre-existing and out of scope here: the helper is shared with another ticket's module. Recorded because a dropped span key on this extract would currently pass unnoticed.",
+      "see": null
+    },
+    {
+      "id": "F4",
+      "summary": "Phase 1 wrote five paraphrased expected impacts and marked four of them Confirmed, where the honest output was a declared gap.",
+      "detail": "Handed a slice with no impact text, the extraction produced EI-01 to EI-05 from the topic's Expected Outcome and Scope, with no quote and no span reference on any entry. EI-01 to EI-04 carry status Confirmed and EI-05 Inferred. §12.4 and §15 make a declared gap the correct output when a mandatory input is missing, and the same run shows the skill can do it: evaluation_priority_weights.json declares all three criteria Assumed with null weights and says no Tier 2B source states them. Phase 5 then built five pathways on the paraphrases, keyed PW-EI-01 to PW-EI-05.",
+      "disposition": "The rerun under D2 must produce Confirmed entries with quotes, or a declared gap. It must not produce paraphrases marked Confirmed again.",
+      "see": "D2"
+    },
+    {
+      "id": "F7",
+      "summary": "Phase 2 added two Tier 3 artifacts that no freeze record covers, and the seeds ticket's freeze test is red on the branch.",
+      "detail": "call_binding/topic_mapping.json and call_binding/compliance_profile.json were added by the dispatch commit 'running phase 4', which carried Phase 2's outputs. The freeze record in demo-architecture-seeds_2026-09-30.json predates them, so tests/test_demo_architecture_seeds.py TestTheFreeze::test_every_tier3_artifact_is_fingerprinted_or_exempt fails, naming both files. The phase did nothing wrong: §7 Phase 2 lists topic_mapping.json as a required output, and compliance_profile.json is a required Phase 6 input. The test is also doing its job, which is to report that Tier 3 grew and no record says so.",
+      "disposition": "Fixed on operator instruction. The freeze covers founding documents against edits in place, and these two are runner outputs, so they are named not frozen rather than fingerprinted: a fingerprint would break on the next legitimate Phase 2 rerun. The superseded record's own unfreezing clause requires a new entry rather than an edit, so the freeze moved to demo-tier3-freeze-phase-written-artifacts_2026-09-30.json, which re-derives all ten fingerprints from disk and refuses to write if any has changed. None had, so nothing was unfrozen. The freeze test now resolves the live record through the supersedes chain instead of a filename, and the branch is green.",
+      "see": "docs/tier4_orchestration_state/decision_log/demo-tier3-freeze-phase-written-artifacts_2026-09-30.json"
+    },
+    {
+      "id": "F8",
+      "summary": "Phase 1 turned two of the intake ticket's tests red by doing its job. They are the only change to the branch's failure count.",
+      "detail": "The full suite reports 29 failures against the recorded baseline of 27 at commit 095e4b6, and the two extra are test_tier2b_biodiv_intake.py::TestStaleExtractedFinding::test_the_extracted_files_still_belong_to_another_call and TestTierBoundaries::test_phase_1_still_owns_tier_2b_extracted. Reading the six extracted files out of the 095e4b6 tree shows all six were MSCA-era then and none mentioned this topic, so both tests passed at the baseline and went red when Phase 1 rewrote them. The first test says so in its own message: it turns red as the signal to strike finding I1, not as a regression. The second asserted that the intake writes no extracted file for this topic, which was checkable only while Phase 1 had not run.",
+      "disposition": "Neither is a regression and neither is fixed here. Both need re-pointing by the intake ticket's owner, together with the status question F9 raises.",
+      "see": "F9"
+    },
+    {
+      "id": "F9",
+      "summary": "Finding I1 of the intake report must not be struck. Its symptom is gone and its cause is not.",
+      "detail": "I1 is that phase_01_gate checks the six Tier 2B extracted files only for non-emptiness and for the presence of source refs, and no predicate compares their content to the selected topic, so the gate would release Phase 1 on another call's outcomes. What changed is only that the MSCA-era files are gone: the predicate set is unaltered, and the branch still holds the gate library unmodified. This run demonstrated the same fail-open in a new form. phase_01_gate passed 17 of 17 over an expected_impacts.json whose five entries paraphrase the wrong section of Part 9, because non-emptiness and a present source ref are satisfied by a citation to any section. Striking I1 because the stale files were overwritten would retire a live gate defect on the strength of its symptom disappearing.",
+      "disposition": "I1 stays Unresolved. The test that pins it should pin the predicate set rather than the stale files, so it tracks the cause. Not changed here: it is the intake ticket's finding and its status is the operator's call.",
+      "see": "F4"
+    },
+    {
+      "id": "F5",
+      "summary": "evaluation_priority_weights.json cites no Tier 2B source, and correctly says so.",
+      "detail": "All three criteria are Assumed with null weights and a note that neither the slice nor the curated extract states evaluation criteria or weights, and that the weighting is governed by Tier 2A and the General Annexes. That is the honest disposition, and the Tier 1 and 2A RIA coverage ticket is where the criteria themselves live.",
+      "disposition": "No action. Recorded so the null weights are not read as a gap.",
+      "see": null
+    },
+    {
+      "id": "F6",
+      "summary": "A seventh file, unit_cost_rates.json, sits in this topic's Tier 2B extracted directory and belongs to another instrument.",
+      "detail": "It cites the MSCA work programme PDF, pages 78 to 80, and predates this branch: it was last written by commit 5afd8f8, before the demo world existed. This topic is a lump-sum RIA, so no unit-cost derivation applies to it under §8.1.",
+      "disposition": "Pre-existing, out of this ticket's scope, and harmless while no unit-cost path runs. Worth a sweep with the other stray Tier 4 byproducts already recorded on this branch.",
+      "see": null
+    }
+  ],
+  "test_suite_state": {
+    "full_suite": "29 failed, 5436 passed, 104 skipped",
+    "recorded_baseline": "27 failed at commit 095e4b6 on this branch",
+    "accounted_for": "The two extra failures are the intake ticket's tests that Phase 1 turned red (F8). Reading the six extracted files out of the 095e4b6 tree confirms both passed at the baseline. No failure sits in a module this evaluation touched.",
+    "green_here": "tests/test_demo_runner_phase_costs.py 26 passed; tests/test_demo_architecture_seeds.py 89 passed 1 skipped; the demo modules together 234 passed 1 skipped."
+  },
+  "what_this_decision_does_not_settle": [
+    "Whether the destination's expected impacts belong in the grouped work programme JSON, in the curated call extract, or in a separate destination extract the slicer includes. D2 fixes the tier, not the shape, and the shape decides whether every future topic under a destination inherits the fix or repeats the gap.",
+    "Whether the Call Slicer should refuse to emit a slice that carries no expected-impact text for a destination-level instrument, which would have turned F3 into a Step 0 failure instead of a Confirmed paraphrase five phases later.",
+    "Whether the benchmark layer should set node_id at the transport hook or keep the ledger node-free and always attribute by gate window. D1 takes the second route for this run without settling the general case.",
+    "What a currency cost for a subscription-transport run means at all. The tokens are estimates from the benchmark layer, the transport bills nothing per token, and the provider projection priced no provider.",
+    "Whether milestones_seed.json should stay fingerprinted, now that F7 has settled that a phase-written Tier 3 artifact sits outside the freeze. §7 lists it as a required Phase 4 output, but the seeds ticket authored it and Phase 4 consumed it without rewriting, so it stays frozen until a rerun actually rewrites it.",
+    "Whether Phase 5 needs anything beyond a rerun once Tier 2B is corrected. Tier 3 maps all six destination impacts, but whether the existing KPIs survive the remapping is a question for the rerun, not for this record."
+  ],
+  "authored_by": "Ticket 'Runner Phases 1 to 6 on the demo', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30. Evaluation of an operator-dispatched run; no runner phase was dispatched to produce it.",
+  "note": "Anonymity: no organisation name, person name, place, grant or project identifier appears in this record. Partners are referred to by their pseudonymous identifiers or not at all."
+}

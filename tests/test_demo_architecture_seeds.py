@@ -93,6 +93,45 @@ def _read(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
+def _live_freeze_records() -> dict[str, dict]:
+    """Every freeze record in the decision log that nothing supersedes.
+
+    A freeze changes by a new entry that supersedes the old one and carries the
+    fingerprints, never by an edit in place — the records say so themselves in
+    their ``unfreezing`` clause. So the current freeze cannot be found at a fixed
+    filename: it has to be resolved through the ``supersedes`` chain, or these
+    tests read a stale record and pass on a freeze nobody is keeping.
+    """
+    records: dict[str, dict] = {}
+    superseded: set[str] = set()
+    for path in sorted((REPO / "docs/tier4_orchestration_state/decision_log").glob("*.json")):
+        entry = _read(path)
+        if not isinstance(entry, dict):
+            continue
+        superseded.update(entry.get("supersedes") or [])
+        if isinstance(entry.get("freeze_record"), dict):
+            records[path.relative_to(REPO).as_posix()] = entry["freeze_record"]
+    return {rel: rec for rel, rec in records.items() if rel not in superseded}
+
+
+def _live_freeze_for(artifact: Path) -> dict:
+    """The one live freeze record that fingerprints *artifact*.
+
+    Resolving by content rather than by filename is what makes the supersession
+    chain usable: the record that holds a file's fingerprint is the record that
+    governs it, whatever the entry is called.
+    """
+    rel = artifact.relative_to(REPO).as_posix()
+    holders = {
+        path: record
+        for path, record in _live_freeze_records().items()
+        if rel in record["artifacts"]
+    }
+    assert holders, f"no live freeze record fingerprints {rel}"
+    assert len(holders) == 1, f"{rel} is fingerprinted by {sorted(holders)}"
+    return next(iter(holders.values()))
+
+
 @pytest.fixture(scope="module")
 def objectives() -> list[dict[str, Any]]:
     return _read(OBJECTIVES)["objectives"]
@@ -992,11 +1031,35 @@ class TestTheFreeze:
     @pytest.fixture(scope="class")
     def freeze(self) -> dict:
         assert DECISION.is_file(), f"{DECISION.name} is absent"
-        return _read(DECISION)["freeze_record"]
+        return _live_freeze_for(OBJECTIVES)
 
     @pytest.fixture(scope="class")
     def concept_freeze(self) -> dict:
-        return _read(CONCEPT_DECISION)["freeze_record"]
+        return _live_freeze_for(TIER3 / "project_brief/concept_note.md")
+
+    def test_every_live_freeze_record_is_reachable(self) -> None:
+        """Two live records, no more: the seeds scope and the project brief."""
+        live = _live_freeze_records()
+        assert len(live) == 2, f"live freeze records: {sorted(live)}"
+
+    def test_the_brief_is_still_governed_by_the_concept_record(self) -> None:
+        """Resolving by content must not drift from the record that claims it."""
+        brief = (TIER3 / "project_brief/concept_note.md").relative_to(REPO).as_posix()
+        live = _live_freeze_records()
+        holders = [rel for rel, rec in live.items() if brief in rec["artifacts"]]
+        assert holders == [CONCEPT_DECISION.relative_to(REPO).as_posix()]
+
+    def test_a_superseded_freeze_record_is_not_read(self) -> None:
+        """The seeds entry's own freeze record is superseded, so it is not live."""
+        seeds_rel = DECISION.relative_to(REPO).as_posix()
+        superseding = [
+            path
+            for path in (REPO / "docs/tier4_orchestration_state/decision_log").glob("*.json")
+            if seeds_rel in (_read(path).get("supersedes") or [])
+        ]
+        if not superseding:
+            pytest.skip("nothing supersedes the seeds freeze record yet")
+        assert seeds_rel not in _live_freeze_records()
 
     def test_the_digest_basis_is_declared_and_shared(
         self, freeze: dict, concept_freeze: dict

@@ -1,0 +1,72 @@
+{
+  "record_type": "decision",
+  "id": "demo-tier3-freeze-sources-index-refreeze",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "supersedes": [
+    "docs/tier4_orchestration_state/decision_log/demo-tier3-freeze-phase-written-artifacts_2026-09-30.json"
+  ],
+  "supersedes_scope": "The freeze_record of the prior refreeze only, which itself superseded the seeds entry's. Everything else either entry records stands unchanged and is not restated here.",
+  "milestone": "Dev Graph demo (instance two), raised as F7 by the ticket 'Runner Phases 1 to 6 on the demo' in plans/dev_graph_demo_tickets.md",
+  "authority": "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule, and the superseded record's own unfreezing clause, which requires a new decision log entry rather than an edit in place. Applies CLAUDE.md §9.1 (docs/ is the durable record, so a decision record is superseded and not overwritten), §9.4 (a decision that affects future interpretation is written to Tier 4) and §7 Phase 2 (topic_mapping.json is a required phase output). Made on explicit operator instruction, as the superseded clause requires. Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "sources.json is refrozen at a new fingerprint. Adding the destination's expected impacts to the Tier 2B curated extract obliged the Tier 3 source index to record the back-references, because the index derives a tier2b_refs pointer for every Tier 2B span on a page it transcribes. The change is bounded and additive: eight existing spans gain a back-reference that was empty, one span is added for the expected-impact binding clause the extract now cites, and page 47's relied_on_for list gains that span id. No quote, offset, page text, citation, transcription method or status changes. The other nine fingerprints are re-derived and unchanged, and the phase-written exemptions are carried forward.",
+  "freeze_record": {
+    "rule": "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule. Once instantiation is complete the founding documents are immutable for the run.",
+    "frozen_on": "2026-09-30",
+    "scope": "Steps ④ to ⑥ of the instantiation sequence, plus the call binding of step ①. Step ③, the project brief, was frozen by docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json and is deliberately not re-fingerprinted here (decision D7). Step ⑦, the uncertainty ledger, is exempt. Tier 3 artifacts written by a runner phase are named in not_frozen: the workflow owns them and the phase gate governs them. Tier 3 artifacts written by a runner phase are named in not_frozen: the workflow owns them and the phase gate governs them.",
+    "digest_basis": "sha256 over LF-normalised bytes, because core.autocrlf is true in this repository and a raw digest would identify the platform rather than the content.",
+    "artifacts": {
+      "docs/tier3_project_instantiation/architecture_inputs/objectives.json": "f53af8487fa3ad17678480f8db5421046a27f4d5089bbe22571783e29b153465",
+      "docs/tier3_project_instantiation/architecture_inputs/outcomes.json": "c1edc44e9e9945e8c1c32c6154a68da80ccb89d85ef7402761253af09b5cc9df",
+      "docs/tier3_project_instantiation/architecture_inputs/impacts.json": "f165033f26b6f801b719557bcb19dbcd1ff1a9e45e58bd340bc3bddb2c0944bc",
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json": "90e30660887936b9a64de2c8d4d05b81e1ac304474549dea7adf856099bd562a",
+      "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json": "030583498e779cc117bbad81bc3de0ec869a3e6a444ef6e7662e3cc49f4c7609",
+      "docs/tier3_project_instantiation/architecture_inputs/risks.json": "ecb0eddbcfea4cd8891cb926c0b99b3a1329af3b55db97c6eb666fa57fba2dfe",
+      "docs/tier3_project_instantiation/consortium/partners.json": "bf765f1275f42ca8f6f75c2a7facbf38757a1629714210d8d0840cc70704a788",
+      "docs/tier3_project_instantiation/consortium/roles.json": "33dcd630340738bdc02af9918fb2d107edf9414e5211b71b48870dfe7706b3c5",
+      "docs/tier3_project_instantiation/call_binding/selected_call.json": "1b311863bceeac64e18c701f524ef755c87912d45bcc6b81c7900c6d1e8c0dc0",
+      "docs/tier3_project_instantiation/source_materials/sources.json": "7b9acecbb0d05b38df2f0920ae894c49a8f1c6fb5ec4bcb16e4bd9be62bcb452"
+    },
+    "not_frozen": {
+      "docs/tier3_project_instantiation/working_assumptions.json": "The uncertainty ledger. The operator manual exempts it by name: it is the one input the operator keeps touching, and later tickets append to it as facts are confirmed or new gaps open.",
+      "docs/tier3_project_instantiation/call_binding/topic_mapping.json": "Written by the runner at Phase 2, which §7 lists it as a required output of. A Phase 2 rerun rewrites it, so a fingerprint here would freeze an artifact the workflow owns and would break on the next legitimate rerun. Its content is governed by the Phase 2 gate, not by the freeze.",
+      "docs/tier3_project_instantiation/call_binding/compliance_profile.json": "Written by the runner at Phase 2 and read by Phase 6 as a required input, per §7. Outside the freeze for the same reason as the topic mapping: the workflow owns it, and the Phase 2 gate governs it."
+    },
+    "covered_elsewhere": {
+      "docs/tier3_project_instantiation/project_brief/concept_note.md": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+      "docs/tier3_project_instantiation/project_brief/project_summary.json": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+      "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json"
+    },
+    "unfreezing": "An operator decision, recorded as a new decision log entry that supersedes this one and carries the new fingerprints. A ticket may not unfreeze on its own judgement (CLAUDE.md §9.1)."
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "A Tier 3 index that derives from Tier 2B is refrozen when Tier 2B legitimately gains content, rather than held at a fingerprint that no longer describes the repository.",
+      "reasoning": "The freeze exists so a founding document is not edited in place to suit a later convenience. It does not exist to stop Tier 2B from acquiring a fact the work programme always stated. sources.json indexes Tier 2B spans, so it sits downstream of Tier 2B by construction: holding its old fingerprint would freeze an index that no longer indexes the repository, and the honest record of that is a new fingerprint, not a stale one. What the freeze guarantees is unchanged — every transcription and offset is byte-identical, and tools/author_demo_sources.py --check re-derives each one from the PDF.",
+      "recorded_in": "This record's freeze_record.artifacts, which carries the new sources.json fingerprint; tests/test_demo_sources.py, whose derivation and span-coverage checks pass on the regenerated index."
+    },
+    {
+      "id": "D2",
+      "decision": "The prior entry is superseded, not edited, and the writer names the one artifact whose fingerprint may change. Any other drift aborts.",
+      "reasoning": "An unfreeze that accepts whatever happens to differ is not a freeze at all. The writer permits a changed fingerprint for sources.json alone, the artifact this decision is about, and aborts on drift in any of the other nine. It also aborts when sources.json has not changed, so the entry cannot be raised against a repository that did not need it.",
+      "recorded_in": "This record; the writer refuses on unauthorised drift, on an absent change, and on any Tier 3 artifact left uncovered."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "A Tier 2B addition cannot be made without touching a frozen Tier 3 index. The coupling is by construction, not by accident.",
+      "detail": "tools/author_demo_sources.py derives a tier2b_refs back-reference for every Tier 2B span on a page the index transcribes, so any span added to the curated call extract makes the frozen index stale, and tests/test_demo_sources.py catches it twice over: the derivation check and the span-coverage check. A ticket that adds a Tier 2B span therefore cannot finish inside Tier 2B. Worth knowing before the next call or topic is taken in.",
+      "disposition": "Recorded. The refreeze is the mechanism; it wants expecting rather than discovering.",
+      "see": "D1"
+    }
+  ],
+  "what_this_decision_does_not_settle": [
+    "Whether a Tier 3 artifact that is derived rather than authored belongs under the freeze at all. sources.json is regenerated by a tool from the PDF and from Tier 2B, so its fingerprint records a derivation rather than an authoring decision, and it will go stale again on the next Tier 2B addition. Naming a derived category would end the refreeze cycle.",
+    "Whether milestones_seed.json should stay fingerprinted. §7 lists it as a required Phase 4 output, yet the seeds ticket authored it and Phase 4 consumed it without rewriting. It stays frozen until a rerun rewrites it.",
+    "Whether the manual's §3.1 freeze rule should name these exceptions itself, rather than leaving each freeze record to name them."
+  ],
+  "authored_by": "Required by the Tier 2B expected-impacts fix (F3 and D2) of the ticket 'Runner Phases 1 to 6 on the demo', docs/tier4_orchestration_state/decision_log/demo-runner-phases-1-6_2026-09-30.json, branch dev_graph_demo, 2026-10-01. Applied on explicit operator instruction to proceed.",
+  "note": "Anonymity: no organisation name, person name, place, grant or project identifier appears in this record."
+}

@@ -1,0 +1,554 @@
+{
+  "schema_id": "orch.dev_graph.evidence_package.v1",
+  "package_id": "sha256:e9747a4eca04fb687765021a568cc05c4a9b0e3594f69a411958531baf9ec3b4",
+  "package_hash": "sha256:96a93e1e6efc2a22e607e0818b4af333f7d5f93c2d6569986cf266d89b909f63",
+  "items": [
+    {
+      "id": "T4.1",
+      "type": "task",
+      "version": "sha256:56354d8abf35fdee4786d8946f4898f00ba5d553f00a5be07dc947bf940ec9c7",
+      "content": {
+        "task_id": "T4.1",
+        "title": "Run the terrestrial campaign in farmland, grassland and field margins",
+        "responsible_partner": "P03",
+        "contributing_partners": [
+          "P01",
+          "P02",
+          "P06",
+          "P11"
+        ],
+        "dependencies": [
+          "T2.5",
+          "T3.1"
+        ],
+        "start_month": 16,
+        "end_month": 36,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "P03",
+      "type": "participant",
+      "version": "sha256:74bb436140189bd170c8cf7fe20b17bd99b0f6deda72c18a5ae686383be966e8",
+      "content": {
+        "partner_id": "P03",
+        "legal_name": "P03",
+        "country": "C1",
+        "country_slot": "C1",
+        "country_slot_class": "MS",
+        "organisation_type": "university",
+        "organisation_description": "University, agriculture",
+        "sector": "higher education, agriculture",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "derived",
+        "participation_status": "Assumed",
+        "capabilities": [
+          "multi-season controlled field-experiment archive covering physiological, spectral, soil-water and weather measurements",
+          "crop and water-balance modelling",
+          "precision agriculture instrumentation"
+        ],
+        "role_in_the_action": "Supplies the long-run field archive that is reworked into documented training and validation sets, and the agricultural pressure gradient the demonstration cases run along.",
+        "personnel_roles": [
+          "field experiment manager, P03",
+          "agronomic modeller, P03"
+        ]
+      }
+    },
+    {
+      "id": "T2.5",
+      "type": "task",
+      "version": "sha256:bacd0b80c97a656364928fcae7c34d3ecc5d7f478bd9f6385e1d7caae69f7fe4",
+      "content": {
+        "task_id": "T2.5",
+        "title": "Select the three demonstration cases against pressure and restoration priority",
+        "responsible_partner": "P11",
+        "contributing_partners": [
+          "P03",
+          "P07",
+          "P08"
+        ],
+        "dependencies": [
+          "T2.1"
+        ],
+        "start_month": 9,
+        "end_month": 15,
+        "validation_status": "Assumed",
+        "source_ref": "Call extract $.scope_requirements[2]; spans SRC-WP9-P75#877-920 and SRC-WP9-P75#957-1017"
+      }
+    },
+    {
+      "id": "T3.1",
+      "type": "task",
+      "version": "sha256:6f43db42afb8e87dfe6cb8cf485daf07c8a4a8af79aac237d6861b4a5eb7679f",
+      "content": {
+        "task_id": "T3.1",
+        "title": "Agree joint definitions for data collection, metadata and processing protocols",
+        "responsible_partner": "P10",
+        "contributing_partners": [
+          "P01",
+          "P07",
+          "P08",
+          "P09"
+        ],
+        "dependencies": [
+          "T1.2"
+        ],
+        "start_month": 4,
+        "end_month": 16,
+        "validation_status": "Assumed",
+        "source_ref": "Call extract $.scope_requirements[4]; span SRC-WP9-P75#2080-2151"
+      }
+    },
+    {
+      "id": "T4.2",
+      "type": "task",
+      "version": "sha256:108a7842901a136395dbfc455b345c45eca01d85f0a10d5d64dc40e294bf6afd",
+      "content": {
+        "task_id": "T4.2",
+        "title": "Run the freshwater campaign in rivers, floodplains and riparian ecotones",
+        "responsible_partner": "P07",
+        "contributing_partners": [
+          "P03",
+          "P09",
+          "P11"
+        ],
+        "dependencies": [
+          "T4.1"
+        ],
+        "start_month": 18,
+        "end_month": 36,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T4.5",
+      "type": "task",
+      "version": "sha256:e4aed2bf46da129fd4cbe12dd465589fa18f2d4a11d8fc4abb7751986498a7c5",
+      "content": {
+        "task_id": "T4.5",
+        "title": "Verify across the cases which harmonisation decisions survived the transfer between realms",
+        "responsible_partner": "P03",
+        "contributing_partners": [
+          "P07",
+          "P08",
+          "P10"
+        ],
+        "dependencies": [
+          "T4.1",
+          "T4.2",
+          "T4.3"
+        ],
+        "start_month": 28,
+        "end_month": 40,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T5.3",
+      "type": "task",
+      "version": "sha256:6e69d34736e8fcce01030a671e4dcfef115600a60366bd8dfa84e533e1575798",
+      "content": {
+        "task_id": "T5.3",
+        "title": "Measure stress metabolomics on the farmland plots and the ecotone plots",
+        "responsible_partner": "P01",
+        "contributing_partners": [
+          "P03",
+          "P09"
+        ],
+        "dependencies": [
+          "T4.1"
+        ],
+        "start_month": 18,
+        "end_month": 34,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T7.4",
+      "type": "task",
+      "version": "sha256:d304ce79fe8ef0db8b0cd58fd30bc1bfa860574e9bc593f0adbaa7ad531e7790",
+      "content": {
+        "task_id": "T7.4",
+        "title": "Transfer the measurement protocols to a second production context",
+        "responsible_partner": "P06",
+        "contributing_partners": [
+          "P03",
+          "P05"
+        ],
+        "dependencies": [
+          "T4.1"
+        ],
+        "start_month": 24,
+        "end_month": 38,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "WP4",
+      "type": "work_package",
+      "version": "sha256:c7d6952b024f7ebfc92be26641a10846c2d162972097fd09ae011904bc9deccb",
+      "content": {
+        "wp_id": "WP4",
+        "id": "WP4",
+        "title": "Demonstration and verification cases along the pressure gradient",
+        "lead_partner": "P03",
+        "start_month": 13,
+        "end_month": 40,
+        "objectives": [
+          "O4"
+        ],
+        "constraints": [
+          "SRC-WP9-P75",
+          "SRC-LUCAS",
+          "SRC-EMBAL"
+        ],
+        "validation_status": "Assumed",
+        "source_ref": "Concept note, 'Three demonstration cases on one gradient'; claims C04, C05 and C12; objectives O4",
+        "note": "The three cases start in sequence. The freshwater and marine cases reuse the terrestrial protocol, so each one tests whether a decision taken upstream transfers.",
+        "tasks": [
+          {
+            "task_id": "T4.1",
+            "title": "Run the terrestrial campaign in farmland, grassland and field margins",
+            "responsible_partner": "P03",
+            "contributing_partners": [
+              "P01",
+              "P02",
+              "P06",
+              "P11"
+            ],
+            "dependencies": [
+              "T2.5",
+              "T3.1"
+            ],
+            "start_month": 16,
+            "end_month": 36,
+            "validation_status": "Assumed"
+          },
+          {
+            "task_id": "T4.2",
+            "title": "Run the freshwater campaign in rivers, floodplains and riparian ecotones",
+            "responsible_partner": "P07",
+            "contributing_partners": [
+              "P03",
+              "P09",
+              "P11"
+            ],
+            "dependencies": [
+              "T4.1"
+            ],
+            "start_month": 18,
+            "end_month": 36,
+            "validation_status": "Assumed"
+          },
+          {
+            "task_id": "T4.3",
+            "title": "Run the marine campaign in coastal and benthic habitats of the transitional waters",
+            "responsible_partner": "P08",
+            "contributing_partners": [
+              "P02",
+              "P07",
+              "P12"
+            ],
+            "dependencies": [
+              "T4.2"
+            ],
+            "start_month": 20,
+            "end_month": 36,
+            "validation_status": "Assumed"
+          },
+          {
+            "task_id": "T4.4",
+            "title": "Acquire and process the airborne and satellite observations across the three cases",
+            "responsible_partner": "P02",
+            "contributing_partners": [
+              "P08",
+              "P12"
+            ],
+            "dependencies": [
+              "T2.3"
+            ],
+            "start_month": 13,
+            "end_month": 38,
+            "validation_status": "Assumed",
+            "source_ref": "Call extract $.eligibility_restrictions.exceptions[1]; span SRC-WP9-P73#1540-1571",
+            "note": "The eligibility condition binds here: once the project uses satellite data it uses the European programmes."
+          },
+          {
+            "task_id": "T4.5",
+            "title": "Verify across the cases which harmonisation decisions survived the transfer between realms",
+            "responsible_partner": "P03",
+            "contributing_partners": [
+              "P07",
+              "P08",
+              "P10"
+            ],
+            "dependencies": [
+              "T4.1",
+              "T4.2",
+              "T4.3"
+            ],
+            "start_month": 28,
+            "end_month": 40,
+            "validation_status": "Assumed"
+          }
+        ],
+        "deliverables": [
+          {
+            "deliverable_id": "D4.1",
+            "title": "Terrestrial case observation dataset",
+            "due_month": 38,
+            "type": "dataset",
+            "produced_by": [
+              "T4.1"
+            ],
+            "validation_status": "Assumed"
+          },
+          {
+            "deliverable_id": "D4.2",
+            "title": "Freshwater case observation dataset",
+            "due_month": 38,
+            "type": "dataset",
+            "produced_by": [
+              "T4.2"
+            ],
+            "validation_status": "Assumed"
+          },
+          {
+            "deliverable_id": "D4.3",
+            "title": "Marine case observation dataset and the airborne and satellite layer behind all three",
+            "due_month": 38,
+            "type": "dataset",
+            "produced_by": [
+              "T4.3",
+              "T4.4"
+            ],
+            "validation_status": "Assumed"
+          },
+          {
+            "deliverable_id": "D4.4",
+            "title": "Cross-case verification report",
+            "due_month": 40,
+            "type": "report",
+            "produced_by": [
+              "T4.5"
+            ],
+            "validation_status": "Assumed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P01",
+      "type": "participant",
+      "version": "sha256:bc1bd341f95ed6a7f99220399291e0809994a02b7d265415c2d968642bc6341e",
+      "content": {
+        "partner_id": "P01",
+        "legal_name": "P01",
+        "country": "C1",
+        "country_slot": "C1",
+        "country_slot_class": "MS",
+        "organisation_type": "research_institute",
+        "organisation_description": "Public research organisation, agricultural institute",
+        "sector": "agricultural research",
+        "is_coordinator": true,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "derived",
+        "participation_status": "Assumed",
+        "capabilities": [
+          "plant physiology and stress metabolomics",
+          "plant phenotyping under controlled and field conditions",
+          "statistical experimental design",
+          "instrument and model calibration",
+          "leakage-safe predictive validation"
+        ],
+        "role_in_the_action": "Coordinator. Owns the in-situ physiological and metabolomic measurement chain, and the statistical design and validation protocol the whole data-integration chain is tested against.",
+        "personnel_roles": [
+          "senior plant physiologist, P01",
+          "metabolomics platform scientist, P01",
+          "statistician, P01"
+        ]
+      }
+    },
+    {
+      "id": "P06",
+      "type": "participant",
+      "version": "sha256:4a1f5c363e83431d6bae6a7775175070aaa8d7fb9aac5b23f9d38f6ae9672583",
+      "content": {
+        "partner_id": "P06",
+        "legal_name": "P06",
+        "country": "C2",
+        "country_slot": "C2",
+        "country_slot_class": "MS",
+        "organisation_type": "research_institute",
+        "organisation_description": "Public research institute, vegetable crops",
+        "sector": "horticultural research",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "derived",
+        "participation_status": "Assumed",
+        "capabilities": [
+          "crop-specific transfer of measurement protocols",
+          "production-context data from horticultural systems"
+        ],
+        "role_in_the_action": "Transfers the measurement protocols to a second production context and a second country, so the harmonisation is tested outside the setting it was built in. P06 held no in-action role in instance one and is a beneficiary here.",
+        "personnel_roles": [
+          "horticultural researcher, P06"
+        ]
+      }
+    },
+    {
+      "id": "P07",
+      "type": "participant",
+      "version": "sha256:fb46b9cce999ec8cfc8594b4bf09cfc071b49cbae53fe7b27482f3ee946bc8f8",
+      "content": {
+        "partner_id": "P07",
+        "legal_name": "P07",
+        "country": "C3",
+        "country_slot": "C3",
+        "country_slot_class": "MS",
+        "organisation_type": "research_institute",
+        "organisation_description": "Public research organisation, freshwater ecology",
+        "sector": "freshwater ecology",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "fictional",
+        "participation_status": "Assumed",
+        "gap_closed": "No freshwater expertise among the derived six, although the scope asks for capabilities across terrestrial, freshwater and marine ecosystems.",
+        "capabilities": [
+          "river, lake and wetland ecology",
+          "environmental DNA sampling networks",
+          "freshwater monitoring aligned with water-policy reporting",
+          "in-situ observation of floodplain and riparian ecotones adjoining farmland"
+        ],
+        "role_in_the_action": "Runs the freshwater demonstration case and the ecotone observations that connect the farmland pressure gradient to the water bodies receiving it.",
+        "personnel_roles": [
+          "freshwater ecologist, P07",
+          "monitoring network coordinator, P07"
+        ]
+      }
+    },
+    {
+      "id": "P10",
+      "type": "participant",
+      "version": "sha256:274d8831cb4c9df6ad70c1deba2ac3ea948f96a0407aabfb84616b98438c936e",
+      "content": {
+        "partner_id": "P10",
+        "legal_name": "P10",
+        "country": "C3",
+        "country_slot": "C3",
+        "country_slot_class": "MS",
+        "organisation_type": "ngo",
+        "organisation_description": "Non-profit research organisation, biodiversity data infrastructure",
+        "sector": "biodiversity data infrastructure",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_status": "Assumed",
+        "participation_role": "beneficiary",
+        "capability_basis": "fictional",
+        "gap_closed": "No biodiversity data-infrastructure partner among the derived six, so nothing to carry the cooperation with in-situ data collection frameworks, the typology crosswalks or the open-science-cloud link the scope requires.",
+        "capabilities": [
+          "operation of a national species-occurrence data facility that publishes to a global biodiversity data facility",
+          "biodiversity data-standard crosswalks between occurrence standards, the European habitat classification and a global ecosystem typology",
+          "findable, accessible, interoperable and reusable metadata practice",
+          "integration of services into the European open science cloud"
+        ],
+        "role_in_the_action": "Owns the interoperability and data-publication layer: the crosswalks, the metadata profile, the cooperation with the named in-situ data frameworks, and the interface a Joint Research Centre contribution would attach to.",
+        "personnel_roles": [
+          "data infrastructure lead, P10",
+          "metadata standards specialist, P10"
+        ]
+      }
+    },
+    {
+      "id": "P11",
+      "type": "participant",
+      "version": "sha256:d7bd5b743b23f0ca67550347cc260eb079a6e499395da756b99132548bf4e54b",
+      "content": {
+        "partner_id": "P11",
+        "legal_name": "P11",
+        "country": "C6",
+        "country_slot": "C6",
+        "country_slot_class": "AC",
+        "organisation_type": "university",
+        "organisation_description": "University institute, socio-ecological systems",
+        "sector": "higher education, socio-ecological research",
+        "is_coordinator": false,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "fictional",
+        "participation_status": "Assumed",
+        "gap_closed": "No socio-ecological or socio-economic analysis among the derived six, although the third scope requirement asks demonstration cases to take socio-economic pressures into account.",
+        "capabilities": [
+          "land-use and sea-use pressure analysis",
+          "socio-economic driver analysis for agriculture and aquaculture",
+          "policy-reporting needs assessment under the nature and habitat directives and the nature restoration regulation",
+          "stakeholder engagement design"
+        ],
+        "role_in_the_action": "Analyses the pressures the demonstration cases are selected against, and translates the reporting requirements the scope names into data needs.",
+        "personnel_roles": [
+          "socio-ecological systems researcher, P11",
+          "policy analyst, P11"
+        ]
+      }
+    },
+    {
+      "id": "T1.2",
+      "type": "task",
+      "version": "sha256:fe07bbba1a454d2eae8d799fd6547d044dd7c7adacebbe475ddbff18ae2d0540",
+      "content": {
+        "task_id": "T1.2",
+        "title": "Write the data management plan and the metadata profile the three cases share",
+        "responsible_partner": "P10",
+        "contributing_partners": [
+          "P04",
+          "P09"
+        ],
+        "dependencies": [],
+        "start_month": 1,
+        "end_month": 6,
+        "validation_status": "Assumed",
+        "note": "Sits in the management work package because it is due at M6, before WP3 opens. WP3 then builds the protocols on it."
+      }
+    },
+    {
+      "id": "T2.1",
+      "type": "task",
+      "version": "sha256:c4f2c2120ee865cac63bb7add665f861a6a4f0c5a457c77b17d5b32d3ad7794c",
+      "content": {
+        "task_id": "T2.1",
+        "title": "Prioritise the biodiversity knowledge gaps and the data needs behind them",
+        "responsible_partner": "P11",
+        "contributing_partners": [
+          "P03",
+          "P07",
+          "P08"
+        ],
+        "dependencies": [],
+        "start_month": 1,
+        "end_month": 8,
+        "validation_status": "Assumed",
+        "source_ref": "Call extract $.scope_requirements[1]; span SRC-WP9-P75#336-417"
+      }
+    },
+    {
+      "id": "D4.1",
+      "type": "deliverable",
+      "version": "sha256:ab8d2e522ac9620be7634954a2cbcffd7168e56199c567bdf2f943fa192217e6",
+      "content": {
+        "deliverable_id": "D4.1",
+        "title": "Terrestrial case observation dataset",
+        "due_month": 38,
+        "type": "dataset",
+        "produced_by": [
+          "T4.1"
+        ],
+        "validation_status": "Assumed"
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "record_type": "decision",
+  "id": "demo-tier3-freeze-phase-written-artifacts",
+  "date": "2026-09-30",
+  "branch": "dev_graph_demo",
+  "supersedes": [
+    "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json"
+  ],
+  "supersedes_scope": "The freeze_record of the seeds entry only. Everything else that entry records — its decisions, its findings and the account of its work — stands unchanged and is not restated here.",
+  "milestone": "Dev Graph demo (instance two), raised as F7 by the ticket 'Runner Phases 1 to 6 on the demo' in plans/dev_graph_demo_tickets.md",
+  "authority": "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule, and the superseded record's own unfreezing clause, which requires a new decision log entry rather than an edit in place. Applies CLAUDE.md §9.1 (docs/ is the durable record, so a decision record is superseded and not overwritten), §9.4 (a decision that affects future interpretation is written to Tier 4) and §7 Phase 2 (topic_mapping.json is a required phase output). Made on explicit operator instruction, as the superseded clause requires. Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "A Tier 3 artifact that a runner phase writes is not a founding document and is not under the freeze. The two call-binding artifacts Phase 2 produced, topic_mapping.json and compliance_profile.json, are named as not frozen, with the reason on each. No fingerprint changes: all ten frozen artifacts were re-derived from disk and match what the superseded record holds, so nothing is unfrozen by this entry. It widens the freeze's coverage; it does not loosen its grip.",
+  "freeze_record": {
+    "rule": "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule. Once instantiation is complete the founding documents are immutable for the run.",
+    "frozen_on": "2026-09-30",
+    "scope": "Steps ④ to ⑥ of the instantiation sequence, plus the call binding of step ①. Step ③, the project brief, was frozen by docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json and is deliberately not re-fingerprinted here (decision D7). Step ⑦, the uncertainty ledger, is exempt. Tier 3 artifacts written by a runner phase are named in not_frozen: the workflow owns them and the phase gate governs them.",
+    "digest_basis": "sha256 over LF-normalised bytes, because core.autocrlf is true in this repository and a raw digest would identify the platform rather than the content.",
+    "artifacts": {
+      "docs/tier3_project_instantiation/architecture_inputs/objectives.json": "f53af8487fa3ad17678480f8db5421046a27f4d5089bbe22571783e29b153465",
+      "docs/tier3_project_instantiation/architecture_inputs/outcomes.json": "c1edc44e9e9945e8c1c32c6154a68da80ccb89d85ef7402761253af09b5cc9df",
+      "docs/tier3_project_instantiation/architecture_inputs/impacts.json": "f165033f26b6f801b719557bcb19dbcd1ff1a9e45e58bd340bc3bddb2c0944bc",
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json": "90e30660887936b9a64de2c8d4d05b81e1ac304474549dea7adf856099bd562a",
+      "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json": "030583498e779cc117bbad81bc3de0ec869a3e6a444ef6e7662e3cc49f4c7609",
+      "docs/tier3_project_instantiation/architecture_inputs/risks.json": "ecb0eddbcfea4cd8891cb926c0b99b3a1329af3b55db97c6eb666fa57fba2dfe",
+      "docs/tier3_project_instantiation/consortium/partners.json": "bf765f1275f42ca8f6f75c2a7facbf38757a1629714210d8d0840cc70704a788",
+      "docs/tier3_project_instantiation/consortium/roles.json": "33dcd630340738bdc02af9918fb2d107edf9414e5211b71b48870dfe7706b3c5",
+      "docs/tier3_project_instantiation/call_binding/selected_call.json": "1b311863bceeac64e18c701f524ef755c87912d45bcc6b81c7900c6d1e8c0dc0",
+      "docs/tier3_project_instantiation/source_materials/sources.json": "c282f12cd55e9cddd86a240c4879aab1419160ebadaf4f7cc0cb26be08dd0828"
+    },
+    "not_frozen": {
+      "docs/tier3_project_instantiation/working_assumptions.json": "The uncertainty ledger. The operator manual exempts it by name: it is the one input the operator keeps touching, and later tickets append to it as facts are confirmed or new gaps open.",
+      "docs/tier3_project_instantiation/call_binding/topic_mapping.json": "Written by the runner at Phase 2, which §7 lists it as a required output of. A Phase 2 rerun rewrites it, so a fingerprint here would freeze an artifact the workflow owns and would break on the next legitimate rerun. Its content is governed by the Phase 2 gate, not by the freeze.",
+      "docs/tier3_project_instantiation/call_binding/compliance_profile.json": "Written by the runner at Phase 2 and read by Phase 6 as a required input, per §7. Outside the freeze for the same reason as the topic mapping: the workflow owns it, and the Phase 2 gate governs it."
+    },
+    "covered_elsewhere": {
+      "docs/tier3_project_instantiation/project_brief/concept_note.md": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+      "docs/tier3_project_instantiation/project_brief/project_summary.json": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+      "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json"
+    },
+    "unfreezing": "An operator decision, recorded as a new decision log entry that supersedes this one and carries the new fingerprints. A ticket may not unfreeze on its own judgement (CLAUDE.md §9.1)."
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "The freeze covers founding documents against edits in place. An artifact a runner phase writes into Tier 3 is a phase output, so it is named in not_frozen rather than fingerprinted.",
+      "reasoning": "Fingerprinting a phase output would set the freeze against the workflow. §7 lists topic_mapping.json as a required Phase 2 output, and the correction this branch already owes — the expected-impacts fix recorded as D2 of the ticket 9 entry — requires a Phase 1 and Phase 5 rerun that Phase 2 work precedes. A fingerprint would turn each legitimate rerun into a freeze violation, which teaches the operator to ignore the test. The artifact is not unguarded: the Phase 2 gate reads it, and the gate is the right guard for something the workflow writes.",
+      "recorded_in": "This record's freeze_record.not_frozen; tests/test_demo_architecture_seeds.py TestTheFreeze, which now resolves the live freeze records through the supersedes chain instead of a hard-coded filename."
+    },
+    {
+      "id": "D2",
+      "decision": "The seeds entry is superseded, not edited. Its freeze_record is carried forward whole, with the fingerprints re-derived and checked rather than copied.",
+      "reasoning": "The superseded record states the mechanism itself: an operator decision recorded as a new entry that supersedes it and carries the fingerprints. Editing it in place would erase what the freeze said on 30 September, which is the history §9.1 exists to keep. Re-deriving rather than copying is what makes the carry-forward checkable: the writer aborts if any frozen artifact has changed, so this entry cannot quietly bless an edit while claiming only to extend coverage.",
+      "recorded_in": "This record; the writer refuses on fingerprint drift and on any Tier 3 artifact left uncovered."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The freeze held across the Phase 1 to 6 run: all ten fingerprints still match, and the two new artifacts are additions, not edits.",
+      "detail": "Re-deriving each fingerprint over LF-normalised bytes reproduces the recorded digest for every frozen artifact, and the three brief artifacts in the concept record match as well. The run added two files to call_binding/ and changed no frozen one, so what the seeds ticket's test caught was missing coverage rather than a violated freeze.",
+      "disposition": "Recorded so the red test is not remembered as a freeze breach.",
+      "see": "D1"
+    }
+  ],
+  "what_this_decision_does_not_settle": [
+    "Whether milestones_seed.json should stay fingerprinted. §7 lists it as a required Phase 4 output, so by this entry's own rule it is a phase output too, yet the seeds ticket authored it and Phase 4 consumed it without rewriting. It stays frozen until a Phase 4 rerun actually rewrites it, and that rerun is the moment to decide.",
+    "Whether the manual's §3.1 freeze rule should name the phase-output exception itself, rather than leaving each freeze record to name it. That is a manual edit and an operator decision."
+  ],
+  "authored_by": "Raised as F7 by the ticket 'Runner Phases 1 to 6 on the demo', docs/tier4_orchestration_state/decision_log/demo-runner-phases-1-6_2026-09-30.json, branch dev_graph_demo, 2026-09-30. Applied on explicit operator instruction.",
+  "note": "Anonymity: no organisation name, person name, place, grant or project identifier appears in this record."
+}

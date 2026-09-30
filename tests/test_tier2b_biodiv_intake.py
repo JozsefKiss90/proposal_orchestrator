@@ -63,8 +63,12 @@ DEADLINE = "2027-09-22"
 TOPIC_PAGES = (73, 74, 75, 76)
 
 #: Pages outside the topic entry that the extract cites: 34 the call timetable,
-#: the destination heading and the deadline model; 35 the 2027 budget table.
-SUPPORTING_PAGES = (34, 35)
+#: the destination heading and the deadline model; 35 the 2027 budget table; 47
+#: and 48 the destination narrative, whose six expected impacts the topic entry
+#: does not restate. The verbatim sweep reads every page listed here, so a span
+#: on a page missing from this tuple would fail on lookup rather than pass
+#: unchecked.
+SUPPORTING_PAGES = (34, 35, 47, 48)
 
 #: Every cross-cutting requirement the ticket names, keyed as the extract keys it.
 CROSS_CUTTING_KEYS = (
