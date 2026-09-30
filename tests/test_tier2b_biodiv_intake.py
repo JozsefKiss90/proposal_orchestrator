@@ -415,11 +415,17 @@ class TestSelectedCall:
         carry, which is the §13.2 fabrication this check exists to catch. The
         absence itself is not the invariant — the status is.
         """
-        assert selected_call["field_status"]["project_duration"] == (
+        status = selected_call["field_status"]["project_duration"]
+        assert status != "Confirmed"
+        assert status == (
             "Unresolved" if "project_duration_months" not in selected_call
             else "Assumed"
         )
         if "project_duration_months" in selected_call:
+            assert (
+                selected_call["field_status"]["project_duration_months"]
+                != "Confirmed"
+            )
             assert selected_call["field_status"]["project_duration_months"] == "Assumed"
             assert "None." in selected_call["project_duration"]["tier2b_basis"]
 

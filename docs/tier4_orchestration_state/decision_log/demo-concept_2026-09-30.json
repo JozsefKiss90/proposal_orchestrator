@@ -23,7 +23,11 @@
     {
       "question_id": "OD2",
       "question": "What project duration does the project assume? Tier 2B sets none.",
-      "options_put": ["36 months", "48 months", "60 months"],
+      "options_put": [
+        "36 months",
+        "48 months",
+        "60 months"
+      ],
       "decision": "48 months.",
       "reasoning": "The terrestrial case needs the multi-season field archive reworked and two further growing seasons measured under the harmonised protocol. The freshwater and marine cases start only once that protocol exists, and each needs a full annual cycle. European scaling and validation need a year after that. At 36 months the cross-realm cycle collapses to one season, which puts the third expected outcome at risk. At 60 months the same EUR 5,000,000 covers a longer burn.",
       "consequence": "Written to selected_call.json as project_duration_months, marked Assumed, and declared under key project_duration in working_assumptions.json. Phase 3 and Phase 4 can now read it. It can never become Confirmed, because Tier 2B carries no duration for this topic to evidence it.",
@@ -32,7 +36,10 @@
     {
       "question_id": "OD3",
       "question": "Does the project carry an acronym?",
-      "options_put": ["Leave it Unresolved", "Set one"],
+      "options_put": [
+        "Leave it Unresolved",
+        "Set one"
+      ],
       "decision": "No acronym. The field stays null and Unresolved.",
       "reasoning": "An acronym is a project identifier, which is one of the categories this branch's anonymity constraint names. An invented one could collide with a real grant. Instance two is a demonstration and is never submitted, so nothing downstream needs one before Phase 8, which is hard-blocked for this topic anyway.",
       "consequence": "project_summary.json concept.acronym stays null with acronym_status Unresolved.",
@@ -41,7 +48,11 @@
     {
       "question_id": "OD4",
       "question": "Is the concept approved, approved with changes, or rejected?",
-      "options_put": ["Approved", "Approved with changes", "Rejected"],
+      "options_put": [
+        "Approved",
+        "Approved with changes",
+        "Rejected"
+      ],
       "decision": "Approved.",
       "reasoning": "The draft answers all three expected outcomes, all five scope requirements, all three ecosystem realms and all nine cross-cutting requirements the call extract records, with every call phrase traced to the span it sits in and every capability traced to partners.json. The weaknesses it carries are stated rather than argued away.",
       "consequence": "The human gate is satisfied. The source materials ticket and the architecture seeds ticket are unblocked. The three brief artifacts are frozen.",
@@ -69,8 +80,8 @@
     },
     {
       "id": "D4",
-      "decision": "No concept claim is marked Confirmed. Only the call phrases and the bound topic are.",
-      "reasoning": "§12.2 reserves Confirmed for a fact a named Tier 1 to Tier 3 source directly evidences. A call phrase qualifies, because the call extract carries it verbatim. The concept itself is design intent, and it rests on capabilities belonging to partners whose participation nobody has confirmed. The operator's approval and gap-option choice are Confirmed as operator acts evidenced by this record, which is a different thing from a claim about the project.",
+      "decision": "No concept claim is marked Confirmed. In field_status only the bound topic and the call phrases are.",
+      "reasoning": "§12.2 reserves Confirmed for a fact a named Tier 1 to Tier 3 source directly evidences. A call phrase qualifies, because the call extract carries it verbatim. The concept itself is design intent, and it rests on capabilities belonging to partners whose participation nobody has confirmed. The operator's approval and gap-option choice carry no §12.2 status at all: see D8, which supersedes the first version of this decision on that point.",
       "recorded_in": "project_summary.json field_status and field_status_note."
     },
     {
@@ -90,6 +101,12 @@
       "decision": "The leakage scan's pseudonymity check was extended to the Tier 3 prose in project_brief/*.md. It previously read JSON only.",
       "reasoning": "Country and nationality names are scoped out of the word scan, because Tier 1 enumerates them, so the pseudonymity check is the only mechanism that catches a country. Before this it looked at JSON artifacts alone. The brief is the project describing itself in sentences, and a real country in a sentence re-identifies a derived partner exactly as one in a field does. The extension is the same check over the same Tier 1 country lists, not a new rule.",
       "recorded_in": "runner/leakage_scan.py PSEUDONYMITY_TEXT_GLOBS; tests/runner/test_leakage_scan.py TestPseudonymityOfTheProseBrief."
+    },
+    {
+      "id": "D8",
+      "decision": "An operator act carries a lifecycle state, not one of the four §12.2 status categories, and does not appear in field_status.",
+      "reasoning": "§12.2 defines Confirmed as directly evidenced by a named source in Tier 1 to Tier 3. An approval is evidenced by this Tier 4 record, and it is an act rather than a fact a tier can evidence. Marking it Confirmed would widen §12.2 by practice, which §14.1 makes invalid and §14.5 reserves to explicit human instruction. Marking it Assumed would be worse: it is not an assumption. The consortium gap analysis had already met this problem and solved it by giving a finding a disposition and leaving status to the four categories.",
+      "recorded_in": "project_summary.json approval.state, gap_option_decision.state and their vocabulary_note; tests/test_demo_concept.py::TestWhatTheDraftDoesNotClaim::test_an_operator_act_never_borrows_the_status_vocabulary."
     }
   ],
   "coverage": {
@@ -107,14 +124,28 @@
     "digest_basis": "sha256 over LF-normalised bytes, because core.autocrlf is true in this repository and a raw digest would identify the platform rather than the content.",
     "artifacts": {
       "docs/tier3_project_instantiation/project_brief/concept_note.md": "0f0662b68cdef6ac6acded4ec70ff0c0f9dd27e2becc0b3ef4a394af49a8f261",
-      "docs/tier3_project_instantiation/project_brief/project_summary.json": "f6801940e5a7d117e9169e3240aa71cbb136a0f305a1b0b154f2079171c672c3",
+      "docs/tier3_project_instantiation/project_brief/project_summary.json": "2593e224fe69e7b194e59a112d0412778f065c31cf067551d7339c7b6bbec83a",
       "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "d7701367e565d607a52599d3fa263ad9ea3260b27c2763edea2956ffe08dedb6"
     },
     "not_frozen": {
       "docs/tier3_project_instantiation/working_assumptions.json": "The uncertainty ledger. The freeze rule exempts it, and later tickets append the effort shares and anything else they leave open.",
       "docs/tier3_project_instantiation/call_binding/selected_call.json": "Not a brief artifact. It gained project_duration_months under D5 and is otherwise unchanged since the Tier 2B intake ticket."
     },
-    "unfreezing": "An operator decision, recorded as a new decision log entry that supersedes this one and carries the new fingerprints. A ticket may not unfreeze on its own judgement (CLAUDE.md §9.1)."
+    "unfreezing": "An operator decision, recorded as a new decision log entry that supersedes this one and carries the new fingerprints. A ticket may not unfreeze on its own judgement (CLAUDE.md §9.1).",
+    "reissued": {
+      "on": "2026-09-30",
+      "reason": "A two-axis review of this ticket found two defects in project_summary.json before the ticket was handed on. The freeze was reissued rather than the corrections deferred, because a frozen artifact that is known to be wrong is worse than an unfrozen one: nothing rereads it.",
+      "defects_corrected": [
+        "The brief stated that selected_call.json records project_duration as Unresolved. The same commit had changed it to Assumed, so a frozen artifact asserted something false about Tier 3 state. A cross-reference check now fails when the two disagree.",
+        "approval and gap_option_decision carried status Confirmed on the strength of this Tier 4 record. CLAUDE.md §12.2 reserves Confirmed for a fact directly evidenced by a named source in Tier 1 to Tier 3, so that silently widened the rule without the amendment §14.5 requires. Both now carry a lifecycle state, following the precedent the consortium gap analysis set with disposition, and neither appears in field_status."
+      ],
+      "prior_artifacts": {
+        "docs/tier3_project_instantiation/project_brief/concept_note.md": "0f0662b68cdef6ac6acded4ec70ff0c0f9dd27e2becc0b3ef4a394af49a8f261",
+        "docs/tier3_project_instantiation/project_brief/project_summary.json": "f6801940e5a7d117e9169e3240aa71cbb136a0f305a1b0b154f2079171c672c3",
+        "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "d7701367e565d607a52599d3fa263ad9ea3260b27c2763edea2956ffe08dedb6"
+      },
+      "scope": "Corrections inside the authoring ticket, before handoff. This is not a precedent for a later ticket editing a frozen artifact: that still needs a superseding decision record, per the unfreezing rule below."
+    }
   },
   "findings": [
     {
@@ -172,6 +203,14 @@
       "disposition": "open",
       "resolution": "This is the ordering the ticket sequence sets: the concept ticket precedes the runner phases ticket. The extract is the authoritative Tier 2B record on this branch and every span in it is checked against the work programme page text by tests/test_tier2b_biodiv_intake.py.",
       "residual": "When Phase 1 writes extracted/, the concept's span references are not re-pointed at it. A later divergence between the extract and extracted/ would not surface here."
+    },
+    {
+      "id": "F8",
+      "finding": "A frozen artifact that describes another artifact can go stale without any check noticing. The first version of this brief did exactly that about selected_call.json.",
+      "status": "Confirmed",
+      "disposition": "resolved",
+      "resolution": "tests/test_demo_concept.py::TestCrossReferences checks that what the brief says about the call binding is true, and that every repository path the brief names exists.",
+      "residual": "The check covers the one cross-reference that went stale and the path list. A brief sentence describing some other artifact in prose is still unchecked, because prose has no reference to resolve."
     }
   ],
   "what_this_decision_does_not_settle": [

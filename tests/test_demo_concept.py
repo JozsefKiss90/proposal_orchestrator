@@ -21,17 +21,22 @@ gate — so a later edit cannot quietly upgrade them.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 import pytest
 
 from runner.leakage_scan import scan_partner_records, scan_tree
 from runner.paths import find_repo_root
-from tests._tier_sources import CRLF, LF, STATUSES
+from tests._tier_sources import (
+    STATUSES,
+    digest as _digest_on,
+    iter_strings as _iter_strings,
+    norm as _norm,
+    resolve_ref as _resolve,
+)
 
 REPO = find_repo_root()
 
@@ -80,57 +85,14 @@ def _read(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
+#: The digest basis the freeze record declares. core.autocrlf is true here, so a
+#: text file checks out CRLF on Windows and LF elsewhere, and a raw digest would
+#: identify the platform rather than the content.
+FREEZE_DIGEST_BASIS = "lf_normalised_bytes"
+
+
 def _digest(path: Path) -> str:
-    """sha256 over LF-normalised bytes, the basis the freeze record declares.
-
-    core.autocrlf is true here, so a text file checks out CRLF on Windows and LF
-    elsewhere. A raw digest would identify the platform rather than the content.
-    """
-    return hashlib.sha256(path.read_bytes().replace(CRLF, LF)).hexdigest()
-
-
-def _norm(text: str) -> str:
-    """Collapse every run of whitespace to one space.
-
-    Both sides of a phrase comparison are normalised, so a phrase wrapped across
-    two lines of Markdown still matches the span it was quoted from.
-    """
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def _iter_strings(node: Any) -> Iterator[str]:
-    if isinstance(node, dict):
-        for value in node.values():
-            yield from _iter_strings(value)
-    elif isinstance(node, list):
-        for value in node:
-            yield from _iter_strings(value)
-    elif isinstance(node, str):
-        yield node
-
-
-def _resolve(node: Any, ref: str) -> Any:
-    """Resolve a ``$.a.b[0]`` reference. ``None`` when it does not resolve."""
-    assert ref.startswith("$"), ref
-    current = node
-    for part in ref[1:].split("."):
-        if not part:
-            continue
-        name, _, rest = part.partition("[")
-        if name:
-            if not isinstance(current, dict) or name not in current:
-                return None
-            current = current[name]
-        while rest:
-            index_text, _, rest = rest.partition("]")
-            if not isinstance(current, list):
-                return None
-            index = int(index_text)
-            if index >= len(current):
-                return None
-            current = current[index]
-            rest = rest.lstrip("[")
-    return current
+    return _digest_on(path, FREEZE_DIGEST_BASIS)
 
 
 def _span_text(node: Any) -> str:
@@ -380,9 +342,9 @@ class TestGapOptions:
     ) -> None:
         """The gate: a chosen option and an unrecorded approval cannot coexist."""
         chosen = summary["gap_option_decision"]["chosen"]
-        if summary["approval"]["status"] == "Unresolved":
+        if summary["approval"]["state"] != "recorded":
             assert chosen is None
-            assert summary["gap_option_decision"]["status"] == "Unresolved"
+            assert summary["gap_option_decision"]["state"] != "recorded"
         else:
             assert chosen in (1, 2, 3)
 
@@ -452,14 +414,14 @@ class TestDuration:
 class TestTheHumanGate:
     def test_the_approval_block_declares_a_human_gate(self, summary: dict) -> None:
         assert summary["approval"]["gate"] == "human"
-        assert summary["approval"]["status"] in STATUSES
+        assert summary["approval"]["state"] in ("recorded", "not_recorded")
 
     def test_no_architecture_seed_exists_while_approval_is_unrecorded(
         self, summary: dict
     ) -> None:
         """The ticket's own rule: no architecture seed is authored until the
         operator records approval."""
-        if summary["approval"]["status"] != "Unresolved":
+        if summary["approval"]["state"] == "recorded":
             return
         for name in SEED_FILES:
             assert not (ARCHITECTURE_INPUTS / name).exists(), (
@@ -469,7 +431,7 @@ class TestTheHumanGate:
     def test_a_recorded_approval_has_a_decision_log_entry(
         self, summary: dict
     ) -> None:
-        if summary["approval"]["status"] == "Unresolved":
+        if summary["approval"]["state"] != "recorded":
             return
         assert DECISION.is_file(), "approval recorded with no decision log entry"
         entry = _read(DECISION)
@@ -535,21 +497,33 @@ class TestWhatTheDraftDoesNotClaim:
         assert summary["field_status"]["concept"] == "Assumed"
 
     def test_nothing_the_project_claims_is_confirmed(self, summary: dict) -> None:
-        """Only three kinds of thing may carry Confirmed here. The bound topic and
-        the call phrases, which a reader of this branch can check against Tier 2B
-        for herself. And the operator's own acts — the approval and the gap-option
-        choice — which the Tier 4 decision record evidences. Every claim the
-        project makes about itself stays Assumed."""
+        """Exactly two things may carry Confirmed, and a reader of this branch can
+        check both against Tier 2B for herself: the bound topic and the call
+        phrases. Everything the project claims about itself stays Assumed."""
         confirmed = {
             field
             for field, status in summary["field_status"].items()
             if status == "Confirmed"
         }
-        allowed = {"topic", "call_phrases", "approval", "gap_option_decision"}
-        assert confirmed <= allowed, f"claimed Confirmed: {sorted(confirmed - allowed)}"
-        assert {"topic", "call_phrases"} <= confirmed
-        if summary["approval"]["status"] != "Unresolved":
-            assert "approval" in confirmed
+        assert confirmed == {"topic", "call_phrases"}
+
+    def test_an_operator_act_never_borrows_the_status_vocabulary(
+        self, summary: dict
+    ) -> None:
+        """§12.2 reserves Confirmed for a fact a named Tier 1-3 source evidences.
+        An approval lives in Tier 4 and is an act, not a fact, so it carries a
+        lifecycle `state` instead. The first version of this brief marked both
+        operator acts Confirmed on a Tier 4 record, which widened §12.2 without
+        the amendment §14.5 requires."""
+        for block in ("approval", "gap_option_decision"):
+            assert "status" not in summary[block], (
+                f"{block} borrows the §12.2 vocabulary for an operator act"
+            )
+            assert summary[block]["state"] not in STATUSES
+            assert summary[block]["vocabulary_note"].strip()
+            assert block not in summary["field_status"]
+        for decision in summary["open_decisions"]:
+            assert decision["state"] in ("decided", "open"), decision["id"]
 
     def test_it_carries_the_two_findings_the_consortium_handed_forward(
         self, summary: dict
@@ -668,3 +642,61 @@ class TestTheFreeze:
 
     def test_unfreezing_is_named_as_an_operator_decision(self, freeze: dict) -> None:
         assert "operator decision" in freeze["unfreezing"].lower()
+
+
+# ---------------------------------------------------------------------------
+# The brief agrees with the artifacts it describes
+# ---------------------------------------------------------------------------
+
+
+class TestCrossReferences:
+    """A frozen artifact that describes another artifact can go stale silently.
+
+    The first version of this brief said selected_call.json recorded the duration
+    as Unresolved. The same commit changed it to Assumed, so the brief asserted
+    something false about Tier 3 state and no check noticed. Freezing a file
+    makes that worse, not better: nothing rereads it.
+    """
+
+    def test_what_the_brief_says_about_the_call_binding_is_true(
+        self, summary: dict
+    ) -> None:
+        bound = _read(SELECTED_CALL)
+        basis = summary["project_duration"]["tier2b_basis"]
+        actual = bound["field_status"]["project_duration"]
+        stale = [
+            status
+            for status in STATUSES
+            if status != actual
+            and f"selected_call.json records project_duration as {status}" in basis
+        ]
+        assert not stale, (
+            f"the brief says selected_call.json records project_duration as "
+            f"{stale[0]}, and it records {actual}"
+        )
+        assert actual in basis, (
+            f"the brief describes selected_call.json without naming its actual "
+            f"status, {actual}"
+        )
+
+    def test_every_repo_path_the_brief_names_exists(self, summary: dict) -> None:
+        """A pointer to a file that is not there is a claim nobody can follow."""
+        named = {
+            value
+            for value in _iter_strings(summary)
+            if value.startswith("docs/") and value.count(" ") == 0
+        }
+        missing = sorted(rel for rel in named if not (REPO / rel).exists())
+        assert not missing, f"the brief names paths that do not exist: {missing}"
+
+    def test_the_brief_and_the_decision_record_name_each_other(
+        self, summary: dict
+    ) -> None:
+        """Either half alone can be renamed or retired without the other noticing."""
+        if summary["approval"]["state"] != "recorded":
+            pytest.skip("the operator has not recorded a decision yet")
+        rel = DECISION.relative_to(REPO).as_posix()
+        assert summary["approval"]["recorded_in"] == rel
+        entry = _read(DECISION)
+        brief = PROJECT_SUMMARY.relative_to(REPO).as_posix()
+        assert brief in entry["freeze_record"]["artifacts"]

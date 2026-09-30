@@ -101,3 +101,45 @@ def read_pdf_pages(pdf: Path, wanted: tuple) -> dict:
         return {n: norm(doc[n - 1].get_text()) for n in wanted}
     finally:
         doc.close()
+
+
+def resolve_ref(node: object, ref: str):
+    """Resolve a ``$.a.b[0]`` reference against a parsed JSON tree.
+
+    Returns ``None`` when the reference does not resolve, which is what a
+    span-reference check treats as a failure. Two test modules assert that an
+    authored artifact's cross-references land somewhere real — the consortium
+    gap analysis and the project concept — and both need the same walk.
+    """
+    assert ref.startswith("$"), ref
+    current = node
+    for part in ref[1:].split("."):
+        if not part:
+            continue
+        name, _, rest = part.partition("[")
+        if name:
+            if not isinstance(current, dict) or name not in current:
+                return None
+            current = current[name]
+        while rest:
+            index_text, _, rest = rest.partition("]")
+            if not isinstance(current, list):
+                return None
+            index = int(index_text)
+            if index >= len(current):
+                return None
+            current = current[index]
+            rest = rest.lstrip("[")
+    return current
+
+
+def iter_strings(node: object):
+    """Yield every string in a parsed JSON tree, depth first."""
+    if isinstance(node, dict):
+        for value in node.values():
+            yield from iter_strings(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from iter_strings(value)
+    elif isinstance(node, str):
+        yield node

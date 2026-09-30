@@ -53,7 +53,7 @@ pseudonymous slot (``C1``, ``C2``, …) recording only Member State or Associate
 Country, which is all the composition condition needs. So the check reads the
 real country lists out of Tier 1 ``participation_rules.json`` — Member States,
 Associated Countries and Overseas Countries and Territories — and fails on any of
-them in any artifact matched by :data:`PSEUDONYMITY_GLOBS`, together with any web
+them in any artifact matched by :data:`PSEUDONYMITY_JSON_GLOBS`, together with any web
 address or email. It covers every Tier 3 artifact that describes the project, not
 the partner registry alone, because this is the only mechanism that catches a
 country at all.
@@ -247,13 +247,14 @@ _EXCLUDED_SEGMENTS: frozenset[str] = frozenset({".obsidian"})
 PARTICIPATION_RULES_REL = _PARTICIPATION_RULES_REL
 PARTNERS_REL = _PARTNERS_REL
 
-#: Tier 3 artifacts the pseudonymity check reads, as repo-relative globs. A real
+#: The Tier 3 *JSON* artifacts the pseudonymity check reads, as repo-relative
+#: globs. The prose leg is :data:`PSEUDONYMITY_TEXT_GLOBS`. A real
 #: country name matters wherever the project describes itself, not only in the
 #: partner registry: a country written into a role, a declaration or the brief
 #: re-identifies a derived partner just as effectively. Country and nationality
 #: names are :data:`SCOPED_OUT` of the word scan, so this is the *only* mechanism
 #: that catches them, and it has to reach every artifact that can carry one.
-PSEUDONYMITY_GLOBS: tuple[str, ...] = (
+PSEUDONYMITY_JSON_GLOBS: tuple[str, ...] = (
     "docs/tier3_project_instantiation/consortium/*.json",
     "docs/tier3_project_instantiation/working_assumptions.json",
     "docs/tier3_project_instantiation/project_brief/*.json",
@@ -600,10 +601,15 @@ def _iter_strings(node: object, where: str) -> Iterable[tuple[str, str]]:
         yield where, node
 
 
-def iter_pseudonymity_files(repo_root: Path) -> list[Path]:
-    """Resolve :data:`PSEUDONYMITY_GLOBS`, minus the declared exemptions."""
+def _iter_globbed(repo_root: Path, globs: Iterable[str]) -> list[Path]:
+    """Resolve *globs* to existing files, deterministically, minus exemptions.
+
+    Both pseudonymity legs resolve their scope the same way and drop the same
+    declared exemptions. One resolver means an exemption can never apply to one
+    leg and not the other.
+    """
     seen: dict[str, Path] = {}
-    for pattern in PSEUDONYMITY_GLOBS:
+    for pattern in globs:
         for path in repo_root.glob(pattern):
             if not path.is_file():
                 continue
@@ -612,20 +618,16 @@ def iter_pseudonymity_files(repo_root: Path) -> list[Path]:
                 continue
             seen[rel] = path
     return [seen[key] for key in sorted(seen)]
+
+
+def iter_pseudonymity_files(repo_root: Path) -> list[Path]:
+    """The JSON leg's scope: :data:`PSEUDONYMITY_JSON_GLOBS`."""
+    return _iter_globbed(repo_root, PSEUDONYMITY_JSON_GLOBS)
 
 
 def iter_pseudonymity_text_files(repo_root: Path) -> list[Path]:
-    """Resolve :data:`PSEUDONYMITY_TEXT_GLOBS`, minus the declared exemptions."""
-    seen: dict[str, Path] = {}
-    for pattern in PSEUDONYMITY_TEXT_GLOBS:
-        for path in repo_root.glob(pattern):
-            if not path.is_file():
-                continue
-            rel = path.relative_to(repo_root).as_posix()
-            if rel in PSEUDONYMITY_EXEMPT:
-                continue
-            seen[rel] = path
-    return [seen[key] for key in sorted(seen)]
+    """The prose leg's scope: :data:`PSEUDONYMITY_TEXT_GLOBS`."""
+    return _iter_globbed(repo_root, PSEUDONYMITY_TEXT_GLOBS)
 
 
 def scan_partner_records(
@@ -636,7 +638,7 @@ def scan_partner_records(
     The structural half of the constraint, and the *only* mechanism that catches
     a country name: country and nationality names are :data:`SCOPED_OUT` of the
     word scan, because Tier 1 enumerates them and a Tier 4 report may discuss
-    them. So this reads every artifact in :data:`PSEUDONYMITY_GLOBS`, not the
+    them. So this reads every artifact in :data:`PSEUDONYMITY_JSON_GLOBS`, not the
     partner registry alone — a country written into a role, a declaration or a
     seed re-identifies a derived partner just as effectively.
 
@@ -684,18 +686,17 @@ def scan_partner_records(
     for path in text_targets:
         rel = path.relative_to(repo_root).as_posix()
         text = path.read_text(encoding="utf-8-sig", errors="replace")
-        for lineno, line in enumerate(text.splitlines(), start=1):
-            for pattern, kind in patterns:
-                for match in pattern.finditer(line):
-                    violations.append(
-                        LeakageViolation(
-                            path=rel,
-                            line=lineno,
-                            noun=match.group(0),
-                            snippet=line.strip(),
-                            kind=kind,
-                        )
+        for pattern, kind in patterns:
+            for lineno, noun, snippet in scan_text(text, pattern):
+                violations.append(
+                    LeakageViolation(
+                        path=rel,
+                        line=lineno,
+                        noun=noun,
+                        snippet=snippet,
+                        kind=kind,
                     )
+                )
     return tuple(violations)
 
 

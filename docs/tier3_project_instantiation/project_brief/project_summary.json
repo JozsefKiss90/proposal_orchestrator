@@ -555,7 +555,7 @@
       48,
       60
     ],
-    "tier2b_basis": "None. Pages 73 to 76 of the work programme carry no duration condition and the portal record carries none. selected_call.json records project_duration as Unresolved for the same reason.",
+    "tier2b_basis": "None. Pages 73 to 76 of the work programme carry no duration condition and the portal record carries none. selected_call.json carried project_duration as Unresolved for the same reason until the operator decided; it now carries the decided value as Assumed, never Confirmed, because no source can evidence it.",
     "reasoning_for_48": "The terrestrial case needs the field archive reworked and at least two further growing seasons measured under the harmonised protocol. The freshwater and marine cases cannot start before that protocol exists, and each needs a full annual cycle. European scaling and validation then need a year on top. Thirty-six months compresses the cross-realm cycle to one season and puts the third expected outcome at risk. Sixty months buys a third validation cycle at the cost of a larger consortium burn against the same EUR 5,000,000.",
     "decision_owner": "operator",
     "consequence_if_left_unresolved": "runner/dependency_normalizer.py reads project_duration_months. Phase 3 or Phase 4 fails closed while it is absent, which is the correct output rather than a defect.",
@@ -602,14 +602,15 @@
     }
   ],
   "gap_option_decision": {
-    "status": "Confirmed",
+    "state": "recorded",
     "chosen": 1,
     "chosen_name": "Add the gap-filling partners",
     "decided_on": "2026-09-30",
     "decided_by": "operator",
     "basis": "Operator decision OD1, recorded in docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json. Confirmed as an operator act evidenced by a named Tier 4 record, not as a fact about any partner: every partner still carries Assumed.",
     "consequence": "The concept runs on all twelve partners, so no Tier 3 artifact needs rework. The composition condition stays met only under assumption, and the six fictional partners stay declared in working_assumptions.json.",
-    "note": "The draft put three options with their consequences and did not choose. This block records what the operator chose."
+    "note": "The draft put three options with their consequences and did not choose. This block records what the operator chose.",
+    "vocabulary_note": "state is a lifecycle value, not one of the four CLAUDE.md §12.2 categories. An operator's choice is an act, not a fact a tier evidences, and §12.2 reserves Confirmed for a fact directly evidenced by a named source in Tier 1 to Tier 3 — this record lives in Tier 4. The consortium gap analysis set the same precedent by giving a finding a disposition and leaving status to the four categories. What the choice implies about the project stays in field_status, where every entry is Assumed."
   },
   "coordination_commitments": [
     {
@@ -672,7 +673,7 @@
       "id": "OD1",
       "question": "Which gap option does the project take?",
       "owner": "operator",
-      "status": "Confirmed",
+      "state": "decided",
       "see": "gap_options",
       "answer": "Option 1 — all twelve partners."
     },
@@ -680,7 +681,7 @@
       "id": "OD2",
       "question": "What project duration does the project assume?",
       "owner": "operator",
-      "status": "Assumed",
+      "state": "decided",
       "see": "project_duration",
       "answer": "48 months."
     },
@@ -688,7 +689,7 @@
       "id": "OD3",
       "question": "Does the project carry an acronym, and if so which?",
       "owner": "operator",
-      "status": "Unresolved",
+      "state": "open",
       "see": "concept.acronym_note",
       "answer": "No acronym. The field stays null and Unresolved."
     },
@@ -696,13 +697,13 @@
       "id": "OD4",
       "question": "Is the concept approved, approved with changes, or rejected?",
       "owner": "operator",
-      "status": "Confirmed",
+      "state": "decided",
       "see": "approval",
       "answer": "Approved."
     }
   ],
   "approval": {
-    "status": "Confirmed",
+    "state": "recorded",
     "gate": "human",
     "rule": "The ticket 'Project concept for operator approval' has a human gate. No architecture seed is authored until the operator records approval. The decision is written to docs/tier4_orchestration_state/decision_log/ and mirrored here.",
     "decision": "Approved",
@@ -713,7 +714,8 @@
       "Source materials and the sources index",
       "Architecture seeds and the uncertainty ledger"
     ],
-    "freeze": "Frozen per the operator manual's freeze rule (section 3.1). concept_note.md, project_summary.json and strategic_positioning.md are immutable for the run. Their fingerprints are recorded in the decision log and checked by tests/test_demo_concept.py. working_assumptions.json stays editable, as the rule allows."
+    "freeze": "Frozen per the operator manual's freeze rule (section 3.1). concept_note.md, project_summary.json and strategic_positioning.md are immutable for the run. Their fingerprints are recorded in the decision log and checked by tests/test_demo_concept.py. working_assumptions.json stays editable, as the rule allows.",
+    "vocabulary_note": "state is a lifecycle value, not one of the four CLAUDE.md §12.2 categories. An operator's choice is an act, not a fact a tier evidences, and §12.2 reserves Confirmed for a fact directly evidenced by a named source in Tier 1 to Tier 3 — this record lives in Tier 4. The consortium gap analysis set the same precedent by giving a finding a disposition and leaving status to the four categories. What the choice implies about the project stays in field_status, where every entry is Assumed."
   },
   "risks_the_draft_carries": [
     {
@@ -748,11 +750,9 @@
     "capability_refs": "Assumed",
     "call_phrases": "Confirmed",
     "project_duration": "Assumed",
-    "gap_option_decision": "Confirmed",
-    "approval": "Confirmed",
     "acronym": "Unresolved"
   },
-  "field_status_note": "call_phrases is Confirmed because every phrase is a verbatim slice of the Tier 2B call extract, checked by tests/test_demo_concept.py. approval and gap_option_decision are Confirmed as operator acts, each evidenced by the named Tier 4 decision record — not as claims about the project. Everything the project itself claims stays Assumed: the concept is design intent, and the capabilities behind it belong to partners whose participation nobody has confirmed. The duration is Assumed because Tier 2B carries none, so no source can evidence it. Nothing here is Confirmed on the strength of the concept's own coherence.",
+  "field_status_note": "Two entries are Confirmed and both are checkable by any reader of this branch: the bound topic, and the call phrases, each a verbatim slice of the Tier 2B call extract (tests/test_demo_concept.py). Everything the project claims about itself is Assumed — the concept is design intent, and the capabilities behind it belong to partners whose participation nobody has confirmed. The duration is Assumed because Tier 2B carries none, so no source can evidence it. The operator's approval and gap-option choice are absent from this block on purpose: they are acts recorded in Tier 4, not facts a tier evidences, and §12.2 reserves Confirmed for Tier 1 to Tier 3 evidence. They carry a lifecycle state of their own instead. Nothing here is Confirmed on the strength of the concept's own coherence.",
   "authored_by": "Ticket 'Project concept for operator approval', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
   "note": "Anonymity: no organisation name, person name, place, web address, grant or project identifier appears here. Partners are pseudonyms and countries are slots. Checked by runner/leakage_scan.py."
 }

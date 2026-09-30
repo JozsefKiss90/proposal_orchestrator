@@ -43,7 +43,7 @@ from runner.consortium_composition import (
 from runner.leakage_scan import scan_partner_records, scan_tree
 from runner.paths import find_repo_root
 from runner.working_assumptions import load_working_assumptions
-from tests._tier_sources import STATUSES
+from tests._tier_sources import STATUSES, resolve_ref as _resolve
 
 REPO = find_repo_root()
 
@@ -777,29 +777,3 @@ def _scenario(report: dict, name: str) -> dict:
     raise AssertionError(f"the report carries no scenario {name!r}")
 
 
-def _resolve(node: Any, ref: str) -> Any:
-    """Resolve a ``$.a.b[0]`` reference against a parsed JSON tree.
-
-    Returns ``None`` when the reference does not resolve, which is what the span
-    check treats as a failure.
-    """
-    assert ref.startswith("$"), ref
-    current = node
-    for part in ref[1:].split("."):
-        if not part:
-            continue
-        name, _, rest = part.partition("[")
-        if name:
-            if not isinstance(current, dict) or name not in current:
-                return None
-            current = current[name]
-        while rest:
-            index_text, _, rest = rest.partition("]")
-            if not isinstance(current, list):
-                return None
-            index = int(index_text)
-            if index >= len(current):
-                return None
-            current = current[index]
-            rest = rest.lstrip("[")
-    return current

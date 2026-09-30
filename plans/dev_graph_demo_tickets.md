@@ -158,36 +158,14 @@ The draft also records the coordination commitments the scope requires: resource
 - [x] After approval, `concept_note.md`, `project_summary.json` and `strategic_positioning.md` are frozen per the operator manual's freeze rule.
 - [x] The leakage test passes on the brief.
 
-**Operator decisions recorded.** Gap option 1, all twelve partners: the second scope requirement asks for
-capabilities across all three ecosystem realms and is not severable, so option 2 drops two of them and
-option 3 leaves four cross-cutting duties without a holder. Duration 48 months. No acronym, because an
-invented one is a project identifier that could collide with a real grant. All four answers are in
-`docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json`.
+**Outcome.** Approved 30 September 2026. Gap option 1 (all twelve partners), duration 48 months, no
+acronym. The reasoning, the seven design decisions, the eight findings and the freeze fingerprints are
+in `docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json`.
 
-**Where the duration landed, and why that needed a decision.** `runner/dependency_normalizer.py` and the
-timeline predicates read `project_duration_months` from `selected_call.json` and nowhere else, and the
-artifact schema marks the field required. The intake ticket left it absent on purpose and handed the
-write here. It is written with status Assumed, its basis recorded in the same file, and declared in
-`working_assumptions.json`. Leaving it absent would have blocked Phases 3 and 4 on a question the
-operator had already answered. Decision D5. The call extract still records no duration, because Tier 2B
-genuinely has none, and a test now pins that separately.
-
-**The freeze is a check, not a convention.** The operator manual's freeze rule had no enforcement. The
-decision log now carries an LF-normalised sha256 for each of the three brief artifacts, and
-`tests/test_demo_concept.py` fails when one is edited. Unfreezing is an operator decision recorded as a
-superseding entry (§9.1). Decision D6.
-
-**One engine change.** The leakage scan's pseudonymity check read JSON only, so nothing looked for a real
-country name in the Tier 3 prose. Country names are scoped out of the word scan, which makes that check
-the only mechanism that catches one. It now reads `project_brief/*.md` over the same Tier 1 country
-lists. Decision D7.
-
-**Findings carried forward.** The concept has no evidence base and no methodology vault backs it, so
-every mechanism is design intent at Assumed (F1, F2). Each of the freshwater and marine realms still
-rests on one partner, and the geography is still thin (F3, F4, from the consortium ticket's F4 and F5).
-The brief has no declared schema, as `roles.json` does not (F5). The brief cites the hand-authored call
-extract rather than Tier 2B `extracted/`, because Phase 1 has not run, and the span references are not
-re-pointed when it does (F7).
+Three things later tickets need from it. The duration lives in `selected_call.json` as
+`project_duration_months`, Assumed, because the runner reads it nowhere else (D5). The freeze rule is
+now a fingerprint test, not a convention (D6). An operator act carries a lifecycle `state`, never a
+§12.2 status (D8).
 
 ## Source materials and the sources index
 

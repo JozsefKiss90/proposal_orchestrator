@@ -44,7 +44,7 @@ from runner.leakage_scan import (
     LEAKAGE_NOUNS,
     PROJECT_IDENTIFIERS,
     PSEUDONYMITY_EXEMPT,
-    PSEUDONYMITY_GLOBS,
+    PSEUDONYMITY_JSON_GLOBS,
     PSEUDONYMITY_TEXT_GLOBS,
     REIDENTIFYING_NOUNS,
     SCAN_GLOBS,
@@ -297,7 +297,7 @@ class TestPseudonymityOfPartnerRecords:
     def test_it_covers_every_tier_3_self_description_not_just_partners(self) -> None:
         """Country names are scoped out of the word scan, so this is the only
         mechanism that catches one. It has to reach more than one file."""
-        joined = " ".join(PSEUDONYMITY_GLOBS)
+        joined = " ".join(PSEUDONYMITY_JSON_GLOBS)
         assert "consortium" in joined
         assert "working_assumptions.json" in joined
         assert "project_brief" in joined
