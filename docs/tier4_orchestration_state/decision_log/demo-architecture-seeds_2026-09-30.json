@@ -1,0 +1,186 @@
+{
+  "record_type": "decision_log_entry",
+  "id": "demo-architecture-seeds_2026-09-30",
+  "date": "2026-09-30",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "authority": [
+    "CLAUDE.md §5 Tier 3, §9.4 durable decisions, §12.2 status categories, §13.3 no fabricated project facts",
+    "Proposal_Engine_Operator_Manual.md §3.1 steps ⑥ and ⑦, and the freeze rule"
+  ],
+  "decision": "The six architecture seeds and the uncertainty ledger for instance two are authored and Tier 3 is frozen. Six objectives, seven work packages, 35 tasks, 24 deliverables, eight milestones, six impact pathways and thirteen risks over 48 months, every project fact Assumed. Effort and key performance indicator targets are left Unresolved and declared rather than seeded.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-architecture-seeds_2026-09-30.json",
+  "unblocks": [
+    "First dev-graph snapshot on the demo world",
+    "Runner Phases 1 to 6 on the demo"
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "title": "The seeds are authored directly as JSON, not through the vault",
+      "decision": "Author objectives.json, outcomes.json, impacts.json, workpackage_seed.json, milestones_seed.json and risks.json as canonical JSON under docs/tier3_project_instantiation/architecture_inputs/.",
+      "reason": "The ticket offers both routes and asks for the decision either way. The operator manual's route compiles vault folders 11 to 17 into the seeds, but those folders stand on the methodology in folders 00 to 10, and instance two has none. Scaffolding an empty methodology vault to compile seeds from it would produce the same content by a longer path, and would suggest the seeds are lifted from evidence.",
+      "consequence": "The demo has no vault, so a change scenario that alters Tier 3 edits the JSON under a revision contract rather than editing a vault node and promoting. Recorded so the scenarios ticket knows which route it inherits. Authoring a vault later is an operator decision, and these seeds would be its first consumer, not its source.",
+      "operator_choice": true
+    },
+    {
+      "id": "D2",
+      "title": "Seven work packages, 35 tasks and eight milestones",
+      "decision": "Adopt the seven-work-package structure: coordination, gap analysis and architecture, protocols and crosswalks, the three demonstration cases, the omics layer, training data and modelling, and policy and sectoral uptake.",
+      "reason": "The ticket asks for at least six work packages with tasks split across partners and cross-work-package dependencies, so the planner has something to propagate along. Tier 2A records no maximum for RIA and asks only that the count be proportionate. Seven is what it takes to give each of the twelve partners a lead and to keep each coordination duty with the partner that owns it.",
+      "consequence": "Twelve task dependencies cross a work package boundary and seven of the eight milestones gather deliverables from more than one work package. Phase 3 may refine the structure. The scale is declared in the ledger under 'project_scale', because no tier evidences that this is the right size."
+    },
+    {
+      "id": "D3",
+      "title": "Pages 47 and 48 of the work programme are transcribed into the source index",
+      "decision": "Extend tools/author_demo_sources.py with the two destination-narrative pages and nine spans carrying the six destination expected impacts, and regenerate docs/tier3_project_instantiation/source_materials/sources.json.",
+      "reason": "The topic's call extract carries expected outcomes and no expected impacts. The expected impacts this project answers are set at destination level. impacts.json maps one pathway to each of them, and writing those impacts into Tier 3 from memory would be the fabrication CLAUDE.md §13.2 forbids. Transcription puts them under the same byte-equal replay rule as every other span.",
+      "consequence": "sources.json goes from 22 entries and 45 spans to 24 and 54. The source materials ticket's validation report gains an 'extended_on' block and its counts are brought to the artifact it describes; its original six rows are unchanged and the prior counts are in git history. The Tier 2B call extract is NOT amended: adding an expected_impacts field there belongs to the intake ticket, and Phase 1 writes the extracted file either way. Findings F2 and F3.",
+      "operator_choice": true
+    },
+    {
+      "id": "D4",
+      "title": "The work package seed carries both wp_id and id",
+      "decision": "Every work package object declares wp_id and id with the same value, and a test pins them equal.",
+      "reason": "runner/dev_graph/builder.py reads wp_id; runner/dependency_normalizer.py reads id and silently skips a work package carrying neither. A seed written for one reader is invisible to the other, and the skip is silent, so the failure would surface downstream as a missing dependency rather than as an error.",
+      "consequence": "The duplication is visible and checked rather than hidden. Neither module is changed: this ticket does not modify the runtime, and picking a winner is a decision for whoever reconciles the two readers. Finding F1."
+    },
+    {
+      "id": "D5",
+      "title": "Effort is left Unresolved, not seeded",
+      "decision": "workpackage_seed.json carries no person-months. The effort question is declared in working_assumptions.json under 'effort_shares'.",
+      "reason": "Nobody has agreed an effort split for a consortium whose every member is Assumed. A seeded figure would enter Tier 3 as a consortium decision no partner took, which §13.3 forbids and which the budget route would then treat as an input.",
+      "consequence": "Phase 3 and the lump-sum budget request resolve it. A downstream phase that needs effort finds an explicit Unresolved with a reason rather than a silent gap."
+    },
+    {
+      "id": "D6",
+      "title": "The twelve key performance indicators carry no target numbers",
+      "decision": "Each indicator names one deliverable that exists in the work package seed and states what it measures. None states a target value.",
+      "reason": "A target is a consortium commitment. No partner's participation is confirmed, so a number here would be the operator's guess wearing a partner's authority. The indicator discipline is the one this repository already uses: measure what the project delivers and controls, never promise a change in the state of biodiversity.",
+      "consequence": "Phase 5 sets the targets once the consortium is confirmed. Declared in the ledger under 'kpi_targets'."
+    },
+    {
+      "id": "D7",
+      "title": "This record freezes the rest of Tier 3 and does not re-fingerprint the brief",
+      "decision": "Fingerprint the ten Tier 3 artifacts the concept freeze did not cover, name working_assumptions.json exempt, and leave the three brief artifacts to demo-concept_2026-09-30.json.",
+      "reason": "Two fingerprints of one file drift apart the moment one record is reissued and the other is not. Between the two records every Tier 3 artifact is covered exactly once, which a test checks in both directions: nothing uncovered, nothing covered twice.",
+      "consequence": "A later ticket that edits a frozen Tier 3 artifact fails the fingerprint check while the edit is still cheap to reverse. Unfreezing is an operator decision recorded as a superseding entry, by the same rule the concept freeze states."
+    },
+    {
+      "id": "D8",
+      "title": "roles.json is not updated with the work package leads",
+      "decision": "Leave roles.json as written, with work_package_leads Unresolved, and declare the seven leads in working_assumptions.json instead.",
+      "reason": "roles.json is a founding document under the freeze rule and it was honest when written: the work packages did not exist. Editing it now to add facts a later ticket produced is the mid-pipeline edit the freeze rule forbids.",
+      "consequence": "A reader of roles.json alone still sees Unresolved, which is the cost. A reader who follows the ledger finds the leads with the reason they are Assumed. Finding F6."
+    },
+    {
+      "id": "D9",
+      "title": "The destination expected impacts are counted from the source, not stated",
+      "decision": "Record six destination expected impacts, hold the valuation clause inside the fourth rather than as a seventh, and add a check that counts the bullet markers in the replayed page text and holds every record to that count.",
+      "reason": "The first draft of this ticket said seven. The fourth bullet straddles the page break and its tail on page 48 carries no bullet marker, so counting it separately invented a call constraint the source does not make, which CLAUDE.md §13.2 forbids. The wrong number reached eight records, including tools/author_demo_sources.py, and two of them then contradicted each other about whether valuation was a seventh impact or half of the fourth.",
+      "consequence": "A number derived from a document is now derived on every run rather than typed once. The two-axis review of this ticket found the error independently on both axes, which is why the fix is a check and not an edit. Finding F13."
+    }
+  ],
+  "freeze_record": {
+    "rule": "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule. Once instantiation is complete the founding documents are immutable for the run.",
+    "frozen_on": "2026-09-30",
+    "scope": "Steps ④ to ⑥ of the instantiation sequence, plus the call binding of step ①. Step ③, the project brief, was frozen by docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json and is deliberately not re-fingerprinted here (decision D7). Step ⑦, the uncertainty ledger, is exempt.",
+    "digest_basis": "sha256 over LF-normalised bytes, because core.autocrlf is true in this repository and a raw digest would identify the platform rather than the content.",
+    "artifacts": {
+      "docs/tier3_project_instantiation/architecture_inputs/objectives.json": "f53af8487fa3ad17678480f8db5421046a27f4d5089bbe22571783e29b153465",
+      "docs/tier3_project_instantiation/architecture_inputs/outcomes.json": "c1edc44e9e9945e8c1c32c6154a68da80ccb89d85ef7402761253af09b5cc9df",
+      "docs/tier3_project_instantiation/architecture_inputs/impacts.json": "f165033f26b6f801b719557bcb19dbcd1ff1a9e45e58bd340bc3bddb2c0944bc",
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json": "90e30660887936b9a64de2c8d4d05b81e1ac304474549dea7adf856099bd562a",
+      "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json": "030583498e779cc117bbad81bc3de0ec869a3e6a444ef6e7662e3cc49f4c7609",
+      "docs/tier3_project_instantiation/architecture_inputs/risks.json": "ecb0eddbcfea4cd8891cb926c0b99b3a1329af3b55db97c6eb666fa57fba2dfe",
+      "docs/tier3_project_instantiation/consortium/partners.json": "bf765f1275f42ca8f6f75c2a7facbf38757a1629714210d8d0840cc70704a788",
+      "docs/tier3_project_instantiation/consortium/roles.json": "33dcd630340738bdc02af9918fb2d107edf9414e5211b71b48870dfe7706b3c5",
+      "docs/tier3_project_instantiation/call_binding/selected_call.json": "1b311863bceeac64e18c701f524ef755c87912d45bcc6b81c7900c6d1e8c0dc0",
+      "docs/tier3_project_instantiation/source_materials/sources.json": "c282f12cd55e9cddd86a240c4879aab1419160ebadaf4f7cc0cb26be08dd0828"
+    },
+    "not_frozen": {
+      "docs/tier3_project_instantiation/working_assumptions.json": "The uncertainty ledger. The operator manual exempts it by name: it is the one input the operator keeps touching, and later tickets append to it as facts are confirmed or new gaps open."
+    },
+    "covered_elsewhere": {
+      "docs/tier3_project_instantiation/project_brief/concept_note.md": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+      "docs/tier3_project_instantiation/project_brief/project_summary.json": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+      "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json"
+    },
+    "unfreezing": "An operator decision, recorded as a new decision log entry that supersedes this one and carries the new fingerprints. A ticket may not unfreeze on its own judgement (CLAUDE.md §9.1)."
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The work package seed has two readers that disagree on the key, and one skips silently.",
+      "see": "D4"
+    },
+    {
+      "id": "F2",
+      "summary": "The topic's call extract carries no expected impacts; they are set at destination level.",
+      "see": "D3"
+    },
+    {
+      "id": "F3",
+      "summary": "The destination-impact spans carry no claim reference, because the concept was frozen before the impacts were grounded.",
+      "see": "D3"
+    },
+    {
+      "id": "F4",
+      "summary": "Five of the six seeds have no declared schema; their shape is set by what the consumers read.",
+      "see": "the validation report"
+    },
+    {
+      "id": "F5",
+      "summary": "milestones_seed.json carries a 'deliverables' field the declared schema does not have, and the builder needs it.",
+      "see": "the validation report"
+    },
+    {
+      "id": "F6",
+      "summary": "roles.json still records the work package leads as Unresolved.",
+      "see": "D8"
+    },
+    {
+      "id": "F7",
+      "summary": "Tier 2A states no maximum work package count for RIA, so nothing checks the count.",
+      "see": "D2"
+    },
+    {
+      "id": "F8",
+      "summary": "A work package can be constrained only by a source index entry, never by a Tier 2B path directly.",
+      "see": "the validation report"
+    },
+    {
+      "id": "F9",
+      "summary": "Two of the three demonstration realms rest on one fictional partner each.",
+      "see": "risks R01 and R02"
+    },
+    {
+      "id": "F10",
+      "summary": "No effort figure and no key performance indicator target is seeded.",
+      "see": "D5 and D6"
+    },
+    {
+      "id": "F11",
+      "summary": "No methodology vault backs the seeds, so every mechanism is design intent.",
+      "see": "D1 and risk R05"
+    },
+    {
+      "id": "F12",
+      "summary": "A deliverable cannot depend on another deliverable: the relationship set has no such predicate, so deliverables couple across work packages through milestones.",
+      "see": "the validation report"
+    },
+    {
+      "id": "F13",
+      "summary": "The destination sets six expected impacts, not seven. The first draft counted the fourth bullet's tail as a separate impact and the wrong number reached eight records.",
+      "see": "D9"
+    }
+  ],
+  "what_this_decision_does_not_settle": [
+    "The effort split and the budget. This is a lump-sum topic, so the repository computes no figure (CLAUDE.md §8.1) and Phase 8 stays hard-blocked until a validated response arrives in the integration directory.",
+    "Whether seven work packages is proportionate. Tier 2A asks for proportionality and states no number, so the judgement is the operator's and stays Assumed.",
+    "Whether the fictional gap partners exist. Every project fact in these seeds rests on twelve Assumed participations, and the demo is a demonstration, never a submission.",
+    "Which identifiers Phase 1 will give the destination expected impacts. The DEST-IMPACT-n ids used here are this record's own, and the join to Tier 2B extracted/expected_impacts.json is re-established when Phase 1 writes it."
+  ],
+  "authored_by": "Ticket 'Architecture seeds and the uncertainty ledger', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Checked by tests/test_demo_architecture_seeds.py: the fingerprints, the coverage of Tier 3 across both freeze records, the ledger, the leakage scan and every cross-reference in the seeds."
+}

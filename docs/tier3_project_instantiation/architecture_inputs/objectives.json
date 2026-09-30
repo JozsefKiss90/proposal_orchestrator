@@ -1,0 +1,164 @@
+{
+  "_provenance": {
+    "record_type": "tier3_objectives",
+    "collection_key": "objectives",
+    "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml declares tier3_source_schemas for selected_call, topic_mapping, compliance_profile, partners, milestones_seed and working_assumptions, and none for this file. Its shape is therefore authored to satisfy its consumers, and no schema_id is coined for it (CLAUDE.md §16.3), as partners.json, roles.json and sources.json say of their own. Consumers: runner/dev_graph/builder.py (objective_id, title), runner/phase8_canonical_pack.py (objective_id -> id, measurable_output -> measurable_target, responsible_partner, contributing_partners), runner/predicates/criterion_predicates.py, and the wp_designer and impact_architect prompt specifications.",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.2 no invented call constraints, §13.3 no fabricated project facts"
+    ],
+    "source": [
+      "docs/tier3_project_instantiation/project_brief/concept_note.md (approved and frozen 2026-09-30)",
+      "docs/tier3_project_instantiation/project_brief/project_summary.json (concept claims C01-C23)",
+      "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+      "docs/tier3_project_instantiation/source_materials/sources.json (span ids resolve into the stored work programme)"
+    ],
+    "baseline_record": "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json",
+    "authoring_route": "Authored directly as JSON. Instance two has no methodology vault, so the vault route of Proposal_Engine_Operator_Manual.md §3.0 would compile folders 11-17 over an empty 00-10. Decision D1.",
+    "field_mapping": "tier2b_expected_outcome_refs is a JSONPath into the call extract. tier2b_span_refs names spans of sources.json, each of which replays byte-equal from the stored PDF. linked_concept_claims names claims of project_summary.json, which is where the call phrase behind each objective already sits.",
+    "status_rule": "Every objective is Assumed. An objective is the operator's design intent, and nothing in Tier 1 to Tier 3 evidences that this consortium will pursue it. The Tier 2B reference an objective answers is Confirmed; the objective is not.",
+    "partner_tokens": "responsible_partner and contributing_partners are pseudonyms of docs/tier3_project_instantiation/consortium/partners.json. No individual is named anywhere."
+  },
+  "spine_status": "pseudonymous_demo",
+  "objectives": [
+    {
+      "objective_id": "O1",
+      "title": "Build one multisensory integration architecture that carries omics, in-situ and remote-sensing observation on a single pressure gradient",
+      "measurable_output": "A prioritised knowledge-gap and data-need analysis, and an integration architecture specification covering the molecular, plot, airborne and satellite layers",
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[1]"],
+      "tier2b_scope_refs": ["$.scope_requirements[0]", "$.scope_requirements[1]"],
+      "tier2b_span_refs": [
+        "SRC-WP9-P74#792-847",
+        "SRC-WP9-P74#2423-2489",
+        "SRC-WP9-P75#336-417"
+      ],
+      "linked_concept_claims": ["C01", "C02", "C03", "C16"],
+      "addressed_by_work_packages": ["WP2", "WP5"],
+      "responsible_partner": "P02",
+      "contributing_partners": ["P04", "P09", "P10", "P11", "P12"],
+      "target_month": 15,
+      "validation_status": "Assumed",
+      "source_ref": "Concept note, 'The chain, from genome to space'; claims C01-C03 and C16 of project_summary.json",
+      "note": "The gap analysis runs before the architecture, in the order the scope requirement states. The architecture is specified once and then tested three times, once per realm."
+    },
+    {
+      "objective_id": "O2",
+      "title": "Agree joint data-collection, metadata and processing protocols, and publish them with crosswalks to the European habitat classification and the global ecosystem typology",
+      "measurable_output": "One protocol set adopted across the three cases, a crosswalk package, a provenance-tracked pipeline release, and publication to the open science cloud and the common data spaces",
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[1]"],
+      "tier2b_scope_refs": ["$.scope_requirements[3]", "$.scope_requirements[4]"],
+      "tier2b_span_refs": [
+        "SRC-WP9-P75#1568-1627",
+        "SRC-WP9-P75#2080-2151",
+        "SRC-WP9-P75#1353-1395",
+        "SRC-WP9-P75#1948-2018"
+      ],
+      "linked_concept_claims": ["C08", "C09", "C15", "C18", "C23"],
+      "addressed_by_work_packages": ["WP1", "WP3"],
+      "responsible_partner": "P10",
+      "contributing_partners": ["P01", "P04", "P08", "P09"],
+      "target_month": 42,
+      "validation_status": "Assumed",
+      "source_ref": "Concept note, 'The chain, from genome to space' and 'Coordination the topic requires'; claims C08, C09, C15, C18 and C23",
+      "note": "The scope asks the project to contribute to consensus, not only to comply. The contribution to the standards bodies is a task, not a dissemination line."
+    },
+    {
+      "objective_id": "O3",
+      "title": "Turn the multi-season field archive and the case observations into documented training and validation resources",
+      "measurable_output": "A published training and validation resource with a declared split protocol, in which site, season and treatment travel together into one fold",
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[2]"],
+      "tier2b_scope_refs": ["$.scope_requirements[0]"],
+      "tier2b_span_refs": ["SRC-WP9-P74#952-985"],
+      "linked_concept_claims": ["C06"],
+      "addressed_by_work_packages": ["WP6"],
+      "responsible_partner": "P03",
+      "contributing_partners": ["P01", "P12"],
+      "target_month": 28,
+      "validation_status": "Assumed",
+      "source_ref": "Concept note, 'Training and validation data'; claim C06",
+      "note": "The split protocol is the objective, not a detail of it. A resource whose folds leak the site teaches a model to recognise the site."
+    },
+    {
+      "objective_id": "O4",
+      "title": "Run three demonstration and verification cases along one agricultural pressure gradient, across the terrestrial, freshwater and marine realms",
+      "measurable_output": "Three harmonised observation datasets, one per realm, and a cross-case report on which harmonisation decisions survived transfer between realms",
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[0]"],
+      "tier2b_scope_refs": ["$.scope_requirements[1]", "$.scope_requirements[2]"],
+      "tier2b_span_refs": [
+        "SRC-WP9-P75#210-262",
+        "SRC-WP9-P75#877-920",
+        "SRC-WP9-P75#957-1017",
+        "SRC-WP9-P74#344-424"
+      ],
+      "linked_concept_claims": ["C04", "C05", "C13"],
+      "addressed_by_work_packages": ["WP4", "WP5"],
+      "responsible_partner": "P03",
+      "contributing_partners": ["P01", "P02", "P06", "P07", "P08", "P09", "P11"],
+      "target_month": 40,
+      "validation_status": "Assumed",
+      "source_ref": "Concept note, 'Three demonstration cases on one gradient'; claims C04, C05 and C13",
+      "note": "One gradient rather than three sites. A harmonisation decision taken for farmland is then tested in two realms that did not design it."
+    },
+    {
+      "objective_id": "O5",
+      "title": "Deliver habitat and ecosystem classification and biodiversity trend prediction at case, regional and European scales",
+      "measurable_output": "Benchmarked classification models for the three cases, European-scale habitat and ecosystem maps, and trend predictions with stated uncertainty",
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[2]", "$.expected_outcomes[0]"],
+      "tier2b_scope_refs": ["$.scope_requirements[0]"],
+      "tier2b_span_refs": [
+        "SRC-WP9-P74#1089-1164",
+        "SRC-WP9-P74#2741-2831"
+      ],
+      "linked_concept_claims": ["C07", "C17"],
+      "addressed_by_work_packages": ["WP6"],
+      "responsible_partner": "P12",
+      "contributing_partners": ["P01", "P02", "P07", "P08", "P11"],
+      "target_month": 45,
+      "validation_status": "Assumed",
+      "source_ref": "Concept note, 'Training and validation data'; claims C07 and C17",
+      "note": "Three scales, because the scope names three. The European scale rests on the case models, so it cannot be delivered before them."
+    },
+    {
+      "objective_id": "O6",
+      "title": "Carry the validated indicators into policy reporting and into farm management, so biodiversity evidence reaches the sectors that create the pressure",
+      "measurable_output": "A reporting-needs assessment agreed with competent authorities, an indicator decision-support release, and a usability evaluation run through a multi-country network of agricultural holdings",
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[0]", "$.expected_outcomes[1]"],
+      "tier2b_scope_refs": ["$.scope_requirements[2]", "$.scope_requirements[3]"],
+      "tier2b_span_refs": [
+        "SRC-WP9-P75#1447-1556",
+        "SRC-WP9-P74#1948-2035",
+        "SRC-WP9-P74#560-631"
+      ],
+      "linked_concept_claims": ["C10", "C14", "C19", "C20"],
+      "addressed_by_work_packages": ["WP7"],
+      "responsible_partner": "P05",
+      "contributing_partners": ["P04", "P06", "P11"],
+      "target_month": 48,
+      "validation_status": "Assumed",
+      "source_ref": "Concept note, 'Reaching agriculture'; claims C10, C14, C19 and C20",
+      "note": "The topic names agriculture twice, as a pressure and as a sector to reach. This objective answers the second naming."
+    }
+  ],
+  "coverage": {
+    "expected_outcomes": {
+      "$.expected_outcomes[0]": ["O4", "O5", "O6"],
+      "$.expected_outcomes[1]": ["O1", "O2", "O6"],
+      "$.expected_outcomes[2]": ["O3", "O5"]
+    },
+    "scope_requirements": {
+      "$.scope_requirements[0]": ["O1", "O3", "O5"],
+      "$.scope_requirements[1]": ["O1", "O4"],
+      "$.scope_requirements[2]": ["O4", "O6"],
+      "$.scope_requirements[3]": ["O2", "O6"],
+      "$.scope_requirements[4]": ["O2"]
+    },
+    "note": "Both directions. Every expected outcome and every scope requirement is answered by at least one objective, and every objective answers at least one expected outcome. Checked by tests/test_demo_architecture_seeds.py."
+  },
+  "field_status": {
+    "objective_titles_and_outputs": "Assumed. Design intent lifted from the approved concept, which no source outside Tier 3 evidences.",
+    "tier2b_references": "Confirmed. Each JSONPath resolves in the call extract and each span replays byte-equal from the stored work programme.",
+    "partner_assignments": "Assumed. Every partner's participation is Assumed, so no assignment can be stronger.",
+    "target_months": "Assumed. Derived from the work package schedule, which rests on the operator's 48-month duration choice."
+  },
+  "authored_by": "Ticket 'Architecture seeds and the uncertainty ledger', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Six objectives for a 48-month Research and Innovation Action. Phase 3 reads this file to ground the work package design and Phase 5 reads it to build the impact pathways. Phase 3 may refine the work package assignment; it may not add an objective, because an objective is an operator design decision."
+}

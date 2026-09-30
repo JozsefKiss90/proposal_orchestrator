@@ -204,11 +204,39 @@ sweep cannot derive single capitalised words (F5).
 
 **Blocked by:** Project concept for operator approval.
 
-- [ ] Every objective maps to at least one expected outcome span in Tier 2B.
-- [ ] Every task names a lead partner pseudonym and at least one task per work package involves two or more partners.
-- [ ] `working_assumptions.json` lists each unconfirmed partner and each Assumed value, with the reason.
-- [ ] The leakage test passes on all Tier 3 files and the vault.
-- [ ] Tier 3 is frozen and its fingerprint is recorded in the decision log.
+- [x] Every objective maps to at least one expected outcome span in Tier 2B.
+- [x] Every task names a lead partner pseudonym and at least one task per work package involves two or more partners.
+- [x] `working_assumptions.json` lists each unconfirmed partner and each Assumed value, with the reason.
+- [x] The leakage test passes on all Tier 3 files and the vault.
+- [x] Tier 3 is frozen and its fingerprint is recorded in the decision log.
+
+**Outcome.** Six seeds authored directly as JSON, not through the vault (D1), because instance two has
+no methodology vault and folders 11 to 17 would have stood on an empty 00 to 10. Six objectives, seven
+work packages, 35 tasks, 24 deliverables, eight milestones, seven outcomes, six impact pathways with
+twelve indicators, thirteen risks, over 48 months. Ten more ledger declarations, twenty-two in all.
+Tier 3 frozen: ten artifacts fingerprinted here, the three brief artifacts left to the concept record,
+the ledger exempt. The thirteen findings and the nine decisions are in
+`docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json`.
+
+**The number that was wrong.** The first draft said the destination sets seven expected impacts. It
+sets six. The fourth bullet straddles a page break and its tail carries no bullet marker, so counting
+it separately invented a call constraint the source does not make (§13.2). The wrong number reached
+eight records before the two-axis review caught it, on both axes independently. The fix is a check:
+`tests/test_demo_architecture_seeds.py` counts the bullet markers in the replayed page text and holds
+every record to that count (D9, F13).
+
+**Two seams the next tickets inherit.** `workpackage_seed.json` has two readers that disagree on the
+key: the dev-graph builder reads `wp_id`, the dependency normaliser reads `id` and silently skips a
+work package carrying neither. Every work package carries both and a test pins them equal (D4, F1).
+And the topic's call extract carries no expected impacts at all — they are set at destination level, so
+pages 47 and 48 were transcribed into `sources.json` and Phase 1 must extract them (D3, F2).
+
+**What is deliberately not settled.** Effort is Unresolved and declared, never seeded: nobody has
+agreed a split for a consortium whose every member is Assumed (D5). The twelve indicators carry no
+target numbers for the same reason (D6). `roles.json` still records the work package leads as
+Unresolved, because it is frozen and was honest when written; the leads are in the ledger instead (D8).
+A deliverable cannot depend on another deliverable — the relationship set has no such predicate, so
+deliverables couple across work packages through milestones (F12).
 
 ## First dev-graph snapshot on the demo world
 

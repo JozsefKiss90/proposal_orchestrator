@@ -1,7 +1,7 @@
 {
   "record_type": "working_assumptions",
   "provenance_class": "manually_placed",
-  "_note": "Operator declarations for instance two. Each declaration turns an Unresolved fact into a conscious Assumed, never a Confirmed (CLAUDE.md §12.2). Written by the 'Anonymised consortium with fictional gap partners' ticket in plans/dev_graph_demo_tickets.md; later tickets append the duration, the effort shares and anything else they leave open. The engine reads this file and never writes it. Schema: .claude/workflows/system_orchestration/artifact_schema_specification.yaml -> tier3_source_schemas.working_assumptions.",
+  "_note": "Operator declarations for instance two. Each declaration turns an Unresolved fact into a conscious Assumed, never a Confirmed (CLAUDE.md §12.2). Written by the 'Anonymised consortium with fictional gap partners' ticket in plans/dev_graph_demo_tickets.md and extended by 'Architecture seeds and the uncertainty ledger', which added the effort shares, the work plan scale, the work package leads, the realm dependencies, the absent KPI targets and the destination-level expected impacts. The engine reads this file and never writes it. Schema: .claude/workflows/system_orchestration/artifact_schema_specification.yaml -> tier3_source_schemas.working_assumptions.",
   "declarations": [
     {
       "key": "P01_participation",
@@ -130,6 +130,54 @@
       "declared_on": "2026-09-30T00:00:00Z",
       "rationale": "Tier 2B sets no duration for this topic. Pages 73 to 76 of the work programme carry no duration condition and the portal record carries none, so the value is the operator’s choice and no source can evidence it. Forty-eight months covers the field archive rework, two further growing seasons under the harmonised protocol, a full annual cycle for each of the freshwater and marine cases, and a year of European scaling and validation. Decision OD2, recorded in docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json, and written to selected_call.json as project_duration_months, where the runner reads it.",
       "checklist_ref": "TIMELINE"
+    },
+    {
+      "key": "effort_shares",
+      "value": "not agreed; workpackage_seed.json carries no person-months",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "The work package design implies an effort split across twelve partners and seven work packages. Nobody has agreed one. A seeded person-month figure would read as a consortium decision, and CLAUDE.md §13.3 forbids a project fact no tier carries. workpackage_seed.json therefore records effort as Unresolved and this declaration is what makes that an operator choice rather than an omission. Phase 3 and the budget route resolve it.",
+      "checklist_ref": "EFFORT"
+    },
+    {
+      "key": "project_scale",
+      "value": "7 work packages, 35 tasks, 24 deliverables, 8 milestones over 48 months",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "The shape of the work plan is the operator's design intent for a EUR 5,000,000 Research and Innovation Action. Tier 2A states no maximum work package count for RIA and asks only that the count be proportionate, so nothing outside Tier 3 evidences this scale. Phase 3 refines it.",
+      "checklist_ref": "WORK_PLAN"
+    },
+    {
+      "key": "work_package_leads",
+      "value": "WP1 P01, WP2 P02, WP3 P10, WP4 P03, WP5 P09, WP6 P12, WP7 P05",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "roles.json recorded work package leads as Unresolved, because the work packages did not exist when it was written. They exist now and each lead follows the management role its partner already holds. No partner has accepted a lead, so the assignment is the operator's and stays Assumed.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "demonstration_case_realms",
+      "value": "terrestrial P03, freshwater P07, marine P08",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "The second scope requirement asks for capabilities across all three realms. Two of the three case leads are fictional partners. If either withdraws, the realm is withdrawn with it: the composition condition survives, the scope requirement does not. Risks R01 and R02 carry the consequence; this declaration carries the fact.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "kpi_targets",
+      "value": "no target numbers set",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "impacts.json carries twelve key performance indicators and not one target. A target is a consortium commitment, and no partner's participation is confirmed, so a number would be the operator's guess wearing a partner's authority. Phase 5 sets the targets once the consortium is confirmed.",
+      "checklist_ref": "IMPACT"
+    },
+    {
+      "key": "destination_expected_impacts",
+      "value": "the six expected impacts are set at destination level, not at topic level",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "The topic's call extract carries expected outcomes and no expected impacts. The six expected impacts this project answers are on pages 47 and 48 of the work programme, under the destination heading, and were transcribed for impacts.json. The fourth straddles the page break and its tail carries no bullet marker, so the destination sets six, not seven. Phase 1 writes Tier 2B extracted/expected_impacts.json and may coin different identifiers from the DEST-IMPACT-n ones used here; the join is re-established at that point. Finding F3.",
+      "checklist_ref": "CALL_BINDING"
     }
   ],
   "_value_note": "A declaration's 'value' carries the fact the operator declares, not its status. The status is Assumed for every declaration and the shared reader stamps it (runner/working_assumptions.py DECLARED_STATUS), so writing 'Assumed' into 'value' would both duplicate it and break the schema's contract: the W1 predicate compares 'value' against a claim's claim_summary. Each *_participation value is derived from the partner's own record in partners.json, so a declaration cannot drift from the registry."

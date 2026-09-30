@@ -75,6 +75,11 @@ PAGES: dict[int, str] = {
     76: "The remainder of the scope: research-infrastructure services, the "
         "FuturEO coordination duty and the tail of the monitoring-scheme "
         "sentence that straddles the page break.",
+    47: "The destination narrative for Biodiversity and ecosystem services: the "
+        "international commitments the destination serves, and the first four of "
+        "its six expected impacts.",
+    48: "The tail of the fourth expected impact, which straddles the page break, "
+        "and the destination's last two.",
 }
 
 #: What the concept takes from each page, for the page source's ``relied_on_for``.
@@ -92,6 +97,62 @@ PAGE_USES: dict[int, str] = {
         "policy-reporting duties the concept assigns to named partners.",
     76: "The FuturEO coordination duty, and the permissive research-infrastructure "
         "clause.",
+    47: "The destination's expected impact statement and its first four bullets, "
+        "which the impact pathways in architecture_inputs/impacts.json are mapped "
+        "against.",
+    48: "The fourth bullet's valuation clause, and the last two expected impacts, "
+        "including the one about farmers and land managers that the agricultural "
+        "uptake pathway answers.",
+}
+
+#: Spans a Tier 3 seed relies on that neither the Tier 2B extract nor a concept
+#: claim cites, as ``{page: ((quote, requirement_ref), ...)}``.
+#:
+#: The call extract carries the topic's expected *outcomes* and no expected
+#: *impacts*: those sit in the destination narrative, two pages this index did
+#: not transcribe while only the concept relied on it. ``impacts.json`` maps a
+#: project pathway to each of them, so each bullet needs a span, and inventing
+#: the bullet text in Tier 3 would be exactly the fabrication §13.2 forbids.
+#:
+#: The destination sets **six** expected impacts. The fourth straddles the page
+#: break, so it has two spans: ``DEST-IMPACT-4`` on page 47 and its tail on page
+#: 48, which carries no bullet marker of its own. Counting that tail as a seventh
+#: impact is the mistake ``TestTheDestinationExpectedImpacts`` exists to prevent.
+#:
+#: Offsets are located the same way every other span is, so a quote that is not
+#: in the replayed page text fails the build rather than being written down.
+SEED_SPANS: dict[int, tuple[tuple[str, str], ...]] = {
+    47: (
+        ("Expected impact: Proposals for topics under this destination should set "
+         "out a credible pathway contributing to", "DEST-IMPACT"),
+        ("putting biodiversity on a path to recovery, and protecting and restoring "
+         "ecosystems and their services", "DEST-IMPACT"),
+        ("Knowledge on biodiversity status and trends and drivers of biodiversity "
+         "loss is improved", "DEST-IMPACT-1"),
+        ("Innovations, methods, pathways, models and tools are available and used "
+         "to protect healthy and resilient ecosystems and to restore degraded "
+         "ones, ensuring the continuous provision of ecosystem services, including "
+         "for adaptation and/or mitigation to climate change", "DEST-IMPACT-2"),
+        ("The ongoing biodiversity crisis and its consequences, notably on "
+         "ecosystem functioning and their services, and the need to monitor, "
+         "protect, restore and sustainably use biodiversity are better understood "
+         "to better benefit the whole society in an inclusive way", "DEST-IMPACT-3"),
+        ("Policymakers and stakeholders, all relevant economic sectors and society "
+         "are aware and well informed of relevant challenges and opportunities of "
+         "biodiversity protection, restoration and sustainable use, leading to "
+         "better implementation of the biodiversity", "DEST-IMPACT-4"),
+    ),
+    48: (
+        ("legislation and better valuation of ecosystem services, leading to "
+         "transformative change towards a nature positive economy", "DEST-IMPACT-4"),
+        ("Farmers, foresters, land and sea managers, fishers and aquaculture "
+         "producers have access to key information, and test and implement "
+         "biodiversity-friendly management practices, while safeguarding food and "
+         "water security and fostering competitiveness, demonstrating the "
+         "long-term sustainability of these sectors", "DEST-IMPACT-5"),
+        ("Progress towards international commitments worldwide on biodiversity is "
+         "made", "DEST-IMPACT-6"),
+    ),
 }
 
 
@@ -530,6 +591,11 @@ def _build_spans(
         add(page, start, quote, claim_ref=cid,
             requirement_refs=claim.get("requirement_refs", []))
 
+    for page, entries in SEED_SPANS.items():
+        for quote, requirement_ref in entries:
+            _, start = _locate(quote, texts, page, f"seed span {requirement_ref}")
+            add(page, start, quote, requirement_refs=(requirement_ref,))
+
     by_page: dict[int, list[dict[str, Any]]] = {page: [] for page in texts}
     for (page, start, _end), span in sorted(merged.items()):
         by_page[page].append(span)
@@ -708,7 +774,7 @@ def build(repo_root: Path) -> dict[str, Any]:
                    "report a grounded claim that no document supports. The builder "
                    "cannot catch that, because it has no way to know whether the text "
                    "is real. Byte-equal replay can.",
-            "consequence": "Sixteen of the twenty-two entries carry no text at all, so "
+            "consequence": "Sixteen of the twenty-four entries carry no text at all, so "
                            "no claim in this project can be verified against a policy "
                            "instrument, a dataset or a paper. That is the honest state "
                            "of the evidence base, not a defect in the index.",
@@ -743,7 +809,12 @@ def build(repo_root: Path) -> dict[str, Any]:
         },
         "authored_by": (
             "tools/author_demo_sources.py, for the ticket 'Source materials and the "
-            "sources index' in plans/dev_graph_demo_tickets.md, branch dev_graph_demo."
+            "sources index' in plans/dev_graph_demo_tickets.md, branch dev_graph_demo. "
+            "Pages 47 and 48 and their nine spans were added by the ticket "
+            "'Architecture seeds and the uncertainty ledger', which needed a Tier 2B "
+            "ground for the impact pathways: see decision D3 in "
+            "docs/tier4_orchestration_state/decision_log/"
+            "demo-architecture-seeds_2026-09-30.json."
         ),
         "note": (
             "Anonymity: no organisation name, person name, place, web address, grant or "

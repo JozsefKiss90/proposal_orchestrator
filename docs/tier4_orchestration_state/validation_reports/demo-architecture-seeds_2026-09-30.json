@@ -1,0 +1,204 @@
+{
+  "report_id": "demo-architecture-seeds_2026-09-30",
+  "report_kind": "tier3_artifact_validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "authority": [
+    "CLAUDE.md §5 Tier 3, §7 Phases 3 to 6, §12.1 reviewability, §12.2 status categories, §13.3 no fabricated project facts",
+    "Proposal_Engine_Operator_Manual.md §3.1 steps ⑥ and ⑦, and the freeze rule"
+  ],
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "question_asked": "Do the six architecture seeds and the uncertainty ledger give Phases 3 to 6 a real consortium design, with every claim traceable to the approved concept, the consortium registry or a Tier 2B span, and nothing invented?",
+  "answer": "Six seeds and twenty-two ledger declarations. Six objectives answer all three expected outcomes and all five scope requirements. Seven work packages carry 35 tasks, 24 deliverables and eight milestones over 48 months; every one of the twelve partners leads at least one task, every work package has a cross-partner task, and twelve task dependencies cross a work package boundary. Six impact pathways answer all six of the destination's expected impacts, each quoting a span that replays byte-equal from the stored work programme; inside the fourth, the valuation clause is stated as partly addressed rather than claimed. Every seeded fact carries Assumed, because the concept is design intent and no partner's participation is confirmed. Effort and key performance indicator targets are left Unresolved and declared, not seeded.",
+  "inputs": [
+    "docs/tier3_project_instantiation/project_brief/concept_note.md",
+    "docs/tier3_project_instantiation/project_brief/project_summary.json",
+    "docs/tier3_project_instantiation/consortium/partners.json",
+    "docs/tier3_project_instantiation/consortium/roles.json",
+    "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "docs/tier3_project_instantiation/source_materials/sources.json",
+    "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+    "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+    "docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json"
+  ],
+  "outputs": [
+    "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+    "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+    "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+    "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+    "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+    "docs/tier3_project_instantiation/architecture_inputs/risks.json",
+    "docs/tier3_project_instantiation/working_assumptions.json",
+    "docs/tier3_project_instantiation/source_materials/sources.json",
+    "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json"
+  ],
+  "acceptance_criteria": [
+    {
+      "criterion": "Every objective maps to at least one expected outcome span in Tier 2B.",
+      "disposition": "met",
+      "evidence": "Each of O1 to O6 carries tier2b_expected_outcome_refs resolving in the call extract, and tier2b_span_refs resolving into sources.json. The reverse also holds: all three expected outcomes are answered. TestObjectives in tests/test_demo_architecture_seeds.py.",
+      "status": "Confirmed"
+    },
+    {
+      "criterion": "Every task names a lead partner pseudonym, and at least one task per work package involves two or more partners.",
+      "disposition": "met",
+      "evidence": "35 tasks, each with a responsible_partner in partners.json. Every one of the seven work packages has at least one task with a non-empty contributing_partners list, and every one of the twelve partners leads at least one task. TestTasks.",
+      "status": "Confirmed"
+    },
+    {
+      "criterion": "working_assumptions.json lists each unconfirmed partner and each Assumed value, with the reason.",
+      "disposition": "met",
+      "evidence": "Twenty-two declarations. Twelve partner participations, the coordinator, the country slots, the composition condition and the duration from the earlier tickets; the effort shares, the work plan scale, the work package leads, the realm dependencies, the absent KPI targets and the destination-level expected impacts from this one. Every declaration carries a rationale. TestTheLedger.",
+      "status": "Confirmed"
+    },
+    {
+      "criterion": "The leakage test passes on all Tier 3 files and the vault.",
+      "disposition": "met, with the branch's recorded state unchanged",
+      "evidence": "runner/leakage_scan.scan_tree reports ok: the seeds introduce no new violation. The branch remains not clean, because instance one's project acronym still stands in a Tier 4 purge record, which the consortium ticket recorded as decision D8 and left unredacted. TestAnonymity.",
+      "status": "Confirmed"
+    },
+    {
+      "criterion": "Tier 3 is frozen and its fingerprint is recorded in the decision log.",
+      "disposition": "met",
+      "evidence": "Ten artifacts fingerprinted in demo-architecture-seeds_2026-09-30.json, three already fingerprinted by demo-concept_2026-09-30.json, and working_assumptions.json exempt by name. Between the two records every Tier 3 artifact is covered exactly once. TestTheFreeze.",
+      "status": "Confirmed"
+    }
+  ],
+  "design_summary": {
+    "objectives": 6,
+    "work_packages": 7,
+    "tasks": 35,
+    "deliverables": 24,
+    "milestones": 8,
+    "risks": 13,
+    "impact_pathways": 6,
+    "kpis": 12,
+    "duration_months": 48,
+    "partners": 12,
+    "cross_work_package_task_dependencies": 12,
+    "milestones_gathering_more_than_one_work_package": 7,
+    "note": "Counts are checked against the artifacts by tests/test_demo_architecture_seeds.py, so a later edit that changes the design fails here rather than leaving this report describing something that no longer exists."
+  },
+  "coverage": {
+    "expected_outcomes": "3 of 3 answered by objectives, and 3 of 3 by outcomes.",
+    "scope_requirements": "5 of 5 answered by objectives.",
+    "destination_expected_impacts": "6 of 6 answered by an impact pathway. Inside the fourth, the ecosystem-service valuation clause is stated as partly addressed with the reason.",
+    "partners": "12 of 12 lead at least one task.",
+    "work_packages": "7 of 7 have a deliverable, a cross-partner task and at least one objective."
+  },
+  "what_was_checked_and_how": [
+    "Objective and outcome references were resolved against the call extract by JSONPath walk, and the source spans against sources.json, which replays each quote byte-equal from the stored PDF.",
+    "Partner pseudonyms in every lead, contributor and owner field were joined against partners.json.",
+    "Task dependencies, deliverable producers and milestone deliverable lists were joined against the work package seed, in both directions.",
+    "The schedule was checked against the 48-month duration in selected_call.json: work packages inside the duration, tasks inside their work package, no deliverable due before a producer starts, at least one producer finished by each due month, no milestone before a deliverable it gathers.",
+    "The work package count was checked against Tier 2A section_schema_registry.json, which records max_work_packages as null for RIA.",
+    "runner.dev_graph.builder.build_snapshot was run twice over the populated repository and the snapshot ids compared.",
+    "runner.dependency_normalizer._build_wp_bounds was run over the seed, to confirm the second reader sees every work package.",
+    "runner.leakage_scan.scan_tree was run over Tier 3, Tier 4, Tier 5 and the vault roots.",
+    "runner.source_index.verify was run over the extended index, and tools/author_demo_sources.py --check re-derived it.",
+    "The destination expected impacts were counted by counting bullet markers in the replayed page text, between the expected-impact lead-in on page 47 and the next heading on page 48, rather than taken from any record."
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "title": "The work package seed has two readers that disagree on the key",
+      "detail": "runner/dev_graph/builder.py reads work_packages[].wp_id. runner/dependency_normalizer.py reads work_packages[].id and silently skips a work package that has neither. A seed written for one reader is invisible to the other, and the normalizer's skip is silent, so the failure would surface as a missing dependency rather than as an error.",
+      "disposition": "Every work package carries both keys with the same value, and a test pins them equal. Neither module is changed: this ticket does not modify the runtime, and choosing a winner is a decision for whoever reconciles them.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F2",
+      "title": "The topic's call extract carries no expected impacts",
+      "detail": "The expected impacts this project answers are set at destination level, on pages 47 and 48 of the work programme, not in the topic entry. The call extract has expected_outcomes and no expected_impacts field, so nothing in Tier 2B named them before this ticket.",
+      "disposition": "Pages 47 and 48 were transcribed into sources.json and impacts.json quotes them by span. The Tier 2B call extract was not amended, because it belongs to the intake ticket. Phase 1 writes Tier 2B extracted/expected_impacts.json and the Phase 5 predicate all_impacts_mapped joins on the identifiers it carries.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F3",
+      "title": "The destination-impact spans carry no claim reference",
+      "detail": "runner/source_index.py requires every claim_refs entry on a span to name a concept claim in project_summary.json. The concept was approved and frozen before the destination expected impacts were grounded, and none of its 23 claims cites one. The nine new spans therefore carry claim_refs [] and are linked by requirement_refs instead.",
+      "disposition": "Recorded. The link from the impacts to the call text runs impacts.json -> span_ref -> sources.json, and each quote is checked against the text at those offsets. The spans also carry requirement_refs naming the same DEST-IMPACT-n ids, but runner/source_index.py validates claim_refs only and never reads requirement_refs, so that half of the link is unchecked free text; tests/test_demo_architecture_seeds.py holds the two id sets equal instead. Unfreezing the concept to add claims is an operator decision and was not taken.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F4",
+      "title": "Five of the six seeds have no declared schema",
+      "detail": "artifact_schema_specification.yaml declares tier3_source_schemas for milestones_seed and not for objectives, outcomes, impacts, workpackage_seed or risks. Their shape is set by what the consumers read: the dev-graph builder, the dependency normalizer, the canonical pack deriver and the Phase 3 to 6 agent prompt specifications.",
+      "disposition": "Each seed says in _provenance that its shape is authored and names the consumers it was written to satisfy, following the convention partners.json and roles.json set. No orch.* schema id is coined (CLAUDE.md §16.3).",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F5",
+      "title": "milestones_seed.json carries a field its declared schema does not have",
+      "detail": "The declared schema has milestone_id, title, due_month and verifiable_criterion. The dev-graph builder also reads a 'deliverables' list and writes a deliverable -> validated_by -> milestone edge from it. Without that field a milestone is an isolated node and gathers nothing.",
+      "disposition": "The field is added and labelled additive in _provenance. It extends the declared schema rather than contradicting it, and the builder is the consumer that needs it.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F6",
+      "title": "roles.json recorded the work package leads as Unresolved and stays that way",
+      "detail": "roles.json was written before any work package existed and honestly recorded work_package_leads as Unresolved. Seven leads now exist in the seed. roles.json is a founding document under the freeze rule, so this ticket does not edit it, and a reader of roles.json alone still sees Unresolved.",
+      "disposition": "The leads are declared in working_assumptions.json under 'work_package_leads', which is the ledger's job. A reader who follows the ledger finds them. Changing roles.json needs a superseding decision record.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F7",
+      "title": "Nothing checks the work package count for an RIA",
+      "detail": "Tier 2A section_schema_registry.json records max_work_packages as null for RIA, with the form's words: the number should be proportionate to the scale and complexity of the project. Seven work packages for a EUR 5,000,000 four-year action is a judgement no tier evidences.",
+      "disposition": "Declared in working_assumptions.json under 'project_scale'. The test that would check the count skips while the registry says null, and starts failing if a later extraction fills it in below the design.",
+      "status": "Assumed"
+    },
+    {
+      "id": "F8",
+      "title": "A work package can be constrained only by a source index entry",
+      "detail": "The dev-graph predicate constrained_by runs work_package -> source, and a source is an entry of sources.json. A work package cannot declare a constraint that points directly at a Tier 2B file or at a call-extract path, even though that is where the constraint text lives.",
+      "disposition": "Constraints name sources.json entries, and the Tier 2B path and span are carried in source_ref alongside. Both are in the record; only one becomes a graph edge.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F9",
+      "title": "Two of the three demonstration realms rest on one fictional partner each",
+      "detail": "Carried from the consortium gap analysis, finding F4. The freshwater case is P07 alone and the marine case P08 alone. The composition condition survives losing either; the second scope requirement does not.",
+      "disposition": "Encoded as risks R01 and R02 with the consequence stated, and declared in the ledger under 'demonstration_case_realms'. The mitigation is honest: the realm is withdrawn and the proposal says so, rather than the case being reassigned to a partner that cannot run it.",
+      "status": "Assumed"
+    },
+    {
+      "id": "F10",
+      "title": "No effort figure and no key performance indicator target is seeded",
+      "detail": "A work plan with no person-months is incomplete for Phase 3, and twelve indicators with no targets are incomplete for Phase 5. Both were left open deliberately: a figure invented here would enter Tier 3 as a consortium decision nobody took.",
+      "disposition": "workpackage_seed.json records effort as Unresolved with the reason, impacts.json says why no target is set, and both are declared in the ledger. Phase 3, Phase 5 and the budget route resolve them.",
+      "status": "Unresolved"
+    },
+    {
+      "id": "F12",
+      "title": "A deliverable cannot depend on another deliverable",
+      "detail": "The ticket asks for deliverables and milestones that depend on each other across work packages. The dev-graph relationship set has no deliverable-to-deliverable predicate: a deliverable reaches a milestone by validated_by, and produces runs work package or task to deliverable. A deliverable that depended on another deliverable could not be expressed in the graph at all.",
+      "disposition": "Deliverables are coupled across work packages through milestones. Seven of the eight milestones gather deliverables from more than one work package, and twelve task dependencies cross a boundary. That is the strongest cross-work-package coupling the closed relationship set permits, and the seed says so rather than implying a link it cannot make.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F13",
+      "title": "The destination sets six expected impacts, and the first draft of this work said seven",
+      "detail": "The fourth bullet straddles the page break. Its tail on page 48, 'legislation and better valuation of ecosystem services, leading to transformative change towards a nature positive economy', carries no bullet marker. Counting it as a separate impact invented a call constraint the source does not make, which CLAUDE.md §13.2 forbids, and the wrong number reached eight records including the tool that generates the source index.",
+      "disposition": "Corrected everywhere. The valuation clause is now recorded inside the fourth impact as partly addressed, not as a seventh impact. tests/test_demo_architecture_seeds.py counts the bullet markers in the replayed page text and holds every record to that count, so the number can no longer be asserted without the document agreeing. Found by the two-axis review of this ticket, independently on both axes.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F11",
+      "title": "No methodology vault backs any of this",
+      "detail": "Carried from the concept note. The operator manual expects the seeds to be compiled from an authored methodology graph in vault folders 00 to 17. Instance two has none, so every mechanism in the seeds is design intent rather than a source_grounded claim.",
+      "disposition": "Recorded as risk R05 and as the reason for authoring route D1. The drafting phases must not upgrade an Assumed mechanism to Confirmed on the strength of a seed.",
+      "status": "Assumed"
+    }
+  ],
+  "status_summary": {
+    "Confirmed": "Every Tier 2B reference and every source span. They resolve in the call extract and replay byte-equal from the stored work programme.",
+    "Assumed": "Every project fact: objectives, outcomes, impact claims, work packages, tasks, deliverables, milestones, risks and every partner assignment.",
+    "Unresolved": "Effort shares, key performance indicator targets, and the valuation clause of the fourth destination expected impact.",
+    "Inferred": "None. Nothing here is derived from confirmed evidence by reasoning; it is either quoted from the call or declared as design intent."
+  },
+  "status_summary_note": "No seeded project fact carries Confirmed. CLAUDE.md §12.2 reserves Confirmed for a fact directly evidenced by a named source in Tier 1 to Tier 3, and the only Tier 3 source for these facts is the concept, which is itself the operator's intent.",
+  "recorded_in": "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json",
+  "authored_by": "Ticket 'Architecture seeds and the uncertainty ledger', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Every mechanical claim in this report is checked by tests/test_demo_architecture_seeds.py against the artifacts themselves, so the report cannot drift from what it describes."
+}

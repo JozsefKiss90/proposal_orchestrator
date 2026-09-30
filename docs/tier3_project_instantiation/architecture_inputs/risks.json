@@ -1,0 +1,184 @@
+{
+  "_provenance": {
+    "record_type": "tier3_risks",
+    "collection_key": "risks",
+    "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml declares tier3_source_schemas for selected_call, topic_mapping, compliance_profile, partners, milestones_seed and working_assumptions, and none for this file. Its shape is therefore authored to satisfy its consumers, and no schema_id is coined for it (CLAUDE.md §16.3), as partners.json, roles.json and sources.json say of their own. Consumers: the implementation_architect prompt specification, which Phase 6 reads to populate the risk register.",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
+    ],
+    "source": [
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "docs/tier3_project_instantiation/consortium/partners.json",
+      "docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json (findings F4 and F5)",
+      "docs/tier3_project_instantiation/project_brief/concept_note.md ('What this draft does not claim')"
+    ],
+    "baseline_record": "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json",
+    "authoring_route": "Authored directly as JSON. Decision D1.",
+    "field_mapping": "likelihood and impact use L, M and H. affected_work_packages names workpackage_seed.json. owner is a partner pseudonym. Phase 6 populates the full risk register from these seeds and assigns contingency owners formally.",
+    "scope_note": "Thirteen risks. Five of them (R01 to R05) come from the consortium's own recorded findings rather than from generic project-risk vocabulary, because those are the risks this design actually carries."
+  },
+  "spine_status": "pseudonymous_demo",
+  "risks": [
+    {
+      "risk_id": "R01",
+      "title": "The freshwater realm rests on one partner whose participation is unconfirmed",
+      "category": "consortium",
+      "likelihood": "M",
+      "impact": "H",
+      "affected_work_packages": ["WP4", "WP5"],
+      "owner": "P01",
+      "mitigation": "Identify a second freshwater partner before the grant agreement. If P07 does not join, the freshwater case is withdrawn and the second scope requirement is answered in two realms, not three. That is a scope change, not a delay, and the proposal states it rather than absorbing it.",
+      "validation_status": "Assumed",
+      "source_ref": "Consortium gap analysis finding F4; concept note, 'What this draft does not claim' item 2"
+    },
+    {
+      "risk_id": "R02",
+      "title": "The marine realm rests on one partner whose participation is unconfirmed",
+      "category": "consortium",
+      "likelihood": "M",
+      "impact": "H",
+      "affected_work_packages": ["WP4", "WP3"],
+      "owner": "P01",
+      "mitigation": "As R01. Losing P08 also removes the marine occurrence-record contribution of the cooperation duty, which P10 then carries alone for the terrestrial and freshwater records only.",
+      "validation_status": "Assumed",
+      "source_ref": "Consortium gap analysis finding F4"
+    },
+    {
+      "risk_id": "R03",
+      "title": "The consortium's geography is thin for a topic asking for use cases across Member States and Associated Countries",
+      "category": "eligibility",
+      "likelihood": "H",
+      "impact": "M",
+      "affected_work_packages": ["WP4", "WP7"],
+      "owner": "P01",
+      "mitigation": "Ten of twelve partners sit in three country slots and five in C1. The composition condition survives losing any one gap partner, but the geographic spread the scope asks for does not. Broaden the user network and the stakeholder work across more countries before submission.",
+      "validation_status": "Assumed",
+      "source_ref": "Consortium gap analysis finding F5; call extract $.scope_requirements[1]"
+    },
+    {
+      "risk_id": "R04",
+      "title": "The composition condition is met only under assumption",
+      "category": "eligibility",
+      "likelihood": "M",
+      "impact": "H",
+      "affected_work_packages": ["WP1"],
+      "owner": "P01",
+      "mitigation": "Every partner that adds a third country is fictional and Assumed. Confirm at least three independent beneficiaries in three countries, one of them in a Member State, before submission. The Joint Research Centre place is counted towards nothing.",
+      "validation_status": "Assumed",
+      "source_ref": "partners.json composition_condition; Tier 1 participation_rules.json"
+    },
+    {
+      "risk_id": "R05",
+      "title": "No methodology vault backs the concept, so the mechanisms are design intent rather than source-grounded claims",
+      "category": "evidence",
+      "likelihood": "H",
+      "impact": "M",
+      "affected_work_packages": ["WP2", "WP6"],
+      "owner": "P02",
+      "mitigation": "Author the methodology before drafting Part B, so the Excellence section is lifted from evidence rather than from intent. Until then every mechanism claim carries Assumed and the drafting phases must not upgrade it.",
+      "validation_status": "Assumed",
+      "source_ref": "Concept note, 'What this draft does not claim' item 4"
+    },
+    {
+      "risk_id": "R06",
+      "title": "A joint protocol is agreed late, and a campaign runs under a protocol that changes afterwards",
+      "category": "technical",
+      "likelihood": "M",
+      "impact": "H",
+      "affected_work_packages": ["WP3", "WP4", "WP5"],
+      "owner": "P10",
+      "mitigation": "Milestone MS2 gates every campaign at M16. A campaign may not start before the protocol is delivered and adopted in writing by the partner running it. A protocol change after MS2 is a revision with its own record, not an edit.",
+      "validation_status": "Assumed",
+      "source_ref": "milestones_seed.json MS2; workpackage_seed.json T4.1 dependency on T3.1"
+    },
+    {
+      "risk_id": "R07",
+      "title": "The crosswalk between occurrence, habitat and ecosystem classifications does not resolve for some habitats",
+      "category": "technical",
+      "likelihood": "H",
+      "impact": "M",
+      "affected_work_packages": ["WP3"],
+      "owner": "P10",
+      "mitigation": "Report the unresolved labels rather than forcing a mapping. An unresolvable habitat is a finding the standards bodies need, and the contribution task exists to carry it to them.",
+      "validation_status": "Assumed"
+    },
+    {
+      "risk_id": "R08",
+      "title": "Environmental DNA reference libraries are incomplete for the taxa the cases need",
+      "category": "technical",
+      "likelihood": "H",
+      "impact": "M",
+      "affected_work_packages": ["WP5"],
+      "owner": "P09",
+      "mitigation": "Build reference sequences for the gap taxa inside the project, and report the share of reads that remained unassigned. An unassigned share is a result, not a failure, provided it is measured.",
+      "validation_status": "Assumed"
+    },
+    {
+      "risk_id": "R09",
+      "title": "A field season is lost to weather, access or permitting in one of the three cases",
+      "category": "operational",
+      "likelihood": "M",
+      "impact": "M",
+      "affected_work_packages": ["WP4"],
+      "owner": "P03",
+      "mitigation": "Each campaign spans several annual cycles inside its window, so one lost season does not end a case. Secure site access and permits before the campaign starts, as part of the case selection dossier.",
+      "validation_status": "Assumed"
+    },
+    {
+      "risk_id": "R10",
+      "title": "The classification models learn the site rather than the biology",
+      "category": "technical",
+      "likelihood": "M",
+      "impact": "H",
+      "affected_work_packages": ["WP6"],
+      "owner": "P01",
+      "mitigation": "The split protocol is fixed in T6.2 before any model is trained, and site, season and treatment travel together into one fold. Benchmarks are reported under the declared split and under no other.",
+      "validation_status": "Assumed",
+      "source_ref": "workpackage_seed.json T6.2"
+    },
+    {
+      "risk_id": "R11",
+      "title": "Practitioners do not act on the indicators the decision surface delivers",
+      "category": "exploitation",
+      "likelihood": "M",
+      "impact": "M",
+      "affected_work_packages": ["WP7"],
+      "owner": "P05",
+      "mitigation": "The usability evaluation asks whether a holding could act, not whether it liked the tool. A negative result is reported, because an indicator nobody acts on is the project's finding about the indicator.",
+      "validation_status": "Assumed"
+    },
+    {
+      "risk_id": "R12",
+      "title": "The budget arrives too late or inconsistent with the work package structure, and Phase 8 stays blocked",
+      "category": "management",
+      "likelihood": "M",
+      "impact": "H",
+      "affected_work_packages": ["WP1"],
+      "owner": "P01",
+      "mitigation": "This is a lump-sum topic, so the repository computes no figure (CLAUDE.md §8.1). Prepare the budget request from the Phase 3, 4 and 6 outputs as soon as they are gated, and treat a missing response as a blocking gate failure rather than a hold state.",
+      "validation_status": "Assumed",
+      "source_ref": "Call extract $.budget_regime; CLAUDE.md §8.4"
+    },
+    {
+      "risk_id": "R13",
+      "title": "The satellite data the cases need is not available from the European programmes for a required band or revisit",
+      "category": "technical",
+      "likelihood": "L",
+      "impact": "M",
+      "affected_work_packages": ["WP4", "WP6"],
+      "owner": "P02",
+      "mitigation": "The eligibility condition requires the European programmes to be used, and permits other data in addition. Record every additional source and the reason the European data did not cover the need.",
+      "validation_status": "Assumed",
+      "source_ref": "Call extract $.eligibility_restrictions.exceptions[1]; span SRC-WP9-P73#1540-1571"
+    }
+  ],
+  "coverage_note": "Every work package is named by at least one risk. Five risks come from this branch's own recorded findings rather than from a generic register, which is what makes the register worth reading.",
+  "field_status": {
+    "risks": "Assumed. Each is the operator's judgement of a design the consortium has not confirmed.",
+    "likelihood_and_impact": "Assumed. No partner has scored these.",
+    "owners": "Assumed. Every partner's participation is Assumed.",
+    "mitigations": "Assumed. Phase 6 turns each into a measure with a trigger and a responsible party."
+  },
+  "authored_by": "Ticket 'Architecture seeds and the uncertainty ledger', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Read by Phase 6, which populates the risk register with mitigation measures. Seeds, not a finished register: no risk here carries a trigger condition or a contingency owner, which is Phase 6's output."
+}

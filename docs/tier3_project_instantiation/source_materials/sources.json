@@ -7,7 +7,7 @@
   "intake_rule": {
     "rule": "A source carries verbatim text only when that text can be re-derived from a file stored in this repository, byte for byte. Everything else is a reference: a citation, an anchor showing where the project names it, and an identifier recorded rather than resolved.",
     "why": "A source record is the one place in Tier 3 where an unevidenced claim can be made to look evidenced. A plausible citation, an invented quotation and a span pointed at it would make the graph report a grounded claim that no document supports. The builder cannot catch that, because it has no way to know whether the text is real. Byte-equal replay can.",
-    "consequence": "Sixteen of the twenty-two entries carry no text at all, so no claim in this project can be verified against a policy instrument, a dataset or a paper. That is the honest state of the evidence base, not a defect in the index.",
+    "consequence": "Sixteen of the twenty-four entries carry no text at all, so no claim in this project can be verified against a policy instrument, a dataset or a paper. That is the honest state of the evidence base, not a defect in the index.",
     "authority": "CLAUDE.md §10.5, §11.5, §12.2 and §13.3; §10.6 for the identifiers recorded from prior knowledge."
   },
   "sources": [
@@ -138,6 +138,186 @@
           "claim_refs": [],
           "span_refs": [
             "SRC-WP9-P35#131-315"
+          ],
+          "status": "Confirmed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-WP9-P47",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 47",
+      "kind": "call_document_page",
+      "status": "Confirmed",
+      "what_the_page_carries": "The destination narrative for Biodiversity and ecosystem services: the international commitments the destination serves, and the first four of its six expected impacts.",
+      "citation": {
+        "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 47.",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 47
+      },
+      "resolves_to": {
+        "class": "stored_document",
+        "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 47,
+        "what_it_holds": "Page 47 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+      },
+      "transcription": {
+        "state": "transcribed",
+        "method": "pymupdf_page_text_whitespace_normalised",
+        "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+      },
+      "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 47 of 360 R&I actions under this destination will encourage international cooperation in line with the global approach on R&I, contributing to EU international biodiversity commitments, notably those taken under the Kunming-Montreal Global Biodiversity Framework (GBF)79, which defines targets for the medium term (2030) and goals for the long term (2050). This destination will also support the Paris Agreement80, the Sustainable Development Goals81 and the United Nations agreement on biodiversity beyond national jurisdiction (BBNJ Agreement)82. Support to processes of the Intergovernmental Science-Policy Platform on Biodiversity and Ecosystem Services (IPBES)83 will be continued. Complementarities and synergies will be ensured with the activities supported by the co- funded partnerships Biodiversa+ 84 , Water4All 85 and the co-funded partnership on Agroecology86, and LIFE87 projects, particularly on nature restoration and protection. The destination supports unlocking the unique assets for research and innovation of the EU outermost regions, in line with the EU strategy for outermost regions88. Expected impact: Proposals for topics under this destination should set out a credible pathway contributing to “putting biodiversity on a path to recovery, and protecting and restoring ecosystems and their services”, and more specifically to one or more of the following expected impacts: • Knowledge on biodiversity status and trends and drivers of biodiversity loss is improved; • Innovations, methods, pathways, models and tools are available and used to protect healthy and resilient ecosystems and to restore degraded ones, ensuring the continuous provision of ecosystem services, including for adaptation and/or mitigation to climate change; • The ongoing biodiversity crisis and its consequences, notably on ecosystem functioning and their services, and the need to monitor, protect, restore and sustainably use biodiversity are better understood to better benefit the whole society in an inclusive way; • Policymakers and stakeholders, all relevant economic sectors and society are aware and well informed of relevant challenges and opportunities of biodiversity protection, restoration and sustainable use, leading to better implementation of the biodiversity 79 Kunming-Montreal Global Biodiversity Framework 80 The Paris Agreement | UNFCCC 81 THE 17 GOALS | Sustainable Development 82 BBNJ Agreement | Agreement on Marine Biological Diversity of Areas beyond National Jurisdiction 83 IPBES Home page | IPBES secretariat 84 Biodiversa + 85 Water Security for the Planet 86 Agroecology Partnership 87 LIFE - European Commission 88 COM(2022) Putting people first, securing sustainable and inclusive growth, unlocking the potential of the EU’s outermost regions",
+      "spans": [
+        {
+          "span_id": "SRC-WP9-P47#1231-1341",
+          "start": 1231,
+          "end": 1341,
+          "quote": "Expected impact: Proposals for topics under this destination should set out a credible pathway contributing to",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P47#1343-1445",
+          "start": 1343,
+          "end": 1445,
+          "quote": "putting biodiversity on a path to recovery, and protecting and restoring ecosystems and their services",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P47#1522-1610",
+          "start": 1522,
+          "end": 1610,
+          "quote": "Knowledge on biodiversity status and trends and drivers of biodiversity loss is improved",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT-1"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P47#1614-1877",
+          "start": 1614,
+          "end": 1877,
+          "quote": "Innovations, methods, pathways, models and tools are available and used to protect healthy and resilient ecosystems and to restore degraded ones, ensuring the continuous provision of ecosystem services, including for adaptation and/or mitigation to climate change",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT-2"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P47#1881-2140",
+          "start": 1881,
+          "end": 2140,
+          "quote": "The ongoing biodiversity crisis and its consequences, notably on ecosystem functioning and their services, and the need to monitor, protect, restore and sustainably use biodiversity are better understood to better benefit the whole society in an inclusive way",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT-3"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P47#2144-2399",
+          "start": 2144,
+          "end": 2399,
+          "quote": "Policymakers and stakeholders, all relevant economic sectors and society are aware and well informed of relevant challenges and opportunities of biodiversity protection, restoration and sustainable use, leading to better implementation of the biodiversity",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT-4"
+          ]
+        }
+      ],
+      "relied_on_for": [
+        {
+          "what": "The destination's expected impact statement and its first four bullets, which the impact pathways in architecture_inputs/impacts.json are mapped against.",
+          "claim_refs": [],
+          "span_refs": [
+            "SRC-WP9-P47#1231-1341",
+            "SRC-WP9-P47#1343-1445",
+            "SRC-WP9-P47#1522-1610",
+            "SRC-WP9-P47#1614-1877",
+            "SRC-WP9-P47#1881-2140",
+            "SRC-WP9-P47#2144-2399"
+          ],
+          "status": "Confirmed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-WP9-P48",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 48",
+      "kind": "call_document_page",
+      "status": "Confirmed",
+      "what_the_page_carries": "The tail of the fourth expected impact, which straddles the page break, and the destination's last two.",
+      "citation": {
+        "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 48.",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 48
+      },
+      "resolves_to": {
+        "class": "stored_document",
+        "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 48,
+        "what_it_holds": "Page 48 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+      },
+      "transcription": {
+        "state": "transcribed",
+        "method": "pymupdf_page_text_whitespace_normalised",
+        "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+      },
+      "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 48 of 360 legislation and better valuation of ecosystem services, leading to transformative change towards a nature positive economy; • Farmers, foresters, land and sea managers, fishers and aquaculture producers have access to key information, and test and implement biodiversity-friendly management practices, while safeguarding food and water security and fostering competitiveness, demonstrating the long-term sustainability of these sectors; • Progress towards international commitments worldwide on biodiversity is made. 2026 Consolidating biodiversity knowledge for nature and society Proposals are invited against the following topic(s): HORIZON-CL6-2026-01-BIODIV-01: Understanding and tackling the decline of insects Call: Call 01 - single stage (2026) Specific conditions Expected EU contribution per project The Commission estimates that an EU contribution of around EUR 6.50 million would allow these outcomes to be addressed appropriately. Nonetheless, this does not preclude submission and selection of a proposal requesting different amounts. Indicative budget The total indicative budget for the topic is EUR 13.00 million. Type of Action Research and Innovation Actions Expected Outcome: Project results are expected to contribute to all of the following expected outcomes: • researchers better understand the status and population trends of insect species and the drivers of their decline; • competent authorities in charge of biodiversity policies at all levels are capable of taking informed decisions, based on better understanding and valuation of socioeconomic benefits and ecological importance of insects, including for climate action; • society and relevant land managers are better informed and equipped to tackle the drivers of the decline of insects. Scope: Insects play a vital role contributing to ecosystem functions in addition to pollination, such as decomposition and nutrient cycles, soil formation (including carbon sequestration) and pest control, control functions essential for maintaining ecosystem complexity, and are an indispensable part of the food chain. Those functions are key for climate change mitigation",
+      "spans": [
+        {
+          "span_id": "SRC-WP9-P48#131-253",
+          "start": 131,
+          "end": 253,
+          "quote": "legislation and better valuation of ecosystem services, leading to transformative change towards a nature positive economy",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT-4"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P48#257-566",
+          "start": 257,
+          "end": 566,
+          "quote": "Farmers, foresters, land and sea managers, fishers and aquaculture producers have access to key information, and test and implement biodiversity-friendly management practices, while safeguarding food and water security and fostering competitiveness, demonstrating the long-term sustainability of these sectors",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT-5"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P48#570-646",
+          "start": 570,
+          "end": 646,
+          "quote": "Progress towards international commitments worldwide on biodiversity is made",
+          "tier2b_refs": [],
+          "claim_refs": [],
+          "requirement_refs": [
+            "DEST-IMPACT-6"
+          ]
+        }
+      ],
+      "relied_on_for": [
+        {
+          "what": "The fourth bullet's valuation clause, and the last two expected impacts, including the one about farmers and land managers that the agricultural uptake pathway answers.",
+          "claim_refs": [],
+          "span_refs": [
+            "SRC-WP9-P48#131-253",
+            "SRC-WP9-P48#257-566",
+            "SRC-WP9-P48#570-646"
           ],
           "status": "Confirmed"
         }
@@ -1480,6 +1660,6 @@
     "what_each_external_source_contains": "Assumed. Nothing is stored, so the citation describes the document without quoting it.",
     "relied_on_for_of_an_external_reference": "Assumed. The anchor shows the call names the source. It does not show the source supports the use."
   },
-  "authored_by": "tools/author_demo_sources.py, for the ticket 'Source materials and the sources index' in plans/dev_graph_demo_tickets.md, branch dev_graph_demo.",
+  "authored_by": "tools/author_demo_sources.py, for the ticket 'Source materials and the sources index' in plans/dev_graph_demo_tickets.md, branch dev_graph_demo. Pages 47 and 48 and their nine spans were added by the ticket 'Architecture seeds and the uncertainty ledger', which needed a Tier 2B ground for the impact pathways: see decision D3 in docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json.",
   "note": "Anonymity: no organisation name, person name, place, web address, grant or project identifier from instance one appears here. The web addresses are public European and international framework addresses, none of which is tied to instance one. No unpublished material and no manuscript is cited."
 }

@@ -1,0 +1,157 @@
+{
+  "_provenance": {
+    "record_type": "tier3_outcomes",
+    "collection_key": "outcomes",
+    "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml declares tier3_source_schemas for selected_call, topic_mapping, compliance_profile, partners, milestones_seed and working_assumptions, and none for this file. Its shape is therefore authored to satisfy its consumers, and no schema_id is coined for it (CLAUDE.md §16.3), as partners.json, roles.json and sources.json say of their own. Consumers: runner/phase8_canonical_pack.py (outcome_id -> id, statement -> title, linked_objectives, linked_wp_ids, linked_deliverable_ids) and the impact_architect prompt specification.",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.2 no invented call constraints, §13.3 no fabricated project facts"
+    ],
+    "source": [
+      "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "docs/tier3_project_instantiation/project_brief/concept_note.md",
+      "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json"
+    ],
+    "baseline_record": "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json",
+    "authoring_route": "Authored directly as JSON. Decision D1.",
+    "separation_note": "outputs are the deliverables of workpackage_seed.json, unchanged in id and title. outcomes are the change of state each group of outputs is meant to bring about. Phase 5 refines the separation against the Tier 2B expected outcomes and builds the impact pathways on it.",
+    "field_mapping": "runner/phase8_canonical_pack.py lifts outcome_id to id and statement to title. linked_objectives, linked_wp_ids and linked_deliverable_ids are the pack's own field names, so the lift is a rename and nothing else."
+  },
+  "spine_status": "pseudonymous_demo",
+  "outputs": [
+    {"deliverable_id": "D1.1", "title": "Data management plan and shared metadata profile", "work_package": "WP1", "due_month": 6, "validation_status": "Assumed"},
+    {"deliverable_id": "D1.2", "title": "Cooperation and coordination plan for the named data frameworks and the space-agency programme", "work_package": "WP1", "due_month": 12, "validation_status": "Assumed"},
+    {"deliverable_id": "D1.3", "title": "Final project report", "work_package": "WP1", "due_month": 48, "validation_status": "Assumed"},
+    {"deliverable_id": "D2.1", "title": "Prioritised knowledge-gap and data-need analysis", "work_package": "WP2", "due_month": 9, "validation_status": "Assumed"},
+    {"deliverable_id": "D2.2", "title": "Multisensory integration architecture specification", "work_package": "WP2", "due_month": 14, "validation_status": "Assumed"},
+    {"deliverable_id": "D2.3", "title": "Demonstration case selection dossier", "work_package": "WP2", "due_month": 15, "validation_status": "Assumed"},
+    {"deliverable_id": "D3.1", "title": "Joint data collection, metadata and processing protocols", "work_package": "WP3", "due_month": 16, "validation_status": "Assumed"},
+    {"deliverable_id": "D3.2", "title": "Interoperability crosswalk package for occurrence, habitat and ecosystem classifications", "work_package": "WP3", "due_month": 28, "validation_status": "Assumed"},
+    {"deliverable_id": "D3.3", "title": "Provenance-tracked processing pipeline release", "work_package": "WP3", "due_month": 34, "validation_status": "Assumed"},
+    {"deliverable_id": "D3.4", "title": "FAIR publication and standards contribution report", "work_package": "WP3", "due_month": 42, "validation_status": "Assumed"},
+    {"deliverable_id": "D4.1", "title": "Terrestrial case observation dataset", "work_package": "WP4", "due_month": 38, "validation_status": "Assumed"},
+    {"deliverable_id": "D4.2", "title": "Freshwater case observation dataset", "work_package": "WP4", "due_month": 38, "validation_status": "Assumed"},
+    {"deliverable_id": "D4.3", "title": "Marine case observation dataset and the airborne and satellite layer behind all three", "work_package": "WP4", "due_month": 38, "validation_status": "Assumed"},
+    {"deliverable_id": "D4.4", "title": "Cross-case verification report", "work_package": "WP4", "due_month": 40, "validation_status": "Assumed"},
+    {"deliverable_id": "D5.1", "title": "Omics sampling and analysis protocol for the three cases", "work_package": "WP5", "due_month": 20, "validation_status": "Assumed"},
+    {"deliverable_id": "D5.2", "title": "Molecular observation dataset with standardised metadata", "work_package": "WP5", "due_month": 34, "validation_status": "Assumed"},
+    {"deliverable_id": "D5.3", "title": "Genome-to-space linkage report", "work_package": "WP5", "due_month": 38, "validation_status": "Assumed"},
+    {"deliverable_id": "D6.1", "title": "Documented training and validation resource with its split protocol", "work_package": "WP6", "due_month": 28, "validation_status": "Assumed"},
+    {"deliverable_id": "D6.2", "title": "Habitat and ecosystem classification models and their case benchmarks", "work_package": "WP6", "due_month": 38, "validation_status": "Assumed"},
+    {"deliverable_id": "D6.3", "title": "European-scale maps and biodiversity trend predictions", "work_package": "WP6", "due_month": 45, "validation_status": "Assumed"},
+    {"deliverable_id": "D7.1", "title": "Policy reporting needs assessment", "work_package": "WP7", "due_month": 22, "validation_status": "Assumed"},
+    {"deliverable_id": "D7.2", "title": "Biodiversity indicator decision-support release", "work_package": "WP7", "due_month": 40, "validation_status": "Assumed"},
+    {"deliverable_id": "D7.3", "title": "Farm-management integration and usability evaluation, with the second-context protocol transfer", "work_package": "WP7", "due_month": 44, "validation_status": "Assumed"},
+    {"deliverable_id": "D7.4", "title": "Dissemination, exploitation and communication plan", "work_package": "WP7", "due_month": 48, "validation_status": "Assumed"}
+  ],
+  "transitions": [
+    {"transition_id": "TR1", "statement": "Four measurement cultures reconciled once per project and discarded, to one reconciliation that is published and reused", "validation_status": "Assumed", "source_ref": "Concept note, 'The gap the topic names'"},
+    {"transition_id": "TR2", "statement": "Habitat labels that stop at the project boundary, to labels that carry a crosswalk to the European classification and the global typology", "validation_status": "Assumed", "source_ref": "Concept note, 'The chain, from genome to space'"},
+    {"transition_id": "TR3", "statement": "Three unconnected demonstration sites, to three realms on one pressure gradient that test the same harmonisation decision", "validation_status": "Assumed", "source_ref": "Concept note, 'Three demonstration cases on one gradient'"},
+    {"transition_id": "TR4", "statement": "A field archive readable only by the group that made it, to a documented training and validation resource with a declared split protocol", "validation_status": "Assumed", "source_ref": "Concept note, 'Training and validation data'"},
+    {"transition_id": "TR5", "statement": "Case-scale habitat maps, to European coverage and trend prediction built on the case models", "validation_status": "Assumed", "source_ref": "Concept note, 'Training and validation data'"},
+    {"transition_id": "TR6", "statement": "Biodiversity indicators that reach a research portal, to indicators inside the farm-management tools of the sector that creates the pressure", "validation_status": "Assumed", "source_ref": "Concept note, 'Reaching agriculture'"}
+  ],
+  "outcomes": [
+    {
+      "outcome_id": "OC1",
+      "statement": "One multisensory integration architecture carries omics, in-situ, airborne and satellite observation, and it is specified from a prioritised account of what is missing rather than of what is available.",
+      "produced_by_outputs": ["D2.1", "D2.2", "D2.3"],
+      "linked_transitions": ["TR1"],
+      "linked_objectives": ["O1"],
+      "linked_wp_ids": ["WP2"],
+      "linked_deliverable_ids": ["D2.1", "D2.2", "D2.3"],
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[1]"],
+      "validation_status": "Assumed",
+      "source_ref": "Objectives O1; call extract $.expected_outcomes[1]",
+      "note": "The gap analysis is the outcome's load-bearing half. An architecture designed around the data that happens to exist reproduces the gap the topic describes."
+    },
+    {
+      "outcome_id": "OC2",
+      "statement": "A joint protocol set, a crosswalk package and a provenance-tracked pipeline make the project's harmonisation decisions usable outside it, and the decisions reach the bodies that maintain the classifications.",
+      "produced_by_outputs": ["D1.1", "D3.1", "D3.2", "D3.3", "D3.4"],
+      "linked_transitions": ["TR1", "TR2"],
+      "linked_objectives": ["O2"],
+      "linked_wp_ids": ["WP1", "WP3"],
+      "linked_deliverable_ids": ["D1.1", "D3.1", "D3.2", "D3.3", "D3.4"],
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[1]"],
+      "validation_status": "Assumed",
+      "source_ref": "Objectives O2; call extract $.scope_requirements[3] and [4]"
+    },
+    {
+      "outcome_id": "OC3",
+      "statement": "Three demonstration cases on one agricultural pressure gradient produce comparable observation datasets across the terrestrial, freshwater and marine realms, and a report says which harmonisation decisions survived the transfer.",
+      "produced_by_outputs": ["D4.1", "D4.2", "D4.3", "D4.4"],
+      "linked_transitions": ["TR3"],
+      "linked_objectives": ["O4"],
+      "linked_wp_ids": ["WP4"],
+      "linked_deliverable_ids": ["D4.1", "D4.2", "D4.3", "D4.4"],
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[0]"],
+      "validation_status": "Assumed",
+      "source_ref": "Objectives O4; call extract $.scope_requirements[1] and [2]",
+      "note": "The verification report is the outcome, not the three datasets. Three datasets that never met would answer the realm requirement and not the integration claim."
+    },
+    {
+      "outcome_id": "OC4",
+      "statement": "The molecular layer joins the in-situ and remote-sensing record through a published metadata standard, so a genomic observation and a satellite observation of the same place can be queried together.",
+      "produced_by_outputs": ["D5.1", "D5.2", "D5.3"],
+      "linked_transitions": ["TR1"],
+      "linked_objectives": ["O1", "O4"],
+      "linked_wp_ids": ["WP5"],
+      "linked_deliverable_ids": ["D5.1", "D5.2", "D5.3"],
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[1]"],
+      "validation_status": "Assumed",
+      "source_ref": "Objectives O1 and O4; call extract span SRC-WP9-P74#792-847"
+    },
+    {
+      "outcome_id": "OC5",
+      "statement": "A documented training and validation resource with a declared split protocol lets an external group reproduce the project's benchmarks and test its own models against them.",
+      "produced_by_outputs": ["D6.1"],
+      "linked_transitions": ["TR4"],
+      "linked_objectives": ["O3"],
+      "linked_wp_ids": ["WP6"],
+      "linked_deliverable_ids": ["D6.1"],
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[2]"],
+      "validation_status": "Assumed",
+      "source_ref": "Objectives O3; call extract span SRC-WP9-P74#952-985"
+    },
+    {
+      "outcome_id": "OC6",
+      "statement": "Habitat and ecosystem classification runs at European coverage, and biodiversity trend predictions carry the uncertainty the case benchmarks measured.",
+      "produced_by_outputs": ["D6.2", "D6.3"],
+      "linked_transitions": ["TR5"],
+      "linked_objectives": ["O5"],
+      "linked_wp_ids": ["WP6"],
+      "linked_deliverable_ids": ["D6.2", "D6.3"],
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[2]", "$.expected_outcomes[0]"],
+      "validation_status": "Assumed",
+      "source_ref": "Objectives O5; call extract span SRC-WP9-P74#1089-1164"
+    },
+    {
+      "outcome_id": "OC7",
+      "statement": "Competent authorities receive outputs shaped to the reporting obligations they carry, and agricultural holdings receive biodiversity indicators inside the tools they already use.",
+      "produced_by_outputs": ["D1.2", "D7.1", "D7.2", "D7.3", "D7.4"],
+      "linked_transitions": ["TR6"],
+      "linked_objectives": ["O6"],
+      "linked_wp_ids": ["WP1", "WP7"],
+      "linked_deliverable_ids": ["D1.2", "D7.1", "D7.2", "D7.3", "D7.4"],
+      "tier2b_expected_outcome_refs": ["$.expected_outcomes[0]", "$.expected_outcomes[1]"],
+      "validation_status": "Assumed",
+      "source_ref": "Objectives O6; call extract spans SRC-WP9-P75#1447-1556 and SRC-WP9-P74#1948-2035"
+    }
+  ],
+  "coverage": {
+    "$.expected_outcomes[0]": ["OC3", "OC6", "OC7"],
+    "$.expected_outcomes[1]": ["OC1", "OC2", "OC4", "OC7"],
+    "$.expected_outcomes[2]": ["OC5", "OC6"],
+    "note": "The call extract records the outcome list as binding: project results are expected to contribute to all three. Each is answered by at least two outcomes."
+  },
+  "field_status": {
+    "outputs": "Assumed. They are the deliverables of workpackage_seed.json and carry its status.",
+    "transitions": "Assumed. Design intent lifted from the approved concept.",
+    "outcomes": "Assumed. Each is a stated change of state, not an achieved one.",
+    "tier2b_references": "Confirmed. Each JSONPath resolves in the call extract and each span replays byte-equal."
+  },
+  "authored_by": "Ticket 'Architecture seeds and the uncertainty ledger', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Read by Phase 5, which builds the impact pathways on the outcomes here and the destination expected impacts in impacts.json. Phase 5 may refine the separation between output, transition and outcome; it may not add an outcome the objectives do not carry."
+}

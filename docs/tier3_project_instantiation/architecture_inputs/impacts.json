@@ -1,0 +1,142 @@
+{
+  "_provenance": {
+    "record_type": "tier3_impacts",
+    "collection_key": "impacts",
+    "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml declares tier3_source_schemas for selected_call, topic_mapping, compliance_profile, partners, milestones_seed and working_assumptions, and none for this file. Its shape is therefore authored to satisfy its consumers, and no schema_id is coined for it (CLAUDE.md §16.3), as partners.json, roles.json and sources.json say of their own. Consumers: the impact_architect prompt specification, and Phase 5, which cross-references the pathways to the Tier 2B expected impacts Phase 1 extracts.",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.2 no invented call constraints, §13.3 no fabricated project facts"
+    ],
+    "source": [
+      "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "docs/tier3_project_instantiation/source_materials/sources.json (SRC-WP9-P47 and SRC-WP9-P48)",
+      "docs/tier3_project_instantiation/project_brief/concept_note.md"
+    ],
+    "baseline_record": "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json",
+    "authoring_route": "Authored directly as JSON. Decision D1.",
+    "where_the_expected_impacts_come_from": "The topic's call extract carries expected outcomes and no expected impacts. The six expected impacts of this topic are set at destination level, on pages 47 and 48 of the work programme, under 'Destination - Biodiversity and ecosystem services'. Those two pages were transcribed for this seed and every bullet below quotes a span that replays byte-equal from the stored PDF. The fourth impact straddles the page break: its tail on page 48 carries no bullet marker, so it is a continuation and not a seventh impact. Decision D3.",
+    "what_is_not_here": "No Tier 2B extracted/expected_impacts.json exists yet. Phase 1 writes it, and the Phase 5 gate predicate all_impacts_mapped joins on the impact identifiers it carries. The identifiers below are this record's own, DEST-IMPACT-1 to -6, one per bullet; if Phase 1 coins different ones, the join is re-established at that point and not by renaming these. Finding F3.",
+    "kpi_rule": "Each key performance indicator measures something the project delivers and controls, and names one deliverable that exists in workpackage_seed.json. No indicator promises a change in the state of biodiversity, because no four-year project measures one."
+  },
+  "spine_status": "pseudonymous_demo",
+  "destination_expected_impacts": {
+    "pathway_statement": {
+      "quote": "putting biodiversity on a path to recovery, and protecting and restoring ecosystems and their services",
+      "span_ref": "SRC-WP9-P47#1343-1445",
+      "requirement": "The destination asks every proposal under it to set out a credible pathway contributing to this.",
+      "validation_status": "Confirmed"
+    },
+    "impacts": [
+      {"impact_ref": "DEST-IMPACT-1", "quote": "Knowledge on biodiversity status and trends and drivers of biodiversity loss is improved", "span_ref": "SRC-WP9-P47#1522-1610", "validation_status": "Confirmed"},
+      {"impact_ref": "DEST-IMPACT-2", "quote": "Innovations, methods, pathways, models and tools are available and used to protect healthy and resilient ecosystems and to restore degraded ones, ensuring the continuous provision of ecosystem services, including for adaptation and/or mitigation to climate change", "span_ref": "SRC-WP9-P47#1614-1877", "validation_status": "Confirmed"},
+      {"impact_ref": "DEST-IMPACT-3", "quote": "The ongoing biodiversity crisis and its consequences, notably on ecosystem functioning and their services, and the need to monitor, protect, restore and sustainably use biodiversity are better understood to better benefit the whole society in an inclusive way", "span_ref": "SRC-WP9-P47#1881-2140", "validation_status": "Confirmed"},
+      {"impact_ref": "DEST-IMPACT-4", "quote": "Policymakers and stakeholders, all relevant economic sectors and society are aware and well informed of relevant challenges and opportunities of biodiversity protection, restoration and sustainable use, leading to better implementation of the biodiversity", "span_ref": "SRC-WP9-P47#2144-2399", "continues_in": "SRC-WP9-P48#131-253", "validation_status": "Confirmed", "note": "The bullet straddles the page break. Its second half is the span on page 48."},
+      {"impact_ref": "DEST-IMPACT-5", "quote": "Farmers, foresters, land and sea managers, fishers and aquaculture producers have access to key information, and test and implement biodiversity-friendly management practices, while safeguarding food and water security and fostering competitiveness, demonstrating the long-term sustainability of these sectors", "span_ref": "SRC-WP9-P48#257-566", "validation_status": "Confirmed"},
+      {"impact_ref": "DEST-IMPACT-6", "quote": "Progress towards international commitments worldwide on biodiversity is made", "span_ref": "SRC-WP9-P48#570-646", "validation_status": "Confirmed"}
+    ],
+    "partly_addressed_clauses": [
+      {
+        "within_impact": "DEST-IMPACT-4",
+        "clause": "better valuation of ecosystem services, leading to transformative change towards a nature positive economy",
+        "span_ref": "SRC-WP9-P48#131-253",
+        "disposition": "The project improves the evidence a valuation rests on. It runs no valuation and claims none, because no partner carries environmental economics. Recorded as a clause of the fourth impact, not as an impact of its own: the tail on page 48 carries no bullet marker.",
+        "validation_status": "Unresolved"
+      }
+    ],
+    "note": "The destination lists six expected impacts and asks each proposal to contribute to one or more. This project maps a pathway to all six. Inside the fourth, the valuation clause is only partly addressed, and says so."
+  },
+  "impacts": [
+    {
+      "impact_id": "IMP1",
+      "title": "Biodiversity status, trends and drivers are known better across three realms",
+      "claim": "The project produces comparable observation of the same pressure gradient in farmland, freshwater ecotones and coastal waters. European-scale habitat maps and trend predictions extend that evidence beyond the cases, and each prediction carries the uncertainty the case benchmarks measured.",
+      "addresses_destination_impacts": ["DEST-IMPACT-1"],
+      "linked_outcomes": ["OC3", "OC6"],
+      "linked_objectives": ["O4", "O5"],
+      "mechanism": "Three campaigns under one protocol (WP4) feed the classification and trend models (WP6).",
+      "validation_status": "Assumed",
+      "source_ref": "Span SRC-WP9-P47#1522-1610; outcomes OC3 and OC6"
+    },
+    {
+      "impact_id": "IMP2",
+      "title": "Reusable methods and tools for ecosystem assessment are available and used",
+      "claim": "The joint protocols, the crosswalk package, the provenance-tracked pipeline and the classification models are released under FAIR terms and published to the open science cloud. A group outside the consortium can apply them without asking the consortium for anything.",
+      "addresses_destination_impacts": ["DEST-IMPACT-2"],
+      "linked_outcomes": ["OC2", "OC6"],
+      "linked_objectives": ["O2", "O5"],
+      "mechanism": "WP3 publishes the protocols, crosswalks and pipeline; WP6 publishes the models and the training resource.",
+      "validation_status": "Assumed",
+      "source_ref": "Span SRC-WP9-P47#1614-1877; outcomes OC2 and OC6",
+      "limit": "Available is delivered by the project. Used is not, and the project measures reuse rather than promising it."
+    },
+    {
+      "impact_id": "IMP3",
+      "title": "How agricultural pressure travels from land to coast is better understood",
+      "claim": "The three cases share one pressure and one measurement protocol, so the project reports how the same agricultural load registers in three realms. That is a question a single-realm study cannot ask, and the socio-economic analysis names the drivers behind the load.",
+      "addresses_destination_impacts": ["DEST-IMPACT-3"],
+      "linked_outcomes": ["OC3", "OC4"],
+      "linked_objectives": ["O1", "O4"],
+      "mechanism": "The gradient design in WP4, the pressure analysis in WP2, and the molecular layer in WP5.",
+      "validation_status": "Assumed",
+      "source_ref": "Span SRC-WP9-P47#1881-2140; outcomes OC3 and OC4"
+    },
+    {
+      "impact_id": "IMP4",
+      "title": "Reporting authorities and stakeholders receive evidence in the form their obligations take",
+      "claim": "The reporting-needs assessment runs before the outputs are designed, so a competent authority can use them without rework. The stakeholder work runs across the whole project rather than as a closing dissemination phase.",
+      "addresses_destination_impacts": ["DEST-IMPACT-4"],
+      "linked_outcomes": ["OC7"],
+      "linked_objectives": ["O6"],
+      "mechanism": "WP7 tasks T7.1 and T7.5, and the crosswalks in WP3 that make a habitat label resolvable against the reporting classifications.",
+      "validation_status": "Assumed",
+      "source_ref": "Spans SRC-WP9-P47#2144-2399 and SRC-WP9-P48#131-253; outcome OC7",
+      "limit": "The valuation clause of this bullet is only partly addressed. See destination_expected_impacts.partly_addressed_clauses."
+    },
+    {
+      "impact_id": "IMP5",
+      "title": "Agricultural holdings get biodiversity indicators inside the tools they already use",
+      "claim": "Indicators derived from the observation chain reach farm-management tools through an existing multi-country user network, and practitioners are asked whether they can act on them. The protocol transfer tests whether a second production context can run the same measurement.",
+      "addresses_destination_impacts": ["DEST-IMPACT-5"],
+      "linked_outcomes": ["OC7"],
+      "linked_objectives": ["O6"],
+      "mechanism": "WP7 tasks T7.2, T7.3 and T7.4.",
+      "validation_status": "Assumed",
+      "source_ref": "Span SRC-WP9-P48#257-566; outcome OC7",
+      "limit": "The uptake channel is a capability of one partner whose participation is Assumed. If P05 does not join, this impact loses its route to practitioners."
+    },
+    {
+      "impact_id": "IMP6",
+      "title": "European biodiversity observation reports against the international frameworks rather than beside them",
+      "claim": "Every habitat label the project publishes carries a crosswalk to the European classification and to a global ecosystem typology, and project occurrence records are published to the global data facilities the topic names. Both are what makes the evidence countable in an international assessment.",
+      "addresses_destination_impacts": ["DEST-IMPACT-6"],
+      "linked_outcomes": ["OC2"],
+      "linked_objectives": ["O2"],
+      "mechanism": "WP3 tasks T3.2 and T3.6, and the cooperation agreement in WP1 task T1.4.",
+      "validation_status": "Assumed",
+      "source_ref": "Span SRC-WP9-P48#570-646; outcome OC2"
+    }
+  ],
+  "kpis": [
+    {"kpi_id": "K01", "statement": "Biodiversity knowledge gaps prioritised, each with the data need behind it named", "measured_on": "D2.1", "impact_id": "IMP1", "validation_status": "Assumed"},
+    {"kpi_id": "K02", "statement": "Observation datasets delivered under one protocol, one per ecosystem realm", "measured_on": "D4.1", "impact_id": "IMP1", "validation_status": "Assumed", "note": "Three is the target. Each rests on a different partner, and two of the three partners are fictional and unconfirmed."},
+    {"kpi_id": "K03", "statement": "Share of the project's habitat labels that resolve to both the European classification and the global typology", "measured_on": "D3.2", "impact_id": "IMP6", "validation_status": "Assumed"},
+    {"kpi_id": "K04", "statement": "Harmonisation decisions tested in a realm that did not design them, and the share that survived", "measured_on": "D4.4", "impact_id": "IMP3", "validation_status": "Assumed"},
+    {"kpi_id": "K05", "statement": "Training and validation sets published with a declared split protocol and a reproducible benchmark", "measured_on": "D6.1", "impact_id": "IMP2", "validation_status": "Assumed"},
+    {"kpi_id": "K06", "statement": "Classification benchmark scores reported per case under the declared split, with uncertainty", "measured_on": "D6.2", "impact_id": "IMP1", "validation_status": "Assumed"},
+    {"kpi_id": "K07", "statement": "European-scale maps and trend predictions published with stated uncertainty", "measured_on": "D6.3", "impact_id": "IMP1", "validation_status": "Assumed"},
+    {"kpi_id": "K08", "statement": "Datasets and services registered in the open science cloud and the common data spaces", "measured_on": "D3.4", "impact_id": "IMP2", "validation_status": "Assumed"},
+    {"kpi_id": "K09", "statement": "Harmonisation decisions submitted to the bodies that maintain the classifications, and their disposition", "measured_on": "D3.4", "impact_id": "IMP6", "validation_status": "Assumed"},
+    {"kpi_id": "K10", "statement": "Reporting obligations for which an output is accepted by a competent authority without rework", "measured_on": "D7.1", "impact_id": "IMP4", "validation_status": "Assumed"},
+    {"kpi_id": "K11", "statement": "Agricultural holdings in the user network that evaluate the indicators, and the share reporting they could act on them", "measured_on": "D7.3", "impact_id": "IMP5", "validation_status": "Assumed"},
+    {"kpi_id": "K12", "statement": "Molecular records joinable to an in-situ and a satellite record of the same place through the published metadata", "measured_on": "D5.3", "impact_id": "IMP3", "validation_status": "Assumed"}
+  ],
+  "kpis_note": "Twelve indicators, each naming one deliverable that exists in workpackage_seed.json. None carries a target number. A target is a consortium commitment, and no partner's participation is confirmed, so a number here would be the operator's guess wearing a partner's authority. Phase 5 sets the targets once the consortium is confirmed.",
+  "field_status": {
+    "destination_expected_impacts": "Confirmed. Each quote replays byte-equal from the stored work programme at the offsets its span declares.",
+    "impact_claims": "Assumed. Each is design intent grounded in a project mechanism, not an achieved result.",
+    "kpi_statements": "Assumed. Each names a real deliverable; none carries a target.",
+    "valuation_clause": "Unresolved. The valuation clause of the fourth impact is partly addressed, with the gap stated."
+  },
+  "authored_by": "Ticket 'Architecture seeds and the uncertainty ledger', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Read by Phase 5, which builds the full impact pathway and cross-references it to the Tier 2B expected impacts Phase 1 extracts. Every claim here names the project mechanism that produces it, so no impact is asserted without a traceable activity (CLAUDE.md §7 Phase 5 gate condition)."
+}

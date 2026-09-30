@@ -18,7 +18,7 @@ rather than asserted:
   the consortium registry is either claimed by a source or declared with a reason.
   `TestEveryEntryResolves` holds the other half.
 * **no source is described as supporting a claim it does not contain.**
-  `TestNothingIsOverclaimed` is where that lives. Sixteen of the twenty-two
+  `TestNothingIsOverclaimed` is where that lives. Sixteen of the twenty-four
   entries carry no text at all, so nothing in this project can be verified
   against a policy instrument, a dataset or a paper. That is the honest state of
   the evidence base, and `TestTheHonestState` pins it so a later edit cannot
@@ -68,7 +68,7 @@ DECISION = (
 
 #: The Part 9 pages the index transcribes. Pinned so a page silently dropped from
 #: the derivation fails here rather than quietly narrowing the evidence base.
-CITED_PAGES = (34, 35, 73, 74, 75, 76)
+CITED_PAGES = (34, 35, 47, 48, 73, 74, 75, 76)
 
 
 def _json(path: Path) -> Any:
@@ -397,15 +397,20 @@ class TestTheHonestState:
         self, index: dict[str, Any], pages: list[dict[str, Any]],
         references: list[dict[str, Any]]
     ) -> None:
-        """Six transcribed pages of a call document, and sixteen references with
+        """Eight transcribed pages of a call document, and sixteen references with
         no text. Written down because it is the ticket's real result: the concept
         now cites its sources, and almost none of those citations can be checked
-        from inside this repository."""
-        assert len(pages) == 6
+        from inside this repository.
+
+        Six pages were transcribed for the concept. The architecture-seeds ticket
+        added pages 47 and 48, the destination narrative carrying the seven
+        expected impacts, because the impact pathways had no other Tier 2B
+        ground."""
+        assert len(pages) == 8
         assert len(references) == 16
         consequence = index["intake_rule"]["consequence"]
         assert "no claim" in consequence
-        assert "twenty-two" in consequence
+        assert "twenty-four" in consequence
 
     def test_the_intake_rule_states_the_byte_equal_condition(
         self, index: dict[str, Any]
@@ -486,7 +491,7 @@ class TestTheHonestState:
     ) -> None:
         answer = _json(VALIDATION_REPORT)["answer"]
         assert f"{len(all_spans)} resolved spans" in answer
-        assert len(pages) + len(references) == 22
+        assert len(pages) + len(references) == 24
 
 
 # ---------------------------------------------------------------------------

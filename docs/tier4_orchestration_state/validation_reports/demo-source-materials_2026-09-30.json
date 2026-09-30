@@ -6,7 +6,7 @@
   "authority": "CLAUDE.md §12.1 (a reviewable output names its inputs by tier and file, states its inferences and flags its assumptions) and §12.2 (the four status categories). §10.6 governs the identifiers recorded from prior knowledge. A ticket-authored report. No gate reads it.",
   "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
   "question_asked": "Does instance two's source index give the concept an evidence base, and how much of that base can be checked from inside this repository?",
-  "answer": "Twenty-two sources. Six are pages of the stored work programme PDF, transcribed and re-derived byte for byte on every check, carrying 45 resolved spans between them. Sixteen are external references — policy instruments, data infrastructures, public datasets and one paper — and not one carries text, because no copy is stored and this workspace has no verified network egress. Every one of the 23 concept claims has a span carrying its call phrase verbatim. No project claim resolves against a policy instrument, a dataset or a paper. That is the honest state of the evidence base, and finding F1 records it rather than the index papering over it.",
+  "answer": "Twenty-four sources. Eight are pages of the stored work programme PDF, transcribed and re-derived byte for byte on every check, carrying 54 resolved spans between them. Sixteen are external references — policy instruments, data infrastructures, public datasets and one paper — and not one carries text, because no copy is stored and this workspace has no verified network egress. Every one of the 23 concept claims has a span carrying its call phrase verbatim. No project claim resolves against a policy instrument, a dataset or a paper. That is the honest state of the evidence base, and finding F1 records it rather than the index papering over it.",
   "inputs": [
     {
       "tier": "Tier 2B",
@@ -64,6 +64,24 @@
       "transcribed_chars": 1687,
       "spans": 1,
       "status": "Confirmed"
+    },
+    {
+      "source_id": "SRC-WP9-P47",
+      "page": 47,
+      "carries": "The destination narrative for Biodiversity and ecosystem services: the international commitments it serves, and the first four of its six expected impacts.",
+      "transcribed_chars": 2899,
+      "spans": 6,
+      "status": "Confirmed",
+      "added_by": "The ticket 'Architecture seeds and the uncertainty ledger'."
+    },
+    {
+      "source_id": "SRC-WP9-P48",
+      "page": 48,
+      "carries": "The tail of the fourth expected impact, which straddles the page break, and the destination's last two.",
+      "transcribed_chars": 2276,
+      "spans": 3,
+      "status": "Confirmed",
+      "added_by": "The ticket 'Architecture seeds and the uncertainty ledger'."
     },
     {
       "source_id": "SRC-WP9-P73",
@@ -350,7 +368,7 @@
   "findings": [
     {
       "id": "F1",
-      "finding": "Sixteen of the twenty-two sources carry no text, so no claim in this project can be verified against a policy instrument, a dataset or a paper. The concept now cites its sources; almost none of those citations can be checked from inside this repository.",
+      "finding": "Sixteen of the twenty-four sources carry no text, so no claim in this project can be verified against a policy instrument, a dataset or a paper. The concept now cites its sources; almost none of those citations can be checked from inside this repository.",
       "status": "Unresolved",
       "disposition": "open",
       "resolution": "The operator stores the documents, or confirms the identifiers from a machine that can resolve them. Either turns a reference into a transcribable source.",
@@ -441,5 +459,13 @@
   },
   "status_summary_note": "Only the two mechanical properties are Confirmed, and they are Confirmed because a program re-derives them, not because they were reviewed. Everything that depends on a document this repository does not hold is Assumed.",
   "authored_by": "Ticket 'Source materials and the sources index', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
-  "note": "Anonymity: no organisation name, person name, place, grant or project identifier from instance one appears in this record. The web addresses are public framework addresses, none tied to instance one. runner/leakage_scan.py reports the branch OK and NOT CLEAN, unchanged by this ticket."
+  "note": "Anonymity: no organisation name, person name, place, grant or project identifier from instance one appears in this record. The web addresses are public framework addresses, none tied to instance one. runner/leakage_scan.py reports the branch OK and NOT CLEAN, unchanged by this ticket.",
+  "extended_on": {
+    "on": "2026-09-30",
+    "by": "The ticket 'Architecture seeds and the uncertainty ledger', plans/dev_graph_demo_tickets.md.",
+    "what": "Pages 47 and 48 of the work programme and their nine spans, carrying the destination's six expected impacts.",
+    "why": "The topic's call extract carries expected outcomes and no expected impacts. impacts.json maps one project pathway to each destination expected impact, and writing those impacts into Tier 3 from memory would be the fabrication CLAUDE.md §13.2 forbids. Transcribing the two pages puts them under the same byte-equal replay rule as every other span.",
+    "why_this_record_changed": "This report states counts derived from sources.json. Leaving them at the pre-extension values would make a Tier 4 record misdescribe the artifact it reports on, which is the staleness the concept ticket's cross-reference check was built to catch. The original counts are recoverable from git history; the six original rows are unchanged.",
+    "recorded_in": "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json"
+  }
 }
