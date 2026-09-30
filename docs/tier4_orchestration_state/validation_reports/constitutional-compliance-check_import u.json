@@ -1,0 +1,113 @@
+{
+  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-10-01T12:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "import uuid; print(uuid.uuid4())",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Grant Agreement Annex used as governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Invented call constraints, scope requirements, outcomes or impacts not in Tier 2B.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Invented project facts (partners, roles, capabilities) not in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Phase 8 activity commenced before the budget gate passed.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Durable decisions stored only in agent memory, not written to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Skill or workflow expanding scope to become a de facto constitutional authority.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silent phase reordering or weakening of gate conditions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalised text produced from incomplete source state without flagging the gap.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Generic programme knowledge substituted for Tier 1 source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Tier 5 outputs not traceable to Tier 1-4 inputs.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Tier 1 or Tier 2 source documents modified to reflect project assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "CLAUDE.md treated as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0
+  },
+  "timestamp": "2026-10-01T12:00:00Z",
+  "check_notes": {
+    "13.1": "Structural authority for sections is section_schema_registry.json (Tier 2A, RIA application form; sections A.4, B.3, B.3.1, B.3.2). References to 'Grant Agreement or Consortium Agreement obligations' and 'grant_agreement_implementation_articles' appear only as governance/escalation basis, not as a proposal schema. No Annex template used as structural authority.",
+    "13.2": "Call-requirement claims (SR-04 crosswalks, CC-07) carry Tier 2B references in source_basis and in traceability_footer (scope_requirements.json, call_constraints.json). Eligibility mentions in R04/R13 are contextual risk descriptions; artifact-level Tier 2B references are present. Per skill scope, only the presence of a Tier 2B reference is checked, not the referenced entry.",
+    "13.3": "Partner identifiers P01-P12, role assignments and capability statements carry Tier 3 references in the traceability_footer (consortium/partners.json, consortium/roles.json, call_binding/compliance_profile.json, call_binding/selected_call.json). WP-lead assignments trace to phase3 wp_structure.json (Tier 4, derived from Tier 3).",
+    "13.4": "Not a Phase 8 artifact (schema_id 'orch.phase6.implementation_architecture.v1'). Content scanned for confirmed budget figures (currency, EUR, person-months patterns): none present. R12 explicitly states the repository computes no figure per CLAUDE.md §8.1.",
+    "13.5": "Not checkable from artifact content alone; enforced by the decision-log-update skill. Recorded pass per skill specification.",
+    "13.6": "Not directly checkable from an artifact. Recorded pass per skill specification.",
+    "13.7": "Phase 6 artifact references only permitted upstream input phase3_wp_design (Tier 4). No references to Phase 7 or Phase 8 outputs as inputs.",
+    "13.8": "Not a Tier 5 deliverable; artifact has no validation_status field. Non-applicable. Note: artifact itself flags open items explicitly (e.g. gender-dimension Tier 2B exemption 'pending call-specific confirmation'), which is correct flagging, not a violation.",
+    "13.9": "Regulatory claims (ethics self-assessment, gender equality plan, civil focus, grant agreement implementation articles) carry Tier 1 references in source_basis and traceability_footer (implementation_constraints.json, governance_principles.json).",
+    "13.10": "Not a Tier 5 artifact. Non-applicable to a Phase 6 (Tier 4) phase output. Recorded pass per skill specification.",
+    "13.11": "Not checkable from a phase output artifact. Recorded pass per skill specification.",
+    "13.12": "Not directly checkable from an artifact. Recorded pass per skill specification. Observed: artifact cites CLAUDE.md §8.1 as binding, consistent with non-violation.",
+    "observation_out_of_scope": "The artifact carries run_id literal 'import uuid; print(uuid.uuid4())', an unresolved placeholder. This is a conformance-stamping concern outside the §13 prohibition set and is not a constitutional violation under this skill; noted for the invoking agent."
+  }
+}

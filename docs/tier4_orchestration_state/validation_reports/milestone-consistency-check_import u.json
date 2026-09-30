@@ -1,8 +1,8 @@
 {
-  "report_id": "milestone_consistency_gantt_designer_2026-10-01T00:00:00+00:00",
+  "report_id": "milestone_consistency_gantt_designer_2026-10-01T00:00:00Z",
   "skill_id": "milestone-consistency-check",
   "invoking_agent": "gantt_designer",
-  "run_id_reference": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "run_id_reference": "import uuid; print(uuid.uuid4())",
   "mode": "FULL",
   "validated_scope": [
     "wp_structure",
@@ -33,7 +33,7 @@
       "task_completion_month": 40,
       "verifiable_criterion_present": true,
       "consistency_status": "flagged",
-      "flag_reason": "Milestone due_month (22) precedes completion of all tasks in responsible WP 'WP4' (max task end_month: 40); no depends_on_tasks or milestone_type specified — flagged as heuristic",
+      "flag_reason": "Milestone due_month (22) precedes completion of all tasks in responsible WP (max task end_month: 40); no depends_on_tasks or milestone_type specified — flagged as heuristic",
       "flag_class": "heuristic"
     },
     {
@@ -87,5 +87,5 @@
     "passed": 7,
     "flagged": 1
   },
-  "timestamp": "2026-10-01T00:00:00+00:00"
+  "timestamp": "2026-10-01T00:00:00Z"
 }

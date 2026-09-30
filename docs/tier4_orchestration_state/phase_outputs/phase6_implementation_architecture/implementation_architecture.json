@@ -1,6 +1,6 @@
 {
   "schema_id": "orch.phase6.implementation_architecture.v1",
-  "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "run_id": "import uuid; print(uuid.uuid4())",
   "governance_matrix": [
     {
       "body_name": "General Assembly",
@@ -18,240 +18,231 @@
         "P11",
         "P12"
       ],
-      "decision_scope": "Strategic and contractual decisions for the consortium: changes to the work plan, redistribution of resources between partners, changes in consortium composition, and amendments to the consortium agreement. The General Assembly is the final internal decision authority.",
-      "meeting_frequency": "Once a year, with extraordinary sessions convened at the coordinator's request.",
-      "escalation_path": "Unresolved matters remain with the General Assembly as the final internal authority. Contractual disputes are handled under the consortium agreement, which complements the grant agreement and contains no provision contrary to it.",
+      "decision_scope": "Strategic direction, approval of project plans and their major revisions, budget reallocation between partners, consortium membership changes, and resolution of matters escalated from the management board.",
+      "meeting_frequency": "Annual, with extraordinary sessions convened on request of the coordinator or any partner.",
+      "escalation_path": "This is the final internal decision body. Matters the Project Management Board cannot resolve are escalated here. Decisions that engage Grant Agreement or Consortium Agreement obligations are routed through the coordinator and handled under the consortium agreement.",
       "source_basis": [
-        "Tier 3 docs/tier3_project_instantiation/consortium/partners.json — all twelve partner_id values supply the composition.",
-        "Tier 1 governance_principles.json consortium_agreement_guidance — escalation wording tied to the rule that a consortium agreement complements and does not contradict the grant agreement."
+        "docs/tier1_normative_framework/extracted/governance_principles.json: consortium_agreement_guidance, escalation_path_constraint",
+        "docs/tier3_project_instantiation/consortium/partners.json: twelve-partner consortium P01-P12",
+        "docs/tier3_project_instantiation/consortium/roles.json: coordinator P01"
       ],
-      "assumption_note": "Body name and meeting frequency are not specified in Tier 3 and are not prescribed in Tier 1 extracted (no_prescribed_governance_body_names, no_prescribed_meeting_frequency). Both are selected as project-operational assumptions."
+      "assumption_note": "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted; selected as a project-operational assumption. The body name is a project-operational choice, since governance_principles.json records no_prescribed_governance_body_names: true."
     },
     {
-      "body_name": "Executive Board",
+      "body_name": "Project Management Board",
       "composition": [
         "P01",
         "P02",
-        "P10",
         "P03",
+        "P05",
         "P09",
-        "P12",
-        "P05"
+        "P10",
+        "P12"
       ],
-      "decision_scope": "Day-to-day operational management: cross-work-package coordination, monitoring of progress and deliverable quality, risk tracking, and preparation of decisions for the General Assembly. Members are the coordinator and the seven work-package leads.",
-      "meeting_frequency": "Quarterly, with additional calls when a risk or dependency requires one.",
-      "escalation_path": "Strategic, budgetary, or contractual matters that exceed operational management are referred to the General Assembly.",
+      "decision_scope": "Operational management, cross-work-package coordination, timeline and critical-path monitoring, risk monitoring, and quality management. Composition is the coordinator and the seven work package leads.",
+      "meeting_frequency": "Quarterly, aligned with reporting and deliverable milestones.",
+      "escalation_path": "Task and work package issues are raised by work package leads to this board. Issues the board cannot resolve are escalated to the General Assembly. This is a project governance route, not a programme rule.",
       "source_basis": [
-        "Tier 3 docs/tier3_project_instantiation/consortium/roles.json — coordinator P01 and scientific and technical coordinator P02.",
-        "Tier 4 docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — work-package lead_partner values P01 (WP1), P02 (WP2), P10 (WP3), P03 (WP4), P09 (WP5), P12 (WP6), P05 (WP7)."
+        "docs/tier3_project_instantiation/consortium/roles.json: coordinator and management roles",
+        "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: work_packages[].lead_partner, partner_role_matrix",
+        "docs/tier1_normative_framework/extracted/governance_principles.json: escalation_path_constraint"
       ],
-      "assumption_note": "Body name and quarterly cadence are not prescribed in Tier 1 extracted and not fixed in Tier 3; both are project-operational assumptions. Composition is derived from confirmed WP lead assignments."
+      "assumption_note": "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted; selected as a project-operational assumption. Body name is a project-operational choice per no_prescribed_governance_body_names: true."
     },
     {
-      "body_name": "Scientific and Technical Committee",
+      "body_name": "Data, Interoperability and Standards Committee",
       "composition": [
+        "P10",
         "P02",
         "P09",
         "P12",
-        "P10",
-        "P01"
+        "P04"
       ],
-      "decision_scope": "Scientific and technical direction: the multisensory integration architecture, the joint protocols, and the harmonisation and standards decisions taken to the standards bodies. Chaired by the scientific and technical coordinator.",
-      "meeting_frequency": "Every two months during protocol and architecture design, easing to quarterly thereafter.",
-      "escalation_path": "Technical decisions with budget or timeline consequences are referred to the Executive Board.",
+      "decision_scope": "Metadata profile, occurrence/habitat/typology crosswalks, FAIR publication decisions, open science and EOSC/Common Data Spaces linkage, and contributions to standards bodies.",
+      "meeting_frequency": "Bimonthly during the protocol and crosswalk work, adjusted to demonstration-case schedules.",
+      "escalation_path": "Cross-cutting interoperability decisions that affect budget or timeline are escalated to the Project Management Board. This is a project governance route consistent with the Tier 1 implementation provisions.",
       "source_basis": [
-        "Tier 3 docs/tier3_project_instantiation/consortium/roles.json — scientific_and_technical_coordinator P02, omics_integration_lead P09, analytics_and_prediction_lead P12, data_management_and_interoperability_lead P10."
+        "docs/tier3_project_instantiation/consortium/roles.json: data_management_and_interoperability_lead P10, coordination_interfaces",
+        "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP3 tasks and leads",
+        "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json: CC-07",
+        "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json: SR-04",
+        "docs/tier1_normative_framework/extracted/governance_principles.json: grant_agreement_implementation_articles"
       ],
-      "assumption_note": "Body name and meeting cadence are project-operational assumptions; Tier 1 extracted prescribes neither. Composition is drawn from confirmed Tier 3 role holders."
-    },
-    {
-      "body_name": "Data, Ethics and Open Science Group",
-      "composition": [
-        "P10",
-        "P01",
-        "P11"
-      ],
-      "decision_scope": "The data management plan and shared metadata profile, FAIR data delivery and open science compliance, and oversight of ethics and data protection. It owns the interoperability and publication decisions linking observation data to relevant data infrastructures, including the European Open Science Cloud where applicable.",
-      "meeting_frequency": "Quarterly, aligned with data management plan updates.",
-      "escalation_path": "Compliance risks are referred to the Executive Board and, where contractual, to the General Assembly.",
-      "source_basis": [
-        "Tier 3 docs/tier3_project_instantiation/consortium/roles.json — data_management_and_interoperability_lead P10, policy_and_stakeholder_lead P11; WP1 task T1.5 (ethics, data protection and open science) responsible partner P01 in wp_structure.json.",
-        "Tier 2B docs/tier2b_topic_and_call_sources/extracted/call_constraints.json CC-08 (FAIR data linked to EOSC, European Common Data Spaces and SAGE) and scope_requirements.json SR-04 and SR-05 (FAIR data, harmonisation workflows and joint protocols) ground the open-science decision scope."
-      ],
-      "assumption_note": "Body name and cadence are project-operational assumptions; Tier 1 extracted prescribes neither. The open-science scope is grounded in Tier 2B, not treated as a generic programme practice."
+      "assumption_note": "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted; selected as a project-operational assumption. Body name is a project-operational choice per no_prescribed_governance_body_names: true."
     }
   ],
   "management_roles": [
     {
-      "role_id": "COORD",
+      "role_id": "MR-COORD",
       "role_name": "Coordinator",
       "assigned_to": "P01",
       "responsibilities": [
-        "Legal and financial coordination and the interface to the granting authority.",
-        "Consortium governance and chairing of the General Assembly and Executive Board.",
-        "Ethics, data protection and open science compliance (WP1 task T1.5)."
+        "Legal and financial coordination of the consortium",
+        "Consortium governance and the interface to the granting authority",
+        "Chairing the General Assembly and the Project Management Board"
       ]
     },
     {
-      "role_id": "STC",
+      "role_id": "MR-SCITECH",
       "role_name": "Scientific and technical coordinator",
       "assigned_to": "P02",
       "responsibilities": [
-        "The observation chain from in-situ measurement through aerial survey to satellite earth observation.",
-        "Sensor harmonisation underpinning the integration architecture.",
-        "Chairing the Scientific and Technical Committee."
+        "Owns the observation chain from in-situ measurement through aerial survey to satellite earth observation",
+        "Sensor harmonisation the integration rests on"
       ]
     },
     {
-      "role_id": "DMIL",
+      "role_id": "MR-DATA",
       "role_name": "Data management and interoperability lead",
       "assigned_to": "P10",
       "responsibilities": [
-        "Data management plan, metadata profile and standard crosswalks.",
-        "Publication of the project's occurrence and habitat data to relevant data infrastructures."
+        "Data management plan and shared metadata profile",
+        "Standard crosswalks and publication of occurrence and habitat data",
+        "Chairing the Data, Interoperability and Standards Committee"
       ]
     },
     {
-      "role_id": "OIL",
+      "role_id": "MR-OMICS",
       "role_name": "Omics integration lead",
       "assigned_to": "P09",
       "responsibilities": [
-        "Integration of the genomic, transcriptomic and environmental DNA layers into the harmonisation workflow.",
-        "Ownership of the omics metadata standard."
+        "Integrates genomic, transcriptomic and environmental DNA layers into the harmonisation workflow",
+        "Owns the omics metadata standard"
       ]
     },
     {
-      "role_id": "APL",
+      "role_id": "MR-ANALYTICS",
       "role_name": "Analytics and prediction lead",
       "assigned_to": "P12",
       "responsibilities": [
-        "Habitat and ecosystem classification and scaling to European coverage.",
-        "Biodiversity trend prediction with stated uncertainty."
+        "Habitat and ecosystem classification and scaling to European coverage",
+        "Biodiversity trend prediction with stated uncertainty"
       ]
     },
     {
-      "role_id": "DCLT",
+      "role_id": "MR-DEMO-TERR",
       "role_name": "Demonstration case lead, terrestrial",
       "assigned_to": "P03",
       "responsibilities": [
-        "The agricultural and grassland demonstration case.",
-        "Conversion of the field archive into documented training and validation sets."
+        "Runs the agricultural and grassland demonstration case",
+        "Converts the field archive into documented training and validation sets"
       ]
     },
     {
-      "role_id": "DCLF",
+      "role_id": "MR-DEMO-FRESH",
       "role_name": "Demonstration case lead, freshwater",
       "assigned_to": "P07",
       "responsibilities": [
-        "The freshwater demonstration case.",
-        "The floodplain and riparian ecotone observations."
+        "Runs the freshwater demonstration case",
+        "Runs the floodplain and riparian ecotone observations"
       ]
     },
     {
-      "role_id": "DCLM",
+      "role_id": "MR-DEMO-MARINE",
       "role_name": "Demonstration case lead, marine",
       "assigned_to": "P08",
       "responsibilities": [
-        "The coastal and transitional-waters demonstration case.",
-        "Marine habitat mapping and marine reporting indicators."
+        "Runs the coastal and transitional-waters demonstration case",
+        "Runs the marine habitat mapping"
       ]
     },
     {
-      "role_id": "SRL",
+      "role_id": "MR-SOFTWARE",
       "role_name": "Software and reproducibility lead",
       "assigned_to": "P04",
       "responsibilities": [
-        "Processing pipelines and provenance tracking.",
-        "Reproducible inference across the demonstration cases."
+        "Processing pipelines and provenance tracking",
+        "Reproducible inference across the demonstration cases"
       ]
     },
     {
-      "role_id": "EUL",
+      "role_id": "MR-EXPLOIT",
       "role_name": "Exploitation and uptake lead",
       "assigned_to": "P05",
       "responsibilities": [
-        "Carrying the biodiversity indicators into farm-management tools.",
-        "Running the uptake channel into the agricultural sector."
+        "Carries the biodiversity indicators into farm-management tools",
+        "Runs the uptake channel into the agricultural sector"
       ]
     },
     {
-      "role_id": "PSL",
+      "role_id": "MR-POLICY",
       "role_name": "Policy and stakeholder lead",
       "assigned_to": "P11",
       "responsibilities": [
-        "Translating reporting requirements into data needs.",
-        "Analysing the pressures the demonstration cases address and running stakeholder engagement."
+        "Translates reporting requirements into data needs",
+        "Analyses the pressures the demonstration cases address",
+        "Runs stakeholder engagement"
       ]
     },
     {
-      "role_id": "PTL",
+      "role_id": "MR-PROTOCOL",
       "role_name": "Protocol transfer lead",
       "assigned_to": "P06",
       "responsibilities": [
-        "Transfer of the measurement protocols to a second production context and a second country."
+        "Transfers the measurement protocols to a second production context and a second country"
       ]
     },
     {
       "role_id": "WPL-WP1",
-      "role_name": "Work package 1 lead — Coordination, governance and the interoperability interface",
+      "role_name": "Work package lead, WP1 Coordination, governance and the interoperability interface",
       "assigned_to": "P01",
       "responsibilities": [
-        "Lead of WP1 per wp_structure.json lead_partner P01.",
-        "Consortium governance, reporting and quality management."
+        "Leads WP1 objectives, tasks and deliverables",
+        "Consistent with wp_structure.json lead_partner for WP1"
       ]
     },
     {
       "role_id": "WPL-WP2",
-      "role_name": "Work package 2 lead — Knowledge gaps, data needs and the integration architecture",
+      "role_name": "Work package lead, WP2 Knowledge gaps, data needs and the integration architecture",
       "assigned_to": "P02",
       "responsibilities": [
-        "Lead of WP2 per wp_structure.json lead_partner P02.",
-        "Specification of the multisensory integration architecture."
+        "Leads WP2 objectives, tasks and deliverables",
+        "Consistent with wp_structure.json lead_partner for WP2"
       ]
     },
     {
       "role_id": "WPL-WP3",
-      "role_name": "Work package 3 lead — Joint protocols, metadata and interoperability crosswalks",
+      "role_name": "Work package lead, WP3 Joint protocols, metadata and interoperability crosswalks",
       "assigned_to": "P10",
       "responsibilities": [
-        "Lead of WP3 per wp_structure.json lead_partner P10.",
-        "Joint protocols, crosswalks and FAIR publication."
+        "Leads WP3 objectives, tasks and deliverables",
+        "Consistent with wp_structure.json lead_partner for WP3"
       ]
     },
     {
       "role_id": "WPL-WP4",
-      "role_name": "Work package 4 lead — Demonstration and verification cases along the pressure gradient",
+      "role_name": "Work package lead, WP4 Demonstration and verification cases along the pressure gradient",
       "assigned_to": "P03",
       "responsibilities": [
-        "Lead of WP4 per wp_structure.json lead_partner P03.",
-        "Cross-case verification of harmonisation decisions."
+        "Leads WP4 objectives, tasks and deliverables",
+        "Consistent with wp_structure.json lead_partner for WP4"
       ]
     },
     {
       "role_id": "WPL-WP5",
-      "role_name": "Work package 5 lead — The omics and molecular observation layer",
+      "role_name": "Work package lead, WP5 The omics and molecular observation layer",
       "assigned_to": "P09",
       "responsibilities": [
-        "Lead of WP5 per wp_structure.json lead_partner P09.",
-        "Environmental DNA, sequencing and the genome-to-space linkage."
+        "Leads WP5 objectives, tasks and deliverables",
+        "Consistent with wp_structure.json lead_partner for WP5"
       ]
     },
     {
       "role_id": "WPL-WP6",
-      "role_name": "Work package 6 lead — Training resources, habitat mapping and trend prediction",
+      "role_name": "Work package lead, WP6 Training resources, habitat mapping and trend prediction",
       "assigned_to": "P12",
       "responsibilities": [
-        "Lead of WP6 per wp_structure.json lead_partner P12.",
-        "Training resources, classification models and European-scale prediction."
+        "Leads WP6 objectives, tasks and deliverables",
+        "Consistent with wp_structure.json lead_partner for WP6"
       ]
     },
     {
       "role_id": "WPL-WP7",
-      "role_name": "Work package 7 lead — Policy uptake, sectoral mainstreaming and exploitation",
+      "role_name": "Work package lead, WP7 Policy uptake, sectoral mainstreaming and exploitation",
       "assigned_to": "P05",
       "responsibilities": [
-        "Lead of WP7 per wp_structure.json lead_partner P05.",
-        "Decision-support integration, dissemination and exploitation planning."
+        "Leads WP7 objectives, tasks and deliverables",
+        "Consistent with wp_structure.json lead_partner for WP7"
       ]
     }
   ],
@@ -349,7 +340,7 @@
     {
       "risk_id": "R11",
       "description": "Practitioners do not act on the indicators the decision surface delivers",
-      "category": "external",
+      "category": "other",
       "likelihood": "medium",
       "impact": "medium",
       "mitigation": "The usability evaluation asks whether a holding could act, not whether it liked the tool. A negative result is reported, because an indicator nobody acts on is the project's finding about the indicator. [Affects: WP7 (Policy uptake, sectoral mainstreaming and exploitation)]",
@@ -375,9 +366,48 @@
     }
   ],
   "ethics_assessment": {
-    "ethics_issues_identified": false,
-    "issues": [],
-    "self_assessment_statement": "The applicants complete the ethics self-assessment required for every Horizon Europe application, consistent with the Tier 1 rule that applicants must complete an ethics self-assessment as part of the application. The Tier 3 compliance_profile.json records ethics_review_required: false as a compliance flag derived during call binding; no Tier 2B extracted source path cites a mandatory ethics review as a topic-specific condition for this call. No human, human-embryo, human-cell, animal, or clinical ethics issue is identified for the planned biodiversity observation work at this stage. The project focuses exclusively on civil applications, consistent with the Tier 1 civil-focus constraint. Any personal-data processing is limited and is handled under the data protection and open science compliance task in WP1 (task T1.5). Integration of the gender dimension in research and innovation content follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance. No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation. A gender equality plan is required at grant signature under the Tier 1 eligibility rule for public bodies, research organisations and higher education establishments in Member States and Associated Countries; the Tier 3 compliance_profile.json gender_plan_required flag is consistent with that rule. Should any ethics issue be triggered during implementation, the applicants will complete the ethics self-assessment in Part A Section 4 and provide an extended annex where needed."
+    "ethics_issues_identified": true,
+    "issues": [
+      {
+        "issue_id": "ETH-ENV",
+        "category": "Environment, health and safety",
+        "description": "Field campaigns in terrestrial, freshwater and marine ecosystems may touch protected areas, endangered species and ecotones. Proportionality of sampling and compliance with nature-protection legislation are assessed.",
+        "source_basis": [
+          "docs/tier1_normative_framework/extracted/implementation_constraints.json: ethics_appraisal_summary, civil_focus_constraint",
+          "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP4 tasks T4.1-T4.3, WP5 task T5.1"
+        ]
+      },
+      {
+        "issue_id": "ETH-DATA",
+        "category": "Personal data",
+        "description": "Stakeholder engagement and evaluation of farm-management tools with users may involve processing of personal data. Data-protection rules apply to collection, storage and further use.",
+        "source_basis": [
+          "docs/tier1_normative_framework/extracted/implementation_constraints.json: ethics_appraisal_summary",
+          "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP7 tasks T7.3, T7.5"
+        ]
+      },
+      {
+        "issue_id": "ETH-AI",
+        "category": "Artificial intelligence",
+        "description": "AI-assisted habitat and ecosystem classification and biodiversity trend prediction are screened for human-rights and values concerns and for how they are addressed, per the ethics appraisal.",
+        "source_basis": [
+          "docs/tier1_normative_framework/extracted/implementation_constraints.json: ethics_appraisal_summary",
+          "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP6 tasks T6.3-T6.5"
+        ]
+      },
+      {
+        "issue_id": "ETH-BIO",
+        "category": "Biological material and environmental DNA",
+        "description": "Environmental DNA sampling, metabarcoding and reference-library work are screened for biological-material handling and associated data-governance implications.",
+        "source_basis": [
+          "docs/tier1_normative_framework/extracted/implementation_constraints.json: ethics_appraisal_summary",
+          "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP5 tasks T5.1-T5.2"
+        ]
+      }
+    ],
+    "self_assessment_statement": "The consortium completes an ethics self-assessment as part of the application, as required by the Tier 1 implementation constraints. The project focuses exclusively on civil applications. Field campaigns in terrestrial, freshwater and marine ecosystems may touch protected areas and species, so environmental ethics and the relevant legislation are assessed. Environmental DNA sampling and omics work are screened for biological-material and data-handling implications. AI-based habitat mapping and biodiversity trend prediction are screened for human-rights and values concerns under the ethics appraisal. Personal data arising from stakeholder engagement and farm-management tool evaluation are processed under data-protection rules. Integration of the gender dimension in research and innovation content follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance. No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation. Partners that are public bodies, research organisations or higher education establishments in Member States and Associated Countries maintain a gender equality plan, per the Tier 1 eligibility rule.",
+    "ethics_review_status_basis": "The Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding; no Tier 2B extracted source path cites ethics review as a topic-specific mandate for this call. The self-assessment requirement itself is grounded in Tier 1 implementation_constraints.json (ethics_self_assessment_required).",
+    "gender_plan_basis": "The Tier 3 compliance_profile.json records gender_plan_required: true. This is grounded in Tier 1 implementation_constraints.json (gender_equality_plan_eligibility), not asserted as a call-specific mandate."
   },
   "instrument_sections_addressed": [
     {
@@ -388,12 +418,12 @@
     {
       "section_id": "B.3",
       "section_name": "Quality and efficiency of the implementation",
-      "status": "addressed"
+      "status": "partially_addressed"
     },
     {
       "section_id": "B.3.1",
       "section_name": "Work plan and resources",
-      "status": "addressed"
+      "status": "partially_addressed"
     },
     {
       "section_id": "B.3.2",
@@ -419,10 +449,11 @@
         "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json",
         "relevant_fields": [
           "ethics_self_assessment_required",
-          "gender_dimension_in_content",
+          "ethics_appraisal_summary",
           "gender_equality_plan_eligibility",
-          "civil_focus_constraint",
-          "dissemination_and_exploitation_requirement"
+          "gender_management_balance_guidance",
+          "gender_dimension_in_content",
+          "civil_focus_constraint"
         ]
       },
       {
@@ -431,23 +462,23 @@
         "relevant_fields": [
           "instruments[].instrument_type=RIA",
           "sections[].section_id",
-          "sections[].section_type",
-          "sections[].mandatory"
+          "sections[].section_name",
+          "sections[].mandatory",
+          "sections[].section_type"
         ]
       },
       {
         "tier": 2,
         "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
         "relevant_fields": [
-          "SR-04",
-          "SR-05"
+          "SR-04"
         ]
       },
       {
         "tier": 2,
         "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
         "relevant_fields": [
-          "CC-08"
+          "CC-07"
         ]
       },
       {
@@ -455,15 +486,16 @@
         "source_path": "docs/tier3_project_instantiation/consortium/partners.json",
         "relevant_fields": [
           "partners[].partner_id",
-          "coordinator"
+          "partners[].organisation_type",
+          "partners[].country_slot_class"
         ]
       },
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/consortium/roles.json",
         "relevant_fields": [
-          "management_roles[].role",
-          "management_roles[].partner_id"
+          "management_roles[]",
+          "coordination_interfaces[]"
         ]
       },
       {
