@@ -1,0 +1,185 @@
+{
+  "record_type": "decision",
+  "id": "demo-concept",
+  "date": "2026-09-30",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Project concept for operator approval' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §12.2 (the four status categories), §13.2 (no invented call constraint), §13.3 (no invented project fact), §10.5 (a material claim names its tier source) and §11.5 (a gap is flagged, not filled). Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "The instance-two concept is approved. The project builds one observation chain from molecules to satellites and runs it along a single agricultural pressure gradient, from farmland through the freshwater ecotones receiving its runoff to the coastal transitional waters downstream. The three ecosystem realms the scope requires therefore sit on one causal chain rather than on three unconnected sites. The operator chose gap option 1, all twelve partners, and set the duration at 48 months. No acronym is coined.",
+  "operator_decisions": [
+    {
+      "question_id": "OD1",
+      "question": "How are the capability gaps against the topic closed?",
+      "options_put": [
+        "Option 1 — add the gap-filling partners: all twelve",
+        "Option 2 — narrow to terrestrial ecosystems: the derived six",
+        "Option 3 — mixed: add P07, P08 and P09 only"
+      ],
+      "decision": "Option 1, all twelve partners.",
+      "reasoning": "The second scope requirement is not severable. It asks for capabilities across terrestrial, freshwater and marine ecosystems, and option 2 drops two realms and fails the Tier 1 composition condition outright. Option 3 covers the realms but leaves four cross-cutting duties without a holder: the in-situ framework cooperation, the typology crosswalks, the open science cloud link and the policy-reporting alignment. Option 1 is also the only option that matches the consortium already authored, so no Tier 3 artifact needs rework.",
+      "consequence": "Half the consortium is fictional and every partner carries Assumed, so the composition condition is met only under assumption. That is the demo's purpose: it exercises the uncertainty ledger on a full-size consortium.",
+      "recorded_in": "project_summary.json gap_option_decision"
+    },
+    {
+      "question_id": "OD2",
+      "question": "What project duration does the project assume? Tier 2B sets none.",
+      "options_put": ["36 months", "48 months", "60 months"],
+      "decision": "48 months.",
+      "reasoning": "The terrestrial case needs the multi-season field archive reworked and two further growing seasons measured under the harmonised protocol. The freshwater and marine cases start only once that protocol exists, and each needs a full annual cycle. European scaling and validation need a year after that. At 36 months the cross-realm cycle collapses to one season, which puts the third expected outcome at risk. At 60 months the same EUR 5,000,000 covers a longer burn.",
+      "consequence": "Written to selected_call.json as project_duration_months, marked Assumed, and declared under key project_duration in working_assumptions.json. Phase 3 and Phase 4 can now read it. It can never become Confirmed, because Tier 2B carries no duration for this topic to evidence it.",
+      "recorded_in": "selected_call.json project_duration; working_assumptions.json key project_duration"
+    },
+    {
+      "question_id": "OD3",
+      "question": "Does the project carry an acronym?",
+      "options_put": ["Leave it Unresolved", "Set one"],
+      "decision": "No acronym. The field stays null and Unresolved.",
+      "reasoning": "An acronym is a project identifier, which is one of the categories this branch's anonymity constraint names. An invented one could collide with a real grant. Instance two is a demonstration and is never submitted, so nothing downstream needs one before Phase 8, which is hard-blocked for this topic anyway.",
+      "consequence": "project_summary.json concept.acronym stays null with acronym_status Unresolved.",
+      "recorded_in": "project_summary.json concept.acronym_note"
+    },
+    {
+      "question_id": "OD4",
+      "question": "Is the concept approved, approved with changes, or rejected?",
+      "options_put": ["Approved", "Approved with changes", "Rejected"],
+      "decision": "Approved.",
+      "reasoning": "The draft answers all three expected outcomes, all five scope requirements, all three ecosystem realms and all nine cross-cutting requirements the call extract records, with every call phrase traced to the span it sits in and every capability traced to partners.json. The weaknesses it carries are stated rather than argued away.",
+      "consequence": "The human gate is satisfied. The source materials ticket and the architecture seeds ticket are unblocked. The three brief artifacts are frozen.",
+      "recorded_in": "project_summary.json approval"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "The concept anchors on one agricultural pressure gradient, and the three ecosystem realms are demonstrated along it rather than at three unrelated sites.",
+      "reasoning": "The derived six carry a deep agricultural measurement base, and the topic names agriculture both as a pressure on ecosystems and as a sector biodiversity data must reach. A shared gradient means a harmonisation decision taken in farmland is tested twice more, in realms that did not design it. That is evidence of integration. Three unconnected cases would assert integration without testing it.",
+      "recorded_in": "concept_note.md 'Three demonstration cases on one gradient'; project_summary.json concept.why_this_anchor and claim C04."
+    },
+    {
+      "id": "D2",
+      "decision": "Every phrase the concept takes from the call is quoted verbatim and carries the span reference it sits in. The prose states the convention: text in double quotes is a verbatim slice of the Tier 2B call extract.",
+      "reasoning": "§13.2 forbids inventing a call constraint, and §10.5 asks a material claim to name its tier source. A paraphrase cannot be checked, and a keyword match would pass on a phrase the call never used in that sense. A byte-level check on the span the claim itself names is the strongest form available without a Tier 2B extracted/ file, which Phase 1 has not yet written.",
+      "recorded_in": "project_summary.json concept_claims; tests/test_demo_concept.py TestCallPhrases."
+    },
+    {
+      "id": "D3",
+      "decision": "Every capability the concept rests on is an exact capability string from partners.json, named with its partner.",
+      "reasoning": "§13.3 forbids inventing a project fact. A concept sentence is the easiest place for a capability nobody recorded to enter Tier 3, because prose reads as design rather than as a claim. Exact-string matching makes that impossible to do accidentally.",
+      "recorded_in": "project_summary.json capability_refs; tests/test_demo_concept.py TestCapabilityClaims."
+    },
+    {
+      "id": "D4",
+      "decision": "No concept claim is marked Confirmed. Only the call phrases and the bound topic are.",
+      "reasoning": "§12.2 reserves Confirmed for a fact a named Tier 1 to Tier 3 source directly evidences. A call phrase qualifies, because the call extract carries it verbatim. The concept itself is design intent, and it rests on capabilities belonging to partners whose participation nobody has confirmed. The operator's approval and gap-option choice are Confirmed as operator acts evidenced by this record, which is a different thing from a claim about the project.",
+      "recorded_in": "project_summary.json field_status and field_status_note."
+    },
+    {
+      "id": "D5",
+      "decision": "The duration is written into selected_call.json as project_duration_months, marked Assumed, even though that file otherwise holds call-scoped facts only.",
+      "reasoning": "runner/dependency_normalizer.py and runner/predicates/timeline_predicates.py read the field from that file and nowhere else, and the artifact schema marks it required. The Tier 2B intake ticket left it absent on purpose and handed the write to this ticket, which is where the operator decision was taken. Marking it Assumed and recording its basis in the same file keeps a reader from mistaking an operator choice for a call constraint. The alternative, leaving it absent, would block Phase 3 and Phase 4 on a question the operator has already answered.",
+      "recorded_in": "selected_call.json project_duration and notes."
+    },
+    {
+      "id": "D6",
+      "decision": "The three brief artifacts are frozen. Their fingerprints are recorded below and checked by tests/test_demo_concept.py.",
+      "reasoning": "The operator manual's freeze rule makes the founding documents immutable once instantiation is complete, because the phases gate on them. A rule nobody checks is a convention. A recorded fingerprint turns it into a test that fails when a later ticket edits a frozen file, which is the point at which the edit is still cheap to reverse. working_assumptions.json stays editable, as the rule allows.",
+      "recorded_in": "freeze_record below."
+    },
+    {
+      "id": "D7",
+      "decision": "The leakage scan's pseudonymity check was extended to the Tier 3 prose in project_brief/*.md. It previously read JSON only.",
+      "reasoning": "Country and nationality names are scoped out of the word scan, because Tier 1 enumerates them, so the pseudonymity check is the only mechanism that catches a country. Before this it looked at JSON artifacts alone. The brief is the project describing itself in sentences, and a real country in a sentence re-identifies a derived partner exactly as one in a field does. The extension is the same check over the same Tier 1 country lists, not a new rule.",
+      "recorded_in": "runner/leakage_scan.py PSEUDONYMITY_TEXT_GLOBS; tests/runner/test_leakage_scan.py TestPseudonymityOfTheProseBrief."
+    }
+  ],
+  "coverage": {
+    "claims": 23,
+    "expected_outcomes_answered": "3 of 3",
+    "scope_requirements_answered": "5 of 5",
+    "ecosystem_realms_answered": "3 of 3",
+    "cross_cutting_requirements_answered": "9 of 9",
+    "basis": "Requirement identifiers are the vocabulary of docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json, so the concept coverage and the consortium coverage can be read against each other. Checked by tests/test_demo_concept.py TestRequirementCoverage.",
+    "note": "Coverage means a claim answers the requirement and names the capability behind it. It does not mean the requirement is met: every claim carries Assumed."
+  },
+  "freeze_record": {
+    "rule": "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule. Once instantiation is complete the founding documents are immutable for the run.",
+    "frozen_on": "2026-09-30",
+    "digest_basis": "sha256 over LF-normalised bytes, because core.autocrlf is true in this repository and a raw digest would identify the platform rather than the content.",
+    "artifacts": {
+      "docs/tier3_project_instantiation/project_brief/concept_note.md": "0f0662b68cdef6ac6acded4ec70ff0c0f9dd27e2becc0b3ef4a394af49a8f261",
+      "docs/tier3_project_instantiation/project_brief/project_summary.json": "f6801940e5a7d117e9169e3240aa71cbb136a0f305a1b0b154f2079171c672c3",
+      "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "d7701367e565d607a52599d3fa263ad9ea3260b27c2763edea2956ffe08dedb6"
+    },
+    "not_frozen": {
+      "docs/tier3_project_instantiation/working_assumptions.json": "The uncertainty ledger. The freeze rule exempts it, and later tickets append the effort shares and anything else they leave open.",
+      "docs/tier3_project_instantiation/call_binding/selected_call.json": "Not a brief artifact. It gained project_duration_months under D5 and is otherwise unchanged since the Tier 2B intake ticket."
+    },
+    "unfreezing": "An operator decision, recorded as a new decision log entry that supersedes this one and carries the new fingerprints. A ticket may not unfreeze on its own judgement (CLAUDE.md §9.1)."
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "finding": "The concept has no evidence base. No source literature is cited, because the source materials ticket is blocked on this approval.",
+      "status": "Unresolved",
+      "disposition": "open",
+      "resolution": "The source materials ticket, now unblocked, writes sources.json and the spans each claim relies on.",
+      "residual": "Until then every mechanism in the concept is design intent at Assumed. Phase 2 has nothing to lift a state-of-the-art claim from."
+    },
+    {
+      "id": "F2",
+      "finding": "No methodology vault backs the brief. The operator manual expects the concept to be lifted from an authored methodology graph in vault folders 00 to 10.",
+      "status": "Unresolved",
+      "disposition": "open",
+      "resolution": "Either the architecture seeds ticket scaffolds the vault and the concept is re-derived from it, or the operator records that instance two authors Tier 3 directly. The seeds ticket already offers both routes.",
+      "residual": "The concept's claims carry no evidence_strength tag, so nothing downstream can tell a source-grounded mechanism from an assumed one."
+    },
+    {
+      "id": "F3",
+      "finding": "Each of the freshwater and marine realms rests on exactly one partner. Losing P07 or P08 leaves the second scope requirement unanswered.",
+      "status": "Assumed",
+      "disposition": "open",
+      "resolution": "Carried into the brief as risk K1 and stated in the concept note. The composition condition survives losing either, which is why the consortium gap analysis recorded it as F4 rather than as a blocker.",
+      "residual": "A single point of failure on a requirement the scope does not make severable."
+    },
+    {
+      "id": "F4",
+      "finding": "Ten of the twelve partners sit in three country slots and five of them in C1. The second scope requirement asks for use cases in Member States and Associated Countries.",
+      "status": "Assumed",
+      "disposition": "open",
+      "resolution": "Carried into the brief as risk K2 and stated in the strategic positioning as a weakness rather than argued away. Redistributing slots is an operator decision, because the derived six map to real entities.",
+      "residual": "A panel comment on geographic balance is foreseeable. Finding F5 of the consortium gap analysis."
+    },
+    {
+      "id": "F5",
+      "finding": "project_summary.json, concept_note.md and strategic_positioning.md have no declared schema. artifact_schema_specification.yaml carries tier3_source_schemas for the call binding, topic mapping, compliance profile, partners, milestones seed and working assumptions, and none for the project brief.",
+      "status": "Unresolved",
+      "disposition": "open",
+      "resolution": "The shape is authored and says so in schema_ref, as roles.json does of its own. No schema_id is coined, because the schema registry registers run-produced artifacts and no Tier 3 source artifact carries one.",
+      "residual": "Phase 2 reads the brief without a schema to validate it against. A structural error would surface as a Phase 2 failure rather than as a gate_01 schema failure. Same gap as roles.json."
+    },
+    {
+      "id": "F6",
+      "finding": "The Tier 2A award criteria the strategic positioning names — Excellence, Impact, and Quality and efficiency of the implementation — have no registry field. The Tier 1 and Tier 2A coverage report carried them forward as its finding F7 for the pre-evaluation profile ticket.",
+      "status": "Confirmed",
+      "disposition": "open",
+      "resolution": "The positioning cites them from that report rather than from programme knowledge. The RIA pre-evaluation profile ticket is where they gain a home.",
+      "residual": "Until that ticket runs, the criteria names live in a validation report and a brief, not in a registry a predicate can read."
+    },
+    {
+      "id": "F7",
+      "finding": "The brief was written before Phase 1 ran, so it cites the hand-authored call extract rather than Tier 2B extracted/.",
+      "status": "Confirmed",
+      "disposition": "open",
+      "resolution": "This is the ordering the ticket sequence sets: the concept ticket precedes the runner phases ticket. The extract is the authoritative Tier 2B record on this branch and every span in it is checked against the work programme page text by tests/test_tier2b_biodiv_intake.py.",
+      "residual": "When Phase 1 writes extracted/, the concept's span references are not re-pointed at it. A later divergence between the extract and extracted/ would not surface here."
+    }
+  ],
+  "what_this_decision_does_not_settle": [
+    "No architecture seed is authored by this ticket. objectives.json, outcomes.json, impacts.json, workpackage_seed.json, milestones_seed.json and risks.json remain absent, and tests/test_demo_concept.py checks that none appears while approval is unrecorded.",
+    "No Tier 5 text is produced. The topic is lump sum, so Phase 8 stays hard-blocked until a validated planner response exists, and CLAUDE.md §13.4 covers preparatory drafting as well as drafting.",
+    "No Tier 2B extracted/ file is written. Phase 1 writes those.",
+    "The effort shares are not set. The architecture seeds ticket declares them in working_assumptions.json."
+  ],
+  "authored_by": "Ticket 'Project concept for operator approval', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Anonymity: no organisation name, person name, place, web address, grant or project identifier appears in this record. Partners are pseudonyms and countries are slots. Checked by runner/leakage_scan.py, which reports the branch as OK and NOT CLEAN: one pre-existing leak stands in the 22 September purge record, which this ticket does not touch."
+}

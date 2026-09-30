@@ -405,10 +405,32 @@ class TestSelectedCall:
             selected_call["field_status"], (selected_call,), "selected_call.field_status"
         )
 
-    def test_project_duration_is_left_unresolved(self, selected_call: dict) -> None:
-        """Tier 2B sets no duration. Asserting one is a §13.3 fabrication."""
-        assert "project_duration_months" not in selected_call
-        assert selected_call["field_status"]["project_duration"] == "Unresolved"
+    def test_project_duration_is_never_confirmed(self, selected_call: dict) -> None:
+        """Tier 2B sets no duration, so nothing can evidence one.
+
+        The intake ticket left `project_duration_months` absent and handed the
+        write to the concept ticket, where the operator takes the decision. Once
+        written the field is Assumed and declared in `working_assumptions.json`.
+        Confirmed would assert a call constraint the work programme does not
+        carry, which is the §13.2 fabrication this check exists to catch. The
+        absence itself is not the invariant — the status is.
+        """
+        assert selected_call["field_status"]["project_duration"] == (
+            "Unresolved" if "project_duration_months" not in selected_call
+            else "Assumed"
+        )
+        if "project_duration_months" in selected_call:
+            assert selected_call["field_status"]["project_duration_months"] == "Assumed"
+            assert "None." in selected_call["project_duration"]["tier2b_basis"]
+
+    def test_the_call_extract_still_records_no_duration(
+        self, extract: dict
+    ) -> None:
+        """Tier 2B is where a duration would have to come from, and it has none.
+        A later ticket writing one into the extract would be inventing a call
+        constraint (§13.2), whichever tier reads it afterwards."""
+        assert extract["project_duration"]["status"] == "Unresolved"
+        assert "project_duration_months" not in extract
 
 
 class TestDecisionLog:

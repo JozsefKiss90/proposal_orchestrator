@@ -15,6 +15,7 @@
   "submission_deadline": "2027-09-22",
   "submission_deadline_time": "17.00.00 Brussels local time",
   "deadline_model": "single-stage",
+  "project_duration_months": 48,
   "expected_eu_contribution_per_project_eur": 5000000,
   "indicative_call_budget_eur": 10000000,
   "indicative_number_of_projects": 2,
@@ -37,12 +38,21 @@
     "indicative_call_budget_eur": "Confirmed",
     "indicative_number_of_projects": "Confirmed",
     "budget_regime": "Confirmed",
-    "project_duration": "Unresolved"
+    "project_duration": "Assumed",
+    "project_duration_months": "Assumed"
   },
   "field_status_basis": "Every field marked Confirmed traces to a named span of the Part 9 work programme PDF, recorded in docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json and re-checked against the page text by tests/test_tier2b_biodiv_intake.py. The spans sit on six pages, not four: the topic entry is on pages 73 to 76, the call timetable, destination heading and deadline model are on page 34, and the indicative number of projects comes from the 2027 budget table on page 35. No field is marked Confirmed on programme knowledge (CLAUDE.md §10.6), and none is marked Confirmed on the portal record alone.",
   "project_duration": {
-    "status": "Unresolved",
-    "note": "Tier 2B sets no duration for this topic. Pages 73 to 76 of the work programme carry no duration condition, and the portal record carries none. Duration is an operator choice. The concept ticket proposes a value and records the operator's decision; until then project_duration_months is absent rather than assumed (CLAUDE.md §13.3). runner/dependency_normalizer.py reads project_duration_months, so Phase 3 or 4 fails closed on its absence. That failure is the correct output, not a defect."
+    "status": "Assumed",
+    "value_months": 48,
+    "decided_on": "2026-09-30",
+    "decided_by": "operator",
+    "recorded_in": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+    "declared_in": "docs/tier3_project_instantiation/working_assumptions.json, key project_duration",
+    "tier2b_basis": "None. Pages 73 to 76 of the work programme carry no duration condition, and the portal record carries none. No source can evidence this value, so it is Assumed and can never become Confirmed (CLAUDE.md 12.2).",
+    "why_it_is_written_here": "runner/dependency_normalizer.py and runner/predicates/timeline_predicates.py read project_duration_months from this file, and the artifact schema requires the field. The Tier 2B intake ticket left it absent and handed the write to the concept ticket, which is where the operator decision was taken.",
+    "reasoning": "The terrestrial case needs the multi-season field archive reworked and two further growing seasons measured under the harmonised protocol. The freshwater and marine cases start only once that protocol exists, and each needs a full annual cycle. European scaling and validation need a year after that.",
+    "note": "This is the one project-scoped fact in this call binding. It sits here because the runner reads it here, and it is marked Assumed so no reader mistakes it for a call constraint."
   },
   "budget_route": {
     "regime": "lump_sum",
@@ -53,5 +63,5 @@
   },
   "anonymity": "Instance two is a demonstration and is never submitted. No coordinator, beneficiary or place is named in this binding. Consortium identity is pseudonymous and lives in docs/tier3_project_instantiation/consortium/, authored by the consortium ticket.",
   "authored_by": "Tier 2B intake ticket, plans/dev_graph_demo_tickets.md, branch dev_graph_demo",
-  "notes": "Call binding for instance two, the dev-graph demo. This file holds call-scoped facts only. Project-scoped facts — consortium, concept, duration, effort — are absent until their own tickets author them, and their absence is an honest gate failure rather than an assumption. The two findings the intake resolved against sources are recorded in docs/tier4_orchestration_state/decision_log/tier2b-biodiv-intake-dates_2026-09-29.json and tier2b-biodiv-intake-grant-type_2026-09-29.json."
+  "notes": "Call binding for instance two, the dev-graph demo. This file holds call-scoped facts only. Project-scoped facts — consortium, concept, effort — are absent until their own tickets author them, and their absence is an honest gate failure rather than an assumption. Duration is the exception: the runner reads project_duration_months from this file, so the concept ticket wrote the operator decision here on 30 September 2026, marked Assumed. The two findings the intake resolved against sources are recorded in docs/tier4_orchestration_state/decision_log/tier2b-biodiv-intake-dates_2026-09-29.json and tier2b-biodiv-intake-grant-type_2026-09-29.json."
 }

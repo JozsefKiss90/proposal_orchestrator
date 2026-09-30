@@ -122,6 +122,14 @@
       "declared_on": "2026-09-30T00:00:00Z",
       "rationale": "The Tier 1 condition needs three independent beneficiaries in three countries, one in a Member State. The derived six span two slots and fail it. Every partner that adds a third country is fictional and Assumed, so the condition is met only on the strength of these declarations. Evaluated by runner/consortium_composition.py and reported in docs/tier4_orchestration_state/validation_reports/demo-consortium-gap-analysis_2026-09-30.json.",
       "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "project_duration",
+      "value": "48 months",
+      "declared_by": "operator",
+      "declared_on": "2026-09-30T00:00:00Z",
+      "rationale": "Tier 2B sets no duration for this topic. Pages 73 to 76 of the work programme carry no duration condition and the portal record carries none, so the value is the operator’s choice and no source can evidence it. Forty-eight months covers the field archive rework, two further growing seasons under the harmonised protocol, a full annual cycle for each of the freshwater and marine cases, and a year of European scaling and validation. Decision OD2, recorded in docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json, and written to selected_call.json as project_duration_months, where the runner reads it.",
+      "checklist_ref": "TIMELINE"
     }
   ],
   "_value_note": "A declaration's 'value' carries the fact the operator declares, not its status. The status is Assumed for every declaration and the shared reader stamps it (runner/working_assumptions.py DECLARED_STATUS), so writing 'Assumed' into 'value' would both duplicate it and break the schema's contract: the W1 predicate compares 'value' against a claim's claim_summary. Each *_participation value is derived from the partner's own record in partners.json, so a declaration cannot drift from the registry."

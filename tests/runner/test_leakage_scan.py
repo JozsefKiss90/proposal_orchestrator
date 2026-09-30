@@ -45,6 +45,7 @@ from runner.leakage_scan import (
     PROJECT_IDENTIFIERS,
     PSEUDONYMITY_EXEMPT,
     PSEUDONYMITY_GLOBS,
+    PSEUDONYMITY_TEXT_GLOBS,
     REIDENTIFYING_NOUNS,
     SCAN_GLOBS,
     SCOPED_OUT,
@@ -357,3 +358,82 @@ class TestPseudonymityOfPartnerRecords:
         (target / "partners.json").write_text(
             json.dumps({"partners": [partner]}), encoding="utf-8"
         )
+
+
+class TestPseudonymityOfTheProseBrief:
+    """The concept note and the strategic positioning are prose, not JSON.
+
+    The word scan reads them, but country names are `SCOPED_OUT` of the word
+    scan, so before this the only mechanism that catches a country never looked
+    at a Markdown file. A brief is the project's own self-description, and a
+    real country written into it re-identifies a derived partner exactly as a
+    country written into `partners.json` does.
+    """
+
+    def test_the_text_globs_cover_the_project_brief(self) -> None:
+        joined = " ".join(PSEUDONYMITY_TEXT_GLOBS)
+        assert "project_brief" in joined
+        assert ".md" in joined
+
+    def test_a_country_in_the_concept_note_is_caught(self, tmp_path: Path) -> None:
+        self._write(tmp_path, "concept_note.md", "The grassland sites sit in Spain.\n")
+        violations = scan_partner_records(tmp_path, rules_root=REPO)
+        assert [v.noun for v in violations] == ["Spain"]
+        assert violations[0].kind == "country_name"
+
+    def test_the_hit_carries_its_line_number(self, tmp_path: Path) -> None:
+        """A JSON hit is located by field path and reports line 0. A prose hit
+        has nowhere to point but the line, so it must carry one."""
+        self._write(
+            tmp_path, "concept_note.md", "First line.\n\nP07 works in Norway.\n"
+        )
+        violations = scan_partner_records(tmp_path, rules_root=REPO)
+        assert [(v.line, v.noun) for v in violations] == [(3, "Norway")]
+        assert violations[0].path.endswith("project_brief/concept_note.md")
+
+    def test_a_web_address_in_the_positioning_note_is_caught(
+        self, tmp_path: Path
+    ) -> None:
+        self._write(
+            tmp_path, "strategic_positioning.md", "See https://example.org for P10.\n"
+        )
+        violations = scan_partner_records(tmp_path, rules_root=REPO)
+        assert [v.noun for v in violations] == ["https://example.org"]
+
+    def test_an_email_in_the_brief_is_caught(self, tmp_path: Path) -> None:
+        self._write(tmp_path, "concept_note.md", "Write to a@b.org.\n")
+        assert [v.noun for v in scan_partner_records(tmp_path, rules_root=REPO)] == [
+            "a@b.org"
+        ]
+
+    def test_a_pseudonymous_brief_is_not_a_hit(self, tmp_path: Path) -> None:
+        self._write(
+            tmp_path,
+            "concept_note.md",
+            "P07 sits in country slot C3, a Member State.\n",
+        )
+        assert scan_partner_records(tmp_path, rules_root=REPO) == ()
+
+    def test_an_absent_brief_is_not_a_violation(self, tmp_path: Path) -> None:
+        target = tmp_path / "docs/tier3_project_instantiation/consortium"
+        target.mkdir(parents=True)
+        (target / "partners.json").write_text(
+            json.dumps({"partners": []}), encoding="utf-8"
+        )
+        assert scan_partner_records(tmp_path, rules_root=REPO) == ()
+
+    def test_the_real_brief_carries_no_country_name(self) -> None:
+        violations = tuple(
+            v
+            for v in scan_partner_records(REPO)
+            if "project_brief" in v.path
+        )
+        assert violations == (), "\n".join(
+            f"{v.path}:{v.line}: [{v.kind}] {v.noun}" for v in violations
+        )
+
+    @staticmethod
+    def _write(root: Path, name: str, text: str) -> None:
+        target = root / "docs/tier3_project_instantiation/project_brief"
+        target.mkdir(parents=True, exist_ok=True)
+        (target / name).write_text(text, encoding="utf-8")

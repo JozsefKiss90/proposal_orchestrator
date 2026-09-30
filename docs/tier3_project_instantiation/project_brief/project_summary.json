@@ -1,0 +1,758 @@
+{
+  "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml carries tier3_source_schemas for selected_call, topic_mapping, compliance_profile, partners, milestones_seed and working_assumptions. It carries none for the project brief, so this shape is authored, as roles.json says of its own. Phase 2 reads the brief as prose and structure, not against a schema.",
+  "record_type": "project_summary",
+  "provenance_class": "manually_placed",
+  "artifact_purpose": "The structured spine of the instance-two concept: what the project claims, which Tier 2B span each claim answers, and which partner capability carries it. Written by the ticket 'Project concept for operator approval' in plans/dev_graph_demo_tickets.md. The prose sits in concept_note.md and strategic_positioning.md; this file is the part a test can check.",
+  "topic": {
+    "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+    "topic_title": "Integrating Remote Sensing and in-situ observations of Biodiversity, towards a fully interoperable observation and data framework",
+    "call_id": "HORIZON-CL6-2027-01",
+    "instrument_type": "RIA",
+    "budget_regime": "lump_sum",
+    "submission_deadline": "2027-09-22",
+    "binding": "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "call_extract": "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json"
+  },
+  "concept": {
+    "working_title": "Genome-to-space biodiversity observation along the agricultural pressure gradient, from farmland to coast",
+    "acronym": null,
+    "acronym_status": "Unresolved",
+    "acronym_note": "No acronym is coined. Instance two is a demonstration and is never submitted, so nothing needs one, and an invented acronym is a project identifier that could collide with a real grant. The operator may set one; it is listed in open_decisions. Operator decision OD3, 2026-09-30: no acronym is set.",
+    "one_line": "One harmonised observation chain, from molecules to satellites, follows a single agricultural pressure gradient through farmland, freshwater ecotones and coastal waters.",
+    "anchor": "Agricultural landscapes, grasslands and the ecotones adjoining them.",
+    "why_this_anchor": "The topic names agriculture as a pressure on ecosystems and as a sector biodiversity data must reach. The derived six carry a deep agricultural measurement base. One pressure gradient runs from farmland through the water bodies receiving its runoff to the coast, so the three ecosystem realms the scope asks for are demonstrated on one causal chain rather than on three unconnected sites."
+  },
+  "concept_claims": [
+    {
+      "claim_id": "C01",
+      "claim": "The project builds one multisensory data-integration system over agricultural landscapes, grasslands and their ecotones.",
+      "call_phrase": "fit-for-purpose multisensory biodiversity data integration systems",
+      "tier2b_span_ref": "$.scope_requirements[0]",
+      "requirement_refs": [
+        "SR1"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P02",
+          "capability": "sensor harmonisation across platforms"
+        },
+        {
+          "partner_id": "P04",
+          "capability": "reproducible inference pipelines"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C02",
+      "claim": "Three omics layers enter the chain: metabolomic measurement from P01, genomic and transcriptomic sequencing and environmental DNA metabarcoding from P09.",
+      "call_phrase": "omics-based data (genomic, transcriptomic, metabolomic)",
+      "tier2b_span_ref": "$.expected_outcomes[1]",
+      "requirement_refs": [
+        "EO2"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P01",
+          "capability": "plant physiology and stress metabolomics"
+        },
+        {
+          "partner_id": "P09",
+          "capability": "genomic and transcriptomic sequencing"
+        },
+        {
+          "partner_id": "P09",
+          "capability": "environmental DNA metabarcoding"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C03",
+      "claim": "The observation chain runs from in-situ plots through field spectroscopy and uncrewed aerial survey to Copernicus satellite data.",
+      "call_phrase": "Copernicus and/or Galileo/EGNOS",
+      "tier2b_span_ref": "$.cross_cutting_requirements.copernicus_galileo_egnos.source_span",
+      "requirement_refs": [
+        "CC-copernicus_galileo_egnos",
+        "EO2"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P02",
+          "capability": "field spectroscopy"
+        },
+        {
+          "partner_id": "P02",
+          "capability": "uncrewed aerial vehicle survey support"
+        },
+        {
+          "partner_id": "P02",
+          "capability": "satellite earth observation data processing"
+        },
+        {
+          "partner_id": "P01",
+          "capability": "plant phenotyping under controlled and field conditions"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C04",
+      "claim": "Three demonstration cases sit on one agricultural pressure gradient: farmland and grassland, the freshwater ecotones receiving their runoff, and the coastal transitional waters downstream.",
+      "call_phrase": "across terrestrial, freshwater and marine ecosystems",
+      "tier2b_span_ref": "$.ecosystem_realms.source_span",
+      "requirement_refs": [
+        "SR2",
+        "REALM-terrestrial",
+        "REALM-freshwater",
+        "REALM-marine"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P03",
+          "capability": "multi-season controlled field-experiment archive covering physiological, spectral, soil-water and weather measurements"
+        },
+        {
+          "partner_id": "P07",
+          "capability": "in-situ observation of floodplain and riparian ecotones adjoining farmland"
+        },
+        {
+          "partner_id": "P08",
+          "capability": "coastal and benthic habitat mapping, including submerged vegetation meadows"
+        },
+        {
+          "partner_id": "P06",
+          "capability": "crop-specific transfer of measurement protocols"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C05",
+      "claim": "Cases are selected for habitats and ecotones the topic marks as degraded or as restoration targets, not for data convenience.",
+      "call_phrase": "under pressure or as restoration priorities",
+      "tier2b_span_ref": "$.scope_requirements[2]",
+      "requirement_refs": [
+        "SR3"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P11",
+          "capability": "land-use and sea-use pressure analysis"
+        },
+        {
+          "partner_id": "P07",
+          "capability": "river, lake and wetland ecology"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C06",
+      "claim": "The multi-season field archive is reworked into documented training and validation sets with a declared split protocol.",
+      "call_phrase": "training and validation resources",
+      "tier2b_span_ref": "$.expected_outcomes[2]",
+      "requirement_refs": [
+        "EO3"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P03",
+          "capability": "multi-season controlled field-experiment archive covering physiological, spectral, soil-water and weather measurements"
+        },
+        {
+          "partner_id": "P01",
+          "capability": "statistical experimental design"
+        },
+        {
+          "partner_id": "P01",
+          "capability": "leakage-safe predictive validation"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C07",
+      "claim": "Deep-learning models scale habitat and ecosystem classification from the three cases to European coverage and predict trends.",
+      "call_phrase": "habitat classification, ecosystem mapping and biodiversity trend prediction",
+      "tier2b_span_ref": "$.expected_outcomes[2]",
+      "requirement_refs": [
+        "EO3",
+        "EO1"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P12",
+          "capability": "deep-learning habitat and ecosystem classification from the European radar and optical earth observation missions"
+        },
+        {
+          "partner_id": "P12",
+          "capability": "predictive biodiversity trend modelling at European scale"
+        },
+        {
+          "partner_id": "P12",
+          "capability": "scalable cloud processing"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C08",
+      "claim": "Every map and habitat label the project publishes carries a crosswalk to the European habitat classification and to the global ecosystem typology.",
+      "call_phrase": "Global Ecosystem Typology as well as EUNIS",
+      "tier2b_span_ref": "$.cross_cutting_requirements.eunis_and_global_ecosystem_typology.source_span",
+      "requirement_refs": [
+        "CC-eunis_and_global_ecosystem_typology",
+        "SR3"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P10",
+          "capability": "biodiversity data-standard crosswalks between occurrence standards, the European habitat classification and a global ecosystem typology"
+        },
+        {
+          "partner_id": "P08",
+          "capability": "marine indicator assessment for policy reporting"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C09",
+      "claim": "Harmonisation workflows and processing protocols are published with provenance and linked to the open science cloud and the common data spaces.",
+      "call_phrase": "European Open Science Cloud (EOSC) and the European Common Data Spaces",
+      "tier2b_span_ref": "$.cross_cutting_requirements.eosc_and_common_data_spaces.source_span",
+      "requirement_refs": [
+        "CC-eosc_and_common_data_spaces",
+        "SR4"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P10",
+          "capability": "integration of services into the European open science cloud"
+        },
+        {
+          "partner_id": "P10",
+          "capability": "findable, accessible, interoperable and reusable metadata practice"
+        },
+        {
+          "partner_id": "P04",
+          "capability": "provenance tracking"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C10",
+      "claim": "Biodiversity indicators derived from the chain are carried into farm-management tools through an existing multi-country user network.",
+      "call_phrase": "biodiversity preservation is a mainstream feature of other sectors, such as agriculture",
+      "tier2b_span_ref": "$.scope_summary",
+      "requirement_refs": [
+        "EO1",
+        "SR4"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P05",
+          "capability": "multi-country user network of agricultural holdings as an uptake channel"
+        },
+        {
+          "partner_id": "P05",
+          "capability": "usability and interoperability evaluation"
+        },
+        {
+          "partner_id": "P04",
+          "capability": "web decision-support engineering"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C11",
+      "claim": "Effort and budget are earmarked for cooperation with the in-situ data collection frameworks the topic names, and project occurrence records are published to them.",
+      "call_phrase": "GBIF, OBIS, LUCAS",
+      "tier2b_span_ref": "$.cross_cutting_requirements.gbif_obis_lucas_cooperation.source_span",
+      "requirement_refs": [
+        "CC-gbif_obis_lucas_cooperation"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P10",
+          "capability": "operation of a national species-occurrence data facility that publishes to a global biodiversity data facility"
+        },
+        {
+          "partner_id": "P08",
+          "capability": "contribution of occurrence records to a global marine biodiversity data facility"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C12",
+      "claim": "Commission-steered grassland and agricultural-landscape monitoring data is ingested as a reference layer for the terrestrial case.",
+      "call_phrase": "LUCAS, specifically LUCAS grassland, and EMBAL",
+      "tier2b_span_ref": "$.cross_cutting_requirements.lucas_grassland_and_embal.source_span[0]",
+      "requirement_refs": [
+        "CC-lucas_grassland_and_embal"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P03",
+          "capability": "multi-season controlled field-experiment archive covering physiological, spectral, soil-water and weather measurements"
+        },
+        {
+          "partner_id": "P10",
+          "capability": "findable, accessible, interoperable and reusable metadata practice"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C13",
+      "claim": "The pressures driving each case are analysed as socio-economic drivers, not treated as background.",
+      "call_phrase": "socio-economic pressures and activities impacting ecosystems",
+      "tier2b_span_ref": "$.scope_requirements[2]",
+      "requirement_refs": [
+        "SR3"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P11",
+          "capability": "socio-economic driver analysis for agriculture and aquaculture"
+        },
+        {
+          "partner_id": "P11",
+          "capability": "stakeholder engagement design"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C14",
+      "claim": "Outputs are shaped to the reporting obligations the topic names, so a competent authority can use them without rework.",
+      "call_phrase": "Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation",
+      "tier2b_span_ref": "$.cross_cutting_requirements.policy_reporting_alignment.source_span",
+      "requirement_refs": [
+        "CC-policy_reporting_alignment",
+        "EO1"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P11",
+          "capability": "policy-reporting needs assessment under the nature and habitat directives and the nature restoration regulation"
+        },
+        {
+          "partner_id": "P08",
+          "capability": "marine indicator assessment for policy reporting"
+        },
+        {
+          "partner_id": "P07",
+          "capability": "freshwater monitoring aligned with water-policy reporting"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C15",
+      "claim": "The project takes its harmonisation decisions to the standards bodies rather than keeping them internal.",
+      "call_phrase": "joint definitions of data collection, metadata and processing protocols",
+      "tier2b_span_ref": "$.scope_requirements[4]",
+      "requirement_refs": [
+        "SR5"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P10",
+          "capability": "biodiversity data-standard crosswalks between occurrence standards, the European habitat classification and a global ecosystem typology"
+        },
+        {
+          "partner_id": "P09",
+          "capability": "standardised omics metadata"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C16",
+      "claim": "A knowledge-gap and data-need analysis runs before the integration design, and sets which gaps the three cases address.",
+      "call_phrase": "identify and prioritise critical biodiversity knowledge gaps and their data needs",
+      "tier2b_span_ref": "$.scope_requirements[1]",
+      "requirement_refs": [
+        "SR2"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P11",
+          "capability": "land-use and sea-use pressure analysis"
+        },
+        {
+          "partner_id": "P10",
+          "capability": "findable, accessible, interoperable and reusable metadata practice"
+        },
+        {
+          "partner_id": "P12",
+          "capability": "predictive biodiversity trend modelling at European scale"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C17",
+      "claim": "Predictive modelling is delivered at three scales, from the case sites through the regional gradient to European coverage.",
+      "call_phrase": "predictive modelling of biodiversity trends at international, regional and European scales",
+      "tier2b_span_ref": "$.scope_requirements[0]",
+      "requirement_refs": [
+        "SR1",
+        "EO1"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P12",
+          "capability": "predictive biodiversity trend modelling at European scale"
+        },
+        {
+          "partner_id": "P01",
+          "capability": "instrument and model calibration"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C18",
+      "claim": "The project delivers FAIR data, harmonisation workflows and processing protocols as named outputs, and verifies them on the three cases.",
+      "call_phrase": "FAIR data, harmonisation workflows and processing protocols",
+      "tier2b_span_ref": "$.scope_requirements[3]",
+      "requirement_refs": [
+        "SR4"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P10",
+          "capability": "findable, accessible, interoperable and reusable metadata practice"
+        },
+        {
+          "partner_id": "P04",
+          "capability": "reproducible inference pipelines"
+        },
+        {
+          "partner_id": "P09",
+          "capability": "bioinformatics pipelines"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C19",
+      "claim": "The assessment outputs are built for ecosystem assessment, protection and restoration planning, which is the first expected outcome.",
+      "call_phrase": "policy-relevant ecosystem assessment, nature protection and restoration planning",
+      "tier2b_span_ref": "$.expected_outcomes[0]",
+      "requirement_refs": [
+        "EO1"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P11",
+          "capability": "policy-reporting needs assessment under the nature and habitat directives and the nature restoration regulation"
+        },
+        {
+          "partner_id": "P10",
+          "capability": "operation of a national species-occurrence data facility that publishes to a global biodiversity data facility"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C20",
+      "claim": "Practitioner and decision-maker capacity is built through the protocols, the user network and the stakeholder work, not through a dissemination line alone.",
+      "call_phrase": "strengthened capacity of researchers, practitioners and decision-makers",
+      "tier2b_span_ref": "$.expected_outcomes[1]",
+      "requirement_refs": [
+        "EO2"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P05",
+          "capability": "requirements elicitation"
+        },
+        {
+          "partner_id": "P11",
+          "capability": "stakeholder engagement design"
+        },
+        {
+          "partner_id": "P06",
+          "capability": "production-context data from horticultural systems"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C21",
+      "claim": "The project provides a standing coordination interface to the space-agency earth observation projects in the same cluster.",
+      "call_phrase": "FuturEO programme",
+      "tier2b_span_ref": "$.cross_cutting_requirements.esa_futureo_coordination.source_span",
+      "requirement_refs": [
+        "CC-esa_futureo_coordination"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P02",
+          "capability": "satellite earth observation data processing"
+        },
+        {
+          "partner_id": "P12",
+          "capability": "scalable cloud processing"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C22",
+      "claim": "The interoperability work package holds an open place for the Joint Research Centre, which the consortium does not count towards any condition.",
+      "call_phrase": "beneficiary with zero funding, or as an associated partner",
+      "tier2b_span_ref": "$.cross_cutting_requirements.jrc_participation.source_span",
+      "requirement_refs": [
+        "CC-jrc_participation"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P10",
+          "capability": "biodiversity data-standard crosswalks between occurrence standards, the European habitat classification and a global ecosystem typology"
+        },
+        {
+          "partner_id": "P01",
+          "capability": "instrument and model calibration"
+        }
+      ],
+      "status": "Assumed"
+    },
+    {
+      "claim_id": "C23",
+      "claim": "Where a European research infrastructure offers a service the chain needs, the project uses it rather than rebuilding it.",
+      "call_phrase": "services offered by European research infrastructures",
+      "tier2b_span_ref": "$.cross_cutting_requirements.research_infrastructures.source_span",
+      "requirement_refs": [
+        "CC-research_infrastructures"
+      ],
+      "capability_refs": [
+        {
+          "partner_id": "P09",
+          "capability": "reference sequence libraries"
+        },
+        {
+          "partner_id": "P10",
+          "capability": "integration of services into the European open science cloud"
+        }
+      ],
+      "status": "Assumed"
+    }
+  ],
+  "concept_claims_note": "Every claim carries the verbatim call phrase it answers and the span that phrase sits in, so a reader can check the concept against Tier 2B without trusting this file (CLAUDE.md 10.5). Every capability reference is an exact capability string from partners.json, so a claim cannot rest on a capability the consortium does not record (13.3). requirement_refs use the vocabulary of the consortium gap analysis, so the two reports can be read against each other. Status is Assumed throughout: the concept is the operator's design intent, and no partner's participation is confirmed.",
+  "project_duration": {
+    "status": "Assumed",
+    "proposed_months": 48,
+    "options_put": [
+      36,
+      48,
+      60
+    ],
+    "tier2b_basis": "None. Pages 73 to 76 of the work programme carry no duration condition and the portal record carries none. selected_call.json records project_duration as Unresolved for the same reason.",
+    "reasoning_for_48": "The terrestrial case needs the field archive reworked and at least two further growing seasons measured under the harmonised protocol. The freshwater and marine cases cannot start before that protocol exists, and each needs a full annual cycle. European scaling and validation then need a year on top. Thirty-six months compresses the cross-realm cycle to one season and puts the third expected outcome at risk. Sixty months buys a third validation cycle at the cost of a larger consortium burn against the same EUR 5,000,000.",
+    "decision_owner": "operator",
+    "consequence_if_left_unresolved": "runner/dependency_normalizer.py reads project_duration_months. Phase 3 or Phase 4 fails closed while it is absent, which is the correct output rather than a defect.",
+    "value_months": 48,
+    "decided_on": "2026-09-30",
+    "decision_basis": "Operator decision OD2, recorded in docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json. Assumed, never Confirmed: Tier 2B carries no duration for this topic, so no source can evidence the value (CLAUDE.md 12.2). Declared under key project_duration in working_assumptions.json and written to selected_call.json as project_duration_months, which is where runner/dependency_normalizer.py and the timeline predicates read it."
+  },
+  "gap_options": [
+    {
+      "option": 1,
+      "name": "Add the gap-filling partners",
+      "summary": "Run with all twelve partners. P07 to P12 close freshwater, marine, omics, data infrastructure, socio-ecological analysis and European-scale AI, and take the consortium from two country slots to six.",
+      "recommended": true,
+      "consequences": [
+        "Every requirement class in the consortium gap analysis has a covering partner, and all three ecosystem realms are demonstrated.",
+        "The Tier 1 composition condition is met, but only under assumption: every partner that adds a third country is fictional.",
+        "Six of twelve partners are declared in working_assumptions.json as unconfirmed, so half the consortium carries Assumed into Phase 6 and Phase 7.",
+        "The concept matches the consortium already authored, so no Tier 3 artifact needs rework."
+      ]
+    },
+    {
+      "option": 2,
+      "name": "Narrow to terrestrial ecosystems",
+      "summary": "Run with the derived six and drop the freshwater and marine cases.",
+      "recommended": false,
+      "consequences": [
+        "The second scope requirement is not answered. It asks for capabilities across terrestrial, freshwater and marine ecosystems, and no reading of that span makes the three realms optional.",
+        "The Tier 1 composition condition fails outright. The derived six span two country slots and the condition needs three.",
+        "Phase 2 has to record an unresolved scope conflict, and its gate condition requires that none remain.",
+        "It is faster and needs no fictional partner, so nothing in Tier 3 rests on an invented entity."
+      ]
+    },
+    {
+      "option": 3,
+      "name": "Mixed: cover the realms and omics only",
+      "summary": "Add P07, P08 and P09, and declare the data infrastructure, socio-ecological analysis and European-scale AI out of scope.",
+      "recommended": false,
+      "consequences": [
+        "The three realms and the omics layer are covered, and the composition condition is met on five country slots.",
+        "Four cross-cutting requirements lose their covering partner: the in-situ framework cooperation, the typology crosswalks, the open science cloud link and the policy-reporting alignment.",
+        "The first expected outcome loses its trend-prediction capability and the third loses the AI mapping it names.",
+        "Three fewer partners carry Assumed, so the uncertainty ledger is smaller."
+      ]
+    }
+  ],
+  "gap_option_decision": {
+    "status": "Confirmed",
+    "chosen": 1,
+    "chosen_name": "Add the gap-filling partners",
+    "decided_on": "2026-09-30",
+    "decided_by": "operator",
+    "basis": "Operator decision OD1, recorded in docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json. Confirmed as an operator act evidenced by a named Tier 4 record, not as a fact about any partner: every partner still carries Assumed.",
+    "consequence": "The concept runs on all twelve partners, so no Tier 3 artifact needs rework. The composition condition stays met only under assumption, and the six fictional partners stay declared in working_assumptions.json.",
+    "note": "The draft put three options with their consequences and did not choose. This block records what the operator chose."
+  },
+  "coordination_commitments": [
+    {
+      "commitment": "Earmark effort and budget for cooperation with the named in-situ data collection frameworks, and publish project occurrence records to them.",
+      "requirement_ref": "CC-gbif_obis_lucas_cooperation",
+      "responsible": [
+        "P10",
+        "P08"
+      ],
+      "claim_ref": "C11"
+    },
+    {
+      "commitment": "Hold an open place in the interoperability work package for the Joint Research Centre, as a zero-funding beneficiary or an associated partner, and count it towards nothing.",
+      "requirement_ref": "CC-jrc_participation",
+      "responsible": [
+        "P10"
+      ],
+      "claim_ref": "C22"
+    },
+    {
+      "commitment": "Ingest the Commission-steered grassland and agricultural-landscape monitoring data as a reference layer.",
+      "requirement_ref": "CC-lucas_grassland_and_embal",
+      "responsible": [
+        "P03",
+        "P10"
+      ],
+      "claim_ref": "C12"
+    },
+    {
+      "commitment": "Provide a standing coordination interface to the space-agency earth observation projects in the same cluster.",
+      "requirement_ref": "CC-esa_futureo_coordination",
+      "responsible": [
+        "P02",
+        "P12"
+      ],
+      "claim_ref": "C21"
+    },
+    {
+      "commitment": "Link the published workflows and data to the open science cloud and the common data spaces.",
+      "requirement_ref": "CC-eosc_and_common_data_spaces",
+      "responsible": [
+        "P10",
+        "P04"
+      ],
+      "claim_ref": "C09"
+    },
+    {
+      "commitment": "Use the European earth observation and satellite navigation programmes wherever the project uses satellite data, which is an eligibility condition rather than a preference.",
+      "requirement_ref": "CC-copernicus_galileo_egnos",
+      "responsible": [
+        "P02",
+        "P12",
+        "P08"
+      ],
+      "claim_ref": "C03"
+    }
+  ],
+  "open_decisions": [
+    {
+      "id": "OD1",
+      "question": "Which gap option does the project take?",
+      "owner": "operator",
+      "status": "Confirmed",
+      "see": "gap_options",
+      "answer": "Option 1 — all twelve partners."
+    },
+    {
+      "id": "OD2",
+      "question": "What project duration does the project assume?",
+      "owner": "operator",
+      "status": "Assumed",
+      "see": "project_duration",
+      "answer": "48 months."
+    },
+    {
+      "id": "OD3",
+      "question": "Does the project carry an acronym, and if so which?",
+      "owner": "operator",
+      "status": "Unresolved",
+      "see": "concept.acronym_note",
+      "answer": "No acronym. The field stays null and Unresolved."
+    },
+    {
+      "id": "OD4",
+      "question": "Is the concept approved, approved with changes, or rejected?",
+      "owner": "operator",
+      "status": "Confirmed",
+      "see": "approval",
+      "answer": "Approved."
+    }
+  ],
+  "approval": {
+    "status": "Confirmed",
+    "gate": "human",
+    "rule": "The ticket 'Project concept for operator approval' has a human gate. No architecture seed is authored until the operator records approval. The decision is written to docs/tier4_orchestration_state/decision_log/ and mirrored here.",
+    "decision": "Approved",
+    "decided_on": "2026-09-30",
+    "decided_by": "operator",
+    "recorded_in": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+    "unblocks": [
+      "Source materials and the sources index",
+      "Architecture seeds and the uncertainty ledger"
+    ],
+    "freeze": "Frozen per the operator manual's freeze rule (section 3.1). concept_note.md, project_summary.json and strategic_positioning.md are immutable for the run. Their fingerprints are recorded in the decision log and checked by tests/test_demo_concept.py. working_assumptions.json stays editable, as the rule allows."
+  },
+  "risks_the_draft_carries": [
+    {
+      "id": "K1",
+      "risk": "The freshwater and marine realms each rest on a single fictional partner. Losing either leaves the second scope requirement unanswered, even though the composition condition survives.",
+      "carried_from": "Finding F4 of the consortium gap analysis.",
+      "status": "Assumed"
+    },
+    {
+      "id": "K2",
+      "risk": "Ten of the twelve partners sit in three country slots and five of them in C1. The second scope requirement asks for use cases in Member States and Associated Countries, and a reader could call the geography thin.",
+      "carried_from": "Finding F5 of the consortium gap analysis.",
+      "status": "Assumed"
+    },
+    {
+      "id": "K3",
+      "risk": "Every capability the concept rests on is Assumed. No partner participation is confirmed, and the derived capabilities trace to a document held outside the repository.",
+      "carried_from": "partners.json field_status.",
+      "status": "Assumed"
+    },
+    {
+      "id": "K4",
+      "risk": "The topic is lump sum, so Phase 8 stays hard-blocked until an external planner response is received and validated. The concept cannot be drafted into Part B on this branch until then.",
+      "carried_from": "selected_call.json budget_route; CLAUDE.md 8.4.",
+      "status": "Confirmed"
+    }
+  ],
+  "field_status": {
+    "topic": "Confirmed",
+    "concept": "Assumed",
+    "concept_claims": "Assumed",
+    "capability_refs": "Assumed",
+    "call_phrases": "Confirmed",
+    "project_duration": "Assumed",
+    "gap_option_decision": "Confirmed",
+    "approval": "Confirmed",
+    "acronym": "Unresolved"
+  },
+  "field_status_note": "call_phrases is Confirmed because every phrase is a verbatim slice of the Tier 2B call extract, checked by tests/test_demo_concept.py. approval and gap_option_decision are Confirmed as operator acts, each evidenced by the named Tier 4 decision record — not as claims about the project. Everything the project itself claims stays Assumed: the concept is design intent, and the capabilities behind it belong to partners whose participation nobody has confirmed. The duration is Assumed because Tier 2B carries none, so no source can evidence it. Nothing here is Confirmed on the strength of the concept's own coherence.",
+  "authored_by": "Ticket 'Project concept for operator approval', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Anonymity: no organisation name, person name, place, web address, grant or project identifier appears here. Partners are pseudonyms and countries are slots. Checked by runner/leakage_scan.py."
+}

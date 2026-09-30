@@ -261,6 +261,15 @@ PSEUDONYMITY_GLOBS: tuple[str, ...] = (
     "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
 )
 
+#: Tier 3 *prose* the pseudonymity check reads, as repo-relative globs. The
+#: brief is the project describing itself in sentences, and a real country name
+#: in a sentence re-identifies a derived partner exactly as one in a field does.
+#: The word scan already reads these files, but country and nationality names are
+#: :data:`SCOPED_OUT` of it, so without this leg no mechanism looked at them.
+PSEUDONYMITY_TEXT_GLOBS: tuple[str, ...] = (
+    "docs/tier3_project_instantiation/project_brief/*.md",
+)
+
 #: Paths excluded from the pseudonymity check, with the reason. ``selected_call``
 #: is a Tier 2B-derived record, not a self-description of the project: it carries
 #: the call's own text, which may name a country the work programme names.
@@ -605,6 +614,20 @@ def iter_pseudonymity_files(repo_root: Path) -> list[Path]:
     return [seen[key] for key in sorted(seen)]
 
 
+def iter_pseudonymity_text_files(repo_root: Path) -> list[Path]:
+    """Resolve :data:`PSEUDONYMITY_TEXT_GLOBS`, minus the declared exemptions."""
+    seen: dict[str, Path] = {}
+    for pattern in PSEUDONYMITY_TEXT_GLOBS:
+        for path in repo_root.glob(pattern):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(repo_root).as_posix()
+            if rel in PSEUDONYMITY_EXEMPT:
+                continue
+            seen[rel] = path
+    return [seen[key] for key in sorted(seen)]
+
+
 def scan_partner_records(
     repo_root: Path, *, rules_root: Optional[Path] = None
 ) -> tuple[LeakageViolation, ...]:
@@ -617,12 +640,18 @@ def scan_partner_records(
     partner registry alone — a country written into a role, a declaration or a
     seed re-identifies a derived partner just as effectively.
 
+    It reads the Tier 3 *prose* in :data:`PSEUDONYMITY_TEXT_GLOBS` on the same
+    grounds. The brief is the project describing itself in sentences, so it can
+    carry a country the same way a field can. A JSON hit is located by field
+    path and reports line ``0``; a prose hit reports its line number.
+
     An absent artifact yields no violation: an empty Tier 3 is a valid state, not
     a leak. An unreadable Tier 1 raises :class:`LeakageError`, because a check
     that cannot run must not report clean.
     """
     targets = iter_pseudonymity_files(repo_root)
-    if not targets:
+    text_targets = iter_pseudonymity_text_files(repo_root)
+    if not targets and not text_targets:
         return ()
 
     countries = real_country_names(rules_root if rules_root else repo_root)
@@ -649,6 +678,21 @@ def scan_partner_records(
                             line=0,
                             noun=match.group(0),
                             snippet=value,
+                            kind=kind,
+                        )
+                    )
+    for path in text_targets:
+        rel = path.relative_to(repo_root).as_posix()
+        text = path.read_text(encoding="utf-8-sig", errors="replace")
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            for pattern, kind in patterns:
+                for match in pattern.finditer(line):
+                    violations.append(
+                        LeakageViolation(
+                            path=rel,
+                            line=lineno,
+                            noun=match.group(0),
+                            snippet=line.strip(),
                             kind=kind,
                         )
                     )
