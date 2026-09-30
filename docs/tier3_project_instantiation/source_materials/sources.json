@@ -1,0 +1,1485 @@
+{
+  "record_type": "source_index",
+  "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml carries tier3_source_schemas for selected_call, topic_mapping, compliance_profile, partners, milestones_seed and working_assumptions, and none for sources.json. runner/dev_graph/builder.py asks only for a non-empty source_id and, if present, a string text. The rest of this shape is authored, and no schema_id is coined for it (CLAUDE.md §16.3), as partners.json and roles.json say of their own. runner/source_index.py holds what the shape must satisfy.",
+  "provenance_class": "derived_from_stored_sources",
+  "artifact_purpose": "The Tier 3 source index for instance two. The dev-graph snapshot builder reads it and turns each entry into a source node; a claim's verified span resolves byte offsets into a source's text. Written by tools/author_demo_sources.py and checked by runner/source_index.py.",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "intake_rule": {
+    "rule": "A source carries verbatim text only when that text can be re-derived from a file stored in this repository, byte for byte. Everything else is a reference: a citation, an anchor showing where the project names it, and an identifier recorded rather than resolved.",
+    "why": "A source record is the one place in Tier 3 where an unevidenced claim can be made to look evidenced. A plausible citation, an invented quotation and a span pointed at it would make the graph report a grounded claim that no document supports. The builder cannot catch that, because it has no way to know whether the text is real. Byte-equal replay can.",
+    "consequence": "Sixteen of the twenty-two entries carry no text at all, so no claim in this project can be verified against a policy instrument, a dataset or a paper. That is the honest state of the evidence base, not a defect in the index.",
+    "authority": "CLAUDE.md §10.5, §11.5, §12.2 and §13.3; §10.6 for the identifiers recorded from prior knowledge."
+  },
+  "sources": [
+    {
+      "source_id": "SRC-WP9-P34",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 34",
+      "kind": "call_document_page",
+      "status": "Confirmed",
+      "what_the_page_carries": "The call conditions table: opening date, deadline and deadline model.",
+      "citation": {
+        "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 34.",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 34
+      },
+      "resolves_to": {
+        "class": "stored_document",
+        "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 34,
+        "what_it_holds": "Page 34 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+      },
+      "transcription": {
+        "state": "transcribed",
+        "method": "pymupdf_page_text_whitespace_normalised",
+        "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+      },
+      "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 34 of 360 Annex A. Eligibility conditions The conditions are described in General Annex B. Financial and operational capacity and exclusion The criteria are described in General Annex C. Award criteria The criteria are described in General Annex D. Documents The documents are described in General Annex E. Procedure The procedure is described in General Annex F. Legal and financial set-up of the Grant Agreements The rules are described in General Annex G. Call - Call 01 - single stage (2027) HORIZON-CL6-2027-01 Overview of this call55 Proposals are invited against the following Destinations and topic(s): Topics Type of Action Budgets (EUR million) Expected EU contribution per project (EUR million)56 Indicative number of projects expected to be funded 2027 Opening: 20 Apr 2027 Deadline(s): 22 Sep 2027 Destination - Biodiversity and ecosystem services 55 The Director-General responsible for the call may decide to open the call up to one month prior to or after the envisaged date(s) of opening. The Director-General responsible may delay the deadline(s) by up to two months. All deadlines are at 17.00.00 Brussels local time. The budget amounts are subject to the availability of the appropriations provided for in the general budget of the Union for 2026 and 2027. 56 Nonetheless, this does not preclude submission and selection of a proposal requesting different amounts.",
+      "spans": [
+        {
+          "span_id": "SRC-WP9-P34#580-616",
+          "start": 580,
+          "end": 616,
+          "quote": "Call - Call 01 - single stage (2027)",
+          "tier2b_refs": [
+            "$.deadline_model_source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P34#886-931",
+          "start": 886,
+          "end": 931,
+          "quote": "Opening: 20 Apr 2027 Deadline(s): 22 Sep 2027",
+          "tier2b_refs": [
+            "$.timetable_source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P34#932-981",
+          "start": 932,
+          "end": 981,
+          "quote": "Destination - Biodiversity and ecosystem services",
+          "tier2b_refs": [
+            "$.destination_source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P34#985-1206",
+          "start": 985,
+          "end": 1206,
+          "quote": "The Director-General responsible for the call may decide to open the call up to one month prior to or after the envisaged date(s) of opening. The Director-General responsible may delay the deadline(s) by up to two months.",
+          "tier2b_refs": [
+            "$.timetable_discretion.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        }
+      ],
+      "relied_on_for": [
+        {
+          "what": "The submission deadline and the deadline model the concept states in its header.",
+          "claim_refs": [],
+          "span_refs": [
+            "SRC-WP9-P34#580-616",
+            "SRC-WP9-P34#886-931",
+            "SRC-WP9-P34#932-981",
+            "SRC-WP9-P34#985-1206"
+          ],
+          "status": "Confirmed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-WP9-P35",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 35",
+      "kind": "call_document_page",
+      "status": "Confirmed",
+      "what_the_page_carries": "The call conditions table: indicative budget and the number of projects.",
+      "citation": {
+        "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 35.",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 35
+      },
+      "resolves_to": {
+        "class": "stored_document",
+        "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 35,
+        "what_it_holds": "Page 35 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+      },
+      "transcription": {
+        "state": "transcribed",
+        "method": "pymupdf_page_text_whitespace_normalised",
+        "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+      },
+      "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 35 of 360 HORIZON-CL6-2027-01-BIODIV-01: Integrating Remote Sensing and in-situ observations of Biodiversity, towards a fully interoperable observation and data framework RIA 10.00 Around 5.00 2 HORIZON-CL6-2027-01-BIODIV-02: Science-policy support to the implementation of EU and global biodiversity policies and strategies CSA 7.00 Around 7.00 1 HORIZON-CL6-2027-01-BIODIV-03: Technical innovation to protect ecosystems and to scale up their restoration IA 14.00 Around 7.00 2 HORIZON-CL6-2027-01-BIODIV-04: Living Labs for the eradication and/or management of invasive alien species RIA 24.00 Around 8.00 3 HORIZON-CL6-2027-01-BIODIV-05: Accelerating the transition to a nature positive economy: Integrating biodiversity into the private sector RIA 14.00 Around 7.00 2 HORIZON-CL6-2027-01-BIODIV-06: Living labs driving transformative change via knowledge integration and inclusive governance RIA 14.00 Around 7.00 2 HORIZON-CL6-2027-01-BIODIV-07: Health of ecosystems and wild species, predictions and impacts on human health, in the face of existing and emerging stressors, from a One Health approach RIA 14.00 Around 7.00 2 HORIZON-CL6-2027-01-BIODIV-08: Fostering common farmland birds and mammals for resilient food production systems RIA 12.00 Around 6.00 2 HORIZON-CL6-2027-01-BIODIV-09: Enhancing the competitiveness of organic crop breeding: focus on intercropping adapted varieties RIA 12.00 Around 6.00 2 Destination - Circular economy and bioeconomy sectors HORIZON-CL6-2027-01-CIRCBIO-01: Enhancing ecodesign and circularity of IA 10.00 Around 5.00 2",
+      "spans": [
+        {
+          "span_id": "SRC-WP9-P35#131-315",
+          "start": 131,
+          "end": 315,
+          "quote": "HORIZON-CL6-2027-01-BIODIV-01: Integrating Remote Sensing and in-situ observations of Biodiversity, towards a fully interoperable observation and data framework RIA 10.00 Around 5.00 2",
+          "tier2b_refs": [
+            "$.project_count_source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        }
+      ],
+      "relied_on_for": [
+        {
+          "what": "The per-project EU contribution the duration decision weighs.",
+          "claim_refs": [],
+          "span_refs": [
+            "SRC-WP9-P35#131-315"
+          ],
+          "status": "Confirmed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-WP9-P73",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 73",
+      "kind": "call_document_page",
+      "status": "Confirmed",
+      "what_the_page_carries": "The topic header: type of action, budget regime, and the two topic-level eligibility exceptions (the Joint Research Centre place, and the Copernicus or Galileo/EGNOS condition).",
+      "citation": {
+        "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 73.",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 73
+      },
+      "resolves_to": {
+        "class": "stored_document",
+        "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 73,
+        "what_it_holds": "Page 73 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+      },
+      "transcription": {
+        "state": "transcribed",
+        "method": "pymupdf_page_text_whitespace_normalised",
+        "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+      },
+      "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 73 of 360 Proposals should foresee appropriate resources to ensure close cooperation with the EC Knowledge Centre for Biodiversity (KCBD) and its Science Service. 2027 Consolidating biodiversity knowledge for nature and society Proposals are invited against the following topic(s): HORIZON-CL6-2027-01-BIODIV-01: Integrating Remote Sensing and in-situ observations of Biodiversity, towards a fully interoperable observation and data framework Call: Call 01 - single stage (2027) Specific conditions Expected EU contribution per project The Commission estimates that an EU contribution of around EUR 5.00 million would allow these outcomes to be addressed appropriately. Nonetheless, this does not preclude submission and selection of a proposal requesting different amounts. Indicative budget The total indicative budget for the topic is EUR 10.00 million. Type of Action Research and Innovation Actions Eligibility conditions The conditions are described in General Annex B. The following exceptions apply: The Joint Research Centre (JRC) may participate as member of the consortium selected for funding as a beneficiary with zero funding, or as an associated partner. The JRC will not participate in the preparation and submission of the proposal - see General Annex B. If projects use satellite-based earth observation, positioning, navigation and/or related timing data and services, beneficiaries must make use of Copernicus and/or Galileo/EGNOS (other data and services may additionally be used). Legal and financial set-up of the Grant Agreements The rules are described in General Annex G. The following exceptions apply: Eligible costs will take the form of a lump sum as defined in the Decision of 7 July 2021 authorising the use of lump sum contributions under the Horizon Europe Programme – the Framework Programme for Research and Innovation (2021-2027) – and in actions under the",
+      "spans": [
+        {
+          "span_id": "SRC-WP9-P73#657-895",
+          "start": 657,
+          "end": 895,
+          "quote": "The Commission estimates that an EU contribution of around EUR 5.00 million would allow these outcomes to be addressed appropriately. Nonetheless, this does not preclude submission and selection of a proposal requesting different amounts.",
+          "tier2b_refs": [
+            "$.budget_source_spans[0]"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P73#914-977",
+          "start": 914,
+          "end": 977,
+          "quote": "The total indicative budget for the topic is EUR 10.00 million.",
+          "tier2b_refs": [
+            "$.budget_source_spans[1]"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P73#978-1024",
+          "start": 978,
+          "end": 1024,
+          "quote": "Type of Action Research and Innovation Actions",
+          "tier2b_refs": [
+            "$.type_of_action_source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P73#1129-1392",
+          "start": 1129,
+          "end": 1392,
+          "quote": "The Joint Research Centre (JRC) may participate as member of the consortium selected for funding as a beneficiary with zero funding, or as an associated partner. The JRC will not participate in the preparation and submission of the proposal - see General Annex B.",
+          "tier2b_refs": [
+            "$.eligibility_restrictions.exceptions[0].source_span",
+            "$.cross_cutting_requirements.jrc_participation.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P73#1231-1289",
+          "start": 1231,
+          "end": 1289,
+          "quote": "beneficiary with zero funding, or as an associated partner",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C22"
+          ],
+          "requirement_refs": [
+            "CC-jrc_participation"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P73#1393-1623",
+          "start": 1393,
+          "end": 1623,
+          "quote": "If projects use satellite-based earth observation, positioning, navigation and/or related timing data and services, beneficiaries must make use of Copernicus and/or Galileo/EGNOS (other data and services may additionally be used).",
+          "tier2b_refs": [
+            "$.eligibility_restrictions.exceptions[1].source_span",
+            "$.cross_cutting_requirements.copernicus_galileo_egnos.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P73#1540-1571",
+          "start": 1540,
+          "end": 1571,
+          "quote": "Copernicus and/or Galileo/EGNOS",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C03"
+          ],
+          "requirement_refs": [
+            "CC-copernicus_galileo_egnos",
+            "EO2"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P73#1751-2014",
+          "start": 1751,
+          "end": 2014,
+          "quote": "Eligible costs will take the form of a lump sum as defined in the Decision of 7 July 2021 authorising the use of lump sum contributions under the Horizon Europe Programme – the Framework Programme for Research and Innovation (2021-2027) – and in actions under the",
+          "tier2b_refs": [
+            "$.budget_regime_source_spans[0]"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        }
+      ],
+      "relied_on_for": [
+        {
+          "what": "The action type, and the two eligibility conditions the consortium design answers: the open Joint Research Centre place, and the obligation to use Copernicus or Galileo/EGNOS once the project uses satellite data.",
+          "claim_refs": [
+            "C03",
+            "C22"
+          ],
+          "span_refs": [
+            "SRC-WP9-P73#657-895",
+            "SRC-WP9-P73#914-977",
+            "SRC-WP9-P73#978-1024",
+            "SRC-WP9-P73#1129-1392",
+            "SRC-WP9-P73#1231-1289",
+            "SRC-WP9-P73#1393-1623",
+            "SRC-WP9-P73#1540-1571",
+            "SRC-WP9-P73#1751-2014"
+          ],
+          "status": "Confirmed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-WP9-P74",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 74",
+      "kind": "call_document_page",
+      "status": "Confirmed",
+      "what_the_page_carries": "The topic's expected outcomes, and the binding force of the outcome list.",
+      "citation": {
+        "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 74.",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 74
+      },
+      "resolves_to": {
+        "class": "stored_document",
+        "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 74,
+        "what_it_holds": "Page 74 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+      },
+      "transcription": {
+        "state": "transcribed",
+        "method": "pymupdf_page_text_whitespace_normalised",
+        "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+      },
+      "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 74 of 360 Research and Training Programme of the European Atomic Energy Community (2021-2025) 112. Expected Outcome: Project results are expected to contribute to all of the following expected outcomes: • advancing robust, policy-relevant ecosystem assessment, nature protection and restoration planning activities, and biodiversity trend prediction based on fit for purpose data, thus supporting EU biodiversity and climate objectives; • strengthened capacity of researchers, practitioners and decision-makers to improve biodiversity monitoring practices and address knowledge gaps via the integration of data and observations across sensors and platforms, ranging from omics-based data (genomic, transcriptomic, metabolomic), various in-situ to satellite-based Earth observation data; • enhanced usability of in-situ datasets as training and validation resources for statistical, machine learning and advanced AI-based approaches, in support of applications such as habitat classification, ecosystem mapping and biodiversity trend prediction. Scope: Achieving the goals of the EU biodiversity strategy for 2030, the Kunming-Montreal Global Biodiversity Framework, and assessing progress towards their defined targets, requires coherent, integrated and long-term monitoring approaches, underpinned by FAIR (Findable, Accessible, Interoperable and Re-usable) data systems. Many existing in-situ data collections (i.e. genomic assessments, ground sampling, drone and airborne observations) were not designed with Satellite Remote Sensing integration in mind (i.e. for validation and calibration, integrated data products, or statistical scaling of information) and lack the structure, interface and metadata required to support advanced analytics, including AI. FAIR data on species and ecosystems will also help to ensure that biodiversity preservation is a mainstream feature of other sectors, such as agriculture, transport, energy or the bioeconomy. There is a need for systemic, harmonised or standardised biodiversity data at Earth’s surface in order to support AI applications ranging from genome to space and to build up our knowledge on the status and trends of habitats, species, ecosystems, and on the drivers of decline. To address these challenges, proposals should: • develop and validate fit-for-purpose multisensory biodiversity data integration systems, to enable omics-based and in-situ data harmonization and integration with remote sensing data from space or sub-orbital platforms, as well as socio-ecological and climatic data for enhancing assessment of ecosystem condition and degradation, and the predictive modelling of biodiversity trends at international, regional and European scales; 112 This decision is available on the Funding and Tenders Portal, in the reference documents section for Horizon Europe, under ‘Simplified costs decisions’ or through this link: https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/horizon/guidance/ls- decision_he_en.pdf",
+      "spans": [
+        {
+          "span_id": "SRC-WP9-P74#131-219",
+          "start": 131,
+          "end": 219,
+          "quote": "Research and Training Programme of the European Atomic Energy Community (2021-2025) 112.",
+          "tier2b_refs": [
+            "$.budget_regime_source_spans[1]"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P74#238-323",
+          "start": 238,
+          "end": 323,
+          "quote": "Project results are expected to contribute to all of the following expected outcomes:",
+          "tier2b_refs": [
+            "$.expected_outcomes_binding_source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P74#344-424",
+          "start": 344,
+          "end": 424,
+          "quote": "policy-relevant ecosystem assessment, nature protection and restoration planning",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C19"
+          ],
+          "requirement_refs": [
+            "EO1"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P74#560-631",
+          "start": 560,
+          "end": 631,
+          "quote": "strengthened capacity of researchers, practitioners and decision-makers",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C20"
+          ],
+          "requirement_refs": [
+            "EO2"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P74#792-847",
+          "start": 792,
+          "end": 847,
+          "quote": "omics-based data (genomic, transcriptomic, metabolomic)",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C02"
+          ],
+          "requirement_refs": [
+            "EO2"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P74#952-985",
+          "start": 952,
+          "end": 985,
+          "quote": "training and validation resources",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C06"
+          ],
+          "requirement_refs": [
+            "EO3"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P74#1089-1164",
+          "start": 1089,
+          "end": 1164,
+          "quote": "habitat classification, ecosystem mapping and biodiversity trend prediction",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C07"
+          ],
+          "requirement_refs": [
+            "EO3",
+            "EO1"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P74#1948-2035",
+          "start": 1948,
+          "end": 2035,
+          "quote": "biodiversity preservation is a mainstream feature of other sectors, such as agriculture",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C10"
+          ],
+          "requirement_refs": [
+            "EO1",
+            "SR4"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P74#2423-2489",
+          "start": 2423,
+          "end": 2489,
+          "quote": "fit-for-purpose multisensory biodiversity data integration systems",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C01"
+          ],
+          "requirement_refs": [
+            "SR1"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P74#2741-2831",
+          "start": 2741,
+          "end": 2831,
+          "quote": "predictive modelling of biodiversity trends at international, regional and European scales",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C17"
+          ],
+          "requirement_refs": [
+            "SR1",
+            "EO1"
+          ]
+        }
+      ],
+      "relied_on_for": [
+        {
+          "what": "The three expected outcomes the concept's chain is built to answer, including the omics layer and the training-and-validation outcome.",
+          "claim_refs": [
+            "C01",
+            "C02",
+            "C06",
+            "C07",
+            "C10",
+            "C17",
+            "C19",
+            "C20"
+          ],
+          "span_refs": [
+            "SRC-WP9-P74#131-219",
+            "SRC-WP9-P74#238-323",
+            "SRC-WP9-P74#344-424",
+            "SRC-WP9-P74#560-631",
+            "SRC-WP9-P74#792-847",
+            "SRC-WP9-P74#952-985",
+            "SRC-WP9-P74#1089-1164",
+            "SRC-WP9-P74#1948-2035",
+            "SRC-WP9-P74#2423-2489",
+            "SRC-WP9-P74#2741-2831"
+          ],
+          "status": "Confirmed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-WP9-P75",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 75",
+      "kind": "call_document_page",
+      "status": "Confirmed",
+      "what_the_page_carries": "The topic scope: the five scope requirements, the ecosystem realms, and most of the cross-cutting requirements.",
+      "citation": {
+        "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 75.",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 75
+      },
+      "resolves_to": {
+        "class": "stored_document",
+        "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 75,
+        "what_it_holds": "Page 75 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+      },
+      "transcription": {
+        "state": "transcribed",
+        "method": "pymupdf_page_text_whitespace_normalised",
+        "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+      },
+      "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 75 of 360 • develop concrete technical capabilities able to answer to diverse use cases, across terrestrial, freshwater and marine ecosystems in Member States and Associated Countries. To this end, proposals should identify and prioritise critical biodiversity knowledge gaps and their data needs, with a focus on predictive analytics and the use of AI, and address them by designing data integration approaches that support scientific and policy needs, including biodiversity protection, restoration, and sustainable use goals and targets, as well as other related policy objectives; • develop demonstration and verification cases focusing on specific ecosystems under the EU ecosystem typology113 and habitats, including ecotones114, identified as those under pressure or as restoration priorities. Proposals should take into account socio-economic pressures and activities impacting ecosystems, including land and sea use and emissions of pollutants (e.g. agriculture, aquaculture, urbanization, resource exploitation and management practices). Demonstration cases should be relevant to EO applications, such as AI-assisted ecosystem and habitat mapping, ensuring interoperability with European and global frameworks such as the Global Ecosystem Typology as well as EUNIS, and aligned with reporting requirements under the Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation; • deliver FAIR data, harmonisation workflows and processing protocols supporting data integration from genome to space and verify the use of generated datasets on identified analysis needs. Proposals should link observation data to emerging socio-economic, climate, agriculture, forestry, fisheries and environmental data and to relevant data infrastructures, including, if applicable, the European Open Science Cloud (EOSC) and the European Common Data Spaces and SAGE115; • contribute to consensus and implementation of joint definitions of data collection, metadata and processing protocols, data quality and harmonization of standards enabling the integration of observations “from genomes to space”. Proposals should earmark resources for cooperation with existing initiatives such as in-situ data collection frameworks (e.g., GBIF, OBIS, LUCAS).The Joint Research Centre (JRC) may join the selected consortium in relation to effective coordination with the EC Knowledge Centre for Biodiversity (KCBD) and its Science Service, as well as incorporating the in-situ data from European Commission steered biodiversity monitoring schemes such as LUCAS, specifically LUCAS grassland, and EMBAL (European Monitoring of Biodiversity in 113 The “EU ecosystem typology” is a classification of ecosystem types developed by the Commission and the European Environmental Agency, in collaboration with Member States and it is tailored to meet EU needs. Its first level is legislated and is used for the reporting under in Annex IX of Regulation (EU) 691/2011. 114 Ecotones are areas of steep transition between ecological communities, ecosystems, and/or ecological regions along an environmental or other gradient. (S. Kark, Effects of Ecotones on Biodiversity, Reference Module in Life Sciences, Elsevier, 2017, ISBN 9780128096338, https://doi.org/10.1016/B978-0-12-809633-8.02290-1) 115 https://www.egi.eu/project/sage/.",
+      "spans": [
+        {
+          "span_id": "SRC-WP9-P75#133-305",
+          "start": 133,
+          "end": 305,
+          "quote": "develop concrete technical capabilities able to answer to diverse use cases, across terrestrial, freshwater and marine ecosystems in Member States and Associated Countries.",
+          "tier2b_refs": [
+            "$.ecosystem_realms.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P75#210-262",
+          "start": 210,
+          "end": 262,
+          "quote": "across terrestrial, freshwater and marine ecosystems",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C04"
+          ],
+          "requirement_refs": [
+            "SR2",
+            "REALM-terrestrial",
+            "REALM-freshwater",
+            "REALM-marine"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#336-417",
+          "start": 336,
+          "end": 417,
+          "quote": "identify and prioritise critical biodiversity knowledge gaps and their data needs",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C16"
+          ],
+          "requirement_refs": [
+            "SR2"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#877-920",
+          "start": 877,
+          "end": 920,
+          "quote": "under pressure or as restoration priorities",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C05"
+          ],
+          "requirement_refs": [
+            "SR3"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#957-1017",
+          "start": 957,
+          "end": 1017,
+          "quote": "socio-economic pressures and activities impacting ecosystems",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C13"
+          ],
+          "requirement_refs": [
+            "SR3"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#1169-1396",
+          "start": 1169,
+          "end": 1396,
+          "quote": "Demonstration cases should be relevant to EO applications, such as AI-assisted ecosystem and habitat mapping, ensuring interoperability with European and global frameworks such as the Global Ecosystem Typology as well as EUNIS,",
+          "tier2b_refs": [
+            "$.cross_cutting_requirements.eunis_and_global_ecosystem_typology.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P75#1353-1395",
+          "start": 1353,
+          "end": 1395,
+          "quote": "Global Ecosystem Typology as well as EUNIS",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C08"
+          ],
+          "requirement_refs": [
+            "CC-eunis_and_global_ecosystem_typology",
+            "SR3"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#1397-1557",
+          "start": 1397,
+          "end": 1557,
+          "quote": "and aligned with reporting requirements under the Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation;",
+          "tier2b_refs": [
+            "$.cross_cutting_requirements.policy_reporting_alignment.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P75#1447-1556",
+          "start": 1447,
+          "end": 1556,
+          "quote": "Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C14"
+          ],
+          "requirement_refs": [
+            "CC-policy_reporting_alignment",
+            "EO1"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#1568-1627",
+          "start": 1568,
+          "end": 1627,
+          "quote": "FAIR data, harmonisation workflows and processing protocols",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C18"
+          ],
+          "requirement_refs": [
+            "SR4"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#1748-2031",
+          "start": 1748,
+          "end": 2031,
+          "quote": "Proposals should link observation data to emerging socio-economic, climate, agriculture, forestry, fisheries and environmental data and to relevant data infrastructures, including, if applicable, the European Open Science Cloud (EOSC) and the European Common Data Spaces and SAGE115;",
+          "tier2b_refs": [
+            "$.cross_cutting_requirements.eosc_and_common_data_spaces.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P75#1948-2018",
+          "start": 1948,
+          "end": 2018,
+          "quote": "European Open Science Cloud (EOSC) and the European Common Data Spaces",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C09"
+          ],
+          "requirement_refs": [
+            "CC-eosc_and_common_data_spaces",
+            "SR4"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#2080-2151",
+          "start": 2080,
+          "end": 2151,
+          "quote": "joint definitions of data collection, metadata and processing protocols",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C15"
+          ],
+          "requirement_refs": [
+            "SR5"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#2263-2409",
+          "start": 2263,
+          "end": 2409,
+          "quote": "Proposals should earmark resources for cooperation with existing initiatives such as in-situ data collection frameworks (e.g., GBIF, OBIS, LUCAS).",
+          "tier2b_refs": [
+            "$.cross_cutting_requirements.gbif_obis_lucas_cooperation.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P75#2390-2407",
+          "start": 2390,
+          "end": 2407,
+          "quote": "GBIF, OBIS, LUCAS",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C11"
+          ],
+          "requirement_refs": [
+            "CC-gbif_obis_lucas_cooperation"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P75#2409-2791",
+          "start": 2409,
+          "end": 2791,
+          "quote": "The Joint Research Centre (JRC) may join the selected consortium in relation to effective coordination with the EC Knowledge Centre for Biodiversity (KCBD) and its Science Service, as well as incorporating the in-situ data from European Commission steered biodiversity monitoring schemes such as LUCAS, specifically LUCAS grassland, and EMBAL (European Monitoring of Biodiversity in",
+          "tier2b_refs": [
+            "$.cross_cutting_requirements.lucas_grassland_and_embal.source_span[0]"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P75#2705-2751",
+          "start": 2705,
+          "end": 2751,
+          "quote": "LUCAS, specifically LUCAS grassland, and EMBAL",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C12"
+          ],
+          "requirement_refs": [
+            "CC-lucas_grassland_and_embal"
+          ]
+        }
+      ],
+      "relied_on_for": [
+        {
+          "what": "The scope requirements, the three ecosystem realms, and the cooperation, monitoring-data, typology-interoperability, data-infrastructure and policy-reporting duties the concept assigns to named partners.",
+          "claim_refs": [
+            "C04",
+            "C05",
+            "C08",
+            "C09",
+            "C11",
+            "C12",
+            "C13",
+            "C14",
+            "C15",
+            "C16",
+            "C18"
+          ],
+          "span_refs": [
+            "SRC-WP9-P75#133-305",
+            "SRC-WP9-P75#210-262",
+            "SRC-WP9-P75#336-417",
+            "SRC-WP9-P75#877-920",
+            "SRC-WP9-P75#957-1017",
+            "SRC-WP9-P75#1169-1396",
+            "SRC-WP9-P75#1353-1395",
+            "SRC-WP9-P75#1397-1557",
+            "SRC-WP9-P75#1447-1556",
+            "SRC-WP9-P75#1568-1627",
+            "SRC-WP9-P75#1748-2031",
+            "SRC-WP9-P75#1948-2018",
+            "SRC-WP9-P75#2080-2151",
+            "SRC-WP9-P75#2263-2409",
+            "SRC-WP9-P75#2390-2407",
+            "SRC-WP9-P75#2409-2791",
+            "SRC-WP9-P75#2705-2751"
+          ],
+          "status": "Confirmed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-WP9-P76",
+      "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 76",
+      "kind": "call_document_page",
+      "status": "Confirmed",
+      "what_the_page_carries": "The remainder of the scope: research-infrastructure services, the FuturEO coordination duty and the tail of the monitoring-scheme sentence that straddles the page break.",
+      "citation": {
+        "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 76.",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 76
+      },
+      "resolves_to": {
+        "class": "stored_document",
+        "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+        "document_id": "tier2b.wp9.horizon-2026-2027",
+        "page": 76,
+        "what_it_holds": "Page 76 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+      },
+      "transcription": {
+        "state": "transcribed",
+        "method": "pymupdf_page_text_whitespace_normalised",
+        "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+      },
+      "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 76 of 360 Agricultural Landscapes). Proposals may consider services offered by European research infrastructures116. This topic is part of the Biodiversity cluster of the EC-ESA Earth System Science Initiative (ESSI). Proposals should foresee sufficient mean for effective coordination with projects selected under ESA’s FuturEO programme. HORIZON-CL6-2027-01-BIODIV-02: Science-policy support to the implementation of EU and global biodiversity policies and strategies Call: Call 01 - single stage (2027) Specific conditions Expected EU contribution per project The Commission estimates that an EU contribution of around EUR 7.00 million would allow these outcomes to be addressed appropriately. Nonetheless, this does not preclude submission and selection of a proposal requesting different amounts. Indicative budget The total indicative budget for the topic is EUR 7.00 million. Type of Action Coordination and Support Actions Eligibility conditions The conditions are described in General Annex B. The following exceptions apply: The Joint Research Centre (JRC) may participate as member of the consortium selected for funding as a beneficiary with zero funding, or as an associated partner. The JRC will not participate in the preparation and submission of the proposal - see General Annex B. Legal and financial set-up of the Grant Agreements The rules are described in General Annex G. The following exceptions apply: Eligible costs will take the form of a lump sum as defined in the Decision of 7 July 2021 authorising the use of lump sum contributions under the Horizon Europe Programme – the Framework Programme for Research and Innovation (2021-2027) – and in actions under the Research and Training Programme of the European Atomic Energy Community (2021-2025) 117. Beneficiaries may provide financial support to third parties. The support to third parties can only be provided in the form of grants. The 116 The catalogue of European Strategy Forum on Research Infrastructures (ESFRI) research infrastructures portfolio can be browsed from ESFRI website https://ri-portfolio.esfri.eu/ 117 This decision is available on the Funding and Tenders Portal, in the reference documents section for Horizon Europe, under ‘Simplified costs decisions’ or through this link: https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/horizon/guidance/ls- decision_he_en.pdf",
+      "spans": [
+        {
+          "span_id": "SRC-WP9-P76#131-156",
+          "start": 131,
+          "end": 156,
+          "quote": "Agricultural Landscapes).",
+          "tier2b_refs": [
+            "$.cross_cutting_requirements.lucas_grassland_and_embal.source_span[1]"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P76#157-237",
+          "start": 157,
+          "end": 237,
+          "quote": "Proposals may consider services offered by European research infrastructures116.",
+          "tier2b_refs": [
+            "$.cross_cutting_requirements.research_infrastructures.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P76#180-233",
+          "start": 180,
+          "end": 233,
+          "quote": "services offered by European research infrastructures",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C23"
+          ],
+          "requirement_refs": [
+            "CC-research_infrastructures"
+          ]
+        },
+        {
+          "span_id": "SRC-WP9-P76#238-460",
+          "start": 238,
+          "end": 460,
+          "quote": "This topic is part of the Biodiversity cluster of the EC-ESA Earth System Science Initiative (ESSI). Proposals should foresee sufficient mean for effective coordination with projects selected under ESA’s FuturEO programme.",
+          "tier2b_refs": [
+            "$.cross_cutting_requirements.esa_futureo_coordination.source_span"
+          ],
+          "claim_refs": [],
+          "requirement_refs": []
+        },
+        {
+          "span_id": "SRC-WP9-P76#442-459",
+          "start": 442,
+          "end": 459,
+          "quote": "FuturEO programme",
+          "tier2b_refs": [],
+          "claim_refs": [
+            "C21"
+          ],
+          "requirement_refs": [
+            "CC-esa_futureo_coordination"
+          ]
+        }
+      ],
+      "relied_on_for": [
+        {
+          "what": "The FuturEO coordination duty, and the permissive research-infrastructure clause.",
+          "claim_refs": [
+            "C21",
+            "C23"
+          ],
+          "span_refs": [
+            "SRC-WP9-P76#131-156",
+            "SRC-WP9-P76#157-237",
+            "SRC-WP9-P76#180-233",
+            "SRC-WP9-P76#238-460",
+            "SRC-WP9-P76#442-459"
+          ],
+          "status": "Confirmed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-GBIF",
+      "title": "Global Biodiversity Information Facility (GBIF)",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "GBIF"
+      ],
+      "citation": {
+        "cited_as": "Global Biodiversity Information Facility (GBIF), the international open-data infrastructure publishing species occurrence records."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#2263-2409",
+        "verbatim": "GBIF",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://www.gbif.org",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The GBIF portal, from which occurrence records and the publishing standards they follow are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The cooperation duty the scope places on the proposal, and the publishing route P10 offers for occurrence data.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-OBIS",
+      "title": "Ocean Biodiversity Information System (OBIS)",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "OBIS"
+      ],
+      "citation": {
+        "cited_as": "Ocean Biodiversity Information System (OBIS), the marine counterpart to GBIF, hosted under the IOC of UNESCO."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#2263-2409",
+        "verbatim": "OBIS",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://obis.org",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The OBIS portal, from which marine occurrence records are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The marine limb of the cooperation duty, which P08 answers by contributing coastal occurrence data.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-LUCAS",
+      "title": "LUCAS — Land Use and Coverage Area frame Survey",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "LUCAS"
+      ],
+      "citation": {
+        "cited_as": "LUCAS (Land Use and Coverage Area frame Survey), the Eurostat in-situ survey of land cover and land use, including its grassland module."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#2263-2409",
+        "verbatim": "LUCAS",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://ec.europa.eu/eurostat/web/lucas",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The Eurostat LUCAS pages, from which the survey design and the released data are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "Both duties that name it: cooperation with an existing in-situ framework, and ingestion of Commission-steered monitoring data.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-EMBAL",
+      "title": "EMBAL — European Monitoring of Biodiversity in Agricultural Landscapes",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "EMBAL"
+      ],
+      "citation": {
+        "cited_as": "EMBAL (European Monitoring of Biodiversity in Agricultural Landscapes), a Commission-steered field survey of biodiversity in farmed landscapes."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#2409-2791",
+        "verbatim": "EMBAL",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": null,
+        "identifier_status": "Unresolved",
+        "basis": "No public persistent identifier is recorded, because none could be verified here. The entry is Unresolved on its identifier and resolves through its anchor instead.",
+        "what_it_holds": "Nothing is stored and no persistent identifier is recorded. The only verified text about EMBAL on this branch is the call sentence that names it."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The monitoring-data ingestion duty, which the concept assigns to P03 and P10.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-EUNIS",
+      "title": "EUNIS habitat classification",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "EUNIS"
+      ],
+      "citation": {
+        "cited_as": "The EUNIS habitat classification, maintained by the European Environment Agency."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1169-1396",
+        "verbatim": "EUNIS",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://eunis.eea.europa.eu",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The EEA's EUNIS pages, from which the habitat classes and their definitions are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The interoperability duty: every habitat label the project publishes carries a crosswalk to it, which P10 owns.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-GET",
+      "title": "IUCN Global Ecosystem Typology",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "Global Ecosystem Typology"
+      ],
+      "citation": {
+        "cited_as": "The IUCN Global Ecosystem Typology, the function-based global classification of ecosystems."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1169-1396",
+        "verbatim": "Global Ecosystem Typology",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://global-ecosystems.org",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The typology's own site, from which the biome and ecosystem functional group definitions are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The second half of the interoperability duty, alongside EUNIS.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-EOSC",
+      "title": "European Open Science Cloud (EOSC)",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "EOSC",
+        "European Open Science Cloud"
+      ],
+      "citation": {
+        "cited_as": "The European Open Science Cloud (EOSC), the European federation of research data services."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1748-2031",
+        "verbatim": "EOSC",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://eosc.eu",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The EOSC portal, from which the service catalogue and onboarding requirements are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The data-infrastructure linking duty, which P10 and P04 hold.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-CDS",
+      "title": "European Common Data Spaces",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "European Common Data Spaces"
+      ],
+      "citation": {
+        "cited_as": "The European Common Data Spaces, the Commission's sectoral data space programme, including its agriculture and Green Deal strands."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1748-2031",
+        "verbatim": "European Common Data Spaces",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://digital-strategy.ec.europa.eu/en/policies/data-spaces",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The Commission's data spaces policy pages, from which the governance and interoperability expectations are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The other half of the data-infrastructure duty the concept accepts.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-COPERNICUS",
+      "title": "Copernicus, the EU Earth observation programme",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "Copernicus"
+      ],
+      "citation": {
+        "cited_as": "Copernicus, the European Union's Earth observation programme, including its Sentinel missions and its data and information services."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P73",
+        "span_id": "SRC-WP9-P73#1393-1623",
+        "verbatim": "Copernicus",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://www.copernicus.eu",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The Copernicus programme pages, from which mission specifications and data access terms are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The eligibility condition on satellite data, and the satellite layer of the observation chain that P02 and P12 hold.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-GALILEO",
+      "title": "Galileo and EGNOS",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "Galileo",
+        "EGNOS"
+      ],
+      "citation": {
+        "cited_as": "Galileo, the EU global navigation satellite system, and EGNOS, its European augmentation service."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P73",
+        "span_id": "SRC-WP9-P73#1393-1623",
+        "verbatim": "Galileo",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://www.euspa.europa.eu",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The EU Agency for the Space Programme pages, from which the positioning services and their accuracy are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The positioning limb of the same eligibility condition, which bears on how in-situ plots and aerial survey are georeferenced.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-FUTUREO",
+      "title": "ESA FuturEO programme",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "FuturEO"
+      ],
+      "citation": {
+        "cited_as": "FuturEO, the European Space Agency's Earth observation research programme, whose projects this topic asks selected consortia to coordinate with."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P76",
+        "span_id": "SRC-WP9-P76#238-460",
+        "verbatim": "FuturEO",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://www.esa.int/Applications/Observing_the_Earth",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "ESA's Earth observation pages. The programme's own project list is not recorded, so which FuturEO projects exist at the deadline is not known here."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The coordination duty the concept assigns to P02 and P12.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-HABITATS-DIR",
+      "title": "Habitats Directive 92/43/EEC",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "Habitats Directive"
+      ],
+      "citation": {
+        "cited_as": "Council Directive 92/43/EEC of 21 May 1992 on the conservation of natural habitats and of wild fauna and flora."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1397-1557",
+        "verbatim": "Habitats Directive",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "http://data.europa.eu/eli/dir/1992/43/oj",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The consolidated directive, from which the Article 17 reporting obligations and the habitat annexes are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The policy-reporting alignment duty, and the reporting needs P11 analyses.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-BIRDS-DIR",
+      "title": "Birds Directive 2009/147/EC",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "Birds Directive"
+      ],
+      "citation": {
+        "cited_as": "Directive 2009/147/EC of the European Parliament and of the Council of 30 November 2009 on the conservation of wild birds."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1397-1557",
+        "verbatim": "Birds Directive",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "http://data.europa.eu/eli/dir/2009/147/oj",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The directive, from which the Article 12 reporting obligations are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The same policy-reporting duty, for the farmland and wetland species the terrestrial and freshwater cases cover.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-MSFD",
+      "title": "Marine Strategy Framework Directive 2008/56/EC",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "Marine Strategy Framework Directive"
+      ],
+      "citation": {
+        "cited_as": "Directive 2008/56/EC of the European Parliament and of the Council of 17 June 2008 establishing a framework for community action in the field of marine environmental policy."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1397-1557",
+        "verbatim": "Marine Strategy Framework Directive",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "http://data.europa.eu/eli/dir/2008/56/oj",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The directive, from which the good-environmental-status descriptors and their indicators are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The marine limb of the policy-reporting duty, which P08 answers through its indicator work.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-NRR",
+      "title": "Nature Restoration Regulation (EU) 2024/1991",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "EU Nature Restoration Regulation"
+      ],
+      "citation": {
+        "cited_as": "Regulation (EU) 2024/1991 of the European Parliament and of the Council of 24 June 2024 on nature restoration."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1397-1557",
+        "verbatim": "EU Nature Restoration Regulation",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "http://data.europa.eu/eli/reg/2024/1991/oj",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The regulation, from which the restoration targets, the ecosystem condition indicators and the national planning obligations are obtained."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The restoration-priority framing of the demonstration cases, and the reporting alignment the scope requires.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    },
+    {
+      "source_id": "SRC-FAIR",
+      "title": "The FAIR data principles",
+      "kind": "external_reference",
+      "status": "Assumed",
+      "names": [
+        "FAIR"
+      ],
+      "citation": {
+        "cited_as": "Wilkinson, M. D. et al. (2016), 'The FAIR Guiding Principles for scientific data management and stewardship', Scientific Data 3, 160018."
+      },
+      "anchor": {
+        "via_source": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#1568-1627",
+        "verbatim": "FAIR",
+        "what_the_anchor_shows": "The call text names this source, inside a span replayed byte-for-byte from the stored page. It does not show what the source itself contains."
+      },
+      "resolves_to": {
+        "class": "external_identifier",
+        "identifier": "https://doi.org/10.1038/sdata.2016.18",
+        "identifier_status": "Assumed",
+        "basis": "Recorded from the model's prior knowledge of the public identifier and not resolved: this workspace has no verified network egress and no copy is stored in the repository. Flagged Assumed under CLAUDE.md §10.6. An operator confirms it by resolving the identifier.",
+        "what_it_holds": "The paper that states the four principles the call's FAIR requirement refers to."
+      },
+      "transcription": {
+        "state": "cited_only",
+        "reason": "No copy is stored in this repository and this workspace has no verified network egress, so no verbatim text is transcribed. The record therefore carries no span, and no claim can be verified against it."
+      },
+      "relied_on_for": [
+        {
+          "what": "The harmonisation and metadata workflows the fourth scope requirement asks for, which P04 and P10 engineer.",
+          "claim_refs": [],
+          "span_refs": [],
+          "status": "Assumed"
+        }
+      ]
+    }
+  ],
+  "names_that_are_not_sources": {
+    "Associated Country": "Tier 1 eligibility vocabulary, the other half of the composition condition.",
+    "BIODIV-01": "The tail of the topic identifier.",
+    "CLAUDE": "The filename of the repository constitution, cited by artifacts that name the clause they comply with.",
+    "Confirmed for Tier": "A regex artifact spanning a status word and a tier reference in adjacent prose.",
+    "DNA": "Part of 'environmental DNA', a technique named in partner capabilities. A method, not a document.",
+    "EUR": "The currency of the budget figure.",
+    "European Space Agency": "The agency whose FuturEO programme the project coordinates with. The programme has an entry (SRC-FUTUREO); the agency as an institution is not itself cited.",
+    "HORIZON": "The first token of the topic and call identifiers. An identifier, not a document.",
+    "Ingest Commission": "A regex artifact from the coordination table row 'Ingest Commission-steered monitoring data'.",
+    "Ingest the Commission": "The same row in project_summary.json, where the phrase reads 'Ingest the Commission-steered monitoring data'.",
+    "Integrating Remote Sensing": "The opening words of the topic title.",
+    "Joint Research Centre": "An EU body the topic allows into the consortium as a zero-funding beneficiary. The concept holds a place for it and cites nothing from it. Its permission is Tier 2B text, carried by the page 73 source.",
+    "Marine Strategy Framework Directive and EU Nature Restoration Regulation": "A regex artifact: the sweep glues two adjacent directive names that the call sentence joins with 'and'. Both halves are sources — SRC-MSFD and SRC-NRR — and each is claimed under its own name.",
+    "Member State": "Tier 1 eligibility vocabulary, carried by the composition condition. Tier 1 governs it.",
+    "Member States and Associated Countries": "A Tier 2B scope phrase naming where use cases must sit. A requirement, not a source.",
+    "REALM": "The prefix of the three requirement references REALM-terrestrial, REALM-freshwater and REALM-marine in project_summary.json. An internal reference key.",
+    "RIA": "The Tier 2A instrument name. A structural authority, not source material.",
+    "Research and Innovation Action": "The Tier 2A action type the topic selects. Tier 2A governs it; nothing is cited from it.",
+    "SME": "An enterprise category from Tier 1 participation vocabulary, used as a partner type in partners.json.",
+    "Satellite Remote Sensing": "A Tier 2B scope phrase describing a measurement class. No document is cited under it; the Copernicus entry carries the missions.",
+    "The Joint Research Centre": "The same body with its article. Same disposition.",
+    "The Tier": "A regex artifact: the article plus a tier reference.",
+    "Use the European": "A regex artifact from a claim that begins 'Use the European radar and optical missions'."
+  },
+  "names_that_are_not_sources_note": "The completeness half of the check. runner/source_index.candidate_names sweeps the concept brief and the consortium registry for every acronym and every multi-word capitalised name, and each candidate must be either claimed by a source's 'names' or declared here with a reason. An unclassified candidate fails the check, so a framework added to the concept later cannot pass unnoticed. Single capitalised words are the sweep's known limit and are listed in SINGLE_WORD_EXTERNALS instead.",
+  "field_status": {
+    "transcribed_text_and_spans": "Confirmed. Re-derived from the stored PDF on every check and compared byte for byte.",
+    "anchors": "Confirmed. Each anchor string is checked to occur inside a replayed span.",
+    "external_identifiers": "Assumed, or Unresolved where none is recorded. None was resolved on this branch.",
+    "what_each_external_source_contains": "Assumed. Nothing is stored, so the citation describes the document without quoting it.",
+    "relied_on_for_of_an_external_reference": "Assumed. The anchor shows the call names the source. It does not show the source supports the use."
+  },
+  "authored_by": "tools/author_demo_sources.py, for the ticket 'Source materials and the sources index' in plans/dev_graph_demo_tickets.md, branch dev_graph_demo.",
+  "note": "Anonymity: no organisation name, person name, place, web address, grant or project identifier from instance one appears here. The web addresses are public European and international framework addresses, none of which is tied to instance one. No unpublished material and no manuscript is cited."
+}

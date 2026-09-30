@@ -1,0 +1,445 @@
+{
+  "report_id": "demo_source_materials_2026-09-30",
+  "report_kind": "source index verification and evidence-base assessment",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Source materials and the sources index' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §12.1 (a reviewable output names its inputs by tier and file, states its inferences and flags its assumptions) and §12.2 (the four status categories). §10.6 governs the identifiers recorded from prior knowledge. A ticket-authored report. No gate reads it.",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "question_asked": "Does instance two's source index give the concept an evidence base, and how much of that base can be checked from inside this repository?",
+  "answer": "Twenty-two sources. Six are pages of the stored work programme PDF, transcribed and re-derived byte for byte on every check, carrying 45 resolved spans between them. Sixteen are external references — policy instruments, data infrastructures, public datasets and one paper — and not one carries text, because no copy is stored and this workspace has no verified network egress. Every one of the 23 concept claims has a span carrying its call phrase verbatim. No project claim resolves against a policy instrument, a dataset or a paper. That is the honest state of the evidence base, and finding F1 records it rather than the index papering over it.",
+  "inputs": [
+    {
+      "tier": "Tier 2B",
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+      "used_for": "The six transcribed pages. The only document on this branch from which verbatim text can be derived and replayed."
+    },
+    {
+      "tier": "Tier 2B",
+      "path": "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+      "used_for": "The 24 recorded quotes on the cited pages, whose offsets the derivation locates, and the page each one declares."
+    },
+    {
+      "tier": "Tier 3",
+      "path": "docs/tier3_project_instantiation/project_brief/project_summary.json",
+      "used_for": "The 23 concept claims whose call phrases become spans, and the claim ids and requirement refs a span carries."
+    },
+    {
+      "tier": "Tier 3",
+      "path": "docs/tier3_project_instantiation/project_brief/concept_note.md",
+      "used_for": "One of the five artifacts swept for external names."
+    },
+    {
+      "tier": "Tier 3",
+      "path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "used_for": "Swept for external names. A framework a partner capability names is cited by the concept's capability claims just as surely as one the prose names."
+    },
+    {
+      "tier": "Index",
+      "path": "docs/index/document_registry.json",
+      "used_for": "The document id every page source must name (§9.6)."
+    }
+  ],
+  "outputs": [
+    "docs/tier3_project_instantiation/source_materials/sources.json",
+    "runner/source_index.py",
+    "tools/author_demo_sources.py",
+    "tests/runner/test_source_index.py",
+    "tests/test_demo_sources.py",
+    "docs/tier4_orchestration_state/validation_reports/demo-source-materials_2026-09-30.json",
+    "docs/tier4_orchestration_state/decision_log/demo-source-materials_2026-09-30.json"
+  ],
+  "transcribed_sources": [
+    {
+      "source_id": "SRC-WP9-P34",
+      "page": 34,
+      "carries": "The call conditions table: opening date, deadline and deadline model.",
+      "transcribed_chars": 1505,
+      "spans": 4,
+      "status": "Confirmed"
+    },
+    {
+      "source_id": "SRC-WP9-P35",
+      "page": 35,
+      "carries": "The call conditions table: indicative budget and the number of projects.",
+      "transcribed_chars": 1687,
+      "spans": 1,
+      "status": "Confirmed"
+    },
+    {
+      "source_id": "SRC-WP9-P73",
+      "page": 73,
+      "carries": "The topic header: type of action, budget regime, and the two topic-level eligibility exceptions.",
+      "transcribed_chars": 2014,
+      "spans": 8,
+      "status": "Confirmed"
+    },
+    {
+      "source_id": "SRC-WP9-P74",
+      "page": 74,
+      "carries": "The three expected outcomes, and the binding force of the outcome list.",
+      "transcribed_chars": 3121,
+      "spans": 10,
+      "status": "Confirmed"
+    },
+    {
+      "source_id": "SRC-WP9-P75",
+      "page": 75,
+      "carries": "The five scope requirements, the ecosystem realms, and most of the cross-cutting requirements.",
+      "transcribed_chars": 3472,
+      "spans": 17,
+      "status": "Confirmed"
+    },
+    {
+      "source_id": "SRC-WP9-P76",
+      "page": 76,
+      "carries": "The FuturEO coordination duty, the research-infrastructure clause, and the tail of the monitoring-scheme sentence that straddles the page break.",
+      "transcribed_chars": 2508,
+      "spans": 5,
+      "status": "Confirmed"
+    }
+  ],
+  "transcribed_sources_basis": "Every row is Confirmed on one basis only: runner.source_index.read_page_text re-run against the stored PDF, compared byte for byte, on every check. Nothing here is Confirmed because it looks right.",
+  "transcribed_sources_note": "One source per cited page, not one per document. A page is the citation unit the call extract already uses, and page-local offsets stay stable when an uncited page changes. Only pages the call extract or a concept claim actually cites are transcribed: an uncited page would be an unused copy of a Tier 2B document sitting in Tier 3.",
+  "external_references": [
+    {
+      "source_id": "SRC-GBIF",
+      "title": "Global Biodiversity Information Facility (GBIF)",
+      "names": [
+        "GBIF"
+      ],
+      "identifier": "https://www.gbif.org",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#2263-2409",
+      "anchor_verbatim": "GBIF",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-OBIS",
+      "title": "Ocean Biodiversity Information System (OBIS)",
+      "names": [
+        "OBIS"
+      ],
+      "identifier": "https://obis.org",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#2263-2409",
+      "anchor_verbatim": "OBIS",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-LUCAS",
+      "title": "LUCAS — Land Use and Coverage Area frame Survey",
+      "names": [
+        "LUCAS"
+      ],
+      "identifier": "https://ec.europa.eu/eurostat/web/lucas",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#2263-2409",
+      "anchor_verbatim": "LUCAS",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-EMBAL",
+      "title": "EMBAL — European Monitoring of Biodiversity in Agricultural Landscapes",
+      "names": [
+        "EMBAL"
+      ],
+      "identifier": null,
+      "identifier_status": "Unresolved",
+      "anchored_in": "SRC-WP9-P75#2409-2791",
+      "anchor_verbatim": "EMBAL",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-EUNIS",
+      "title": "EUNIS habitat classification",
+      "names": [
+        "EUNIS"
+      ],
+      "identifier": "https://eunis.eea.europa.eu",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1169-1396",
+      "anchor_verbatim": "EUNIS",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-GET",
+      "title": "IUCN Global Ecosystem Typology",
+      "names": [
+        "Global Ecosystem Typology"
+      ],
+      "identifier": "https://global-ecosystems.org",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1169-1396",
+      "anchor_verbatim": "Global Ecosystem Typology",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-EOSC",
+      "title": "European Open Science Cloud (EOSC)",
+      "names": [
+        "EOSC",
+        "European Open Science Cloud"
+      ],
+      "identifier": "https://eosc.eu",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1748-2031",
+      "anchor_verbatim": "EOSC",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-CDS",
+      "title": "European Common Data Spaces",
+      "names": [
+        "European Common Data Spaces"
+      ],
+      "identifier": "https://digital-strategy.ec.europa.eu/en/policies/data-spaces",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1748-2031",
+      "anchor_verbatim": "European Common Data Spaces",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-COPERNICUS",
+      "title": "Copernicus, the EU Earth observation programme",
+      "names": [
+        "Copernicus"
+      ],
+      "identifier": "https://www.copernicus.eu",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P73#1393-1623",
+      "anchor_verbatim": "Copernicus",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-GALILEO",
+      "title": "Galileo and EGNOS",
+      "names": [
+        "Galileo",
+        "EGNOS"
+      ],
+      "identifier": "https://www.euspa.europa.eu",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P73#1393-1623",
+      "anchor_verbatim": "Galileo",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-FUTUREO",
+      "title": "ESA FuturEO programme",
+      "names": [
+        "FuturEO"
+      ],
+      "identifier": "https://www.esa.int/Applications/Observing_the_Earth",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P76#238-460",
+      "anchor_verbatim": "FuturEO",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-HABITATS-DIR",
+      "title": "Habitats Directive 92/43/EEC",
+      "names": [
+        "Habitats Directive"
+      ],
+      "identifier": "http://data.europa.eu/eli/dir/1992/43/oj",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1397-1557",
+      "anchor_verbatim": "Habitats Directive",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-BIRDS-DIR",
+      "title": "Birds Directive 2009/147/EC",
+      "names": [
+        "Birds Directive"
+      ],
+      "identifier": "http://data.europa.eu/eli/dir/2009/147/oj",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1397-1557",
+      "anchor_verbatim": "Birds Directive",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-MSFD",
+      "title": "Marine Strategy Framework Directive 2008/56/EC",
+      "names": [
+        "Marine Strategy Framework Directive"
+      ],
+      "identifier": "http://data.europa.eu/eli/dir/2008/56/oj",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1397-1557",
+      "anchor_verbatim": "Marine Strategy Framework Directive",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-NRR",
+      "title": "Nature Restoration Regulation (EU) 2024/1991",
+      "names": [
+        "EU Nature Restoration Regulation"
+      ],
+      "identifier": "http://data.europa.eu/eli/reg/2024/1991/oj",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1397-1557",
+      "anchor_verbatim": "EU Nature Restoration Regulation",
+      "status": "Assumed"
+    },
+    {
+      "source_id": "SRC-FAIR",
+      "title": "The FAIR data principles",
+      "names": [
+        "FAIR"
+      ],
+      "identifier": "https://doi.org/10.1038/sdata.2016.18",
+      "identifier_status": "Assumed",
+      "anchored_in": "SRC-WP9-P75#1568-1627",
+      "anchor_verbatim": "FAIR",
+      "status": "Assumed"
+    }
+  ],
+  "external_references_basis": "Every row is Assumed on everything except its anchor. The anchor is Confirmed: the named string occurs inside a span that was itself replayed from the stored page. That proves the call text names the source. It proves nothing about what the source contains, which is why no use of an external reference carries Confirmed and no span points at one.",
+  "external_references_note": "Fifteen identifiers are recorded from prior knowledge and flagged Assumed under §10.6. None was resolved: see finding F2. EMBAL carries no identifier at all rather than a guessed one, and resolves through its anchor instead (finding F3).",
+  "coverage": {
+    "concept_claims_with_a_resolved_span": "23 of 23. Each claim's call_phrase occurs verbatim in a transcribed page, at the offsets the span records.",
+    "tier2b_recorded_quotes_located": "24 of 24 on the cited pages. Every quote the call extract recorded for pages 34, 35, 73, 74, 75 and 76 was found verbatim in the transcribed text.",
+    "topic_requirements_reached": "20 of the 20 rows the consortium gap analysis carries: three expected outcomes, five scope requirements, nine cross-cutting requirements and the three ecosystem realms.",
+    "external_names_classified": "39 derived candidates. Eighteen names are claimed by the sixteen external references; 23 candidates are declared not to be sources, each with a reason.",
+    "note": "Requirement coverage here means a span exists that carries the requirement's text. It does not mean the project satisfies the requirement. The gap analysis answers that question, against partners rather than against text."
+  },
+  "what_was_checked_and_how": [
+    {
+      "check": "Transcriptions replay byte for byte.",
+      "how": "runner.source_index.read_page_text is re-run against the stored PDF and compared to the stored text. The generator and the verifier call the same function, so agreement is not two extractors coinciding.",
+      "result": "6 of 6."
+    },
+    {
+      "check": "Spans resolve.",
+      "how": "text[start:end] must equal the recorded quote, exactly.",
+      "result": "45 of 45."
+    },
+    {
+      "check": "References are anchored.",
+      "how": "The anchor string must occur inside the quote of a declared span of the named page source.",
+      "result": "16 of 16."
+    },
+    {
+      "check": "Nothing is overclaimed.",
+      "how": "A use may carry Confirmed only when it names a span the source declares. No external reference declares one, so none can.",
+      "result": "No use of an external reference carries Confirmed."
+    },
+    {
+      "check": "Every cited name is disposed of.",
+      "how": "The sweep derives candidates from five Tier 3 artifacts; each must be claimed by a source or declared with a reason, and a declared name the sweep no longer produces also fails.",
+      "result": "39 of 39."
+    },
+    {
+      "check": "The index is its own derivation.",
+      "how": "tools/author_demo_sources.py --check re-derives the whole file and compares it to disk.",
+      "result": "Identical."
+    },
+    {
+      "check": "The dev-graph builder reads it.",
+      "how": "build_snapshot over the populated repository root, twice.",
+      "result": "34 nodes, 22 of them sources, same snapshot id on both builds."
+    },
+    {
+      "check": "Anonymity.",
+      "how": "runner/leakage_scan.py over Tier 3, Tier 4, Tier 5 and the vault.",
+      "result": "OK, NOT CLEAN. No new leak. The one recorded pre-existing leak in the 22 September purge record is unchanged by this ticket."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "finding": "Sixteen of the twenty-two sources carry no text, so no claim in this project can be verified against a policy instrument, a dataset or a paper. The concept now cites its sources; almost none of those citations can be checked from inside this repository.",
+      "status": "Unresolved",
+      "disposition": "open",
+      "resolution": "The operator stores the documents, or confirms the identifiers from a machine that can resolve them. Either turns a reference into a transcribable source.",
+      "residual": "Until then a Phase 2 state-of-the-art claim has an anchor but no evidence. The concept's own finding F1 asked for an evidence base; this ticket built the frame for one and filled a sixth of it."
+    },
+    {
+      "id": "F2",
+      "finding": "No external identifier was resolved. Two probes from this workspace returned an interstitial (EUR-Lex) and a 403 (GBIF), and the available fetch tool returns a model-written answer rather than raw bytes, which cannot serve as a transcription. All fifteen recorded identifiers are prior knowledge.",
+      "status": "Assumed",
+      "disposition": "declared",
+      "resolution": "Each identifier is flagged Assumed under §10.6 with its basis stated in the record, and the verifier refuses to let any of them be marked Confirmed.",
+      "residual": "An identifier could be wrong — a stale ELI path, a moved portal — and nothing on this branch would notice."
+    },
+    {
+      "id": "F3",
+      "finding": "EMBAL has no recorded identifier. None could be verified here, and the call text names it only in passing.",
+      "status": "Unresolved",
+      "disposition": "declared",
+      "resolution": "The field is null with identifier_status Unresolved, not a guessed URL. The source resolves through its anchor in the stored call page instead, which is what the verifier requires of a reference with no identifier.",
+      "residual": "A reader who wants EMBAL's own documentation gets the call's mention of it and nothing more."
+    },
+    {
+      "id": "F4",
+      "finding": "The call text names three things the concept does not: SAGE (scope requirement 4, footnote 115), the EU biodiversity strategy for 2030 and the Kunming-Montreal Global Biodiversity Framework (both in the scope summary). None has an entry, because the criterion is about sources the concept cites.",
+      "status": "Confirmed",
+      "disposition": "carried",
+      "resolution": "Not a gap in the index. It is a gap in the concept, and it goes to the architecture seeds ticket, where an objective or an impact may want to cite the strategy or the global framework.",
+      "residual": "A reader comparing the index against the call will find three call-named frameworks missing and needs this row to see why."
+    },
+    {
+      "id": "F5",
+      "finding": "The candidate sweep cannot derive a single capitalised word. In English prose most are sentence openers, and no mechanical rule separates Copernicus from Proposals without reading the sentence. Copernicus, FuturEO, Galileo and Sentinel are a hand list in SINGLE_WORD_EXTERNALS.",
+      "status": "Confirmed",
+      "disposition": "declared",
+      "resolution": "The limit is named in the module docstring and pinned by a test, so completeness is claimed for acronyms and multi-word names only.",
+      "residual": "A single-word framework added to the concept later is not derived and will not fail the partition. Only an acronym or a multi-word name will."
+    },
+    {
+      "id": "F6",
+      "finding": "Tier 3 now carries verbatim Tier 2B text. The call extract and this index hold the same sentences, so they could drift apart.",
+      "status": "Confirmed",
+      "disposition": "closed by mechanism",
+      "resolution": "Byte-equal replay, not convention. Both artifacts derive from the same stored PDF, and both fail together if it is replaced. The index also locates every one of the extract's 24 recorded quotes, so a quote edited in the extract alone fails here.",
+      "residual": "The duplication is real. It is bounded to six pages, and no page is transcribed that nothing cites."
+    },
+    {
+      "id": "F7",
+      "finding": "The Joint Research Centre sentence appears identically on pages 73 and 76 of the Part 9 PDF. A phrase-location rule that took the first hit would record the wrong page for concept claim C22.",
+      "status": "Confirmed",
+      "disposition": "closed",
+      "resolution": "The derivation uses the page the call extract declares when the claim's tier2b_span_ref resolves to a span, and refuses with an error when no page is declared and more than one page matches. A span whose page is guessed is a span whose provenance is guessed.",
+      "residual": "None. The refusal is a hard error in tools/author_demo_sources.py, not a warning."
+    },
+    {
+      "id": "F8",
+      "finding": "source_materials/*.json is outside PSEUDONYMITY_JSON_GLOBS, so a real country name in a source record is caught by no mechanism. The word scan reads the file, but country names are SCOPED_OUT of it.",
+      "status": "Confirmed",
+      "disposition": "open",
+      "resolution": "Deliberately not closed. A citation may legitimately name a country — a national dataset, a directive's national plans — and adding this path to the pseudonymity globs would fail on a correct record. The reliance fields use partner pseudonyms, and no entry here names a country.",
+      "residual": "A later ticket that writes a national source into this file has no mechanism telling it the country is a leak. The operator decides whether the pseudonymity check should grow a per-field scope."
+    },
+    {
+      "id": "F9",
+      "finding": "Tier 3 carries web addresses for the first time on this branch. Fifteen of them.",
+      "status": "Confirmed",
+      "disposition": "declared",
+      "resolution": "The constraint forbids instance one's addresses, not every address. Each one is a European or international framework address named in the call. A test asserts partners.json still carries none, because an address in a partner record is what would re-identify a derived partner.",
+      "residual": "The URL pattern in the leakage scan does not read this path, so the assertion rests on that one test rather than on the scan."
+    },
+    {
+      "id": "F10",
+      "finding": "Neither partners.json nor the concept names a Sentinel mission or Darwin Core, though the satellite layer and P10's crosswalk work imply both. Neither has an entry, because neither is cited.",
+      "status": "Confirmed",
+      "disposition": "carried",
+      "resolution": "Goes to the architecture seeds ticket. A work package that names a mission or a metadata standard needs the entry written then, and the partition will demand it.",
+      "residual": "The Copernicus entry names the Sentinel missions in its citation, so the satellite layer is not sourceless. The occurrence-standard crosswalk is."
+    }
+  ],
+  "findings_review": {
+    "note": "F1 is the one that matters. The rest are limits of a mechanism, stated so the mechanism is not mistaken for a guarantee it does not give. F4 and F10 are work for the next ticket, not defects here."
+  },
+  "status_summary": {
+    "transcribed_text_and_offsets": "Confirmed. Machine-derived and re-derived on every check.",
+    "anchors": "Confirmed. Each anchor string is checked inside a replayed span.",
+    "external_identifiers": "Assumed for fifteen references, Unresolved for one.",
+    "what_each_external_source_contains": "Assumed. The citation describes the document without quoting it.",
+    "the_concept_rests_on_evidence": "Unresolved. Sixteen of twenty-two entries cannot be checked from inside this repository."
+  },
+  "status_summary_note": "Only the two mechanical properties are Confirmed, and they are Confirmed because a program re-derives them, not because they were reviewed. Everything that depends on a document this repository does not hold is Assumed.",
+  "authored_by": "Ticket 'Source materials and the sources index', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Anonymity: no organisation name, person name, place, grant or project identifier from instance one appears in this record. The web addresses are public framework addresses, none tied to instance one. runner/leakage_scan.py reports the branch OK and NOT CLEAN, unchanged by this ticket."
+}

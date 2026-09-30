@@ -1,0 +1,84 @@
+{
+  "record_type": "decision",
+  "id": "demo-source-materials",
+  "date": "2026-09-30",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Source materials and the sources index' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §10.5 (a material claim names its tier source), §10.6 (prior knowledge is a last resort and its use is flagged), §11.5 (a gap is flagged, not filled), §12.2 (the four status categories) and §13.3 (no invented project fact). Not a constitutional amendment; §14.5 is not engaged.",
+
+  "decision": "Instance two's source index is built on one rule: a source carries verbatim text only when that text can be re-derived from a file stored in this repository, byte for byte. Six sources meet it — the cited pages of the stored work programme PDF — and carry 45 resolved spans. Sixteen do not, and carry no text at all. The concept's 23 claims each have a span; none of them resolves against a policy instrument, a dataset or a paper. The index says so rather than filling the gap.",
+
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "A source carries verbatim text only when the text replays byte-equal from a stored file. There is no third transcription state.",
+      "reasoning": "A source record is the one place in Tier 3 where an unevidenced claim can be dressed as an evidenced one. Write a plausible citation, invent a quotation, point a span at it, and the snapshot builder reports a grounded claim no document supports. The builder cannot catch that: it has no way to know whether the text is real. Byte-equal replay can. A 'paraphrased' or 'summarised' state would reopen the hole, so the state set is closed at two.",
+      "recorded_in": "sources.json intake_rule; runner/source_index.py TRANSCRIPTION_STATES; tests/runner/test_source_index.py TestTranscription."
+    },
+    {
+      "id": "D2",
+      "decision": "The cited pages of the stored call document are Tier 3 sources.",
+      "reasoning": "The dev graph needs text a span can resolve into, and the stored work programme PDF is the only document on this branch from which verbatim text can be derived and replayed. The cost is duplication: the Tier 2B call extract and this index hold the same sentences. That is accepted because the duplication is closed by mechanism rather than by convention — both derive from the same PDF, the index locates every one of the extract's 24 recorded quotes, and a quote edited in either alone fails. Only pages something cites are transcribed.",
+      "recorded_in": "sources.json sources[kind=call_document_page]; validation report finding F6.",
+      "alternative_rejected": "Cite the call extract instead of the PDF. Rejected: the extract is itself authored, so a span into it would verify against a transcription rather than against the document."
+    },
+    {
+      "id": "D3",
+      "decision": "An external identifier is recorded from prior knowledge, flagged Assumed, and may never be Confirmed.",
+      "reasoning": "Nothing resolved any of them. Two probes from this workspace returned an interstitial and a 403, and the available fetch tool answers a question about a page rather than returning its bytes, which cannot serve as a transcription. §10.6 makes prior knowledge a last resort whose use is flagged, so each identifier carries Assumed with its basis in the record. The verifier refuses Confirmed on an external identifier outright, so the flag cannot be removed by an edit.",
+      "recorded_in": "sources.json resolves_to.identifier_status and basis; runner/source_index.py _check_resolution; validation report finding F2."
+    },
+    {
+      "id": "D4",
+      "decision": "An identifier that could not be recorded is left null, not guessed. The source resolves through its anchor instead.",
+      "reasoning": "EMBAL has no identifier here. A plausible-looking URL would be an invented fact in Tier 3, which is exactly what §13.3 forbids, and it would look identical to the fifteen that are real. The ticket's criterion asks that each entry resolve to a stored file or a public identifier; a null identifier still resolves, through the stored call page that names it. The verifier requires one or the other and refuses a source with neither.",
+      "recorded_in": "sources.json SRC-EMBAL; validation report finding F3."
+    },
+    {
+      "id": "D5",
+      "decision": "Every external reference is anchored in a stored artifact that names it, and the anchor record states what it does not show.",
+      "reasoning": "An anchor is the only thing about an unstored reference that can be checked: the named string occurs inside a span already replayed from the stored page. Without it, 'the concept cites this' is an assertion. With it, the assertion is mechanical. The record also says plainly that the anchor proves the call names the source and proves nothing about what the source contains, because that is the exact confusion the ticket's third criterion guards against.",
+      "recorded_in": "sources.json anchor.what_the_anchor_shows; runner/source_index.py _check_anchor; tests/runner/test_source_index.py TestAnchors."
+    },
+    {
+      "id": "D6",
+      "decision": "The set of sources the concept cites is derived, not hand-listed. Every derived candidate is claimed by a source or declared not to be one, with a reason.",
+      "reasoning": "'Each source cited in the concept has an entry' is only a check if the cited set is computed. A hand list proves the author remembered what the author wrote. The sweep takes every acronym and multi-word capitalised name from the brief and the consortium registry and demands a disposition for each, so a framework added later produces an unclassified candidate and fails. A declared name the sweep no longer produces also fails, because a dead entry hides a drift in the sweep.",
+      "recorded_in": "sources.json names_that_are_not_sources; runner/source_index.py candidate_names and _check_coverage."
+    },
+    {
+      "id": "D7",
+      "decision": "The sweep's limit is named rather than implied: a single capitalised word is a hand list.",
+      "reasoning": "In English prose most single capitalised words are sentence openers, and no mechanical rule separates Copernicus from Proposals without reading the sentence. Claiming completeness over them would be false. The four that matter are listed, the limit is in the module docstring, and a test pins it. Completeness is claimed for acronyms and multi-word names only.",
+      "recorded_in": "runner/source_index.py SINGLE_WORD_EXTERNALS; validation report finding F5."
+    },
+    {
+      "id": "D8",
+      "decision": "The index is generated, not authored. tools/author_demo_sources.py writes it and --check re-derives it.",
+      "reasoning": "Every offset in the file is a derived value, and a derived value typed by hand is a value nobody checked. The generator and the verifier call one extraction function, so a green check is not two extractors agreeing by luck. This decision earned itself during the ticket: the first draft of the validation report carried hand-typed span ids and thirteen of sixteen were wrong. A test now holds the report's rows against the index too.",
+      "recorded_in": "tools/author_demo_sources.py; tests/test_demo_sources.py TestTheIndexVerifies and TestTheHonestState.test_the_report_rows_match_the_index."
+    },
+    {
+      "id": "D9",
+      "decision": "A span carries both the Tier 2B reference that recorded it and the concept claim that needs it.",
+      "reasoning": "Two derivations produce spans: the call extract's recorded quotes, and the concept claims' call phrases. Merging them into one span set without recording which produced each would lose the ability to ask why a span exists. A span that only a claim needs is an evidence request; one that only the extract recorded is a call constraint nothing yet uses. The distinction matters to the architecture seeds ticket.",
+      "recorded_in": "sources.json spans[].tier2b_refs and spans[].claim_refs."
+    },
+    {
+      "id": "D10",
+      "decision": "When a claim's phrase occurs on more than one page, the page the call extract declares governs. With no declared page and more than one match, the derivation fails.",
+      "reasoning": "The Joint Research Centre sentence appears identically on pages 73 and 76. A first-hit rule would have recorded page 73 by accident rather than by evidence, and would record the wrong page the next time the accident fell the other way. A span whose page is guessed is a span whose provenance is guessed, so the generator raises instead.",
+      "recorded_in": "tools/author_demo_sources.py _locate; validation report finding F7."
+    }
+  ],
+
+  "what_this_decision_does_not_settle": [
+    "Whether any recorded identifier is correct. None was resolved, so a stale path or a moved portal would pass unnoticed (finding F2).",
+    "What any external source actually says. Sixteen entries carry a citation and no text, so the project's use of each one is Assumed (finding F1).",
+    "Whether the concept should cite SAGE, the EU biodiversity strategy for 2030 or the Kunming-Montreal Global Biodiversity Framework. The call names all three; the concept names none, so none has an entry. That goes to the architecture seeds ticket (finding F4).",
+    "Whether the pseudonymity check should reach source_materials. A citation may legitimately name a country, so extending the globs would fail on a correct record. Left open for the operator (finding F8)."
+  ],
+
+  "authored_by": "Ticket 'Source materials and the sources index', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+  "note": "Anonymity: no organisation name, person name, place, grant or project identifier from instance one appears in this record. Tier 3 carries public framework web addresses for the first time on this branch, none tied to instance one and none in a partner record (finding F9). runner/leakage_scan.py reports the branch OK and NOT CLEAN, unchanged by this ticket."
+}

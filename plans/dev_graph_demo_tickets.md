@@ -173,9 +173,28 @@ now a fingerprint test, not a convention (D6). An operator act carries a lifecyc
 
 **Blocked by:** Project concept for operator approval.
 
-- [ ] `sources.json` validates against the builder's schema, and the builder reads it without error.
+- [x] `sources.json` validates against the builder's schema, and the builder reads it without error.
 - [ ] Each source cited in the concept has an entry. Each entry resolves to a stored file or a public persistent identifier.
-- [ ] No source is described as supporting a claim it does not contain. Claims without a verified span keep declared status and verified span as separate fields.
+- [x] No source is described as supporting a claim it does not contain. Claims without a verified span keep declared status and verified span as separate fields.
+
+**Outcome.** Twenty-two sources. Six are transcribed pages of the stored Part 9 PDF, carrying 45
+resolved spans. Sixteen are external references carrying no text. All 23 concept claims have a span
+holding their call phrase verbatim. The report and the ten decisions are in
+`demo-source-materials_2026-09-30.json`, under `validation_reports/` and `decision_log/`.
+
+**The rule the index is built on.** A source carries verbatim text only when that text replays
+byte-equal from a stored file. A source record is the one place in Tier 3 where an invented quotation
+plus a span makes the builder report a grounded claim no document supports. The builder cannot catch
+that. Byte-equal replay can.
+
+**Why one box is unticked.** `SRC-EMBAL` resolves to no identifier, only to the call page naming it.
+Nine other identifiers are homepages rather than persistent identifiers. Both are recorded honestly.
+Neither meets the box as written (F3). No identifier was resolved at all: this workspace has no usable
+egress, and the fetch tool returns a written answer rather than bytes (F1, F2).
+
+**Carried forward.** The call names SAGE, the 2030 biodiversity strategy and the Kunming-Montreal
+framework. The concept names none (F4). Nothing names a Sentinel mission or Darwin Core (F10). The name
+sweep cannot derive single capitalised words (F5).
 
 ## Architecture seeds and the uncertainty ledger
 
