@@ -1,6 +1,6 @@
 {
   "schema_id": "orch.phase4.gantt.v1",
-  "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "run_id": "import uuid; print(uuid.uuid4())",
   "tasks": [
     {
       "task_id": "T1.1",
@@ -48,13 +48,13 @@
       "task_id": "T2.2",
       "wp_id": "WP2",
       "start_month": 1,
-      "end_month": 8,
+      "end_month": 9,
       "responsible_partner": "P02"
     },
     {
       "task_id": "T2.3",
       "wp_id": "WP2",
-      "start_month": 4,
+      "start_month": 6,
       "end_month": 14,
       "responsible_partner": "P02"
     },
@@ -62,7 +62,7 @@
       "task_id": "T2.4",
       "wp_id": "WP2",
       "start_month": 4,
-      "end_month": 13,
+      "end_month": 12,
       "responsible_partner": "P11"
     },
     {
@@ -75,7 +75,7 @@
     {
       "task_id": "T3.1",
       "wp_id": "WP3",
-      "start_month": 4,
+      "start_month": 7,
       "end_month": 16,
       "responsible_partner": "P10"
     },
@@ -89,8 +89,8 @@
     {
       "task_id": "T3.3",
       "wp_id": "WP3",
-      "start_month": 12,
-      "end_month": 20,
+      "start_month": 16,
+      "end_month": 24,
       "responsible_partner": "P09"
     },
     {
@@ -103,14 +103,14 @@
     {
       "task_id": "T3.5",
       "wp_id": "WP3",
-      "start_month": 28,
+      "start_month": 24,
       "end_month": 42,
       "responsible_partner": "P10"
     },
     {
       "task_id": "T3.6",
       "wp_id": "WP3",
-      "start_month": 34,
+      "start_month": 30,
       "end_month": 42,
       "responsible_partner": "P10"
     },
@@ -124,28 +124,28 @@
     {
       "task_id": "T4.2",
       "wp_id": "WP4",
-      "start_month": 16,
+      "start_month": 18,
       "end_month": 38,
       "responsible_partner": "P07"
     },
     {
       "task_id": "T4.3",
       "wp_id": "WP4",
-      "start_month": 16,
+      "start_month": 18,
       "end_month": 38,
       "responsible_partner": "P08"
     },
     {
       "task_id": "T4.4",
       "wp_id": "WP4",
-      "start_month": 13,
+      "start_month": 16,
       "end_month": 38,
       "responsible_partner": "P02"
     },
     {
       "task_id": "T4.5",
       "wp_id": "WP4",
-      "start_month": 34,
+      "start_month": 32,
       "end_month": 40,
       "responsible_partner": "P03"
     },
@@ -188,20 +188,20 @@
       "task_id": "T6.2",
       "wp_id": "WP6",
       "start_month": 16,
-      "end_month": 26,
+      "end_month": 24,
       "responsible_partner": "P01"
     },
     {
       "task_id": "T6.3",
       "wp_id": "WP6",
-      "start_month": 28,
+      "start_month": 24,
       "end_month": 38,
       "responsible_partner": "P12"
     },
     {
       "task_id": "T6.4",
       "wp_id": "WP6",
-      "start_month": 38,
+      "start_month": 34,
       "end_month": 45,
       "responsible_partner": "P12"
     },
@@ -222,21 +222,21 @@
     {
       "task_id": "T7.2",
       "wp_id": "WP7",
-      "start_month": 22,
+      "start_month": 20,
       "end_month": 40,
       "responsible_partner": "P04"
     },
     {
       "task_id": "T7.3",
       "wp_id": "WP7",
-      "start_month": 34,
+      "start_month": 30,
       "end_month": 44,
       "responsible_partner": "P05"
     },
     {
       "task_id": "T7.4",
       "wp_id": "WP7",
-      "start_month": 38,
+      "start_month": 32,
       "end_month": 44,
       "responsible_partner": "P06"
     },
@@ -297,10 +297,12 @@
       "verifiable_criterion": "The molecular dataset, the genome-to-space linkage report and the processing pipeline release are delivered, and a molecular record can be joined to an in-situ and a satellite record through the published metadata.",
       "responsible_wp": "WP5",
       "depends_on_tasks": [
+        "T5.1",
         "T5.2",
+        "T5.3",
         "T5.4"
       ],
-      "milestone_type": "intermediate_checkpoint"
+      "milestone_type": "wp_completion"
     },
     {
       "milestone_id": "MS6",
@@ -311,7 +313,8 @@
       "depends_on_tasks": [
         "T4.1",
         "T4.2",
-        "T4.3"
+        "T4.3",
+        "T4.4"
       ],
       "milestone_type": "intermediate_checkpoint"
     },
@@ -333,11 +336,13 @@
       "verifiable_criterion": "The European-scale maps and trend predictions are published with stated uncertainty, the usability evaluation is reported, and the exploitation plan names the route each output takes after the project.",
       "responsible_wp": "WP7",
       "depends_on_tasks": [
+        "T7.1",
+        "T7.2",
         "T7.3",
         "T7.4",
         "T7.5"
       ],
-      "milestone_type": "intermediate_checkpoint"
+      "milestone_type": "wp_completion"
     }
   ],
   "critical_path": [

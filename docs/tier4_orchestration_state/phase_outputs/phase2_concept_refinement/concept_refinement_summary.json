@@ -1,30 +1,28 @@
 {
   "schema_id": "orch.phase2.concept_refinement_summary.v1",
-  "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "run_id": "import uuid; print(uuid.uuid4())",
   "topic_mapping_rationale": {
     "EO-01": {
       "topic_element_id": "EO-01",
-      "mapping_to_concept": "The concept builds outputs for policy-relevant ecosystem assessment, nature protection and restoration planning, and biodiversity trend prediction. Concept claim C19 addresses 'policy-relevant ecosystem assessment, nature protection and restoration planning' through P11's policy-reporting needs assessment under the nature and habitat directives. Claim C17 delivers 'predictive modelling of biodiversity trends at international, regional and European scales' via P12, and C05 selects habitats 'under pressure or as restoration priorities'. The chain rests on fit-for-purpose multisensory data (C01). Mechanism is named and specific; verbatim key terms appear in the concept corpus.",
-      "tier2b_source_ref": "Expected Outcome (p.74); HORIZON-CL6-2027-01-BIODIV-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json claims C19, C17, C05, C01; concept_note.md section 'Three demonstration cases on one gradient' (lines 61-78)",
+      "mapping_to_concept": "The concept builds outputs for policy-relevant ecosystem assessment, nature protection and restoration planning, and biodiversity trend prediction. C19 names these activities verbatim, carried by P11 policy-reporting needs assessment and P10 occurrence-data facility. C07 and C17 supply predictive biodiversity trend modelling scaled from case sites to European coverage via P12. C14 shapes outputs to named reporting instruments so a competent authority can use them. The mechanism is explicit and non-contradicted.",
+      "tier2b_source_ref": "Expected Outcome (WP Part 9, p.74); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C19, C07, C17, C14; concept_note.md 'The chain, from genome to space' and 'Coordination the topic requires'",
       "status": "Confirmed",
-      "vocabulary_gaps": [
-        "climate objectives (the concept references climatic and socio-ecological pressures but does not use the term 'climate objectives' verbatim)"
-      ]
+      "vocabulary_gaps": []
     },
     "EO-02": {
       "topic_element_id": "EO-02",
-      "mapping_to_concept": "The concept strengthens capacity of researchers, practitioners and decision-makers and integrates observations across sensors and platforms from omics to satellite. Claim C20 addresses 'strengthened capacity of researchers, practitioners and decision-makers' through protocols, the user network and stakeholder work. Claim C02 supplies 'omics-based data (genomic, transcriptomic, metabolomic)' from P01 and P09. The genome-to-space chain (concept_note.md table) carries measurement from molecules through in-situ plots to Copernicus satellite data (C03), and C16 identifies and prioritises knowledge gaps. Verbatim key terms and a named mechanism both appear.",
-      "tier2b_source_ref": "Expected Outcome (p.74); HORIZON-CL6-2027-01-BIODIV-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json claims C20, C02, C03, C16; concept_note.md section 'The chain, from genome to space' (lines 46-59)",
+      "mapping_to_concept": "The concept strengthens capacity of researchers, practitioners and decision-makers and integrates data across sensors from omics to satellite. C20 uses the outcome's capacity phrase verbatim, delivered through P05 user network, P11 stakeholder work and P06 protocol transfer. C02 supplies the three omics layers 'omics-based data (genomic, transcriptomic, metabolomic)' verbatim via P01 and P09. C01 integrates multisensory data and C16 addresses knowledge gaps. Mechanism present and consistent.",
+      "tier2b_source_ref": "Expected Outcome (WP Part 9, p.74); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C20, C02, C01, C16; concept_note.md 'The chain, from genome to space' and 'Reaching agriculture'",
       "status": "Confirmed",
       "vocabulary_gaps": []
     },
     "EO-03": {
       "topic_element_id": "EO-03",
-      "mapping_to_concept": "The concept enhances usability of in-situ datasets as training and validation resources for machine learning and AI, supporting habitat classification, ecosystem mapping and biodiversity trend prediction. Claim C06 reworks P03's multi-season field archive into documented 'training and validation resources' with P01's declared leakage-safe split protocol. Claim C07 scales 'habitat classification, ecosystem mapping and biodiversity trend prediction' through P12's deep-learning classification. Verbatim key terms appear and the validation mechanism is specific.",
-      "tier2b_source_ref": "Expected Outcome (p.74); HORIZON-CL6-2027-01-BIODIV-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json claims C06, C07; concept_note.md section 'Training and validation data' (lines 80-88)",
+      "mapping_to_concept": "The concept reworks in-situ datasets into training and validation resources for machine learning and AI, supporting habitat classification, ecosystem mapping and trend prediction. C06 uses 'training and validation resources' verbatim, with P03 archive and a P01 leakage-safe split protocol. C07 uses 'habitat classification, ecosystem mapping and biodiversity trend prediction' verbatim via P12 deep-learning classification. Mechanism explicit and non-contradicted.",
+      "tier2b_source_ref": "Expected Outcome (WP Part 9, p.74); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C06, C07; concept_note.md 'Training and validation data'",
       "status": "Confirmed",
       "vocabulary_gaps": []
     }
@@ -32,131 +30,158 @@
   "scope_coverage": {
     "SR-01": {
       "scope_element_id": "SR-01",
-      "constraint_ref": null,
+      "constraint_ref": "CC-02",
       "coverage_status": "covered",
-      "coverage_description": "The concept builds one fit-for-purpose multisensory data-integration system harmonising omics, in-situ and remote-sensing data, and delivers predictive modelling at case, regional and European scales. Claims C01 and C17 name the system and the three scales.",
-      "tier2b_source_ref": "Scope (p.74-75); HORIZON-CL6-2027-01-BIODIV-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json claims C01, C17; concept_note.md 'The chain, from genome to space' (lines 46-59)",
-      "notes": null
+      "coverage_description": "The concept builds one multisensory integration system harmonising omics, in-situ and remote-sensing data (C01) and delivers predictive modelling at case, regional and European scales (C17). Harmonisation workflows carry provenance (C09).",
+      "tier2b_source_ref": "Scope — 'proposals should' (WP Part 9, p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C01, C17, C09; concept_note.md 'The chain, from genome to space'",
+      "notes": "Socio-ecological and climatic data enter via P11 pressure analysis and P03 weather measurements."
     },
     "SR-02": {
       "scope_element_id": "SR-02",
       "constraint_ref": null,
-      "coverage_status": "covered",
-      "coverage_description": "The concept answers use cases across terrestrial, freshwater and marine ecosystems on one pressure gradient (C04) and prioritises critical knowledge gaps and data needs before the integration design (C16), with predictive analytics via P12. Option 1 takes the consortium to six country slots across Member States and Associated Countries.",
-      "tier2b_source_ref": "Scope (p.75); HORIZON-CL6-2027-01-BIODIV-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json claims C04, C16; concept_note.md 'Three demonstration cases on one gradient' (lines 61-78)",
-      "notes": "Geographic breadth is thin. Ten of twelve partners sit in three country slots and five in C1. The requirement to span Member States and Associated Countries is met at minimum (six slots), but the concept itself carries this as risk K2 (Finding F5). Not blocking; flagged for the evaluator's geographic-balance concern."
+      "coverage_status": "partially_covered",
+      "coverage_description": "The concept delivers capabilities across terrestrial, freshwater and marine realms on one gradient (C04), a knowledge-gap analysis (C16) and predictive analytics with AI (C07). Coverage of the three realms is complete.",
+      "tier2b_source_ref": "Scope — 'proposals should' (WP Part 9, p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C04, C16, C07; concept_note.md 'Three demonstration cases on one gradient'",
+      "notes": "Partial: the concept flags thin geography (K2/F5, ten of twelve partners in three country slots) and single-partner dependency for each aquatic realm (K1/F4). The 'Member States and Associated Countries' spread is met under Assumed at six slots but is a stated weakness, not a scope gap. Non-blocking."
     },
     "SR-03": {
       "scope_element_id": "SR-03",
-      "constraint_ref": "CC-07",
+      "constraint_ref": "CC-06",
       "coverage_status": "covered",
-      "coverage_description": "The three demonstration cases target habitats and ecotones the topic marks as under pressure or as restoration priorities (C05), and the driving pressures are analysed as socio-economic drivers rather than background (C13) through P11.",
-      "tier2b_source_ref": "Scope (p.75); HORIZON-CL6-2027-01-BIODIV-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json claims C05, C13; concept_note.md demonstration cases table (lines 66-74)",
-      "notes": null
+      "coverage_description": "Demonstration cases target habitats and ecotones marked 'under pressure or as restoration priorities' (C05), analyse socio-economic pressures (C13), and carry crosswalks to the Global Ecosystem Typology and EUNIS (C08) for AI-assisted mapping (C07).",
+      "tier2b_source_ref": "Scope — 'proposals should' (WP Part 9, p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C05, C13, C08, C07; concept_note.md 'Three demonstration cases on one gradient'",
+      "notes": "Case selection rests on P11 pressure evidence rather than data convenience."
     },
     "SR-04": {
       "scope_element_id": "SR-04",
-      "constraint_ref": "CC-08",
+      "constraint_ref": "CC-07",
       "coverage_status": "covered",
-      "coverage_description": "The concept delivers FAIR data, harmonisation workflows and processing protocols as named outputs and verifies them on the three cases (C18), and links published workflows to socio-economic and environmental data and to relevant infrastructures (C09).",
-      "tier2b_source_ref": "Scope (p.75); HORIZON-CL6-2027-01-BIODIV-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json claims C18, C09; concept_note.md 'Reaching agriculture' and 'Coordination the topic requires' (lines 90-108)",
-      "notes": null
+      "coverage_description": "The concept delivers FAIR data, harmonisation workflows and processing protocols as named outputs and verifies them on the three cases (C18), links observation data to EOSC and the Common Data Spaces (C09), and ingests Commission-steered monitoring data (C12).",
+      "tier2b_source_ref": "Scope — 'proposals should' (WP Part 9, p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C18, C09, C12; concept_note.md 'Coordination the topic requires'",
+      "notes": "Linking to agriculture, environmental, climate, socio-economic and marine data is explicit; forestry and fisheries sector linking is not named in the concept corpus. The core FAIR/workflow/protocol deliverable is fully covered."
     },
     "SR-05": {
       "scope_element_id": "SR-05",
       "constraint_ref": null,
       "coverage_status": "covered",
-      "coverage_description": "The project takes its harmonisation decisions to the standards bodies rather than keeping them internal (C15), contributing to joint definitions of data collection, metadata and processing protocols through P10 and P09.",
-      "tier2b_source_ref": "Scope (p.75); HORIZON-CL6-2027-01-BIODIV-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json claim C15",
+      "coverage_description": "The concept takes its harmonisation decisions to standards bodies rather than keeping them internal (C15), contributing to joint definitions of data collection, metadata and processing protocols via P10 crosswalks and P09 standardised omics metadata.",
+      "tier2b_source_ref": "Scope — 'proposals should' (WP Part 9, pp.75-76); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C15; concept_note.md 'The chain, from genome to space'",
       "notes": null
     },
     "SR-06": {
       "scope_element_id": "SR-06",
-      "constraint_ref": "CC-research_infrastructures",
+      "constraint_ref": "CC-06",
       "coverage_status": "covered",
-      "coverage_description": "Where a European research infrastructure offers a needed service the project uses it rather than rebuilding it (C23), via P09 reference sequence libraries and P10 open-science-cloud integration. This scope element is permissive, not mandatory.",
-      "tier2b_source_ref": "Scope (p.76); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "project_summary.json claim C23",
-      "notes": "SR-06 is mandatory:false (permissive). Coverage is offered but not required for gate passage."
+      "coverage_description": "Permissive element. The concept uses European research infrastructure services where the chain needs them rather than rebuilding them (C23), through P09 reference libraries and P10 EOSC integration.",
+      "tier2b_source_ref": "Scope — 'proposals may' (WP Part 9, p.76); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C23; concept_note.md 'Coordination the topic requires'",
+      "notes": "Non-mandatory (mandatory: false); addressed but not required for gate passage."
     },
     "CC-01": {
       "scope_element_id": "CC-01",
       "constraint_ref": null,
       "coverage_status": "covered",
-      "coverage_description": "The concept acknowledges the lump-sum regime for this RIA topic and records that Phase 8 stays hard-blocked until a validated external planner response arrives (risk K4). The constraint is a legal/financial set-up condition handled at the budget gate, not a substantive scope claim.",
-      "tier2b_source_ref": "Legal and financial set-up (p.73-74); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "concept_note.md instrument line (line 5); project_summary.json risk K4",
-      "notes": "Budget-mechanism constraint. Acknowledged, not fabricated; enforcement is at Phase 7."
+      "coverage_description": "The concept recognises the lump-sum eligible-cost regime and its General Annex G exception. It records the topic as lump-sum RIA and defers budget computation to the external planner.",
+      "tier2b_source_ref": "Specific conditions / Legal and financial set-up (WP Part 9, pp.73-74); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json topic.budget_regime 'lump_sum', risks_the_draft_carries K4; strategic_positioning.md 'Fit to the evaluation criteria'",
+      "notes": "Budget figures are not produced at concept level; Phase 8 stays hard-blocked until a validated lump-sum response arrives (K4, CLAUDE.md §8.4)."
     },
     "CC-02": {
       "scope_element_id": "CC-02",
-      "constraint_ref": null,
+      "constraint_ref": "SR-01",
       "coverage_status": "covered",
-      "coverage_description": "The concept contributes to all three expected outcomes rather than a subset. EO-01, EO-02 and EO-03 each carry Confirmed alignment in topic_mapping_rationale, satisfying the 'all of the following expected outcomes' binding.",
-      "tier2b_source_ref": "Expected Outcome (p.74); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "project_summary.json 'Traceability' claims reaching every expected outcome; concept_note.md lines 173-177",
-      "notes": null
+      "coverage_description": "The observation chain runs to Copernicus satellite data and the concept quotes 'Copernicus and/or Galileo/EGNOS' (C03) as an eligibility condition, held by P02 and P12.",
+      "tier2b_source_ref": "Specific conditions (WP Part 9, p.73); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C03, coordination_commitments CC-copernicus_galileo_egnos; concept_note.md satellite layer table",
+      "notes": "Mirrors eligibility condition EC-03."
     },
     "CC-03": {
       "scope_element_id": "CC-03",
       "constraint_ref": null,
       "coverage_status": "covered",
-      "coverage_description": "The concept earmarks effort and budget for cooperation with GBIF, OBIS and LUCAS and publishes project occurrence records to them (C11), held by P10 and P08 in the coordination commitments.",
-      "tier2b_source_ref": "Scope (p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "project_summary.json claim C11, coordination_commitments; concept_note.md coordination table (line 104)",
+      "coverage_description": "Project results contribute to all three expected outcomes, satisfying the 'all' binding. EO-01, EO-02 and EO-03 each carry a Confirmed mapping in topic_mapping_rationale.",
+      "tier2b_source_ref": "Expected Outcome (WP Part 9, p.74); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C19 (EO-01), C20/C02 (EO-02), C06/C07 (EO-03)",
       "notes": null
     },
     "CC-04": {
       "scope_element_id": "CC-04",
       "constraint_ref": null,
       "coverage_status": "covered",
-      "coverage_description": "The concept ingests Commission-steered LUCAS grassland and EMBAL monitoring data as a reference layer for the terrestrial case (C12), held by P03 and P10.",
-      "tier2b_source_ref": "Scope (p.75-76); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "project_summary.json claim C12; concept_note.md coordination table (line 105)",
+      "coverage_description": "The concept earmarks resources for cooperation with GBIF, OBIS and LUCAS and publishes project occurrence records to them (C11), held by P10 and P08.",
+      "tier2b_source_ref": "Scope (WP Part 9, p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C11, coordination_commitments CC-gbif_obis_lucas_cooperation; concept_note.md 'Coordination the topic requires'",
       "notes": null
     },
     "CC-05": {
       "scope_element_id": "CC-05",
       "constraint_ref": null,
       "coverage_status": "covered",
-      "coverage_description": "The concept provides a standing coordination interface to the ESA FuturEO earth-observation projects in the same EC-ESA cluster (C21), held by P02 and P12.",
-      "tier2b_source_ref": "Scope (p.76); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "project_summary.json claim C21; concept_note.md coordination table (line 108)",
+      "coverage_description": "The concept provides a standing coordination interface to the ESA FuturEO earth-observation projects in the same cluster (C21), held by P02 and P12.",
+      "tier2b_source_ref": "Scope (WP Part 9, p.76); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C21, coordination_commitments CC-esa_futureo_coordination; concept_note.md 'Coordination the topic requires'",
       "notes": null
     },
     "CC-06": {
       "scope_element_id": "CC-06",
-      "constraint_ref": null,
+      "constraint_ref": "SR-03",
       "coverage_status": "covered",
-      "coverage_description": "Outputs are shaped to the reporting obligations under the Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation, so a competent authority can use them without rework (C14), via P11, P08 and P07.",
-      "tier2b_source_ref": "Scope (p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "project_summary.json claim C14",
+      "coverage_description": "Every map and habitat label carries a crosswalk to the Global Ecosystem Typology and EUNIS (C08), securing interoperability with European and global frameworks. P10 owns interoperability.",
+      "tier2b_source_ref": "Scope (WP Part 9, p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C08; concept_note.md 'The chain, from genome to space'",
       "notes": null
     },
     "CC-07": {
       "scope_element_id": "CC-07",
-      "constraint_ref": "SR-03",
+      "constraint_ref": "SR-04",
       "coverage_status": "covered",
-      "coverage_description": "Every map and habitat label the project publishes carries a crosswalk to the Global Ecosystem Typology and EUNIS (C08), owned by P10, ensuring interoperability with European and global frameworks.",
-      "tier2b_source_ref": "Scope (p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "project_summary.json claim C08; concept_note.md lines 57-59",
-      "notes": null
+      "coverage_description": "The concept delivers FAIR data, harmonisation workflows and processing protocols (C18) and links them to EOSC and the European Common Data Spaces (C09), held by P10 and P04.",
+      "tier2b_source_ref": "Scope (WP Part 9, p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C18, C09, coordination_commitments CC-eosc_and_common_data_spaces; concept_note.md 'Coordination the topic requires'",
+      "notes": "SAGE ('where applicable') is not explicitly named in the concept corpus; EOSC and the Common Data Spaces are covered."
     },
     "CC-08": {
       "scope_element_id": "CC-08",
-      "constraint_ref": "SR-04",
-      "coverage_status": "partially_covered",
-      "coverage_description": "The concept delivers FAIR data and links observation data to the European Open Science Cloud and the European Common Data Spaces (C09), held by P10 and P04. The constraint names SAGE as a further target 'where applicable'; the concept does not name SAGE explicitly.",
-      "tier2b_source_ref": "Scope (p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
-      "tier3_evidence_ref": "project_summary.json claim C09; concept_note.md coordination table (line 107)",
-      "notes": "SAGE is a 'where applicable' target in the constraint text, not a hard requirement. Its omission is discretionary and not blocking. EOSC and Common Data Spaces are covered."
+      "constraint_ref": "SR-03",
+      "coverage_status": "covered",
+      "coverage_description": "Outputs are shaped to the Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation (C14), so a competent authority can use them without rework. Held by P11, P08 and P07.",
+      "tier2b_source_ref": "Scope (WP Part 9, p.75); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C14; concept_note.md 'Reaching agriculture'",
+      "notes": null
+    },
+    "CC-09": {
+      "scope_element_id": "CC-09",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The interoperability work package holds an open place for the Joint Research Centre as a zero-funding beneficiary or associated partner, counted towards nothing (C22), held by P10.",
+      "tier2b_source_ref": "Specific conditions (WP Part 9, p.73); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json C22, coordination_commitments CC-jrc_participation; concept_note.md 'Coordination the topic requires'",
+      "notes": "Mirrors eligibility condition EC-02; the JRC takes no part in preparing the proposal."
+    },
+    "CC-10": {
+      "scope_element_id": "CC-10",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept works to the indicative envelope of about EUR 5.00 million per project within a EUR 10.00 million topic funding roughly two projects, and treats the two slots as the competitive frame.",
+      "tier2b_source_ref": "Specific conditions / Budget table (WP Part 9, pp.73, 35); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "strategic_positioning.md 'The competitive picture'; project_summary.json project_duration.reasoning_for_48",
+      "notes": "Actual budget figures are computed externally; the concept only acknowledges the envelope."
+    },
+    "CC-11": {
+      "scope_element_id": "CC-11",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept treats the action as a Research and Innovation Action throughout, consistent with the RIA type of action and its three award criteria.",
+      "tier2b_source_ref": "Type of Action (WP Part 9, p.73); HORIZON-CL6-2027-01-BIODIV-01.json",
+      "tier3_evidence_ref": "project_summary.json topic.instrument_type 'RIA'; concept_note.md header; strategic_positioning.md 'Fit to the evaluation criteria'",
+      "notes": null
     }
   },
   "scope_conflict_log": [],
-  "strategic_differentiation": "The differentiator is whether the pieces form one system or a portfolio. One agricultural pressure gradient carries all three ecosystem realms as a single causal chain: farmland, the freshwater ecotones receiving its runoff, and the coastal waters downstream. A harmonisation decision taken in farmland is therefore tested twice more, in realms that did not design it, so a shared gradient evidences integration rather than asserting it. The second differentiator is P01's leakage-safe validation protocol, which makes the reworked field archive genuinely usable as the 'training and validation resources' EO-03 requires. The third is P05's existing multi-country user network of agricultural holdings, an operating uptake channel into farming rather than a planned one. The concept states its own weaknesses plainly: six of twelve partners are Assumed gap-fillers, the geography is thin (risk K2), and no evidence base is cited yet because the source-materials step is blocked on approval."
+  "strategic_differentiation": "One pressure gradient carries all three ecosystem realms as a single causal chain. Farmland drains into the freshwater ecotones that receive its runoff, which drain to the coastal waters downstream. A harmonisation decision taken in farmland is therefore tested twice more, in realms that did not design it. This makes integration 'across terrestrial, freshwater and marine ecosystems' evidence rather than assertion, where competing consortia assemble three unrelated sites. Two further differentiators reinforce the position: a leakage-safe validation protocol (P01) that keeps site, season and treatment in one fold, and an existing multi-country agricultural user network (P05) that carries indicators into farm-management tools. The concept also states its own weaknesses plainly, since half the consortium is Assumed and the geography is thin (K1, K2, K3)."
 }

@@ -1,9 +1,9 @@
 {
   "schema_id": "orch.phase4.scheduling_constraints.v1",
-  "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
-  "source_wp_structure_run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "run_id": "import uuid; print(uuid.uuid4())",
+  "source_wp_structure_run_id": "import uuid; print(uuid.uuid4())",
   "derived_from_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-  "normalization_timestamp": "2026-09-30T18:02:54.411113+00:00",
+  "normalization_timestamp": "2026-09-30T23:00:51.896374+00:00",
   "project_duration_months": 48,
   "wp_bounds": {
     "WP1": {
@@ -40,72 +40,72 @@
     {
       "from": "WP1",
       "to": "WP3",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP1 ends M48, WP3 starts M4"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP2",
       "to": "WP3",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP2 ends M15, WP3 starts M4"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP2",
       "to": "WP4",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP2 ends M15, WP4 starts M13"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP3",
       "to": "WP4",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP3 ends M42, WP4 starts M13"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP3",
       "to": "WP5",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP3 ends M42, WP5 starts M13"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP4",
       "to": "WP5",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP4 ends M40, WP5 starts M13"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP3",
       "to": "WP6",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP3 ends M42, WP6 starts M16"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP4",
       "to": "WP6",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP4 ends M40, WP6 starts M16"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP2",
       "to": "WP7",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP2 ends M15, WP7 starts M10"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "WP4",
       "to": "WP7",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP4 ends M40, WP7 starts M10"
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "T1.2",
@@ -198,100 +198,100 @@
         "from": "WP1",
         "to": "WP3"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP1 ends M48, WP3 starts M4"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP2",
         "to": "WP3"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP2 ends M15, WP3 starts M4"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP2",
         "to": "WP4"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP2 ends M15, WP4 starts M13"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP3",
         "to": "WP4"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP3 ends M42, WP4 starts M13"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP3",
         "to": "WP5"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP3 ends M42, WP5 starts M13"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP4",
         "to": "WP5"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP4 ends M40, WP5 starts M13"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP3",
         "to": "WP6"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP3 ends M42, WP6 starts M16"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP4",
         "to": "WP6"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP4 ends M40, WP6 starts M16"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP2",
         "to": "WP7"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP2 ends M15, WP7 starts M10"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {
         "from": "WP4",
         "to": "WP7"
       },
-      "original_type": "finish_to_start",
+      "original_type": "data_input",
       "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP4 ends M40, WP7 starts M10"
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "edge": {

@@ -1,0 +1,17 @@
+{
+  "decision_id": "gap_risk_flagged_gantt_designer_2026-10-01T00-00-00Z",
+  "decision_type": "gap_risk_flagged",
+  "invoking_agent": "gantt_designer",
+  "phase_context": "phase_04_gantt_milestones",
+  "run_id_reference": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "decision_description": "The Phase 4 milestone consistency check flagged milestone MS3 as heuristic-inconsistent. Its due month 22 precedes the completion of all WP4 tasks at month 40. MS3 is an intermediate checkpoint, not a work package completion. Its verifiable criterion asks only that each of the three campaigns has collected at least one field round, the omics sampling protocol is delivered, and the reporting-needs assessment states what the outputs must carry. The flag is accepted as a false positive of the WP-completion heuristic. MS3 stands at month 22.",
+  "alternatives_considered": [
+    "Move the MS3 due month to 40 to match the maximum WP4 task end month; rejected because it would defer an early-progress checkpoint past the completion it is meant to precede.",
+    "Add explicit depends_on_tasks and milestone_type to MS3 so the check reads it as an intermediate checkpoint; retained as a downstream schema improvement but not required to resolve the flag, since the criterion already scopes MS3 to partial campaign progress.",
+    "Escalate the flag to the operator as an unresolved timeline conflict; rejected because the heuristic, not the schedule, is the source of the mismatch."
+  ],
+  "tier_authority_applied": "CLAUDE.md §7 — Phase 4 gate condition (all milestones have a defined verifiable criterion, the timeline fits within the call-specified duration, and no critical path dependency is unresolved)",
+  "rationale": "The consistency check compared the MS3 due month against the maximum WP4 task end month because MS3 declares no depends_on_tasks and no milestone_type. The gantt records MS3 as an intermediate checkpoint whose criterion is partial campaign progress. Month 22 supports that criterion: tasks T4.1, T4.2 and T4.3 all start by month 18 and run to month 38, so each campaign can collect a first field round before month 22. A checkpoint on early campaign progress must fall before campaign completion. Due month 22 is therefore correct, and the heuristic flag reports a modelling gap in MS3's metadata, not a scheduling error. The Phase 4 gate condition asks for a defined verifiable criterion, which MS3 carries, and a timeline within the 48-month duration, which month 22 satisfies.",
+  "resolution_status": "resolved",
+  "timestamp": "2026-10-01T00:00:00Z"
+}

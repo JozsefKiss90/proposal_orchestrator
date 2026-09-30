@@ -1,18 +1,18 @@
 {
-  "decision_id": "scope_check_concept_refiner_2026-10-01T12:00:00Z",
+  "decision_id": "scope_check_concept_refiner_20261001T120000Z",
   "decision_type": "scope_check",
   "invoking_agent": "concept_refiner",
   "phase_context": "phase_02_concept_refinement",
   "scope_findings": [
     {
-      "claim": "The project builds one multisensory biodiversity data-integration system carrying measurement from molecules to satellites, harmonising omics, in-situ and remote-sensing data for enhanced ecosystem-condition assessment.",
+      "claim": "The project builds one harmonised multisensory observation chain that integrates omics, in-situ, airborne and satellite data for ecosystem condition assessment and predictive modelling.",
       "scope_element_ref": "SR-01",
       "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "Three omics layers enter the observation chain: stress metabolomics from P01, and genomic, transcriptomic and environmental-DNA sequencing from P09.",
+      "claim": "Three omics layers enter the chain: metabolomic measurement, genomic and transcriptomic sequencing, and environmental DNA metabarcoding.",
       "scope_element_ref": "SR-01",
       "constraint_ref": null,
       "status": "in_scope",
@@ -26,143 +26,139 @@
       "flag_reason": null
     },
     {
-      "claim": "Three demonstration cases sit on one agricultural pressure gradient: farmland and grassland, the freshwater ecotones receiving their runoff, and the coastal transitional waters downstream.",
+      "claim": "Three demonstration cases cover terrestrial, freshwater and marine ecosystems along one agricultural pressure gradient from farmland through freshwater ecotones to coastal waters.",
       "scope_element_ref": "SR-02",
       "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "Demonstration cases target habitats and ecotones marked as under pressure or as restoration priorities, selected on evidence of socio-economic pressures rather than data convenience.",
+      "claim": "Cases target habitats and ecotones the topic marks as under pressure or as restoration priorities, selected on evidence rather than data availability.",
       "scope_element_ref": "SR-03",
       "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "The multi-season field archive is reworked into documented training and validation sets with a declared, leakage-safe split protocol.",
-      "scope_element_ref": "SR-04",
-      "constraint_ref": null,
-      "status": "in_scope",
-      "flag_reason": null
-    },
-    {
-      "claim": "Deep-learning models scale habitat and ecosystem classification from the three cases to European coverage and predict biodiversity trends.",
-      "scope_element_ref": "SR-02",
-      "constraint_ref": null,
-      "status": "in_scope",
-      "flag_reason": null
-    },
-    {
-      "claim": "Every published habitat label carries a crosswalk to EUNIS and to the Global Ecosystem Typology.",
-      "scope_element_ref": "SR-05",
-      "constraint_ref": "CC-06",
-      "status": "in_scope",
-      "flag_reason": null
-    },
-    {
-      "claim": "Harmonisation workflows and processing protocols are published with provenance and linked to the European Open Science Cloud and the European Common Data Spaces.",
-      "scope_element_ref": "SR-04",
-      "constraint_ref": "CC-07",
-      "status": "in_scope",
-      "flag_reason": null
-    },
-    {
-      "claim": "Biodiversity indicators are carried into farm-management tools through an existing multi-country user network of agricultural holdings, and practitioner ability to act on them is evaluated.",
-      "scope_element_ref": "SR-04",
-      "constraint_ref": null,
-      "status": "flagged",
-      "flag_reason": "Borderline against SR-04. SR-04 names agriculture only as a domain whose data is linked to observation data; pushing biodiversity indicators into farm-management decision tools is an uptake/exploitation activity that no loaded Tier 2B scope element clearly requires. Whether it falls within SR-04 depends on project framing. Scope element involved: SR-04."
-    },
-    {
-      "claim": "Effort and budget are earmarked for cooperation with GBIF, OBIS and LUCAS, and project occurrence records are published to them.",
-      "scope_element_ref": null,
-      "constraint_ref": "CC-04",
-      "status": "in_scope",
-      "flag_reason": null
-    },
-    {
-      "claim": "Commission-steered grassland and agricultural-landscape monitoring data, including LUCAS grassland and EMBAL, is ingested as a reference layer for the terrestrial case.",
-      "scope_element_ref": "SR-04",
-      "constraint_ref": "CC-04",
-      "status": "in_scope",
-      "flag_reason": null
-    },
-    {
-      "claim": "The pressures driving each case are analysed as socio-economic drivers rather than treated as background.",
+      "claim": "The pressures driving each case are analysed as socio-economic pressures and activities impacting ecosystems.",
       "scope_element_ref": "SR-03",
       "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "Outputs are aligned to reporting obligations under the Habitats Directive, the Birds Directive, the Marine Strategy Framework Directive and the EU Nature Restoration Regulation.",
-      "scope_element_ref": null,
-      "constraint_ref": "CC-08",
-      "status": "in_scope",
-      "flag_reason": null
-    },
-    {
-      "claim": "The project contributes its harmonisation decisions to standards bodies as joint definitions of data collection, metadata and processing protocols.",
-      "scope_element_ref": "SR-05",
-      "constraint_ref": null,
-      "status": "in_scope",
-      "flag_reason": null
-    },
-    {
-      "claim": "A knowledge-gap and data-need analysis runs before the integration design and prioritises which critical biodiversity knowledge gaps the cases address.",
+      "claim": "A knowledge-gap and data-need analysis runs before the integration design and prioritises critical biodiversity knowledge gaps.",
       "scope_element_ref": "SR-02",
       "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "Predictive modelling is delivered at case-site, regional and European scales.",
+      "claim": "Deep-learning models scale habitat classification and ecosystem mapping from the three cases to European coverage and predict biodiversity trends, using AI-assisted mapping.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Predictive modelling of biodiversity trends is delivered at case, regional and European scales.",
       "scope_element_ref": "SR-01",
       "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "The project delivers FAIR data, harmonisation workflows and processing protocols as named outputs and verifies them on the three cases.",
+      "claim": "The project delivers FAIR data, harmonisation workflows and processing protocols supporting data integration from genome to space.",
       "scope_element_ref": "SR-04",
       "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "The interoperability work package holds an open place for the Joint Research Centre as a zero-funding beneficiary or associated partner, counted towards no eligibility condition.",
-      "scope_element_ref": null,
-      "constraint_ref": "CC-09",
+      "claim": "The multi-season field archive is reworked into documented training and validation datasets with a declared split protocol, and its use is verified on the demonstration cases.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "The project provides a standing coordination interface to the ESA FuturEO earth-observation projects in the same cluster.",
+      "claim": "Every habitat label the project publishes carries a crosswalk to the Global Ecosystem Typology and EUNIS.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": "CC-06",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Harmonisation workflows and data are published with provenance and linked to the European Open Science Cloud and the European Common Data Spaces.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": "CC-07",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Commission-steered grassland and agricultural-landscape monitoring data (LUCAS grassland, EMBAL) is ingested as a reference layer for the terrestrial case.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": "CC-04",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Effort and budget are earmarked for cooperation with the named in-situ data collection frameworks GBIF, OBIS and LUCAS, and project occurrence records are published to them.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-04",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project provides a standing coordination interface to the space-agency earth-observation projects of the ESA FuturEO programme.",
       "scope_element_ref": null,
       "constraint_ref": "CC-05",
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "Where a European research infrastructure offers a service the observation chain needs, the project uses it rather than rebuilding it.",
+      "claim": "The interoperability work package holds an open, zero-funding place for the Joint Research Centre, counted towards no eligibility condition.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-09",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Outputs are shaped to reporting obligations under the Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-08",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project contributes its harmonisation decisions to standards bodies, supporting joint definitions of data collection, metadata and processing protocols.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Where a European research infrastructure offers a service the chain needs, the project uses it rather than rebuilding it.",
       "scope_element_ref": "SR-06",
       "constraint_ref": null,
       "status": "in_scope",
       "flag_reason": null
     },
     {
-      "claim": "The project uses Copernicus and European satellite navigation programmes wherever it uses satellite data.",
-      "scope_element_ref": null,
-      "constraint_ref": "CC-02",
-      "status": "in_scope",
-      "flag_reason": null
+      "claim": "Biodiversity indicators derived from the chain are carried into farm-management decision-support tools through a multi-country user network of agricultural holdings, and practitioners are evaluated on whether they can act on them.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "Borderline against loaded Tier 2B scope. SR-04 requires linking observation data to agriculture (and other sector) data and to data infrastructures; it does not name carrying biodiversity indicators into farm-management decision-support tools as a required scope element. The concept traces this uptake activity to the call extract's scope_summary phrase ('biodiversity preservation is a mainstream feature of other sectors, such as agriculture'), which is not present in scope_requirements.json or call_constraints.json. Confirming this claim in_scope would rely on a scope element outside the loaded Tier 2B authority; scope boundary is defined by Tier 2B only. Nearest element is SR-04, pending confirmation against a Tier 2B scope element."
     }
   ],
   "tier2b_source_refs": [
     "Scope — 'proposals should' (WP Part 9, p.75)",
     "Scope — 'proposals should' (WP Part 9, pp.75-76)",
-    "Scope — 'proposals may' (WP Part 9, p.76)"
+    "Scope — 'proposals may' (WP Part 9, p.76)",
+    "Scope (WP Part 9, p.75)",
+    "Scope (WP Part 9, p.76)",
+    "Specific conditions (WP Part 9, p.73)"
   ],
   "tier_authority_applied": "Tier 2B scope_requirements.json; Tier 2B call_constraints.json",
   "resolution_status": "unresolved",

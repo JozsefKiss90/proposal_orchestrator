@@ -1,6 +1,6 @@
 {
   "schema_id": "orch.phase3.wp_structure.v1",
-  "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "run_id": "import uuid; print(uuid.uuid4())",
   "work_packages": [
     {
       "wp_id": "WP1",
@@ -31,7 +31,7 @@
         },
         {
           "task_id": "T1.2",
-          "title": "Write the data management plan and shared metadata profile",
+          "title": "Write the shared data management plan and metadata profile",
           "responsible_partner": "P10",
           "contributing_partners": [
             "P04",
@@ -48,7 +48,7 @@
         },
         {
           "task_id": "T1.4",
-          "title": "Agree cooperation with the named in-situ data frameworks",
+          "title": "Agree cooperation with named in-situ data frameworks and hold the JRC place open",
           "responsible_partner": "P10",
           "contributing_partners": [
             "P03",
@@ -68,16 +68,16 @@
         {
           "deliverable_id": "D1.1",
           "title": "Data management plan and shared metadata profile",
-          "type": "report",
+          "type": "other",
           "due_month": 6,
-          "responsible_partner": "P10"
+          "responsible_partner": "P01"
         },
         {
           "deliverable_id": "D1.2",
-          "title": "Cooperation and coordination plan for data frameworks and space-agency programme",
-          "type": "report",
+          "title": "Cooperation and coordination plan",
+          "type": "other",
           "due_month": 12,
-          "responsible_partner": "P02"
+          "responsible_partner": "P01"
         },
         {
           "deliverable_id": "D1.3",
@@ -129,7 +129,7 @@
         },
         {
           "task_id": "T2.3",
-          "title": "Specify the multisensory integration architecture from molecules to satellites",
+          "title": "Specify the multisensory integration architecture",
           "responsible_partner": "P02",
           "contributing_partners": [
             "P04",
@@ -139,7 +139,7 @@
         },
         {
           "task_id": "T2.4",
-          "title": "Specify socio-ecological and climatic data layers ingested by the architecture",
+          "title": "Specify socio-ecological and climatic data layers",
           "responsible_partner": "P11",
           "contributing_partners": [
             "P07"
@@ -162,12 +162,12 @@
           "title": "Prioritised knowledge-gap and data-need analysis",
           "type": "report",
           "due_month": 9,
-          "responsible_partner": "P11"
+          "responsible_partner": "P02"
         },
         {
           "deliverable_id": "D2.2",
           "title": "Multisensory integration architecture specification",
-          "type": "report",
+          "type": "other",
           "due_month": 14,
           "responsible_partner": "P02"
         },
@@ -176,7 +176,7 @@
           "title": "Demonstration case selection dossier",
           "type": "report",
           "due_month": 15,
-          "responsible_partner": "P11"
+          "responsible_partner": "P02"
         }
       ],
       "dependencies": []
@@ -199,7 +199,7 @@
       "tasks": [
         {
           "task_id": "T3.1",
-          "title": "Agree joint definitions for data collection, metadata and processing protocols",
+          "title": "Agree joint data collection, metadata and processing protocols",
           "responsible_partner": "P10",
           "contributing_partners": [
             "P01",
@@ -210,7 +210,7 @@
         },
         {
           "task_id": "T3.2",
-          "title": "Build crosswalks between occurrence, habitat and ecosystem classifications",
+          "title": "Build occurrence, habitat and ecosystem typology crosswalks",
           "responsible_partner": "P10",
           "contributing_partners": [
             "P08",
@@ -236,7 +236,7 @@
         },
         {
           "task_id": "T3.5",
-          "title": "Publish datasets and services to the open science cloud and common data spaces",
+          "title": "Publish datasets and services to the open science cloud and data spaces",
           "responsible_partner": "P10",
           "contributing_partners": [
             "P04"
@@ -256,7 +256,7 @@
         {
           "deliverable_id": "D3.1",
           "title": "Joint data collection, metadata and processing protocols",
-          "type": "report",
+          "type": "other",
           "due_month": 16,
           "responsible_partner": "P10"
         },
@@ -272,7 +272,7 @@
           "title": "Provenance-tracked processing pipeline release",
           "type": "software",
           "due_month": 34,
-          "responsible_partner": "P04"
+          "responsible_partner": "P10"
         },
         {
           "deliverable_id": "D3.4",
@@ -285,13 +285,13 @@
       "dependencies": [
         {
           "depends_on_wp_id": "WP1",
-          "dependency_type": "finish_to_start",
-          "notes": "Protocols build on the data management plan metadata profile (T3.1 on T1.2)"
+          "dependency_type": "data_input",
+          "notes": "Protocols build on the metadata profile fixed by the data management plan (T3.1 on T1.2)."
         },
         {
           "depends_on_wp_id": "WP2",
-          "dependency_type": "finish_to_start",
-          "notes": "Pipelines implement the integration architecture (T3.4 on T2.3)"
+          "dependency_type": "data_input",
+          "notes": "Pipelines implement the integration architecture (T3.4 on T2.3)."
         }
       ]
     },
@@ -347,7 +347,7 @@
         },
         {
           "task_id": "T4.4",
-          "title": "Acquire and process airborne and satellite observations across cases",
+          "title": "Acquire and process airborne and satellite observations across the cases",
           "responsible_partner": "P02",
           "contributing_partners": [
             "P08",
@@ -378,14 +378,14 @@
           "title": "Freshwater case observation dataset",
           "type": "dataset",
           "due_month": 38,
-          "responsible_partner": "P07"
+          "responsible_partner": "P03"
         },
         {
           "deliverable_id": "D4.3",
-          "title": "Marine case observation dataset and airborne/satellite layer",
+          "title": "Marine case dataset and the airborne and satellite layer",
           "type": "dataset",
           "due_month": 38,
-          "responsible_partner": "P08"
+          "responsible_partner": "P03"
         },
         {
           "deliverable_id": "D4.4",
@@ -398,13 +398,13 @@
       "dependencies": [
         {
           "depends_on_wp_id": "WP2",
-          "dependency_type": "finish_to_start",
-          "notes": "Campaign starts once its case is selected and architecture is set (T4.1 on T2.5, T4.4 on T2.3)"
+          "dependency_type": "data_input",
+          "notes": "Campaigns start once cases are selected and acquisition follows the architecture (T4.1 on T2.5, T4.4 on T2.3)."
         },
         {
           "depends_on_wp_id": "WP3",
-          "dependency_type": "finish_to_start",
-          "notes": "Campaign starts once the joint protocol exists (T4.1 on T3.1)"
+          "dependency_type": "data_input",
+          "notes": "A campaign starts once the joint protocol exists (T4.1 on T3.1)."
         }
       ]
     },
@@ -465,8 +465,8 @@
       "deliverables": [
         {
           "deliverable_id": "D5.1",
-          "title": "Omics sampling and analysis protocol for the three cases",
-          "type": "report",
+          "title": "Omics sampling and analysis protocol",
+          "type": "other",
           "due_month": 20,
           "responsible_partner": "P09"
         },
@@ -488,13 +488,13 @@
       "dependencies": [
         {
           "depends_on_wp_id": "WP3",
-          "dependency_type": "finish_to_start",
-          "notes": "Omics sampling follows the joint protocol and metadata standard (T5.1 on T3.1, T5.4 on T3.3)"
+          "dependency_type": "data_input",
+          "notes": "Omics sampling follows the joint protocol and joins via the metadata standard (T5.1 on T3.1, T5.4 on T3.3)."
         },
         {
           "depends_on_wp_id": "WP4",
-          "dependency_type": "finish_to_start",
-          "notes": "Metabolomics measured on the terrestrial plots the campaign runs (T5.3 on T4.1)"
+          "dependency_type": "data_input",
+          "notes": "Metabolomics is measured on the terrestrial plots the campaign runs (T5.3 on T4.1)."
         }
       ]
     },
@@ -517,7 +517,7 @@
       "tasks": [
         {
           "task_id": "T6.1",
-          "title": "Rework field archive into documented training and validation sets",
+          "title": "Rework the field archive into documented training and validation sets",
           "responsible_partner": "P03",
           "contributing_partners": [
             "P01",
@@ -567,11 +567,11 @@
           "title": "Documented training and validation resource with split protocol",
           "type": "dataset",
           "due_month": 28,
-          "responsible_partner": "P03"
+          "responsible_partner": "P12"
         },
         {
           "deliverable_id": "D6.2",
-          "title": "Habitat and ecosystem classification models and case benchmarks",
+          "title": "Habitat and ecosystem classification models and benchmarks",
           "type": "software",
           "due_month": 38,
           "responsible_partner": "P12"
@@ -587,13 +587,13 @@
       "dependencies": [
         {
           "depends_on_wp_id": "WP3",
-          "dependency_type": "finish_to_start",
-          "notes": "Training resource documented against the joint protocol (T6.1 on T3.1)"
+          "dependency_type": "data_input",
+          "notes": "The training resource is documented against the joint protocol (T6.1 on T3.1)."
         },
         {
           "depends_on_wp_id": "WP4",
-          "dependency_type": "finish_to_start",
-          "notes": "Models train on the observations acquisition produces (T6.3 on T4.4)"
+          "dependency_type": "data_input",
+          "notes": "Models train on the observations the acquisition task produces (T6.3 on T4.4)."
         }
       ]
     },
@@ -670,14 +670,14 @@
           "title": "Policy reporting needs assessment",
           "type": "report",
           "due_month": 22,
-          "responsible_partner": "P11"
+          "responsible_partner": "P05"
         },
         {
           "deliverable_id": "D7.2",
           "title": "Biodiversity indicator decision-support release",
           "type": "software",
           "due_month": 40,
-          "responsible_partner": "P04"
+          "responsible_partner": "P05"
         },
         {
           "deliverable_id": "D7.3",
@@ -689,21 +689,21 @@
         {
           "deliverable_id": "D7.4",
           "title": "Dissemination, exploitation and communication plan",
-          "type": "report",
+          "type": "other",
           "due_month": 48,
-          "responsible_partner": "P11"
+          "responsible_partner": "P05"
         }
       ],
       "dependencies": [
         {
           "depends_on_wp_id": "WP2",
-          "dependency_type": "finish_to_start",
-          "notes": "Decision surface reads the architecture outputs (T7.2 on T2.3)"
+          "dependency_type": "data_input",
+          "notes": "The decision surface reads the architecture's outputs (T7.2 on T2.3)."
         },
         {
           "depends_on_wp_id": "WP4",
-          "dependency_type": "finish_to_start",
-          "notes": "A protocol transfers only once it has been run (T7.4 on T4.1)"
+          "dependency_type": "data_input",
+          "notes": "A protocol transfers only once it has been run (T7.4 on T4.1)."
         }
       ]
     }
@@ -757,52 +757,52 @@
       {
         "from": "WP1",
         "to": "WP3",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP2",
         "to": "WP3",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP2",
         "to": "WP4",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP3",
         "to": "WP4",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP3",
         "to": "WP5",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP4",
         "to": "WP5",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP3",
         "to": "WP6",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP4",
         "to": "WP6",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP2",
         "to": "WP7",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "WP4",
         "to": "WP7",
-        "edge_type": "finish_to_start"
+        "edge_type": "data_input"
       },
       {
         "from": "T1.2",
@@ -1015,24 +1015,16 @@
   ],
   "normalization_issues": [
     {
-      "issue": "deliverable_type_normalized",
       "severity": "advisory",
-      "detail": "Seed types outside the [report, dataset, software, other] enum remapped to report: D1.1, D1.2, D2.2, D3.1, D5.1, D7.4 (seed 'plan'/'specification')."
+      "detail": "Deliverable responsible_partner synthesized as the WP lead_partner; seed deliverables carried produced_by only, not responsible_partner."
     },
     {
-      "issue": "deliverable_responsible_partner_synthesized",
       "severity": "advisory",
-      "detail": "Seed deliverables carried no responsible_partner; assigned from the responsible_partner of the first producing task."
+      "detail": "Deliverable types 'plan' and 'specification' remapped to 'other' to satisfy the enum [report, dataset, software, other]."
     },
     {
-      "issue": "wp_dependencies_derived",
       "severity": "advisory",
-      "detail": "WP-level dependencies derived from seed cross_work_package_dependencies; dependency_type defaulted to finish_to_start pending dependency_mapper enrichment."
-    },
-    {
-      "issue": "wp_contributing_partners_derived",
-      "severity": "advisory",
-      "detail": "WP-level contributing_partners derived from task responsible and contributing partners, excluding the WP lead."
+      "detail": "WP-level contributing_partners and dependencies were derived from task responsible_partner/contributing_partners and from cross_work_package_dependencies; seed WPs carried neither field at WP level. dependency_type set to data_input for all derived WP edges."
     }
   ]
 }
