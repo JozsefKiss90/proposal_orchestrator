@@ -360,6 +360,18 @@ response now sits in `received/` under an operator override, so `g08_p02` passes
 fails on `g08_p03` and `g08_p08`, which the Phase 7 node writes, so the freeze is unchanged.
 Criterion 2 now waits on the operator's dispatch rather than on an absent response.
 
+**Amended again 1 October 2026: the freeze is lifted.** The operator's second Phase 7 dispatch
+released n07 and `gate_09` passed 9 of 9 deterministic predicates, recorded in
+`phase7_budget_gate/gate_result.json`. The six Phase 8 nodes moved from `hard_block_upstream` to
+`pending`, and `--dry-run` reports n08a, n08b and n08c ready. Criterion 1 still stands on its
+second branch, because Phase 8 has not reached released, but the gate it records is now a pass
+rather than a block.
+
+Criteria 2, 3 and 4 wait on a Phase 8 dispatch and on nothing else. No constitutional block
+stands in front of them, and ticket B closed the F1 defect that would have failed criterion 3.
+Phase 8 drafting is now permitted under §13.4 for the first time on this branch. Every figure it
+draws on is fictional, so §13.8 applies to the first section written.
+
 **Criterion 4 is checked over the wrong package, so its box stays open.** `assert_no_leakage`
 ran over all 6 blind packages the demo world holds, rebuilt from their stored manifests, and
 all 6 are clean. The package the criterion means is the one built around candidate version 1,

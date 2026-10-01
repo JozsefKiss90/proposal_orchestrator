@@ -58,11 +58,14 @@ deliverable resting on one must say so. That is a label, not a gate.
   said: both demo tickets' validation reports, both decision records, both Outcomes, and the
   two test modules that assert the blocking state.
 - [ ] Tier 5 content derived from this budget carries the fictional label.
-- [ ] After the operator dispatches Phase 7, the node writes `validation/` and
+- [x] After the operator dispatches Phase 7, the node writes `validation/` and
   `budget_gate_assessment.json`, and `gate_09` reaches pass. Recorded, not assumed.
-  The operator dispatched on 2026-10-01. The node failed at `agent_body`, the gate was
-  never evaluated, and the cause was an engine defect rather than the budget. Fixed
-  below; the box stays open until a gate result exists.
+  The operator dispatched twice. The first dispatch failed at `agent_body`, the gate was
+  never evaluated, and the cause was an engine defect rather than the budget. After the
+  fix in `67794f3` the second dispatch released n07, and `gate_09` passed 9 of 9
+  deterministic predicates. Recorded in the evaluator's own
+  `phase7_budget_gate/gate_result.json`, which is the only artifact entitled to say so
+  (§17.6.3).
 
 **Not in this ticket.** A real internal budget route needs a §14 amendment, an operator-approved
 effort estimate, a declared cost model and a deterministic component under byte-equal replay.
@@ -98,6 +101,19 @@ All four are fixed, recorded in
 validation artifact was **not** hand-authored: that would have passed `g08_p03` on a file
 no skill produced, which is the fabricated completion §15 forbids and the thing §17.6.6
 exists to catch.
+
+**The gate passed on the re-dispatch, and the refusal was the right call.** n07 is
+`released`, `gate_09` is `pass` on 9 of 9 deterministic predicates, and the skill wrote
+both artifacts itself. The stale `validation_artifact_reference` corrected itself in the
+rerun, as predicted — it named a timestamped file that never existed and now names the
+canonical one. Ten tests across the three demo modules had pinned the blocked state and
+were falsified by the pass; each is now an invariant read off the **evaluator's**
+artifact rather than the skill's self-declaration, which is the distinction the first
+failure taught. The §13.8 tripwire changed shape too: instead of asserting Tier 5 is
+empty, it requires the fictional label in every Tier 5 file. That check is per file, not
+per sentence, because the whole budget is fictional and no reader can tell which sentence
+rests on it. It fails closed on an unlabelled section, which will be the operator's first
+signal if a Phase 8 draft omits the label.
 
 ---
 

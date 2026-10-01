@@ -127,8 +127,18 @@ def ria_bundle():
 # ---------------------------------------------------------------------------
 
 
-class TestThePhase8BlockIsRecorded:
-    """Criterion 1, second branch: the blocking gate is recorded."""
+class TestThePhase8BlockIsLifted:
+    """Criterion 1, now on its first branch rather than its second.
+
+    The ticket's criterion reads "Phase 8 reaches released, or its blocking gate
+    is recorded".  It was satisfied by the second branch twice over: first with
+    ``received/`` empty, then with the node failing at ``agent_body``.  On
+    1 October the re-dispatch released n07 and ``gate_09`` recorded a pass, so
+    the six Phase 8 nodes sit at ``pending`` and three of them dispatch.
+
+    Phase 8 has still written nothing, which is why criteria 2 to 4 stay open.
+    What changed is that nothing constitutional now blocks them.
+    """
 
     def test_the_topic_is_lump_sum_so_the_response_is_the_operators_step(self):
         call = _json("docs/tier3_project_instantiation/call_binding/selected_call.json")
@@ -153,33 +163,35 @@ class TestThePhase8BlockIsRecorded:
         assert response["figures_are_fictional"] is True
         assert response["produced_by_external_planner"] is False
 
-    def test_no_validation_artifact_exists(self):
-        assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
+    def test_the_validation_artifact_exists(self):
+        assert dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
 
-    def test_the_dispatched_phase_7_still_did_not_release(self):
-        """Phase 8 is frozen for a new reason, and still frozen.
+    def test_the_dispatched_phase_7_released(self):
+        """Second dispatch, after commit ``67794f3`` fixed the output contract.
 
-        When this ticket ran, nothing had been dispatched.  The operator dispatched
-        Phase 7 on 1 October; its node blocked at exit because the skill never wrote
-        the validation artifact it declared, so the exit gate was never evaluated and
-        every Phase 8 node took ``hard_block_upstream``.
+        The first dispatch blocked at exit: the skill never wrote the validation
+        artifact it declared, so the exit gate was never evaluated and every
+        Phase 8 node took ``hard_block_upstream``.  Both artifacts now exist and
+        the gate evaluated.
         """
         assessment = _json(
             "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
             "budget_gate_assessment.json"
         )
         assert assessment["gate_pass_declaration"] == "pass"
-        assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
+        assert dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
 
-    def test_phase_7_has_no_gate_result_while_phases_1_to_6_each_have_one(self):
-        assert not (REPO / PHASE_7_REL / "gate_result.json").exists()
-        earlier = sorted(
+    def test_every_phase_through_7_now_has_a_gate_result(self):
+        """Seven, where this ticket recorded six and a frozen node."""
+        assert (REPO / PHASE_7_REL / "gate_result.json").exists()
+        results = sorted(
             p.parent.name
             for p in (REPO / "docs/tier4_orchestration_state/phase_outputs").rglob(
                 "gate_result.json"
             )
         )
-        assert len(earlier) == 6, earlier
+        assert len(results) == 7, results
+        assert "phase7_budget_gate" in results
 
     def test_the_hard_block_gate_is_still_the_budget_gate(self):
         assert _HARD_BLOCK_GATE == "gate_09_budget_consistency"

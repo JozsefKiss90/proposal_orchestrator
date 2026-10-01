@@ -325,50 +325,75 @@ class TestTheOverrideIsRecorded:
 # ---------------------------------------------------------------------------
 
 
-class TestTheRestOfPhase7IsStillTheOperatorsStep:
-    def test_no_validation_artifact_exists_yet(self):
-        assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed, (
-            "validation/ is populated. The Phase 7 node writes it, so either the "
-            "operator has dispatched Phase 7 — update this ticket's record — or "
-            "something else wrote an integration artifact."
+class TestThePhase7DispatchReachedTheGate:
+    """The operator's second dispatch released the node, on 1 October.
+
+    The first dispatch failed at ``agent_body``: the skill declared ``pass`` and
+    named a validation artifact it could not write, so §17.6.6 read the empty
+    directory off disk and §17.3.2 skipped the gate.  Commit ``67794f3`` gave the
+    skill the output contract it was missing.  The re-dispatch wrote both
+    artifacts and ``gate_09`` evaluated to pass on 9 of 9 predicates.
+
+    These tests read the gate evaluator's own artifact, never the skill's
+    self-declaration.  That distinction is the whole lesson of the first failure:
+    a skill saying ``pass`` proved nothing, and §17.6.3 reserves the gate result
+    to the evaluator.
+    """
+
+    def test_the_validation_directory_holds_the_canonical_artifact(self):
+        assert dir_non_empty(VALIDATION_REL, repo_root=REPO).passed, (
+            "validation/ is empty again. g08_p03 reads it, so the gate cannot "
+            "pass; check whether a rerun cleared it."
         )
 
-    def test_the_assessment_exists_but_no_validation_artifact_backs_it(self):
-        """The operator dispatched Phase 7 on 1 October. It did not pass.
+    def test_the_artifact_the_assessment_names_is_on_disk(self):
+        """The assessment's claim and the directory's contents now agree.
 
-        The skill wrote the assessment and declared ``pass``, naming a validation
-        artifact it never wrote.  ``validation/`` still holds only ``.gitkeep``, so
-        ``_determine_can_evaluate_exit_gate`` found a gate-relevant artifact missing,
-        the agent body failed with ``INCOMPLETE_OUTPUT``, and the exit gate was never
-        evaluated.  §17.6.6 is what caught it: readiness is read off disk, never
-        inferred from a skill reporting success.
+        The first dispatch broke precisely here, so the pairing is worth its own
+        test: a reference to a file nobody wrote is what §17.6.6 caught.
         """
         assessment = _json(ASSESSMENT_REL)
-        assert assessment["gate_pass_declaration"] == "pass"
-        assert assessment["validation_artifact_reference"]
-        assert not (
-            REPO / VALIDATION_REL / assessment["validation_artifact_reference"]
-        ).exists(), "the artifact the assessment names now exists; re-check the gate"
+        reference = assessment["validation_artifact_reference"]
+        assert reference
+        assert (REPO / VALIDATION_REL / reference).exists(), (
+            f"the assessment names {reference!r}, which is not in validation/"
+        )
 
-    def test_no_gate_result_was_written_for_phase_7(self):
-        """No gate result, because the exit gate was never reached."""
-        assert not (REPO / PHASE_7_REL / "gate_result.json").exists()
+    def test_the_gate_evaluator_recorded_a_pass(self):
+        """§17.6.3: only the evaluator writes this, so only it can be believed."""
+        result = _json(PHASE_7_REL + "/gate_result.json")
+        assert result["gate_id"] == "gate_09_budget_consistency"
+        assert result["status"] == "pass"
+        assert result["deterministic_predicates"]["failed"] == []
 
-    def test_the_gate_cannot_pass_on_the_response_alone(self):
-        """g08_p03 reads validation/, which the Phase 7 node has not populated."""
+    def test_the_gate_read_both_directories_it_depends_on(self):
+        """g08_p02 reads received/, g08_p03 reads validation/. Both are populated."""
         assert dir_non_empty(RECEIVED_REL, repo_root=REPO).passed
-        assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
+        assert dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
 
-    def test_tier_5_holds_nothing_so_no_fictional_label_is_due_yet(self):
+    def test_tier_5_content_carries_the_fictional_label(self):
+        """§13.8 falls due the moment Phase 8 drafts a section.
+
+        Vacuous while Tier 5 holds only placeholders, and live from the first
+        draft.  The check is deliberately broad — every Tier 5 file, not only
+        those quoting a figure — because the demo's entire budget is fictional
+        and a reader cannot tell which sentence rests on it.  Fail closed and
+        label the section, rather than adjudicate per sentence.
+        """
         real = [
             p
             for p in (REPO / TIER_5_REL).rglob("*")
             if p.is_file() and p.name != ".gitkeep"
         ]
-        assert real == [], (
-            "Tier 5 content exists. §13.8 requires content resting on these "
-            "fictional figures to flag the gap; the override record carries the "
-            "obligation and this test marks when it falls due."
+        unlabelled = [
+            str(p.relative_to(REPO))
+            for p in real
+            if "fictional" not in p.read_text(encoding="utf-8-sig").lower()
+        ]
+        assert unlabelled == [], (
+            "Tier 5 content rests on fictional budget figures without saying so. "
+            "§13.8 requires the deliverable to flag the gap, and the override "
+            "record in the decision log carries the obligation."
         )
 
     def test_the_override_record_carries_the_outstanding_label_obligation(

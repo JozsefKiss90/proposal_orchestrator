@@ -199,14 +199,18 @@ class TestTheRequestNamesPseudonymsOnly:
 # ---------------------------------------------------------------------------
 
 
-class TestTheGateIsStillUnmet:
-    """No *external* response ever arrived, and the gate is still unmet.
+class TestTheGateIsMetOnAFictionalResponse:
+    """No *external* response ever arrived, and the gate passes anyway.
 
-    What changed since this ticket ran is one directory: ``received/`` now holds the
-    fictional response ticket A authored.  What did not change is the verdict.  The
-    gate reads ``validation/`` and ``budget_gate_assessment.json`` as well, both of
-    them the Phase 7 node's to write, and dispatching that node is the operator's
-    step on this repository.
+    That is the point of the override, and the cost of it.  ``received/`` holds
+    one hand-authored fictional response; the Phase 7 node wrote the validation
+    artifact and the assessment on the operator's second dispatch; and
+    ``gate_09`` passed 9 of 9 predicates on 1 October.
+
+    None of those predicates can tell a fictional figure from a planner's.
+    ``g08_p05`` and ``g08_p06`` count identifiers and ``g08_p04`` cannot reject a
+    non-numeric figure (G3).  Keeping fiction out was §8.1's job, which is why
+    suspending it took a human instruction rather than a code change.
     """
 
     def test_every_response_present_declares_itself_fictional(self):
@@ -220,31 +224,36 @@ class TestTheGateIsStillUnmet:
         assert all(r["produced_by_external_planner"] is False for r in responses)
         assert all(r["figures_are_fictional"] is True for r in responses)
 
-    def test_the_validation_directory_holds_no_validation_artifact(self):
-        assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
+    def test_the_validation_directory_holds_the_validation_artifact(self):
+        assert dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
 
-    def test_the_assessment_declares_a_pass_the_gate_never_got_to_evaluate(self):
-        """Phase 7 was dispatched and blocked at exit, not at the gate.
+    def test_the_gate_evaluator_confirmed_the_skills_declaration(self):
+        """The skill's ``pass`` is now backed by the evaluator's own ``pass``.
 
-        The skill declared ``pass`` and named a validation artifact it did not write.
-        The agent runtime checks gate-relevant artifacts on disk (§17.6.6), found
-        ``validation/`` empty, and failed the body — so the exit gate was skipped
-        entirely (§17.3.2) and HARD_BLOCK propagated to Phase 8 (§17.3.4).
+        On the first dispatch it was not.  The skill declared ``pass`` and named a
+        validation artifact it did not write; §17.6.6 read the empty directory off
+        disk, the body failed, §17.3.2 skipped the gate and HARD_BLOCK propagated
+        to Phase 8 (§17.3.4).  The assertion order below is deliberate: the
+        evaluator's artifact is the authority (§17.6.3), and the skill's
+        declaration is only interesting because it agrees with it.
         """
+        base = (
+            "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
+        )
+        result = json.loads(
+            (REPO / (base + "gate_result.json")).read_text(encoding="utf-8-sig")
+        )
+        assert result["gate_id"] == "gate_09_budget_consistency"
+        assert result["status"] == "pass"
+        assert result["deterministic_predicates"]["failed"] == []
+        assert dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
+
         assessment = json.loads(
-            (
-                REPO
-                / "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
-                "budget_gate_assessment.json"
-            ).read_text(encoding="utf-8-sig")
+            (REPO / (base + "budget_gate_assessment.json")).read_text(
+                encoding="utf-8-sig"
+            )
         )
         assert assessment["gate_pass_declaration"] == "pass"
-        assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
-        assert not (
-            REPO
-            / "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
-            "gate_result.json"
-        ).exists()
 
     def test_the_coverage_predicates_are_satisfied_by_the_fictional_response(self):
         """Coverage is structural: it counts identifiers, not evidence.

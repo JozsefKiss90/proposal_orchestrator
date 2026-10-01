@@ -76,7 +76,7 @@
     "The leakage guard: each stored package under docs/tier4_orchestration_state/dev_graph/packages/ is rebuilt as a Package from its manifest.json and package.json, filtered to view blind_pre_evaluation, and passed to assert_no_leakage. All 6 pass. The guard is also shown to fire on a planted item, so a pass is not a vacuous pass.",
     "The document-route defect: a synthetic RIA-shaped document carrying the three profile-required section ids is imported into a copy of tests/fixtures/dev_graph_synthetic under tmp_path, blind evidence is built under the real harness/profiles/ria_default.json, and assess_candidate is called with a stub assessor. It raises EvidencePackError naming the missing anchor. Nothing is written into docs/ by this check.",
     "The intake record: written through runner.dev_graph.intake.record_esr_intake, re-read through read_esr_intake, and shown immutable — the same content again is a no-op, and different content under the same id is refused.",
-    "Anonymity: py -3.10 -m runner.leakage_scan over 168 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
+    "Anonymity: py -3.10 -m runner.leakage_scan over 169 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
   ],
   "findings": [
     {
@@ -171,6 +171,25 @@
       "by": "Ticket B, plans/tickets_budget_and_blind_lane.md",
       "what_changed": "F1 and F2 are fixed, so their dispositions no longer read 'recorded unfixed'. Criterion 3 is no longer blocked by a defect. It now waits only on a Part B, which Phase 8 produces once the operator dispatches Phase 7 and Phase 8.",
       "what_did_not_change": "Criterion 3's disposition stays 'not met': there is still no candidate version 1 to grade. What changed is the reason — a defect became a wait. Criteria 2 and 4 are untouched, and D5's judgement that a demo ticket should not settle the fix stands: ticket B settled it, not this ticket."
+    },
+    {
+      "date": "2026-10-01",
+      "by": "The operator's second Phase 7 dispatch, after commit 67794f3",
+      "authority": "CLAUDE.md §9.1 and §17.6.3. The gate result is the gate evaluator's own artifact and is the only admissible record that gate_09 passed. What this report checked is preserved verbatim above; what is no longer true is marked here.",
+      "what_changed": "gate_09_budget_consistency reached pass, 9 of 9 deterministic predicates, recorded at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json and evaluated at 2026-10-01T18:52:57Z under run id 'import uuid; print(uuid.uuid4())'. n07_budget_gate is released. The six Phase 8 nodes moved from hard_block_upstream to pending, and n08a, n08b and n08c are dispatchable. The categorical Phase 8 block of §8.4 and §13.4 is satisfied, not suspended: it was always conditional on the gate, and the gate has now passed on the fictional response authored under the operator override.",
+      "which_confirmed_lines_this_supersedes": [
+        "'received/ and validation/ are empty, so g08_p02 and g08_p03 fail.' Both directories are now populated and both predicates pass. validation/ holds budget_validation_response.json, written by the budget-interface-validation skill, not by hand.",
+        "'No gate_result.json exists for Phase 7; phases 1 to 6 each have one.' Seven phases now have one.",
+        "'The document route raises EvidencePackError on the RIA profile's first anchor.' Superseded earlier by ticket B, which fixed F1.",
+        "'The leakage scan reports no new leak over 164 files.' The scan now covers 169 files and still reports no new leak, with the same 11 recorded pre-existing leaks."
+      ],
+      "what_did_not_change": "Criteria 2, 3 and 4 are still not met, and Phase 8 has still written nothing. Tier 5 holds only its placeholders. What changed is the nature of the wait: all three now wait on a Phase 8 dispatch alone, with no constitutional block and no known defect in front of them. Criterion 1's disposition moves from its second branch to its first only when Phase 8 reaches released; until then it stands as recorded, with the gate now recorded as passing rather than blocking.",
+      "affects": [
+        "acceptance_criteria[0].evidence, which describes received/ as empty and names the test class TestThePhase8BlockIsRecorded. That class is now TestThePhase8BlockIsLifted in tests/test_demo_candidate_blind_baseline.py.",
+        "the_gate.blocking_predicate and the_gate.human_step_outstanding, both now discharged.",
+        "status_summary.Confirmed, per the list above."
+      ],
+      "what_the_gate_still_cannot_see": "That every figure it validated is fictional. g08_p05 and g08_p06 count identifiers, g08_p04 declares no type for lump_sum (G3), and no predicate compares a figure against a planner's. A passing gate_09 on this branch certifies structural consistency, not budgetary truth."
     }
   ]
 }
