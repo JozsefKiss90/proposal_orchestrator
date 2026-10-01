@@ -76,7 +76,7 @@
     "The leakage guard: each stored package under docs/tier4_orchestration_state/dev_graph/packages/ is rebuilt as a Package from its manifest.json and package.json, filtered to view blind_pre_evaluation, and passed to assert_no_leakage. All 6 pass. The guard is also shown to fire on a planted item, so a pass is not a vacuous pass.",
     "The document-route defect: a synthetic RIA-shaped document carrying the three profile-required section ids is imported into a copy of tests/fixtures/dev_graph_synthetic under tmp_path, blind evidence is built under the real harness/profiles/ria_default.json, and assess_candidate is called with a stub assessor. It raises EvidencePackError naming the missing anchor. Nothing is written into docs/ by this check.",
     "The intake record: written through runner.dev_graph.intake.record_esr_intake, re-read through read_esr_intake, and shown immutable — the same content again is a no-op, and different content under the same id is refused.",
-    "Anonymity: py -3.10 -m runner.leakage_scan over 165 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
+    "Anonymity: py -3.10 -m runner.leakage_scan over 167 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
   ],
   "findings": [
     {
@@ -84,14 +84,14 @@
       "severity": "blocking for the blind lane's guarded route",
       "finding": "The dev-graph document route cannot feed either real instrument profile. materialise_candidate writes one sub-section per passage and gives it the section's own id; the RIA rubrics anchor on B.1.1, B.1.2, B.2.1, B.2.2, B.3.1 and B.3.2, and the MSCA-PF rubrics on 1.1 to 3.2. build_evidence_pack fails closed on the missing anchor. The only profile the route can serve is one whose rubric anchors equal its section ids, which describes the synthetic syn_graph profile in tests/harness/test_blind_leakage.py and no shipped profile.",
       "why_it_was_not_caught_before": "The document route's tests use the synthetic profile, where anchor and section id coincide. The RIA and MSCA-PF profile tests use the directory route with a candidate built from the rubric anchors. No test crossed the two. This is what handoff stage 7 was for.",
-      "disposition": "recorded unfixed; a Milestone 2 ticket",
+      "disposition": "FIXED by ticket B on 2026-10-01. A document section carries an optional sub_sections list; the builder copies it onto the passage node and materialise_candidate emits it instead of synthesising one. The field is optional and an empty list normalises to absent, so no record's content_version moves. The anchor map still fails closed: a document declaring no sub-section, or declaring fewer than the profile anchors on, still raises. Proved by tests/harness/test_blind_document_subsections.py (22 tests).",
       "fix_shape": "Either a document record declares its sub-sections and materialise_candidate preserves them, or the profile declares how a section's passage maps onto its anchors. The first keeps the anchor map fail-closed and puts the structure where the drafter already knows it; the second changes no document schema. The choice is not this ticket's to make: it changes what a document snapshot is."
     },
     {
       "id": "F2",
       "severity": "coupled consequence of F1",
       "finding": "An ESR intake can be stamped on a blind report only through the document route: _check_intake refuses an intake when the candidate is a directory, because a directory names no document. While F1 stands, the demo's not_applicable availability cannot reach any RIA blind report, so criteria 3 and 4 cannot be satisfied by the same report.",
-      "disposition": "recorded unfixed; resolved by F1",
+      "disposition": "FIXED with F1 by ticket B. An ESR intake now stamps onto a report produced through the document route, and demo-biodiv-2027-part-b-v1 is the record it was proved with.",
       "fix_shape": "None of its own. Fixing F1 resolves it."
     },
     {
@@ -164,5 +164,13 @@
       "the_gate.blocking_predicate and the_gate.human_step_outstanding",
       "the anonymity line's scanned-file count, 164 to 165, for the override record added to Tier 4. The scan reports no new leak. docs/integrations/ is outside its scope, so the response itself is checked by tests/test_demo_fictional_budget_override.py instead."
     ]
-  }
+  },
+  "amended_again": [
+    {
+      "date": "2026-10-01",
+      "by": "Ticket B, plans/tickets_budget_and_blind_lane.md",
+      "what_changed": "F1 and F2 are fixed, so their dispositions no longer read 'recorded unfixed'. Criterion 3 is no longer blocked by a defect. It now waits only on a Part B, which Phase 8 produces once the operator dispatches Phase 7 and Phase 8.",
+      "what_did_not_change": "Criterion 3's disposition stays 'not met': there is still no candidate version 1 to grade. What changed is the reason — a defect became a wait. Criteria 2 and 4 are untouched, and D5's judgement that a demo ticket should not settle the fix stands: ticket B settled it, not this ticket."
+    }
+  ]
 }

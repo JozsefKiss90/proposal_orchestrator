@@ -1,17 +1,13 @@
 {
-  "decision_id": "gap_risk_flagged_gantt_designer_2026-10-01T00-00-00Z",
-  "decision_type": "gap_risk_flagged",
-  "invoking_agent": "gantt_designer",
-  "phase_context": "phase_04_gantt_milestones",
-  "run_id_reference": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
-  "decision_description": "The Phase 4 milestone consistency check flagged milestone MS3 as heuristic-inconsistent. Its due month 22 precedes the completion of all WP4 tasks at month 40. MS3 is an intermediate checkpoint, not a work package completion. Its verifiable criterion asks only that each of the three campaigns has collected at least one field round, the omics sampling protocol is delivered, and the reporting-needs assessment states what the outputs must carry. The flag is accepted as a false positive of the WP-completion heuristic. MS3 stands at month 22.",
-  "alternatives_considered": [
-    "Move the MS3 due month to 40 to match the maximum WP4 task end month; rejected because it would defer an early-progress checkpoint past the completion it is meant to precede.",
-    "Add explicit depends_on_tasks and milestone_type to MS3 so the check reads it as an intermediate checkpoint; retained as a downstream schema improvement but not required to resolve the flag, since the criterion already scopes MS3 to partial campaign progress.",
-    "Escalate the flag to the operator as an unresolved timeline conflict; rejected because the heuristic, not the schedule, is the source of the mismatch."
-  ],
-  "tier_authority_applied": "CLAUDE.md §7 — Phase 4 gate condition (all milestones have a defined verifiable criterion, the timeline fits within the call-specified duration, and no critical path dependency is unresolved)",
-  "rationale": "The consistency check compared the MS3 due month against the maximum WP4 task end month because MS3 declares no depends_on_tasks and no milestone_type. The gantt records MS3 as an intermediate checkpoint whose criterion is partial campaign progress. Month 22 supports that criterion: tasks T4.1, T4.2 and T4.3 all start by month 18 and run to month 38, so each campaign can collect a first field round before month 22. A checkpoint on early campaign progress must fall before campaign completion. Due month 22 is therefore correct, and the heuristic flag reports a modelling gap in MS3's metadata, not a scheduling error. The Phase 4 gate condition asks for a defined verifiable criterion, which MS3 carries, and a timeline within the 48-month duration, which month 22 satisfies.",
-  "resolution_status": "resolved",
+  "decision_id": "constitutional_violation_compliance_validator_2026-10-01T00-00-00Z",
+  "decision_type": "constitutional_violation",
+  "invoking_agent": "compliance_validator",
+  "phase_context": "phase_07_budget_gate",
+  "run_id_reference": "import uuid; print(uuid.uuid4())",
+  "decision_description": "The Phase 7 budget gate assessment at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json declares gate_pass_declaration 'pass'. It grounds that pass on a budget source named budget_response_FICTIONAL_demo_2026-10-01.json, whose figures are explicitly labelled fictional and were not produced by the external Lump Sum Budget Planner (produced_by_external_planner: false). All wp_coverage_results (WP1-WP7) and partner_coverage_results (P01-P12) resolve their figures to that fictional response. For a lump-sum instrument, a budget figure from a source so named is an invented budget figure. The constitutional-compliance-check skill flagged this as a §13.3 violation at critical severity. This entry records that violation as a durable Tier 4 decision requiring human operator resolution.",
+  "alternatives_considered": [],
+  "tier_authority_applied": "CLAUDE.md §13.3",
+  "rationale": "Per CLAUDE.md §9.4 and §13.5, a detected constitutional violation that affects future interpretation, traceability, and reproducibility must be written to the Tier 4 decision log and not held only in agent memory. The violation is recorded as unresolved because resolution requires a human operator to confirm or reject any in-session §1 override suspending §13.3; no such override is present in this skill's context and none may be assumed. Until that confirmation, the gate pass rests on a fabricated budget source contrary to §8.3 and §17.6.7.",
+  "resolution_status": "unresolved",
   "timestamp": "2026-10-01T00:00:00Z"
 }

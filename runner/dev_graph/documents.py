@@ -127,16 +127,55 @@ def _objects(rec: dict[str, Any], key: str, where: str) -> Iterator[dict[str, An
         yield item
 
 
+def _sub_sections(s: dict[str, Any], where: str) -> list[dict[str, Any]]:
+    """The section's declared sub-sections, in declaration order.
+
+    Optional. A section that declares none normalises without the key at all, so an
+    existing record's ``content_version`` is unchanged by this field's introduction —
+    and ``[]`` is therefore normalised to absent, or the same document would hash two
+    ways depending on how its author spelled "none".
+
+    The id is the one a pre-evaluation profile's rubrics anchor on, so it commonly
+    carries dots. ``_ID_RE`` already admits those after the first character, and this
+    layer stays agnostic about which ids any profile uses. Ids must be unique within
+    the section: two sub-sections under one id would make an anchor map ambiguous, and
+    such a map is required to fail closed.
+    """
+    out: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for sub in _objects(s, "sub_sections", where):
+        sub_id = _str(sub, "sub_section_id", where)
+        if not _ID_RE.match(sub_id):
+            raise _malformed(
+                where, f"{where}: sub_section_id {sub_id!r} is not a plain identifier"
+            )
+        if sub_id in seen:
+            raise _malformed(where, f"{where}: duplicate sub_section_id {sub_id!r}")
+        seen.add(sub_id)
+        out.append(
+            {
+                "sub_section_id": sub_id,
+                "title": _str(sub, "title", f"sub-section {sub_id}", required=False),
+                "content": _str(sub, "content", f"sub-section {sub_id}", required=False),
+            }
+        )
+    return out
+
+
 def _section(s: dict[str, Any], where: str) -> dict[str, Any]:
     sid = _str(s, "section_id", where)
     if not _ID_RE.match(sid):
         raise _malformed(where, f"{where}: section_id {sid!r} is not a plain identifier")
-    return {
+    section = {
         "section_id": sid,
         "title": _str(s, "title", f"section {sid}", required=False),
         "content": _str(s, "content", f"section {sid}", required=False),
         "addresses": _ids(s, "addresses", f"section {sid}"),
     }
+    subs = _sub_sections(s, f"section {sid}")
+    if subs:
+        section["sub_sections"] = subs
+    return section
 
 
 def _verified_span(raw: Any, where: str) -> dict[str, Any] | None:
@@ -281,12 +320,21 @@ def render_document(sections: list[dict[str, Any]]) -> tuple[str, dict[str, dict
 
     The layout is fixed (``## <id> <title>``, blank line, content, blank line)
     so a span is a stable function of the sections alone.
+
+    A declared sub-section follows its section's own content as a third-level block
+    (``### <id> <title>``), inside the section's span: the span has to cover the
+    sub-section prose, or a passage would point at text that omits the section's
+    dedicated answers. A section declaring none renders exactly as before.
     """
     parts: list[str] = []
     spans: dict[str, dict[str, int]] = {}
     pos = 0
     for s in sections:
         block = f"## {s['section_id']} {s['title']}\n\n{s['content']}\n\n"
+        for sub in s.get("sub_sections", ()):
+            block += (
+                f"### {sub['sub_section_id']} {sub['title']}\n\n{sub['content']}\n\n"
+            )
         spans[s["section_id"]] = {"start": pos, "end": pos + len(block)}
         parts.append(block)
         pos += len(block)

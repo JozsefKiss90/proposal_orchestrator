@@ -117,18 +117,43 @@ the ranking signal and converts a fail-closed check into a vacuous pass.
 
 **Blocked by:** nothing.
 
-- [ ] `sub_sections` is optional on a document section, so an existing record keeps its current
+- [x] `sub_sections` is optional on a document section, so an existing record keeps its current
   behaviour. Check the `milestone_2` and `graph` branches for records before relying on that.
-- [ ] A document whose sections declare sub-sections grades under the real RIA profile, through
+- [x] A document whose sections declare sub-sections grades under the real RIA profile, through
   the document route, and the report carries the candidate hash, profile version and assessor
   pin.
-- [ ] The anchor map still fails closed. A declared anchor absent from the candidate still
+- [x] The anchor map still fails closed. A declared anchor absent from the candidate still
   raises, and a test proves it.
-- [ ] The same candidate grades under the MSCA-PF profile.
-- [ ] F2 closes with it. An ESR intake can be stamped on the resulting report, and
+- [x] The same candidate grades under the MSCA-PF profile.
+- [x] F2 closes with it. An ESR intake can be stamped on the resulting report, and
   `demo-biodiv-2027-part-b-v1` is the record to try it with.
-- [ ] The existing document-route and profile tests pass unchanged.
-- [ ] The demo's F1 reproduction test is inverted, from a recorded defect into a passing case.
+- [x] The existing document-route and profile tests pass unchanged.
+- [x] The demo's F1 reproduction test is inverted, from a recorded defect into a passing case.
+
+**Outcome: seven of seven.** Two functions changed and nothing else. `_section` in
+`runner/dev_graph/documents.py` normalises an optional `sub_sections` list, and
+`materialise_candidate` emits it when present. The builder needed no edit: it already copies
+every section field onto the passage node. 22 new tests in
+`tests/harness/test_blind_document_subsections.py`.
+
+**Optional had to mean hash-stable.** A section declaring none normalises without the key, and
+an empty list normalises to absent too. Otherwise one document would hash two ways depending on
+how its author spelled "none", and every stored `content_version` would move. No document record
+exists on any branch, so nothing stored was at risk, but the synthetic fixture's node ids were.
+
+**The span had to grow with it.** `render_document` now renders each sub-section as a
+third-level block inside its section's span. A span that stopped at the section's own content
+would point at text omitting the section's dedicated answers, which is what the anchor ranks.
+
+**One departure from this ticket as written.** It said the builder derives a passage per
+sub-section. That would break the materialiser, which writes one artifact per passage named for
+its section, so two sub-sections of one section would collide on a filename. It would also
+re-point every claim-to-passage edge. The passage stays per section and carries its
+sub-sections, which is what the evidence pack reads anyway.
+
+**The agnosticism lint earned its keep.** A first draft of the `materialise_candidate` docstring
+named RIA and MSCA-PF, and `test_harness_python_carries_no_instrument_name` failed. Which ids a
+profile anchors on is the profile's business, never the harness's.
 
 ---
 

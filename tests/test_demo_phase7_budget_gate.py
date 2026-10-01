@@ -223,11 +223,27 @@ class TestTheGateIsStillUnmet:
     def test_the_validation_directory_holds_no_validation_artifact(self):
         assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
 
-    def test_no_budget_gate_assessment_was_written(self):
+    def test_the_assessment_declares_a_pass_the_gate_never_got_to_evaluate(self):
+        """Phase 7 was dispatched and blocked at exit, not at the gate.
+
+        The skill declared ``pass`` and named a validation artifact it did not write.
+        The agent runtime checks gate-relevant artifacts on disk (§17.6.6), found
+        ``validation/`` empty, and failed the body — so the exit gate was skipped
+        entirely (§17.3.2) and HARD_BLOCK propagated to Phase 8 (§17.3.4).
+        """
+        assessment = json.loads(
+            (
+                REPO
+                / "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
+                "budget_gate_assessment.json"
+            ).read_text(encoding="utf-8-sig")
+        )
+        assert assessment["gate_pass_declaration"] == "pass"
+        assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
         assert not (
             REPO
             / "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
-            "budget_gate_assessment.json"
+            "gate_result.json"
         ).exists()
 
     def test_the_coverage_predicates_are_satisfied_by_the_fictional_response(self):

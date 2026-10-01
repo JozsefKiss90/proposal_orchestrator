@@ -312,10 +312,23 @@ def assert_no_leakage(package: Package) -> None:
 def materialise_candidate(package: Package, document: str, target_dir: Path) -> Path:
     """Write the package's passages and claims of *document* as section artifacts.
 
-    One ``<section_id>.json`` per passage: the passage as the single
-    sub-section, the document's claims of that section as the claim ledger
-    (declared status lowercased, the verified span id as ``source_ref``).
-    Derived from the package alone, so the same package lands the same bytes.
+    One ``<section_id>.json`` per passage, with the document's claims of that section
+    as the claim ledger (declared status lowercased, the verified span id as
+    ``source_ref``).  Derived from the package alone, so the same package lands the
+    same bytes.
+
+    The sub-sections are the section's **declared** ones when it has any, preserved in
+    declaration order with their ids intact.  That is what lets a profile grade this
+    route at all: a profile's rubrics anchor below the section, and
+    ``build_evidence_pack`` fails closed on an anchor absent from the artifact, so
+    synthesising one sub-section named for its section made every anchored profile
+    unusable here.  Which ids a profile anchors on is the profile's business and never
+    this module's.
+
+    A section declaring none falls back to that single synthesised sub-section, which
+    is what every section produced before sub-sections existed.  A record written
+    against the old shape therefore still grades, against a profile whose anchors are
+    its section ids.
     """
     passages = [
         i for i in package.items
@@ -351,6 +364,15 @@ def materialise_candidate(package: Package, document: str, target_dir: Path) -> 
             "document": document,
             "passage": {"id": p["id"], "version": p["version"]},
             "sub_sections": [
+                {
+                    "sub_section_id": str(sub["sub_section_id"]),
+                    "title": str(sub.get("title", "")),
+                    "content": str(sub.get("content", "")),
+                }
+                for sub in c["sub_sections"]
+            ]
+            if c.get("sub_sections")
+            else [
                 {"sub_section_id": sid, "title": str(c.get("title", "")), "content": str(c.get("content", ""))}
             ],
             "validation_status": {"claim_statuses": ledger},

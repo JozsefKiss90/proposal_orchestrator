@@ -79,12 +79,12 @@
     {
       "id": "F1",
       "summary": "The dev-graph document route cannot feed either shipped instrument profile: one sub-section named for its section against rubric anchors B.1.1 to B.3.2 (RIA) and 1.1 to 3.2 (MSCA-PF).",
-      "disposition": "recorded unfixed; Milestone 2 ticket"
+      "disposition": "FIXED by ticket B on 2026-10-01. A document section carries an optional sub_sections list; the builder copies it onto the passage node and materialise_candidate emits it instead of synthesising one. The field is optional and an empty list normalises to absent, so no record's content_version moves. The anchor map still fails closed: a document declaring no sub-section, or declaring fewer than the profile anchors on, still raises. Proved by tests/harness/test_blind_document_subsections.py (22 tests)."
     },
     {
       "id": "F2",
       "summary": "An ESR intake can be stamped only through the document route, so F1 also blocks the demo's not_applicable availability from reaching any RIA blind report.",
-      "disposition": "recorded unfixed; resolved by F1"
+      "disposition": "FIXED with F1 by ticket B. An ESR intake now stamps onto a report produced through the document route, and demo-biodiv-2027-part-b-v1 is the record it was proved with."
     },
     {
       "id": "F3",
@@ -124,5 +124,13 @@
       "what_is_outstanding_for_the_operator, which named the planner run",
       "D1's reasoning, which rests on the Phase 8 block. The block stands, so D1 stands."
     ]
-  }
+  },
+  "amended_again": [
+    {
+      "date": "2026-10-01",
+      "by": "Ticket B, plans/tickets_budget_and_blind_lane.md",
+      "what_changed": "F1 and F2 are fixed, so their dispositions no longer read 'recorded unfixed'. Criterion 3 is no longer blocked by a defect. It now waits only on a Part B, which Phase 8 produces once the operator dispatches Phase 7 and Phase 8.",
+      "what_did_not_change": "Criterion 3's disposition stays 'not met': there is still no candidate version 1 to grade. What changed is the reason — a defect became a wait. Criteria 2 and 4 are untouched, and D5's judgement that a demo ticket should not settle the fix stands: ticket B settled it, not this ticket."
+    }
+  ]
 }

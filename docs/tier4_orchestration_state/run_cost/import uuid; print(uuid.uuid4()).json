@@ -381,19 +381,49 @@
     "timed_out": 0
   },
   "unattributed_after_last_gate": {
-    "invocations": 0,
-    "estimated_input_tokens": 0,
-    "estimated_output_tokens": 0,
-    "estimated_total_tokens": 0,
-    "wall_clock_seconds": 0.0,
-    "span_seconds": 0.0,
-    "first_invocation_utc": null,
-    "last_invocation_utc": null,
-    "execution_modes": {},
-    "models": [],
+    "invocations": 5,
+    "estimated_input_tokens": 155465,
+    "estimated_output_tokens": 5135,
+    "estimated_total_tokens": 160600,
+    "wall_clock_seconds": 348.344,
+    "span_seconds": 289.35,
+    "first_invocation_utc": "2026-10-01T16:01:25.104668+00:00",
+    "last_invocation_utc": "2026-10-01T16:06:14.455065+00:00",
+    "execution_modes": {
+      "cli-prompt": 3,
+      "tapm": 2
+    },
+    "models": [
+      "claude-opus-4-8"
+    ],
     "failed": 0,
     "timed_out": 0,
-    "by_skill": {}
+    "by_skill": {
+      "budget-interface-validation": {
+        "invocations": 2,
+        "estimated_input_tokens": 95564,
+        "estimated_output_tokens": 2560,
+        "wall_clock_seconds": 141.797
+      },
+      "constitutional-compliance-check": {
+        "invocations": 1,
+        "estimated_input_tokens": 9550,
+        "estimated_output_tokens": 1558,
+        "wall_clock_seconds": 97.015
+      },
+      "decision-log-update": {
+        "invocations": 1,
+        "estimated_input_tokens": 38087,
+        "estimated_output_tokens": 531,
+        "wall_clock_seconds": 50.219
+      },
+      "gate-enforcement": {
+        "invocations": 1,
+        "estimated_input_tokens": 12264,
+        "estimated_output_tokens": 486,
+        "wall_clock_seconds": 59.313
+      }
+    }
   },
   "note": "Token counts are the benchmark layer's own estimates, not a provider's billed usage. wall_clock_seconds sums the invocations; span_seconds measures first to last invocation in the window and so includes the gaps between them."
 }

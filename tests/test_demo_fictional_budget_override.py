@@ -65,6 +65,10 @@ PARTNERS_REL = "docs/tier3_project_instantiation/consortium/partners.json"
 CALL_REL = "docs/tier3_project_instantiation/call_binding/selected_call.json"
 PHASE_7_REL = "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate"
 TIER_5_REL = "docs/tier5_deliverables"
+ASSESSMENT_REL = (
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
+    "budget_gate_assessment.json"
+)
 OVERRIDE_REL = (
     "docs/tier4_orchestration_state/decision_log/"
     "demo-fictional-budget-override_2026-10-01.json"
@@ -329,14 +333,29 @@ class TestTheRestOfPhase7IsStillTheOperatorsStep:
             "something else wrote an integration artifact."
         )
 
-    def test_no_budget_gate_assessment_was_written(self):
-        assert not (REPO / PHASE_7_REL / "budget_gate_assessment.json").exists()
+    def test_the_assessment_exists_but_no_validation_artifact_backs_it(self):
+        """The operator dispatched Phase 7 on 1 October. It did not pass.
+
+        The skill wrote the assessment and declared ``pass``, naming a validation
+        artifact it never wrote.  ``validation/`` still holds only ``.gitkeep``, so
+        ``_determine_can_evaluate_exit_gate`` found a gate-relevant artifact missing,
+        the agent body failed with ``INCOMPLETE_OUTPUT``, and the exit gate was never
+        evaluated.  §17.6.6 is what caught it: readiness is read off disk, never
+        inferred from a skill reporting success.
+        """
+        assessment = _json(ASSESSMENT_REL)
+        assert assessment["gate_pass_declaration"] == "pass"
+        assert assessment["validation_artifact_reference"]
+        assert not (
+            REPO / VALIDATION_REL / assessment["validation_artifact_reference"]
+        ).exists(), "the artifact the assessment names now exists; re-check the gate"
 
     def test_no_gate_result_was_written_for_phase_7(self):
+        """No gate result, because the exit gate was never reached."""
         assert not (REPO / PHASE_7_REL / "gate_result.json").exists()
 
     def test_the_gate_cannot_pass_on_the_response_alone(self):
-        """g08_p03 reads validation/, which only the Phase 7 node writes."""
+        """g08_p03 reads validation/, which the Phase 7 node has not populated."""
         assert dir_non_empty(RECEIVED_REL, repo_root=REPO).passed
         assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
 

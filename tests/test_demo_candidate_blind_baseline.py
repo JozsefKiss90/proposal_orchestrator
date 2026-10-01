@@ -13,11 +13,16 @@ reported as done later.  Two unrelated blocks account for the first two:
    placed one fictional response there under an operator override, which leaves the
    block intact: ``validation/`` and ``budget_gate_assessment.json`` are the Phase 7
    node's to write, and dispatching that node is the operator's step.
-2. **The blind lane's document route cannot feed either shipped profile.**
-   ``materialise_candidate`` writes one sub-section per passage and names it for the
-   section; the RIA rubrics anchor on ``B.1.1`` to ``B.3.2`` and the MSCA-PF rubrics on
-   ``1.1`` to ``3.2``.  The anchor map fails closed.  This criterion would fail with
-   Part B in hand, which is why it is a finding (F1) and not a wait.
+2. **The blind lane's document route could feed neither shipped profile — F1, now
+   fixed.**  ``materialise_candidate`` synthesised one sub-section named for its
+   section, while the RIA rubrics anchor on ``B.1.1`` to ``B.3.2`` and the MSCA-PF
+   rubrics on ``1.1`` to ``3.2``, so the anchor map failed closed and no report was
+   written.  This criterion would have failed with Part B in hand, which is why it was
+   a finding and not a wait.  Ticket B in ``plans/tickets_budget_and_blind_lane.md``
+   closed it: a section declares its sub-sections, and the materialiser emits them.
+   What remains here is the half that was never a defect — a document declaring none
+   still fails closed — and ``tests/harness/test_blind_document_subsections.py`` owns
+   the fix.
 
 The fourth criterion asks the leakage guard about the package built around candidate
 version 1.  The guard runs clean over all 6 blind packages the demo world holds, but
@@ -151,8 +156,20 @@ class TestThePhase8BlockIsRecorded:
     def test_no_validation_artifact_exists(self):
         assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
 
-    def test_no_budget_gate_assessment_was_written(self):
-        assert not (REPO / PHASE_7_REL / "budget_gate_assessment.json").exists()
+    def test_the_dispatched_phase_7_still_did_not_release(self):
+        """Phase 8 is frozen for a new reason, and still frozen.
+
+        When this ticket ran, nothing had been dispatched.  The operator dispatched
+        Phase 7 on 1 October; its node blocked at exit because the skill never wrote
+        the validation artifact it declared, so the exit gate was never evaluated and
+        every Phase 8 node took ``hard_block_upstream``.
+        """
+        assessment = _json(
+            "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
+            "budget_gate_assessment.json"
+        )
+        assert assessment["gate_pass_declaration"] == "pass"
+        assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
 
     def test_phase_7_has_no_gate_result_while_phases_1_to_6_each_have_one(self):
         assert not (REPO / PHASE_7_REL / "gate_result.json").exists()
@@ -450,7 +467,51 @@ def _anchors_and_sections(bundle) -> tuple[set[str], set[str]]:
 
 
 class TestTheDocumentRouteCannotFeedTheRiaProfile:
-    """F1.  The guarded route builds its evidence, then the anchor map refuses it."""
+    """F1, now **fixed** by ticket B — and these tests say what is left.
+
+    When this ticket ran, the dev-graph document route could feed no shipped profile:
+    ``materialise_candidate`` synthesised one sub-section named for its section, and the
+    anchor map refused it.  Ticket B gave a section an optional ``sub_sections`` list,
+    which the builder carries onto the passage and the materialiser emits.
+
+    What this class still pins is the half of F1 that was never a defect.  A document
+    that declares **no** sub-section still cannot feed an anchored profile, and must
+    still fail closed rather than grade on a vacuous anchor.  The RIA-shaped document
+    below declares none, so it is exactly that case.  The positive case — a document
+    that does declare them, grading under the real RIA and MSCA-PF profiles — lives in
+    ``tests/harness/test_blind_document_subsections.py``.
+    """
+
+    def test_a_declaring_document_now_grades_under_the_real_ria_profile(
+        self, world, ria_bundle, tmp_path
+    ):
+        """F1 inverted: the case that raised ``EvidencePackError`` now returns a report."""
+        anchors = sorted(
+            a for r in ria_bundle.rubric_set.rubrics for a in r.anchor_sub_section_ids
+        )
+        document = _ria_shaped_document(
+            [sid for _c, sid in ba.required_sections(ria_bundle.profile)]
+        )
+        for section in document["sections"]:
+            section["sub_sections"] = [
+                {"sub_section_id": a, "title": a, "content": RIA_SECTION_TEXT}
+                for a in anchors
+            ]
+        rel = Path("docs/tier5_deliverables/candidates/declaring.json")
+        (world / rel).parent.mkdir(parents=True, exist_ok=True)
+        (world / rel).write_text(json.dumps(document, indent=2), encoding="utf-8")
+        import_document(world, rel)
+        evidence = ba.build_blind_evidence(
+            world,
+            document["document_id"],
+            profile_version=ria_bundle.version,
+            out_dir=tmp_path / "out",
+        )
+        report = ba.assess_candidate(
+            _stub_judge(tmp_path), ria_bundle, evidence=evidence, clock=lambda: FROZEN
+        )
+        assert report.scope in {"complete", "partial"}
+        assert report.candidate_hash.startswith("sha256:")
 
     def test_the_ria_rubrics_anchor_below_the_section(self, ria_bundle):
         anchors, sections = _anchors_and_sections(ria_bundle)
@@ -464,7 +525,7 @@ class TestTheDocumentRouteCannotFeedTheRiaProfile:
         assert anchors == {"1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "3.1", "3.2"}
         assert not anchors & sections
 
-    def test_the_route_materialises_one_sub_section_named_for_its_section(
+    def test_a_document_declaring_none_falls_back_to_one_named_for_its_section(
         self, world, ria_bundle, tmp_path
     ):
         evidence = _evidence(world, ria_bundle, tmp_path / "out")
@@ -473,7 +534,7 @@ class TestTheDocumentRouteCannotFeedTheRiaProfile:
             ids = [s["sub_section_id"] for s in artifact["sub_sections"]]
             assert ids == [artifact["section_id"]]
 
-    def test_assessment_fails_closed_on_the_missing_anchor(
+    def test_a_document_declaring_none_still_fails_closed_on_the_anchor(
         self, world, ria_bundle, tmp_path
     ):
         evidence = _evidence(world, ria_bundle, tmp_path / "out")

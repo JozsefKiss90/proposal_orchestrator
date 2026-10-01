@@ -1,0 +1,80 @@
+{
+  "record_type": "decision",
+  "id": "demo-blind-document-subsections",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "milestone": "Ticket B in plans/tickets_budget_and_blind_lane.md, 'Make the blind lane's document route usable by a shipped profile'",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4. This is an engine fix in the out-of-band QA lane, which is never a runtime gate, so no phase, gate or tier definition is touched and §14 is not engaged. §10.2 applies to the harness as an execution aid: the fix keeps the anchor's purpose rather than only stopping its exception.",
+  "decision": "A document section carries an optional sub_sections list. runner.dev_graph.documents._section normalises it, render_document renders each sub-section as a third-level block inside its section's span, and harness.blind_assessment.materialise_candidate emits the declared sub-sections instead of synthesising one named for the section. The snapshot builder needed no change: it already copies every section field onto the passage node. This closes findings F1 and F2 of demo-candidate-blind-baseline_2026-10-01.json, so the dev-graph document route can now be graded by a shipped instrument profile.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json",
+  "decisions": [
+    {
+      "id": "B1",
+      "decision": "The optional field normalises to absent when empty, not to an empty list.",
+      "reasoning": "content_version is content_hash over the normalised record, and the builder refuses a record whose stored content_version does not match. If a section always carried a sub_sections key, every existing record's hash would move, and if an empty list were kept, one document would hash two ways depending on how its author spelled 'none'. No document record exists in docs/ on any branch — checked on dev_graph_demo, dev_graph, milestone_2, graph and main — so nothing stored was at risk. The synthetic fixture was: every node id derived from its content_version would have shifted.",
+      "recorded_in": "tests/harness/test_blind_document_subsections.py TestTheOldShapeIsUntouched."
+    },
+    {
+      "id": "B2",
+      "decision": "The section's rendered span grows to cover its sub-sections.",
+      "reasoning": "A passage node points at a span of the rendered document. The sub-sections carry the section's dedicated answers to each expectation, which is exactly the text the anchor ranks. A span that stopped at the section's own content would point at text omitting them, so a reader resolving the passage from the snapshot would see less than the assessor graded. The layout stays fixed, so a span remains a stable function of the sections alone.",
+      "recorded_in": "render_document's docstring; TestTheDeclaredSubSectionsSurvive test_the_rendered_span_covers_the_sub_section_text."
+    },
+    {
+      "id": "B3",
+      "decision": "The passage stays one per section and carries its sub-sections. The ticket said the builder derives a passage per sub-section; that is not what was built.",
+      "reasoning": "materialise_candidate writes one artifact per passage, named for its section, so two sub-sections of one section would collide on a filename. A passage per sub-section would also re-point every claim-to-passage edge, since a claim declares a section_id and the builder resolves it through passage_ids, and it would change what a revision contract treats as one unit of wording. None of that is needed: build_evidence_pack reads the sub_sections array inside a section artifact, so the sub-sections have to reach the artifact, not become passages. The departure is recorded rather than silently taken.",
+      "recorded_in": "This record; the ticket's Outcome; TestTheDeclaredSubSectionsSurvive test_the_passage_node_carries_them."
+    },
+    {
+      "id": "B4",
+      "decision": "A sub_section_id must be a plain identifier and unique within its section.",
+      "reasoning": "_ID_RE already admits a dot after the first character, so both shipped anchor shapes validate without widening the rule. Uniqueness is the part that matters for the fix: two sub-sections under one id would make the anchor map ambiguous, and the anchor map is required to fail closed. An ambiguous anchor is a silent partial pass, which is the failure mode the fail-closed rule exists to prevent.",
+      "recorded_in": "_sub_sections in runner/dev_graph/documents.py; TestTheAnchorMapStillFailsClosed."
+    },
+    {
+      "id": "B5",
+      "decision": "The fallback is kept: a section declaring no sub-section still materialises one named for itself.",
+      "reasoning": "That is what every section produced before this field existed. Removing it would break the document route for any record written against the old shape, and for the synthetic profile whose anchors are its section ids. The cost is that an under-declared document still fails closed against an anchored profile, which is correct: it is the honest report that the candidate has no dedicated answer to that expectation.",
+      "recorded_in": "materialise_candidate's docstring; TestTheOldShapeIsUntouched test_a_candidate_with_no_sub_sections_still_materialises_one."
+    },
+    {
+      "id": "B6",
+      "decision": "The anchor bonus is tested by observing selection, not by reading a score.",
+      "reasoning": "ProseSpan carries no score, so a test asserting one would have had to reach into the selection internals. The bonus is observable from outside: a paragraph matching no selection term survives selection when it sits in a declared anchor, and is excluded as not_relevant when the anchor moves elsewhere. That contrast proves the bonus still ranks a dedicated answer, which is the property the ticket required a fix to keep.",
+      "recorded_in": "TestItGradesUnderTheShippedProfiles test_the_anchor_bonus_is_still_what_ranks_a_dedicated_answer."
+    },
+    {
+      "id": "B7",
+      "decision": "No instrument name was added to harness Python.",
+      "reasoning": "A first draft of the materialise_candidate docstring named both shipped profiles and tests/harness/test_profile.py::TestNoInstrumentLiterals failed. The harness is instrument-agnostic by construction, and which ids a profile anchors on is the profile's business. The docstring now states the structural rule and names no instrument. The lint caught this, which is the ticket's sixth criterion working as intended.",
+      "recorded_in": "This record; the ticket's Outcome."
+    }
+  ],
+  "findings_closed": [
+    {
+      "id": "F1",
+      "was": "The dev-graph document route cannot feed either shipped instrument profile: one sub-section named for its section against rubric anchors below the section.",
+      "now": "Fixed. A section declares its sub-sections and the materialiser emits them. Both shipped profiles grade a declaring document through the document route, and the report carries the candidate hash, profile version and assessor pin."
+    },
+    {
+      "id": "F2",
+      "was": "An ESR intake can be stamped only through the document route, so F1 also blocked the demo's not_applicable availability from reaching any report.",
+      "now": "Fixed with F1. The demo's own intake record, demo-biodiv-2027-part-b-v1, stamps onto a report graded through the document route."
+    }
+  ],
+  "findings_still_open": [
+    {
+      "id": "F3",
+      "summary": "record_esr_intake requires a submission_id with no way to declare that no submission exists. The demo uses the sentinel NOT_SUBMITTED.",
+      "disposition": "still open. The intake was read here, not written, so this ticket had no occasion to touch its schema. The ticket offered to fold it in if the intake were touched anyway; it was not."
+    },
+    {
+      "id": "F6",
+      "summary": "The demo world's 6 blind packages hold no passage, claim or commitment item, so a clean leakage-guard pass over them is uninformative.",
+      "disposition": "partly addressed. The document route now builds packages that carry passages and claims, and the guard runs on the package before a byte is materialised, so the guard has something real to check on this route. The demo world's own 6 stored packages are unchanged, and criterion 4 of the blind-baseline ticket still needs the package built around a real candidate version."
+    }
+  ],
+  "what_this_does_not_settle": "Criterion 3 of the blind-baseline ticket is no longer blocked by a defect, but it is still not met: there is no candidate version 1 to grade. A Part B requires Phase 8, which requires gate_09 to pass, which requires the operator to dispatch Phase 7. The blind lane is out-of-band QA and never a runtime gate, so nothing here changes any gate, phase or tier definition.",
+  "authored_by": "Ticket B, plans/tickets_budget_and_blind_lane.md, branch dev_graph_demo. No runner phase was dispatched. No gate result was written. No document was imported into docs/: every test imports into a copy of tests/fixtures/dev_graph_synthetic under tmp_path, because a real import would move the demo snapshot id that three Tier 4 records cite."
+}

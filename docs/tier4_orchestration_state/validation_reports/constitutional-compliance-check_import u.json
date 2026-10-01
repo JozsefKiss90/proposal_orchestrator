@@ -1,90 +1,90 @@
 {
-  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-10-01T12:00:00Z",
+  "report_id": "compliance_check_budget_gate_assessment_unspecified_2026-10-01T00:00:00Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "compliance_validator",
+  "invoking_agent": "unspecified",
   "run_id_reference": "import uuid; print(uuid.uuid4())",
-  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
-      "prohibition_description": "Grant Agreement Annex used as governing structural schema for proposal writing.",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.2",
-      "prohibition_description": "Invented call constraints, scope requirements, outcomes or impacts not in Tier 2B.",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Invented project facts (partners, roles, capabilities) not in Tier 3.",
-      "check_status": "pass",
-      "violation_evidence": null,
-      "severity": null
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, budget figures — not present in Tier 3.",
+      "check_status": "violation",
+      "violation_evidence": "The artifact grounds the gate pass on a budget source explicitly labelled fictional: \"budget_response_reference\": \"budget_response_FICTIONAL_demo_2026-10-01.json\" and \"validation_artifact_reference\": \"budget_validation_response_2026-10-01T00:00:00Z.json\". All wp_coverage_results and partner_coverage_results (WP1–WP7, P01–P12) resolve budget figures via \"received/budget_response_FICTIONAL_demo_2026-10-01.json#...\". The artifact carries no traceability_footer referencing docs/tier3_project_instantiation/, and the budget source is a fabricated ('FICTIONAL') response rather than a received, validated external planner budget. A budget figure source so named is an invented budget figure under §13.3 (and contravenes §8.3/§17.6.7 on fabricated/substituted budget figures).",
+      "severity": "critical"
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Phase 8 activity commenced before the budget gate passed.",
+      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.5",
-      "prohibition_description": "Durable decisions stored only in agent memory, not written to Tier 4.",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "Skill or workflow expanding scope to become a de facto constitutional authority.",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silent phase reordering or weakening of gate conditions.",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions when inputs are incomplete.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalised text produced from incomplete source state without flagging the gap.",
+      "prohibition_description": "Finalizing proposal text when source state is incomplete without flagging the gap.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Generic programme knowledge substituted for Tier 1 source documents.",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe rules as a substitute for Tier 1 source documents.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Tier 5 outputs not traceable to Tier 1-4 inputs.",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1–4.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.11",
-      "prohibition_description": "Tier 1 or Tier 2 source documents modified to reflect project assumptions.",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project assumptions.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.12",
-      "prohibition_description": "CLAUDE.md treated as advisory or optional.",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
@@ -92,22 +92,20 @@
   ],
   "summary": {
     "total_prohibitions_checked": 12,
-    "violations_found": 0
+    "violations_found": 1
   },
-  "timestamp": "2026-10-01T12:00:00Z",
-  "check_notes": {
-    "13.1": "Structural authority for sections is section_schema_registry.json (Tier 2A, RIA application form; sections A.4, B.3, B.3.1, B.3.2). References to 'Grant Agreement or Consortium Agreement obligations' and 'grant_agreement_implementation_articles' appear only as governance/escalation basis, not as a proposal schema. No Annex template used as structural authority.",
-    "13.2": "Call-requirement claims (SR-04 crosswalks, CC-07) carry Tier 2B references in source_basis and in traceability_footer (scope_requirements.json, call_constraints.json). Eligibility mentions in R04/R13 are contextual risk descriptions; artifact-level Tier 2B references are present. Per skill scope, only the presence of a Tier 2B reference is checked, not the referenced entry.",
-    "13.3": "Partner identifiers P01-P12, role assignments and capability statements carry Tier 3 references in the traceability_footer (consortium/partners.json, consortium/roles.json, call_binding/compliance_profile.json, call_binding/selected_call.json). WP-lead assignments trace to phase3 wp_structure.json (Tier 4, derived from Tier 3).",
-    "13.4": "Not a Phase 8 artifact (schema_id 'orch.phase6.implementation_architecture.v1'). Content scanned for confirmed budget figures (currency, EUR, person-months patterns): none present. R12 explicitly states the repository computes no figure per CLAUDE.md §8.1.",
-    "13.5": "Not checkable from artifact content alone; enforced by the decision-log-update skill. Recorded pass per skill specification.",
-    "13.6": "Not directly checkable from an artifact. Recorded pass per skill specification.",
-    "13.7": "Phase 6 artifact references only permitted upstream input phase3_wp_design (Tier 4). No references to Phase 7 or Phase 8 outputs as inputs.",
-    "13.8": "Not a Tier 5 deliverable; artifact has no validation_status field. Non-applicable. Note: artifact itself flags open items explicitly (e.g. gender-dimension Tier 2B exemption 'pending call-specific confirmation'), which is correct flagging, not a violation.",
-    "13.9": "Regulatory claims (ethics self-assessment, gender equality plan, civil focus, grant agreement implementation articles) carry Tier 1 references in source_basis and traceability_footer (implementation_constraints.json, governance_principles.json).",
-    "13.10": "Not a Tier 5 artifact. Non-applicable to a Phase 6 (Tier 4) phase output. Recorded pass per skill specification.",
-    "13.11": "Not checkable from a phase output artifact. Recorded pass per skill specification.",
-    "13.12": "Not directly checkable from an artifact. Recorded pass per skill specification. Observed: artifact cites CLAUDE.md §8.1 as binding, consistent with non-violation.",
-    "observation_out_of_scope": "The artifact carries run_id literal 'import uuid; print(uuid.uuid4())', an unresolved placeholder. This is a conformance-stamping concern outside the §13 prohibition set and is not a constitutional violation under this skill; noted for the invoking agent."
-  }
+  "timestamp": "2026-10-01T00:00:00Z",
+  "decision_log_entries": [
+    {
+      "decision_id": "constitutional_violation_unspecified_2026-10-01T00:00:00Z",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.3_budget_gate_assessment_2026-10-01T00:00:00Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.3",
+      "artifact_affected": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. The Phase 7 budget gate declares gate_pass_declaration: 'pass' on a budget source explicitly named 'budget_response_FICTIONAL_demo_2026-10-01.json'. This is a fabricated budget figure under §13.3 and is not a validated external planner response under §8.3/§17.6.7. If an in-session §1 human override suspending §13.3 was in force when this artifact was produced, that override is not present in this skill's audit context and cannot be assumed; the operator must confirm or reject it.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-10-01T00:00:00Z"
+    }
+  ]
 }
