@@ -76,18 +76,53 @@
     }
   ],
   "findings": [
-    {"id": "F1", "summary": "The dev-graph document route cannot feed either shipped instrument profile: one sub-section named for its section against rubric anchors B.1.1 to B.3.2 (RIA) and 1.1 to 3.2 (MSCA-PF).", "disposition": "recorded unfixed; Milestone 2 ticket"},
-    {"id": "F2", "summary": "An ESR intake can be stamped only through the document route, so F1 also blocks the demo's not_applicable availability from reaching any RIA blind report.", "disposition": "recorded unfixed; resolved by F1"},
-    {"id": "F3", "summary": "record_esr_intake requires a submission_id with no way to declare that no submission exists.", "disposition": "recorded unfixed; Milestone 2 ticket"},
-    {"id": "F4", "summary": "Phase 8 has produced nothing. The gate is working; the outstanding step is the operator's planner run.", "disposition": "correct behaviour; recorded"},
-    {"id": "F6", "summary": "The demo world's 6 blind packages hold 0 passage, 0 claim and 0 commitment items, so they cannot carry the leak the guard looks for. The clean pass is correct and uninformative.", "disposition": "recorded; it is why criterion 4's box stays open"},
-    {"id": "F5", "summary": "The demo's 6 blind packages are all incomplete at budget 3000, and build_blind_evidence refuses an incomplete package.", "disposition": "recorded; no change made, because no real package is built yet"}
+    {
+      "id": "F1",
+      "summary": "The dev-graph document route cannot feed either shipped instrument profile: one sub-section named for its section against rubric anchors B.1.1 to B.3.2 (RIA) and 1.1 to 3.2 (MSCA-PF).",
+      "disposition": "recorded unfixed; Milestone 2 ticket"
+    },
+    {
+      "id": "F2",
+      "summary": "An ESR intake can be stamped only through the document route, so F1 also blocks the demo's not_applicable availability from reaching any RIA blind report.",
+      "disposition": "recorded unfixed; resolved by F1"
+    },
+    {
+      "id": "F3",
+      "summary": "record_esr_intake requires a submission_id with no way to declare that no submission exists.",
+      "disposition": "recorded unfixed; Milestone 2 ticket"
+    },
+    {
+      "id": "F4",
+      "summary": "Phase 8 has produced nothing. The gate is working; the outstanding step is the operator's planner run.",
+      "disposition": "correct behaviour; recorded"
+    },
+    {
+      "id": "F6",
+      "summary": "The demo world's 6 blind packages hold 0 passage, 0 claim and 0 commitment items, so they cannot carry the leak the guard looks for. The clean pass is correct and uninformative.",
+      "disposition": "recorded; it is why criterion 4's box stays open"
+    },
+    {
+      "id": "F5",
+      "summary": "The demo's 6 blind packages are all incomplete at budget 3000, and build_blind_evidence refuses an incomplete package.",
+      "disposition": "recorded; no change made, because no real package is built yet"
+    }
   ],
   "milestone_2_candidates": [
     "Fix F1: decide where a section's sub-section structure lives, then make the document route feed a shipped profile. The failing case exists.",
     "Fix F3: let an intake declare that no submission exists.",
-    "Re-run this ticket after the operator's planner run and a released Phase 8. Criteria 2 and 3 are the only ones outstanding."
+    "Re-run this ticket after the operator dispatches Phase 7 and Phase 8 reaches released. Criteria 2 and 3 are the only ones outstanding, and every Phase 8 figure will trace to the fictional budget, which §13.8 requires the deliverable to say."
   ],
-  "what_is_outstanding_for_the_operator": "Run the external Lump Sum Budget Planner against docs/tier3_project_instantiation/integration/budget_request.json and place the response in docs/integrations/lump_sum_budget_planner/received/. Phase 7 and Phase 8 are then dispatchable. Criterion 3 additionally needs F1 fixed.",
-  "authored_by": "Implementation of the ticket 'Candidate Part B and the blind baseline'. No runner phase was dispatched. No gate result was written. No proposal text was drafted."
+  "what_is_outstanding_for_the_operator": "Dispatch Phase 7. The node then writes the validation artifact to docs/integrations/lump_sum_budget_planner/validation/ and budget_gate_assessment.json to phase7_budget_gate/, and gate_09 can reach pass. The external planner run this record named is no longer outstanding: no planner exists for this repository, so ticket A authored a fictional response under the operator override at docs/tier4_orchestration_state/decision_log/demo-fictional-budget-override_2026-10-01.json. Criterion 3 additionally needs F1 fixed, which is ticket B.",
+  "authored_by": "Implementation of the ticket 'Candidate Part B and the blind baseline'. No runner phase was dispatched. No gate result was written. No proposal text was drafted.",
+  "amended": {
+    "date": "2026-10-01",
+    "by": "Ticket A, plans/tickets_budget_and_blind_lane.md",
+    "authority": "CLAUDE.md §9.1: docs/ is the durable record, so a record that would now mislead a reader about the branch's state is amended rather than left standing. What was checked is preserved verbatim; what is no longer true is marked here.",
+    "what_changed": "received/ is no longer empty. One fictional budget response was authored by hand under an operator override of §8.1, §8.3 and §17.6.7, by the §1 in-session route, recorded at docs/tier4_orchestration_state/decision_log/demo-fictional-budget-override_2026-10-01.json. No planner produced it and none exists for this repository. The file is docs/integrations/lump_sum_budget_planner/received/budget_response_FICTIONAL_demo_2026-10-01.json.",
+    "what_did_not_change": "gate_09 has still not passed, and the categorical Phase 8 block of §8.4 and §13.4 stands. validation/ is still empty and no budget_gate_assessment.json exists. Criterion 1 of this ticket therefore keeps its disposition, and criteria 2, 3 and 4 keep theirs. Criterion 2 remains blocked upstream, though the block it waits on has narrowed from an absent response to an undispatched Phase 7.",
+    "affects": [
+      "what_is_outstanding_for_the_operator, which named the planner run",
+      "D1's reasoning, which rests on the Phase 8 block. The block stands, so D1 stands."
+    ]
+  }
 }

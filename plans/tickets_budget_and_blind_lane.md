@@ -8,7 +8,7 @@ They have no shared code and no shared artifact. Ticket B does not wait for tick
 
 Constraints that apply to both:
 
-- `CLAUDE.md` governs. Ticket A runs under an operator override of three named rules, by the §1
+- `CLAUDE.md` governs. Ticket A runs under an operator override of six named clauses, by the §1
   route. Neither ticket amends the constitution, so §14 is not engaged.
 - The DAG scheduler, the node state machine and gate-evaluation authority are not modified.
 - Tests run with `py -3.10`. Neither ticket dispatches a runner phase. The operator does.
@@ -22,11 +22,16 @@ Constraints that apply to both:
 No code, no new budget regime, no constitutional amendment.
 
 **The override.** The operator has instructed, in session, that `CLAUDE.md` is overridden for
-this task. The rules overridden are §8.1 and §17.6.7, which reserve lump-sum computation to the
-external planner, and §8.3, which forbids substituting an internally generated figure for an
-absent response. §1 permits this: an explicit in-session instruction scoped to the instruction
-that invokes it. It is not an amendment, so §14 is not engaged, and the override expires with
-this ticket.
+this task. §1 permits this: an explicit in-session instruction scoped to the instruction that
+invokes it. It is not an amendment, so §14 is not engaged, and the override expires with this
+ticket.
+
+**Six clauses, not three.** This ticket first named §8.1 and §17.6.7, which reserve lump-sum
+computation to the external planner, and §8.3, which forbids an internally generated substitute.
+The code review found that understated. A hand-authored response also breaches §5's integration
+constraint, §8.4's lump-sum *source* clause with §7's restatement of it, and §13.3's
+budget-figure item. §8.4's *categorical Phase 8 block* is a different sentence and is not
+suspended. Nor is §13.3's list of every other project fact.
 
 **Why it is this small.** `gate_09`'s lump-sum branch reads the response from `received/` through
 four predicates: `g08_p02` directory non-empty, `g08_p04` contract conformance, `g08_p05` work
@@ -44,14 +49,14 @@ deliverable resting on one must say so. That is a label, not a gate.
 
 **Blocked by:** nothing.
 
-- [ ] A response in `received/` conforms to the interface contract, covers all 7 work packages
+- [x] A response in `received/` conforms to the interface contract, covers all 7 work packages
   and all 12 partners, and declares itself fictional in its own content.
-- [ ] `g08_p02`, `g08_p04`, `g08_p05` and `g08_p06` pass on it. A test proves each.
-- [ ] A Tier 4 decision record names the override, the three rules it suspends, who authorised
-  it, and that it expires with this ticket.
-- [ ] The records that pin an empty `received/` are updated, not left contradicting the branch:
-  the demo ticket's validation report, its decision record, its Outcome, and the four tests in
-  `tests/test_demo_candidate_blind_baseline.py` that assert the blocking state.
+- [x] `g08_p02`, `g08_p04`, `g08_p05` and `g08_p06` pass on it. A test proves each.
+- [x] A Tier 4 decision record names the override, every clause it suspends, who authorised it,
+  and that it expires with this ticket.
+- [x] Nothing on the branch is left contradicting it. That reached further than this box first
+  said: both demo tickets' validation reports, both decision records, both Outcomes, and the
+  two test modules that assert the blocking state.
 - [ ] Tier 5 content derived from this budget carries the fictional label.
 - [ ] After the operator dispatches Phase 7, the node writes `validation/` and
   `budget_gate_assessment.json`, and `gate_09` reaches pass. Recorded, not assumed.
@@ -60,6 +65,22 @@ deliverable resting on one must say so. That is a label, not a gate.
 effort estimate, a declared cost model and a deterministic component under byte-equal replay.
 That was the earlier draft of this ticket. It is the right shape for a live proposal and the
 wrong shape for a demo, so it is dropped rather than carried as scope.
+
+**Outcome: four of six, and the last two are not mine to close.** One file was written,
+`budget_response_FICTIONAL_demo_2026-10-01.json`, and no code changed. The four predicates that
+read `received/` pass on it, each proved by its own test. The override is recorded in
+`demo-fictional-budget-override_2026-10-01.json`. Tier 5 is still empty, so no §13.8 label is
+due yet, and a test fails the moment Phase 8 writes a section. The gate passes only after the
+operator dispatches Phase 7. No runner phase was dispatched and no gate result was written.
+
+**What the gate cannot see.** `g08_p05` and `g08_p06` count identifiers, so they passed the
+moment a file covering 7 work packages and 12 partners appeared. `g08_p04` cannot reject a
+non-numeric figure, because the contract declares no type for `lump_sum` (G3). None of the three
+can tell a fictional figure from a planner's. That is what §8.1 was carrying, and why suspending
+it took a human instruction rather than a code change. G1 and G2 are also recorded unfixed: the
+leakage scan does not reach `docs/integrations/`, and `budget_request.json` holds a Python
+snippet where its `run_id` belongs. Forty-five new tests.
+
 ---
 
 ## Ticket B — Make the blind lane's document route usable by a shipped profile

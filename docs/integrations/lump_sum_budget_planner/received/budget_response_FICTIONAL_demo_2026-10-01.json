@@ -1,0 +1,118 @@
+{
+  "response_id": "budget_response_FICTIONAL_HORIZON-CL6-2027-01_demo_2026-10-01",
+  "schema_version": "1.0",
+  "protocol": "lump_sum_budget_planner_v1",
+  "request_id": "budget_request_HORIZON-CL6-2027-01",
+  "call_id": "HORIZON-CL6-2027-01",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "budget_regime": "lump_sum",
+  "currency": "EUR",
+  "figures_are_fictional": true,
+  "produced_by_external_planner": false,
+  "authorised_by": "docs/tier4_orchestration_state/decision_log/demo-fictional-budget-override_2026-10-01.json",
+  "provenance_note": "Every figure in this file is fictional. No Lump Sum Budget Planner produced it, and none exists for this repository. It was written by hand inside the repository under an operator override recorded at the path in authorised_by, so that the Phase 7 gate can be exercised on instance two. That record names the six constitutional clauses the override suspends, two of them in part. Instance two is a demonstration and is never submitted. No figure here is an estimate of any real cost, and none may be carried into a live proposal.",
+  "figure_basis_note": "Each entry carries figure_basis rather than a status field, because none of §12.2's four categories fits an invented figure. Assumed means adopted in the absence of direct evidence, with the assumption declared, and these figures hold no such position. §12.2 is not suspended and no category is claimed here.",
+  "work_packages": [
+    {
+      "wp_id": "WP1",
+      "lump_sum": 520000,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "wp_id": "WP2",
+      "lump_sum": 610000,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "wp_id": "WP3",
+      "lump_sum": 880000,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "wp_id": "WP4",
+      "lump_sum": 1150000,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "wp_id": "WP5",
+      "lump_sum": 760000,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "wp_id": "WP6",
+      "lump_sum": 620000,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "wp_id": "WP7",
+      "lump_sum": 460000,
+      "figure_basis": "invented_for_this_demonstration"
+    }
+  ],
+  "partners": [
+    {
+      "partner_id": "P01",
+      "total_effort_pm": 54,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P02",
+      "total_effort_pm": 50,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P03",
+      "total_effort_pm": 48,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P04",
+      "total_effort_pm": 36,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P05",
+      "total_effort_pm": 32,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P06",
+      "total_effort_pm": 24,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P07",
+      "total_effort_pm": 34,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P08",
+      "total_effort_pm": 34,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P09",
+      "total_effort_pm": 44,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P10",
+      "total_effort_pm": 46,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P11",
+      "total_effort_pm": 28,
+      "figure_basis": "invented_for_this_demonstration"
+    },
+    {
+      "partner_id": "P12",
+      "total_effort_pm": 50,
+      "figure_basis": "invented_for_this_demonstration"
+    }
+  ],
+  "total_lump_sum": 5000000,
+  "total_effort_pm": 480,
+  "total_basis": "The work package figures sum to 5000000, which is the expected EU contribution per project recorded as Confirmed in docs/tier3_project_instantiation/call_binding/selected_call.json and traced to the Part 9 work programme. That anchor keeps the fiction tied to a real call figure rather than an arbitrary one. The split across work packages, and every person-month total, are invented and carry no basis of any kind.",
+  "identity_note": "Partner identity is the Tier 3 pseudonym only. No partner name, country or place appears here. docs/integrations/ sits outside both legs of runner/leakage_scan.py, which covers Tier 3, Tier 4, Tier 5 and the vaults, so this file is checked by tests/test_demo_fictional_budget_override.py instead."
+}

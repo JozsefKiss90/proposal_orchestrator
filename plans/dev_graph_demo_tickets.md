@@ -300,6 +300,12 @@ call's own indicative figures included. The operator has not run the planner, so
 on their second branch. `received/` is empty, which is `g08_p02`, and the hard block on Phase 8 is intact.
 Phase 7 is not dispatched and no gate result is written.
 
+**Amended 1 October 2026 by ticket A in `plans/tickets_budget_and_blind_lane.md`.** No planner exists
+for this repository, so the operator overrode six constitutional clauses for that task alone. One fictional
+response now sits in `received/`, which lifts `g08_p02`, `g08_p04`, `g08_p05` and `g08_p06`. The gate
+still fails on `g08_p03` and `g08_p08`, and the Phase 8 block stands. The override is recorded in
+`demo-fictional-budget-override_2026-10-01.json`.
+
 **Nothing in the repository validated a budget request or a budget response.** `g08_p04` read the
 interface contract as a JSON Schema. That document has no JSON-Schema keyword at its root, so the
 predicate accepted every payload. Ten findings and nine decisions, three of them from the code review,
@@ -346,8 +352,13 @@ recorded unfixed as F1 and F2. Ten findings and seven decisions are in
 **Outcome: one of four.** The blocking gate is recorded from the gate's own predicates. No node
 was dispatched and no gate result was written. The planner response is absent, so `g08_p02`
 fails and all six Phase 8 nodes stay frozen. Phase 8 has written nothing, and Tier 5 holds only
-its placeholders. The ESR intake record carries availability `not_applicable`; it is the one
+its placeholders. The ESR intake record carries availability `not_applicable`, which is the one
 part of the ticket neither block reaches.
+
+**Amended 1 October 2026 by ticket A in `plans/tickets_budget_and_blind_lane.md`.** A fictional
+response now sits in `received/` under an operator override, so `g08_p02` passes. The gate still
+fails on `g08_p03` and `g08_p08`, which the Phase 7 node writes, so the freeze is unchanged.
+Criterion 2 now waits on the operator's dispatch rather than on an absent response.
 
 **Criterion 4 is checked over the wrong package, so its box stays open.** `assert_no_leakage`
 ran over all 6 blind packages the demo world holds, rebuilt from their stored manifests, and

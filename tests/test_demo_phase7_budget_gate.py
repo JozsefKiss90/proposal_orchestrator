@@ -3,17 +3,27 @@ The demo's Phase 7: the budget request, and the hard block that is still intact.
 
 Ticket "Budget request and the Phase 7 gate" in ``plans/dev_graph_demo_tickets.md``.
 BIODIV-01 is a **lump-sum** RIA, so Phase 7 routes through the external Lump Sum
-Budget Planner.  The repository composes the request; the operator runs the
-planner and places the response in ``received/``.  Until that response exists,
-``gate_09`` fails and every Phase 8 node is frozen (CLAUDE.md §8.4, §13.4).
+Budget Planner.  The repository composes the request; the planner's response belongs
+in ``received/``.  Until ``gate_09`` passes, every Phase 8 node is frozen (CLAUDE.md
+§8.4, §13.4).
+
+When this ticket ran, ``received/`` was empty and the blocking gate failure was the
+whole of its second finding.  No planner exists for this repository, so ticket A in
+``plans/tickets_budget_and_blind_lane.md`` later authored one **fictional** response
+under an operator override of six constitutional clauses, recorded at
+``docs/tier4_orchestration_state/decision_log/demo-fictional-budget-override_2026-10-01.json``.
+That override is scoped to that ticket by §1 and amends nothing.  The hard block it
+leaves standing is this module's subject, and ``tests/test_demo_fictional_budget_override.py``
+owns the response itself.
 
 These tests read the real repository.  They assert three things the ticket asks
 for:
 
 1. The composed request conforms to the interface contract and names
    pseudonymous partners only.
-2. The response is absent, so the gate's own blocking condition is the recorded
-   outcome — not a hold state, and not a fabricated pass.
+2. No budget *validation* artifact and no gate assessment exist, so the gate's own
+   blocking condition is still the recorded outcome — not a hold state, and not a
+   fabricated pass.
 3. The hard block on Phase 8 is intact: the gate that triggers it is still
    ``gate_09``, and the frozen set still covers every Phase 8 node.
 
@@ -189,13 +199,26 @@ class TestTheRequestNamesPseudonymsOnly:
 # ---------------------------------------------------------------------------
 
 
-class TestTheMissingResponseBlocks:
-    def test_the_received_directory_holds_no_response(self):
-        result = dir_non_empty(RECEIVED_REL, repo_root=REPO)
-        assert not result.passed, (
-            "A response has appeared in received/. Re-run the Phase 7 ticket: "
-            "this test pins the recorded blocking state, not a wish."
-        )
+class TestTheGateIsStillUnmet:
+    """No *external* response ever arrived, and the gate is still unmet.
+
+    What changed since this ticket ran is one directory: ``received/`` now holds the
+    fictional response ticket A authored.  What did not change is the verdict.  The
+    gate reads ``validation/`` and ``budget_gate_assessment.json`` as well, both of
+    them the Phase 7 node's to write, and dispatching that node is the operator's
+    step on this repository.
+    """
+
+    def test_every_response_present_declares_itself_fictional(self):
+        """The directory is no longer empty, and nothing in it came from a planner."""
+        responses = [
+            json.loads(p.read_text(encoding="utf-8-sig"))
+            for p in (REPO / RECEIVED_REL).iterdir()
+            if p.is_file() and p.suffix == ".json"
+        ]
+        assert responses, "received/ is empty; ticket A's response is missing"
+        assert all(r["produced_by_external_planner"] is False for r in responses)
+        assert all(r["figures_are_fictional"] is True for r in responses)
 
     def test_the_validation_directory_holds_no_validation_artifact(self):
         assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
@@ -207,17 +230,23 @@ class TestTheMissingResponseBlocks:
             "budget_gate_assessment.json"
         ).exists()
 
-    def test_the_coverage_predicates_report_every_wp_and_partner_uncovered(self):
+    def test_the_coverage_predicates_are_satisfied_by_the_fictional_response(self):
+        """Coverage is structural: it counts identifiers, not evidence.
+
+        Both predicates passed the moment a file covering the 7 work packages and
+        12 partners appeared.  Neither can tell a fictional figure from a planner's,
+        which is why §8.1 exists and why suspending it needed a human instruction.
+        """
         wp_result = wp_budget_coverage_match(
             WP_STRUCTURE_REL, RECEIVED_REL, repo_root=REPO
         )
         partner_result = partner_budget_coverage_match(
             PARTNERS_REL, RECEIVED_REL, repo_root=REPO
         )
-        assert not wp_result.passed
-        assert len(wp_result.details["missing_from_budget"]) == 7
-        assert not partner_result.passed
-        assert len(partner_result.details["missing_from_budget"]) == 12
+        assert wp_result.passed, wp_result.reason
+        assert wp_result.details["wps_checked"] == 7
+        assert partner_result.passed, partner_result.reason
+        assert partner_result.details["partners_checked"] == 12
 
     def test_an_absent_response_is_a_gate_failure_not_a_hold_state(self, manifest):
         gate = next(

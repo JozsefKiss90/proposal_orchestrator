@@ -5,10 +5,14 @@ Ticket "Candidate Part B and the blind baseline" in ``plans/dev_graph_demo_ticke
 Three of its four criteria are not met, and these tests pin why so none can be quietly
 reported as done later.  Two unrelated blocks account for the first two:
 
-1. **Phase 8 is frozen.**  BIODIV-01 is a lump-sum RIA.  ``received/`` holds no
-   planner response, so ``gate_09`` fails, and CLAUDE.md §8.4 and §13.4 freeze every
-   Phase 8 node.  There is therefore no Part B, and drafting one here — by the runner
-   or by hand — is the violation the gate exists to prevent.
+1. **Phase 8 is frozen.**  BIODIV-01 is a lump-sum RIA, and ``gate_09`` has not
+   passed, so CLAUDE.md §8.4 and §13.4 freeze every Phase 8 node.  There is therefore
+   no Part B, and drafting one here — by the runner or by hand — is the violation the
+   gate exists to prevent.  When this ticket ran, the block was simply an empty
+   ``received/``.  Ticket A in ``plans/tickets_budget_and_blind_lane.md`` has since
+   placed one fictional response there under an operator override, which leaves the
+   block intact: ``validation/`` and ``budget_gate_assessment.json`` are the Phase 7
+   node's to write, and dispatching that node is the operator's step.
 2. **The blind lane's document route cannot feed either shipped profile.**
    ``materialise_candidate`` writes one sub-section per passage and names it for the
    section; the RIA rubrics anchor on ``B.1.1`` to ``B.3.2`` and the MSCA-PF rubrics on
@@ -125,11 +129,24 @@ class TestThePhase8BlockIsRecorded:
         call = _json("docs/tier3_project_instantiation/call_binding/selected_call.json")
         assert call["budget_regime"] == "lump_sum"
 
-    def test_no_planner_response_has_been_received(self):
-        assert not dir_non_empty(RECEIVED_REL, repo_root=REPO).passed, (
-            "A response has appeared in received/. Re-run this ticket: these tests pin "
-            "the recorded blocking state, not a wish."
+    def test_the_only_response_is_the_fictional_one_authored_under_override(self):
+        """Ticket A placed it there. No planner produced it, and none exists.
+
+        When this ticket ran, ``received/`` was empty and that was the whole of the
+        block.  Ticket A in ``plans/tickets_budget_and_blind_lane.md`` then authored
+        one fictional response under an operator override of six constitutional clauses.
+        The block below is unchanged, because the gate reads more than this directory.
+        """
+        assert dir_non_empty(RECEIVED_REL, repo_root=REPO).passed
+        responses = sorted(
+            p.name
+            for p in (REPO / RECEIVED_REL).iterdir()
+            if p.is_file() and p.name != ".gitkeep"
         )
+        assert responses == ["budget_response_FICTIONAL_demo_2026-10-01.json"]
+        response = _json(RECEIVED_REL + responses[0])
+        assert response["figures_are_fictional"] is True
+        assert response["produced_by_external_planner"] is False
 
     def test_no_validation_artifact_exists(self):
         assert not dir_non_empty(VALIDATION_REL, repo_root=REPO).passed
@@ -638,7 +655,10 @@ class TestTheRecord:
         assert block["permitted_purpose"] == intake.permitted_purpose
 
     def test_the_outstanding_human_step_is_named(self, decision):
-        assert "Lump Sum Budget Planner" in decision["what_is_outstanding_for_the_operator"]
+        """It was the planner run. Ticket A narrowed it to the Phase 7 dispatch."""
+        outstanding = decision["what_is_outstanding_for_the_operator"]
+        assert "Dispatch Phase 7" in outstanding
+        assert "demo-fictional-budget-override_2026-10-01.json" in outstanding
 
     def test_the_defects_are_offered_as_milestone_2_candidates(self, decision):
         assert len(decision["milestone_2_candidates"]) >= 2

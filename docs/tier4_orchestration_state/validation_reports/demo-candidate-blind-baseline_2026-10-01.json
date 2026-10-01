@@ -56,8 +56,10 @@
     "bypass_prohibited": true,
     "absent_artifacts_behavior": "blocking_gate_failure",
     "budget_regime": "lump_sum",
-    "blocking_predicate": "g08_p02 (dir_non_empty over docs/integrations/lump_sum_budget_planner/received/)",
-    "blocking_edges": ["e07_to_08a"],
+    "blocking_predicate": "When this report was written: g08_p02 (dir_non_empty over docs/integrations/lump_sum_budget_planner/received/). Now: g08_p03 (dir_non_empty over validation/) and g08_p08 (non_empty_json over budget_gate_assessment.json). Ticket A authored a fictional response under the recorded override, so the four predicates that read received/ pass. The gate still fails, and the frozen set below is unchanged.",
+    "blocking_edges": [
+      "e07_to_08a"
+    ],
     "frozen_nodes": [
       "n08a_excellence_drafting",
       "n08b_impact_drafting",
@@ -66,7 +68,7 @@
       "n08e_evaluator_review",
       "n08f_revision"
     ],
-    "human_step_outstanding": "The operator runs the external Lump Sum Budget Planner against docs/tier3_project_instantiation/integration/budget_request.json and places the response in received/. Until then the gate's failure is the correct output, and no Phase 8 substep may begin."
+    "human_step_outstanding": "The operator dispatches Phase 7, whose node writes the validation artifact and budget_gate_assessment.json. Until gate_09 passes, the gate's failure is the correct output and no Phase 8 substep may begin. The planner run this report named is no longer the outstanding step: no planner exists for this repository, and a fictional response stands in its place under docs/tier4_orchestration_state/decision_log/demo-fictional-budget-override_2026-10-01.json."
   },
   "what_was_checked_and_how": [
     "The Phase 8 block: the gate_09 predicates run directly as pure functions over the real repository, with no node dispatched and no gate result written. The frozen set is read from runner.run_context.PHASE_8_NODE_IDS and the hard-block gate from runner.dag_scheduler._HARD_BLOCK_GATE, then cross-checked against the manifest gate_registry entry and its blocking_edges.",
@@ -74,7 +76,7 @@
     "The leakage guard: each stored package under docs/tier4_orchestration_state/dev_graph/packages/ is rebuilt as a Package from its manifest.json and package.json, filtered to view blind_pre_evaluation, and passed to assert_no_leakage. All 6 pass. The guard is also shown to fire on a planted item, so a pass is not a vacuous pass.",
     "The document-route defect: a synthetic RIA-shaped document carrying the three profile-required section ids is imported into a copy of tests/fixtures/dev_graph_synthetic under tmp_path, blind evidence is built under the real harness/profiles/ria_default.json, and assess_candidate is called with a stub assessor. It raises EvidencePackError naming the missing anchor. Nothing is written into docs/ by this check.",
     "The intake record: written through runner.dev_graph.intake.record_esr_intake, re-read through read_esr_intake, and shown immutable — the same content again is a no-op, and different content under the same id is refused.",
-    "Anonymity: py -3.10 -m runner.leakage_scan over 164 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
+    "Anonymity: py -3.10 -m runner.leakage_scan over 165 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
   ],
   "findings": [
     {
@@ -151,5 +153,16 @@
     "plans/dev_graph_demo_tickets.md"
   ],
   "authored_by": "Implementation of the ticket 'Candidate Part B and the blind baseline'. No runner phase was dispatched. The runtime made no Claude invocation. No gate result was written.",
-  "note": "Three of the four criteria are not met, and this report says so rather than narrowing the criteria to fit. §15 prefers an explicit failure to a fabricated completion. One block is a human step the ticket always depended on. The other is a defect in the lane the ticket was written to exercise, and it would have failed the criterion even with Part B in hand."
+  "note": "Three of the four criteria are not met, and this report says so rather than narrowing the criteria to fit. §15 prefers an explicit failure to a fabricated completion. One block is a human step the ticket always depended on. The other is a defect in the lane the ticket was written to exercise, and it would have failed the criterion even with Part B in hand.",
+  "amended": {
+    "date": "2026-10-01",
+    "by": "Ticket A, plans/tickets_budget_and_blind_lane.md",
+    "authority": "CLAUDE.md §9.1: docs/ is the durable record, so a record that would now mislead a reader about the branch's state is amended rather than left standing. What was checked is preserved verbatim; what is no longer true is marked here.",
+    "what_changed": "received/ is no longer empty. One fictional budget response was authored by hand under an operator override of §8.1, §8.3 and §17.6.7, by the §1 in-session route, recorded at docs/tier4_orchestration_state/decision_log/demo-fictional-budget-override_2026-10-01.json. No planner produced it and none exists for this repository. The file is docs/integrations/lump_sum_budget_planner/received/budget_response_FICTIONAL_demo_2026-10-01.json.",
+    "what_did_not_change": "gate_09 has still not passed, and the categorical Phase 8 block of §8.4 and §13.4 stands. validation/ is still empty and no budget_gate_assessment.json exists. Criterion 1 of this ticket therefore keeps its disposition, and criteria 2, 3 and 4 keep theirs. Criterion 2 remains blocked upstream, though the block it waits on has narrowed from an absent response to an undispatched Phase 7.",
+    "affects": [
+      "the_gate.blocking_predicate and the_gate.human_step_outstanding",
+      "the anonymity line's scanned-file count, 164 to 165, for the override record added to Tier 4. The scan reports no new leak. docs/integrations/ is outside its scope, so the response itself is checked by tests/test_demo_fictional_budget_override.py instead."
+    ]
+  }
 }

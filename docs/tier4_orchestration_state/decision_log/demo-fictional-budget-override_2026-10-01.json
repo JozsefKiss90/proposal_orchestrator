@@ -1,0 +1,107 @@
+{
+  "record_type": "decision",
+  "id": "demo-fictional-budget-override",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "milestone": "Ticket A in plans/tickets_budget_and_blind_lane.md, 'Make the Phase 7 gate pass on a fictional demo budget'",
+  "authority": "CLAUDE.md §1 and §3 priority 1: an explicit in-session human instruction that consciously and directly overrides a named constitutional rule, applying only for the scope of the instruction that invokes it. Written to Tier 4 under §9.4, because a suspended constitutional rule held only in a session transcript is not a durable decision. The records this ticket amended are amended under §9.1 and §12.3: docs/ is the durable record, and a contradiction between what a record states and what the branch holds is resolved explicitly rather than left to a later reader.",
+  "authorised_by": "operator",
+  "authorisation_route": "CLAUDE.md §1, the in-session named override. The operator's instruction was that this is a demo run with a fictional budget, so CLAUDE.md can be overridden for this task only.",
+  "is_constitutional_amendment": false,
+  "why_it_is_not_an_amendment": "§1 distinguishes an override from an amendment: an override applies for the scope of the instruction that invokes it and does not amend the constitution. §14 is therefore not engaged, no amendment record is added to CLAUDE.md, and §14.5 is satisfied without one. CLAUDE.md is unmodified by this ticket. §14.1 is the reason that matters in the other direction: had this been effected by changing a gate, a predicate or a skill instead, the change would have been invalid.",
+  "expires": "With this ticket. The override permits one artifact and no other. It does not authorise a second fictional response, a fictional figure in any other artifact, or any fictional budget on another branch.",
+  "decision": "One fictional lump-sum budget response is authored by hand into docs/integrations/lump_sum_budget_planner/received/, so that gate_09 can be exercised on instance two. No planner produced it and no planner exists for this repository. The file is the only hand-authored artifact: the remaining gate_09 predicates read artifacts the Phase 7 node writes itself, so no code, no new budget regime and no deterministic component is introduced. The alternative shape considered and dropped was a real internal budget route, which would need a §14 amendment, an operator-approved effort estimate, a declared cost model and a byte-equal replay check. That is the right shape for a live proposal and the wrong shape for a demonstration.",
+  "artifact_permitted": "docs/integrations/lump_sum_budget_planner/received/budget_response_FICTIONAL_demo_2026-10-01.json",
+  "rules_suspended": [
+    {
+      "rule": "§5, the Lump Sum Budget Planner integration constraint",
+      "what_it_requires": "This repository does not perform lump-sum budget computation. For lump-sum instruments the integration directory is the exclusive channel for budget data exchange.",
+      "why_suspended_here": "The figures were produced inside the repository, so the clause is breached whatever the directory they sit in. §5 is listed because the C1 amendment record names it and §17.6.7 as the two clauses that assert budget computation is exclusively external, and an override of one that left the other standing would be incoherent. The second half of the clause is not suspended: the data does reach Phase 8 through received/ and validation/, which is the channel §5 describes."
+    },
+    {
+      "rule": "§8.1",
+      "what_it_requires": "For lump-sum instruments, this repository does not compute, estimate or generate budgets; budget computation is exclusively the responsibility of the external Lump Sum Budget Planner, because lump-sum figures require judgment and are not replayable.",
+      "why_suspended_here": "No planner transport exists anywhere in this repository and the operator manual documents no procedure for running one. The rule's purpose is to keep an un-replayable judgment out of the repository. A figure declared fictional in its own content makes no judgment about any real cost, so the demonstration carries the rule's risk in a form a reader cannot mistake for a real budget."
+    },
+    {
+      "rule": "§8.3",
+      "what_it_requires": "No agent may invent, substitute, approximate or silently generate budget figures. Where a response has not been received and validated, dependent content must be flagged as incomplete and must not be finalized.",
+      "why_suspended_here": "The invention is the point of the demonstration and is the part that is overridden. The word in the rule that is not overridden is silently: the response declares itself fictional, names this record as its authority, and states that no planner produced it. Instance two is never submitted, so no evaluator and no grant officer ever reads these figures."
+    },
+    {
+      "rule": "§8.4, the lump-sum source clause only",
+      "what_it_requires": "For lump-sum instruments, a validated external response must be present in docs/integrations/lump_sum_budget_planner/received/, and its absence is a blocking gate failure. §7's Phase 7 gate condition restates the same requirement.",
+      "why_suspended_here": "A response authored inside the repository is not an external one, so gate_09 can only pass on it if this clause is suspended. It is the clause the first draft of this record wrongly described as untouched. The rest of §8.4 is NOT suspended, and the distinction is the whole point: the categorical Phase 8 block is a separate sentence of the same section, it is declared unconditional and instrument-independent, and it stands. §8.4 is therefore split between this list and still_in_force rather than appearing in one of them whole."
+    },
+    {
+      "rule": "§13.3, to the extent it names budget figures",
+      "what_it_requires": "No agent may invent project facts — the clause lists partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes and equipment — that are not present in Tier 3.",
+      "why_suspended_here": "The clause names budget figures outright, so inventing one breaches it and no reading of the override avoids that. The first draft of this record listed §13.3 as still in force and glossed it as 'no project fact outside the budget was invented', which carved out exactly what the clause forbids. The suspension is confined to the two budget items: every other fact in the response is the Tier 3 pseudonym or the Phase 3 work package identifier, and the rest of §13.3's list is untouched."
+    },
+    {
+      "rule": "§17.6.7",
+      "what_it_requires": "No runtime layer may fabricate, estimate or substitute budget figures; for lump-sum instruments budget computation remains exclusively the external planner's.",
+      "why_suspended_here": "Only to the extent that this file exists in the path the runtime reads. The runtime layers themselves are untouched: no skill, component, predicate or gate was modified, and the budget-interface-validation skill's constitutional halt on materialising a numeric figure stands exactly as written. The suspension covers the hand-authored artifact, not the code."
+    }
+  ],
+  "still_in_force": [
+    {
+      "rule": "§8.4 and §13.4, the categorical Phase 8 block",
+      "consequence": "Not suspended. No Phase 8 activity begins — including preparatory drafting — until gate_09 confirms a complete, structurally consistent budget. This ticket makes the gate able to pass. It does not declare it passed and unfreezes nothing on its own. §8.4's source clause is suspended and is listed above; this sentence of the same section is not, and §13.4 is not suspended at all."
+    },
+    {
+      "rule": "§8.5",
+      "consequence": "The response conforms to the interface contract at docs/integrations/lump_sum_budget_planner/interface_contract.json, checked by g08_p04 through runner/interface_contract.py in the response role. A fictional figure is still a figure that must sit in the contracted shape. What that check cannot see is recorded under findings as G3."
+    },
+    {
+      "rule": "§13.3, every item in its list except budget figures",
+      "consequence": "No partner name, capability, role, objective, prior experience, team size or equipment was invented. Partner identity in the response is the Tier 3 pseudonym and nothing else, and the work package identifiers are the Phase 3 output's own."
+    },
+    {
+      "rule": "§13.8",
+      "consequence": "Tier 5 content resting on these figures must flag the gap. Tier 5 currently holds nothing but placeholders, so the obligation is outstanding rather than discharged. It is recorded under outstanding.tier_5_label."
+    },
+    {
+      "rule": "§12.2",
+      "consequence": "Untouched, and the response is careful not to appear to use it. §12.2's four categories govern validation reports, and a figure invented for a demonstration is none of them: Assumed means adopted in the absence of direct evidence with the assumption declared, which is an analytic posture this figure does not hold. So the response records figure_basis invented_for_this_demonstration rather than a status field, and no §12.2 category is claimed for it anywhere."
+    },
+    {
+      "rule": "§17.1.4 and §17.6.3",
+      "consequence": "Gate evaluation belongs to the scheduler and gate result artifacts to the gate evaluator. No gate result was written by this ticket. The gate's predicate functions were run because they are pure, which reads the gate's arithmetic and does not declare its verdict."
+    }
+  ],
+  "what_this_costs": "Every Phase 8 figure now traces to fiction. Once the operator dispatches Phase 7 and gate_09 passes, Phase 8 can draft resource and effort content that rests on an invented budget, and §13.8 is then the only thing standing between that content and a reader who takes it for real. The cost is therefore a labelling obligation that falls due at the moment Tier 5 acquires its first file. A second cost is smaller and worth naming: three Tier 4 records and two test modules asserted an empty received/ as the branch's recorded state, and this ticket had to update them rather than leave the branch contradicting itself. A third cost surfaced in review and is the reason scope_correction exists: the override's own first draft understated what it suspended, which is the failure mode an override is most exposed to. A rule left off the list is a rule breached without a record.",
+  "findings": [
+    {
+      "id": "G1",
+      "summary": "docs/integrations/ sits outside both legs of runner/leakage_scan.py. SCAN_GLOBS covers Tier 3, Tier 4, Tier 5 and the vaults, and PSEUDONYMITY_JSON_GLOBS reaches the budget request as a Tier 3 integration artifact. Neither reaches a received response, so a real organisation name arriving in one would not be caught.",
+      "disposition": "recorded, not fixed. This response carries pseudonyms only, proved by tests/test_demo_fictional_budget_override.py::TestTheResponseNamesPseudonymsOnly. Widening the scan is engine work that a demo ticket should not settle: a genuine third-party response is not the repository's to rewrite, so the right response to a leak found there is a question the scan's design has to answer first."
+    },
+    {
+      "id": "G2",
+      "summary": "docs/tier3_project_instantiation/integration/budget_request.json carries run_id \"import uuid; print(uuid.uuid4())\", which is a Python snippet where a run identifier belongs.",
+      "disposition": "recorded, not fixed, and out of this ticket's scope. It does not affect gate_09: g08_p09 checks run ownership of budget_gate_assessment.json, which the Phase 7 node writes with the run's own identifier, and no gate_09 predicate reads the request's run_id."
+    },
+    {
+      "id": "G3",
+      "summary": "g08_p04 cannot reject a non-numeric budget figure. The interface contract declares no type for lump_sum or total_effort_pm, so runner/interface_contract.py checks that a priced line has a price field and not that the field holds a number. The module's own docstring states this.",
+      "disposition": "recorded, not fixed. Closing it means putting the type in the contract, which the contract's demo_mode_note defers to production hardening. Not this ticket's to settle, and it does not affect this response, whose figures are integers checked by tests/test_demo_fictional_budget_override.py."
+    }
+  ],
+  "outstanding": {
+    "operator_dispatch": "The operator dispatches Phase 7. The node's budget-interface-validation skill in response mode then writes the validation artifact to docs/integrations/lump_sum_budget_planner/validation/ and budget_gate_assessment.json to phase7_budget_gate/, which are what g08_p03, g08_p07, g08_p08 and g08_p09 read. Only then can gate_09 reach pass, and only the gate evaluator may record that it did. Nothing on this branch dispatches a runner phase.",
+    "tier_5_label": "Tier 5 content derived from this budget carries a visible declaration that its budget figures are fictional, under §13.8. It falls due when Phase 8 writes its first section, which cannot happen before the gate passes. tests/test_demo_fictional_budget_override.py asserts Tier 5 is still empty, so the obligation becomes a test failure at the moment it becomes live rather than a note someone has to remember.",
+    "gate_pass_record": "After the dispatch, that gate_09 reached pass is recorded against the gate evaluator's own artifact, not assumed from the response's presence."
+  },
+  "records_updated": [
+    "docs/tier4_orchestration_state/validation_reports/demo-budget-request-phase7_2026-10-01.json",
+    "docs/tier4_orchestration_state/decision_log/demo-budget-request-phase7_2026-10-01.json",
+    "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json",
+    "docs/tier4_orchestration_state/decision_log/demo-candidate-blind-baseline_2026-10-01.json",
+    "plans/dev_graph_demo_tickets.md",
+    "tests/test_demo_phase7_budget_gate.py",
+    "tests/test_demo_candidate_blind_baseline.py"
+  ],
+  "authored_by": "Ticket A, plans/tickets_budget_and_blind_lane.md, branch dev_graph_demo. No runner phase was dispatched. No gate result was written. No proposal text was drafted. CLAUDE.md was not modified.",
+  "scope_correction": "The first draft of this record, and the ticket text it was written from, named three suspended rules: §8.1, §8.3 and §17.6.7. The code review found that understated. §5's integration constraint, §8.4's lump-sum source clause with §7's restatement of it, and §13.3's budget-figure item are all breached by a hand-authored response, and an override that does not name them would be an override by omission. Six clauses are now listed, two of them partially. Nothing further was overridden to reach that list: the breaches existed from the moment the file was written, and what changed is only that the record says so."
+}

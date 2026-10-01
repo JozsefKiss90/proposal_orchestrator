@@ -86,5 +86,15 @@
     "recorded_baseline": "29 failed, 5436 passed, 104 skipped, recorded by the Phases 1 to 6 ticket on 2026-10-01",
     "accounted_for": "The failure count is unchanged and the 13 failing modules are the same ones: transport (11), skill applicability (3), Phase 8 consistency (3), drafting skill hygiene (3), the Tier 2B intake pair the Phase 1 rerun turned red (2), and five singletons. None sits in a module this ticket touched. The pass count grew by 111, which is this ticket's new tests.",
     "green_here": "tests/runner/test_budget_request.py 44 passed; tests/runner/test_interface_contract.py 24 passed; tests/test_demo_phase7_budget_gate.py 42 passed; the touched modules together, including the pre-existing schema-predicate, unit-cost, instrument-profile, leakage-scan, node-resolver, deterministic-component, phase-7 and architecture-seed suites, 517 passed 1 skipped."
+  },
+  "amended": {
+    "date": "2026-10-01",
+    "by": "Ticket A, plans/tickets_budget_and_blind_lane.md",
+    "authority": "CLAUDE.md §9.1: docs/ is the durable record, so a record that would now mislead a reader about the branch's state is amended rather than left standing. What was checked is preserved verbatim; what is no longer true is marked here. This record is not a validated checkpoint, so no checkpoint state is displaced.",
+    "what_changed": "received/ is no longer empty. One fictional budget response was authored by hand under an operator override of §8.1, §8.3 and §17.6.7, by the §1 in-session route, recorded at docs/tier4_orchestration_state/decision_log/demo-fictional-budget-override_2026-10-01.json. No planner produced it and none exists for this repository. The file is docs/integrations/lump_sum_budget_planner/received/budget_response_FICTIONAL_demo_2026-10-01.json.",
+    "what_did_not_change": "gate_09 has still not passed, and the categorical Phase 8 block of §8.4 and §13.4 stands. validation/ is still empty and no budget_gate_assessment.json exists, both of them the Phase 7 node's to write. Dispatching that node is the operator's step, and only the gate evaluator may record that the gate passed (§17.6.3).",
+    "affects": [
+      "every statement that received/ is empty, and the planner run named as the outstanding human step"
+    ]
   }
 }
