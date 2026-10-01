@@ -1,0 +1,114 @@
+{
+  "record_type": "decision",
+  "id": "ria-pre-evaluation-profile",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'RIA pre-evaluation profile in the harness' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4 (a decision affecting future interpretation is written to Tier 4, not held in agent memory), §10.2 (a skill or harness is an execution aid, never an authority), §10.5 (a material claim names its tiered source), §10.6 (programme knowledge is not substituted for a source document that is present) and §12.2 (the four status categories). Not a constitutional amendment; §14.5 is not engaged.",
+  "instrument_type": "RIA",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "report": "docs/tier4_orchestration_state/validation_reports/ria-pre-evaluation-profile_2026-10-01.json",
+  "decisions": [
+    {
+      "id": "D1",
+      "question": "The RIA/IA evaluation form annotates no aspect with an [OPTION for ...] tag, and the profile mechanism requires one on every aspect. What goes in the field?",
+      "decision": "Every aspect carries the tag 'RIA and IA', and the grammar declares known_variants ['RIA', 'IA'] with applicable_variant 'RIA'. The tag's status is Inferred, recorded in the scorecard's ria_scope_rule and in the validation report, while the aspect texts around it stay Confirmed.",
+      "reasoning": "The form covers two types of action and names neither on any aspect, so every aspect applies to an RIA. That is a reading of the form's own scope, which its title and its page-3 heading both state. Leaving the field blank is not available: the substrate loader rejects an aspect with an empty option_tag. Recording a derivation in a field the loader treats as transcribed is the lesser problem, provided the derivation is labelled. §10.5 requires the label.",
+      "status": "Inferred",
+      "affects": [
+        "Candidate Part B and the blind baseline"
+      ]
+    },
+    {
+      "id": "D2",
+      "question": "An RIA is unweighted, and parse_scoring requires a weight_pct number for every criterion. What number?",
+      "decision": "1 for each criterion, the unweighted ranking multiplier. The rule has one home: scoring.weighting_note states that weight_pct carries a multiplier and not a percentage, beside the page-2 quote it rests on. A test asserts the value, the note, the quote, and that no criterion carries a per-criterion copy of it.",
+      "reasoning": "Three candidates were available. A share of the maximum (5, since 5 + 5 + 5 = 15) reads as 5% under a key named for a percentage. A true percentage (33.33) is a number no source states. A multiplier of 1 is what the General Annexes imply: page 27 names the 1.5 weight on Impact for Innovation Actions only, and the evaluation form states that scores are normally not weighted, so an RIA's multiplier is 1. The multiplier also matches the concept the field is named for. Nothing in the harness multiplies by the value, so the choice costs no arithmetic; it only has to be honest about what it means.",
+      "status": "Inferred",
+      "affects": [
+        "Candidate Part B and the blind baseline"
+      ]
+    },
+    {
+      "id": "D3",
+      "question": "The aspect ids of the MSCA-PF scorecard are unprefixed. Should the RIA ids reuse that convention?",
+      "decision": "No. The RIA aspect ids are prefixed: ria-exc-objectives, ria-exc-methodology, ria-imp-pathways, ria-imp-measures, ria-impl-workplan, ria-impl-capacity. The MSCA-PF ids are left as they stand.",
+      "reasoning": "An expectation_key is the cell key of a blind report. Unprefixed ids let two profiles produce cells that read identically while carrying different expectation text, disambiguated only by the report's profile pin. Four of the six RIA aspects would have collided by name with an MSCA-PF one. Renaming the MSCA-PF ids would move its rubric fingerprint and invalidate its frozen baselines for no gain, so the convention changes forward only. See finding F4.",
+      "status": "Confirmed",
+      "affects": [
+        "Change scenarios and shadow comparison"
+      ]
+    },
+    {
+      "id": "D4",
+      "question": "What does a rubric anchor on for an RIA?",
+      "decision": "The RIA Part B sub-section ids the Tier 2A section_schema_registry declares: B.1.1, B.1.2, B.2.1, B.2.2, B.3.1 and B.3.2, one per rubric. A test checks each anchor against the registry's proposal_section and implementation_section entries.",
+      "reasoning": "The anchor must equal the sub_section_id Phase 8 writes, and that comes from the registry by way of InstrumentProfile.drafting_sub_sections. The RIA entries carry a 'B.' prefix where the MSCA-PF entries carry bare ids, so the two profiles' anchors differ in shape and neither can be copied from the other. A mismatch is not silent: build_evidence_pack raises on an anchor absent from the section. See finding F5.",
+      "status": "Confirmed",
+      "affects": [
+        "Candidate Part B and the blind baseline"
+      ]
+    },
+    {
+      "id": "D5",
+      "question": "The scorecard is a verbatim freeze of a form. How is it authored so that the freeze is real?",
+      "decision": "Generated, not typed. The six aspect texts and the six scoring-level texts were extracted from the stored PDF and injected into the file. The test re-runs the same extraction and compares, including across the page-4 to page-5 boundary where one aspect breaks.",
+      "reasoning": "The scorecard is the anchor the deterministic applicability filter reproduces, so a drifted scorecard would redefine what is graded while every loader still reported a pass. Hand transcription of six long sentences is exactly the error class the byte-equal transcription rule of the source-materials ticket exists to prevent. The test was confirmed to bite: replacing 'Clarity' with 'Quality' in one aspect turned 3 tests red and errored 11 more.",
+      "status": "Confirmed",
+      "affects": []
+    },
+    {
+      "id": "D6",
+      "question": "Does the RIA profile become the harness default?",
+      "decision": "No. DEFAULT_PROFILE_PATH still resolves to harness/profiles/msca_pf_default.json. The RIA profile is selected with --profile.",
+      "reasoning": "Changing the default is a harness Python change, which the ticket rules out and the branch constraint forbids. It would also silently repoint every command that omits --profile, including the frozen MSCA-PF baselines. A test pins the default so a later change is deliberate.",
+      "status": "Confirmed",
+      "affects": [
+        "Candidate Part B and the blind baseline"
+      ]
+    },
+    {
+      "id": "D7",
+      "question": "Should a rubric anchor the optional impact canvas at B.2.3?",
+      "decision": "No. Six rubrics anchor the six mandatory drafted sub-sections, and B.2.3 is left unanchored. The rubric set's framing records why, and a test pins that it is the only unanchored one.",
+      "reasoning": "B.2.3 restates the pathway and the measures already anchored at B.2.1 and B.2.2 rather than answering an aspect of its own, and the form tells applicants to remove it if unused. build_evidence_pack fails closed on an absent anchor, so anchoring an optional sub-section would make every Impact pack raise for a candidate that omitted it. The canvas prose is still selected on term match when present, so nothing is lost. See finding F8.",
+      "status": "Confirmed",
+      "affects": [
+        "Candidate Part B and the blind baseline"
+      ]
+    }
+  ],
+  "defects_recorded_unfixed": [
+    {
+      "finding": "F1",
+      "summary": "The profile mechanism makes an option-tag grammar mandatory, and a single-type-of-action form has no variants to tag. The RIA profile declares a tag and an exception prefix that record no form annotation.",
+      "why_unfixed": "A degenerate single-variant grammar satisfies the loader, so no Python change was needed, and the branch constraint holds the harness unmodified. The honest fix is a profile field declaring that the instrument has no variants, which is a Milestone 2 ticket."
+    },
+    {
+      "finding": "F2",
+      "summary": "weight_pct presumes a weighted scorecard. An RIA sums three unweighted scores to 15, so the key is a misnomer for this profile.",
+      "why_unfixed": "Nothing multiplies by the value, and the misnomer is named in the data rather than hidden. Renaming the key or adding an unweighted flag changes parse_scoring and every scorecard, which this ticket may not do."
+    },
+    {
+      "finding": "F3",
+      "summary": "DEFAULT_RUBRIC_BASELINE_PATH is one path with no profile in its name, and it is the default of the freeze and check commands. Freezing an RIA grid at the default would overwrite an MSCA-PF one.",
+      "why_unfixed": "Both commands take an explicit path and no RIA grid is frozen here. The fix is to derive the default from the profile id."
+    },
+    {
+      "finding": "F5",
+      "summary": "The RIA anchors depend on Phase 8 writing the registry's 'B.' prefixed sub-section ids. A drafter writing '1.1' would make every evidence pack raise.",
+      "why_unfixed": "That is the designed fail-closed behaviour, and the next ticket checks the written ids before assessing."
+    },
+    {
+      "finding": "F7",
+      "summary": "The first acceptance criterion cannot be met in full by any profile: a rubric's wording, steps, terms and threshold are authored, and two scorecard fields are Inferred.",
+      "why_unfixed": "It is a wording problem in the ticket, not in the work. The criterion is recorded as met in part with its scope on the criterion line, following decision D3 of the Tier 1 and Tier 2A coverage ticket."
+    },
+    {
+      "finding": "F9",
+      "summary": "Three test files now carry near-identical copies of the same candidate-building helpers, against the house rule tests/_tier_sources.py states.",
+      "why_unfixed": "Consolidating would edit two test files this ticket does not otherwise touch, and the duplication predates it."
+    }
+  ],
+  "verification": "tests/harness/test_ria_profile.py, 28 tests, all passing. The data files are held to the stored ef_he-ria-ia_en.pdf: every aspect text, every scoring level, the scale, both thresholds, the maximum of 15 and the no-weighting rule are re-read from pages 2, 4 and 5 and compared, verbatim up to whitespace collapsing. Mutating one word of one aspect turns the file red, as does moving the maximum off 15, a criterion threshold off 3, or a weight off 1; each was tried and reverted. tests/harness/ reports 1 failed, 707 passed and 25 skipped; the failure is a missing Tier 3 confirmation_checklist.json and is in the branch baseline. The full suite reports 29 failed, 5575 passed and 104 skipped. The same 29 were measured with this work stashed, and the two failure sets are identical name for name, so none is caused by this change. mypy over the new test file reports no error in it. The agnosticism lint reports no project noun in any of the three data files. Both axes of /code-review ran; ten findings are in the validation report."
+}

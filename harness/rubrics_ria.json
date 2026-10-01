@@ -1,0 +1,220 @@
+{
+  "rubric_set_id": "ria_ia_rubrics",
+  "version": "1.0.0",
+  "scorecard_id": "ria_ia_evaluation_scorecard",
+  "scorecard_version": "4.0",
+  "framing": "Integrity-framed: each rubric asks whether the section ADDRESSES and GROUNDS its expectation — never whether the prose is good. Expectation texts are the verbatim scorecard aspect texts (EU Grants: Evaluation form (HE RIA and IA) V4.0, pp.4-5); expectation_key equals the scorecard aspect id. Anchors are the RIA Part B sub-section ids the Tier 2A section_schema_registry declares, which is what Phase 8 writes as sub_section_id. One RIA sub-section is deliberately unanchored: B.2.3, the optional impact canvas the form labels 'Summary (OPTIONAL - Please remove this section if not used)'. It restates the pathway and the measures already anchored at B.2.1 and B.2.2 rather than answering an aspect of its own, and anchoring an optional sub-section would make every Impact pack raise whenever a candidate omits it. Its prose is still selected on term match when present.",
+  "rubrics": [
+    {
+      "expectation_key": "ria-exc-objectives",
+      "criterion_id": "excellence",
+      "expectation_text": "Clarity and pertinence of the project’s objectives, and the extent to which the proposed work is ambitious, and goes beyond the state of the art.",
+      "rubric": "Decide whether the evidence pack shows the section substantively ADDRESSES this expectation - objectives that are clear, measurable and pertinent to the topic, and a stated advance beyond the state of the art - and whether what it says is GROUNDED in claim-ledger entries. Generic ambition language with no identifiable objective, or a state-of-the-art claim resting on no confirmed claim with a real source_ref, must not pass. Do not reward eloquence or formatting; judge only addressal and grounding.",
+      "evaluation_steps": [
+        "List the prose spans that state an actual objective, or a specific advance beyond the state of the art, rather than generic ambition.",
+        "Check each objective is measurable and pertinent to the topic: an identifiable outcome, a scope, and a stated relation to current practice.",
+        "Cross-check the substantive statements against the claim-ledger entries: are the objectives and state-of-the-art claims backed, and are the load-bearing ones status=confirmed with a real source_ref?",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the expectation, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "objective",
+        "objectives",
+        "state of the art",
+        "state-of-the-art",
+        "ambition",
+        "ambitious",
+        "beyond",
+        "novel",
+        "novelty",
+        "advance",
+        "measurable",
+        "verifiable",
+        "maturity",
+        "technology readiness",
+        "TRL"
+      ],
+      "anchor_sub_section_ids": [
+        "B.1.1"
+      ]
+    },
+    {
+      "expectation_key": "ria-exc-methodology",
+      "criterion_id": "excellence",
+      "expectation_text": "Soundness of the proposed methodology, including the underlying concepts, models, assumptions, inter-disciplinary approaches, appropriate consideration of the gender dimension in research and innovation content, and the quality of open science practices, including sharing and management of research outputs and engagement of citizens, civil society and end users where appropriate.",
+      "rubric": "Decide whether the evidence pack shows the section substantively ADDRESSES this expectation - a concrete methodology with its underlying concepts, models and assumptions, its interdisciplinary elements, an explicit treatment of the gender dimension in research and innovation content, and named open science practices - and whether these are GROUNDED in claim-ledger entries. A methodology described only in abstractions must not pass, nor may silence on the gender dimension or on open science. Judge only addressal and grounding, never prose quality.",
+      "evaluation_steps": [
+        "List the prose spans that describe the actual methodology: concepts, models, assumptions, methods, data and analysis approach.",
+        "Check the interdisciplinary approach, the gender dimension in research and innovation content, and the open science practices are each explicitly treated; a reasoned statement of non-relevance counts as treatment, silence does not.",
+        "Check a data management plan is named as a deliverable: the RIA Part B template requires one as a distinct deliverable within the first six months (Tier 2A section_schema_registry, B.1.2, from af_he-ria-ia_en.pdf). The evaluation form does not name it, so treat its absence as a gap in the methodology rather than an unmet aspect of this expectation.",
+        "Cross-check the substantive methodological statements against the claim-ledger entries: are they backed, and are the load-bearing ones status=confirmed with a real source_ref?",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the expectation, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "methodology",
+        "methodological",
+        "method",
+        "methods",
+        "concept",
+        "model",
+        "models",
+        "assumption",
+        "assumptions",
+        "inter-disciplinary",
+        "interdisciplinary",
+        "gender dimension",
+        "gender",
+        "open science",
+        "open access",
+        "data management plan",
+        "FAIR",
+        "citizens",
+        "end users"
+      ],
+      "anchor_sub_section_ids": [
+        "B.1.2"
+      ]
+    },
+    {
+      "expectation_key": "ria-imp-pathways",
+      "criterion_id": "impact",
+      "expectation_text": "Credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme.",
+      "rubric": "Decide whether the evidence pack shows the section substantively ADDRESSES this expectation - a pathway from the project's own results to the outcomes this topic specifies and to the wider impacts of its destination, with named target groups and the barriers that stand between them - and whether these are GROUNDED in claim-ledger entries. An impact claim with no project mechanism behind it, or a pathway asserted against an outcome the call does not state, must not pass. Judge only addressal and grounding.",
+      "evaluation_steps": [
+        "List the prose spans that connect a specific project result to a specific expected outcome or wider impact, rather than describing research and innovation in general.",
+        "Check the target groups are named and specific, and that requirements or barriers beyond the project's scope and duration are identified with mitigating measures.",
+        "Cross-check each outcome and impact against the claim-ledger entries: is the expected outcome traceable to the call, and is the project mechanism behind it status=confirmed with a real source_ref?",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the expectation, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "pathway",
+        "pathways",
+        "expected outcome",
+        "expected outcomes",
+        "outcome",
+        "outcomes",
+        "impact",
+        "impacts",
+        "destination",
+        "target group",
+        "target groups",
+        "barrier",
+        "barriers",
+        "uptake",
+        "beneficiaries",
+        "quantified"
+      ],
+      "anchor_sub_section_ids": [
+        "B.2.1"
+      ]
+    },
+    {
+      "expectation_key": "ria-imp-measures",
+      "criterion_id": "impact",
+      "expectation_text": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities.",
+      "rubric": "Decide whether the evidence pack shows the section substantively ADDRESSES this expectation - a dissemination and exploitation plan with communication activities, each measure matched to a target group and justified, plus an intellectual property strategy - and whether these are GROUNDED in claim-ledger entries. A list of channels with no target group, or an exploitation claim resting on no confirmed entry, must not pass. Judge only addressal and grounding.",
+      "evaluation_steps": [
+        "List the prose spans that state an actual dissemination, exploitation or communication measure, with the target group it reaches.",
+        "Check each measure is justified as suited to its target group, that activities after the project's end are addressed, and that an intellectual property strategy is outlined.",
+        "Cross-check the measures against the claim-ledger entries: are the named channels, partners and protection measures backed, and are the load-bearing ones status=confirmed with a real source_ref?",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the expectation, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "dissemination",
+        "exploitation",
+        "communication",
+        "target group",
+        "target groups",
+        "intellectual property",
+        "patent",
+        "standardisation",
+        "open access",
+        "publication",
+        "publications",
+        "stakeholder",
+        "stakeholders",
+        "policy feedback",
+        "commercialise"
+      ],
+      "anchor_sub_section_ids": [
+        "B.2.2"
+      ]
+    },
+    {
+      "expectation_key": "ria-impl-workplan",
+      "criterion_id": "implementation",
+      "expectation_text": "Quality and effectiveness of the work plan, assessment of risks, and appropriateness of the effort assigned to work packages, and the resources overall.",
+      "rubric": "Decide whether the evidence pack shows the section substantively ADDRESSES this expectation - a work plan of work packages, tasks, deliverables and milestones, an assessment of critical risks with mitigation, and effort assigned per work package with the resources overall justified - and whether these are GROUNDED in claim-ledger entries. A work plan with no effort figures, or risks listed without mitigation, must not pass. An effort or cost figure that no confirmed entry supports is not grounded. Judge only addressal and grounding.",
+      "evaluation_steps": [
+        "List the prose spans that describe work packages, their tasks and deliverables, the milestones and their means of verification, and the timeline.",
+        "Check critical risks are assessed with likelihood, severity and mitigation, and that effort is assigned per work package with the resources overall justified.",
+        "Cross-check the work plan and the effort figures against the claim-ledger entries: are they backed, and are the load-bearing ones status=confirmed with a real source_ref? An assumed or absent effort figure weakens grounding decisively.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the expectation, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "work package",
+        "work packages",
+        "task",
+        "tasks",
+        "deliverable",
+        "deliverables",
+        "milestone",
+        "milestones",
+        "risk",
+        "risks",
+        "mitigation",
+        "person-month",
+        "person-months",
+        "effort",
+        "resources",
+        "Gantt",
+        "critical path",
+        "timeline",
+        "subcontracting"
+      ],
+      "anchor_sub_section_ids": [
+        "B.3.1"
+      ]
+    },
+    {
+      "expectation_key": "ria-impl-capacity",
+      "criterion_id": "implementation",
+      "expectation_text": "Capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise.",
+      "rubric": "Decide whether the evidence pack shows the section substantively ADDRESSES this expectation - each participant's capacity and its role in this project, and the expertise the consortium as a whole brings together, including access to the critical infrastructure the work needs - and whether these are GROUNDED in claim-ledger entries. A partner list with no stated role, or a capability claim resting on no confirmed entry, must not pass as grounded. Judge only addressal and grounding.",
+      "evaluation_steps": [
+        "List the prose spans that state a participant's capacity and the role it holds in this project.",
+        "Check the consortium is shown to cover the expertise the objectives need, that the members complement one another, and that access to critical infrastructure is addressed.",
+        "Cross-check each participant's capacity and role against the claim-ledger entries: are they backed, and are the load-bearing ones status=confirmed with a real source_ref? An assumed partner capability weakens grounding decisively.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the expectation, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "consortium",
+        "participant",
+        "participants",
+        "partner",
+        "partners",
+        "role",
+        "roles",
+        "capacity",
+        "capability",
+        "capabilities",
+        "expertise",
+        "complement",
+        "infrastructure",
+        "value chain",
+        "affiliated entity",
+        "associated partner",
+        "beneficiary",
+        "beneficiaries"
+      ],
+      "anchor_sub_section_ids": [
+        "B.3.2"
+      ]
+    }
+  ]
+}

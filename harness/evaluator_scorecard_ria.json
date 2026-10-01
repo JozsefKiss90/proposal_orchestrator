@@ -1,0 +1,105 @@
+{
+  "scorecard_id": "ria_ia_evaluation_scorecard",
+  "instrument": "Horizon Europe Research and Innovation Action (RIA)",
+  "provenance": {
+    "source_form": "EU Grants: Evaluation form (HE RIA and IA)",
+    "version": "4.0",
+    "version_date": "2025-11-12",
+    "work_programme": "WP2026/7",
+    "source_path": "docs/tier2a_instrument_schemas/evaluation_forms/ria_ia/ef_he-ria-ia_en.pdf",
+    "criteria_pages": "4-5",
+    "scoring_page": 2,
+    "derived_from": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+    "transcription_basis": "Every aspect text, criterion name and scoring level in this file was copied from the stored PDF by text extraction, not retyped. tests/harness/test_ria_profile.py re-reads the same pages and compares; changing one word turns it red. Verbatim here means verbatim up to whitespace: the PDF breaks every aspect across two or more lines, and prints a double space in 'the  measures' (p.5) and 'may  be given' (p.2), so each run of whitespace is collapsed to one space on both sides of the comparison. No character other than whitespace is altered, added or dropped.",
+    "verified_on": "2026-10-01",
+    "ria_scope_rule": "The form covers two types of action, RIA and IA, and annotates no aspect as specific to either. Every aspect therefore applies to an RIA. The form carries no [OPTION for ...] annotation on its aspects, so each option_tag below reads 'RIA and IA' as a statement of the form's own scope. That tag is Inferred from the form's title and heading, not transcribed from an annotation; the aspect texts themselves are Confirmed verbatim. The scorecard loader requires a non-empty option_tag on every aspect, which is why a form with no variants still declares one.",
+    "excluded_aspects_rule": "Empty, and deliberately so: no aspect of this form is inapplicable to an RIA."
+  },
+  "scoring": {
+    "scale": "0-5, half-marks may be given",
+    "scale_source_quote": "Scoring must be in the range from 0-5. Half-marks may be given.",
+    "levels": {
+      "0": "The proposal fails to address the criterion or cannot be assessed due to missing or incomplete information.",
+      "1": "Poor. The criterion is inadequately addressed, or there are serious inherent weaknesses.",
+      "2": "Fair. The proposal broadly addresses the criterion, but there are significant weaknesses.",
+      "3": "Good. The proposal addresses the criterion well, but a number of shortcomings are present.",
+      "4": "Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.",
+      "5": "Excellent. The proposal successfully addresses all relevant aspects of the criterion. Any shortcomings are minor."
+    },
+    "overall_threshold": 10,
+    "overall_max": 15,
+    "individual_threshold": 3,
+    "threshold_source_quote": "The threshold for the individual criteria is 3. The overall threshold, applying to the sum of the 3 individual scores, is 10 points.",
+    "weighting_source_quote": "Scores are normally NOT weighted.",
+    "weighting_note": "The three criteria are each scored 0-5 and summed, unweighted, to a total out of 15. The individual threshold is 3 and the overall threshold is 10 of 15. Specific calls or topics may set different thresholds or weighting (form p.2). weight_pct below is the only weight key the scorecard loader accepts, so each criterion carries the unweighted ranking multiplier of 1 rather than a percentage; the General Annexes name the 1.5 weight on Impact for Innovation Actions only."
+  },
+  "criteria": [
+    {
+      "id": "excellence",
+      "name": "Excellence",
+      "weight_pct": 1,
+      "threshold_score": 3,
+      "score_field": "Score 1",
+      "source_page": 4,
+      "aspects": [
+        {
+          "id": "ria-exc-objectives",
+          "source_page": 4,
+          "option_tag": "RIA and IA",
+          "text": "Clarity and pertinence of the project’s objectives, and the extent to which the proposed work is ambitious, and goes beyond the state of the art."
+        },
+        {
+          "id": "ria-exc-methodology",
+          "source_page": 4,
+          "option_tag": "RIA and IA",
+          "text": "Soundness of the proposed methodology, including the underlying concepts, models, assumptions, inter-disciplinary approaches, appropriate consideration of the gender dimension in research and innovation content, and the quality of open science practices, including sharing and management of research outputs and engagement of citizens, civil society and end users where appropriate."
+        }
+      ]
+    },
+    {
+      "id": "impact",
+      "name": "Impact",
+      "weight_pct": 1,
+      "threshold_score": 3,
+      "score_field": "Score 2",
+      "source_page": "4-5",
+      "aspects": [
+        {
+          "id": "ria-imp-pathways",
+          "source_page": "4-5",
+          "option_tag": "RIA and IA",
+          "text": "Credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme."
+        },
+        {
+          "id": "ria-imp-measures",
+          "source_page": 5,
+          "option_tag": "RIA and IA",
+          "text": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities."
+        }
+      ]
+    },
+    {
+      "id": "implementation",
+      "name": "Quality and efficiency of the implementation",
+      "weight_pct": 1,
+      "threshold_score": 3,
+      "score_field": "Score 3",
+      "source_page": 5,
+      "aspects": [
+        {
+          "id": "ria-impl-workplan",
+          "source_page": 5,
+          "option_tag": "RIA and IA",
+          "text": "Quality and effectiveness of the work plan, assessment of risks, and appropriateness of the effort assigned to work packages, and the resources overall."
+        },
+        {
+          "id": "ria-impl-capacity",
+          "source_page": 5,
+          "option_tag": "RIA and IA",
+          "text": "Capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise."
+        }
+      ]
+    }
+  ],
+  "excluded_aspects": []
+}

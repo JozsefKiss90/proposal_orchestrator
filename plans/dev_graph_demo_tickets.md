@@ -311,9 +311,26 @@ are in `demo-budget-request-phase7_2026-10-01.json`.
 
 **Blocked by:** Tier 1 and Tier 2A coverage check for an RIA.
 
-- [ ] The profile loads, has its own version, and every field traces to the evaluation form or the General Annexes award criteria.
-- [ ] The existing MSCA-default profile tests still pass.
-- [ ] A dry run on a synthetic RIA-shaped candidate produces a report with the RIA criteria.
+- [x] The profile loads and has its own version. Every field the form or the General Annexes can
+  supply traces to them. The three classes that cannot are declared with their §12.2 status (F7).
+- [x] The existing MSCA-default profile tests still pass.
+- [x] A dry run on a synthetic RIA-shaped candidate produces a report with the RIA criteria.
+
+**Outcome.** Three data files and no Python: `harness/profiles/ria_default.json`,
+`harness/evaluator_scorecard_ria.json` and `harness/rubrics_ria.json`. Six expectations, two per
+criterion, scored 0 to 5 and summed unweighted to 15 with a threshold of 10. The scorecard was
+generated with the aspect and level texts extracted from `ef_he-ria-ia_en.pdf`, not retyped, and the
+transcription checks re-read pages 2, 4 and 5 and compare, verbatim up to whitespace collapsing. One
+aspect breaks across the page boundary, so the test strips page 5's running header and asserts it
+carries the version the provenance claims. 28 tests in all. The MSCA-PF profile still loads, still
+holds nine expectations, and is still the default.
+
+**Two scorecard fields fit a multi-variant form, not this one.** The RIA/IA form annotates no aspect
+with an `[OPTION for ...]` tag and the loader requires one, so every aspect carries `RIA and IA` as
+an Inferred reading of the form's scope. An RIA is unweighted and `parse_scoring` requires a
+`weight_pct`, so each criterion carries the ranking multiplier 1. Both are Milestone 1 defects,
+recorded unfixed as F1 and F2. Ten findings and seven decisions are in
+`ria-pre-evaluation-profile_2026-10-01.json`.
 
 ## Candidate Part B and the blind baseline
 

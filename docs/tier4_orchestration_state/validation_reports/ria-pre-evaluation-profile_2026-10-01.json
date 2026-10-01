@@ -1,0 +1,205 @@
+{
+  "report_id": "ria-pre-evaluation-profile",
+  "report_kind": "validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'RIA pre-evaluation profile in the harness' in plans/dev_graph_demo_tickets.md",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "instrument_type": "RIA",
+  "authority": "CLAUDE.md §10.2 (the harness is an execution aid, never an authority), §10.5 (every material claim names its tiered source), §10.6 (programme knowledge is not substituted for a source document that is present), §12.2 (the four status categories) and §15 (a declared gap beats a fabricated completion). The harness is out-of-band QA and never a runtime gate, per harness/HARNESS.md. Not a constitutional amendment; §14.5 is not engaged.",
+  "question_asked": "Can the Milestone 1 pre-evaluation profile mechanism carry an RIA, built from the Tier 2A RIA/IA evaluation form, with no harness Python change?",
+  "answer": "Yes. Three data files carry it: a profile document, a scorecard transcribed from the form, and a rubric set. No Python was changed. Two shapes in the scorecard schema fit a multi-variant form better than a single-type one, and both are worked around in data rather than in code; they are recorded as Milestone 1 defects F1 and F2.",
+  "acceptance_criteria": [
+    {
+      "criterion": "The profile loads, has its own version, and every field traces to the evaluation form or the General Annexes award criteria.",
+      "met": "in part, with the scope stated",
+      "evidence": "The profile loads: load_profile_bundle('harness/profiles/ria_default.json') returns six applicable expectations across three criteria, no exclusions, and a profile version distinct from the MSCA-PF default's. Every field the form or the General Annexes can supply does trace, and is re-read from the stored PDF by tests/harness/test_ria_profile.py: the six aspect texts, the three criterion names, the six scoring levels, the scale, the individual threshold of 3, the overall threshold of 10 and the maximum of 15. Three field classes cannot trace, and each is declared with its CLAUDE.md §12.2 status rather than presented as transcribed: option_tag (Inferred, F1), weight_pct (Inferred, F2), and every rubric's prose, evaluation_steps, selection_terms and pass_threshold (Assumed, because no source prescribes a rubric's wording). The criterion as written cannot be met in full by any profile, the MSCA-PF one included."
+    },
+    {
+      "criterion": "The existing MSCA-default profile tests still pass.",
+      "met": true,
+      "evidence": "tests/harness/ reports 1 failed, 707 passed and 25 skipped. The one failure, test_rubric_report.py::test_real_spine_register_loads_and_is_fully_confirmed, is a missing Tier 3 confirmation_checklist.json and is in the branch baseline. tests/harness/test_profile.py and tests/harness/test_rubrics.py are green, and the new file re-asserts the MSCA-PF bundle independently."
+    },
+    {
+      "criterion": "A dry run on a synthetic RIA-shaped candidate produces a report with the RIA criteria.",
+      "met": true,
+      "evidence": "Two dry runs. assess_candidate over a candidate built under tmp_path yields six cells whose summary criteria are exactly excellence, impact and implementation. The module command writes the report file and renders it: harness.commands.blind_assessment assess --candidate <dir> --profile harness/profiles/ria_default.json, exit 0, scope complete. The assessor is a scripted backend, so no Claude call is made."
+    }
+  ],
+  "outputs": [
+    "harness/profiles/ria_default.json",
+    "harness/evaluator_scorecard_ria.json",
+    "harness/rubrics_ria.json",
+    "tests/harness/test_ria_profile.py",
+    "harness/HARNESS.md (shipped-profiles table and the two schema-shape notes)"
+  ],
+  "inputs": [
+    "docs/tier2a_instrument_schemas/evaluation_forms/ria_ia/ef_he-ria-ia_en.pdf, pages 2, 4 and 5",
+    "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json, the RIA entry",
+    "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json, the RIA Part B sub-sections",
+    "docs/tier4_orchestration_state/validation_reports/tier1-tier2a-ria-coverage_2026-09-29.json, for the scoring facts and their spans",
+    "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf, page 27, for the ranking-weight rule"
+  ],
+  "what_was_checked_and_how": {
+    "transcription": "The six aspect texts were extracted from the PDF by splitting the page-4 and page-5 text on the form's own bullet glyph and cutting each segment at 'Comments:'. The scorecard was then generated with those strings injected, not retyped. The test re-runs the same extraction and compares the ordered tuple of six texts to the ordered tuple of six scorecard texts. Replacing one word of one aspect turns 3 tests red and errors 11 more, which was tried and reverted.",
+    "page_boundary": "The Impact criterion's first aspect breaks across pages 4 and 5. Joining the two pages naively leaves page 5's running header inside the sentence, so the test strips the header and asserts it carries the version the scorecard's provenance claims. A form reissued under a new version stops matching rather than being graded silently.",
+    "scoring": "Scale, the six level texts, the individual threshold of 3, the overall threshold of 10 and the maximum of 15 are each matched against page 2. The three quotes the scorecard stores are asserted present on that page verbatim.",
+    "applicability": "Every expectation comes out applicable under the profile's grammar, with the tag resolved from the scorecard because the registry rows carry no inline tag. Repointing the profile at a variant the tag does not name raises 'not applicable', which the test asserts: the filter reproduces the scorecard or it fails.",
+    "anchors": "Each rubric's anchor sub-section id is checked against the RIA sections the Tier 2A section_schema_registry declares as proposal_section or implementation_section, which is the set InstrumentProfile.drafting_sub_sections returns.",
+    "isolation": "The MSCA-PF bundle is reloaded in the same test file and its nine expectations, its 100-point maximum and its distinct version and rubric fingerprint are asserted. DEFAULT_PROFILE_PATH still resolves to the MSCA-PF profile."
+  },
+  "element_status": [
+    {
+      "element": "the six evaluator expectations",
+      "value": "two per criterion, verbatim from form pages 4 and 5",
+      "status": "Confirmed",
+      "evidence": "Extracted from ef_he-ria-ia_en.pdf and re-extracted by the test. Verbatim up to whitespace: the PDF breaks every aspect across lines and prints a double space in 'the  measures', so runs of whitespace are collapsed to one on both sides of the comparison and no other character is altered. The texts also match the RIA entry of evaluator_expectation_registry.json under the same rule, which is the bijection the substrate loader requires."
+    },
+    {
+      "element": "criterion names",
+      "value": "Excellence; Impact; Quality and efficiency of the implementation",
+      "status": "Confirmed",
+      "evidence": "Form headings '1. Excellence', '2. Impact' and '3. Quality and efficiency of the implementation' on pages 4 and 5."
+    },
+    {
+      "element": "scoring scale and levels",
+      "value": "0 to 5, half-marks allowed; six level texts",
+      "status": "Confirmed",
+      "evidence_span": {
+        "quote": "Scoring must be in the range from 0-5. Half-marks may be given.",
+        "source_document": "ef_he-ria-ia_en.pdf",
+        "source_page": 2
+      }
+    },
+    {
+      "element": "thresholds",
+      "value": "3 per criterion; 10 of 15 overall",
+      "status": "Confirmed",
+      "evidence_span": {
+        "quote": "The threshold for the individual criteria is 3. The overall threshold, applying to the sum of the 3 individual scores, is 10 points.",
+        "source_document": "ef_he-ria-ia_en.pdf",
+        "source_page": 2
+      }
+    },
+    {
+      "element": "criterion weight",
+      "value": "1, the unweighted ranking multiplier",
+      "status": "Inferred",
+      "evidence_span": {
+        "quote": "Scores are normally NOT weighted.",
+        "source_document": "ef_he-ria-ia_en.pdf",
+        "source_page": 2
+      },
+      "note": "The form states no number. 1 follows from the no-weighting rule and from the General Annexes naming the 1.5 weight on Impact for Innovation Actions only. The scorecard loader requires a weight, so the inference is recorded in weight_pct and named in scoring.weighting_note. See F2."
+    },
+    {
+      "element": "option tag 'RIA and IA' on every aspect",
+      "value": "the form's two types of action",
+      "status": "Inferred",
+      "evidence": "The form's title reads 'Evaluation form (HE RIA and IA)' and its page-3 heading 'EVALUATION FORM (RIA IA)'. No aspect carries an [OPTION for ...] annotation, so every aspect applies to both. The tag is derived from the form's scope, not transcribed from an annotation. See F1."
+    },
+    {
+      "element": "criterion-to-section map",
+      "value": "excellence_section, impact_section, implementation_section",
+      "status": "Inferred",
+      "evidence": "Inferred, not Confirmed: the only places that name these stems are .claude/agents/excellence_writer.md, impact_writer.md and implementation_writer.md, and .claude/ is runtime execution memory under CLAUDE.md §9.2, ranked tenth in the §3 hierarchy, so it is not a Tier 1-3 source. The inference is that the three Phase 8 writer agents declare these output paths for every instrument, and the MSCA-PF profile already maps to the same three stems, so they are instrument-independent."
+    },
+    {
+      "element": "rubric anchor sub-section ids",
+      "value": "B.1.1, B.1.2, B.2.1, B.2.2, B.3.1, B.3.2",
+      "status": "Confirmed",
+      "evidence": "The RIA proposal_section and implementation_section entries of section_schema_registry.json. The MSCA-PF entries carry bare ids ('1.1'), the RIA entries a 'B.' prefix, so the two profiles' anchors differ in shape. See F5."
+    },
+    {
+      "element": "rubric text, evaluation steps, pass threshold and selection terms",
+      "value": "authored, six rubrics, threshold 0.6",
+      "status": "Assumed",
+      "evidence": "No source prescribes a rubric's wording. Each rubric is framed on the MSCA-PF set's integrity question and on the Part B field requirements the RIA section_schema_registry records for the anchored sub-section. The threshold of 0.6 matches the MSCA-PF set, which is a convention, not a form rule."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The profile mechanism makes an option-tag grammar mandatory, and the RIA/IA form has no variants to tag.",
+      "detail": "harness/profile.py requires option_tag_grammar with a non-empty all_except_prefix, and harness/expectations.py requires every scorecard aspect to carry a non-empty option_tag. Both exist because the MSCA form annotates its aspects per fellowship variant. The RIA/IA form annotates none. The profile therefore declares a tag ('RIA and IA') and an exception prefix ('all HE RIA and IA except ') that record no annotation, and the tag's status is Inferred while the aspect texts around it are Confirmed. A field the loader treats as transcribed now carries a derivation.",
+      "disposition": "Not fixed. A degenerate single-type grammar satisfies the loader, so no Python change was needed, and the branch constraint holds the harness unmodified. Recorded because it is a Milestone 1 shape defect, not a property of this call.",
+      "recommended_fix": "Let a profile declare that its instrument has no variants, and make option_tag optional when it does. A candidate Milestone 2 ticket."
+    },
+    {
+      "id": "F2",
+      "summary": "weight_pct presumes a weighted scorecard; an RIA is unweighted.",
+      "detail": "parse_scoring requires a weight_pct number for every profile criterion. Nothing in the harness multiplies by it: Scoring.weights is parsed, reported and never used in arithmetic. For MSCA-PF the values are 50, 30 and 20, true percentages of a weighted total of 100. An RIA sums three unweighted 0-5 scores to 15. The value recorded is 1, the ranking multiplier, in a key named for a percentage.",
+      "disposition": "Not fixed. The rule has one home: scoring.weighting_note states that weight_pct carries the unweighted ranking multiplier and not a percentage, beside the form quote it rests on. A test asserts the value, the note, the page-2 quote, and that no criterion carries a per-criterion copy of the note.",
+      "recommended_fix": "Let a scorecard declare unweighted: true and omit per-criterion weights, or rename the key. A candidate Milestone 2 ticket."
+    },
+    {
+      "id": "F3",
+      "summary": "The rubric-grid baseline default path is one slot for two profiles.",
+      "detail": "DEFAULT_RUBRIC_BASELINE_PATH is harness/regression_baselines/rubric_grid.rubric.json, with no profile in the name, and it is the default of --out on the freeze command and --baseline on the check. Freezing an RIA grid at the default would overwrite an MSCA-PF one. The baseline record carries profile_id and profile_version, so a cross-profile comparison is detectable rather than silent, but the collision is one command away.",
+      "disposition": "Not fixed. Both commands take an explicit path, and no RIA grid is frozen by this ticket.",
+      "recommended_fix": "Derive the default from the profile id."
+    },
+    {
+      "id": "F4",
+      "summary": "Expectation keys are not namespaced by profile, so two profiles could key the same cell differently.",
+      "detail": "The MSCA-PF scorecard uses bare aspect ids (exc-obj, imp-dissemination). A second profile reusing those ids would produce blind-report cells that read identically while carrying different expectation text, disambiguated only by the report's profile pin.",
+      "disposition": "Avoided by convention, not by the mechanism. The RIA aspect ids are prefixed (ria-exc-objectives and so on), so a cell names its profile on its face. The MSCA-PF ids are left as they stand.",
+      "recommended_fix": "None required. Recorded so the next profile follows the prefix."
+    },
+    {
+      "id": "F5",
+      "summary": "The RIA anchors depend on Phase 8 writing the registry's 'B.' prefixed sub-section ids.",
+      "detail": "The rubrics anchor on B.1.1 to B.3.2, the ids section_schema_registry.json declares for RIA and that InstrumentProfile.drafting_sub_sections returns. A drafter that writes '1.1' instead would make every evidence pack raise, because build_evidence_pack fails closed on an anchor absent from the section.",
+      "disposition": "Left as the designed fail-closed behaviour. A mismatch raises on the first real candidate rather than grading a pack with no anchor bonus.",
+      "recommended_fix": "The next ticket, 'Candidate Part B and the blind baseline', confirms the written sub_section_id values against these anchors before assessing."
+    },
+    {
+      "id": "F6",
+      "summary": "The new test file is a second detector of finding F13 of the runner-phases report.",
+      "detail": "F13 records that a Phase 1 run destroys the MSCA-PF entry in the shared Tier 2A evaluator registry while its gate passes. tests/harness/test_ria_profile.py loads the MSCA-PF bundle from that registry, so the destruction now turns this file red as well as the MSCA-PF profile tests.",
+      "disposition": "Not a defect in this ticket's work. Recorded as a useful side effect."
+    },
+    {
+      "id": "F7",
+      "summary": "The acceptance criterion 'every field traces to the evaluation form or the General Annexes award criteria' cannot be met in full by any profile.",
+      "detail": "A rubric's wording, its evaluation steps, its selection terms and its pass threshold are authored. No source prescribes them, and the MSCA-PF profile is in the same position. Two scorecard fields are also Inferred rather than transcribed, for the reasons in F1 and F2. The criterion is therefore recorded as met in part with its scope stated, rather than ticked flat.",
+      "disposition": "Recorded, not worked around. Ticket 'Tier 1 and Tier 2A coverage check for an RIA' set the precedent in its decision D3: ticking a criterion and qualifying it elsewhere puts the ticket and the decision log in contradiction, so the qualification goes on the criterion line itself.",
+      "recommended_fix": "Reword the criterion in a later ticket to name the field classes it governs."
+    },
+    {
+      "id": "F8",
+      "summary": "One RIA sub-section is anchored by no rubric: B.2.3, the optional impact canvas.",
+      "detail": "The registry declares seven drafted RIA sub-sections and the six rubrics anchor six of them. B.2.3 is the 'Summary (OPTIONAL - Please remove this section if not used)' impact canvas. It restates the pathway and the measures already anchored at B.2.1 and B.2.2 rather than answering an aspect of its own, and anchoring an optional sub-section would make every Impact pack raise whenever a candidate omits it, because build_evidence_pack fails closed on an absent anchor.",
+      "disposition": "A recorded choice. The rubric set's framing states it, and a test pins that B.2.3 is the only unanchored drafted sub-section, that it is the only optional one, and that the framing note names it. Its prose is still selected on term match when the candidate carries it.",
+      "recommended_fix": "None required."
+    },
+    {
+      "id": "F9",
+      "summary": "Three test files now carry near-identical copies of the same candidate-building helpers.",
+      "detail": "tests/harness/test_profile.py, tests/harness/test_blind_assessment.py and tests/harness/test_ria_profile.py each define a _section builder, a scripted backend, a judge factory and a candidate-directory builder. tests/_tier_sources.py states the house rule for exactly this case: the shared helpers live in one module 'so a fix to the span sniffing or the digest basis reaches both'.",
+      "disposition": "Not fixed. Consolidating would edit two test files this ticket does not otherwise touch, and the duplication predates it. Raised by the standards review.",
+      "recommended_fix": "Move the four helpers into a tests/harness/_candidates.py and have all three files import them. A candidate Milestone 2 ticket."
+    },
+    {
+      "id": "F10",
+      "summary": "The transcription is verbatim up to whitespace, which the first draft of these records did not say.",
+      "detail": "The PDF breaks every aspect across two or more lines, and prints a double space in 'the  measures' (p.5) and 'may  be given' (p.2). Both sides of every comparison collapse runs of whitespace to one space, so the stored text differs from the PDF's byte sequence in whitespace alone. Calling that 'verbatim' without the qualification overstates it.",
+      "disposition": "Declared. The scorecard's provenance.transcription_basis now states the rule and names the two double spaces, and no character other than whitespace is altered, added or dropped.",
+      "recommended_fix": "None required."
+    }
+  ],
+  "status_summary": {
+    "Confirmed": 5,
+    "Inferred": 3,
+    "Assumed": 1,
+    "Unresolved": 0
+  },
+  "boundaries_respected": [
+    "No harness Python was changed. No runner module, gate, gate predicate or manifest was touched.",
+    "No Tier 1, Tier 2A or Tier 2B source document or extracted file was modified. The RIA registry entry is read, not edited.",
+    "No Tier 3 or Tier 5 artifact was written. The dry-run candidates live under tmp_path and are discarded.",
+    "No runner phase was dispatched.",
+    "No real organisation, person, place, address or project identifier appears in the new files; the agnosticism lint reports no project noun in any of the three data files."
+  ],
+  "verification": "tests/harness/test_ria_profile.py, 28 tests, all passing. tests/harness/, 707 passed, 25 skipped and 1 pre-existing failure. The full suite reports 29 failed, 5575 passed and 104 skipped. The same 29 were measured on the branch with this work stashed, and the two failure sets are identical name for name, so none is caused by this change.",
+  "recorded_in": "docs/tier4_orchestration_state/decision_log/ria-pre-evaluation-profile_2026-10-01.json"
+}

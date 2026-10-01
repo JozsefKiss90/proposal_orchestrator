@@ -315,6 +315,28 @@ carry `profile_id` and `profile_version`.
 no longer carries is recorded as absent (`present_in_registry=False`), not
 graded, and not an error: the scorecard is still reproduced.
 
+**Shipped profiles.** Two, each with its own scorecard and rubric set:
+
+| Profile | Instrument | Scorecard | Rubrics | Expectations |
+|---|---|---|---|---|
+| `profiles/msca_pf_default.json` | MSCA-PF | `evaluator_scorecard_msca_pf.json` v2.2 | `rubrics_msca_pf.json` | 9, one excluded |
+| `profiles/ria_default.json` | RIA | `evaluator_scorecard_ria.json` v4.0 | `rubrics_ria.json` | 6, none excluded |
+
+`DEFAULT_PROFILE_PATH` still points at the MSCA-PF one; the RIA profile is
+selected with `--profile harness/profiles/ria_default.json`.
+`tests/harness/test_ria_profile.py` re-reads the RIA aspect texts, criterion
+names, scoring levels, scale, thresholds and maximum from the stored
+`ef_he-ria-ia_en.pdf` and compares — verbatim up to whitespace collapsing, since
+the form breaks every aspect across lines. A drifted scorecard turns the suite
+red rather than redefining what is graded.
+
+Two scorecard fields the loader treats as transcribed are Inferred for an RIA,
+because the schema fits a multi-variant form better than a single-type one:
+`option_tag` (the form annotates no aspect) and `weight_pct` (an RIA is
+unweighted). Both are declared in the scorecard's `provenance` and
+`scoring.weighting_note`, and recorded as Milestone 1 defects F1 and F2 in
+`docs/tier4_orchestration_state/validation_reports/ria-pre-evaluation-profile_2026-10-01.json`.
+
 ## Blind assessment (`blind_assessment.py` + `commands/blind_assessment.py`)
 
 The blind pre-evaluation lane assesses one specified candidate against a
