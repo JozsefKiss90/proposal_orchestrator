@@ -136,6 +136,27 @@ def _run_unit_cost_budget_deriver(run_id: str, repo_root: Path) -> list[Path]:
     return [written] if written is not None else []
 
 
+def _run_budget_request_composer(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the lump-sum budget request composer (§8.2).
+
+    Composes the structured budget request the operator hands to the external
+    Lump Sum Budget Planner, from the call binding, the Phase 3 WP structure,
+    the Phase 4 Gantt, the Phase 6 implementation architecture and the Tier 3
+    consortium.  Every effort and cost field carries the
+    ``requires_external_computation`` sentinel: the composer computes no
+    figure (§8.1, §8.3).  Closed by byte-equal replay — the request carries no
+    wall-clock field and its ``request_id`` derives from the call, not the run.
+
+    The composer returns ``None`` (writing nothing) for a declared non-lump-sum
+    instrument — the internal unit-cost derivation owns that budget — so the
+    adapter records no outputs in that case.
+    """
+    from runner.budget_request import derive_budget_request
+
+    written = derive_budget_request(run_id, repo_root)
+    return [written] if written is not None else []
+
+
 def _run_canonical_pack_deriver(run_id: str, repo_root: Path) -> list[Path]:
     """Adapter for the Phase-8 canonical reference pack deriver (ticket 10).
 
@@ -298,7 +319,15 @@ def _run_dev_graph_revision_record_writer(run_id: str, repo_root: Path) -> list[
 #: closed by the byte-equal replay check ``assembler(drafts) == section_json``.
 #: The unit-cost budget deriver (§8.1 / C1) computes the MSCA-style budget
 #: deterministically from published rates, closed by
-#: ``unit_cost_budget(months, rates, host_coeff) == figure``.  The
+#: ``unit_cost_budget(months, rates, host_coeff) == figure``.  Its lump-sum
+#: counterpart, the budget request composer (§8.2), computes no figure at all:
+#: it composes the structured request the operator hands to the external
+#: planner, from the call binding, Phases 3, 4 and 6 and the Tier 3 consortium,
+#: with every effort and cost field left as a sentinel.  The two never both
+#: write, because both ask one shared guard
+#: (``runner.instrument_profile.owns_budget_regime``) rather than each testing
+#: the call binding themselves; an unresolvable regime is owned by neither and
+#: ``gate_09`` then blocks on the missing artifact.  The
 #: assumption-appliers (β honesty layer, ticket 9) flip enumerated declared
 #: ``unresolved → assumed`` claims in the section drafts pre-assembly, closed by
 #: idempotent byte-equal replay.  The canonical-pack deriver (ticket 10)
@@ -322,6 +351,7 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "impact_assumption_applier": _run_impact_assumption_applier,
     "implementation_assumption_applier": _run_implementation_assumption_applier,
     "unit_cost_budget_deriver": _run_unit_cost_budget_deriver,
+    "budget_request_composer": _run_budget_request_composer,
     "canonical_pack_deriver": _run_canonical_pack_deriver,
     "checkpoint_publisher": _run_checkpoint_publisher,
     "final_export_writer": _run_final_export_writer,

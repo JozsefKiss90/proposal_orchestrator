@@ -298,3 +298,65 @@ def resolve_instrument_profile(
         budget_regime=budget_regime,
         phases_in_scope=list(phases_in_scope),
     )
+
+
+# ---------------------------------------------------------------------------
+# The budget-regime guard the two Phase-7 budget components share
+# ---------------------------------------------------------------------------
+
+
+def resolve_budget_regime(repo_root: Path) -> Optional[str]:
+    """The selected call's budget regime, or ``None`` when it does not resolve.
+
+    Two sources, in order. The Tier 3 call binding's own ``budget_regime``
+    field wins when it names a member of :data:`VALID_BUDGET_REGIMES`; a
+    project that has decided its regime has said so there, and the demo's
+    BIODIV-01 binding traces that field to a named work programme page.
+    Otherwise the Tier 2A instrument registry decides, through
+    :func:`resolve_instrument_profile`, which is the source ``gate_09``'s own
+    ``applies_when`` filter uses.
+
+    Returns ``None`` when neither source resolves — an unknown instrument, an
+    absent registry, a value outside the valid set. The caller then runs
+    nothing, which is the fail-closed answer: the gate's resolution fails
+    closed on the same state (§12.4), so ``gate_09`` blocks rather than
+    passing on a budget nobody owned.
+    """
+    try:
+        data = _read_json(repo_root / SELECTED_CALL_REL, "selected_call.json")
+    except InstrumentProfileError:
+        return None
+    if isinstance(data, dict):
+        declared = data.get("budget_regime")
+        if isinstance(declared, str) and declared in VALID_BUDGET_REGIMES:
+            return declared
+    try:
+        return resolve_instrument_profile(repo_root).budget_regime
+    except InstrumentProfileError:
+        return None
+
+
+def owns_budget_regime(repo_root: Path, regime: str) -> bool:
+    """Whether the budget component for *regime* owns this call's budget.
+
+    The guard the two Phase-7 budget components share, so that *exactly one*
+    of them writes on any given call — the lump-sum request composer or the
+    unit-cost deriver, never both and never neither-by-accident. Hand-rolled
+    guards cannot keep that property: two independent ``!=`` tests both pass
+    when the regime is absent, and both components write.
+
+    An unresolvable regime returns ``False`` for every *regime*, so no
+    component writes and ``gate_09`` blocks on the missing artifact.
+
+    Raises
+    ------
+    ValueError
+        *regime* is not a member of :data:`VALID_BUDGET_REGIMES`. A caller
+        asking about a regime that does not exist is a programming error, not
+        a call-binding state.
+    """
+    if regime not in VALID_BUDGET_REGIMES:
+        raise ValueError(
+            f"regime must be one of {sorted(VALID_BUDGET_REGIMES)}, got {regime!r}"
+        )
+    return resolve_budget_regime(repo_root) == regime

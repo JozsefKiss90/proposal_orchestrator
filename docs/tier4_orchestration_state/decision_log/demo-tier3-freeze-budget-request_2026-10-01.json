@@ -1,0 +1,55 @@
+{
+  "record_type": "decision",
+  "id": "demo-tier3-freeze-budget-request",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "supersedes": [
+    "docs/tier4_orchestration_state/decision_log/demo-tier3-freeze-sources-index-refreeze_2026-10-01.json"
+  ],
+  "supersedes_scope": "The freeze_record of the prior refreeze only, which itself superseded the phase-written-artifacts entry's. Everything else either entry records stands unchanged and is not restated here.",
+  "milestone": "Dev Graph demo (instance two), ticket 'Budget request and the Phase 7 gate' in plans/dev_graph_demo_tickets.md",
+  "authority": "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule, and the superseded record's own unfreezing clause, which requires a new decision log entry rather than an edit in place. Applies CLAUDE.md §9.1 (docs/ is the durable record, so a decision record is superseded and not overwritten), §9.4 (a decision that affects future interpretation is written to Tier 4) and §7 Phase 7 (the budget request is prepared under §8.2 within Phase 7). Not a constitutional amendment; §14.5 is not engaged, and no artifact is unfrozen.",
+  "decision": "docs/tier3_project_instantiation/integration/budget_request.json is named not frozen. It is a Tier 3 artifact written by a runner phase, which the superseded record's own scope clause already exempts by rule; this entry applies that rule to the first such artifact outside the call binding. No fingerprint changes: all ten frozen artifacts were re-derived from disk and match what the superseded record holds. The entry widens the freeze's coverage of Tier 3; it does not loosen its grip, and it unfreezes nothing.",
+  "freeze_record": {
+    "rule": "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule. Once instantiation is complete the founding documents are immutable for the run.",
+    "frozen_on": "2026-09-30",
+    "scope": "Steps ④ to ⑥ of the instantiation sequence, plus the call binding of step ①. Step ③, the project brief, was frozen by docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json and is deliberately not re-fingerprinted here. Step ⑦, the uncertainty ledger, is exempt. Tier 3 artifacts written by a runner phase are named in not_frozen: the workflow owns them and the phase gate governs them.",
+    "digest_basis": "sha256 over LF-normalised bytes, because core.autocrlf is true in this repository and a raw digest would identify the platform rather than the content.",
+    "artifacts": {
+      "docs/tier3_project_instantiation/architecture_inputs/objectives.json": "f53af8487fa3ad17678480f8db5421046a27f4d5089bbe22571783e29b153465",
+      "docs/tier3_project_instantiation/architecture_inputs/outcomes.json": "c1edc44e9e9945e8c1c32c6154a68da80ccb89d85ef7402761253af09b5cc9df",
+      "docs/tier3_project_instantiation/architecture_inputs/impacts.json": "f165033f26b6f801b719557bcb19dbcd1ff1a9e45e58bd340bc3bddb2c0944bc",
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json": "90e30660887936b9a64de2c8d4d05b81e1ac304474549dea7adf856099bd562a",
+      "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json": "030583498e779cc117bbad81bc3de0ec869a3e6a444ef6e7662e3cc49f4c7609",
+      "docs/tier3_project_instantiation/architecture_inputs/risks.json": "ecb0eddbcfea4cd8891cb926c0b99b3a1329af3b55db97c6eb666fa57fba2dfe",
+      "docs/tier3_project_instantiation/consortium/partners.json": "bf765f1275f42ca8f6f75c2a7facbf38757a1629714210d8d0840cc70704a788",
+      "docs/tier3_project_instantiation/consortium/roles.json": "33dcd630340738bdc02af9918fb2d107edf9414e5211b71b48870dfe7706b3c5",
+      "docs/tier3_project_instantiation/call_binding/selected_call.json": "1b311863bceeac64e18c701f524ef755c87912d45bcc6b81c7900c6d1e8c0dc0",
+      "docs/tier3_project_instantiation/source_materials/sources.json": "7b9acecbb0d05b38df2f0920ae894c49a8f1c6fb5ec4bcb16e4bd9be62bcb452"
+    },
+    "not_frozen": {
+      "docs/tier3_project_instantiation/working_assumptions.json": "The uncertainty ledger. The operator manual exempts it by name: it is the one input the operator keeps touching, and later tickets append to it as facts are confirmed or new gaps open.",
+      "docs/tier3_project_instantiation/call_binding/topic_mapping.json": "Written by the runner at Phase 2, which §7 lists it as a required output of. A Phase 2 rerun rewrites it, so a fingerprint here would freeze an artifact the workflow owns and would break on the next legitimate rerun. Its content is governed by the Phase 2 gate, not by the freeze.",
+      "docs/tier3_project_instantiation/call_binding/compliance_profile.json": "Written by the runner at Phase 2 and read by Phase 6 as a required input, per §7. Outside the freeze for the same reason as the topic mapping: the workflow owns it, and the Phase 2 gate governs it.",
+      "docs/tier3_project_instantiation/integration/budget_request.json": "Composed by the budget_request_composer deterministic component, which the manifest binds to the n07_budget_gate node body. The workflow owns the artifact and gate_09 governs it, so it is outside the freeze for the same reason as the two Phase 2 call-binding artifacts: an n07 dispatch recomposes it, and a fingerprint here would freeze an artifact a legitimate rerun rewrites. What replaces the fingerprint is the component's determinism: recomposition is byte-equal for the same inputs, checked by tests/runner/test_budget_request.py TestDeterminism and on the real records by tests/test_demo_phase7_budget_gate.py. Provenance of the instance now on disk, stated plainly because the validation report records that Phase 7 was not dispatched: it was produced by invoking the component directly against the repository root, not by an n07 dispatch. A dispatch rewrites it byte-equal apart from run_id, which is the one field that carries the run."
+    },
+    "covered_elsewhere": {
+      "docs/tier3_project_instantiation/project_brief/concept_note.md": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+      "docs/tier3_project_instantiation/project_brief/project_summary.json": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json",
+      "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "docs/tier4_orchestration_state/decision_log/demo-concept_2026-09-30.json"
+    },
+    "unfreezing": "An operator decision, recorded as a new decision log entry that supersedes this one and carries the new fingerprints. A ticket may not unfreeze on its own judgement (CLAUDE.md §9.1)."
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "The budget request is exempt from the freeze rather than fingerprinted, on the phase-written rule, not on a new ground.",
+      "reasoning": "The freeze protects founding documents an operator authored and the run must not drift from. This artifact is neither. It is composed inside the n07 node body from the call binding, Phases 3, 4 and 6 and the consortium, and an n07 dispatch recomposes it, so a fingerprint would break on the next legitimate rerun — precisely the reason the superseded record gave for exempting topic_mapping.json and compliance_profile.json. What replaces the fingerprint is stronger here than there: the composer is a deterministic component closed by byte-equal replay, so the content is pinned by its inputs rather than by a recorded digest. The not_frozen reason states how the instance on disk was actually produced, because the artifact is exempt on what the component is bound to do, not on a dispatch that has not happened.",
+      "recorded_in": "This freeze_record not_frozen entry; tests/test_demo_architecture_seeds.py TestTheFreeze::test_every_tier3_artifact_is_fingerprinted_or_exempt."
+    }
+  ],
+  "findings": [],
+  "what_this_decision_does_not_settle": "Whether a future Tier 3 integration artifact that is not phase-written belongs in the freeze. The exemption is written per path, with its reason, so a hand-placed integration artifact would fail the coverage test and come back for a decision rather than inheriting this one.",
+  "authored_by": "Ticket 'Budget request and the Phase 7 gate', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-10-01. Required because composing the budget request added the first Tier 3 artifact no freeze record covered, which the coverage test caught.",
+  "note": "Read the freeze through the supersedes chain, never by filename. This entry is the live freeze for the ten fingerprinted artifacts."
+}

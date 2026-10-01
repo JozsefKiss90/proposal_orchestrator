@@ -302,7 +302,29 @@ class TestPseudonymityOfPartnerRecords:
         assert "working_assumptions.json" in joined
         assert "project_brief" in joined
         assert "architecture_inputs" in joined
+        assert "integration" in joined
         assert len(iter_pseudonymity_files(REPO)) >= 3
+
+    def test_a_country_in_the_budget_request_is_caught(self, tmp_path: Path) -> None:
+        """The budget request leaves the repository for an external system.
+
+        It restates the consortium for the planner, so it can carry a real
+        country exactly as the partner registry can — and it is the one Tier 3
+        artifact that is handed to a third party.
+        """
+        target = tmp_path / "docs/tier3_project_instantiation/integration"
+        target.mkdir(parents=True)
+        (target / "budget_request.json").write_text(
+            json.dumps(
+                {"partners": [{"partner_id": "P01", "country": "Portugal"}]}
+            ),
+            encoding="utf-8",
+        )
+        violations = scan_partner_records(tmp_path, rules_root=REPO)
+        assert [v.noun for v in violations] == ["Portugal"]
+        assert violations[0].path.startswith(
+            "docs/tier3_project_instantiation/integration/budget_request.json"
+        )
 
     def test_a_country_in_roles_json_is_caught(self, tmp_path: Path) -> None:
         target = tmp_path / "docs/tier3_project_instantiation/consortium"

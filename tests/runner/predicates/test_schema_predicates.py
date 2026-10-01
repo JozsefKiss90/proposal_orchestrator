@@ -331,6 +331,165 @@ class TestInterfaceContractConforms:
 
 
 # ---------------------------------------------------------------------------
+# §interface_contract_conforms — planner contract document mode (CLAUDE.md §8.5)
+# ---------------------------------------------------------------------------
+
+
+_PLANNER_CONTRACT = {
+    "contract_version": "1.0",
+    "protocol": "lump_sum_budget_planner_v1",
+    "response_schema": {
+        "required_fields": [
+            "response_id",
+            "schema_version",
+            "work_packages",
+            "partners",
+        ],
+        "work_package_entry": {"required_fields": ["wp_id", "lump_sum"]},
+        "partner_entry": {"required_fields": ["partner_id", "total_effort_pm"]},
+    },
+    "validation_rules": {"no_negative_values": "All values must be non-negative"},
+}
+
+
+def _conforming_response() -> dict:
+    return {
+        "response_id": "resp-1",
+        "schema_version": "1.0",
+        "work_packages": [{"wp_id": "WP1", "lump_sum": 100.0}],
+        "partners": [{"partner_id": "P01", "total_effort_pm": 12.0}],
+    }
+
+
+class TestInterfaceContractConformsPlannerDocument:
+    """A contract document is interpreted, not read as a JSON Schema.
+
+    The repository's ``interface_contract.json`` carries ``response_schema``
+    blocks rather than JSON-Schema keywords.  Validated as a JSON Schema it
+    accepts every payload, so §8.5 ("responses that do not conform must be
+    rejected and flagged") was unenforced on the only predicate that checks it.
+    """
+
+    def test_pass_conforming_response(self, tmp_path):
+        response_dir = tmp_path / "received"
+        response_dir.mkdir()
+        _write(response_dir, "r.json", _conforming_response())
+        contract = _write(tmp_path, "contract.json", _PLANNER_CONTRACT)
+        result = interface_contract_conforms(response_dir, contract)
+        assert result.passed
+        assert result.details["contract_mode"] == "planner_contract_document"
+        assert result.details["json_files_validated"] == 1
+
+    def test_fail_missing_required_response_field(self, tmp_path):
+        response_dir = tmp_path / "received"
+        response_dir.mkdir()
+        payload = _conforming_response()
+        del payload["schema_version"]
+        _write(response_dir, "r.json", payload)
+        contract = _write(tmp_path, "contract.json", _PLANNER_CONTRACT)
+        result = interface_contract_conforms(response_dir, contract)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+        assert result.details["violations"][0]["field"] == "schema_version"
+
+    def test_fail_missing_work_package_entry_field(self, tmp_path):
+        response_dir = tmp_path / "received"
+        response_dir.mkdir()
+        payload = _conforming_response()
+        payload["work_packages"] = [{"wp_id": "WP1"}]
+        _write(response_dir, "r.json", payload)
+        contract = _write(tmp_path, "contract.json", _PLANNER_CONTRACT)
+        result = interface_contract_conforms(response_dir, contract)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+
+    def test_fail_negative_budget_value(self, tmp_path):
+        response_dir = tmp_path / "received"
+        response_dir.mkdir()
+        payload = _conforming_response()
+        payload["work_packages"] = [{"wp_id": "WP1", "lump_sum": -5}]
+        _write(response_dir, "r.json", payload)
+        contract = _write(tmp_path, "contract.json", _PLANNER_CONTRACT)
+        result = interface_contract_conforms(response_dir, contract)
+        assert not result.passed
+        assert (
+            result.details["violations"][0]["requirement"]
+            == "validation_rules.no_negative_values"
+        )
+
+    def test_fail_every_non_conforming_file_is_named(self, tmp_path):
+        response_dir = tmp_path / "received"
+        response_dir.mkdir()
+        _write(response_dir, "a.json", {"response_id": "a"})
+        _write(response_dir, "b.json", _conforming_response())
+        _write(response_dir, "c.json", {"partners": "not-a-list"})
+        contract = _write(tmp_path, "contract.json", _PLANNER_CONTRACT)
+        result = interface_contract_conforms(response_dir, contract)
+        assert not result.passed
+        offenders = {v["file"] for v in result.details["violations"]}
+        assert any(name.endswith("a.json") for name in offenders)
+        assert any(name.endswith("c.json") for name in offenders)
+        assert not any(name.endswith("b.json") for name in offenders)
+
+    def test_fail_contract_has_no_response_block(self, tmp_path):
+        """A request-only contract cannot state the response rule."""
+        response_dir = tmp_path / "received"
+        response_dir.mkdir()
+        _write(response_dir, "r.json", _conforming_response())
+        contract = _write(
+            tmp_path,
+            "contract.json",
+            {"request_schema": {"required_fields": ["request_id"]}},
+        )
+        result = interface_contract_conforms(response_dir, contract)
+        assert not result.passed
+        assert result.failure_category == MALFORMED_ARTIFACT
+
+    def test_a_hybrid_contract_gets_both_readings(self, tmp_path):
+        """Both halves apply, so neither can be silently dropped."""
+        contract_data = dict(_PLANNER_CONTRACT)
+        contract_data["type"] = "object"
+        contract_data["required"] = ["settlement_id"]
+        contract = _write(tmp_path, "contract.json", contract_data)
+
+        response_dir = tmp_path / "received"
+        response_dir.mkdir()
+        # Conforms to the contract document, violates the schema half.
+        _write(response_dir, "r.json", _conforming_response())
+        result = interface_contract_conforms(response_dir, contract)
+        assert not result.passed
+        assert result.details["contract_mode"] == (
+            "planner_contract_document+json_schema"
+        )
+
+        # Satisfies the schema half, violates the contract-document half.
+        other = tmp_path / "received2"
+        other.mkdir()
+        _write(other, "r.json", {"settlement_id": "s-1"})
+        assert not interface_contract_conforms(other, contract).passed
+
+        # Satisfies both.
+        both = tmp_path / "received3"
+        both.mkdir()
+        payload = _conforming_response()
+        payload["settlement_id"] = "s-1"
+        _write(both, "r.json", payload)
+        assert interface_contract_conforms(both, contract).passed
+
+    def test_repository_contract_rejects_a_bare_response(self, tmp_path):
+        """The real shipped contract, against a payload a JSON Schema accepted."""
+        contract_path = Path(
+            "docs/integrations/lump_sum_budget_planner/interface_contract.json"
+        )
+        response_dir = tmp_path / "received"
+        response_dir.mkdir()
+        _write(response_dir, "r.json", {"anything": [1, 2, 3]})
+        result = interface_contract_conforms(response_dir, contract_path)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+
+
+# ---------------------------------------------------------------------------
 # §risk_register_populated
 # ---------------------------------------------------------------------------
 

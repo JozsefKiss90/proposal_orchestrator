@@ -88,6 +88,11 @@ from typing import List, Optional, Union
 import jsonschema
 import jsonschema.exceptions
 
+from runner.interface_contract import (
+    carries_json_schema_keywords,
+    is_planner_contract,
+    validate_payload,
+)
 from runner.paths import resolve_repo_path
 from runner.predicates.types import (
     MALFORMED_ARTIFACT,
@@ -513,15 +518,15 @@ def interface_contract_conforms(
 ) -> PredicateResult:
     """
     Pass iff all .json files in *response_path* (direct children) conform
-    to the JSON schema defined in *contract_path*.
+    to the contract at *contract_path*.
 
     Contract (gate_rules_library_plan.md §4.2)
     -------------------------------------------
     Pass condition:
         * response_path exists and is a directory
-        * contract_path exists and is a valid JSON schema object
+        * contract_path exists and parses as a JSON object
         * every .json file in response_path (direct children) is valid JSON
-          and conforms to the schema
+          and conforms to the contract
 
     No JSON files
     -------------
@@ -530,12 +535,22 @@ def interface_contract_conforms(
     in the gate sequence.  This predicate's responsibility is structure
     validation only.  This behaviour is explicit and tested.
 
-    JSON Schema validation
-    ----------------------
-    Uses ``jsonschema`` 4.x.  An empty contract ``{}`` is a valid JSON
-    Schema that accepts any JSON value, so the current placeholder contract
-    will not block.  When the contract is populated, this predicate will
-    enforce the schema.
+    Two readings of the contract
+    ----------------------------
+    A **planner contract document** — one carrying a ``request_schema`` or
+    ``response_schema`` block, which is what
+    ``docs/integrations/lump_sum_budget_planner/interface_contract.json`` is —
+    is interpreted by :mod:`runner.interface_contract` in the ``response``
+    role: required fields, the per-entry shapes for ``work_packages`` and
+    ``partners``, and ``validation_rules.no_negative_values``.  A contract of
+    any other shape is validated as a JSON Schema with ``jsonschema`` 4.x.
+
+    The branch exists because that document has no JSON-Schema keyword at its
+    root.  Read as a schema it accepts every payload, so CLAUDE.md §8.5 —
+    "responses that do not conform to the interface contract must be rejected
+    and flagged, not silently accepted" — was nominally checked by ``g08_p04``
+    and in fact unenforced.  An empty contract ``{}`` remains a valid JSON
+    Schema that accepts any JSON value.
 
     Failure categories
     ------------------
@@ -543,11 +558,12 @@ def interface_contract_conforms(
         response_path does not exist or is not a directory; contract_path
         does not exist.
     ``MALFORMED_ARTIFACT``
-        contract_path contains invalid JSON; or a response file contains
-        invalid JSON.
+        contract_path contains invalid JSON; a response file contains invalid
+        JSON; or the contract document carries no ``response_schema`` block
+        and so cannot state the rule it is being asked to apply.
     ``POLICY_VIOLATION``
-        A response file is valid JSON but fails schema validation against
-        the contract.
+        A response file is valid JSON but fails validation against the
+        contract.
 
     Parameters
     ----------
@@ -635,6 +651,27 @@ def interface_contract_conforms(
             },
         )
 
+    # Which reading of the contract applies.  A *planner contract document*
+    # (one carrying a ``<role>_schema`` block) is interpreted on its own terms
+    # by runner.interface_contract; anything else is read as a JSON Schema.
+    # Without this branch the repository's own contract — which has no
+    # JSON-Schema keyword at its root — accepts every payload, and §8.5
+    # ("responses that do not conform must be rejected and flagged, not
+    # silently accepted") is nominally checked and actually unenforced.
+    planner_mode = is_planner_contract(contract_schema)
+    # A hybrid contract — a ``<role>_schema`` block *and* JSON-Schema keywords
+    # at the root — gets both readings.  Running only the contract-document
+    # half would silently drop whatever the schema half constrains.
+    schema_mode = (not planner_mode) or carries_json_schema_keywords(
+        contract_schema
+    )
+    if planner_mode and schema_mode:
+        contract_mode = "planner_contract_document+json_schema"
+    elif planner_mode:
+        contract_mode = "planner_contract_document"
+    else:
+        contract_mode = "json_schema"
+
     violations: list[dict] = []
     for json_file in json_files:
         try:
@@ -654,6 +691,40 @@ def interface_contract_conforms(
                     "error": str(exc),
                 },
             )
+
+        if planner_mode:
+            try:
+                contract_violations = validate_payload(
+                    content, contract_schema, role="response"
+                )
+            except ValueError as exc:
+                # The contract cannot state the response rule (no
+                # ``response_schema`` block).  Fail closed: a contract that
+                # cannot be applied must not be read as passing everything.
+                return PredicateResult(
+                    passed=False,
+                    failure_category=MALFORMED_ARTIFACT,
+                    reason=(
+                        f"Contract at {resolved_contract} cannot validate a "
+                        f"budget response: {exc}"
+                    ),
+                    details={
+                        "contract_path": str(resolved_contract),
+                        "contract_mode": contract_mode,
+                        "contract_error": str(exc),
+                    },
+                )
+            violations.extend(
+                {
+                    "file": str(json_file),
+                    "field": violation.field,
+                    "requirement": violation.requirement,
+                    "message": violation.detail,
+                }
+                for violation in contract_violations
+            )
+            if not schema_mode:
+                continue
 
         try:
             jsonschema.validate(instance=content, schema=contract_schema)
@@ -680,16 +751,20 @@ def interface_contract_conforms(
             )
 
     if violations:
+        offending_files = sorted({str(v["file"]) for v in violations})
         return PredicateResult(
             passed=False,
             failure_category=POLICY_VIOLATION,
             reason=(
-                f"{len(violations)} response file(s) in {resolved_response} "
-                f"do not conform to the interface contract at {resolved_contract}."
+                f"{len(offending_files)} response file(s) in {resolved_response} "
+                f"do not conform to the interface contract at {resolved_contract} "
+                f"({len(violations)} violation(s))."
             ),
             details={
                 "path": str(resolved_response),
                 "contract_path": str(resolved_contract),
+                "contract_mode": contract_mode,
+                "non_conforming_files": offending_files,
                 "violations": violations,
             },
         )
@@ -699,6 +774,7 @@ def interface_contract_conforms(
         details={
             "path": str(resolved_response),
             "contract_path": str(resolved_contract),
+            "contract_mode": contract_mode,
             "json_files_validated": len(json_files),
         },
     )

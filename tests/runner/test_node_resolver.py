@@ -284,13 +284,17 @@ class TestDeterministicComponentResolution:
             "n04_gantt_milestones"
         ) == ["dependency_normalizer"]
 
-    def test_n07_binds_unit_cost_budget_deriver(
+    def test_n07_binds_one_composer_per_budget_regime(
         self, resolver: NodeResolver
     ) -> None:
-        # C1 (ticket 8): the unit-cost budget deriver runs in the n07 node body.
-        assert resolver.resolve_deterministic_components(
-            "n07_budget_gate"
-        ) == ["unit_cost_budget_deriver"]
+        # C1 (ticket 8) bound the unit-cost budget deriver to the n07 node
+        # body; the lump-sum budget request composer (§8.2) joins it. Each
+        # guards on the selected call's declared budget_regime, so exactly one
+        # of the two writes on any given call.
+        assert resolver.resolve_deterministic_components("n07_budget_gate") == [
+            "unit_cost_budget_deriver",
+            "budget_request_composer",
+        ]
 
     def test_n08f_binds_export_writer_then_checkpoint_publisher(
         self, resolver: NodeResolver

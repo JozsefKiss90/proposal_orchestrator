@@ -61,6 +61,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from runner.atomic_write import atomic_write_json
+from runner.instrument_profile import owns_budget_regime, resolve_budget_regime
 from runner.working_assumptions import (
     WORKING_ASSUMPTIONS_REL,
     WorkingAssumptions,
@@ -460,13 +461,17 @@ def derive_unit_cost_budget(run_id: str, repo_root: Path) -> Optional[Path]:
     if not isinstance(call_data, dict):
         raise UnitCostBudgetError("selected_call.json root is not an object")
 
-    # Instrument guard: skip cleanly for non-unit-cost instruments.
-    regime = call_data.get("budget_regime")
-    if regime is not None and regime != "unit_cost":
+    # Instrument guard: skip cleanly for non-unit-cost instruments.  Shared
+    # with the lump-sum request composer (runner/budget_request.py) so that
+    # exactly one of the two writes on any given call.  Two hand-rolled ``!=``
+    # guards could not hold that property: both passed when the regime was
+    # absent, and both components wrote.
+    if not owns_budget_regime(repo_root, "unit_cost"):
         logger.info(
-            "unit_cost_budget_deriver skipped: budget_regime=%r is not "
-            "unit_cost (the lump-sum branch owns this instrument's budget)",
-            regime,
+            "unit_cost_budget_deriver skipped: this call's budget regime is "
+            "%r, not unit_cost (None means unresolvable, and no budget "
+            "component writes — gate_09 then blocks on the missing artifact)",
+            resolve_budget_regime(repo_root),
         )
         return None
 

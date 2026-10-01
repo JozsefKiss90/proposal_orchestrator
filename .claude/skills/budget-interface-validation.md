@@ -57,6 +57,8 @@ This skill has two invocation modes, determined by the agent context parameter `
 
 The invoking agent must provide `invocation_mode` as a context parameter. If absent or invalid: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="invocation_mode required; must be 'request_validation' or 'response_validation'") and halt.
 
+**Mode A is not reached in the n07 node body.** `runner/agent_runtime.py` injects `invocation_mode: "response_validation"` for every invocation of this skill under `n07_budget_gate`, so only Mode B runs there. Request conformance moved to the `budget_request_composer` deterministic component (`runner/budget_request.py`), which validates the composed request against the interface contract **before** writing it and refuses to write a non-conforming one (CLAUDE.md §8.5). Mode A is retained as the specification of request-side validation; it is not the active path.
+
 ---
 
 ### Mode A — Request Validation

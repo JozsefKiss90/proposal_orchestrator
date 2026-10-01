@@ -30,15 +30,24 @@ exit_gate: null
 
 Phase 7 pre-gate action agent. Declared as `pre_gate_agent: budget_interface_coordinator` under `n07_budget_gate` in `manifest.compile.yaml`. Executes before `budget_gate_validator` evaluates `gate_09_budget_consistency`.
 
-Reads WP structure and Gantt outputs to prepare a structured budget request payload conforming to the interface contract at `docs/integrations/lump_sum_budget_planner/interface_contract.json`. Writes the request to `docs/tier3_project_instantiation/integration/budget_request.json` for human handoff to the external Lump Sum Budget Planner.
+This agent **does not declare the budget gate passed** and **does not compute budget figures**.
 
-This agent **does not declare the budget gate passed** and **does not compute budget figures**. Its sole purpose is request preparation.
+## Request composition is deterministic — SUPERSEDED here
+
+`budget_request.json` is **no longer composed by this agent**. It is written by the `budget_request_composer` deterministic component (`runner/budget_request.py`), bound to `n07_budget_gate` under `deterministic_components` in `manifest.compile.yaml` (CLAUDE.md §17.5.3 / C2, §16.5 / C3).
+
+Composing the request is a transform, not a judgment. Every field is copied from a named upstream artifact — the call binding, the Phase 3 WP structure, the Phase 4 Gantt, the Phase 6 implementation architecture, the Tier 3 consortium — or is the constant `requires_external_computation` sentinel. A deterministic component closed by byte-equal replay is therefore the right layer, and it removes the one route by which a Claude invocation could have written a figure into a budget request.
+
+Two consequences for this specification:
+
+- The `budget-interface-validation` binding below describes **Mode A** (request validation). The agent runtime injects `invocation_mode: "response_validation"` for every invocation of that skill in this node body (`runner/agent_runtime.py`), so Mode A does not run here. Request conformance is checked by the component itself, before the write: a non-conforming request raises and nothing is written (§8.5).
+- This agent's remaining Phase 7 role is the decision-log leg: recording interface-contract interpretation decisions and gaps that the component's fail-closed behaviour surfaces.
 
 ## Canonical Output
 
-`docs/tier3_project_instantiation/integration/budget_request.json`
+`docs/tier3_project_instantiation/integration/budget_request.json` — written by the `budget_request_composer` component, not by this agent.
 
-This artifact is listed in `manifest.compile.yaml` artifact registry (`a_t3_budget_request`) with a note: "Produced by budget_interface_coordinator pre-gate action; not a gate condition."
+This artifact is listed in `manifest.compile.yaml` artifact registry (`a_t3_budget_request`) and is **not a gate condition**.
 
 ## No Exit Gate
 

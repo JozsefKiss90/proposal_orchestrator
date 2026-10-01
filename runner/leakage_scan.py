@@ -260,6 +260,10 @@ PSEUDONYMITY_JSON_GLOBS: tuple[str, ...] = (
     "docs/tier3_project_instantiation/project_brief/*.json",
     "docs/tier3_project_instantiation/architecture_inputs/*.json",
     "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
+    # The budget request restates the consortium for the external Lump Sum
+    # Budget Planner. It is the one Tier 3 artifact handed to a third party,
+    # so a real country name in it leaves the repository.
+    "docs/tier3_project_instantiation/integration/*.json",
 )
 
 #: Tier 3 *prose* the pseudonymity check reads, as repo-relative globs. The

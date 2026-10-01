@@ -279,10 +279,10 @@ here. Every exclusion count is now derived into the run summary and read back by
 
 **Blocked by:** Architecture seeds and the uncertainty ledger; Tier 1 and Tier 2A coverage check for an RIA.
 
-- [ ] Phases 1–6 each reach released, or the blocking gate and reason are recorded in Tier 4.
-- [ ] Tier 2B `extracted/` holds the six files for this topic, traceable to the Part 9 source.
-- [ ] Run manifests with reuse decisions are preserved for every run.
-- [ ] Run cost and duration per phase are recorded.
+- [x] Phases 1–6 each reach released, or the blocking gate and reason are recorded in Tier 4.
+- [x] Tier 2B `extracted/` holds the six files for this topic, traceable to the Part 9 source.
+- [x] Run manifests with reuse decisions are preserved for every run.
+- [x] Run cost and duration per phase are recorded.
 
 ## Budget request and the Phase 7 gate
 
@@ -290,9 +290,20 @@ here. Every exclusion count is now derived into the run summary and read back by
 
 **Blocked by:** Runner Phases 1 to 6 on the demo; Tier 2B intake for the selected topic.
 
-- [ ] The budget request conforms to `interface_contract.json` and names pseudonymous partners only.
-- [ ] A received response is validated, or the missing response is recorded as a blocking gate failure.
-- [ ] Phase 7 reaches released, or its hard block on Phase 8 is shown intact.
+- [x] The budget request conforms to `interface_contract.json` and names pseudonymous partners only.
+- [x] A received response is validated, or the missing response is recorded as a blocking gate failure.
+- [x] Phase 7 reaches released, or its hard block on Phase 8 is shown intact.
+
+**Outcome.** The request is composed and conforms: 7 work packages, 12 pseudonymous partners, and 38
+effort and cost fields left to the planner as a non-numeric sentinel. No euro amount appears in it, the
+call's own indicative figures included. The operator has not run the planner, so criteria 2 and 3 are met
+on their second branch. `received/` is empty, which is `g08_p02`, and the hard block on Phase 8 is intact.
+Phase 7 is not dispatched and no gate result is written.
+
+**Nothing in the repository validated a budget request or a budget response.** `g08_p04` read the
+interface contract as a JSON Schema. That document has no JSON-Schema keyword at its root, so the
+predicate accepted every payload. Ten findings and nine decisions, three of them from the code review,
+are in `demo-budget-request-phase7_2026-10-01.json`.
 
 ## RIA pre-evaluation profile in the harness
 

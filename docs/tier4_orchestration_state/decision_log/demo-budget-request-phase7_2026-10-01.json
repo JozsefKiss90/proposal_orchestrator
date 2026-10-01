@@ -1,0 +1,90 @@
+{
+  "record_type": "decision",
+  "id": "demo-budget-request-phase7",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Budget request and the Phase 7 gate' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §8.1 (the repository computes no lump-sum figure), §8.2 (it may prepare structured budget requests), §8.3 (no agent invents, substitutes or approximates a figure), §8.4 and §13.4 (the categorical Phase 8 block), §8.5 (the interface contract governs, and a non-conforming response is rejected and flagged), §17.5.3 and §16.5 (deterministic components and their manifest binding), §17.1.4 and §17.6.3 (gate evaluation and gate results belong to the scheduler and the gate evaluator), §12.1 to §12.4 and §15 (explicit failure over fabricated completion). Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "BIODIV-01 is a lump-sum RIA, so Phase 7 routes through the external Lump Sum Budget Planner. The repository now composes the budget request deterministically and validates it against the interface contract before writing it. The request is written, conforms, covers all seven work packages and all twelve pseudonymous partners, and carries no budget figure. The operator has not run the planner, so no response exists: gate_09's own blocking condition is recorded in this ticket's validation report, Phase 7 is not released, and the hard block on Phase 8 is shown intact. Criterion 1 is met; criteria 2 and 3 are met on their second branch, which is the branch the ticket wrote for its human step. Building it exposed that nothing in the repository validated a budget request or a budget response: the only predicate that claimed to read the interface contract read it as a JSON Schema, and that document has no JSON-Schema keyword at its root, so it accepted every payload. Ten findings are recorded, seven from the work and three from its code review; seven are fixed.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-budget-request-phase7_2026-10-01.json",
+  "acceptance_criteria": [
+    {
+      "criterion": "The budget request conforms to interface_contract.json and names pseudonymous partners only.",
+      "disposition": "met"
+    },
+    {
+      "criterion": "A received response is validated, or the missing response is recorded as a blocking gate failure.",
+      "disposition": "met on the second branch"
+    },
+    {
+      "criterion": "Phase 7 reaches released, or its hard block on Phase 8 is shown intact.",
+      "disposition": "met on the second branch"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "The budget request is composed by a deterministic component, runner/budget_request.py bound as budget_request_composer, not by the budget_interface_coordinator pre-gate agent the manifest note named.",
+      "reasoning": "Composing the request is a transform, not a judgment. Every field is copied from a named upstream artifact — the call binding, the Phase 3 WP structure, the Phase 4 Gantt, the Phase 6 implementation architecture, the Tier 3 consortium — or is a constant sentinel. That is the §17.5.3 contract exactly: no domain reasoning, no inference, closed by byte-equal replay. It also removes the only route by which a Claude invocation could have written a number into a budget request, which is worth more here than anywhere else in the engine because §8.1 and §8.3 are absolute about figures. The component form is chosen over a skill for the reason C2 gives: a skill is defined by Claude invocation, and run_skill has no non-Claude mode.",
+      "recorded_in": "runner/budget_request.py; runner/deterministic_components.py COMPONENT_REGISTRY; the n07_budget_gate deterministic_components binding and the a_t3_budget_request note in .claude/workflows/system_orchestration/manifest.compile.yaml; .claude/agents/budget_interface_coordinator.md; tests/runner/test_budget_request.py; tests/runner/test_node_resolver.py."
+    },
+    {
+      "id": "D2",
+      "decision": "The fail-open of F1 is closed at the predicate, by teaching it to interpret a planner contract document, rather than by rewriting interface_contract.json into a JSON Schema.",
+      "reasoning": "The contract is a shared artifact: §8.5 makes it the authority for both sides of the exchange, and the external planner reads it too. Rewriting it into a JSON Schema to suit this repository's predicate would change the shared authority to fit the implementation, which is the wrong direction of fit. Interpreting it keeps the document as written and leaves the JSON-Schema path intact for a contract that is one — the eight pre-existing predicate cases pass unchanged. The branch is explicit, not a guess: a contract carrying a <role>_schema block is a contract document, anything else is a schema.",
+      "recorded_in": "runner/interface_contract.py; runner/predicates/schema_predicates.py interface_contract_conforms; tests/runner/test_interface_contract.py; tests/runner/predicates/test_schema_predicates.py TestInterfaceContractConformsPlannerDocument."
+    },
+    {
+      "id": "D3",
+      "decision": "The validator checks only what the contract states. No field-level type constraint, value range or protocol rule is invented beyond required fields, the two entry shapes and the non-negative rule.",
+      "reasoning": "The contract's own demo_mode_note says field-level types and value ranges are a production concern it does not yet carry. Adding them from programme knowledge would be §10.6 in miniature: a check the source cannot ground, asserted as if it could. A contract that cannot state a rule must not be read as stating that everything passes either, which is why a contract with no response_schema block now fails closed instead of accepting the response.",
+      "recorded_in": "The module docstring of runner/interface_contract.py; the MALFORMED_ARTIFACT branch in interface_contract_conforms; test_a_contract_without_the_role_block_is_rejected and test_fail_contract_has_no_response_block."
+    },
+    {
+      "id": "D4",
+      "decision": "The request carries no numeric field other than months. Every effort and cost field holds the non-numeric sentinel requires_external_computation, and the call's two indicative euro amounts are not carried into it.",
+      "reasoning": "A numeric placeholder in a budget field is a figure waiting to be mistaken for one, and zero is the worst of them because it reads as a priced line. A non-numeric token cannot be read as a figure by any consumer and tells the planner which fields are its to compute. The call's indicative amounts are excluded on the same ground as §13.3: they are call-level facts about a topic's budget envelope, not this project's figures, and a request carrying them invites the planner to anchor on them. The absence is checked twice — field by field, and by walking the whole payload for numbers and permitting only the month fields and a source reference's tier.",
+      "recorded_in": "runner/budget_request.py REQUIRES_EXTERNAL_COMPUTATION and EXTERNALLY_COMPUTED_FIELDS; tests/runner/test_budget_request.py TestNoBudgetFigure; tests/test_demo_phase7_budget_gate.py test_it_carries_no_budget_figure and test_the_calls_indicative_euro_amounts_are_not_carried_into_it."
+    },
+    {
+      "id": "D5",
+      "decision": "A partner whose country field has left its country_slot halts the compose. The composer does not resolve the disagreement by preferring the slot.",
+      "reasoning": "Tier 3 carries both fields because the artifact schema requires country while this branch's anonymity constraint requires a pseudonymous slot token. When the two disagree, one of them is a real country name, and that is a defect in the partner record. Preferring the slot would produce a clean request and leave the leak in Tier 3, where the next artifact to read country would carry it. Halting fixes it at the record, which is the rule this demo has followed since the snapshot ticket. The composer copies; choosing between two spellings of a fact is inference, and a deterministic component may not infer.",
+      "recorded_in": "runner/budget_request.py _partner_identity; tests/runner/test_budget_request.py test_a_partner_whose_country_leaves_its_slot_is_refused."
+    },
+    {
+      "id": "D6",
+      "decision": "Phase 7 is not dispatched and no gate result is written. The hard block is shown by reading the gate's own predicates and the scheduler's wiring, not by evaluating the gate.",
+      "reasoning": "§17.1.4 gives gate evaluation to the scheduler and §17.6.3 gives gate results to the gate evaluator. Calling the evaluator out of band would write a gate_result.json for a dispatch that never happened — a fabricated record, which is the thing §15 names. The predicates themselves are pure functions and reading them is just reading. What they return is recorded in the validation report, which is a Tier 4 record under §9.1: received/ empty, validation/ empty, no assessment, all seven work packages and all twelve partners uncovered. The block is then shown structurally — the hard-block gate is still gate_09, the frozen set equals the manifest's six Phase 8 nodes, every edge the gate guards leaves n07, gate_10a re-asserts the gate, and no Phase 8 or Tier 5 output exists. The same rule governs the artifact: the composer was invoked directly against the repository root, which is a deterministic Claude-free pass and consumes no dispatch, and both records say so rather than implying Phase 7 ran.",
+      "recorded_in": "tests/test_demo_phase7_budget_gate.py TestTheMissingResponseBlocks and TestTheHardBlockIsIntact; the the_gate block of the validation report."
+    },
+    {
+      "id": "D7",
+      "decision": "The composed request is named not frozen, in a superseding freeze record, on the existing phase-written rule.",
+      "reasoning": "Recorded in full in docs/tier4_orchestration_state/decision_log/demo-tier3-freeze-budget-request_2026-10-01.json. In short: an n07 rerun recomposes the request, so a fingerprint would break on the next legitimate rerun, exactly as the superseded record reasoned for the two Phase 2 call-binding artifacts. All ten existing fingerprints were re-derived from disk and are unchanged, so nothing is unfrozen.",
+      "recorded_in": "docs/tier4_orchestration_state/decision_log/demo-tier3-freeze-budget-request_2026-10-01.json."
+    },
+    {
+      "id": "D8",
+      "decision": "Every count in this ticket's records is derived from the artifact, not typed.",
+      "reasoning": "The seeds ticket's D9 and the snapshot ticket's D8 both recorded this rule after a typed number turned out to be wrong, and the snapshot report noted that repeating the lesson meant it was not yet mechanical. The report generator reads budget_request.json, wp_structure.json, gantt.json and partners.json and computes every figure it prints: 7 work packages, 12 partners, 38 sentinel fields, 7 Gantt windows, 12 partners carrying a Phase 6 role. The arithmetic is checkable from the artifact: 7 times 2 plus 12 times 2 is 38.",
+      "recorded_in": "The the_request block of the validation report; tests/test_demo_phase7_budget_gate.py, which re-derives the same counts from the same files rather than asserting literals."
+    },
+    {
+      "id": "D9",
+      "decision": "The two Phase 7 budget components share one budget-regime guard, runner.instrument_profile.owns_budget_regime, instead of each testing the call binding's field itself. An unresolvable regime is owned by neither, so nothing is written and gate_09 blocks.",
+      "reasoning": "The manifest asserts that exactly one of the two writes on any given call. Two independent inequality guards cannot hold that property — both pass when budget_regime is absent, and both components write — and a manifest that states a rule the code does not implement breaches §16.5 and §16.7 (F9). One shared guard makes the property structural rather than a comment, and the property is then checked rather than asserted. It resolves from the call binding's declared field first, since a project that has decided its regime says so there, and falls back to the Tier 2A instrument registry, which is the source gate_09's own applies_when filter uses — so the components and the gate can no longer disagree about which branch a call is on. Owning nothing on an unresolvable regime is the §12.4 answer: the gate's resolution fails closed on the same state, so a missing budget artifact blocks instead of a component guessing which kind of budget to write.",
+      "recorded_in": "runner/instrument_profile.py resolve_budget_regime and owns_budget_regime; the guards in runner/budget_request.py and runner/unit_cost_budget.py; tests/runner/test_budget_request.py test_exactly_one_budget_component_claims_any_given_call, test_an_unresolvable_regime_writes_nothing and test_an_unknown_regime_is_claimed_by_neither."
+    }
+  ],
+  "findings": "Ten, recorded with their detail and disposition in the validation report. Seven from building the ticket: F1 the g08_p04 fail-open on the interface contract (fixed); F2 the unreachable and mis-aimed Mode A of budget-interface-validation (closed by the composer); F3 the registered but unproducible budget_request.json artifact (closed); F4 the pseudonymity check's scope missing the integration directory (fixed); F5 the two budget coverage predicates checking identifier presence rather than pricing (recorded, no change); F6 the mis-pasted run id propagating into this artifact (not fixed here; belongs at F11 of the Phases 1 to 6 report); F7 the freeze coverage test catching the new Tier 3 artifact (fixed at the record). Three more from the code review of this ticket: F8 a response can carry the price fields without a price and still conform (not fixed; the contract must carry the type); F9 both budget components wrote on an unresolvable regime while the manifest claimed they could not (fixed by D9); F10 a narrow hybrid-contract fail-open the F1 fix introduced (fixed).",
+  "what_this_decision_does_not_settle": "Whether the response the operator brings back will pass. gate_09 validates it when Phase 7 is dispatched, and a non-conforming or incomplete response is a gate failure like any other. Nor does it settle the production hardening of interface_contract.json: the document's own demo_mode_note asks for field-level types, value ranges and protocol versioning, and D3 declines to invent them. Phase 8 remains hard-blocked, so the candidate Part B ticket stays blocked on the operator's planner run.",
+  "authored_by": "Ticket 'Budget request and the Phase 7 gate', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-10-01.",
+  "note": "The ticket says 'This ticket has a human step.' Everything up to that step is done and checked; the step itself is the operator's. The honest shape of the result is a composed request plus a declared block, not a released Phase 7.",
+  "test_suite_state": {
+    "full_suite": "29 failed, 5547 passed, 104 skipped",
+    "recorded_baseline": "29 failed, 5436 passed, 104 skipped, recorded by the Phases 1 to 6 ticket on 2026-10-01",
+    "accounted_for": "The failure count is unchanged and the 13 failing modules are the same ones: transport (11), skill applicability (3), Phase 8 consistency (3), drafting skill hygiene (3), the Tier 2B intake pair the Phase 1 rerun turned red (2), and five singletons. None sits in a module this ticket touched. The pass count grew by 111, which is this ticket's new tests.",
+    "green_here": "tests/runner/test_budget_request.py 44 passed; tests/runner/test_interface_contract.py 24 passed; tests/test_demo_phase7_budget_gate.py 42 passed; the touched modules together, including the pre-existing schema-predicate, unit-cost, instrument-profile, leakage-scan, node-resolver, deterministic-component, phase-7 and architecture-seed suites, 517 passed 1 skipped."
+  }
+}

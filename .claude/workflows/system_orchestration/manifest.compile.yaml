@@ -144,15 +144,27 @@ node_registry:
     source_file: workflow_phases/phase_07_budget_gate.yaml
     agent: budget_gate_validator
     pre_gate_agent: budget_interface_coordinator
-    # Deterministic components (§16.5/C3): the unit-cost budget deriver (C1)
-    # runs in the node body before skill sequencing.  It writes the internal
-    # deterministic derivation (unit_cost_budget.json) for unit-cost
-    # instruments; gate_09's unit-cost branch validates it.  For lump-sum
-    # instruments the deriver still writes an assessment naming its inputs, but
-    # the lump-sum gate branch validates the external received/ response
-    # instead — the two sources never overlap (§8.4, C1).
+    # Deterministic components (§16.5/C3), one per budget regime, both running
+    # in the node body before skill sequencing.  Both ask the same guard,
+    # runner.instrument_profile.owns_budget_regime — which resolves the regime
+    # from the call binding's declared field, else from the Tier 2A instrument
+    # registry that gate_09's own applies_when filter uses — so at most one
+    # writes and the two sources never overlap (§8.4, C1).  An unresolvable
+    # regime is owned by neither: nothing is written and gate_09 blocks on the
+    # missing artifact, rather than a component guessing a budget kind (§12.4).
+    #   * unit_cost_budget_deriver (C1) — for unit-cost instruments, writes the
+    #     internal deterministic derivation (unit_cost_budget.json) that
+    #     gate_09's unit-cost branch validates.
+    #   * budget_request_composer (§8.2) — for lump-sum instruments, composes
+    #     budget_request.json from the call binding, Phases 3, 4 and 6 and the
+    #     Tier 3 consortium, for the operator to hand to the external planner.
+    #     It computes NO figure: every effort and cost field is left as the
+    #     requires_external_computation sentinel (§8.1, §8.3). The request is
+    #     not a gate condition; gate_09's lump-sum branch validates the
+    #     external response in received/, not this request.
     deterministic_components:
       - unit_cost_budget_deriver
+      - budget_request_composer
     skills:
       - budget-interface-validation
       - gate-enforcement
@@ -949,7 +961,11 @@ artifact_registry:
     tier: tier3_integration
     produced_by: n07_budget_gate
     consumed_by: []
-    note: "Produced by budget_interface_coordinator pre-gate action; not a gate condition"
+    note: >
+      Composed by the budget_request_composer deterministic component in the
+      n07 node body (lump-sum instruments only); not a gate condition. It
+      carries no budget figure: every effort and cost field is the
+      requires_external_computation sentinel (§8.1, §8.3).
 
   # Integration artifacts
   - artifact_id: a_int_budget_received
