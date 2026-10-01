@@ -338,10 +338,42 @@ recorded unfixed as F1 and F2. Ten findings and seven decisions are in
 
 **Blocked by:** Budget request and the Phase 7 gate; RIA pre-evaluation profile in the harness.
 
-- [ ] Phase 8 reaches released, or its blocking gate is recorded.
+- [x] Phase 8 reaches released, or its blocking gate is recorded.
 - [ ] Candidate version 1 is a document snapshot with state imported, with passages linked by span.
 - [ ] The blind report carries the candidate hash, profile version and assessor pin, and is labelled complete or partial.
 - [ ] The leakage guard confirms no historical-feedback item entered the package.
+
+**Outcome: one of four.** The blocking gate is recorded from the gate's own predicates. No node
+was dispatched and no gate result was written. The planner response is absent, so `g08_p02`
+fails and all six Phase 8 nodes stay frozen. Phase 8 has written nothing, and Tier 5 holds only
+its placeholders. The ESR intake record carries availability `not_applicable`; it is the one
+part of the ticket neither block reaches.
+
+**Criterion 4 is checked over the wrong package, so its box stays open.** `assert_no_leakage`
+ran over all 6 blind packages the demo world holds, rebuilt from their stored manifests, and
+all 6 are clean. The package the criterion means is the one built around candidate version 1,
+and that package does not exist. Worse, those 6 hold 0 passage, 0 claim and 0 commitment
+items, which are the three types a historical-feedback tag rides on (F6). The clean pass is
+correct and tells a reader nothing about a real Part B package.
+
+**There is no candidate version 1, and the blind lane could not have graded one.** The first gap
+is the human step the ticket always depended on. Until the operator runs the external planner,
+§13.4 forbids drafting the Part B this ticket would import, by the runner or by hand. The second
+gap is a defect, F1, and it would have failed the criterion with Part B in hand.
+
+**F1: the document route cannot feed either shipped profile.** `materialise_candidate` writes
+one sub-section per passage and names it for its section. The RIA rubrics anchor on `B.1.1` to
+`B.3.2`, and the MSCA-PF rubrics on `1.1` to `3.2`. The anchor map then fails closed with an
+`EvidencePackError`. The route's own tests use a synthetic profile whose anchors are its section
+ids. The profile tests use the directory route with a candidate built from the anchors. No test
+crossed the two, which is what handoff stage 7 was for.
+
+A second finding rides on the first. An ESR intake can be stamped only through the document
+route, so criteria 3 and 4 cannot share one report while F1 stands. The intake writer also
+requires a `submission_id` and offers no way to declare that none exists. So the record carries
+the sentinel `NOT_SUBMITTED` (F3). F1 was reproduced in a temporary graph root, never in
+`docs/`, because a real import would move the pinned demo snapshot id. Six findings and eight
+decisions are in `demo-candidate-blind-baseline_2026-10-01.json`, with 58 tests.
 
 ## Change scenarios and shadow comparison
 

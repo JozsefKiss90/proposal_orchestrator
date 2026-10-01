@@ -1,0 +1,93 @@
+{
+  "record_type": "decision",
+  "id": "demo-candidate-blind-baseline",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Candidate Part B and the blind baseline' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §8.4 and §13.4 (the categorical Phase 8 block, which covers preparatory drafting and binds this record's author as much as the runner), §8.1 and §8.3 (the repository computes no lump-sum figure and invents none), §12.1 to §12.4 (reviewability and the four status categories), §13.3 (no invented project fact), §17.1.4 and §17.6.3 (gate evaluation and gate results belong to the scheduler and the gate evaluator) and §15 (explicit failure over fabricated completion). Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "Three of the ticket's four criteria are recorded as not met. Criterion 1 is met on its second branch: the Phase 8 block is recorded from the gate's own predicates, and Phase 8 has written nothing. Criterion 4 names the package built around candidate version 1, which does not exist, so its box stays open; the guard did run clean over the 6 blind packages the demo world holds. Criterion 2 waits on a human step the ticket always depended on — BIODIV-01 is a lump-sum RIA and the operator has not run the external planner, so gate_09 fails and every Phase 8 node is frozen. Criterion 3 waits on a defect this ticket found: the blind lane's dev-graph document route cannot feed either shipped instrument profile, because it materialises one sub-section named for its section while the RIA rubrics anchor on B.1.1 to B.3.2 and the MSCA-PF rubrics on 1.1 to 3.2. That criterion would have failed with Part B in hand. The ESR intake record is written with availability not_applicable, which is the one part of the ticket neither block reaches. Six findings; none fixed, and the reason each is left unfixed is recorded.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json",
+  "acceptance_criteria": [
+    {
+      "criterion": "Phase 8 reaches released, or its blocking gate is recorded.",
+      "disposition": "met on the second branch"
+    },
+    {
+      "criterion": "Candidate version 1 is a document snapshot with state imported, with passages linked by span.",
+      "disposition": "not met, blocked upstream"
+    },
+    {
+      "criterion": "The blind report carries the candidate hash, profile version and assessor pin, and is labelled complete or partial.",
+      "disposition": "not met, blocked by finding F1"
+    },
+    {
+      "criterion": "The leakage guard confirms no historical-feedback item entered the package.",
+      "disposition": "not met as stated; the guard ran clean over the packages that exist"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "No Part B is drafted on this branch, by the runner or by hand, and the ticket is reported blocked rather than delivered against a hand-written candidate.",
+      "reasoning": "§13.4 prohibits any Phase 8 activity, including preparatory drafting, before the budget gate passes, and §8.4 states that the block is unconditional and instrument-independent. A hand-written Part B would be the same activity under another author, and importing it as candidate version 1 would put a document into Tier 4 that no gated phase produced. The gate exists to stop exactly this, so satisfying the ticket by routing around it would make the demo worthless as a test of the engine. §15 makes the declared failure the correct output.",
+      "recorded_in": "This record; the validation report's criterion 2; tests/test_demo_candidate_blind_baseline.py TestThePhase8BlockIsRecorded and TestNoCandidateVersionExists."
+    },
+    {
+      "id": "D2",
+      "decision": "The ESR intake record is written now, before the document it concerns exists.",
+      "reasoning": "The intake is not a Phase 8 substep. §13.4 enumerates drafting, assembly, evaluator review and revision; an out-of-band dev-graph record of what is known about an Evaluation Summary Report is none of them, and the blind lane is never a runtime gate. Writing it now fixes the document identity the eventual import must use, which turns a later mismatch into a test failure instead of a judgement call. The builder never reads the intake directory, so the demo snapshot id does not move. The cost is real and recorded: an intake record is immutable, so a Part B imported under another document id needs a new intake id.",
+      "recorded_in": "docs/tier4_orchestration_state/dev_graph/intake/demo-biodiv-2027-part-b-v1.json; the validation report's the_esr_intake block; TestTheEsrIntakeRecord."
+    },
+    {
+      "id": "D3",
+      "decision": "Availability is not_applicable, not unavailable, and prior_submission is false.",
+      "reasoning": "The demo is a demonstration, not a submission. not_applicable says no report exists; unavailable would say one exists and was not obtained, which would be an invented fact under §13.3. The module declares availability and never infers it, so the field had to be set: prior_submission false on its own stores unknown, and unknown would understate what is known here.",
+      "recorded_in": "The intake record; TestTheEsrIntakeRecord."
+    },
+    {
+      "id": "D4",
+      "decision": "submission_id carries the sentinel NOT_SUBMITTED, and the schema gap is recorded as F3 rather than patched.",
+      "reasoning": "record_esr_intake requires a submission_id and offers no way to declare that no submission exists. A sentinel that reads as an absence cannot be mistaken for a submission number, so it does not invent a fact. Changing the schema to make the field optional is a Milestone 1 defect fix and touches a record type two lanes already read; doing it inside a demo ticket would widen the ticket into engine work the ticket did not ask for.",
+      "recorded_in": "F3 in the validation report; TestTheEsrIntakeRecord."
+    },
+    {
+      "id": "D5",
+      "decision": "F1, the document-route anchor mismatch, is recorded unfixed with two candidate fix shapes and no choice between them.",
+      "reasoning": "The fix changes either what a document snapshot is (sub-sections become part of the record) or what a profile declares (a passage-to-anchor map). Both are schema changes to shared artifacts, and the first changes the input the drafter writes. Picking one inside a demo ticket would let a ticket settle a design question for the engine, which is the §13.6 anti-pattern in miniature. The defect is reproduced by a test, so the fix has a failing case waiting for it.",
+      "recorded_in": "F1 in the validation report; TestTheDocumentRouteCannotFeedTheRiaProfile."
+    },
+    {
+      "id": "D6",
+      "decision": "The defect is reproduced in a temporary graph root over the synthetic fixture, never by importing a document into docs/.",
+      "reasoning": "A document record in docs/tier4_orchestration_state/dev_graph/documents/ would add an artifact_version node to the demo snapshot and move its snapshot id, which ticket 8 pinned at 116 nodes and 305 edges and which three records cite. A reproduction must not change the world it reports on. The synthetic fixture already carries the sources, objectives and participants the builder needs, so the copy is cheap.",
+      "recorded_in": "TestTheDocumentRouteCannotFeedTheRiaProfile; the validation report's what_was_checked_and_how."
+    },
+    {
+      "id": "D7",
+      "decision": "Criterion 4 is recorded as not met and its ticket box stays open, even though the guard ran clean over every blind package the demo world holds.",
+      "reasoning": "assert_no_leakage ran over all 6 stored blind packages and they are clean, which is a real check on real records, though F6 shows those packages hold no passage, claim or commitment item and so cannot carry the leak. It is not the check the criterion asks for, which is the guard running over the package built around candidate version 1. Marking the box done would let a later reader believe the Part B package had been guarded. The distinction is between a check that ran and the check that was asked for, and §15 resolves it the same way as criteria 2 and 3.",
+      "recorded_in": "The validation report's criterion 4; TestTheLeakageGuardIsCleanOnTheDemoWorld."
+    },
+    {
+      "id": "D8",
+      "decision": "No gate_result.json is written for Phase 7 or Phase 8, and no runner phase is dispatched.",
+      "reasoning": "§17.6.3 reserves gate result artifacts to the gate evaluator and §17.1.4 reserves gate evaluation to the scheduler. The gate's predicates are pure functions and may be read; their verdict may not be written as a gate result by anything else. Dispatching a phase is the operator's step on this repository.",
+      "recorded_in": "This record; the validation report's the_gate block; the test module's header."
+    }
+  ],
+  "findings": [
+    {"id": "F1", "summary": "The dev-graph document route cannot feed either shipped instrument profile: one sub-section named for its section against rubric anchors B.1.1 to B.3.2 (RIA) and 1.1 to 3.2 (MSCA-PF).", "disposition": "recorded unfixed; Milestone 2 ticket"},
+    {"id": "F2", "summary": "An ESR intake can be stamped only through the document route, so F1 also blocks the demo's not_applicable availability from reaching any RIA blind report.", "disposition": "recorded unfixed; resolved by F1"},
+    {"id": "F3", "summary": "record_esr_intake requires a submission_id with no way to declare that no submission exists.", "disposition": "recorded unfixed; Milestone 2 ticket"},
+    {"id": "F4", "summary": "Phase 8 has produced nothing. The gate is working; the outstanding step is the operator's planner run.", "disposition": "correct behaviour; recorded"},
+    {"id": "F6", "summary": "The demo world's 6 blind packages hold 0 passage, 0 claim and 0 commitment items, so they cannot carry the leak the guard looks for. The clean pass is correct and uninformative.", "disposition": "recorded; it is why criterion 4's box stays open"},
+    {"id": "F5", "summary": "The demo's 6 blind packages are all incomplete at budget 3000, and build_blind_evidence refuses an incomplete package.", "disposition": "recorded; no change made, because no real package is built yet"}
+  ],
+  "milestone_2_candidates": [
+    "Fix F1: decide where a section's sub-section structure lives, then make the document route feed a shipped profile. The failing case exists.",
+    "Fix F3: let an intake declare that no submission exists.",
+    "Re-run this ticket after the operator's planner run and a released Phase 8. Criteria 2 and 3 are the only ones outstanding."
+  ],
+  "what_is_outstanding_for_the_operator": "Run the external Lump Sum Budget Planner against docs/tier3_project_instantiation/integration/budget_request.json and place the response in docs/integrations/lump_sum_budget_planner/received/. Phase 7 and Phase 8 are then dispatchable. Criterion 3 additionally needs F1 fixed.",
+  "authored_by": "Implementation of the ticket 'Candidate Part B and the blind baseline'. No runner phase was dispatched. No gate result was written. No proposal text was drafted."
+}
