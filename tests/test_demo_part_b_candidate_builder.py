@@ -834,3 +834,40 @@ class TestTheImporterStillOwnsItsOwnRules:
                 },
                 "handmade",
             )
+
+
+class TestTheExpectedCriterionIsTheOneTheRunnerStamps:
+    """The builder refuses a section whose ``criterion`` is not what it expects.
+
+    That check is only safe if the expectation matches what Phase 8 actually
+    writes.  ``runner.decomposed_drafting.SLUG_CRITERION`` is the sole owner of
+    the label: it is both the join key against the Tier 2A registry and the
+    string the section assembler stamps into the artifact.  A first draft of
+    this tool took the implementation label from the Tier 5 schema's field
+    description instead ("Must equal 'Quality and efficiency of the
+    implementation'"), which the runner has never written — so the builder
+    would have refused every valid n08c artifact.
+    """
+
+    def test_each_spec_expects_the_label_the_runner_stamps(self):
+        from runner.decomposed_drafting import SLUG_CRITERION
+
+        mismatched = []
+        for spec in SECTION_SPECS:
+            slug = spec.section_id[: -len("_section")]
+            expected = SLUG_CRITERION.get(slug)
+            if expected is None:
+                mismatched.append(f"{spec.section_id}: no slug {slug!r} in the map")
+            elif spec.criterion != expected:
+                mismatched.append(
+                    f"{spec.section_id}: builder expects {spec.criterion!r}, "
+                    f"the runner stamps {expected!r}"
+                )
+        assert mismatched == [], mismatched
+
+    def test_the_map_is_covered_in_full(self):
+        """Three sections, three slugs; a missing one would be silently skipped."""
+        from runner.decomposed_drafting import SLUG_CRITERION
+
+        slugs = {spec.section_id[: -len("_section")] for spec in SECTION_SPECS}
+        assert slugs == set(SLUG_CRITERION)

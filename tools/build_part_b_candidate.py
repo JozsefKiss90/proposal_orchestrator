@@ -59,6 +59,7 @@ if str(_HERE.parent) not in sys.path:
     sys.path.insert(0, str(_HERE.parent))
 
 from runner.atomic_write import atomic_write_json, canonical_json_bytes  # noqa: E402
+from runner.decomposed_drafting import SLUG_CRITERION  # noqa: E402
 from runner.dev_graph.documents import normalise_candidate  # noqa: E402
 from runner.dev_graph.schema import DevGraphError  # noqa: E402
 from runner.phase8_preseed import PRESEED_NODE_CONFIG  # noqa: E402
@@ -105,14 +106,9 @@ class SectionSpec:
     criterion: str
 
 
-#: The criterion string each Tier 5 section schema fixes, in its own field
-#: description ("Must equal ...").  Not owned by another module, unlike the
-#: schema ids below, so it is declared here and checked against the artifact.
-_CRITERION_BY_SECTION: dict[str, str] = {
-    "excellence_section": "Excellence",
-    "impact_section": "Impact",
-    "implementation_section": "Quality and efficiency of the implementation",
-}
+#: Suffix every Phase 8 section artifact's filename carries; stripping it
+#: yields the drafting slug that ``SLUG_CRITERION`` is keyed by.
+SECTION_SUFFIX = "_section"
 
 
 def _section_specs() -> tuple[SectionSpec, ...]:
@@ -123,13 +119,21 @@ def _section_specs() -> tuple[SectionSpec, ...]:
     import time that its own copies do not drift from their source. Restating
     the ids here would be a third copy free to drift from both, so they are
     read from it and keyed by the target filename stem.
+
+    The criterion label is likewise read from its owner,
+    ``runner.decomposed_drafting.SLUG_CRITERION``, which is both the join key
+    against the Tier 2A registry and the string the section assembler stamps
+    into the artifact. The Tier 5 schema's field description disagrees for the
+    implementation section (F10): it reads "Must equal 'Quality and efficiency
+    of the implementation'", a string the runner has never written.
     """
     by_stem = {
         Path(cfg["target_path"]).stem: cfg["schema_id"]
         for cfg in PRESEED_NODE_CONFIG.values()
     }
     specs = []
-    for section_id, criterion in _CRITERION_BY_SECTION.items():
+    for slug, criterion in SLUG_CRITERION.items():
+        section_id = f"{slug}{SECTION_SUFFIX}"
         schema_id = by_stem.get(section_id)
         if schema_id is None:
             raise BuilderError(
@@ -175,7 +179,7 @@ def _read_section(repo_root: Path, spec: SectionSpec) -> dict[str, Any]:
             f"{spec.section_id}: artifact_status is 'invalid'. The runner "
             "marked this section unfit, so it may not become a candidate."
         )
-    # The schema fixes each section's criterion, and the section title is
+    # SLUG_CRITERION fixes each section's criterion, and the section title is
     # taken from the artifact rather than from this file, so a disagreement
     # has to be caught here or the candidate would carry the wrong heading.
     criterion = raw.get("criterion")

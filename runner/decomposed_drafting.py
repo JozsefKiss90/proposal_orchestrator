@@ -66,7 +66,11 @@ logger = logging.getLogger(__name__)
 #: explicit map (not derived from the slug) so the human-facing criterion
 #: string is authoritative; the actual sub-section set is still read from the
 #: instrument profile, so no page count or sub-section id is hardcoded.
-_SLUG_CRITERION: dict[str, str] = {
+#: Public because it is the sole owner of the label: it is both the join key
+#: against the Tier 2A ``section_schema_registry`` and the ``criterion`` string
+#: stamped into the Tier 5 section artifact, so any other reader must take it
+#: from here rather than keep a copy free to drift.
+SLUG_CRITERION: dict[str, str] = {
     "excellence": "Excellence",
     "impact": "Impact",
     "implementation": "Implementation",
@@ -699,7 +703,7 @@ def draft_section_decomposed(
         raise DecomposedDraftingError(
             f"Unknown section slug {slug!r}; expected one of {sorted(VALID_SLUGS)}"
         )
-    criterion = _SLUG_CRITERION[slug]
+    criterion = SLUG_CRITERION[slug]
 
     # Source the section-specific extra_fields the assembler requires unless the
     # caller supplied them (tests inject fixtures).  Done BEFORE drafting so a

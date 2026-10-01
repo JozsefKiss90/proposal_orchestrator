@@ -76,7 +76,7 @@
     "The leakage guard: each stored package under docs/tier4_orchestration_state/dev_graph/packages/ is rebuilt as a Package from its manifest.json and package.json, filtered to view blind_pre_evaluation, and passed to assert_no_leakage. All 6 pass. The guard is also shown to fire on a planted item, so a pass is not a vacuous pass.",
     "The document-route defect: a synthetic RIA-shaped document carrying the three profile-required section ids is imported into a copy of tests/fixtures/dev_graph_synthetic under tmp_path, blind evidence is built under the real harness/profiles/ria_default.json, and assess_candidate is called with a stub assessor. It raises EvidencePackError naming the missing anchor. Nothing is written into docs/ by this check.",
     "The intake record: written through runner.dev_graph.intake.record_esr_intake, re-read through read_esr_intake, and shown immutable — the same content again is a no-op, and different content under the same id is refused.",
-    "Anonymity: py -3.10 -m runner.leakage_scan over 170 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
+    "Anonymity: py -3.10 -m runner.leakage_scan over 171 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
   ],
   "findings": [
     {
@@ -190,6 +190,12 @@
         "status_summary.Confirmed, per the list above."
       ],
       "what_the_gate_still_cannot_see": "That every figure it validated is fictional. g08_p05 and g08_p06 count identifiers, g08_p04 declares no type for lump_sum (G3), and no predicate compares a figure against a planner's. A passing gate_09 on this branch certifies structural consistency, not budgetary truth."
+    },
+    {
+      "date": "2026-10-01",
+      "why": "The first Phase 8 dispatch of this instantiation, --node 8a, failed before any Claude call: the RIA entry in the Tier 2A section schema registry bound no sub-section to a criterion, so the drafting resolver found nothing to draft. The fix and the two findings it surfaced are recorded in decision record demo-phase8-criterion-binding_2026-10-01.json, which is itself a Tier 4 file inside the scan.",
+      "what_changed_here": "The leakage scan count rises from 170 to 171 files. The scan was re-run: no new leak, and the 11 recorded pre-existing leaks in the 22 September purge record are unchanged.",
+      "what_it_means_for_the_criteria": "Criterion 1 is unaffected: Phase 8 reaching a recorded blocking state is what this dispatch produced, and the block is now lifted at the registry layer. Criteria 2, 3 and 4 still wait on the operator completing 8a to 8c, which the fix makes reachable. The dispatch also corrected the Part B candidate builder, which expected an implementation criterion string the runner has never written and would have refused every valid n08c artifact."
     }
   ]
 }

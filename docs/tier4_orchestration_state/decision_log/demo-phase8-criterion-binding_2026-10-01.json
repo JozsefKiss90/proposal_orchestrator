@@ -1,0 +1,64 @@
+{
+  "record_id": "demo-phase8-criterion-binding",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "trigger": "The operator dispatched the first Phase 8 substep of this instantiation, py -3.10 -m runner --run-id <id> --node 8a. The node reached blocked_at_exit with failure_origin agent_body and no exit gate evaluated: instrument profile 'RIA' has no drafting sub-sections for criterion 'Excellence' (slug 'excellence'). No Claude call was made, so the dispatch cost no quota.",
+  "what_the_dispatch_proved": "Phases 1 to 7 are released and the n08a entry gate passes, so the Phase 8 block really is lifted. The failure is one layer in: the node body's first act is to resolve which sub-sections the slug drafts, and for an RIA that resolution returned nothing.",
+  "findings": {
+    "F10_the_ria_registry_bound_no_sub_section_to_a_criterion": {
+      "status": "fixed",
+      "what": "draft_section_decomposed resolves its drafting granularity by matching the instrument profile drafting sub-sections against a criterion label. The MSCA-PF entry in docs/tier2a_instrument_schemas/extracted/section_schema_registry.json carries criterion on its three criterion sections and on all nine drafting sub-sections. The RIA entry carried it on none of its eighteen rows, so all three Phase 8 slugs resolved to an empty set.",
+      "why_the_ria_coverage_ticket_did_not_catch_it": "The RIA entry was extracted for structure: section ids, section_type, mandatory, page limits and field requirements. Every consumer exercised at the time read those. criterion is read in exactly one place in the runner, the Phase 8 drafting resolver, and nothing before this dispatch had reached it on an RIA. The profile resolver fails closed on a missing required field, but criterion is not one of its required fields, so the profile resolved clean and the gap surfaced one layer further in.",
+      "the_fix": "criterion added to ten RIA rows: the three criterion sections B.1, B.2, B.3 and the seven drafting sub-sections beneath them. Ten lines added, none changed. The binding follows the form own nesting, which the rows already recorded in prose: the field_requirements of B.1 open with 'Parent section for Excellence evaluation criterion' and close with 'Contains subsections B.1.1 Objectives and ambition and B.1.2 Methodology'.",
+      "where_the_labels_came_from": "Not typed. The patch read the three tokens off the MSCA-PF entry of the same registry, keyed by the normalised criterion heading, and asserted it found all three. That matters for criterion 3: the registry token is 'Implementation' while the RIA form heading is 'Quality and efficiency of the implementation'. The token is the registry join vocabulary, not a form quotation, and the MSCA-PF entry is where that convention already lived."
+    },
+    "F11_the_tier5_schema_description_names_a_criterion_the_runner_never_writes": {
+      "status": "recorded unfixed; the builder was corrected to the runner",
+      "what": "The implementation_section schema in .claude/workflows/system_orchestration/artifact_schema_specification.yaml describes its criterion field as: Must equal 'Quality and efficiency of the implementation'. runner.decomposed_drafting stamps 'Implementation', which the section assembler carries verbatim into the artifact. Excellence and Impact agree on both sides; criterion 3 does not.",
+      "why_it_has_gone_unnoticed": "No validator reads a field description and no gate predicate checks the criterion string, so an artifact carrying 'Implementation' passes gate_10c and gate_10d unremarked. The MSCA-PF lane ran n08a to n08f green with the short token.",
+      "which_side_is_the_outlier": "The short token is the operative one. It is pinned as the artifact criterion across roughly twenty test modules, including the cross-section consistency checks and the gate_10d fixtures, and the decomposed_drafting comment declares the map authoritative for the human-facing string. The schema description is stale prose from before that refactor.",
+      "why_it_is_not_fixed_here": "Correcting the description means editing an authority file that governs the production MSCA-PF lane, to match code, on a demo branch, for no operational effect. That is an operator call. Changing the runtime to the long string is the worse option: it would ripple through every pinned fixture and the registry join key at once.",
+      "what_was_fixed_instead": "tools/build_part_b_candidate.py had taken the long string from the schema description and refused any section whose criterion disagreed. It would therefore have refused every valid n08c artifact. The tool now reads the label from its owner, runner.decomposed_drafting.SLUG_CRITERION, which removes the copy rather than correcting it."
+    }
+  },
+  "decisions": {
+    "D1_the_registry_is_the_right_place_to_fix_it": "The alternative was to make the resolver fall back to the parent criterion section when a sub-section declares no criterion. That would be a lower layer inferring a Tier 2A fact the registry did not state, and it would hide the same gap in the next instrument extracted. The registry is the structural authority for the instrument (CLAUDE.md section 5, Tier 2A), so the missing binding belongs there.",
+    "D2_the_slug_criterion_map_became_public": "_SLUG_CRITERION is the sole owner of the label: it is both the join key against the Tier 2A registry and the string stamped into the Tier 5 artifact. It is now SLUG_CRITERION, so a second reader takes it from there instead of keeping a copy. Same reasoning as D14 of the Part B builder record, applied to the label rather than the schema id.",
+    "D3_the_fixture_derivation_is_grounded_in_an_independent_origin": "test_the_label_is_the_registrys_token_not_the_form_heading compares the RIA criterion-3 token against the MSCA-PF token for the same heading, and asserts the token differs from the heading. Comparing the new rows only against their own parents would be true by construction, since this ticket wrote both. The D15 lesson.",
+    "D4_the_remaining_phase8_substeps_were_pre_flighted_not_guessed": "The same shape of failure could sit in front of 8b and 8c, and the operator would have found it only after 8a spent its quota. Everything the three drafting node bodies do before their first Claude call was run directly: the sub-section resolution, source_section_extra_fields for each slug, and the canonical-pack deriver input extraction. All three resolve. Recorded under what_was_pre_flighted below."
+  },
+  "what_was_pre_flighted": {
+    "sub_section_resolution": {
+      "excellence": [
+        "B.1.1",
+        "B.1.2"
+      ],
+      "impact": [
+        "B.2.1",
+        "B.2.2",
+        "B.2.3"
+      ],
+      "implementation": [
+        "B.3.1",
+        "B.3.2"
+      ]
+    },
+    "source_section_extra_fields": {
+      "excellence": [],
+      "impact": [
+        "dec_coverage",
+        "impact_pathway_refs"
+      ],
+      "implementation": [
+        "gantt_ref",
+        "milestone_refs",
+        "risk_register_ref",
+        "wp_table_refs"
+      ]
+    },
+    "canonical_pack_deriver_inputs": "6 objectives, 7 outcomes, 7 work packages, 24 deliverables, 12 partners, 22 declared assumptions. The deriver fail-closed backstop requires objectives, outcomes, wps and deliverables non-empty; none is empty. The pack itself was not written, only its extraction replayed, because a Tier 4 artifact written outside a dispatch is not this session to write.",
+    "what_it_does_not_cover": "The drafting calls themselves and the gate predicates that read the drafted prose. The gate_10a predicates g09a_p07 to p10 check the prose against the canonical reference pack, and g09a_p11 and p12 check the claim statuses. Nothing short of the run exercises those."
+  },
+  "tests": "9 in tests/test_demo_phase8_ria_criterion_binding.py, plus 2 added to tests/test_demo_part_b_candidate_builder.py in TestTheExpectedCriterionIsTheOneTheRunnerStamps, which is now 44.",
+  "what_the_tests_do_not_prove": "That an RIA Part B drafts well, or at all. They prove the join the node body performs before drafting resolves to the right sub-sections in the right order, and that the builder criterion expectation matches what the runner writes."
+}
