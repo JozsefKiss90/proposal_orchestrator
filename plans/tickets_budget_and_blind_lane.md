@@ -1,82 +1,65 @@
-# Tickets: internal budget derivation, and the blind lane's document route
+# Tickets: the demo's Phase 7 gate, and the blind lane's document route
 
-Two independent tickets. Both were raised as findings by the demo ticket "Candidate Part B and
-the blind baseline", recorded in
+Two independent tickets. Both unblock the demo ticket "Candidate Part B and the blind baseline",
+whose findings are recorded in
 `docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json`.
 
 They have no shared code and no shared artifact. Ticket B does not wait for ticket A.
 
 Constraints that apply to both:
 
-- `CLAUDE.md` governs. Ticket A changes it, by the §14 amendment route and no other.
+- `CLAUDE.md` governs. Ticket A runs under an operator override of three named rules, by the §1
+  route. Neither ticket amends the constitution, so §14 is not engaged.
 - The DAG scheduler, the node state machine and gate-evaluation authority are not modified.
-- The categorical Phase 8 block (§8.4, §13.4) is preserved verbatim. Neither ticket weakens it.
-- Tests run with `py -3.10`. Neither ticket dispatches a runner phase.
+- Tests run with `py -3.10`. Neither ticket dispatches a runner phase. The operator does.
 
 ---
 
-## Ticket A — Internal budget derivation for a call with no external planner
+## Ticket A — Make the Phase 7 gate pass on a fictional demo budget
 
-**Why this is an amendment.** There is no external Lump Sum Budget Planner. The repository has
-never held a transport for one: no subprocess call, no HTTP client, no URL, no script. §8.1,
-§8.3 and §17.6.7 nonetheless reserve lump-sum computation to that system, and §13.3 forbids an
-agent inventing a budget figure. An agent computing the budget is therefore inadmissible under
-`CLAUDE.md` as written. §14.1 makes a change of constitutional meaning through code alone
-invalid. So the amendment is the first deliverable, not a footnote to the code.
+**What to build:** One fictional budget response in
+`docs/integrations/lump_sum_budget_planner/received/`, so `gate_09` passes and Phase 8 unblocks.
+No code, no new budget regime, no constitutional amendment.
 
-**The precedent to follow.** The C1 amendment already did this once, for unit-cost instruments.
-Its argument is the one to reuse: §8 externalises lump-sum budgeting because lump-sum figures
-carry un-replayable judgment, and externalisation is the anti-fabrication guarantee. Where that
-guarantee can be supplied another way, externalisation adds nothing. `runner/unit_cost_budget.py`
-is the shape of the answer: a pure arithmetic core that is the byte-equal CI target, plus a
-deterministic component the agent runtime invokes in the n07 node body (§17.5.3).
+**The override.** The operator has instructed, in session, that `CLAUDE.md` is overridden for
+this task. The rules overridden are §8.1 and §17.6.7, which reserve lump-sum computation to the
+external planner, and §8.3, which forbids substituting an internally generated figure for an
+absent response. §1 permits this: an explicit in-session instruction scoped to the instruction
+that invokes it. It is not an amendment, so §14 is not engaged, and the override expires with
+this ticket.
 
-**Why unit-cost's guarantee is not enough on its own.** A unit-cost budget is fixed arithmetic
-on published constants, so determinism closes it completely. A lump sum has no published
-constants. Two inputs carry real judgment: the effort in person-months per task and partner,
-and the cost model that turns effort into euros. Determinism cannot launder either. So the
-guarantee has to be split.
+**Why it is this small.** `gate_09`'s lump-sum branch reads the response from `received/` through
+four predicates: `g08_p02` directory non-empty, `g08_p04` contract conformance, `g08_p05` work
+package coverage and `g08_p06` partner coverage. All four pass on a single file covering the 7
+work packages and 12 partners. The remaining predicates read artifacts the Phase 7 node writes
+itself, so nothing else is authored by hand.
 
-**What to build:** A third budget regime, `derived_lump_sum`, whose figures come from two
-operator-approved judgment inputs and one deterministic transform.
+**What the file must contain.** The four `response_schema` required fields, a `lump_sum` per work
+package and a `total_effort_pm` per partner. Figures are fictional and declared so in the file.
+Summing the work package figures to the 5,000,000 euro expected contribution in
+`selected_call.json` keeps the fiction traceable to a Tier 2B number rather than arbitrary.
 
-1. **The judgment layer.** A skill estimates effort person-months per task, per partner, from
-   the Phase 3 work package structure and the Phase 4 Gantt. It writes a proposal, never a
-   budget. Every line carries its §12.2 status and its reasoning. The artifact is inert until
-   the operator approves it, on the pattern the concept approval already uses.
-2. **The cost model.** Personnel rates, overhead treatment and other direct cost categories are
-   declared by the operator in Tier 3, each with a §12.2 status. No agent writes a rate. An
-   absent rate is `Unresolved` and blocks, exactly as the host coefficient does today.
-3. **The deterministic layer.** A new component multiplies approved effort by declared rates and
-   writes the budget. It performs no reasoning, invokes no Claude, and is closed by a byte-equal
-   replay check. It is bound in the manifest per §16.5, as C3 requires.
-
-The existing `lump_sum` regime stays exactly as it is, for a project that does have a planner.
-The amendment adds a route and removes none. Say so if you want the external route retired
-instead — that is a larger change and a different ticket.
+**What this costs.** Every Phase 8 figure then traces to fiction. §13.8 still binds, so a Tier 5
+deliverable resting on one must say so. That is a label, not a gate.
 
 **Blocked by:** nothing.
 
-- [ ] The amendment record is written into `CLAUDE.md` §8, naming every section it touches:
-  §8.1, §8.3, §8.4, §17.6.7, §7 Phase 7, §5's integration constraints. §14.2 lists the five
-  fields each amendment must carry.
-- [ ] §14.4 is satisfied. No section of the amended constitution contradicts another, and the
-  §13.3 prohibition on invented project facts still reads true.
-- [ ] `VALID_BUDGET_REGIMES` carries `derived_lump_sum`, and `resolve_budget_regime` returns it
-  from the Tier 3 call binding.
-- [ ] `gate_09` gains an `applies_when: {budget_regime: derived_lump_sum}` predicate set. The
-  lump-sum and unit-cost sets are untouched and their tests still pass.
-- [ ] The effort estimate is a Tier 3 artifact with a §12.2 status per line. An unapproved
-  estimate fails the gate. A test proves the gate blocks on it.
-- [ ] The cost model is operator-declared. A test proves no agent can write a rate, and that an
-  absent rate is `Unresolved` rather than defaulted.
-- [ ] The deterministic component replays byte-equal from its inputs, under a CI check that
-  names the figure.
-- [ ] The categorical Phase 8 block still holds. Every budget component must resolve to
-  Confirmed or operator-declared Assumed before `gate_09` passes.
-- [ ] `budget_request.json` carries a real run identifier. It currently holds the literal string
-  `import uuid; print(uuid.uuid4())`, and the same string names two decision log files.
+- [ ] A response in `received/` conforms to the interface contract, covers all 7 work packages
+  and all 12 partners, and declares itself fictional in its own content.
+- [ ] `g08_p02`, `g08_p04`, `g08_p05` and `g08_p06` pass on it. A test proves each.
+- [ ] A Tier 4 decision record names the override, the three rules it suspends, who authorised
+  it, and that it expires with this ticket.
+- [ ] The records that pin an empty `received/` are updated, not left contradicting the branch:
+  the demo ticket's validation report, its decision record, its Outcome, and the four tests in
+  `tests/test_demo_candidate_blind_baseline.py` that assert the blocking state.
+- [ ] Tier 5 content derived from this budget carries the fictional label.
+- [ ] After the operator dispatches Phase 7, the node writes `validation/` and
+  `budget_gate_assessment.json`, and `gate_09` reaches pass. Recorded, not assumed.
 
+**Not in this ticket.** A real internal budget route needs a §14 amendment, an operator-approved
+effort estimate, a declared cost model and a deterministic component under byte-equal replay.
+That was the earlier draft of this ticket. It is the right shape for a live proposal and the
+wrong shape for a demo, so it is dropped rather than carried as scope.
 ---
 
 ## Ticket B — Make the blind lane's document route usable by a shipped profile
