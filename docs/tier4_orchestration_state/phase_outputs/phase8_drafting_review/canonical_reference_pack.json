@@ -1,0 +1,640 @@
+{
+  "schema_id": "orch.phase8.canonical_reference_pack.v1",
+  "run_id": "import uuid; print(uuid.uuid4())",
+  "objectives": [
+    {
+      "id": "O1",
+      "title": "Build one multisensory integration architecture that carries omics, in-situ and remote-sensing observation on a single pressure gradient",
+      "measurable_target": "A prioritised knowledge-gap and data-need analysis, and an integration architecture specification covering the molecular, plot, airborne and satellite layers",
+      "responsible_partner": "P02",
+      "contributing_partners": [
+        "P04",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O2",
+      "title": "Agree joint data-collection, metadata and processing protocols, and publish them with crosswalks to the European habitat classification and the global ecosystem typology",
+      "measurable_target": "One protocol set adopted across the three cases, a crosswalk package, a provenance-tracked pipeline release, and publication to the open science cloud and the common data spaces",
+      "responsible_partner": "P10",
+      "contributing_partners": [
+        "P01",
+        "P04",
+        "P08",
+        "P09"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O3",
+      "title": "Turn the multi-season field archive and the case observations into documented training and validation resources",
+      "measurable_target": "A published training and validation resource with a declared split protocol, in which site, season and treatment travel together into one fold",
+      "responsible_partner": "P03",
+      "contributing_partners": [
+        "P01",
+        "P12"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O4",
+      "title": "Run three demonstration and verification cases along one agricultural pressure gradient, across the terrestrial, freshwater and marine realms",
+      "measurable_target": "Three harmonised observation datasets, one per realm, and a cross-case report on which harmonisation decisions survived transfer between realms",
+      "responsible_partner": "P03",
+      "contributing_partners": [
+        "P01",
+        "P02",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P11"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O5",
+      "title": "Deliver habitat and ecosystem classification and biodiversity trend prediction at case, regional and European scales",
+      "measurable_target": "Benchmarked classification models for the three cases, European-scale habitat and ecosystem maps, and trend predictions with stated uncertainty",
+      "responsible_partner": "P12",
+      "contributing_partners": [
+        "P01",
+        "P02",
+        "P07",
+        "P08",
+        "P11"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O6",
+      "title": "Carry the validated indicators into policy reporting and into farm management, so biodiversity evidence reaches the sectors that create the pressure",
+      "measurable_target": "A reporting-needs assessment agreed with competent authorities, an indicator decision-support release, and a usability evaluation run through a multi-country network of agricultural holdings",
+      "responsible_partner": "P05",
+      "contributing_partners": [
+        "P04",
+        "P06",
+        "P11"
+      ],
+      "provenance": "confirmed"
+    }
+  ],
+  "outcomes": [
+    {
+      "id": "OC1",
+      "title": "One multisensory integration architecture carries omics, in-situ, airborne and satellite observation, and it is specified from a prioritised account of what is missing rather than of what is available.",
+      "linked_objectives": [
+        "O1"
+      ],
+      "linked_wp_ids": [
+        "WP2"
+      ],
+      "linked_deliverable_ids": [
+        "D2.1",
+        "D2.2",
+        "D2.3"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC2",
+      "title": "A joint protocol set, a crosswalk package and a provenance-tracked pipeline make the project's harmonisation decisions usable outside it, and the decisions reach the bodies that maintain the classifications.",
+      "linked_objectives": [
+        "O2"
+      ],
+      "linked_wp_ids": [
+        "WP1",
+        "WP3"
+      ],
+      "linked_deliverable_ids": [
+        "D1.1",
+        "D3.1",
+        "D3.2",
+        "D3.3",
+        "D3.4"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC3",
+      "title": "Three demonstration cases on one agricultural pressure gradient produce comparable observation datasets across the terrestrial, freshwater and marine realms, and a report says which harmonisation decisions survived the transfer.",
+      "linked_objectives": [
+        "O4"
+      ],
+      "linked_wp_ids": [
+        "WP4"
+      ],
+      "linked_deliverable_ids": [
+        "D4.1",
+        "D4.2",
+        "D4.3",
+        "D4.4"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC4",
+      "title": "The molecular layer joins the in-situ and remote-sensing record through a published metadata standard, so a genomic observation and a satellite observation of the same place can be queried together.",
+      "linked_objectives": [
+        "O1",
+        "O4"
+      ],
+      "linked_wp_ids": [
+        "WP5"
+      ],
+      "linked_deliverable_ids": [
+        "D5.1",
+        "D5.2",
+        "D5.3"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC5",
+      "title": "A documented training and validation resource with a declared split protocol lets an external group reproduce the project's benchmarks and test its own models against them.",
+      "linked_objectives": [
+        "O3"
+      ],
+      "linked_wp_ids": [
+        "WP6"
+      ],
+      "linked_deliverable_ids": [
+        "D6.1"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC6",
+      "title": "Habitat and ecosystem classification runs at European coverage, and biodiversity trend predictions carry the uncertainty the case benchmarks measured.",
+      "linked_objectives": [
+        "O5"
+      ],
+      "linked_wp_ids": [
+        "WP6"
+      ],
+      "linked_deliverable_ids": [
+        "D6.2",
+        "D6.3"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC7",
+      "title": "Competent authorities receive outputs shaped to the reporting obligations they carry, and agricultural holdings receive biodiversity indicators inside the tools they already use.",
+      "linked_objectives": [
+        "O6"
+      ],
+      "linked_wp_ids": [
+        "WP1",
+        "WP7"
+      ],
+      "linked_deliverable_ids": [
+        "D1.2",
+        "D7.1",
+        "D7.2",
+        "D7.3",
+        "D7.4"
+      ],
+      "provenance": "confirmed"
+    }
+  ],
+  "wps": [
+    {
+      "wp_id": "WP1",
+      "title": "Coordination, governance and the interoperability interface",
+      "lead_partner": "P01",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Knowledge gaps, data needs and the integration architecture",
+      "lead_partner": "P02",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Joint protocols, metadata and interoperability crosswalks",
+      "lead_partner": "P10",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP4",
+      "title": "Demonstration and verification cases along the pressure gradient",
+      "lead_partner": "P03",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP5",
+      "title": "The omics and molecular observation layer",
+      "lead_partner": "P09",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP6",
+      "title": "Training resources, habitat mapping and trend prediction",
+      "lead_partner": "P12",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP7",
+      "title": "Policy uptake, sectoral mainstreaming and exploitation",
+      "lead_partner": "P05",
+      "provenance": "confirmed"
+    }
+  ],
+  "deliverables": [
+    {
+      "deliverable_id": "D1.1",
+      "title": "Data management plan and shared metadata profile",
+      "due_month": 6,
+      "type": "other",
+      "parent_wp": "WP1",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D1.2",
+      "title": "Cooperation and coordination plan",
+      "due_month": 12,
+      "type": "other",
+      "parent_wp": "WP1",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D1.3",
+      "title": "Final project report",
+      "due_month": 48,
+      "type": "report",
+      "parent_wp": "WP1",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D2.1",
+      "title": "Prioritised knowledge-gap and data-need analysis",
+      "due_month": 9,
+      "type": "report",
+      "parent_wp": "WP2",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D2.2",
+      "title": "Multisensory integration architecture specification",
+      "due_month": 14,
+      "type": "other",
+      "parent_wp": "WP2",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D2.3",
+      "title": "Demonstration case selection dossier",
+      "due_month": 15,
+      "type": "report",
+      "parent_wp": "WP2",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D3.1",
+      "title": "Joint data collection, metadata and processing protocols",
+      "due_month": 16,
+      "type": "other",
+      "parent_wp": "WP3",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D3.2",
+      "title": "Interoperability crosswalk package",
+      "due_month": 28,
+      "type": "dataset",
+      "parent_wp": "WP3",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D3.3",
+      "title": "Provenance-tracked processing pipeline release",
+      "due_month": 34,
+      "type": "software",
+      "parent_wp": "WP3",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D3.4",
+      "title": "FAIR publication and standards contribution report",
+      "due_month": 42,
+      "type": "report",
+      "parent_wp": "WP3",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D4.1",
+      "title": "Terrestrial case observation dataset",
+      "due_month": 38,
+      "type": "dataset",
+      "parent_wp": "WP4",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D4.2",
+      "title": "Freshwater case observation dataset",
+      "due_month": 38,
+      "type": "dataset",
+      "parent_wp": "WP4",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D4.3",
+      "title": "Marine case dataset and the airborne and satellite layer",
+      "due_month": 38,
+      "type": "dataset",
+      "parent_wp": "WP4",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D4.4",
+      "title": "Cross-case verification report",
+      "due_month": 40,
+      "type": "report",
+      "parent_wp": "WP4",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5.1",
+      "title": "Omics sampling and analysis protocol",
+      "due_month": 20,
+      "type": "other",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5.2",
+      "title": "Molecular observation dataset with standardised metadata",
+      "due_month": 34,
+      "type": "dataset",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5.3",
+      "title": "Genome-to-space linkage report",
+      "due_month": 38,
+      "type": "report",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D6.1",
+      "title": "Documented training and validation resource with split protocol",
+      "due_month": 28,
+      "type": "dataset",
+      "parent_wp": "WP6",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D6.2",
+      "title": "Habitat and ecosystem classification models and benchmarks",
+      "due_month": 38,
+      "type": "software",
+      "parent_wp": "WP6",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D6.3",
+      "title": "European-scale maps and biodiversity trend predictions",
+      "due_month": 45,
+      "type": "dataset",
+      "parent_wp": "WP6",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D7.1",
+      "title": "Policy reporting needs assessment",
+      "due_month": 22,
+      "type": "report",
+      "parent_wp": "WP7",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D7.2",
+      "title": "Biodiversity indicator decision-support release",
+      "due_month": 40,
+      "type": "software",
+      "parent_wp": "WP7",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D7.3",
+      "title": "Farm-management integration and usability evaluation",
+      "due_month": 44,
+      "type": "report",
+      "parent_wp": "WP7",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D7.4",
+      "title": "Dissemination, exploitation and communication plan",
+      "due_month": 48,
+      "type": "other",
+      "parent_wp": "WP7",
+      "provenance": "confirmed"
+    }
+  ],
+  "partners": [
+    {
+      "legal_name": "P01",
+      "country": "C1",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P02",
+      "country": "C1",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P03",
+      "country": "C1",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P04",
+      "country": "C1",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P05",
+      "country": "C1",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P06",
+      "country": "C2",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P07",
+      "country": "C3",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P08",
+      "country": "C4",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P09",
+      "country": "C5",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P10",
+      "country": "C3",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P11",
+      "country": "C6",
+      "provenance": "confirmed"
+    },
+    {
+      "legal_name": "P12",
+      "country": "C5",
+      "provenance": "confirmed"
+    }
+  ],
+  "declared_assumptions": [
+    {
+      "key": "P01_participation",
+      "declared_value": "beneficiary, research_institute, country slot C1 (MS)",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P02_participation",
+      "declared_value": "beneficiary, university, country slot C1 (MS)",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P03_participation",
+      "declared_value": "beneficiary, university, country slot C1 (MS)",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P04_participation",
+      "declared_value": "beneficiary, sme, country slot C1 (MS)",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P05_participation",
+      "declared_value": "beneficiary, sme, country slot C1 (MS)",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P06_participation",
+      "declared_value": "beneficiary, research_institute, country slot C2 (MS)",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P07_participation",
+      "declared_value": "beneficiary, research_institute, country slot C3 (MS)",
+      "checklist_ref": "CONSORTIUM_GAP",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P08_participation",
+      "declared_value": "beneficiary, university, country slot C4 (AC)",
+      "checklist_ref": "CONSORTIUM_GAP",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P09_participation",
+      "declared_value": "beneficiary, university, country slot C5 (MS)",
+      "checklist_ref": "CONSORTIUM_GAP",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P10_participation",
+      "declared_value": "beneficiary, ngo, country slot C3 (MS)",
+      "checklist_ref": "CONSORTIUM_GAP",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P11_participation",
+      "declared_value": "beneficiary, university, country slot C6 (AC)",
+      "checklist_ref": "CONSORTIUM_GAP",
+      "provenance": "assumed"
+    },
+    {
+      "key": "P12_participation",
+      "declared_value": "beneficiary, sme, country slot C5 (MS)",
+      "checklist_ref": "CONSORTIUM_GAP",
+      "provenance": "assumed"
+    },
+    {
+      "key": "coordinator",
+      "declared_value": "P01",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "country_slot_assignment",
+      "declared_value": "C1 MS, C2 MS, C3 MS, C4 AC, C5 MS, C6 AC",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "composition_condition",
+      "declared_value": "met only under assumption",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "project_duration",
+      "declared_value": "48 months",
+      "checklist_ref": "TIMELINE",
+      "provenance": "assumed"
+    },
+    {
+      "key": "effort_shares",
+      "declared_value": "not agreed; workpackage_seed.json carries no person-months",
+      "checklist_ref": "EFFORT",
+      "provenance": "assumed"
+    },
+    {
+      "key": "project_scale",
+      "declared_value": "7 work packages, 35 tasks, 24 deliverables, 8 milestones over 48 months",
+      "checklist_ref": "WORK_PLAN",
+      "provenance": "assumed"
+    },
+    {
+      "key": "work_package_leads",
+      "declared_value": "WP1 P01, WP2 P02, WP3 P10, WP4 P03, WP5 P09, WP6 P12, WP7 P05",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "demonstration_case_realms",
+      "declared_value": "terrestrial P03, freshwater P07, marine P08",
+      "checklist_ref": "CONSORTIUM",
+      "provenance": "assumed"
+    },
+    {
+      "key": "kpi_targets",
+      "declared_value": "no target numbers set",
+      "checklist_ref": "IMPACT",
+      "provenance": "assumed"
+    },
+    {
+      "key": "destination_expected_impacts",
+      "declared_value": "the six expected impacts are set at destination level, not at topic level",
+      "checklist_ref": "CALL_BINDING",
+      "provenance": "assumed"
+    }
+  ],
+  "aliases": []
+}

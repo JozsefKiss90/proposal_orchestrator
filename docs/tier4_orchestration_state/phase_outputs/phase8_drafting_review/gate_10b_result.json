@@ -1,0 +1,112 @@
+{
+  "schema_id": "orch.gate_result.v1",
+  "gate_id": "gate_10b_impact_completeness",
+  "gate_kind": "exit",
+  "run_id": "import uuid; print(uuid.uuid4())",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:de9024a2292050c8995468b274aac267a3d30667f497d9fe5aca2921f3e4d456",
+  "input_artifact_fingerprints": {
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:040f34cfacf80e5f40fe9378d7c8fb035b4afa8748fc48482801ca36ec590bdf",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:e9deea68ad0d6382b046412f5e1c83f94d8321e73901dd57bf965a146c8f1882"
+  },
+  "evaluated_at": "2026-10-01T22:41:52.386902+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "fail",
+  "deterministic_predicates": {
+    "passed": [
+      "g09b_p02",
+      "g09b_p03",
+      "g09b_p01",
+      "g09b_p04",
+      "g09b_p05",
+      "g09b_p05b",
+      "g09b_p06",
+      "g09b_p08",
+      "g09b_p09",
+      "g09b_p11",
+      "g09b_p12",
+      "g09b_p13"
+    ],
+    "failed": [
+      {
+        "predicate_id": "g09b_p07",
+        "type": "coverage",
+        "function": "no_unresolved_material_claims",
+        "args": {
+          "path": "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        },
+        "failure_category": "POLICY_VIOLATION",
+        "reason": "Unresolved material claims in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json: validation_status.overall_status is 'unresolved'",
+        "details": {
+          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
+          "overall_status": "unresolved"
+        },
+        "fail_message": "Impact section contains unresolved material claims.\n",
+        "prose_condition": "No unresolved material claims in Impact section"
+      },
+      {
+        "predicate_id": "g09b_p10",
+        "type": "coverage",
+        "function": "canonical_terms_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Canonical term issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json: 5 term(s) with wrong titles",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "term_type": "outcome_title",
+              "id": "OC2",
+              "canonical_title": "A joint protocol set, a crosswalk package and a provenance-tracked pipeline make the project's harmonisation decisions usable outside it, and the decisions reach the bodies that maintain the classifications.",
+              "found_title": "joint protocols, a crosswalk package and a provenance-tracked pipeline make the harmonisation decisions usable outside the project and reach the standards bodies",
+              "issue": "Outcome OC2 has wrong title attached: found 'joint protocols, a crosswalk package and a provenance-tracked pipeline make the harmonisation decisions usable outside the project and reach the standards bodies', expected 'A joint protocol set, a crosswalk package and a provenance-tracked pipeline make the project's harmonisation decisions usable outside it, and the decisions reach the bodies that maintain the classifications.'"
+            },
+            {
+              "term_type": "outcome_title",
+              "id": "OC3",
+              "canonical_title": "Three demonstration cases on one agricultural pressure gradient produce comparable observation datasets across the terrestrial, freshwater and marine realms, and a report says which harmonisation decisions survived the transfer.",
+              "found_title": "three cases on one gradient produce comparable datasets across the three realms, with a report on which decisions survived transfer",
+              "issue": "Outcome OC3 has wrong title attached: found 'three cases on one gradient produce comparable datasets across the three realms, with a report on which decisions survived transfer', expected 'Three demonstration cases on one agricultural pressure gradient produce comparable observation datasets across the terrestrial, freshwater and marine realms, and a report says which harmonisation decisions survived the transfer.'"
+            },
+            {
+              "term_type": "outcome_title",
+              "id": "OC5",
+              "canonical_title": "A documented training and validation resource with a declared split protocol lets an external group reproduce the project's benchmarks and test its own models against them.",
+              "found_title": "a documented training and validation resource lets an external group reproduce the benchmarks",
+              "issue": "Outcome OC5 has wrong title attached: found 'a documented training and validation resource lets an external group reproduce the benchmarks', expected 'A documented training and validation resource with a declared split protocol lets an external group reproduce the project's benchmarks and test its own models against them.'"
+            },
+            {
+              "term_type": "outcome_title",
+              "id": "OC6",
+              "canonical_title": "Habitat and ecosystem classification runs at European coverage, and biodiversity trend predictions carry the uncertainty the case benchmarks measured.",
+              "found_title": "classification runs at European coverage and trend predictions carry measured uncertainty",
+              "issue": "Outcome OC6 has wrong title attached: found 'classification runs at European coverage and trend predictions carry measured uncertainty', expected 'Habitat and ecosystem classification runs at European coverage, and biodiversity trend predictions carry the uncertainty the case benchmarks measured.'"
+            },
+            {
+              "term_type": "outcome_title",
+              "id": "OC7",
+              "canonical_title": "Competent authorities receive outputs shaped to the reporting obligations they carry, and agricultural holdings receive biodiversity indicators inside the tools they already use.",
+              "found_title": "authorities receive outputs shaped to their reporting obligations and holdings receive indicators inside their own tools",
+              "issue": "Outcome OC7 has wrong title attached: found 'authorities receive outputs shaped to their reporting obligations and holdings receive indicators inside their own tools', expected 'Competent authorities receive outputs shaped to the reporting obligations they carry, and agricultural holdings receive biodiversity indicators inside the tools they already use.'"
+            }
+          ]
+        },
+        "fail_message": "Impact section shortens or paraphrases canonical objective or WP titles from the reference pack.\n",
+        "prose_condition": "Canonical objective and WP titles preserved"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [],
+    "skipped": true
+  },
+  "skipped_semantic": true,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10b_result.json"
+}

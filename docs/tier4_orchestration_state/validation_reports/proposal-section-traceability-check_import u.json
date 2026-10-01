@@ -1,0 +1,277 @@
+{
+  "report_id": "traceability_impact_section_impact_writer_2026-10-02T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "impact_writer",
+  "run_id_reference": "import uuid; print(uuid.uuid4())",
+  "section_id_audited": "impact_section",
+  "claim_audit_results": [
+    {
+      "claim_id": "C1",
+      "claim_summary": "BIODIV-01 is a Research and Innovation Action under the destination Biodiversity and ecosystem services",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json (instrument_type RIA, destination Confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C2",
+      "claim_summary": "The topic sets three expected outcomes (EO-01, EO-02, EO-03)",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json (EO-01..EO-03, Confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C3",
+      "claim_summary": "The destination sets six longer-term expected impacts (EI-01..EI-06), at destination level not topic level",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-01..EI-06, destination-level, Confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C4",
+      "claim_summary": "The central result is one reusable observation chain carrying measurement from molecules to satellites along a single agricultural pressure gradient from farmland through freshwater ecotones to coastal waters",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (objective O4: single agricultural pressure gradient across three realms)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C5",
+      "claim_summary": "The three demonstration cases share one pressure and one measurement protocol, so a harmonisation decision is tested in realms that did not design it (D4.4)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (OC3; deliverable D4.4 Cross-case verification report)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C6",
+      "claim_summary": "The named result deliverables D2.2, D3.1-D3.4, D5.3, D6.1-D6.3 and D7.2 carry the canonical titles the section uses",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables array)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C7",
+      "claim_summary": "The project fixes twelve impact indicators, each measuring something it delivers and each naming one deliverable",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (kpis K01-K12, each measured_on one deliverable)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C8",
+      "claim_summary": "Each impact indicator names a deliverable that exists in the work plan",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables D2.1, D4.1, D4.4, D6.1-D6.3, D3.2, D3.4, D7.1, D7.3, D5.3)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C9",
+      "claim_summary": "No target numbers are fixed for the indicators yet",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (kpi_targets: no target numbers set)",
+      "flag_reason": "Operator-declared assumption; targets await consortium confirmation. Explicitly declared, not accepted as Confirmed."
+    },
+    {
+      "claim_id": "C10",
+      "claim_summary": "The project duration is 48 months",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (project_duration: 48 months); mirrored in selected_call.json field_status Assumed",
+      "flag_reason": "No Tier 2B source evidences a duration; operator-declared and can never be Confirmed."
+    },
+    {
+      "claim_id": "C11",
+      "claim_summary": "The valuation clause of the fourth destination impact is only partly addressed; the project improves the evidence a valuation rests on but runs none, as no partner carries environmental economics",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (partly_addressed_clauses within DEST-IMPACT-4, validation_status Unresolved)",
+      "flag_reason": "Source marks the valuation clause Unresolved; the gap is disclosed, not resolved."
+    },
+    {
+      "claim_id": "C12",
+      "claim_summary": "The demonstration case realms are terrestrial P03, freshwater P07, marine P08",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (demonstration_case_realms)",
+      "flag_reason": "Project fact resting on operator-declared, unconfirmed partners (P07, P08 fictional); declared Assumed, not Confirmed."
+    },
+    {
+      "claim_id": "C13",
+      "claim_summary": "Use of the European earth observation and satellite navigation programmes is an eligibility condition for satellite data under this topic",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json (claim C03, call_phrase 'Copernicus and/or Galileo/EGNOS', call_phrases Confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C14",
+      "claim_summary": "The Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation are the reporting obligations named for this topic",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json (claim C14, verbatim call_phrase, call_phrases Confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C15",
+      "claim_summary": "A plan for dissemination and exploitation including communication is an admissibility condition, with a more detailed plan as a mandatory deliverable updated periodically",
+      "status": "confirmed",
+      "source_ref": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json (RIA section B.2.2 field_requirements)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C16",
+      "claim_summary": "WP7 'Policy uptake, sectoral mainstreaming and exploitation' carries dissemination, exploitation and communication, consolidated in D7.4",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (WP7 title; deliverable D7.4)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C17",
+      "claim_summary": "The Data management plan and shared metadata profile (D1.1), due at month 6, fixes the open-data and FAIR commitments",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D1.1, due_month 6)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C18",
+      "claim_summary": "The action is a Research and Innovation Action, not an Innovation Action, so no path to commercialise an innovation is required",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json (instrument_type RIA, Confirmed); IA-only commercialisation requirement in section_schema_registry.json B.2.2",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C19",
+      "claim_summary": "Dissemination is open FAIR release of the protocols, crosswalks, pipeline, training resource, models, maps and genome-to-space report to the open science cloud and common data spaces",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables D3.1-D3.4, D6.1-D6.3, D5.3; OC2)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C20",
+      "claim_summary": "The measures are proportionate to a Research and Innovation Action of EUR 5,000,000 funding two projects",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json (expected_eu_contribution_per_project_eur 5000000; indicative_number_of_projects 2, Confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C21",
+      "claim_summary": "Exploitation carries biodiversity indicators into farm-management tools via D7.2 and D7.3",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D7.2, D7.3; OC7)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C22",
+      "claim_summary": "The uptake channel is P05's multi-country user network, a partner whose participation is assumed",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (P05_participation)",
+      "flag_reason": "Project fact resting on operator-declared, unconfirmed partner; the draft itself flags participation as assumed."
+    },
+    {
+      "claim_id": "C23",
+      "claim_summary": "A measurement protocol transfers to a second production context, resting on P06 whose participation is assumed",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (P06_participation)",
+      "flag_reason": "Project fact resting on operator-declared, unconfirmed partner; flagged as assumed in the draft."
+    },
+    {
+      "claim_id": "C24",
+      "claim_summary": "The project submits its harmonisation decisions to the bodies maintaining the classifications, with dispositions recorded in D3.4",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D3.4 FAIR publication and standards contribution report; OC2)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C25",
+      "claim_summary": "The crosswalk, open-science-cloud and standards-submission measures are held by P10, whose participation is assumed",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (P10_participation)",
+      "flag_reason": "Project fact resting on operator-declared, fictional gap partner; flagged as assumed in the draft."
+    },
+    {
+      "claim_id": "C26",
+      "claim_summary": "The beneficiaries sit in Member States and Associated Countries under the assumed country-slot assignment",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (country_slot_assignment, composition_condition met only under assumption)",
+      "flag_reason": "Operator-declared country slots; composition met only under assumption, so declared Assumed."
+    },
+    {
+      "claim_id": "C27",
+      "claim_summary": "The primary IP protection measure is copyright under open licences, with software released open-source and datasets, crosswalks and the training resource under open FAIR terms",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (software deliverables D3.3, D6.2, D7.2; dataset deliverables D3.2, D5.2, D6.1, D6.3)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C28",
+      "claim_summary": "Patents and design rights are not the primary route because the outputs are protocols, data, models and software rather than patentable devices",
+      "status": "inferred",
+      "source_ref": "Derivation: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json records deliverable types as software/dataset/report/other (none a DEM device); the claim derives 'patents not primary' from the absence of device deliverables",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C29",
+      "claim_summary": "An SME sustaining the decision-support may keep background tooling a trade secret while foreground stays open, resting on P04 and P05 whose participation is assumed",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (P04_participation, P05_participation)",
+      "flag_reason": "Project fact resting on operator-declared, unconfirmed partners; flagged as assumed in the draft."
+    },
+    {
+      "claim_id": "C30",
+      "claim_summary": "Detailed IP access rights belong in the consortium agreement, which is not yet drafted",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json (concept at Assumed; no consortium agreement artifact exists)",
+      "flag_reason": "No Tier 1-4 artifact evidences a consortium agreement; disclosed as a project-stage gap, not resolved."
+    },
+    {
+      "claim_id": "C31",
+      "claim_summary": "Outputs are shaped to the reporting obligations via the Policy reporting needs assessment (D7.1) and the Interoperability crosswalk package (D3.2), feeding monitoring and review",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D7.1, D3.2; OC7)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C32",
+      "claim_summary": "Crosswalked labels and occurrence records make progress on international biodiversity commitments countable, the sixth destination impact",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-06)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C33",
+      "claim_summary": "The reusable observation chain is released under open terms so use continues after the project, with reuse measured through the indicators and recorded in the Final project report (D1.3)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D1.3 Final project report, due_month 48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C34",
+      "claim_summary": "Many in-situ collections 'were not designed with Satellite Remote Sensing integration in mind' and 'lack the structure, interface and metadata required to support advanced analytics, including AI', so reconciliation is done once per project and discarded",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (section 'The gap the topic names', verbatim quotes)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C35",
+      "claim_summary": "Assessment and trend prediction need fit-for-purpose interoperable data across the terrestrial, freshwater and marine realms (SR-01, SR-02)",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-01, SR-02, mandatory, Confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C36",
+      "claim_summary": "The project outcomes are OC1 to OC7 as stated in the canvas",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (outcomes OC1-OC7)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C37",
+      "claim_summary": "Occurrence records reach the global biodiversity data facilities through cooperation held in WP1 and WP3, resting on P10",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (P10_participation)",
+      "flag_reason": "Mechanism (WP1/WP3 cooperation) is confirmed structure but rests on operator-declared, fictional partner P10; declared Assumed."
+    }
+  ],
+  "summary": {
+    "total_claims": 37,
+    "confirmed": 25,
+    "inferred": 1,
+    "assumed": 9,
+    "unresolved": 2
+  },
+  "no_unsupported_claims_declaration": false,
+  "timestamp": "2026-10-02T00:00:00Z"
+}
