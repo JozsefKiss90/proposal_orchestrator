@@ -1,0 +1,399 @@
+{
+  "schema_id": "orch.run_cost.per_phase.v1",
+  "run_id": "import uuid; print(uuid.uuid4())",
+  "phases_covered": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "attribution": {
+    "status": "Inferred",
+    "method": "Each ledger row is attributed to the earliest phase whose gate was evaluated at or after the row's timestamp.",
+    "inference_chain": [
+      "Every ledger row carries node_id: null, because runner/benchmark/transport_hook.py does not set it.",
+      "A phase's invocations therefore cannot be read off the row; they have to be bounded in time.",
+      "A phase is dispatched after the previous phase's gate is evaluated, and its own gate is evaluated after its last invocation, so the two gate times bound it.",
+      "The phase gates' evaluated_at values are checked to ascend with phase number, and every gate result is checked to carry this run id. Either check failing aborts the derivation."
+    ],
+    "why_not_confirmed": "No artifact records which phase an invocation belonged to. The attribution is sound but reconstructed, so it is Inferred under §12.2 and not Confirmed.",
+    "supersedes": ".claude/benchmark/import uuid; print(uuid.uuid4())/phase_analytics.json, which attributes this run's whole cumulative ledger to one phase."
+  },
+  "monetary_cost": {
+    "cost_usd": null,
+    "status": "Unresolved",
+    "reason": ".claude/benchmark/import uuid; print(uuid.uuid4())/provider_projection.json evaluated 0 providers, so no rate exists to price this run's tokens against. A figure is not substituted (§8.3).",
+    "provider_projection": ".claude/benchmark/import uuid; print(uuid.uuid4())/provider_projection.json"
+  },
+  "inputs": [
+    ".claude/benchmark/import uuid; print(uuid.uuid4())/invocation_ledger.jsonl",
+    ".claude/benchmark/import uuid; print(uuid.uuid4())/provider_projection.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/gate_result.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json"
+  ],
+  "per_phase": [
+    {
+      "phase": 1,
+      "gate_id": "phase_01_gate",
+      "gate_status": "pass",
+      "gate_result_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+      "window_start_exclusive_utc": null,
+      "window_end_inclusive_utc": "2026-09-30T22:33:29.258755+00:00",
+      "invocations": 4,
+      "estimated_input_tokens": 48248,
+      "estimated_output_tokens": 25921,
+      "estimated_total_tokens": 74169,
+      "wall_clock_seconds": 618.297,
+      "span_seconds": 487.454,
+      "first_invocation_utc": "2026-09-30T22:23:10.655866+00:00",
+      "last_invocation_utc": "2026-09-30T22:31:18.110332+00:00",
+      "execution_modes": {
+        "tapm": 4
+      },
+      "models": [
+        "claude-opus-4-8"
+      ],
+      "failed": 0,
+      "timed_out": 0,
+      "by_skill": {
+        "call-requirements-extraction": {
+          "invocations": 1,
+          "estimated_input_tokens": 10532,
+          "estimated_output_tokens": 5243,
+          "wall_clock_seconds": 154.5
+        },
+        "evaluation-matrix-builder": {
+          "invocations": 1,
+          "estimated_input_tokens": 7605,
+          "estimated_output_tokens": 2180,
+          "wall_clock_seconds": 81.234
+        },
+        "instrument-schema-normalization": {
+          "invocations": 1,
+          "estimated_input_tokens": 8496,
+          "estimated_output_tokens": 16358,
+          "wall_clock_seconds": 251.641
+        },
+        "topic-scope-check": {
+          "invocations": 1,
+          "estimated_input_tokens": 21615,
+          "estimated_output_tokens": 2140,
+          "wall_clock_seconds": 130.922
+        }
+      }
+    },
+    {
+      "phase": 2,
+      "gate_id": "phase_02_gate",
+      "gate_status": "pass",
+      "gate_result_path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json",
+      "window_start_exclusive_utc": "2026-09-30T22:33:29.258755+00:00",
+      "window_end_inclusive_utc": "2026-09-30T22:43:44.227803+00:00",
+      "invocations": 4,
+      "estimated_input_tokens": 99064,
+      "estimated_output_tokens": 8686,
+      "estimated_total_tokens": 107750,
+      "wall_clock_seconds": 499.844,
+      "span_seconds": 417.269,
+      "first_invocation_utc": "2026-09-30T22:35:24.287454+00:00",
+      "last_invocation_utc": "2026-09-30T22:42:21.556125+00:00",
+      "execution_modes": {
+        "cli-prompt": 1,
+        "tapm": 3
+      },
+      "models": [
+        "claude-opus-4-8"
+      ],
+      "failed": 0,
+      "timed_out": 0,
+      "by_skill": {
+        "concept-alignment-check": {
+          "invocations": 1,
+          "estimated_input_tokens": 10608,
+          "estimated_output_tokens": 4323,
+          "wall_clock_seconds": 209.593
+        },
+        "concept-call-binding-derivation": {
+          "invocations": 1,
+          "estimated_input_tokens": 5135,
+          "estimated_output_tokens": 921,
+          "wall_clock_seconds": 53.0
+        },
+        "decision-log-update": {
+          "invocations": 1,
+          "estimated_input_tokens": 61706,
+          "estimated_output_tokens": 1233,
+          "wall_clock_seconds": 82.61
+        },
+        "topic-scope-check": {
+          "invocations": 1,
+          "estimated_input_tokens": 21615,
+          "estimated_output_tokens": 2209,
+          "wall_clock_seconds": 154.641
+        }
+      }
+    },
+    {
+      "phase": 3,
+      "gate_id": "phase_03_gate",
+      "gate_status": "pass",
+      "gate_result_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json",
+      "window_start_exclusive_utc": "2026-09-30T22:43:44.227803+00:00",
+      "window_end_inclusive_utc": "2026-09-30T23:00:04.724574+00:00",
+      "invocations": 6,
+      "estimated_input_tokens": 126207,
+      "estimated_output_tokens": 26706,
+      "estimated_total_tokens": 152913,
+      "wall_clock_seconds": 683.58,
+      "span_seconds": 929.255,
+      "first_invocation_utc": "2026-09-30T22:43:44.407753+00:00",
+      "last_invocation_utc": "2026-09-30T22:59:13.662281+00:00",
+      "execution_modes": {
+        "cli-prompt": 2,
+        "tapm": 4
+      },
+      "models": [
+        "claude-opus-4-8"
+      ],
+      "failed": 0,
+      "timed_out": 0,
+      "by_skill": {
+        "g03_p06": {
+          "invocations": 1,
+          "estimated_input_tokens": 6214,
+          "estimated_output_tokens": 557,
+          "wall_clock_seconds": 36.312
+        },
+        "gate-enforcement": {
+          "invocations": 1,
+          "estimated_input_tokens": 12260,
+          "estimated_output_tokens": 369,
+          "wall_clock_seconds": 51.0
+        },
+        "instrument-schema-normalization": {
+          "invocations": 1,
+          "estimated_input_tokens": 8496,
+          "estimated_output_tokens": 15872,
+          "wall_clock_seconds": 248.829
+        },
+        "milestone-consistency-check": {
+          "invocations": 1,
+          "estimated_input_tokens": 76378,
+          "estimated_output_tokens": 776,
+          "wall_clock_seconds": 59.719
+        },
+        "work-package-normalization": {
+          "invocations": 1,
+          "estimated_input_tokens": 15486,
+          "estimated_output_tokens": 4405,
+          "wall_clock_seconds": 153.532
+        },
+        "wp-dependency-analysis": {
+          "invocations": 1,
+          "estimated_input_tokens": 7373,
+          "estimated_output_tokens": 4727,
+          "wall_clock_seconds": 134.188
+        }
+      }
+    },
+    {
+      "phase": 4,
+      "gate_id": "phase_04_gate",
+      "gate_status": "pass",
+      "gate_result_path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json",
+      "window_start_exclusive_utc": "2026-09-30T23:00:04.724574+00:00",
+      "window_end_inclusive_utc": "2026-09-30T23:05:42.111773+00:00",
+      "invocations": 4,
+      "estimated_input_tokens": 83289,
+      "estimated_output_tokens": 4255,
+      "estimated_total_tokens": 87544,
+      "wall_clock_seconds": 289.532,
+      "span_seconds": 234.165,
+      "first_invocation_utc": "2026-09-30T23:00:52.149397+00:00",
+      "last_invocation_utc": "2026-09-30T23:04:46.314636+00:00",
+      "execution_modes": {
+        "cli-prompt": 2,
+        "tapm": 2
+      },
+      "models": [
+        "claude-opus-4-8"
+      ],
+      "failed": 0,
+      "timed_out": 0,
+      "by_skill": {
+        "decision-log-update": {
+          "invocations": 1,
+          "estimated_input_tokens": 26060,
+          "estimated_output_tokens": 734,
+          "wall_clock_seconds": 46.953
+        },
+        "gantt-schedule-builder": {
+          "invocations": 1,
+          "estimated_input_tokens": 3811,
+          "estimated_output_tokens": 2287,
+          "wall_clock_seconds": 130.094
+        },
+        "gate-enforcement": {
+          "invocations": 1,
+          "estimated_input_tokens": 12260,
+          "estimated_output_tokens": 482,
+          "wall_clock_seconds": 55.594
+        },
+        "milestone-consistency-check": {
+          "invocations": 1,
+          "estimated_input_tokens": 41158,
+          "estimated_output_tokens": 752,
+          "wall_clock_seconds": 56.891
+        }
+      }
+    },
+    {
+      "phase": 5,
+      "gate_id": "phase_05_gate",
+      "gate_status": "pass",
+      "gate_result_path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/gate_result.json",
+      "window_start_exclusive_utc": "2026-09-30T23:05:42.111773+00:00",
+      "window_end_inclusive_utc": "2026-09-30T23:26:12.133578+00:00",
+      "invocations": 4,
+      "estimated_input_tokens": 25825,
+      "estimated_output_tokens": 9322,
+      "estimated_total_tokens": 35147,
+      "wall_clock_seconds": 449.923,
+      "span_seconds": 326.074,
+      "first_invocation_utc": "2026-09-30T23:18:41.853173+00:00",
+      "last_invocation_utc": "2026-09-30T23:24:07.927513+00:00",
+      "execution_modes": {
+        "tapm": 4
+      },
+      "models": [
+        "claude-opus-4-8"
+      ],
+      "failed": 0,
+      "timed_out": 0,
+      "by_skill": {
+        "dissemination-exploitation-communication-check": {
+          "invocations": 1,
+          "estimated_input_tokens": 7483,
+          "estimated_output_tokens": 2772,
+          "wall_clock_seconds": 108.453
+        },
+        "gate-enforcement": {
+          "invocations": 1,
+          "estimated_input_tokens": 12260,
+          "estimated_output_tokens": 998,
+          "wall_clock_seconds": 124.063
+        },
+        "impact-dec-enricher": {
+          "invocations": 1,
+          "estimated_input_tokens": 3239,
+          "estimated_output_tokens": 2500,
+          "wall_clock_seconds": 110.297
+        },
+        "impact-pathway-core-builder": {
+          "invocations": 1,
+          "estimated_input_tokens": 2843,
+          "estimated_output_tokens": 3052,
+          "wall_clock_seconds": 107.11
+        }
+      }
+    },
+    {
+      "phase": 6,
+      "gate_id": "phase_06_gate",
+      "gate_status": "pass",
+      "gate_result_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json",
+      "window_start_exclusive_utc": "2026-09-30T23:26:12.133578+00:00",
+      "window_end_inclusive_utc": "2026-09-30T23:46:17.853819+00:00",
+      "invocations": 5,
+      "estimated_input_tokens": 116957,
+      "estimated_output_tokens": 11306,
+      "estimated_total_tokens": 128263,
+      "wall_clock_seconds": 501.658,
+      "span_seconds": 408.66,
+      "first_invocation_utc": "2026-09-30T23:37:56.010741+00:00",
+      "last_invocation_utc": "2026-09-30T23:44:44.670368+00:00",
+      "execution_modes": {
+        "cli-prompt": 1,
+        "tapm": 4
+      },
+      "models": [
+        "claude-opus-4-8"
+      ],
+      "failed": 0,
+      "timed_out": 0,
+      "by_skill": {
+        "constitutional-compliance-check": {
+          "invocations": 1,
+          "estimated_input_tokens": 9556,
+          "estimated_output_tokens": 1936,
+          "wall_clock_seconds": 94.547
+        },
+        "gate-enforcement": {
+          "invocations": 1,
+          "estimated_input_tokens": 12260,
+          "estimated_output_tokens": 935,
+          "wall_clock_seconds": 93.11
+        },
+        "governance-model-builder": {
+          "invocations": 1,
+          "estimated_input_tokens": 11535,
+          "estimated_output_tokens": 5293,
+          "wall_clock_seconds": 170.11
+        },
+        "milestone-consistency-check": {
+          "invocations": 1,
+          "estimated_input_tokens": 81516,
+          "estimated_output_tokens": 746,
+          "wall_clock_seconds": 66.109
+        },
+        "risk-register-builder": {
+          "invocations": 1,
+          "estimated_input_tokens": 2090,
+          "estimated_output_tokens": 2396,
+          "wall_clock_seconds": 77.782
+        }
+      }
+    }
+  ],
+  "totals": {
+    "invocations": 27,
+    "estimated_input_tokens": 499590,
+    "estimated_output_tokens": 86196,
+    "estimated_total_tokens": 585786,
+    "wall_clock_seconds": 3042.834,
+    "span_seconds": 4894.015,
+    "first_invocation_utc": "2026-09-30T22:23:10.655866+00:00",
+    "last_invocation_utc": "2026-09-30T23:44:44.670368+00:00",
+    "execution_modes": {
+      "cli-prompt": 6,
+      "tapm": 21
+    },
+    "models": [
+      "claude-opus-4-8"
+    ],
+    "failed": 0,
+    "timed_out": 0
+  },
+  "unattributed_after_last_gate": {
+    "invocations": 0,
+    "estimated_input_tokens": 0,
+    "estimated_output_tokens": 0,
+    "estimated_total_tokens": 0,
+    "wall_clock_seconds": 0.0,
+    "span_seconds": 0.0,
+    "first_invocation_utc": null,
+    "last_invocation_utc": null,
+    "execution_modes": {},
+    "models": [],
+    "failed": 0,
+    "timed_out": 0,
+    "by_skill": {}
+  },
+  "note": "Token counts are the benchmark layer's own estimates, not a provider's billed usage. wall_clock_seconds sums the invocations; span_seconds measures first to last invocation in the window and so includes the gaps between them."
+}

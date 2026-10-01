@@ -1,0 +1,426 @@
+{
+  "report_id": "demo-runner-phases-1-6_2026-10-01",
+  "report_kind": "runner_phase_dispatch_validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "authority": [
+    "CLAUDE.md §6 (phases ordered, gates mandatory, outputs durable), §7 (the phase definitions and gate conditions checked here), §9.1 (docs/ is the durable record), §9.5 (reproducibility and auditability), §12.1 (reviewability), §12.2 (the four status categories) and §15 (explicit failure over fabricated completion).",
+    "The ticket 'Runner Phases 1 to 6 on the demo' in plans/dev_graph_demo_tickets.md supplies the four acceptance criteria."
+  ],
+  "question_asked": "Do Phases 1 to 6 dispatch through the runner on the frozen Tier 3 and reach released, with Tier 2B extracted/ traceable to the Part 9 source, the run manifests preserved, and cost and duration recorded per phase?",
+  "answer": "Yes, on the second of two runs. All six nodes reached released on both, with every gate passing and no failed predicate. The first run exposed the substantive defect: this topic's expected impacts had never entered Tier 2B at all, so Phase 1 built expected_impacts.json out of the topic's own Expected Outcome and Scope text and marked four of five paraphrases Confirmed. The destination narrative on Part 9 pages 47 and 48, which states the six, is absent from the grouped work programme JSON, so the Step 0 slice could not carry it. The curated call extract was given the six, sliced from the PDF and cross-checked against the Tier 3 transcription of those pages, and the phases were rerun. expected_impacts.json now holds 6 Confirmed entries citing pages 47 and 48, and Phase 5 carries 6 pathways, one per impact. Cost and duration per phase are derived from the invocation ledger, because the benchmark layer's own roll-up attributed a whole run to a single phase. Two things are recorded rather than repaired: the rerun's run id is a mis-pasted shell fragment, and this evaluation briefly read a requirement into the preservation criterion that the criterion does not state.",
+  "acceptance_criteria": [
+    {
+      "criterion": "Phases 1-6 each reach released, or the blocking gate and reason are recorded in Tier 4.",
+      "disposition": "met",
+      "evidence": "The run manifest records n01 to n06 all released, each with failure_origin null and exit_gate_evaluated true. The six phase gates pass with no failed predicate and nothing skipped: phase_01_gate 17/17 deterministic, phase_02_gate 6/6 plus one semantic, phase_03_gate 8/8, phase_04_gate 11/11, phase_05_gate 9/9, phase_06_gate 10/10. gate_01_source_integrity passes 6/6. Every phase wrote its canonical artifact to its phase output directory. n07 and the n08 nodes remain pending, so the Phase 7 block on Phase 8 stands."
+    },
+    {
+      "criterion": "Tier 2B extracted/ holds the six files for this topic, traceable to the Part 9 source.",
+      "disposition": "met",
+      "evidence": "All six files are present and were rewritten by this run. Five carry source sections at pages 73 to 76, which resolve through the curated call extract to its declared source document, the Part 9 work programme PDF. The sixth, expected_impacts.json, traces to the wrong part of Part 9: its five entries paraphrase the topic's own Expected Outcome and Scope text at pages 73 to 74. The curated extract was given the destination's six, sliced from the PDF, and the operator reran Phases 1 to 6 on 30 September at 22:33 to 23:46 UTC. expected_impacts.json now holds six entries, EI-01 to EI-06, every one Confirmed and citing Part 9 pages 47 and 48, with EI-04 recorded as straddling the page break. Phase 5 remapped from five pathways to six, PW1 to PW6, one per destination impact. The other five files trace to pages 73 to 76, and evaluation_priority_weights.json still declares its three criteria Assumed with null weights. See F3, F4 and D2."
+    },
+    {
+      "criterion": "Run manifests with reuse decisions are preserved for every run.",
+      "disposition": "met",
+      "evidence": "The criterion names the run manifest, and reuse decisions are persisted to the manifest: RunContext.record_reuse_decision writes into it. The manifest is cumulative, so both qualifying runs hold all six node states, all six failure details and a reuse_decisions field. Empty is the correct value, not a missing one: REUSE_SKIP_SKILLS covers only n08a, n08b and n08c, so no node dispatched in Phases 1 to 6 can produce a reuse decision. Both manifests are now preserved under docs/tier4_orchestration_state/run_records/ by tools/preserve_run_manifests.py, which closes the one real gap: they had lived only in gitignored runtime state. See F2, F11 and D4."
+    },
+    {
+      "criterion": "Run cost and duration per phase are recorded.",
+      "disposition": "met",
+      "evidence": "docs/tier4_orchestration_state/run_cost/import uuid; print(uuid.uuid4()).json, derived by tools/derive_run_phase_costs.py and read back by tests/test_demo_runner_phase_costs.py. It replaces the benchmark layer's own roll-up, which attributed all 27 invocations of the run to phase 5. Duration and tokens are recorded per phase; a currency cost is Unresolved and written as null, because the provider projection priced no provider. See D1 and F1. Re-derived for the rerun: 27 invocations, 499,590 estimated input and 86,196 output tokens, 3,042.8 seconds of invocation wall clock across the six phases."
+    }
+  ],
+  "gates": [
+    {
+      "gate_id": "phase_01_gate",
+      "status": "pass",
+      "deterministic_passed": 17,
+      "deterministic_total": 17,
+      "semantic_passed": 0,
+      "semantic_total": 0,
+      "skipped_semantic": false,
+      "evaluated_at": "2026-09-30T22:33:29.258755+00:00"
+    },
+    {
+      "gate_id": "phase_02_gate",
+      "status": "pass",
+      "deterministic_passed": 6,
+      "deterministic_total": 6,
+      "semantic_passed": 1,
+      "semantic_total": 1,
+      "skipped_semantic": false,
+      "evaluated_at": "2026-09-30T22:43:44.227803+00:00"
+    },
+    {
+      "gate_id": "phase_03_gate",
+      "status": "pass",
+      "deterministic_passed": 8,
+      "deterministic_total": 8,
+      "semantic_passed": 0,
+      "semantic_total": 0,
+      "skipped_semantic": false,
+      "evaluated_at": "2026-09-30T23:00:04.724574+00:00"
+    },
+    {
+      "gate_id": "phase_04_gate",
+      "status": "pass",
+      "deterministic_passed": 11,
+      "deterministic_total": 11,
+      "semantic_passed": 0,
+      "semantic_total": 0,
+      "skipped_semantic": false,
+      "evaluated_at": "2026-09-30T23:05:42.111773+00:00"
+    },
+    {
+      "gate_id": "phase_05_gate",
+      "status": "pass",
+      "deterministic_passed": 9,
+      "deterministic_total": 9,
+      "semantic_passed": 0,
+      "semantic_total": 0,
+      "skipped_semantic": false,
+      "evaluated_at": "2026-09-30T23:26:12.133578+00:00"
+    },
+    {
+      "gate_id": "phase_06_gate",
+      "status": "pass",
+      "deterministic_passed": 10,
+      "deterministic_total": 10,
+      "semantic_passed": 0,
+      "semantic_total": 0,
+      "skipped_semantic": false,
+      "evaluated_at": "2026-09-30T23:46:17.853819+00:00"
+    }
+  ],
+  "tier2b_extracted": [
+    {
+      "file": "call_constraints.json",
+      "entries": 11,
+      "statuses": [
+        "Confirmed"
+      ],
+      "part9_pages_cited": [
+        73,
+        74,
+        75,
+        76
+      ]
+    },
+    {
+      "file": "eligibility_conditions.json",
+      "entries": 4,
+      "statuses": [
+        "Confirmed"
+      ],
+      "part9_pages_cited": [
+        73,
+        75
+      ]
+    },
+    {
+      "file": "evaluation_priority_weights.json",
+      "entries": 3,
+      "statuses": [
+        "Assumed"
+      ],
+      "part9_pages_cited": []
+    },
+    {
+      "file": "expected_impacts.json",
+      "entries": 6,
+      "statuses": [
+        "Confirmed"
+      ],
+      "part9_pages_cited": [
+        47,
+        48,
+        73
+      ]
+    },
+    {
+      "file": "expected_outcomes.json",
+      "entries": 3,
+      "statuses": [
+        "Confirmed"
+      ],
+      "part9_pages_cited": [
+        74
+      ]
+    },
+    {
+      "file": "scope_requirements.json",
+      "entries": 6,
+      "statuses": [
+        "Confirmed"
+      ],
+      "part9_pages_cited": [
+        75,
+        76
+      ]
+    }
+  ],
+  "expected_impacts": {
+    "count": 6,
+    "level": "destination",
+    "entries": [
+      {
+        "impact_id": "EI-01",
+        "status": "Confirmed",
+        "source_section": "Destination 'Biodiversity and ecosystem services' — Expected impact (WP Part 9, p.47)"
+      },
+      {
+        "impact_id": "EI-02",
+        "status": "Confirmed",
+        "source_section": "Destination 'Biodiversity and ecosystem services' — Expected impact (WP Part 9, p.47)"
+      },
+      {
+        "impact_id": "EI-03",
+        "status": "Confirmed",
+        "source_section": "Destination 'Biodiversity and ecosystem services' — Expected impact (WP Part 9, p.47)"
+      },
+      {
+        "impact_id": "EI-04",
+        "status": "Confirmed",
+        "source_section": "Destination 'Biodiversity and ecosystem services' — Expected impact (WP Part 9, pp.47-48)"
+      },
+      {
+        "impact_id": "EI-05",
+        "status": "Confirmed",
+        "source_section": "Destination 'Biodiversity and ecosystem services' — Expected impact (WP Part 9, p.48)"
+      },
+      {
+        "impact_id": "EI-06",
+        "status": "Confirmed",
+        "source_section": "Destination 'Biodiversity and ecosystem services' — Expected impact (WP Part 9, p.48)"
+      }
+    ],
+    "phase5_pathways": [
+      {
+        "pathway_id": "PW1",
+        "expected_impact_id": "EI-01"
+      },
+      {
+        "pathway_id": "PW2",
+        "expected_impact_id": "EI-02"
+      },
+      {
+        "pathway_id": "PW3",
+        "expected_impact_id": "EI-03"
+      },
+      {
+        "pathway_id": "PW4",
+        "expected_impact_id": "EI-04"
+      },
+      {
+        "pathway_id": "PW5",
+        "expected_impact_id": "EI-05"
+      },
+      {
+        "pathway_id": "PW6",
+        "expected_impact_id": "EI-06"
+      }
+    ],
+    "kpis": 12
+  },
+  "preserved_run_records": [
+    {
+      "file": "d68acaef-e9b2-412e-bc09-4b34c386d5fd.json",
+      "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+      "run_id_is_a_uuid": true,
+      "nodes_released": 6,
+      "nodes_recorded": 6,
+      "reuse_decisions": 0
+    },
+    {
+      "file": "import-uuid-print-uuid.uuid4.json",
+      "run_id": "import uuid; print(uuid.uuid4())",
+      "run_id_is_a_uuid": false,
+      "nodes_released": 6,
+      "nodes_recorded": 6,
+      "reuse_decisions": 0
+    }
+  ],
+  "cost_and_duration": {
+    "source": "docs/tier4_orchestration_state/run_cost/import uuid; print(uuid.uuid4()).json",
+    "attribution_status": "Inferred",
+    "per_phase": [
+      {
+        "phase": 1,
+        "invocations": 4,
+        "estimated_total_tokens": 74169,
+        "wall_clock_seconds": 618.297
+      },
+      {
+        "phase": 2,
+        "invocations": 4,
+        "estimated_total_tokens": 107750,
+        "wall_clock_seconds": 499.844
+      },
+      {
+        "phase": 3,
+        "invocations": 6,
+        "estimated_total_tokens": 152913,
+        "wall_clock_seconds": 683.58
+      },
+      {
+        "phase": 4,
+        "invocations": 4,
+        "estimated_total_tokens": 87544,
+        "wall_clock_seconds": 289.532
+      },
+      {
+        "phase": 5,
+        "invocations": 4,
+        "estimated_total_tokens": 35147,
+        "wall_clock_seconds": 449.923
+      },
+      {
+        "phase": 6,
+        "invocations": 5,
+        "estimated_total_tokens": 128263,
+        "wall_clock_seconds": 501.658
+      }
+    ],
+    "totals": {
+      "invocations": 27,
+      "estimated_input_tokens": 499590,
+      "estimated_output_tokens": 86196,
+      "estimated_total_tokens": 585786,
+      "wall_clock_seconds": 3042.834,
+      "span_seconds": 4894.015,
+      "first_invocation_utc": "2026-09-30T22:23:10.655866+00:00",
+      "last_invocation_utc": "2026-09-30T23:44:44.670368+00:00",
+      "execution_modes": {
+        "cli-prompt": 6,
+        "tapm": 21
+      },
+      "models": [
+        "claude-opus-4-8"
+      ],
+      "failed": 0,
+      "timed_out": 0
+    },
+    "monetary_cost": {
+      "cost_usd": null,
+      "status": "Unresolved",
+      "reason": ".claude/benchmark/import uuid; print(uuid.uuid4())/provider_projection.json evaluated 0 providers, so no rate exists to price this run's tokens against. A figure is not substituted (§8.3).",
+      "provider_projection": ".claude/benchmark/import uuid; print(uuid.uuid4())/provider_projection.json"
+    }
+  },
+  "what_was_checked_and_how": [
+    "Every gate result was read off disk and its predicate counts summed, rather than trusting the status field alone. All six phase gates and gate_01_source_integrity pass with no failed predicate and nothing skipped.",
+    "Node states came from the run manifests, not from the gate results, so 'released' is the scheduler's own record.",
+    "Each of the six Tier 2B extracted files was opened and its entries, declared statuses and cited Part 9 pages derived from its content.",
+    "The six destination impacts were sliced out of the Part 9 PDF by tools/author_biodiv_destination_impacts.py and every quote cross-checked against the Tier 3 transcription of pages 47 and 48, which replays byte-equal from the same PDF. The tool refuses to write when the two reads disagree or the counts differ, and it caught two real errors in the derivation before either reached the extract.",
+    "Reuse decisions were traced to where the runtime persists them: RunContext.record_reuse_decision writes into the run manifest, not the run summary. Empty is correct for Phases 1 to 6, because REUSE_SKIP_SKILLS covers only the three Phase 8 drafting nodes.",
+    "Per-phase cost and duration were recovered by partitioning the invocation ledger on the phase gates' evaluated_at times, after every ledger row was found to carry node_id null. The attribution is declared Inferred, and the two structural facts it rests on are checked and fail closed.",
+    "Which gates would go stale on the Tier 2B change was determined by reading each gate result's input_artifact_fingerprints, which is how the rerun scope was bounded to Phases 1 and 5 rather than guessed.",
+    "The full suite was run. The only failures outside this ticket's modules are the recorded pre-existing set plus the two the Phase 1 run turned red in the intake ticket, both verified against the 095e4b6 tree as having passed at the baseline."
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The benchmark layer attributed all 27 invocations, 575,107 estimated tokens and 3,108 seconds to phase 5 alone.",
+      "detail": "phase_analytics.json reports phases_observed [5] and nodes_observed n05_impact_architecture for a run that dispatched six phases. run_benchmark_summary.json contradicts itself in the same file, reporting 5 invocations and 393.5 seconds for n06 beside the stale 27-invocation phase 5 block. The cause is structural, not a bad run: transport_hook.py sets no node_id, so analytics.py infers the node from the run summary's single dispatched node, and an append-only ledger under one run id makes that inference wrong for every phase but the last. Any multi-dispatch run is affected.",
+      "disposition": "Worked around by D1 for this run. The benchmark layer is not changed here; this is a candidate Milestone 2 ticket.",
+      "see": "D1"
+    },
+    {
+      "id": "F2",
+      "summary": "Six dispatches shared one run id, so five run summaries were overwritten, and none of it is in the repository.",
+      "detail": "run_summary.json describes the n06 dispatch: phase_scope 6, dispatched_nodes [n06_implementation_architecture], started_at 18:30:12Z against the run manifest's created_at of 17:15:28Z. The cumulative run_manifest.json is intact and holds all six node states. .claude/runs/ is gitignored, so the ticket's preservation criterion is satisfied only on the operator's disk.",
+      "disposition": "D4 sets the rule for the reruns that will need it.",
+      "see": "D4"
+    },
+    {
+      "id": "F3",
+      "summary": "The destination's expected impacts are absent from Tier 2B altogether, at both layers the slicer reads.",
+      "detail": "A destination record in cluster_CL6.grouped.json holds only destination_title and calls, so the 646 KB grouped file carries no destination narrative to slice. The Step 0 slice is 7,937 bytes and its destination field is the bare string 'Biodiversity and Ecosystem Services (2026-27)'; none of the six impact sentences appears in it. The curated extract has no expected_impacts field and declares source_pages 73-76. The source itself is present: the Part 9 PDF sits in work_programmes/cluster_climate/, and the Tier 3 source materials record transcribes pages 47 and 48, which it describes as carrying the destination's six expected impacts.",
+      "disposition": "Closed at Tier 2B. The curated extract now carries the six impacts, sliced from the PDF and cross-checked against the Tier 3 transcription; all nine spans replay byte-equal and every character offset agrees with the independent transcription. The gap is out of Tier 2B's source layer. It remains in Tier 2B extracted/ until Phase 1 is rerun, which only the operator does.",
+      "see": "D2"
+    },
+    {
+      "id": "F13",
+      "summary": "The rerun's Phase 1 destroyed another instrument's entry in a shared Tier 2A registry, renamed a criterion and wrote an evaluator expectation that is not verbatim in the form — all while its gate passed 17 of 17.",
+      "detail": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json held ['RIA', 'MSCA-PF'] after the first run, which added the RIA entry without touching the MSCA-PF one. After the rerun it held ['RIA'] alone. Three regressions in one write: the MSCA-PF instrument was dropped, which broke 53 tests in the eval harness because its default profile is MSCA-PF; the RIA criterion id was changed from 'Implementation' to 'Quality and efficiency of the implementation', breaking the key the registry is read by; and an Excellence expectation was rewritten into text that is not verbatim in the Tier 2A evaluation form, which the RIA coverage ticket's verbatim test rejects. That ticket's tests caught all three, including one written for exactly this — test_the_msca_entry_is_untouched.",
+      "disposition": "Repaired by restoring the file to commit 7d52c7e, the last state whose tests passed, which carries both instruments, the 'Implementation' criterion id and verbatim expectations. 56 of the 57 new failures cleared; the 57th was already failing at the recorded baseline. The registry is not re-derived, because the restored version is a committed artifact that the suite verifies against the evaluation form.",
+      "constitutional_significance": "Two kinds of violation, neither of which the gate noticed. §6.4 requires a rerun to update state deterministically from its inputs: two runs of Phase 1 on the same inputs produced different Tier 2A output, one additive and one destructive. And §10.5 requires a material claim to be traceable to its source, which an evaluator expectation that is not in the evaluation form is not. phase_01_gate passed 17 of 17 through both, because it fingerprints only selected_call.json and carries no predicate over the Tier 2A registry the phase writes. This is the fail-open of F9 and intake finding I1, now demonstrated destroying data rather than merely admitting a paraphrase.",
+      "disposition_beyond_this_ticket": "Candidate Milestone 2 tickets: a predicate that the instruments present in a Tier 2A registry before a phase are present after it; and a verbatim check on evaluator expectations at write time rather than only in a ticket's own test module.",
+      "see": "F9"
+    },
+    {
+      "id": "F11",
+      "summary": "Nothing validates --run-id, so a mis-pasted argument became this run's identifier in 18 Tier 4 artifacts and four file names.",
+      "detail": "The rerun carries the run id 'import uuid; print(uuid.uuid4())' — a shell substitution that was pasted rather than expanded. The runner accepted it, and it is now the run_id field in 18 Tier 4 artifacts and the name of a run directory, a benchmark directory and four files, including validation_reports/constitutional-compliance-check_import u.json. §9.5 asks that an output be auditable from its documented inputs, which assumes the run id identifies a run. A code fragment does not.",
+      "disposition": "Not repaired. Rewriting run_id across 18 artifacts and two runtime directories by hand would risk corrupting the provenance it claims to fix, and the string is at least consistent across every artifact of the run. The preserved run records carry a run_id_is_a_uuid field so the malformed one is visible rather than tidied away. Candidate Milestone 2 ticket: validate --run-id at the CLI boundary.",
+      "see": null
+    },
+    {
+      "id": "F12",
+      "summary": "This evaluation read a requirement into criterion 3 that the criterion does not state, and a six-phase rerun was spent on it.",
+      "detail": "The criterion asks that run manifests with their reuse decisions be preserved. This record first read that as requiring one run id per dispatch, on the grounds that a shared run id overwrites run_summary.json. But the summary is not the manifest and is not where reuse decisions live: record_reuse_decision writes to the manifest, which is cumulative and survives every dispatch. The operator reran all six phases to obtain distinct ids that the criterion never asked for, and the paste that was meant to supply them produced F11.",
+      "disposition": "Corrected here. The rerun was not wasted — it is what closed criterion 2 — but it was not needed for criterion 3. The lesson is to check which artifact a criterion names before deciding what satisfies it.",
+      "see": "F2"
+    },
+    {
+      "id": "F10",
+      "summary": "The near-miss span sweep is blind on any document with a top-level source_document field, which this extract has.",
+      "detail": "iter_malformed_spans in tests/_tier_sources.py exists to catch a span that dropped one of its three keys, because such a span leaves the verbatim sweep silently rather than failing it. On the call extract the root object itself holds source_document and neither quote nor source_page, so the helper reports the root as a near miss and returns without descending. It therefore inspects nothing. The behaviour is identical before and after this ticket's edit, and no test in test_tier2b_biodiv_intake.py calls the helper at all; only test_tier1_tier2a_ria_coverage.py does. The verbatim sweep itself is unaffected: iter_spans descends normally and checked all 33 spans in the extract, including the nine added on pages 47 and 48.",
+      "disposition": "Pre-existing and out of scope here: the helper is shared with another ticket's module. Recorded because a dropped span key on this extract would currently pass unnoticed.",
+      "see": null
+    },
+    {
+      "id": "F4",
+      "summary": "Phase 1 wrote five paraphrased expected impacts and marked four of them Confirmed, where the honest output was a declared gap.",
+      "detail": "Handed a slice with no impact text, the extraction produced EI-01 to EI-05 from the topic's Expected Outcome and Scope, with no quote and no span reference on any entry. EI-01 to EI-04 carry status Confirmed and EI-05 Inferred. §12.4 and §15 make a declared gap the correct output when a mandatory input is missing, and the same run shows the skill can do it: evaluation_priority_weights.json declares all three criteria Assumed with null weights and says no Tier 2B source states them. Phase 5 then built five pathways on the paraphrases, keyed PW-EI-01 to PW-EI-05.",
+      "disposition": "The rerun under D2 must produce Confirmed entries with quotes, or a declared gap. It must not produce paraphrases marked Confirmed again.",
+      "see": "D2"
+    },
+    {
+      "id": "F7",
+      "summary": "Phase 2 added two Tier 3 artifacts that no freeze record covers, and the seeds ticket's freeze test is red on the branch.",
+      "detail": "call_binding/topic_mapping.json and call_binding/compliance_profile.json were added by the dispatch commit 'running phase 4', which carried Phase 2's outputs. The freeze record in demo-architecture-seeds_2026-09-30.json predates them, so tests/test_demo_architecture_seeds.py TestTheFreeze::test_every_tier3_artifact_is_fingerprinted_or_exempt fails, naming both files. The phase did nothing wrong: §7 Phase 2 lists topic_mapping.json as a required output, and compliance_profile.json is a required Phase 6 input. The test is also doing its job, which is to report that Tier 3 grew and no record says so.",
+      "disposition": "Fixed on operator instruction. The freeze covers founding documents against edits in place, and these two are runner outputs, so they are named not frozen rather than fingerprinted: a fingerprint would break on the next legitimate Phase 2 rerun. The superseded record's own unfreezing clause requires a new entry rather than an edit, so the freeze moved to demo-tier3-freeze-phase-written-artifacts_2026-09-30.json, which re-derives all ten fingerprints from disk and refuses to write if any has changed. None had, so nothing was unfrozen. The freeze test now resolves the live record through the supersedes chain instead of a filename, and the branch is green.",
+      "see": "docs/tier4_orchestration_state/decision_log/demo-tier3-freeze-phase-written-artifacts_2026-09-30.json"
+    },
+    {
+      "id": "F8",
+      "summary": "Phase 1 turned two of the intake ticket's tests red by doing its job. They are the only change to the branch's failure count.",
+      "detail": "The full suite reports 29 failures against the recorded baseline of 27 at commit 095e4b6, and the two extra are test_tier2b_biodiv_intake.py::TestStaleExtractedFinding::test_the_extracted_files_still_belong_to_another_call and TestTierBoundaries::test_phase_1_still_owns_tier_2b_extracted. Reading the six extracted files out of the 095e4b6 tree shows all six were MSCA-era then and none mentioned this topic, so both tests passed at the baseline and went red when Phase 1 rewrote them. The first test says so in its own message: it turns red as the signal to strike finding I1, not as a regression. The second asserted that the intake writes no extracted file for this topic, which was checkable only while Phase 1 had not run.",
+      "disposition": "Neither is a regression and neither is fixed here. Both need re-pointing by the intake ticket's owner, together with the status question F9 raises.",
+      "see": "F9"
+    },
+    {
+      "id": "F9",
+      "summary": "Finding I1 of the intake report must not be struck. Its symptom is gone and its cause is not.",
+      "detail": "I1 is that phase_01_gate checks the six Tier 2B extracted files only for non-emptiness and for the presence of source refs, and no predicate compares their content to the selected topic, so the gate would release Phase 1 on another call's outcomes. What changed is only that the MSCA-era files are gone: the predicate set is unaltered, and the branch still holds the gate library unmodified. This run demonstrated the same fail-open in a new form. phase_01_gate passed 17 of 17 over an expected_impacts.json whose five entries paraphrase the wrong section of Part 9, because non-emptiness and a present source ref are satisfied by a citation to any section. Striking I1 because the stale files were overwritten would retire a live gate defect on the strength of its symptom disappearing.",
+      "disposition": "I1 stays Unresolved. The test that pins it should pin the predicate set rather than the stale files, so it tracks the cause. Not changed here: it is the intake ticket's finding and its status is the operator's call.",
+      "see": "F4"
+    },
+    {
+      "id": "F5",
+      "summary": "evaluation_priority_weights.json cites no Tier 2B source, and correctly says so.",
+      "detail": "All three criteria are Assumed with null weights and a note that neither the slice nor the curated extract states evaluation criteria or weights, and that the weighting is governed by Tier 2A and the General Annexes. That is the honest disposition, and the Tier 1 and 2A RIA coverage ticket is where the criteria themselves live.",
+      "disposition": "No action. Recorded so the null weights are not read as a gap.",
+      "see": null
+    },
+    {
+      "id": "F6",
+      "summary": "A seventh file, unit_cost_rates.json, sits in this topic's Tier 2B extracted directory and belongs to another instrument.",
+      "detail": "It cites the MSCA work programme PDF, pages 78 to 80, and predates this branch: it was last written by commit 5afd8f8, before the demo world existed. This topic is a lump-sum RIA, so no unit-cost derivation applies to it under §8.1.",
+      "disposition": "Pre-existing, out of this ticket's scope, and harmless while no unit-cost path runs. Worth a sweep with the other stray Tier 4 byproducts already recorded on this branch.",
+      "see": null
+    }
+  ],
+  "status_summary": {
+    "Confirmed": "The six destination expected impacts, each quoted from Part 9 pages 47 and 48 and matched against an independent transcription. The node states and gate results, read off disk.",
+    "Inferred": "Per-phase cost and duration. No artifact records which phase an invocation belonged to, so the attribution is reconstructed from the gate windows.",
+    "Assumed": "The three evaluation criteria in evaluation_priority_weights.json, with null weights, because no Tier 2B source for this topic states a criterion set or a weighting.",
+    "Unresolved": "A currency cost for the run: the provider projection priced no provider, so cost_usd is null. Intake finding I1, which this run showed is still live even though its symptom is gone."
+  },
+  "recorded_in": "docs/tier4_orchestration_state/decision_log/demo-runner-phases-1-6_2026-09-30.json",
+  "authored_by": "Ticket 'Runner Phases 1 to 6 on the demo', plans/dev_graph_demo_tickets.md, branch dev_graph_demo. Evaluated 2026-09-30, closed 2026-10-01. No runner phase was dispatched to produce this report.",
+  "note": "Anonymity: no organisation name, person name, place, grant or project identifier appears in this report. Partners are referred to by their pseudonymous identifiers or not at all."
+}

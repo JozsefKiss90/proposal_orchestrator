@@ -1,0 +1,75 @@
+{
+  "schema_id": "orch.run_record.preserved.v1",
+  "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "run_id_is_a_uuid": true,
+  "copied_from": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "created_at": "2026-09-30T17:15:28.642574+00:00",
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "released",
+    "n04_gantt_milestones": "released",
+    "n05_impact_architecture": "released",
+    "n06_implementation_architecture": "released"
+  },
+  "node_failure_details": {
+    "n01_call_analysis": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n02_concept_refinement": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n03_wp_design": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n04_gantt_milestones": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n05_impact_architecture": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n06_implementation_architecture": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    }
+  },
+  "reuse_decisions": {},
+  "reuse_decisions_note": "Empty is the correct record for a Phases 1 to 6 run, not a missing one: the reuse layer covers only the three Phase 8 drafting nodes, so no node dispatched here can produce a reuse decision.",
+  "reuse_policy": {
+    "reuse_policy_for_run": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+    "approved_artifacts": []
+  },
+  "surviving_run_summary": {
+    "overall_status": "pass",
+    "phase_scope": 6,
+    "dispatched_nodes": [
+      "n06_implementation_architecture"
+    ],
+    "started_at": "2026-09-30T18:30:12.592421+00:00",
+    "completed_at": "2026-09-30T18:36:46.156702+00:00",
+    "gate_results_index": {
+      "phase_06_gate": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json"
+    }
+  },
+  "run_summary_caveat": "A run summary is rewritten by each dispatch under the same run id. This run dispatched 6 phases, so the summary preserved here describes only its last dispatch: n06_implementation_architecture. The node states and reuse decisions above come from the manifest, which is cumulative and loses nothing."
+}

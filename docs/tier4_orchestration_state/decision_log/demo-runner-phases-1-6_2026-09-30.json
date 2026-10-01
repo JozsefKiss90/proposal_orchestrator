@@ -2,14 +2,75 @@
   "record_type": "decision",
   "id": "demo-runner-phases-1-6",
   "date": "2026-09-30",
+  "closed_on": "2026-10-01",
   "branch": "dev_graph_demo",
   "milestone": "Dev Graph demo (instance two), ticket 'Runner Phases 1 to 6 on the demo' in plans/dev_graph_demo_tickets.md",
   "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §9.5 (a reproducible output documents its inputs), §12.1 (reviewability), §12.2 (the four status categories), §12.3 (a contradiction is resolved explicitly, naming the method, the source that prevailed and the reasoning), §12.4 (a missing mandatory input is a gate failure, not an optimistic inference), §13.2 (no invented call constraint), §10.6 (a source document governs over programme knowledge) and §15 (explicit failure over fabricated completion). Not a constitutional amendment; §14.5 is not engaged.",
-  "decision": "The operator dispatched Phases 1 to 6 under one run id and all six nodes reached released, every gate passing with no failed predicate. Two of the ticket's four acceptance criteria are met on that evidence. The third is partly met, because six dispatches shared one run id and the per-dispatch run summary survives only for the last of them. The fourth is met by the derivation this record introduces, after the benchmark layer's own roll-up was found to attribute the whole run to a single phase. One substantive defect surfaced and is not fixed here: the topic's expected impacts never entered Tier 2B, so Phase 1 wrote paraphrases of the topic's outcome and scope text in their place and marked them Confirmed. The ticket stays open on that.",
-  "validation_report": null,
-  "validation_report_status": "Not written. The ticket's validation report is due when the criteria it would report are all met; two are not. This record carries the dispositions in the meantime.",
+  "decision": "The operator dispatched Phases 1 to 6, twice, and on both runs all six nodes reached released with every gate passing and no failed predicate. Cost and duration per phase come from a derivation this record introduces, after the benchmark layer's own roll-up was found to attribute a whole run to a single phase. The run manifests, which are what the preservation criterion names, are now copied into the durable record. One substantive defect surfaced and has been fixed: the topic's expected impacts had never entered Tier 2B, so Phase 1 wrote paraphrases of the topic's outcome and scope text in their place and marked them Confirmed. The curated extract was given the destination's six impacts, sliced from the Part 9 PDF, and Phases 1 to 6 were rerun. All four criteria are now met and the ticket is checked. Three things the criteria do not cover are recorded. The rerun's Phase 1 destroyed the MSCA-PF entry in a shared Tier 2A registry, renamed a criterion and wrote a non-verbatim evaluator expectation, breaking 57 tests while its gate passed 17 of 17; that is repaired by restoring the last good committed version (F13). The rerun's run id is a mis-pasted shell fragment (F11). And this evaluation briefly read a requirement into criterion 3 that the criterion does not state (F12). The ticket is checked on its four criteria, and F13 is the warning that those four criteria would not have caught a destroyed registry.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-runner-phases-1-6_2026-10-01.json",
+  "runs": {
+    "judged_on": "import uuid; print(uuid.uuid4())",
+    "why": "Two runs dispatched the full Phase 1 to 6 sequence on this world. The criteria are judged on the second, because it is the one that ran after the Tier 2B expected-impacts fix and so produced the artifacts now on disk. The first is kept because its numbers are what the benchmark misattribution (F1) was found against.",
+    "first": {
+      "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+      "dispatched": "2026-09-30T17:15 to 18:36 UTC",
+      "per_phase_cost_and_duration": {
+        "1": {
+          "invocations": 4,
+          "estimated_total_tokens": 76112,
+          "wall_clock_seconds": 714.921,
+          "gate_status": "pass"
+        },
+        "2": {
+          "invocations": 4,
+          "estimated_total_tokens": 105425,
+          "wall_clock_seconds": 458.687,
+          "gate_status": "pass"
+        },
+        "3": {
+          "invocations": 6,
+          "estimated_total_tokens": 144589,
+          "wall_clock_seconds": 716.639,
+          "gate_status": "pass"
+        },
+        "4": {
+          "invocations": 4,
+          "estimated_total_tokens": 87279,
+          "wall_clock_seconds": 290.549,
+          "gate_status": "pass"
+        },
+        "5": {
+          "invocations": 4,
+          "estimated_total_tokens": 34864,
+          "wall_clock_seconds": 534.405,
+          "gate_status": "pass"
+        },
+        "6": {
+          "invocations": 5,
+          "estimated_total_tokens": 126838,
+          "wall_clock_seconds": 392.811,
+          "gate_status": "pass"
+        }
+      },
+      "totals": {
+        "invocations": 27,
+        "estimated_input_tokens": 491140,
+        "estimated_output_tokens": 83967,
+        "wall_clock_seconds": 3108.012,
+        "cost_usd": null,
+        "cost_usd_status": "Unresolved"
+      },
+      "preserved_at": "docs/tier4_orchestration_state/run_records/d68acaef-e9b2-412e-bc09-4b34c386d5fd.json"
+    },
+    "rerun": {
+      "run_id": "import uuid; print(uuid.uuid4())",
+      "run_id_note": "Not a UUID. A shell substitution was pasted instead of its result, and nothing validates the argument. See F11.",
+      "dispatched": "2026-09-30T22:23 to 23:46 UTC",
+      "preserved_at": "docs/tier4_orchestration_state/run_records/import-uuid-print-uuid.uuid4.json"
+    }
+  },
   "run": {
-    "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+    "run_id": "import uuid; print(uuid.uuid4())",
     "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
     "instrument": "RIA, lump sum",
     "nodes_released": [
@@ -29,51 +90,51 @@
       "n08e_evaluator_review",
       "n08f_revision"
     ],
-    "dispatch_pattern": "Six single-phase dispatches, one per phase, all under one run id. The cumulative run manifest holds every node state; run_summary.json was overwritten by each dispatch and now describes n06 alone.",
+    "dispatch_pattern": "Six single-phase dispatches, one per phase, all under one run id. The cumulative run manifest holds every node state and the reuse_decisions field, which is what the preservation criterion names. run_summary.json was overwritten by each dispatch and now describes n06 alone; it is not the manifest and holds no reuse decision.",
     "per_phase_cost_and_duration": {
       "1": {
         "invocations": 4,
-        "estimated_total_tokens": 76112,
-        "wall_clock_seconds": 714.921,
+        "estimated_total_tokens": 74169,
+        "wall_clock_seconds": 618.297,
         "gate_status": "pass"
       },
       "2": {
         "invocations": 4,
-        "estimated_total_tokens": 105425,
-        "wall_clock_seconds": 458.687,
+        "estimated_total_tokens": 107750,
+        "wall_clock_seconds": 499.844,
         "gate_status": "pass"
       },
       "3": {
         "invocations": 6,
-        "estimated_total_tokens": 144589,
-        "wall_clock_seconds": 716.639,
+        "estimated_total_tokens": 152913,
+        "wall_clock_seconds": 683.58,
         "gate_status": "pass"
       },
       "4": {
         "invocations": 4,
-        "estimated_total_tokens": 87279,
-        "wall_clock_seconds": 290.549,
+        "estimated_total_tokens": 87544,
+        "wall_clock_seconds": 289.532,
         "gate_status": "pass"
       },
       "5": {
         "invocations": 4,
-        "estimated_total_tokens": 34864,
-        "wall_clock_seconds": 534.405,
+        "estimated_total_tokens": 35147,
+        "wall_clock_seconds": 449.923,
         "gate_status": "pass"
       },
       "6": {
         "invocations": 5,
-        "estimated_total_tokens": 126838,
-        "wall_clock_seconds": 392.811,
+        "estimated_total_tokens": 128263,
+        "wall_clock_seconds": 501.658,
         "gate_status": "pass"
       }
     },
-    "per_phase_cost_and_duration_source": "docs/tier4_orchestration_state/run_cost/d68acaef-e9b2-412e-bc09-4b34c386d5fd.json",
+    "per_phase_cost_and_duration_source": "docs/tier4_orchestration_state/run_cost/import uuid; print(uuid.uuid4()).json",
     "totals": {
       "invocations": 27,
-      "estimated_input_tokens": 491140,
-      "estimated_output_tokens": 83967,
-      "wall_clock_seconds": 3108.012,
+      "estimated_input_tokens": 499590,
+      "estimated_output_tokens": 86196,
+      "wall_clock_seconds": 3042.834,
       "cost_usd": null,
       "cost_usd_status": "Unresolved"
     }
@@ -86,18 +147,18 @@
     },
     {
       "criterion": "Tier 2B extracted/ holds the six files for this topic, traceable to the Part 9 source.",
-      "disposition": "not met, pending one rerun",
-      "evidence": "All six files are present and were rewritten by this run. Five carry source sections at pages 73 to 76, which resolve through the curated call extract to its declared source document, the Part 9 work programme PDF. The sixth, expected_impacts.json, traces to the wrong part of Part 9: its five entries paraphrase the topic's own Expected Outcome and Scope text at pages 73 to 74, while the topic's expected impacts are the destination's six at pages 47 to 48. The source-layer gap behind that is now closed — the curated extract carries the six, sliced from the PDF — so what stands between this criterion and met is a Phase 1 rerun, which only the operator dispatches. See F3, F4 and D2."
+      "disposition": "met",
+      "evidence": "All six files are present and were rewritten by this run. Five carry source sections at pages 73 to 76, which resolve through the curated call extract to its declared source document, the Part 9 work programme PDF. The sixth, expected_impacts.json, traces to the wrong part of Part 9: its five entries paraphrase the topic's own Expected Outcome and Scope text at pages 73 to 74. The curated extract was given the destination's six, sliced from the PDF, and the operator reran Phases 1 to 6 on 30 September at 22:33 to 23:46 UTC. expected_impacts.json now holds six entries, EI-01 to EI-06, every one Confirmed and citing Part 9 pages 47 and 48, with EI-04 recorded as straddling the page break. Phase 5 remapped from five pathways to six, PW1 to PW6, one per destination impact. The other five files trace to pages 73 to 76, and evaluation_priority_weights.json still declares its three criteria Assumed with null weights. See F3, F4 and D2."
     },
     {
       "criterion": "Run manifests with reuse decisions are preserved for every run.",
-      "disposition": "partly met",
-      "evidence": "One cumulative run_manifest.json survives with all six node states and their failure details. reuse_decisions is empty, and that is correct rather than missing: REUSE_SKIP_SKILLS covers only n08a, n08b and n08c, so a Phase 1 to 6 dispatch generates no reuse decision. What is not preserved is the per-dispatch run summary, overwritten five times under the shared run id, and none of it is in the repository, since .claude/runs/ is gitignored. See F2 and D4."
+      "disposition": "met",
+      "evidence": "The criterion names the run manifest, and reuse decisions are persisted to the manifest: RunContext.record_reuse_decision writes into it. The manifest is cumulative, so both qualifying runs hold all six node states, all six failure details and a reuse_decisions field. Empty is the correct value, not a missing one: REUSE_SKIP_SKILLS covers only n08a, n08b and n08c, so no node dispatched in Phases 1 to 6 can produce a reuse decision. Both manifests are now preserved under docs/tier4_orchestration_state/run_records/ by tools/preserve_run_manifests.py, which closes the one real gap: they had lived only in gitignored runtime state. See F2, F11 and D4."
     },
     {
       "criterion": "Run cost and duration per phase are recorded.",
       "disposition": "met",
-      "evidence": "docs/tier4_orchestration_state/run_cost/d68acaef-e9b2-412e-bc09-4b34c386d5fd.json, derived by tools/derive_run_phase_costs.py and read back by tests/test_demo_runner_phase_costs.py. It replaces the benchmark layer's own roll-up, which attributed all 27 invocations of the run to phase 5. Duration and tokens are recorded per phase; a currency cost is Unresolved and written as null, because the provider projection priced no provider. See D1 and F1."
+      "evidence": "docs/tier4_orchestration_state/run_cost/import uuid; print(uuid.uuid4()).json, derived by tools/derive_run_phase_costs.py and read back by tests/test_demo_runner_phase_costs.py. It replaces the benchmark layer's own roll-up, which attributed all 27 invocations of the run to phase 5. Duration and tokens are recorded per phase; a currency cost is Unresolved and written as null, because the provider projection priced no provider. See D1 and F1. Re-derived for the rerun: 27 invocations, 499,590 estimated input and 86,196 output tokens, 3,042.8 seconds of invocation wall clock across the six phases."
     }
   ],
   "decisions": [
@@ -105,7 +166,7 @@
       "id": "D1",
       "decision": "Per-phase cost and duration is derived by partitioning the invocation ledger on the phase gates' evaluated_at times, and the status of that attribution is Inferred. The benchmark layer's phase_analytics.json is named superseded for this run rather than corrected in place.",
       "reasoning": "The ledger cannot answer the question directly. runner/benchmark/transport_hook.py never sets node_id, so all 27 rows carry node_id null, and runner/benchmark/analytics.py falls back to inferring the node from the run summary's single dispatched node. The ledger is append-only across dispatches and a run summary names only the latest one, so on this dispatch pattern the inference hands the whole cumulative ledger to one phase. A phase is nonetheless bounded in time: it is dispatched after the previous phase's gate and its own gate is evaluated after its last invocation. Partitioning on those boundaries recovers the attribution without guessing, and the two structural facts it rests on, monotonic gate times and a single run id, are checked and fail closed. No artifact records which phase an invocation belonged to, so the result is Inferred under §12.2 and not Confirmed. A currency figure is not substituted: the provider projection evaluated zero providers, so cost_usd is null and Unresolved, which is the §8.3 discipline applied to a run cost.",
-      "recorded_in": "tools/derive_run_phase_costs.py; docs/tier4_orchestration_state/run_cost/d68acaef-e9b2-412e-bc09-4b34c386d5fd.json; tests/test_demo_runner_phase_costs.py TestEveryPhaseGotItsOwnNumbers, TestTheNumbersComeFromTheLedger, TestHonesty, TestDeterminism."
+      "recorded_in": "tools/derive_run_phase_costs.py; docs/tier4_orchestration_state/run_cost/import uuid; print(uuid.uuid4()).json; tests/test_demo_runner_phase_costs.py TestEveryPhaseGotItsOwnNumbers, TestTheNumbersComeFromTheLedger, TestHonesty, TestDeterminism."
     },
     {
       "id": "D2",
@@ -165,6 +226,29 @@
       "detail": "A destination record in cluster_CL6.grouped.json holds only destination_title and calls, so the 646 KB grouped file carries no destination narrative to slice. The Step 0 slice is 7,937 bytes and its destination field is the bare string 'Biodiversity and Ecosystem Services (2026-27)'; none of the six impact sentences appears in it. The curated extract has no expected_impacts field and declares source_pages 73-76. The source itself is present: the Part 9 PDF sits in work_programmes/cluster_climate/, and the Tier 3 source materials record transcribes pages 47 and 48, which it describes as carrying the destination's six expected impacts.",
       "disposition": "Closed at Tier 2B. The curated extract now carries the six impacts, sliced from the PDF and cross-checked against the Tier 3 transcription; all nine spans replay byte-equal and every character offset agrees with the independent transcription. The gap is out of Tier 2B's source layer. It remains in Tier 2B extracted/ until Phase 1 is rerun, which only the operator does.",
       "see": "D2"
+    },
+    {
+      "id": "F13",
+      "summary": "The rerun's Phase 1 destroyed another instrument's entry in a shared Tier 2A registry, renamed a criterion and wrote an evaluator expectation that is not verbatim in the form — all while its gate passed 17 of 17.",
+      "detail": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json held ['RIA', 'MSCA-PF'] after the first run, which added the RIA entry without touching the MSCA-PF one. After the rerun it held ['RIA'] alone. Three regressions in one write: the MSCA-PF instrument was dropped, which broke 53 tests in the eval harness because its default profile is MSCA-PF; the RIA criterion id was changed from 'Implementation' to 'Quality and efficiency of the implementation', breaking the key the registry is read by; and an Excellence expectation was rewritten into text that is not verbatim in the Tier 2A evaluation form, which the RIA coverage ticket's verbatim test rejects. That ticket's tests caught all three, including one written for exactly this — test_the_msca_entry_is_untouched.",
+      "disposition": "Repaired by restoring the file to commit 7d52c7e, the last state whose tests passed, which carries both instruments, the 'Implementation' criterion id and verbatim expectations. 56 of the 57 new failures cleared; the 57th was already failing at the recorded baseline. The registry is not re-derived, because the restored version is a committed artifact that the suite verifies against the evaluation form.",
+      "constitutional_significance": "Two kinds of violation, neither of which the gate noticed. §6.4 requires a rerun to update state deterministically from its inputs: two runs of Phase 1 on the same inputs produced different Tier 2A output, one additive and one destructive. And §10.5 requires a material claim to be traceable to its source, which an evaluator expectation that is not in the evaluation form is not. phase_01_gate passed 17 of 17 through both, because it fingerprints only selected_call.json and carries no predicate over the Tier 2A registry the phase writes. This is the fail-open of F9 and intake finding I1, now demonstrated destroying data rather than merely admitting a paraphrase.",
+      "disposition_beyond_this_ticket": "Candidate Milestone 2 tickets: a predicate that the instruments present in a Tier 2A registry before a phase are present after it; and a verbatim check on evaluator expectations at write time rather than only in a ticket's own test module.",
+      "see": "F9"
+    },
+    {
+      "id": "F11",
+      "summary": "Nothing validates --run-id, so a mis-pasted argument became this run's identifier in 18 Tier 4 artifacts and four file names.",
+      "detail": "The rerun carries the run id 'import uuid; print(uuid.uuid4())' — a shell substitution that was pasted rather than expanded. The runner accepted it, and it is now the run_id field in 18 Tier 4 artifacts and the name of a run directory, a benchmark directory and four files, including validation_reports/constitutional-compliance-check_import u.json. §9.5 asks that an output be auditable from its documented inputs, which assumes the run id identifies a run. A code fragment does not.",
+      "disposition": "Not repaired. Rewriting run_id across 18 artifacts and two runtime directories by hand would risk corrupting the provenance it claims to fix, and the string is at least consistent across every artifact of the run. The preserved run records carry a run_id_is_a_uuid field so the malformed one is visible rather than tidied away. Candidate Milestone 2 ticket: validate --run-id at the CLI boundary.",
+      "see": null
+    },
+    {
+      "id": "F12",
+      "summary": "This evaluation read a requirement into criterion 3 that the criterion does not state, and a six-phase rerun was spent on it.",
+      "detail": "The criterion asks that run manifests with their reuse decisions be preserved. This record first read that as requiring one run id per dispatch, on the grounds that a shared run id overwrites run_summary.json. But the summary is not the manifest and is not where reuse decisions live: record_reuse_decision writes to the manifest, which is cumulative and survives every dispatch. The operator reran all six phases to obtain distinct ids that the criterion never asked for, and the paste that was meant to supply them produced F11.",
+      "disposition": "Corrected here. The rerun was not wasted — it is what closed criterion 2 — but it was not needed for criterion 3. The lesson is to check which artifact a criterion names before deciding what satisfies it.",
+      "see": "F2"
     },
     {
       "id": "F10",
