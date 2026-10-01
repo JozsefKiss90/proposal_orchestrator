@@ -3908,6 +3908,121 @@ tier2a_extracted_schemas:
 
 
 # =============================================================================
+# SECTION 8B — INTEGRATION VALIDATION ARTIFACT SCHEMAS
+# =============================================================================
+#
+# Artifacts the repository writes INTO docs/integrations/ to record what it
+# checked about an externally supplied file. These are not budget data: the
+# budget itself arrives in received/ from the external planner and is never
+# authored here (CLAUDE.md §8.1, §8.3, §17.6.7).
+#
+# The section exists because the budget-interface-validation skill declares
+# two writes_to directories and so runs on output_contract: "multi_artifact".
+# That writer skips any artifact whose schema declares no required fields,
+# and an artifact whose canonical_path lives in no section listed in
+# runner.skill_runtime._SCHEMA_SECTION_KEYS is never resolved at all. With
+# neither in place the skill declared a validation artifact it had not
+# written, n07's _determine_can_evaluate_exit_gate found validation/ empty,
+# and the node failed at agent_body before gate_09 was evaluated (§17.6.6).
+#
+# No schema_id_value here. The skill specification's output table declares
+# run_id not required for this artifact, and _extract_schema_requirements
+# derives that from the absence of schema_id_value.
+
+integration_validation_schemas:
+
+  budget_validation_response:
+    canonical_path: "docs/integrations/lump_sum_budget_planner/validation/budget_validation_response.json"
+    provenance_class: run_produced
+    description: >
+      The record of what the budget-interface-validation skill checked about
+      the budget response in received/: whether it conforms to the interface
+      contract (CLAUDE.md §8.5), and which work packages and partners of the
+      Phase 3 structure it covers. g08_p03 requires a .json file in this
+      directory, and the Phase 7 budget_gate_assessment names this file in
+      its validation_artifact_reference.
+
+      The filename is fixed, not timestamped. A rerun of Phase 7 must update
+      this artifact deterministically from its inputs (§6.4), which a
+      timestamped name turns into an accumulating pile instead.
+
+      This artifact must carry no numeric budget value. The skill validates
+      structure — field presence and identifier coverage — and the
+      specification halts it on materialising any figure.
+
+    fields:
+      validation_id:
+        type: string
+        required: true
+        description: >
+          Identifies this validation act, conventionally
+          budget_validation_response_<ISO8601 timestamp>. Distinct from the
+          filename, which is fixed.
+      validation_type:
+        type: string
+        required: true
+        enum:
+          - request_conformance
+          - response_conformance
+        description: >
+          Mode B of the skill writes response_conformance. Request
+          conformance moved to the budget_request_composer deterministic
+          component, which refuses to write a non-conforming request.
+      contract_version:
+        type: string
+        required: true
+        description: >
+          The version field of interface_contract.json that the response was
+          checked against.
+      validated_file_reference:
+        type: string
+        required: true
+        description: >
+          Filename of the checked budget response in received/. The Phase 7
+          assessment's budget_response_reference must name the same file.
+      conformance_status:
+        type: string
+        required: true
+        enum:
+          - conforms
+          - non_conforming
+        description: >
+          non_conforming is a blocking inconsistency. A non-conforming
+          response must be rejected and flagged, never silently accepted
+          (CLAUDE.md §8.5).
+      non_conformance_findings:
+        type: array
+        required: true
+        description: >
+          One entry per contract breach. Empty when the response conforms.
+        item_schema:
+          field_name:
+            type: string
+            required: true
+          issue_type:
+            type: string
+            required: true
+            enum:
+              - missing
+              - wrong_type
+          contract_requirement:
+            type: string
+            required: true
+      structural_consistency_findings:
+        type: array
+        required: true
+        description: >
+          Consolidated coverage issues against wp_structure.json: a work
+          package or partner the response does not cover. Empty for Mode A,
+          which checks no structure.
+        item_type: string
+      timestamp:
+        type: string
+        required: true
+        description: ISO 8601 timestamp of the validation act.
+
+
+# =============================================================================
 # SECTION 9 — SCHEMA ID REGISTRY
 # =============================================================================
 #

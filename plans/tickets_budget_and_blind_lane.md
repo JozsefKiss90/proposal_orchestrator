@@ -60,6 +60,9 @@ deliverable resting on one must say so. That is a label, not a gate.
 - [ ] Tier 5 content derived from this budget carries the fictional label.
 - [ ] After the operator dispatches Phase 7, the node writes `validation/` and
   `budget_gate_assessment.json`, and `gate_09` reaches pass. Recorded, not assumed.
+  The operator dispatched on 2026-10-01. The node failed at `agent_body`, the gate was
+  never evaluated, and the cause was an engine defect rather than the budget. Fixed
+  below; the box stays open until a gate result exists.
 
 **Not in this ticket.** A real internal budget route needs a §14 amendment, an operator-approved
 effort estimate, a declared cost model and a deterministic component under byte-equal replay.
@@ -80,6 +83,21 @@ can tell a fictional figure from a planner's. That is what §8.1 was carrying, a
 it took a human instruction rather than a code change. G1 and G2 are also recorded unfixed: the
 leakage scan does not reach `docs/integrations/`, and `budget_request.json` holds a Python
 snippet where its `run_id` belongs. Forty-five new tests.
+
+**What actually blocked the gate, and it was not the budget.** The operator dispatched
+Phase 7 on 2026-10-01. n07 ended `blocked_at_exit` with `failure_origin: "agent_body"`,
+`exit_gate_evaluated: false`, and all six Phase 8 nodes on `hard_block_upstream`.
+`gate_09` was never evaluated. The `budget-interface-validation` skill declared
+`gate_pass_declaration: "pass"` and named a validation artifact it never wrote, so
+`_determine_can_evaluate_exit_gate` found `validation/` holding only `.gitkeep` and
+§17.3.2 skipped the gate. The skill could not write it: its catalog entry carried no
+`output_contract`, the artifact had no schema, the sections the runtime searched stopped
+at Tier 2A, and the multi-artifact prompt directive existed only in the TAPM assembler.
+All four are fixed, recorded in
+`decision_log/demo-n07-validation-artifact-contract_2026-10-01.json`, with 20 tests. The
+validation artifact was **not** hand-authored: that would have passed `g08_p03` on a file
+no skill produced, which is the fabricated completion §15 forbids and the thing §17.6.6
+exists to catch.
 
 ---
 

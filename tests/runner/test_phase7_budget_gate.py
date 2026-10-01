@@ -426,21 +426,56 @@ class TestInvocationModeInjection:
         with patch(_RUN_SKILL_TARGET, side_effect=_capture):
             run_agent(**kwargs)
 
-        # Find the primary agent's invocation of budget-interface-validation
-        # (not the pre-gate one, which has no caller_context)
-        biv_primary = [
+        biv = [
             (sid, ctx) for sid, ctx in captured_contexts
-            if sid == "budget-interface-validation" and ctx is not None
+            if sid == "budget-interface-validation"
         ]
-        assert len(biv_primary) >= 1, (
-            f"Expected at least one budget-interface-validation invocation "
-            f"with caller_context. Got: {captured_contexts}"
+        assert len(biv) >= 1, (
+            f"Expected at least one budget-interface-validation invocation. "
+            f"Got: {captured_contexts}"
         )
-        ctx = biv_primary[0][1]
-        assert "invocation_mode" in ctx, (
-            f"caller_context missing 'invocation_mode': {ctx}"
+        for _sid, ctx in biv:
+            assert ctx is not None, (
+                "every invocation must carry caller_context; the pre-gate "
+                "one used to carry none"
+            )
+            assert "invocation_mode" in ctx, (
+                f"caller_context missing 'invocation_mode': {ctx}"
+            )
+            assert ctx["invocation_mode"] == "response_validation"
+
+    def test_the_pre_gate_invocation_gets_the_mode_too(
+        self, tmp_path: Path
+    ) -> None:
+        """The skill is declared under both agents, so it runs twice.
+
+        The pre-gate call used to pass no caller_context at all. Per the
+        skill's own specification an absent invocation_mode is a
+        MISSING_INPUT failure, and its request-validation mode writes to
+        the same canonical validation artifact the response mode owns —
+        so an unmoded pre-gate run could leave a request-conformance
+        artifact where gate_09's dir_non_empty check would accept it.
+        """
+        kwargs = _make_phase7_env(tmp_path)
+        captured: list[dict | None] = []
+
+        def _capture(skill_id, run_id, repo_root, inputs, *, caller_context=None, **kw):
+            if skill_id == "budget-interface-validation":
+                captured.append(
+                    dict(caller_context) if caller_context else None
+                )
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_capture):
+            run_agent(**kwargs)
+
+        assert len(captured) == 2, (
+            f"expected a pre-gate and a primary invocation, got {captured}"
         )
-        assert ctx["invocation_mode"] == "response_validation"
+        assert all(
+            ctx and ctx.get("invocation_mode") == "response_validation"
+            for ctx in captured
+        ), captured
 
 
 # ---------------------------------------------------------------------------

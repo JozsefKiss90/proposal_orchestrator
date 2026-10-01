@@ -37,16 +37,20 @@ constitutional_constraints:
 
 | Path | Artifact | Schema ID | Required Fields (from artifact_schema_specification.yaml) | run_id Required | Derivation Source |
 |------|----------|-----------|----------------------------------------------------------|-----------------|-------------------|
-| `docs/integrations/lump_sum_budget_planner/validation/` | Budget validation artifact file (e.g., `budget_validation_<timestamp>.json`) | N/A — integration validation artifact | validation_id; validation_type: request_conformance or response_conformance; contract_version; validated_file_reference; conformance_status: conforms/non_conforming; non_conformance_findings array; structural_consistency_findings array; timestamp | No — integration validation artifact | conformance_status derived from comparing received/ budget response against interface_contract.json schema; structural_consistency_findings derived from comparing budget response WP/partner entries against wp_structure.json |
+| `docs/integrations/lump_sum_budget_planner/validation/budget_validation_response.json` | Budget validation artifact | N/A — no schema_id; the entry is `integration_validation_schemas.budget_validation_response` | validation_id; validation_type: request_conformance or response_conformance; contract_version; validated_file_reference; conformance_status: conforms/non_conforming; non_conformance_findings array; structural_consistency_findings array; timestamp | No — integration validation artifact | conformance_status derived from comparing received/ budget response against interface_contract.json schema; structural_consistency_findings derived from comparing budget response WP/partner entries against wp_structure.json |
 | `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` | budget_gate_assessment.json | `orch.phase7.budget_gate_assessment.v1` | schema_id, run_id, gate_pass_declaration[pass/fail], budget_response_reference (filename in received/), validation_artifact_reference (filename in validation/), wp_coverage_results (array: wp_id, present_in_budget boolean, budget_line_reference, inconsistencies per WP), partner_coverage_results (array: partner_id, present_in_budget boolean, budget_line_reference, inconsistencies per partner), blocking_inconsistencies (array: inconsistency_id, description, severity[blocking/non_blocking], resolution[resolved/unresolved], resolution_note) | Yes | gate_pass_declaration derived from: response present in received/ AND conforms to interface contract AND no blocking inconsistencies; all other fields derived from structural consistency check of received response against wp_structure.json |
 
 **Note:** `artifact_status` must be ABSENT at write time for budget_gate_assessment.json; the runner stamps it post-gate. If the received/ directory is empty, gate_pass_declaration must be "fail" — this is a blocking gate failure with hard_block: true per the gate result schema. This skill must never generate, estimate, or invent any budget figures.
+
+**This skill writes two artifacts, so it runs on `output_contract: "multi_artifact"`.** Return ONE flat JSON object carrying the required fields of both: the eight validation fields anchored on `validation_id`, and the assessment fields anchored on `gate_pass_declaration`. The runtime splits that object by schema and writes each artifact to its canonical path. Do not nest the two under file names. A response carrying only the assessment fields fails with `INCOMPLETE_OUTPUT`, and nothing is written — which is what happened when this skill declared a validation artifact it had not produced: `validation/` stayed empty, n07's `can_evaluate_exit_gate` returned False, and `gate_09` was never evaluated (CLAUDE.md §17.3.2, §17.6.6).
+
+Both filenames are canonical and fixed. A rerun of Phase 7 must update them deterministically from its inputs (§6.4), so neither carries a timestamp. `validation_id` keeps its timestamp — it names the validation act, not the file.
 
 ### Artifact Registry Cross-Reference
 
 | Output Path | Registered in manifest.compile.yaml artifact_registry? | Producing Node |
 |-------------|--------------------------------------------------------|----------------|
-| `docs/integrations/lump_sum_budget_planner/validation/` | Yes — artifact_id: a_int_budget_validation | n07_budget_gate |
+| `docs/integrations/lump_sum_budget_planner/validation/` | Yes — artifact_id: a_int_budget_validation (directory); `budget_validation_response.json` is the canonical file within it | n07_budget_gate |
 | `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` | Yes — artifact_id: a_t4_phase7 (directory); canonical file within that directory | n07_budget_gate |
 
 ## Execution Specification
@@ -58,6 +62,8 @@ This skill has two invocation modes, determined by the agent context parameter `
 The invoking agent must provide `invocation_mode` as a context parameter. If absent or invalid: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="invocation_mode required; must be 'request_validation' or 'response_validation'") and halt.
 
 **Mode A is not reached in the n07 node body.** `runner/agent_runtime.py` injects `invocation_mode: "response_validation"` for every invocation of this skill under `n07_budget_gate`, so only Mode B runs there. Request conformance moved to the `budget_request_composer` deterministic component (`runner/budget_request.py`), which validates the composed request against the interface contract **before** writing it and refuses to write a non-conforming one (CLAUDE.md §8.5). Mode A is retained as the specification of request-side validation; it is not the active path.
+
+**Every invocation means two.** This skill is declared under both `budget_interface_coordinator`, the node's `pre_gate_agent`, and `budget_gate_validator`, the primary agent, so one n07 node body invokes it twice: once in Phase C and once in the primary skill loop. Both now receive `response_validation`. The pre-gate call carried no `invocation_mode` until 2026-10-01, which by this specification's own Step 1 is a MISSING_INPUT failure, and the run of that date shows both invocations in `.claude/benchmark/<run>/invocation_ledger.jsonl`. The second invocation deterministically overwrites the first. That it runs at all is redundant, and removing it means changing the node's agent bindings (CLAUDE.md §16.5), which is not this skill's business.
 
 ---
 
@@ -89,7 +95,9 @@ The invoking agent must provide `invocation_mode` as a context parameter. If abs
 
 #### 4. Write Sequence (Mode A)
 
-- Step A.4.1: Write the validation artifact to `docs/integrations/lump_sum_budget_planner/validation/<validation_id>.json`
+- Step A.4.1: The validation artifact is written to `docs/integrations/lump_sum_budget_planner/validation/`. As in Mode B, the runtime performs the write; this skill writes no file itself (CLAUDE.md §17.5.2).
+
+Mode A has no canonical path of its own. The one schema in that directory is the response-conformance artifact, so a Mode A run under the current contract would overwrite it — which is why both n07 invocations are given `response_validation` rather than leaving one unmoded. Request conformance lives in the `budget_request_composer` deterministic component. Giving Mode A its own canonical artifact is work for whoever revives the path, and it would also have to reckon with `g08_p03`, which counts files in `validation/` without reading them: a request-conformance artifact alone would satisfy it.
 
 ---
 
@@ -115,7 +123,7 @@ The invoking agent must provide `invocation_mode` as a context parameter. If abs
 
 #### 3. Output Construction (Mode B)
 
-**Budget validation artifact (e.g., `budget_validation_response_<timestamp>.json`):**
+**Budget validation artifact (canonical path `validation/budget_validation_response.json`), in declaration order:**
 - `validation_id`: `"budget_validation_response_<ISO8601_timestamp>"`
 - `validation_type`: `"response_conformance"`
 - `contract_version`: from interface_contract.json
@@ -130,7 +138,7 @@ The invoking agent must provide `invocation_mode` as a context parameter. If abs
 - `run_id`: copied from invoking agent's run_id parameter
 - `gate_pass_declaration`: derived from Step B.2.8 — "pass" or "fail"
 - `budget_response_reference`: derived from Step B.2.2 — filename in received/
-- `validation_artifact_reference`: filename of the validation artifact written to validation/
+- `validation_artifact_reference`: `"budget_validation_response.json"` — the canonical filename in validation/. Naming anything else makes the assessment cite a file that does not exist.
 - `wp_coverage_results`: derived from Step B.2.5 — array of `{wp_id, present_in_budget, budget_line_reference, inconsistencies[]}`
 - `partner_coverage_results`: derived from Step B.2.6 — array of `{partner_id, present_in_budget, budget_line_reference, inconsistencies[]}`
 - `blocking_inconsistencies`: derived from Step B.2.7 — array of `{inconsistency_id, description, severity, resolution, resolution_note}`
@@ -143,9 +151,13 @@ The invoking agent must provide `invocation_mode` as a context parameter. If abs
 
 ### 5. Write Sequence (Mode B)
 
-- Step B.5.1: Write validation artifact to `docs/integrations/lump_sum_budget_planner/validation/<validation_id>.json`
-- Step B.5.2: Create directory `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/` if not present.
-- Step B.5.3: Write `budget_gate_assessment.json` to `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json`
+Both artifacts leave this skill in the single flat JSON response described above. The runtime performs the writes; this skill writes no file itself (CLAUDE.md §17.5.2).
+
+- Step B.5.1: The validation artifact is written to `docs/integrations/lump_sum_budget_planner/validation/budget_validation_response.json`.
+- Step B.5.2: The runtime creates `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/` if not present.
+- Step B.5.3: The assessment is written to `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json`.
+
+Omitting either artifact's fields from the response fails the whole invocation. Neither file is written, so a declared pass can never outrun the evidence for it.
 
 ## Constitutional Constraint Enforcement
 

@@ -76,7 +76,7 @@
     "The leakage guard: each stored package under docs/tier4_orchestration_state/dev_graph/packages/ is rebuilt as a Package from its manifest.json and package.json, filtered to view blind_pre_evaluation, and passed to assert_no_leakage. All 6 pass. The guard is also shown to fire on a planted item, so a pass is not a vacuous pass.",
     "The document-route defect: a synthetic RIA-shaped document carrying the three profile-required section ids is imported into a copy of tests/fixtures/dev_graph_synthetic under tmp_path, blind evidence is built under the real harness/profiles/ria_default.json, and assess_candidate is called with a stub assessor. It raises EvidencePackError naming the missing anchor. Nothing is written into docs/ by this check.",
     "The intake record: written through runner.dev_graph.intake.record_esr_intake, re-read through read_esr_intake, and shown immutable — the same content again is a no-op, and different content under the same id is refused.",
-    "Anonymity: py -3.10 -m runner.leakage_scan over 167 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
+    "Anonymity: py -3.10 -m runner.leakage_scan over 168 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. No new leak. The 11 recorded pre-existing leaks in the 22 September purge record are unchanged."
   ],
   "findings": [
     {

@@ -255,29 +255,42 @@ def _load_artifact_schemas(repo_root: Path) -> dict:
     return data
 
 
+#: Top-level sections of ``artifact_schema_specification.yaml`` that are
+#: searched when resolving a skill's ``writes_to`` path to its canonical
+#: artifact.  A section absent from the specification is skipped, so a
+#: key may be listed before its section exists.
+#:
+#: A canonical path in an unlisted section is unreachable *from a skill*:
+#: the runtime will neither hint it to Claude nor write it.  That is how
+#: n07's integration validation artifact went missing while its skill
+#: declared it written.  ``operational_artifact_schemas`` is deliberately
+#: unlisted — the dev-graph artifacts it holds are written by their own
+#: deterministic layer, and most of its canonical paths are templates
+#: carrying ``<placeholders>`` rather than resolvable paths.
+_SCHEMA_SECTION_KEYS: tuple[str, ...] = (
+    "tier4_phase_output_schemas",
+    "tier5_deliverable_schemas",
+    "tier3_source_schemas",
+    "tier2b_extracted_schemas",
+    "tier2a_extracted_schemas",
+    "checkpoint_schemas",
+    "integration_validation_schemas",
+)
+
+
 def _find_schema_for_path(
     canonical_path: str,
     repo_root: Path,
 ) -> dict | None:
     """Find the schema entry whose ``canonical_path`` matches.
 
-    Searches all schema sections (``tier4_phase_output_schemas``,
-    ``tier5_deliverable_schemas``, ``tier3_source_schemas``,
-    ``tier2b_extracted_schemas``, ``tier2a_extracted_schemas``,
-    ``checkpoint_schemas``).  Returns the schema entry dict, or ``None``
-    if no match is found.
+    Searches every section named in :data:`_SCHEMA_SECTION_KEYS`.
+    Returns the schema entry dict, or ``None`` if no match is found.
     """
     spec = _load_artifact_schemas(repo_root)
     # Normalise to forward-slash repo-relative string
     norm = canonical_path.replace("\\", "/")
-    for section_key in (
-        "tier4_phase_output_schemas",
-        "tier5_deliverable_schemas",
-        "tier3_source_schemas",
-        "tier2b_extracted_schemas",
-        "tier2a_extracted_schemas",
-        "checkpoint_schemas",
-    ):
+    for section_key in _SCHEMA_SECTION_KEYS:
         section = spec.get(section_key)
         if not isinstance(section, dict):
             continue
@@ -472,6 +485,162 @@ def _validate_skill_inputs(
 # ---------------------------------------------------------------------------
 
 
+#: Fields the multi-artifact writer stamps itself rather than reading
+#: out of the response by name.  They are excluded from the anchor so a
+#: schema declaring ``schema_id`` first still anchors on a domain field.
+_META_FIELDS: frozenset[str] = frozenset({"schema_id", "run_id"})
+
+
+def _anchor_field(required_fields: list[str]) -> str | None:
+    """Return the field a multi-artifact response is keyed on.
+
+    The first required field that is not runtime metadata.  The writer
+    uses it to tell a flat response from a nested one, and the prompt
+    directive asks for it by name, so the two must agree: a directive
+    naming ``schema_id`` would ask for a key the writer never looks for.
+
+    Returns ``None`` when the schema declares nothing but metadata.
+    """
+    for field_name in required_fields:
+        if field_name not in _META_FIELDS:
+            return field_name
+    return None
+
+
+def _artifacts_under_directory(
+    dir_rel_path: str,
+    repo_root: Path,
+) -> list[tuple[str, dict]]:
+    """Return ``(canonical_path, schema_entry)`` for artifacts in a directory.
+
+    Searches every section named in :data:`_SCHEMA_SECTION_KEYS` for
+    entries whose ``canonical_path`` lives under *dir_rel_path*.  Both
+    the prompt assemblers and the canonical writer resolve a directory
+    ``writes_to`` entry through this, so a path the prompt hints is a
+    path the writer can land.
+
+    Raises :class:`SkillRuntimeError` if the specification cannot load.
+    """
+    spec = _load_artifact_schemas(repo_root)
+    dir_norm = dir_rel_path.rstrip("/")
+    found: list[tuple[str, dict]] = []
+    for section_key in _SCHEMA_SECTION_KEYS:
+        section = spec.get(section_key)
+        if not isinstance(section, dict):
+            continue
+        for _name, entry in section.items():
+            if not isinstance(entry, dict):
+                continue
+            canonical = entry.get("canonical_path", "")
+            if canonical.startswith(dir_norm + "/"):
+                found.append((canonical, entry))
+    return found
+
+
+def _resolve_output_artifacts(
+    writes_to: list[str],
+    repo_root: Path,
+) -> list[tuple[str, dict]]:
+    """Resolve *writes_to* to the canonical artifacts it covers.
+
+    A directory entry expands to every canonical artifact under it; a
+    file entry resolves to its own schema when one exists.  An entry
+    that resolves to nothing is dropped, so this is the prompt's view of
+    the output set — the writer keeps its own slightly wider view, which
+    retains a file path whose schema is absent.
+    """
+    resolved: list[tuple[str, dict]] = []
+    for rel_path in writes_to:
+        abs_wpath = repo_root / rel_path
+        if rel_path.endswith("/") or abs_wpath.is_dir():
+            try:
+                resolved.extend(_artifacts_under_directory(rel_path, repo_root))
+            except SkillRuntimeError:
+                continue
+        else:
+            entry = _find_schema_for_path(rel_path, repo_root)
+            if entry is not None:
+                resolved.append((rel_path, entry))
+    return resolved
+
+
+def _collect_schema_hints(
+    writes_to: list[str],
+    repo_root: Path,
+) -> tuple[list[str], bool]:
+    """Resolve *writes_to* to canonical schema hints.
+
+    Returns ``(schema_hints, any_schema_requires_run_id)``.  A hint names
+    one canonical path with its ``schema_id`` and required fields, in the
+    order the schema declares them — :func:`_anchor_field` reads that
+    order, so the order is part of the contract, not presentation.
+
+    Both prompt assemblers call this.  They used to each carry their own
+    copy of the loop, which is how the cli-prompt assembler came to omit
+    the multi-artifact directive that only the TAPM copy had.
+    """
+    schema_hints: list[str] = []
+    any_schema_requires_run_id = False
+
+    for path, entry in _resolve_output_artifacts(writes_to, repo_root):
+        sid, req = _extract_schema_requirements(entry)
+        if sid:
+            any_schema_requires_run_id = True
+        hint = f"  - {path}"
+        if sid:
+            hint += f" (schema_id: {sid!r})"
+        if req:
+            hint += f" required fields: {', '.join(req)}"
+        schema_hints.append(hint)
+
+    return schema_hints, any_schema_requires_run_id
+
+
+def _multi_artifact_directive(
+    writes_to: list[str],
+    repo_root: Path,
+) -> str:
+    """Name the top-level keys a multi-artifact response must carry.
+
+    The writer extracts each sub-artifact by looking for its anchor
+    field at the top level of one flat object.  Nested shapes are tried
+    as a fallback, but the flat shape is what is asked for.  The anchor
+    comes from :func:`_anchor_field`, the same function the writer uses,
+    so the key asked for is the key looked for.
+
+    Returns the empty string when no artifact has a domain field to
+    anchor on: the writer skips those, so there is nothing to direct.
+    """
+    anchor_fields: list[str] = []
+    for _path, entry in _resolve_output_artifacts(writes_to, repo_root):
+        _sid, req = _extract_schema_requirements(entry)
+        anchor = _anchor_field(req)
+        if anchor is not None and anchor not in anchor_fields:
+            anchor_fields.append(anchor)
+    if not anchor_fields:
+        return ""
+
+    block = (
+        "\n## CRITICAL: Multi-Artifact Response Format\n\n"
+        "This skill produces MULTIPLE artifacts in a single response. "
+        "Your JSON response MUST be a single flat object containing ALL "
+        "of the following top-level keys — one for each artifact:\n\n"
+    )
+    for field_name in anchor_fields:
+        block += f'- "{field_name}"\n'
+    block += "\nExample structure (showing keys only):\n```\n{\n"
+    for field_name in anchor_fields:
+        block += f'  "{field_name}": [...],\n'
+    block += (
+        "}\n```\n"
+        "Every key listed above MUST be present in your response. "
+        "A response missing any of these keys is a validation failure. "
+        "Do NOT nest artifacts under file names or paths — use the "
+        "flat structure shown above.\n"
+    )
+    return block
+
+
 def _assemble_skill_prompt(
     skill_spec: str,
     inputs: dict[str, Any],
@@ -479,6 +648,7 @@ def _assemble_skill_prompt(
     writes_to: list[str],
     constraints: list[str],
     repo_root: Path,
+    output_contract: str = "single_artifact",
 ) -> tuple[str, str]:
     """Assemble the system and user prompts for Claude invocation.
 
@@ -501,43 +671,11 @@ def _assemble_skill_prompt(
     for c in constraints:
         system_prompt += f"- {c}\n"
 
-    # Determine if the output schema requires run_id/schema_id
-    any_schema_requires_run_id = False
-    for rel_path in writes_to:
-        abs_wpath = repo_root / rel_path
-        if rel_path.endswith("/") or abs_wpath.is_dir():
-            try:
-                spec_data = _load_artifact_schemas(repo_root)
-            except SkillRuntimeError:
-                continue
-            dir_norm = rel_path.rstrip("/")
-            for section_key in (
-                "tier4_phase_output_schemas",
-                "tier5_deliverable_schemas",
-                "tier3_source_schemas",
-                "tier2b_extracted_schemas",
-                "tier2a_extracted_schemas",
-                "checkpoint_schemas",
-            ):
-                section = spec_data.get(section_key)
-                if not isinstance(section, dict):
-                    continue
-                for _name, entry in section.items():
-                    if not isinstance(entry, dict):
-                        continue
-                    cp = entry.get("canonical_path", "")
-                    if cp.startswith(dir_norm + "/"):
-                        if entry.get("schema_id_value"):
-                            any_schema_requires_run_id = True
-                            break
-                if any_schema_requires_run_id:
-                    break
-        else:
-            w_entry = _find_schema_for_path(rel_path, repo_root)
-            if w_entry is not None and w_entry.get("schema_id_value"):
-                any_schema_requires_run_id = True
-        if any_schema_requires_run_id:
-            break
+    # Resolve the output schemas once: the metadata requirement and the
+    # per-artifact hints come from the same lookup.
+    schema_hints, any_schema_requires_run_id = _collect_schema_hints(
+        writes_to, repo_root
+    )
 
     if any_schema_requires_run_id:
         system_prompt += (
@@ -570,6 +708,19 @@ def _assemble_skill_prompt(
     if any_schema_requires_run_id:
         user_prompt += f"run_id: {run_id}\n"
     user_prompt += f"writes_to: {', '.join(writes_to)}\n"
+
+    if schema_hints:
+        user_prompt += "\nExpected output schemas:\n"
+        for hint in schema_hints:
+            user_prompt += hint + "\n"
+
+    # A multi-artifact skill must be told which top-level keys to carry
+    # in this mode too.  The directive used to live only in the TAPM
+    # assembler, so a cli-prompt skill on this contract was asked for one
+    # artifact and judged on two.
+    if output_contract == "multi_artifact":
+        user_prompt += _multi_artifact_directive(writes_to, repo_root)
+
     user_prompt += (
         "\nReturn a single JSON object conforming to the output schema "
         "defined in the skill specification above. Do not wrap in markdown. "
@@ -633,53 +784,9 @@ def _assemble_tapm_prompt(
 
     # Look up schemas for writes_to paths to determine metadata
     # requirements and build schema hints for the user prompt.
-    schema_hints: list[str] = []
-    any_schema_requires_run_id = False
-    for rel_path in writes_to:
-        abs_wpath = repo_root / rel_path
-        if rel_path.endswith("/") or abs_wpath.is_dir():
-            try:
-                spec_data = _load_artifact_schemas(repo_root)
-            except SkillRuntimeError:
-                continue
-            dir_norm = rel_path.rstrip("/")
-            for section_key in (
-                "tier4_phase_output_schemas",
-                "tier5_deliverable_schemas",
-                "tier3_source_schemas",
-                "tier2b_extracted_schemas",
-                "tier2a_extracted_schemas",
-                "checkpoint_schemas",
-            ):
-                section = spec_data.get(section_key)
-                if not isinstance(section, dict):
-                    continue
-                for _name, entry in section.items():
-                    if not isinstance(entry, dict):
-                        continue
-                    cp = entry.get("canonical_path", "")
-                    if cp.startswith(dir_norm + "/"):
-                        sid, req = _extract_schema_requirements(entry)
-                        if sid:
-                            any_schema_requires_run_id = True
-                        hint = f"  - {cp}"
-                        if sid:
-                            hint += f" (schema_id: {sid!r})"
-                        if req:
-                            hint += f" required fields: {', '.join(req)}"
-                        schema_hints.append(hint)
-        else:
-            w_entry = _find_schema_for_path(rel_path, repo_root)
-            if w_entry is not None:
-                sid, req = _extract_schema_requirements(w_entry)
-                if sid:
-                    any_schema_requires_run_id = True
-                hint = f"  - {rel_path}"
-                if sid:
-                    hint += f" (schema_id: {sid!r})"
-                if req:
-                    hint += f" required fields: {', '.join(req)}"
-                schema_hints.append(hint)
+    schema_hints, any_schema_requires_run_id = _collect_schema_hints(
+        writes_to, repo_root
+    )
 
     # Output field requirements — conditional on artifact type
     if any_schema_requires_run_id:
@@ -766,41 +873,8 @@ def _assemble_tapm_prompt(
         for h in schema_hints:
             user_prompt += h + "\n"
 
-    if output_contract == "multi_artifact" and schema_hints:
-        # Explicit multi-artifact response format instructions.
-        # Extract the anchor field (first required field) from each hint
-        # so Claude knows exactly which top-level keys to include.
-        anchor_fields: list[str] = []
-        for h in schema_hints:
-            # Hints look like:
-            #   "  - <path> required fields: field1, field2"
-            if "required fields:" in h:
-                fields_part = h.split("required fields:", 1)[1].strip()
-                first_field = fields_part.split(",")[0].strip()
-                if first_field:
-                    anchor_fields.append(first_field)
-        if anchor_fields:
-            user_prompt += (
-                "\n## CRITICAL: Multi-Artifact Response Format\n\n"
-                "This skill produces MULTIPLE artifacts in a single response. "
-                "Your JSON response MUST be a single flat object containing ALL "
-                "of the following top-level keys — one for each artifact:\n\n"
-            )
-            for af in anchor_fields:
-                user_prompt += f"- \"{af}\"\n"
-            user_prompt += (
-                "\nExample structure (showing keys only):\n"
-                "```\n{\n"
-            )
-            for af in anchor_fields:
-                user_prompt += f"  \"{af}\": [...],\n"
-            user_prompt += (
-                "}\n```\n"
-                "Every key listed above MUST be present in your response. "
-                "A response missing any of these keys is a validation failure. "
-                "Do NOT nest artifacts under file names or paths — use the "
-                "flat structure shown above.\n"
-            )
+    if output_contract == "multi_artifact":
+        user_prompt += _multi_artifact_directive(writes_to, repo_root)
 
     if output_contract == "payload":
         # Payload-contract skills return an in-memory payload rather than a
@@ -1754,6 +1828,7 @@ def run_skill(
             writes_to=writes_to,
             constraints=constraints,
             repo_root=repo_root,
+            output_contract=output_contract,
         )
         logger.info(
             "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds  backend=%s",
@@ -2357,28 +2432,17 @@ def run_skill(
         abs_path = repo_root / rel_path
         if rel_path.endswith("/") or abs_path.is_dir():
             # Directory write path — collect all canonical artifacts
-            # whose canonical_path lives inside this directory.
-            spec = _load_artifact_schemas(repo_root)
-            dir_norm = rel_path.rstrip("/")
-            for section_key in (
-                "tier4_phase_output_schemas",
-                "tier5_deliverable_schemas",
-                "tier3_source_schemas",
-                "tier2b_extracted_schemas",
-                "tier2a_extracted_schemas",
-                "checkpoint_schemas",
-            ):
-                section = spec.get(section_key)
-                if not isinstance(section, dict):
-                    continue
-                for _name, entry_s in section.items():
-                    if not isinstance(entry_s, dict):
-                        continue
-                    cp = entry_s.get("canonical_path", "")
-                    if cp.startswith(dir_norm + "/"):
-                        dir_artifacts.append((cp, entry_s))
+            # whose canonical_path lives inside this directory.  Shared
+            # with the prompt assemblers, so a path Claude is told about
+            # is a path this writer can land.
+            dir_artifacts.extend(
+                _artifacts_under_directory(rel_path, repo_root)
+            )
         else:
             # File write path — look for an exact canonical_path match.
+            # Unlike the prompt's view, a file with no schema is KEPT:
+            # the single-artifact fallback below needs its path, and
+            # writes the parsed response to it unvalidated.
             file_entry = _find_schema_for_path(rel_path, repo_root)
             dir_artifacts.append((rel_path, file_entry or {}))
 
@@ -2421,8 +2485,29 @@ def run_skill(
         all_errors: list[str] = []
         pending_writes: list[tuple[str, dict]] = []
 
-        # Metadata fields are stamped separately from domain fields.
-        _META_FIELDS = {"schema_id", "run_id"}
+        # artifact_status must be absent — not silently removed (§17.6.5).
+        # Each sub-artifact is built from its schema's required fields, so
+        # an artifact_status in the response would never reach
+        # _validate_skill_output and would simply be dropped. That turns a
+        # mandated validation failure into a silent repair, which is the
+        # one thing §17.5.4 and §17.6.5 both forbid.
+        if "artifact_status" in parsed:
+            _elapsed = time.monotonic() - _skill_t0
+            logger.info(
+                "  skill FAIL   id=%s  category=MALFORMED_ARTIFACT  "
+                "contract=multi_artifact  elapsed=%.1fs  "
+                "(artifact_status present)",
+                skill_id, _elapsed,
+            )
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r} multi-artifact validation failed: "
+                    "artifact_status must be absent at write time "
+                    "(the runner stamps it post-gate)"
+                ),
+                failure_category="MALFORMED_ARTIFACT",
+            )
 
         for canonical_rel, s_entry in dir_artifacts:
             exp_sid, req_fields = _extract_schema_requirements(s_entry)
@@ -2431,14 +2516,12 @@ def run_skill(
             if not req_fields:
                 continue  # Skip schemas with no required fields
 
-            # Domain fields = required fields minus metadata.
-            # The first domain field is used as the anchor to detect
-            # whether Claude returned a flat or nested response shape.
-            domain_fields = [f for f in req_fields if f not in _META_FIELDS]
-            if not domain_fields:
+            # The anchor detects whether Claude returned a flat or a
+            # nested response shape.  It is also the key the prompt asks
+            # for, so both sides must compute it the same way.
+            anchor_field = _anchor_field(req_fields)
+            if anchor_field is None:
                 continue  # No domain fields to anchor extraction
-
-            anchor_field = domain_fields[0]
 
             # Claude may return one of several response shapes:
             #   Flat:           { "evaluation_matrix": {...}, "instruments": [...] }

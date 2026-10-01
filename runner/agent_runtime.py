@@ -490,6 +490,13 @@ _LUMP_SUM_ONLY_ARTIFACT_MARKERS: tuple[str, ...] = (
     "integration/budget_request.json",
 )
 
+#: The n07 skill that needs an ``invocation_mode`` in caller context, and
+#: the only mode it has left there.  It is declared under both the
+#: pre-gate agent and the primary agent, so it runs twice in one node
+#: body and must be given its mode in both places — see Phase C.
+_BUDGET_VALIDATION_SKILL: str = "budget-interface-validation"
+_BUDGET_VALIDATION_MODE: str = "response_validation"
+
 
 def _resolve_budget_regime_safe(repo_root: Path) -> Optional[str]:
     """Return the instrument budget regime, or ``None`` if unresolvable.
@@ -1395,7 +1402,28 @@ def run_agent(
 
         # Execute pre-gate agent's skills first
         for sid in pre_gate_skills:
-            result = run_skill(sid, run_id, repo_root, resolved_inputs)
+            # budget-interface-validation is used by BOTH the pre-gate
+            # and the primary agent, so it runs here too.  It needs its
+            # invocation_mode in both places: without one its own
+            # specification says to fail with MISSING_INPUT, and its
+            # request-validation mode writes to the same canonical
+            # validation artifact that the response mode owns.  Request
+            # conformance now lives in the budget_request_composer
+            # deterministic component, so response_validation is the
+            # only mode this skill has left under n07.
+            pre_gate_context: Optional[dict[str, Any]] = None
+            if sid == _BUDGET_VALIDATION_SKILL:
+                pre_gate_context = {
+                    "invocation_mode": _BUDGET_VALIDATION_MODE
+                }
+            result = run_skill(
+                sid,
+                run_id,
+                repo_root,
+                resolved_inputs,
+                node_id=node_id,
+                caller_context=pre_gate_context,
+            )
             record = SkillInvocationRecord(
                 skill_id=sid,
                 status=result.status,
@@ -1604,13 +1632,10 @@ def run_agent(
             )
 
         # Inject invocation_mode for budget-interface-validation.
-        # When invoked by the primary agent body the skill operates in
-        # response_validation mode (Mode B) to produce the canonical
-        # budget_gate_assessment.json artifact.
-        if sid == "budget-interface-validation":
+        if sid == _BUDGET_VALIDATION_SKILL:
             if not caller_context:
                 caller_context = {}
-            caller_context["invocation_mode"] = "response_validation"
+            caller_context["invocation_mode"] = _BUDGET_VALIDATION_MODE
 
         # Inject gate_id context for gate-enforcement invocations.
         # The gate_id is resolved from the manifest's exit_gate binding

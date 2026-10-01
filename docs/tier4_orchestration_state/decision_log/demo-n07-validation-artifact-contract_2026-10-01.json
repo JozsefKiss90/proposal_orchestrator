@@ -1,0 +1,135 @@
+{
+  "record_type": "decision",
+  "id": "demo-n07-validation-artifact-contract",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "milestone": "Unblocking the Phase 7 exit gate after the operator's dispatch of 2026-10-01 failed at the agent body. Follows ticket A in plans/tickets_budget_and_blind_lane.md, which supplied the budget response the gate reads.",
+  "authority": "CLAUDE.md §9.4: a decision affecting future interpretation is written to Tier 4. §14 is NOT engaged: no phase definition, gate condition, tier meaning or authority relation changes. §16.2 names artifact_schema_specification.yaml as an authoritative source of agent scope. §16.3 forbids an agent introducing an artifact path the specifications do not define. This change does the reverse. The manifest had registered the path all along; what was missing was its schema entry, and that is what was added. §17.5.2 reserves prompt assembly, validation and I/O to the skill runtime, which is the only Python changed. The scheduler, the gate evaluator, the node state machine and gate-evaluation authority are untouched (§17.1.4, §17.6.2).",
+  "what_failed": {
+    "run_id": "import uuid; print(uuid.uuid4())",
+    "dispatched_by": "operator",
+    "node": "n07_budget_gate",
+    "state": "blocked_at_exit",
+    "failure_origin": "agent_body",
+    "failure_category": "INCOMPLETE_OUTPUT",
+    "exit_gate_evaluated": false,
+    "failure_reason": "Agent 'budget_gate_validator': all skills succeeded but gate-relevant artifacts are missing from disk for node 'n07_budget_gate'",
+    "downstream": "All six Phase 8 nodes took hard_block_upstream, per §17.3.4: an agent-body failure at the budget gate node produces the same downstream freeze as an exit-gate failure.",
+    "note": "gate_09_budget_consistency was never evaluated. The budget response ticket A authored is not what stopped this run, and no gate result was written — §17.6.3 and §17.1.4 hold."
+  },
+  "root_cause": {
+    "summary": "The budget-interface-validation skill declared a validation artifact it had no way to write, and the runtime believed the disk rather than the declaration.",
+    "chain": [
+      "The skill returned gate_pass_declaration: 'pass' and named budget_validation_response_2026-10-01T00:00:00Z.json in validation_artifact_reference.",
+      "Only budget_gate_assessment.json was written. docs/integrations/lump_sum_budget_planner/validation/ still held nothing but .gitkeep.",
+      "The manifest registers a_int_budget_validation with tier integration_validation and required_for_gate gate_09_budget_consistency, and agent_runtime._get_artifacts_produced_by_node treats that tier as gate-relevant.",
+      "_determine_can_evaluate_exit_gate requires a directory artifact to hold at least one .json file. It returned False.",
+      "Per §17.3.2 the exit gate is skipped when can_evaluate_exit_gate is False. The node failed at agent_body."
+    ],
+    "why_the_skill_could_not_write_it": [
+      "Its skill_catalog.yaml entry declared two writes_to directories and carried no output_contract, so the runtime defaulted to single_artifact and landed exactly one file.",
+      "The validation artifact had no schema entry anywhere in artifact_schema_specification.yaml. The multi_artifact writer skips any artifact whose schema declares no required fields, so declaring the contract alone would have changed nothing.",
+      "The six section keys the skill runtime searched stopped at Tier 2A and never reached docs/integrations/, so a schema placed in a new section would have been unreachable without naming that section.",
+      "The multi-artifact response directive existed only in the TAPM prompt assembler. This skill runs in cli-prompt mode, so it would have been asked for one artifact and judged on two."
+    ],
+    "verdict": "§17.6.6 worked exactly as written. The runtime refused to take a successful skill invocation as evidence that an artifact exists. The defect was in the skill's declared output contract, not in the check that caught it."
+  },
+  "what_was_rejected": {
+    "decision": "The validation artifact was not hand-authored.",
+    "reasoning": "Writing it by hand would have satisfied g08_p03's dir_non_empty check and released the node, making gate_09 pass on a validation artifact no skill produced. That is the fabricated completion §15 forbids and the exact failure mode §17.6.6 exists to catch. The §1 override of ticket A covers an operator-authorised fictional budget; it does not cover faking a skill output, and no override was sought for one."
+  },
+  "decisions": [
+    {
+      "id": "N1",
+      "decision": "artifact_schema_specification.yaml gains a section, integration_validation_schemas, holding one entry: budget_validation_response.",
+      "reasoning": "The artifact had to be reachable by canonical path, and the existing sections are tier-named. Placing an integrations path under tier4_phase_output_schemas would have made the directory scan find it while filing it under a tier it does not belong to. A section named for what the artifact is keeps the specification honest about Tier boundaries (§5, §9.1).",
+      "recorded_in": "artifact_schema_specification.yaml SECTION 8B; tests/runner/test_budget_validation_artifact.py TestTheValidationArtifactHasASchema."
+    },
+    {
+      "id": "N2",
+      "decision": "The entry declares no schema_id_value, so no run_id or schema_id is demanded of the artifact.",
+      "reasoning": "The skill specification's output table has always declared run_id not required for this artifact, and _extract_schema_requirements derives the requirement from the presence of schema_id_value. Adding one would have contradicted the specification and stamped runtime metadata onto a record of what was checked about an external file. The traceability that matters is already there: validated_file_reference names the response, and the Phase 7 assessment carries the run_id.",
+      "recorded_in": "tests/runner/test_budget_validation_artifact.py test_it_declares_no_schema_id_so_no_run_id_is_demanded_of_it."
+    },
+    {
+      "id": "N3",
+      "decision": "The filename is fixed, budget_validation_response.json, not timestamped as the skill specification described.",
+      "reasoning": "§6.4 requires a rerun to update Tier 4 state deterministically from its inputs. A timestamped filename turns every rerun into an additional file, so g08_p03's dir_non_empty check would pass on an accumulating pile in which the current validation cannot be identified. The canonical-path contract also requires one fixed name. validation_id keeps its timestamp: it names the validation act, not the file.",
+      "recorded_in": "The schema entry's description; the skill specification's Step B.5.1 and validation_artifact_reference."
+    },
+    {
+      "id": "N4",
+      "decision": "The skill catalog entry declares output_contract: \"multi_artifact\". The schema and the contract are one change, not two.",
+      "reasoning": "Either alone is useless or harmful. Without the contract the writer lands one file. With the schema present and the contract absent, the single-artifact path writes the whole parsed response to whichever of the two canonical paths resolves first, which would put the assessment's content in the validation file. A test pins that both writes_to entries now resolve to exactly one canonical artifact each.",
+      "recorded_in": "tests/runner/test_budget_validation_artifact.py TestTheSkillDeclaresTheMultiArtifactContract."
+    },
+    {
+      "id": "N5",
+      "decision": "The multi-artifact response directive moved out of the TAPM assembler into a shared helper that both assemblers call.",
+      "reasoning": "This is the first cli-prompt skill on the multi-artifact contract, and the cli-prompt assembler emitted neither the per-artifact schema hints nor the directive naming the top-level keys. A contract that only holds in one transport mode is not a contract. The same move removed the fourth copy of the schema-section loop: _collect_schema_hints and _multi_artifact_directive now carry what three places had each reimplemented.",
+      "recorded_in": "runner/skill_runtime.py _collect_schema_hints, _multi_artifact_directive, _SCHEMA_SECTION_KEYS; tests/runner/test_budget_validation_artifact.py TestThePromptNamesBothAnchorFields."
+    },
+    {
+      "id": "N6",
+      "decision": "The two artifacts' required field names must stay disjoint, and the declaration order of the validation fields is part of the contract.",
+      "reasoning": "The writer asks for one flat object and extracts each sub-artifact by its anchor — the first required field its schema declares that is not schema_id or run_id. A name appearing in both schemas would be collected into both artifacts, and reordering the fields would change the key Claude is asked for. Both properties are now asserted rather than left as a coincidence of how the schemas happened to be written.",
+      "recorded_in": "tests/runner/test_budget_validation_artifact.py TestTheTwoArtifactsDoNotCollide, test_it_declares_them_in_the_order_the_writer_anchors_on."
+    },
+    {
+      "id": "N7",
+      "decision": "Mode A of the skill is left without a canonical path, and the gap is stated in the specification.",
+      "reasoning": "The one schema in the validation directory is the response-conformance artifact, so a Mode A run under this contract would overwrite it. Request conformance moved to the budget_request_composer deterministic component, which refuses to write a non-conforming request. Inventing a second canonical artifact for a path nothing executes would be speculative. The specification now says so instead of implying Mode A still works. It would also have to reckon with g08_p03, which counts files in validation/ without reading them, so a request-conformance artifact alone satisfies it."
+    },
+    {
+      "id": "N8",
+      "decision": "The pre-gate invocation of the skill is now given invocation_mode too. The earlier draft of N7 asserted agent_runtime injected it for every n07 invocation. That was false, and the code review caught it.",
+      "reasoning": "The skill is declared under both budget_interface_coordinator, n07's pre_gate_agent, and budget_gate_validator, the primary agent, so one node body invokes it twice. Phase C called run_skill positionally with no caller_context; the injection lived only in the primary loop. The existing test even said so in a comment: 'not the pre-gate one, which has no caller_context'. By this skill's own Step 1 an absent invocation_mode is a MISSING_INPUT failure. Worse under the new contract: an unmoded or Mode A run would write a request-conformance record to the canonical path the response mode owns, and g08_p03 would accept it, since the predicate counts files without reading them. The run of 2026-10-01 shows both invocations in .claude/benchmark/<run>/invocation_ledger.jsonl. Both now receive response_validation, and the second deterministically overwrites the first. That the duplicate invocation exists at all is redundant but not fixed here: removing it means changing the node's agent bindings (§16.5).",
+      "recorded_in": "runner/agent_runtime.py Phase C and _BUDGET_VALIDATION_SKILL; tests/runner/test_phase7_budget_gate.py TestInvocationModeInjection, which now asserts over every invocation rather than the first one carrying a context."
+    },
+    {
+      "id": "N9",
+      "decision": "The multi-artifact writer now rejects a response carrying artifact_status instead of discarding it.",
+      "reasoning": "§17.6.5 names the presence of artifact_status a validation failure, 'not auto-correctable'. The single-artifact path enforces that in _validate_skill_output. The multi-artifact writer builds each sub-artifact from its schema's required fields, and artifact_status is declared optional, so it never reached validation and was silently dropped. Routing this skill onto that path would have converted a mandated failure into exactly the silent repair §17.5.4 forbids. The check is on the parsed response, before extraction, so neither artifact is written.",
+      "recorded_in": "runner/skill_runtime.py, the multi_artifact branch; tests/runner/test_budget_validation_artifact.py TestItRefusesArtifactStatusRatherThanDroppingIt."
+    },
+    {
+      "id": "N10",
+      "decision": "The anchor field is computed by one function, _anchor_field, used by both the writer and the prompt directive.",
+      "reasoning": "The directive took the literal first required field while the writer took the first field that is not schema_id or run_id. For the Phase 7 assessment those differ: the prompt asked for a top-level 'schema_id' key and never named gate_pass_declaration, which is the key the writer actually looks for. The original test could not catch it, because the schema-hint lines above the directive list every required field of both artifacts, so the field appeared in the prompt either way. A pre-existing TAPM defect that this change newly relied on and newly exported to cli-prompt mode.",
+      "recorded_in": "runner/skill_runtime.py _anchor_field and _META_FIELDS; tests/runner/test_budget_validation_artifact.py test_the_directive_asks_for_no_metadata_field, test_the_writer_and_the_prompt_read_the_same_anchor."
+    }
+  ],
+  "what_is_outstanding_for_the_operator": {
+    "step": "Re-dispatch Phase 7.",
+    "command": "py -3.10 -m runner --run-id <the existing run id> --phase 7",
+    "why_the_run_id_matters": "Every Phase 1 to 6 gate result on this branch carries run_id 'import uuid; print(uuid.uuid4())', the literal string PowerShell passed through from single quotes. g08_p01's gate_pass_recorded match is exact, so a fresh UUID fails that predicate and no amount of budget work compensates. Reuse the existing id.",
+    "also": "The dispatch of 2026-10-01T17:04 dispatched no node: the scheduler loaded the persisted RunContext, found n07 already blocked_at_exit, and completed in 0.09 seconds with dispatched_nodes empty. Step 0 did run — the Call Slicer rewrote its slice timestamp, which is the only change in HORIZON-CL6-2027-01-BIODIV-01.slice.json. A re-dispatch has to clear or force past that persisted node state, or it will replay the same summary.",
+    "what_should_then_happen": "The skill writes both artifacts, _determine_can_evaluate_exit_gate returns True, and the scheduler evaluates gate_09 for the first time. Whether it passes is the gate evaluator's finding to record, not a prediction made here.",
+    "stale_field_on_disk": "budget_gate_assessment.json currently names budget_validation_response_2026-10-01T00:00:00Z.json in validation_artifact_reference, a file that does not exist. It is a skill output and was not hand-corrected; the re-dispatch overwrites it with the canonical name."
+  },
+  "disclosure": {
+    "what_happened": "The operator's budget_gate_assessment.json was deleted and then restored during this session.",
+    "detail": "The file appeared in docs/ during a full-suite run and was diagnosed as test pollution before .claude/runs/ mtimes were checked. It was the operator's real dispatch output. It was restored by re-parsing the JSON captured in .claude/skill_diag/budget-interface-validation_import u_parsed.txt, so its content is the run's and its bytes are a reconstruction.",
+    "why_it_is_recorded": "§9.1 makes docs/ the durable record. A reconstructed artifact in it must say so rather than pass as the original."
+  },
+  "findings_still_open": [
+    {
+      "id": "G1",
+      "summary": "runner/leakage_scan.py reaches neither docs/integrations/ nor its received budget responses: the path is in no SCAN_GLOB.",
+      "disposition": "still open. Unchanged by this fix."
+    },
+    {
+      "id": "G2",
+      "summary": "budget_request.json carries the Python snippet 'import uuid; print(uuid.uuid4())' where its run_id belongs, because that is the demo run's actual id.",
+      "disposition": "still open, and now load-bearing: g08_p01 matches that exact string, so correcting it would invalidate every Phase 1 to 6 gate result on this branch."
+    },
+    {
+      "id": "G3",
+      "summary": "g08_p04 cannot reject a non-numeric figure, because the interface contract declares no type for lump_sum.",
+      "disposition": "still open. Unchanged by this fix."
+    }
+  ],
+  "what_this_does_not_settle": "gate_09 has still never been evaluated on this branch, and nothing here asserts it will pass. Ticket A's last box stays open until the gate evaluator records a result. Phase 8 remains hard-blocked, so the blind-baseline ticket's criteria 2, 3 and 4 still have no candidate Part B to work on.",
+  "found_by_code_review": "Three of the decisions above exist because the two-axis code review found them, and two were defects in this change rather than observations about it: N10, the anchor the prompt asks for not being the anchor the writer reads; N9, artifact_status silently dropped on the multi-artifact path; and N8, a claim in this record's own first draft that the code did not support. The spec reviewer also read a mid-edit state and reported a test that had already been replaced, and reported the leakage count as hand-edited without re-running the scan — py -3.10 -m runner.leakage_scan was in fact re-run, reporting 168 files and no new leak.",
+  "authored_by": "Engine fix following the operator's Phase 7 dispatch, branch dev_graph_demo. No runner phase was dispatched. No gate result was written. No budget figure was authored, computed or copied. 30 new tests in tests/runner/test_budget_validation_artifact.py, plus one widened and one added in tests/runner/test_phase7_budget_gate.py."
+}
