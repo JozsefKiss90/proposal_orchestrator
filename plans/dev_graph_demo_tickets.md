@@ -372,6 +372,36 @@ stands in front of them, and ticket B closed the F1 defect that would have faile
 Phase 8 drafting is now permitted under §13.4 for the first time on this branch. Every figure it
 draws on is fictional, so §13.8 applies to the first section written.
 
+**F7: nothing converted a Phase 8 draft into a candidate, and it is now built.** Criterion 2
+says the draft is "imported as candidate version 1". Phase 8 writes three section artifacts
+under `proposal_sections/`; the document route imports a candidate carrying `document_id`,
+`sections`, `claims` and `commitments`. Nothing joined the two. `import_document` is called from
+exactly two places in the tree, the revisions module and the tests, and every test hand-writes
+its candidate. Both halves were well tested and neither asked where a real candidate comes
+from.
+
+This blocks criteria 2 and 4, not criterion 3. The spec review caught a first draft of this
+entry overstating it. `load_candidate` resolves a section artifact by name inside a candidate
+directory, and `proposal_sections/` already is such a directory. Criterion 3's three pinned
+fields were therefore reachable through the **directory** route with no conversion. The ticket
+asks for the blind pre-evaluation view, which is the document route, and this report already
+recorded that the directory route carries no package and refuses to stamp an intake.
+
+`tools/build_part_b_candidate.py` is that converter, with 42 tests and a decision record at
+`decision_log/demo-part-b-candidate-builder_2026-10-01.json`. It is an operator tool, not a
+skill and not a manifest-bound component, and it writes the candidate without importing it. The
+anchor chain is what forced exact copying. Tier 2A declares the RIA sub-sections `B.1.1` to
+`B.3.2`, and the drafting skills take `sub_section_id` from that registry. The RIA rubrics anchor
+on six of those seven, so a converter that renumbered one would break grading silently.
+
+**The end-to-end test nearly proved nothing.** The anchor map is read on the `assess_candidate`
+path, not when the evidence pack is built, so a first draft that stopped at
+`build_blind_evidence` passed with every anchor missing. It now runs the judge and asserts the
+three pins criterion 3 names. Claims are carried from each section's own `validation_status`,
+which gives the leakage guard real items and closes the claim half of F6. Commitments stay
+empty. `milestone_refs` and `wp_table_refs` are id lists with no text, so a commitment built
+from one would have invented content.
+
 **Criterion 4 is checked over the wrong package, so its box stays open.** `assert_no_leakage`
 ran over all 6 blind packages the demo world holds, rebuilt from their stored manifests, and
 all 6 are clean. The package the criterion means is the one built around candidate version 1,

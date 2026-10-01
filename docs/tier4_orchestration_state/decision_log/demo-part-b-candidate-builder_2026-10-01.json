@@ -1,0 +1,93 @@
+{
+  "record_type": "implementation_decision",
+  "id": "demo-part-b-candidate-builder_2026-10-01",
+  "date": "2026-10-01",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "authority": [
+    "CLAUDE.md §9.4: the mapping choices below affect how a future reader interprets a candidate, so they are recorded rather than left in the code alone.",
+    "§17.5.2 and §17.5.3: this is neither a skill nor a manifest-bound deterministic component. It performs no Claude invocation and is not declared in a node body, so §16.5 binds nothing here. It is an operator tool in the shape of tools/derive_run_phase_costs.py.",
+    "§12.4: a missing mandatory input is a failure, not a partial output. The builder refuses rather than emitting a two-section Part B.",
+    "The ticket 'Candidate Part B and the blind baseline' in plans/dev_graph_demo_tickets.md asks that the Phase 8 draft be imported as candidate version 1."
+  ],
+  "what_was_missing": {
+    "summary": "Nothing converted Phase 8 Tier 5 section artifacts into a blind-lane candidate.",
+    "evidence": "import_document is called from exactly two places in the tree: runner/dev_graph/revisions.py create_candidate_version, and the tests. Every test hand-writes its candidate JSON. No module under runner/, harness/ or tools/ read docs/tier5_deliverables/proposal_sections/ and produced a document_id, sections, claims, commitments object.",
+    "why_it_mattered": "Criterion 2 (a document snapshot) and criterion 4 (assert_no_leakage over the package, which only the document route builds) both rest on candidate version 1 and were unreachable without a converter. A Phase 8 dispatch is six nodes of drafting, and the operator would have spent that run and then found no route from the draft to an imported candidate. That is the n07 pattern: quota spent on a path with an unbuilt step in front of it.",
+    "why_no_test_caught_it": "The import path is well tested, and so is the grading path. Both are tested from hand-written candidates, so neither ever asked where a real candidate comes from.",
+    "correction_from_the_spec_review": "A first draft of this record and of the ticket text said criteria 2 to 4 would all have failed for want of a converter. That overstates it for criterion 3. load_candidate resolves a section artifact by name inside a candidate directory, and build_evidence_pack reads sub_sections and claim_statuses straight off those artifacts. docs/tier5_deliverables/proposal_sections/ is already such a directory, so criterion 3 three pinned fields were reachable through the directory route with no conversion at all. What the ticket asks for is the blind pre-evaluation view, which is the document route, and the blind-baseline validation report already recorded that the directory route carries no package, is not covered by the leakage guard and refuses to stamp an intake. The converter is required for the route the ticket names, not for the grader."
+  },
+  "the_anchor_chain_that_had_to_hold": {
+    "chain": [
+      "Tier 2A section_schema_registry.json declares the RIA sub-sections B.1.1, B.1.2, B.2.1, B.2.2, B.2.3, B.3.1 and B.3.2.",
+      "The Phase 8 drafting skills take sub_section_id from section_schema_registry.json.",
+      "harness/rubrics_ria.json anchors its six rubrics on B.1.1, B.1.2, B.2.1, B.2.2, B.3.1 and B.3.2 — six of those seven, with B.2.3 unanchored.",
+      "runner/dev_graph/documents.py admits dots in an identifier, so B.1.1 is a valid sub_section_id.",
+      "Ticket B made sub_sections optional on a document section and had materialise_candidate preserve them."
+    ],
+    "consequence": "Every sub_section_id is carried verbatim. A converter that renumbered or re-titled one would break grading silently, because the anchor is a score bonus whose absence fails closed.",
+    "proved_by": "tests/test_demo_part_b_candidate_builder.py TestTheAnchorChainCloses grades a built candidate under the real RIA profile through assess_candidate, and asserts the three pins criterion 3 names. The fail-closed case drops one anchor and asserts the EvidencePackError still names it."
+  },
+  "where_the_anchor_check_actually_fires": "On the assess_candidate path, not when the evidence pack is built. build_blind_evidence succeeds with every anchor missing. A first draft of the end-to-end test stopped at build_blind_evidence and passed while proving nothing; it now runs the judge.",
+  "decisions": {
+    "D1_not_a_skill_or_component": "An operator tool, not a skill and not a deterministic component bound in the manifest. Importing a candidate is a deliberate act with a §9.4 consequence, an immutable document record, and the ticket describes it as a step separate from drafting. Binding it into a node body would make every Phase 8 run create a document version.",
+    "D2_build_and_import_are_separate": "The tool writes the candidate file and stops. It never calls import_document. A test asserts no document record appears.",
+    "D3_section_id_is_the_filename_stem": "excellence_section, impact_section and implementation_section. These are exactly the ids the RIA profile criteria section_ids names, which is what lets a built candidate satisfy required_sections.",
+    "D4_title_is_copied_not_restated": "The section title is the artifact own criterion field, checked against the value its schema fixes. A disagreement refuses, because it means either the wrong artifact or a drifted skill.",
+    "D5_addresses_is_empty": "The snapshot builder validates that an addressed id exists. A Tier 5 section own references are work package and milestone ids whose presence as graph nodes is not guaranteed, so addressing them would fail the import on a sound document. Empty is honest and blocks nothing.",
+    "D6_section_content_is_empty": "The prose lives in the sub-sections. render_document renders each as a third-level block inside its section span, per ticket B, so the span still covers the text the anchor ranks.",
+    "D7_claims_come_from_validation_status": "Each section validation_status.claim_statuses becomes a claim: claim_id and claim_summary carried, section_id set to the owning section, status mapped to evidence_strength by a one-way lookup (confirmed to source_grounded, inferred to inference, unresolved to unconfirmed). F6 recorded that the demo blind packages held 0 claims, which makes a clean leakage pass vacuous; this gives the guard real items to read.",
+    "D8_declared_status_is_not_emitted": "The builder maps status to evidence_strength and stops. declared_status is derived by normalise_candidate from the graph own EVIDENCE_TO_STATUS lookup. Emitting it here would be a second copy of that lookup, free to contradict it.",
+    "D9_no_verified_span": "A Tier 5 claim source_ref is a path plus an id, never an offset range. Deriving offsets from it would be invention, and the span is what the claim verifier checks against real source text. Every claim verified_span is absent, which normalise_candidate renders as null.",
+    "D10_commitments_are_empty": "No Tier 5 field carries a commitment in the shape the graph wants. milestone_refs and wp_table_refs are id lists with no text, so turning one into a commitment would invent its content. The commitment half of F6 stays open.",
+    "D11_no_run_id_and_no_timestamp": "A candidate is content addressed. Carrying either would move its content_version on every rerun and make each rerun a new version rather than the same one. A test asserts a rebuild imports as the same record.",
+    "D12_identifier_shape_is_the_importers_to_judge": "The first draft imported a private identifier regex from runner.dev_graph.documents and re-checked identifier shape itself. The finished candidate is now validated through normalise_candidate, the validator the importer runs, so the rule lives in one place and a build that would not import fails at build time with the reason.",
+    "D13_claim_approval_is_pending": "The approval vocabulary offers approved, not_applicable and pending. Nothing approved the demo Part B, so pending says so. approved would assert a review that never happened.",
+    "D14_schema_ids_are_read_from_their_owner": "runner.phase8_preseed.PRESEED_NODE_CONFIG already binds each Phase 8 node to its target path and schema_id, and that module asserts at import time that its own copies do not drift from their source. The first draft restated the three schema ids in the builder, which would have been a third copy free to drift from both. They are now read from PRESEED_NODE_CONFIG and keyed by the target filename stem, with a test asserting the agreement. The criterion strings stay local, because no module owns them: each Tier 5 section schema fixes its criterion in a field description, and the builder checks the artifact against it.",
+    "D15_the_fixture_comes_from_the_registry_not_the_anchors": "The anchor-chain test first built its fixture sub-sections from the profile anchors and then asserted the anchors were present, which is true by construction. The fixture now derives its sub-section ids from the Tier 2A section_schema_registry, so the registry and the profile are independent origins, and a second test asserts the candidate is strictly wider than the anchor set. B.2.3 is the unanchored sub-section that makes the two sets differ, and it must survive into the candidate because it is Part B content whether or not a rubric ranks it."
+  },
+  "what_this_does_not_do": [
+    "It does not draft. Phase 8 is still the operator dispatch, and §13.4 governs when it may run.",
+    "It does not import. The operator calls import_document when a durable record is wanted.",
+    "It does not write an ESR intake. That is the intake own contract, and the demo record id is demo-biodiv-2027-part-b-v1, where the NOT_SUBMITTED sentinel of F3 still applies.",
+    "It does not close criteria 2, 3 or 4. All three need a real Part B, which needs the Phase 8 dispatch."
+  ],
+  "verified_against": "A copy of tests/fixtures/dev_graph_synthetic, never docs/. A real import would move the pinned demo snapshot id, which is why the blind-baseline ticket reproduced F1 in a temporary root too.",
+  "tests": "42 in tests/test_demo_part_b_candidate_builder.py.",
+  "authored_by": "Branch dev_graph_demo. No runner phase was dispatched. No gate result was written. No proposal text was drafted. No Tier 5 content was created. CLAUDE.md was not modified.",
+  "findings": {
+    "F8_a_carried_claim_is_ungrounded_to_the_judge": {
+      "status": "recorded, with the limitation asserted by a test",
+      "what": "Every claim this builder carries reaches the assessor with source_ref empty. The Tier 5 claim shape records source_ref as a path plus an id. The graph claim shape has no such field: materialise_candidate derives source_ref from the id of the source_span node that the snapshot builder mints in _add_verified_span, and that function refuses a source which is not already a graph node with text at the declared offsets.",
+      "why_it_is_not_fixed": "A Tier 5 source_ref supplies neither offsets nor a source node, so no honest verified_span can be built from it. Synthesising offsets to populate the field would be the fabrication D9 refuses. Closing this properly needs either the Phase 8 drafting skills to emit spans, or a source-node registry for Tier 3 paths. Neither is in this ticket.",
+      "why_the_claims_are_still_carried": "The leakage guard reads claim text, which is what F6 asked for: the demo six blind packages held 0 claim items, and a clean pass over them was vacuous. A built candidate now puts a claim item in the package. The grading cost is that the claim looks unevidenced to the judge, which is recorded here rather than left for someone to discover from a score.",
+      "pinned_by": "tests/test_demo_part_b_candidate_builder.py TestClaimsComeFromTheArtifactsOwnValidationStatus test_a_carried_claim_reaches_the_grader_without_a_source_ref, which round-trips a claim through import, the snapshot and materialise_candidate and asserts source_ref is empty."
+    },
+    "F9_the_candidates_directory_is_not_in_the_section_5_enumeration": {
+      "status": "declared judgement, not a silent choice",
+      "what": "CLAUDE.md section 5 enumerates Tier 5 as proposal sections, assembled drafts, final exports and review packets. docs/tier5_deliverables/candidates/ is none of those, and section 16.3 forbids introducing artifact paths not defined in the specifications.",
+      "why_it_is_accepted_here": "The path is not invented by this tool. Eleven test modules import candidates from it, the dev-graph synthetic fixture is laid out that way, and the ESR intake decision record of 2026-09-24 names a fixture under the same directory. The candidate is also an input to the import rather than a deliverable: the durable artifact is the document record under Tier 4.",
+      "what_would_settle_it": "Either the section 5 enumeration names candidates/, by amendment, or the candidate is written somewhere that is not Tier 5. An operator decision, not an implementing ticket one."
+    }
+  },
+  "what_the_tests_do_not_prove": "Grading quality. Both end-to-end tests drive a scripted assessor that always passes, so what they prove is the anchor chain, the three pins and the round trip, not that a real judge would score the candidate well. The judge is not this ticket subject.",
+  "found_by_code_review": {
+    "standards_axis": [
+      "The tool wrote with json.dumps instead of runner.atomic_write, so a crash mid-write could leave a half-written candidate and --check compared against hand-rolled bytes. Now atomic_write_json and canonical_json_bytes.",
+      "main serialised its own copy instead of calling write_candidate, so the shipped write path was not the tested one. One writer now, with a test pinning the CLI output to the bytes write_candidate produces.",
+      "A refusal printed to stdout and returned 1, indistinguishable from --check drift. Now BLOCKED on stderr with exit 2, matching tools/derive_run_phase_costs.py.",
+      "SectionSpec.extra_required existed only for the test fixtures and shipped in the tool. Moved to the test module.",
+      "The argument parser took its description from a docstring paragraph split. Now a literal.",
+      "repo_root was typed loosely and --repo-root was neither typed nor resolved, so relative_to could raise on an odd root. Typed and resolved."
+    ],
+    "spec_axis": [
+      "The gap was overstated for criterion 3; corrected above.",
+      "The anchor test was vacuous; see D15.",
+      "source_ref was dropped silently; now F8, asserted by a test.",
+      "The test count was stated as 35 when it was 39, and is now 42.",
+      "A test docstring said the builder validates addressed ids, which reads as this builder. It is the snapshot builder, as D5 says.",
+      "SECTION_SPECS duplicated constants phase8_preseed owns; see D14."
+    ],
+    "checked_and_rejected": "The spec axis implied source_ref was merely dropped and could be carried. It cannot: the graph claim shape has no source_ref field, and the only route to one is a verified_span that the snapshot builder resolves against a real source node and real offsets. A further suspicion, that materialise_candidate reads a span id key while the graph writes source_id, was checked and is wrong: the snapshot builder rewrites the span into a stored field carrying id, version, source, start and end, so reading the id is correct."
+  }
+}
