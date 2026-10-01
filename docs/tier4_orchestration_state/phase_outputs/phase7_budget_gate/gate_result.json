@@ -1,0 +1,67 @@
+{
+  "schema_id": "orch.gate_result.v1",
+  "gate_id": "gate_09_budget_consistency",
+  "gate_kind": "exit",
+  "run_id": "import uuid; print(uuid.uuid4())",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:399e6429cc1a781a25f3704d3c6265c9ce7522e3db34e9e044300c5d7c5126a6",
+  "input_artifact_fingerprints": {
+    "docs/integrations/lump_sum_budget_planner/received": "sha256:607fe24bd5ea619011a1e682f44c72c8e9cadf82b303ced8402576ee45273232",
+    "docs/integrations/lump_sum_budget_planner/validation": "sha256:72f061e6386ecde26f8f629aeab2bf06c5b9b3477172b853061b45808f06d51d",
+    "docs/tier2b_topic_and_call_sources/extracted/unit_cost_rates.json": "sha256:9d291b89e6880015689d872bb2219cb6e033ef456d6e494f2059c162d575d9b1",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json": "sha256:1e1273c90a80ad660319d92729e3d223aab650c12d5e08cd5c247edd89ab69ed",
+    "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json": "sha256:65639ec28d1cee789f4e4da63d34a86d75e60a15b8700b05b8b808fec5ebb132",
+    "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json": "sha256:e887c922fb48bba43f14528934c4bed879170d987e85051376901940fecb42a7"
+  },
+  "evaluated_at": "2026-10-01T18:52:57.761175+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "pass",
+  "deterministic_predicates": {
+    "passed": [
+      "g08_p02",
+      "g08_p03",
+      "g08_p08",
+      "g08_p09",
+      "g08_p01",
+      "g08_p04",
+      "g08_p07",
+      "g08_p05",
+      "g08_p06"
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": []
+  },
+  "skipped_semantic": false,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\gate_result.json",
+  "skipped_not_applicable_predicates": [
+    {
+      "predicate_id": "g08_uc01",
+      "applies_when": {
+        "budget_regime": "unit_cost"
+      },
+      "resolved_budget_regime": "lump_sum",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_uc02",
+      "applies_when": {
+        "budget_regime": "unit_cost"
+      },
+      "resolved_budget_regime": "lump_sum",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_uc03",
+      "applies_when": {
+        "budget_regime": "unit_cost"
+      },
+      "resolved_budget_regime": "lump_sum",
+      "reason": "not applicable for resolved budget_regime"
+    }
+  ]
+}

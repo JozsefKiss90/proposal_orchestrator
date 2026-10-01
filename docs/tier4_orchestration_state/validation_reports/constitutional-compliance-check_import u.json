@@ -1,34 +1,34 @@
 {
-  "report_id": "compliance_check_budget_gate_assessment_unspecified_2026-10-01T00:00:00Z",
+  "report_id": "compliance_check_budget_gate_assessment_budget_gate_validator_2026-10-01T12:00:00Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "unspecified",
+  "invoking_agent": "budget_gate_validator",
   "run_id_reference": "import uuid; print(uuid.uuid4())",
   "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
-      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
+      "prohibition_description": "Grant Agreement Annex template used as the governing structural schema.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.2",
-      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
+      "prohibition_description": "Invented call constraints, scope requirements, expected outcomes, or expected impacts not in Tier 2B.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, budget figures — not present in Tier 3.",
+      "prohibition_description": "Invented project facts, including budget figures, not present in or traceable to Tier 3.",
       "check_status": "violation",
-      "violation_evidence": "The artifact grounds the gate pass on a budget source explicitly labelled fictional: \"budget_response_reference\": \"budget_response_FICTIONAL_demo_2026-10-01.json\" and \"validation_artifact_reference\": \"budget_validation_response_2026-10-01T00:00:00Z.json\". All wp_coverage_results and partner_coverage_results (WP1–WP7, P01–P12) resolve budget figures via \"received/budget_response_FICTIONAL_demo_2026-10-01.json#...\". The artifact carries no traceability_footer referencing docs/tier3_project_instantiation/, and the budget source is a fabricated ('FICTIONAL') response rather than a received, validated external planner budget. A budget figure source so named is an invented budget figure under §13.3 (and contravenes §8.3/§17.6.7 on fabricated/substituted budget figures).",
+      "violation_evidence": "The assessment passes the budget gate on a budget whose source is self-labelled fictional: \"budget_response_reference\": \"budget_response_FICTIONAL_demo_2026-10-01.json\", with every budget_line_reference pointing to \"received/budget_response_FICTIONAL_demo_2026-10-01.json#...\" (e.g. WP1, P01). The artifact carries no traceability_footer linking the partner IDs (P01-P12), work-package IDs (WP1-WP7), or the budget figures to any path within docs/tier3_project_instantiation/. Budget figures are an enumerated project fact under §13.3 and a fictional budget source is not a Tier 3 source.",
       "severity": "critical"
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed.",
+      "prohibition_description": "Commencing Phase 8 activity before the budget gate has passed.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
@@ -42,35 +42,35 @@
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
+      "prohibition_description": "A workflow or skill becoming a de facto constitutional authority.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silently reordering phases or weakening gate conditions when inputs are incomplete.",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalizing proposal text when source state is incomplete without flagging the gap.",
+      "prohibition_description": "Finalising proposal text with incomplete or unvalidated source state without flagging the gap.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Using agent-local knowledge of Horizon Europe rules as a substitute for Tier 1 source documents.",
+      "prohibition_description": "Generic programme knowledge used as a substitute for Tier 1 source documents.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1–4.",
+      "prohibition_description": "Tier 5 outputs not traceable to specific Tier 1-4 inputs.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
@@ -90,22 +90,33 @@
       "severity": null
     }
   ],
+  "non_applicability_notes": {
+    "13.1": "Phase 7 gate assessment; no structural reference to any Grant Agreement Annex, Model Grant Agreement Annex, or AGA template as a schema source.",
+    "13.2": "Artifact asserts no call requirement, scope boundary, or eligibility condition; it is a budget-coverage assessment. No call-constraint claim to trace.",
+    "13.4": "Not a Phase 8 artifact. schema_id is orch.phase7.budget_gate_assessment.v1 (not orch.tier5.* or orch.phase8.*). This artifact is the budget gate itself, not downstream Phase 8 content.",
+    "13.5": "Not checkable from artifact content alone; enforced by the decision-log-update skill.",
+    "13.6": "Not checkable from an artifact; a scope-of-authority property, not an artifact property.",
+    "13.7": "Phase 7 artifact references only lower/input-phase elements (WP structure from Phase 3, partners from Tier 3). No reference to a phase higher than the current one.",
+    "13.8": "Not a Tier 5 deliverable; no validation_status.overall_status field exists on this phase output. The 13.8 content-flagging check targets Tier 5 section drafts.",
+    "13.9": "No claim in the artifact references Horizon Europe participation conditions, grant agreement terms, or the financial regulation. No regulatory claim to trace to Tier 1.",
+    "13.10": "Not a Tier 5 artifact; this is a Tier 4 phase output. The Tier 5 traceability check does not apply.",
+    "13.11": "Not checkable from a phase output or deliverable artifact.",
+    "13.12": "Not directly checkable from an artifact."
+  },
   "summary": {
     "total_prohibitions_checked": 12,
     "violations_found": 1
   },
-  "timestamp": "2026-10-01T00:00:00Z",
-  "decision_log_entries": [
-    {
-      "decision_id": "constitutional_violation_unspecified_2026-10-01T00:00:00Z",
-      "decision_type": "constitutional_violation",
-      "violation_id": "13.3_budget_gate_assessment_2026-10-01T00:00:00Z",
-      "constitutional_rule_ref": "CLAUDE.md §13.3",
-      "artifact_affected": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
-      "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected; requires human operator resolution. The Phase 7 budget gate declares gate_pass_declaration: 'pass' on a budget source explicitly named 'budget_response_FICTIONAL_demo_2026-10-01.json'. This is a fabricated budget figure under §13.3 and is not a validated external planner response under §8.3/§17.6.7. If an in-session §1 human override suspending §13.3 was in force when this artifact was produced, that override is not present in this skill's audit context and cannot be assumed; the operator must confirm or reject it.",
-      "tier_authority_applied": "CLAUDE.md §13",
-      "timestamp": "2026-10-01T00:00:00Z"
-    }
-  ]
+  "timestamp": "2026-10-01T12:00:00Z",
+  "decision_log_entry": {
+    "decision_id": "constitutional_violation_budget_gate_validator_2026-10-01T12:00:00Z",
+    "decision_type": "constitutional_violation",
+    "violation_id": "13.3_budget_gate_assessment_2026-10-01T12:00:00Z",
+    "constitutional_rule_ref": "CLAUDE.md §13.3",
+    "artifact_affected": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+    "resolution_status": "unresolved",
+    "resolution_note": "Constitutional violation detected; requires human operator resolution. The Phase 7 gate declares \"pass\" on a budget whose source file is self-labelled fictional (budget_response_FICTIONAL_demo_2026-10-01.json); under §13.3 budget figures are an enumerated project fact and must be traceable to Tier 3, and under §8.3/§17.6.7 budget figures may not be fabricated. This skill flags the violation; it does not resolve it.",
+    "tier_authority_applied": "CLAUDE.md §13",
+    "timestamp": "2026-10-01T12:00:00Z"
+  }
 }

@@ -1,13 +1,16 @@
 {
-  "decision_id": "constitutional_violation_compliance_validator_2026-10-01T00-00-00Z",
+  "decision_id": "constitutional_violation_budget_gate_validator_2026-10-01T12-00-00Z",
   "decision_type": "constitutional_violation",
-  "invoking_agent": "compliance_validator",
+  "invoking_agent": "budget_gate_validator",
   "phase_context": "phase_07_budget_gate",
   "run_id_reference": "import uuid; print(uuid.uuid4())",
-  "decision_description": "The Phase 7 budget gate assessment at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json declares gate_pass_declaration 'pass'. It grounds that pass on a budget source named budget_response_FICTIONAL_demo_2026-10-01.json, whose figures are explicitly labelled fictional and were not produced by the external Lump Sum Budget Planner (produced_by_external_planner: false). All wp_coverage_results (WP1-WP7) and partner_coverage_results (P01-P12) resolve their figures to that fictional response. For a lump-sum instrument, a budget figure from a source so named is an invented budget figure. The constitutional-compliance-check skill flagged this as a §13.3 violation at critical severity. This entry records that violation as a durable Tier 4 decision requiring human operator resolution.",
-  "alternatives_considered": [],
-  "tier_authority_applied": "CLAUDE.md §13.3",
-  "rationale": "Per CLAUDE.md §9.4 and §13.5, a detected constitutional violation that affects future interpretation, traceability, and reproducibility must be written to the Tier 4 decision log and not held only in agent memory. The violation is recorded as unresolved because resolution requires a human operator to confirm or reject any in-session §1 override suspending §13.3; no such override is present in this skill's context and none may be assumed. Until that confirmation, the gate pass rests on a fabricated budget source contrary to §8.3 and §17.6.7.",
+  "decision_description": "The Phase 7 budget gate assessment (docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json) declares gate_pass_declaration \"pass\" on a budget whose source file is self-labelled fictional. The budget_response_reference is budget_response_FICTIONAL_demo_2026-10-01.json, and every wp_coverage and partner_coverage budget_line_reference points into received/budget_response_FICTIONAL_demo_2026-10-01.json. That response declares figures_are_fictional: true, produced_by_external_planner: false, and carries figure_basis \"invented_for_this_demonstration\" on every work-package and partner line. The budget figures (WP1-WP7 lump sums, P01-P12 person-months) are an enumerated project fact under CLAUDE.md §13.3 and are not traceable to any path under docs/tier3_project_instantiation/. A fictional, hand-authored budget is not a Tier 3 source and is not a validated external Lump Sum Budget Planner response. This entry records, as a durable decision, the §13.3 violation detected by the constitutional-compliance-check of the budget gate assessment.",
+  "alternatives_considered": [
+    "Treat the fictional budget as an acceptable basis and let the Phase 7 'pass' stand, so that downstream Phase 8 drafting could proceed. Rejected: §13.3 forbids inventing project budget figures, and §8.3 and §17.6.7 forbid fabricating or substituting budget figures.",
+    "Record the violation as unresolved and surface it to the human operator, leaving resolution to a named override or a validated budget response. Adopted: this skill durably records the violation per §9.4/§13.5; it does not and may not resolve a §13 violation autonomously."
+  ],
+  "tier_authority_applied": "CLAUDE.md §13.3 (invented budget figures are a prohibited project fact; cross-referenced with §8.3 and §17.6.7, which forbid fabricating or substituting budget figures, and §9.4, which requires durable recording of this decision)",
+  "rationale": "The constitutional-compliance-check of the Phase 7 budget gate assessment found one §13.3 violation: the gate passes on a self-labelled fictional budget whose figures trace to no Tier 3 source. Under §9.4 and §13.5 this finding affects future interpretation and traceability and must be written to the Tier 4 decision log rather than held in agent memory. The violation is recorded as unresolved because §13 violations require human operator resolution; the skill flags the violation and does not resolve it. No budget figure from the fictional response may be carried into finalized proposal content while this entry stands unresolved.",
   "resolution_status": "unresolved",
-  "timestamp": "2026-10-01T00:00:00Z"
+  "timestamp": "2026-10-01T12:00:00Z"
 }
