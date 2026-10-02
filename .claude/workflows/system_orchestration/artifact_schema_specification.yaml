@@ -3425,7 +3425,7 @@ operational_artifact_schemas:
           reruns:
             type: array
             required: true
-            description: One entry per recorded rerun (5.16), ordered by run id; empty until the operator's first rerun is recorded. Each carries the record's path, run id, one diagnostic label per arm, the count of planner_narrower rows and whether they are investigated.
+            description: One entry per recorded rerun (5.16), ordered by run id; empty until the first rerun is recorded; a declared synthetic run is listed like any other and is told apart by its run id. Each carries the record's path, run id, one diagnostic label per arm, the count of planner_narrower rows and whether they are investigated.
       arms:
         type: array
         required: true
@@ -3623,7 +3623,7 @@ operational_artifact_schemas:
       schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.scenario_rerun.v1".}
       scenario_id: {type: string, required: true}
       enactment: {type: string, required: true, description: Repo-relative path of the enactment record (5.15).}
-      run_id: {type: string, required: true, description: The dispatched run, a plain identifier.}
+      run_id: {type: string, required: true, description: The compared run, a plain identifier. Normally a dispatched run; a run whose manifest declares itself synthetic is recorded under an id that says so, and the decision log names it.}
       comparisons:
         type: array
         required: true

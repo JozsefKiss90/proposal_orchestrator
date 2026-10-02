@@ -1,0 +1,55 @@
+{
+  "report_id": "demo-change-scenarios-synthetic-rerun_2026-10-02",
+  "report_kind": "scenario_rerun_validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "authority": [
+    "CLAUDE.md §12.1 to §12.4 and §15: what follows is reviewable from named files, every element carries one of the four statuses, and the thing that did not happen (a dispatch) is reported as not having happened.",
+    "§9.5: the comparison is reproducible from the embedded manifest and the plans on disk.",
+    "§17.1, §17.6.2, §17.6.3: no gate evaluated, no gate result written, scheduler untouched.",
+    "Subticket B boxes 3 to 5 in plans/dev_graph_demo_tickets.md."
+  ],
+  "question_asked": "Can the rerun half of subticket B be demonstrated without a dispatch, with every record saying so; and what does the comparison report for the enacted scenario?",
+  "answer": "Yes, as a declared synthetic run, and none of the three boxes is met by it. The manifest under synthetic-rerun-2026-10-02 declares itself synthetic, its decisions are what the reuse layer derives over the live world (not_reused, fingerprint_mismatch, for all three drafting nodes), and the comparison reports planner_narrower for arm 1 and planner_narrower for arm 2: planner_narrower on n08a_excellence_drafting (a1_move_d3_2); n08a_excellence_drafting (a2_move_ms4); n08b_impact_drafting (a2_move_ms4), agreed on n08b_impact_drafting (a1_move_d3_2); n08c_implementation_drafting (a1_move_d3_2); n08c_implementation_drafting (a2_move_ms4), no planner_broader row. The reason is recorded. The boxes stay open because they ask for a dispatch.",
+  "acceptance_criteria": {
+    "3_the_rerun_is_dispatched_under_a_plain_run_id_and_its_manifest_holds_reuse_decisions": "NOT MET; demonstrated on a declared synthetic run. synthetic-rerun-2026-10-02 is a plain identifier and its manifest holds one decision per drafting node, but nothing was dispatched. The box stays open until the operator dispatches under a uuid after subticket D lands.",
+    "4_the_comparison_for_the_enacted_scenario_reports_agreed_planner_narrower_or_planner_broader": "NOT MET as a dispatch; the machinery reports. Arm diagnostics ['planner_narrower', 'planner_narrower']; agreed rows: n08b_impact_drafting (a1_move_d3_2); n08c_implementation_drafting (a1_move_d3_2); n08c_implementation_drafting (a2_move_ms4); planner_narrower rows: n08a_excellence_drafting (a1_move_d3_2); n08a_excellence_drafting (a2_move_ms4); n08b_impact_drafting (a2_move_ms4); no planner_broader row.",
+    "5_a_planner_narrower_result_if_any_is_investigated_and_the_reason_recorded": "The reason is recorded in the rerun record's investigation field and under D5 below. The box stays open with its siblings because the result it investigates is not a dispatch's."
+  },
+  "what_was_checked_and_how": {
+    "the_manifest": "A scratch script called runner.phase8_reuse.validate_reuse_candidate for each node in REUSE_ELIGIBLE_NODES and wrote the status and reason it returned, with the stored and current fingerprints beside them, into a manifest that declares itself synthetic. The script refused to overwrite an existing directory.",
+    "the_comparison": "py -3.10 -m tools.enact_demo_change_scenario --scenario deliverable_month_moves --record-rerun --run-id synthetic-rerun-2026-10-02 --investigation ... ran the same code path a dispatched run would: one shadow comparison per arm at its canonical path (docs/tier4_orchestration_state/dev_graph/shadow_comparisons/3371fb06250f16c8/comparison.json, docs/tier4_orchestration_state/dev_graph/shadow_comparisons/c612f604f93b878c/comparison.json) and the rerun record. A dry run of compare_shadow over the same inputs beforehand gave the same six rows.",
+    "the_scenario_record": "py -3.10 -m tools.run_demo_change_scenarios rewrote the scenario records; the enacted block lists the rerun with its two diagnostics, three planner_narrower rows and investigated true. Its --check mode, tools.build_demo_dev_graph --check and tools.derive_dev_graph_run_records --check all pass.",
+    "the_tests": "tests/test_demo_change_scenarios.py: the rerun record and the scenario record agree; every planner_narrower row is investigated; the decision record declares the run synthetic and undispatched; the comparison rows are recomputed from the embedded manifest and the plans and match the record byte for byte in content; the decisions match the embedded derivation; no preserved run record and no entry of COMPARED_RUN_IDS names the synthetic run."
+  },
+  "status_summary": {
+    "Confirmed": [
+      "The six comparison rows and their diagnostics, docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/reruns/synthetic-rerun-2026-10-02.json, derived from the two plans and the embedded manifest.",
+      "Every stored fingerprint of the three drafting sections differs from the current one; the reuse layer's reason is fingerprint_mismatch for each.",
+      "The manifest holds no node state, so tools/preserve_run_manifests.py never copies it."
+    ],
+    "Inferred": [
+      "A dispatch under a uuid after subticket D lands records the same three decisions and the same six rows, provided the sections and Tier 3 do not move first (F2)."
+    ],
+    "Assumed": [],
+    "Unresolved": [
+      "Boxes 3, 4 and 5 as the ticket means them: a dispatched rerun. Operator act, after subticket D."
+    ]
+  },
+  "findings": [
+    "F1 — three planner_narrower rows, not one: arm 2 reaches the excellence and impact sections only transitively.",
+    "F2 — subticket D changes what is persisted, not what is decided; the demonstration shows the dispatch's result in advance.",
+    "F3 — the sixteen real runs still refuse with no_reuse_decision; the synthetic run is not among them."
+  ],
+  "recorded_in": [
+    "docs/tier4_orchestration_state/decision_log/demo-change-scenarios-synthetic-rerun_2026-10-02.json",
+    "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/reruns/synthetic-rerun-2026-10-02.json",
+    "docs/tier4_orchestration_state/dev_graph/shadow_comparisons/3371fb06250f16c8/comparison.json",
+    "docs/tier4_orchestration_state/dev_graph/shadow_comparisons/c612f604f93b878c/comparison.json",
+    "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/scenario.json",
+    "plans/dev_graph_demo_tickets.md, subticket B"
+  ],
+  "authored_by": "Claude Fable 5.1, on operator instruction, 2026-10-02.",
+  "note": "No gate was evaluated and no gate result written. No phase was dispatched. The run this report concerns did not take place, and every artifact that names it says so."
+}

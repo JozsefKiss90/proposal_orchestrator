@@ -1,0 +1,169 @@
+{
+  "schema_id": "orch.dev_graph.scenario_rerun.v1",
+  "scenario_id": "deliverable_month_moves",
+  "enactment": "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/enactment.json",
+  "run_id": "synthetic-rerun-2026-10-02",
+  "comparisons": [
+    {
+      "arm_id": "a1_move_d3_2",
+      "change_id": "deliverable_month_moves__a1_move_d3_2",
+      "plan_id": "sha256:267723b06dc034dcf2ab6b835312b5f6f7620c6a271124f6b2d536a428b5f845",
+      "comparison": "docs/tier4_orchestration_state/dev_graph/shadow_comparisons/3371fb06250f16c8/comparison.json",
+      "diagnostic": "planner_narrower",
+      "rows": [
+        {
+          "node_id": "n08a_excellence_drafting",
+          "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "scheduler_status": "not_reused",
+          "scheduler": "rerun",
+          "planner": "reuse",
+          "planner_actions": [
+            "reuse-under-policy"
+          ],
+          "record_ids": [
+            "proposal_sections.excellence_section"
+          ],
+          "diagnostic": "planner_narrower",
+          "detail": "the advisory retains the result only under an explicit policy"
+        },
+        {
+          "node_id": "n08b_impact_drafting",
+          "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "scheduler_status": "not_reused",
+          "scheduler": "rerun",
+          "planner": "rerun",
+          "planner_actions": [
+            "rerun"
+          ],
+          "record_ids": [
+            "proposal_sections.impact_section"
+          ],
+          "diagnostic": "agreed",
+          "detail": "the advisory says rerun"
+        },
+        {
+          "node_id": "n08c_implementation_drafting",
+          "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+          "scheduler_status": "not_reused",
+          "scheduler": "rerun",
+          "planner": "rerun",
+          "planner_actions": [
+            "rerun"
+          ],
+          "record_ids": [
+            "proposal_sections.implementation_section"
+          ],
+          "diagnostic": "agreed",
+          "detail": "the advisory says rerun"
+        }
+      ],
+      "refused": null
+    },
+    {
+      "arm_id": "a2_move_ms4",
+      "change_id": "deliverable_month_moves__a2_move_ms4",
+      "plan_id": "sha256:0ba55f7af0f1f7109a37e6a08fae0c7c17f1f8ce9756a207de2e74cf3ee6fb06",
+      "comparison": "docs/tier4_orchestration_state/dev_graph/shadow_comparisons/c612f604f93b878c/comparison.json",
+      "diagnostic": "planner_narrower",
+      "rows": [
+        {
+          "node_id": "n08a_excellence_drafting",
+          "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "scheduler_status": "not_reused",
+          "scheduler": "rerun",
+          "planner": "reuse",
+          "planner_actions": [
+            "reuse-under-policy"
+          ],
+          "record_ids": [
+            "proposal_sections.excellence_section"
+          ],
+          "diagnostic": "planner_narrower",
+          "detail": "the advisory retains the result only under an explicit policy"
+        },
+        {
+          "node_id": "n08b_impact_drafting",
+          "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "scheduler_status": "not_reused",
+          "scheduler": "rerun",
+          "planner": "reuse",
+          "planner_actions": [
+            "reuse-under-policy"
+          ],
+          "record_ids": [
+            "proposal_sections.impact_section"
+          ],
+          "diagnostic": "planner_narrower",
+          "detail": "the advisory retains the result only under an explicit policy"
+        },
+        {
+          "node_id": "n08c_implementation_drafting",
+          "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+          "scheduler_status": "not_reused",
+          "scheduler": "rerun",
+          "planner": "rerun",
+          "planner_actions": [
+            "rerun"
+          ],
+          "record_ids": [
+            "proposal_sections.implementation_section"
+          ],
+          "diagnostic": "agreed",
+          "detail": "the advisory says rerun"
+        }
+      ],
+      "refused": null
+    }
+  ],
+  "planner_narrower_rows": [
+    {
+      "arm_id": "a1_move_d3_2",
+      "node_id": "n08a_excellence_drafting",
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "scheduler_status": "not_reused",
+      "scheduler": "rerun",
+      "planner": "reuse",
+      "planner_actions": [
+        "reuse-under-policy"
+      ],
+      "record_ids": [
+        "proposal_sections.excellence_section"
+      ],
+      "diagnostic": "planner_narrower",
+      "detail": "the advisory retains the result only under an explicit policy"
+    },
+    {
+      "arm_id": "a2_move_ms4",
+      "node_id": "n08a_excellence_drafting",
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "scheduler_status": "not_reused",
+      "scheduler": "rerun",
+      "planner": "reuse",
+      "planner_actions": [
+        "reuse-under-policy"
+      ],
+      "record_ids": [
+        "proposal_sections.excellence_section"
+      ],
+      "diagnostic": "planner_narrower",
+      "detail": "the advisory retains the result only under an explicit policy"
+    },
+    {
+      "arm_id": "a2_move_ms4",
+      "node_id": "n08b_impact_drafting",
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "scheduler_status": "not_reused",
+      "scheduler": "rerun",
+      "planner": "reuse",
+      "planner_actions": [
+        "reuse-under-policy"
+      ],
+      "record_ids": [
+        "proposal_sections.impact_section"
+      ],
+      "diagnostic": "planner_narrower",
+      "detail": "the advisory retains the result only under an explicit policy"
+    }
+  ],
+  "investigation": "DECLARED SYNTHETIC RUN: synthetic-rerun-2026-10-02 was never dispatched; its manifest declares itself synthetic and its reuse decisions are what runner.phase8_reuse.validate_reuse_candidate returned over the live world on 2026-10-02 (not_reused, fingerprint_mismatch, for all three drafting nodes). The three planner_narrower rows disagree on granularity, not on fact. The scheduler fingerprints docs/tier3_project_instantiation/ as a whole, so a changed due month in workpackage_seed.json or milestones_seed.json invalidates every drafting node. The planner traces record-level inputs: for arm 1 the excellence section reaches D3.2 only through T3.2 and partner P08 (a transitive hit), and for arm 2 the excellence section reaches MS4 through D6.1, T6.1 and P03 while the impact section reaches it only because MS4 validates its input D3.2; neither section lists the changed record as a direct input, so the planner asks reuse-under-policy. The narrower verdict is defensible because the changed field (due_month) does not alter any record those two sections draw on directly, and the conservative verdict is safe because a redraft costs quota, not correctness. No reuse policy is recorded for this world, so the operative verdict stays the scheduler's rerun; the disagreement is the directory-level fingerprint, which subticket D does not change. Recorded in docs/tier4_orchestration_state/decision_log/demo-change-scenarios-synthetic-rerun_2026-10-02.json; the acceptance boxes 3 to 5 of subticket B stay open."
+}

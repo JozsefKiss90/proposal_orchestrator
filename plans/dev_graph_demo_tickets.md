@@ -766,6 +766,19 @@ of Tier 3, so a rerun redrafts every section and persists no decision, and the c
 refuse. Once D lands, `--record-rerun --run-id <id>` writes the comparison; expect `planner_narrower`
 on n08a for the first arm.
 
+**Demonstrated 2026-10-02 on a declared synthetic run; boxes 3 to 5 stay open.** Record:
+`docs/tier4_orchestration_state/decision_log/demo-change-scenarios-synthetic-rerun_2026-10-02.json`.
+The operator asked for the rerun's output to be mocked. A mocked dispatch presented as real is a
+fabricated completion (§15), so the admissible form was built instead: a manifest under the plain id
+`synthetic-rerun-2026-10-02` that declares itself synthetic and undispatched, whose reuse decisions are what
+`validate_reuse_candidate` derives over the live world (`not_reused`, `fingerprint_mismatch`, all three
+nodes). The recording tool compared both arms against it through the real code path. Result:
+`planner_narrower` on n08a_excellence_drafting (a1_move_d3_2); n08a_excellence_drafting (a2_move_ms4); n08b_impact_drafting (a2_move_ms4); `agreed` on n08b_impact_drafting (a1_move_d3_2); n08c_implementation_drafting (a1_move_d3_2); n08c_implementation_drafting (a2_move_ms4); no `planner_broader`. The
+disagreement is granularity: the scheduler fingerprints Tier 3 as a directory, the planner traces
+record-level inputs and marks a transitive hit `reuse-under-policy`, and no policy exists, so the
+scheduler's rerun stands. Subticket D persists that verdict and does not change it. The synthetic record
+stays beside the operator's eventual dispatch record; nothing is ticked on its account.
+
 #### C. Candidate version 2 and the superseded blind lane
 
 **What to build:** After the rerun, the candidate builder produces a Part B version 2 from the

@@ -1,0 +1,57 @@
+{
+  "schema_id": "orch.dev_graph.shadow_comparison.v1",
+  "comparison_id": "sha256:c612f604f93b878c490f4761c303ffd302d87be29f69abc0fab49e812f2cf7f0",
+  "advisory": true,
+  "mode": "shadow",
+  "consumed_at_runtime": false,
+  "plan_id": "sha256:0ba55f7af0f1f7109a37e6a08fae0c7c17f1f8ce9756a207de2e74cf3ee6fb06",
+  "run_id": "synthetic-rerun-2026-10-02",
+  "diagnostic": "planner_narrower",
+  "rows": [
+    {
+      "node_id": "n08a_excellence_drafting",
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "scheduler_status": "not_reused",
+      "scheduler": "rerun",
+      "planner": "reuse",
+      "planner_actions": [
+        "reuse-under-policy"
+      ],
+      "record_ids": [
+        "proposal_sections.excellence_section"
+      ],
+      "diagnostic": "planner_narrower",
+      "detail": "the advisory retains the result only under an explicit policy"
+    },
+    {
+      "node_id": "n08b_impact_drafting",
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "scheduler_status": "not_reused",
+      "scheduler": "rerun",
+      "planner": "reuse",
+      "planner_actions": [
+        "reuse-under-policy"
+      ],
+      "record_ids": [
+        "proposal_sections.impact_section"
+      ],
+      "diagnostic": "planner_narrower",
+      "detail": "the advisory retains the result only under an explicit policy"
+    },
+    {
+      "node_id": "n08c_implementation_drafting",
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "scheduler_status": "not_reused",
+      "scheduler": "rerun",
+      "planner": "rerun",
+      "planner_actions": [
+        "rerun"
+      ],
+      "record_ids": [
+        "proposal_sections.implementation_section"
+      ],
+      "diagnostic": "agreed",
+      "detail": "the advisory says rerun"
+    }
+  ]
+}

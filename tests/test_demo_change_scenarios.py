@@ -18,7 +18,9 @@ Three groups of test:
 
 No test here dispatches a phase. The reruns the ticket pairs with each
 advisory are operator work, and what blocks them is recorded in the decision
-log rather than simulated.
+log rather than simulated. The one rerun recorded so far is a declared
+synthetic run: its manifest says it was never dispatched, and the tests below
+hold it to that declaration rather than treating it as the operator's rerun.
 """
 
 from __future__ import annotations
@@ -45,7 +47,7 @@ from runner.dev_graph.scenarios import (
     scenario_rel,
     write_scenario_records,
 )
-from runner.dev_graph.shadow import DIAGNOSTICS, advisory_verdicts
+from runner.dev_graph.shadow import DIAGNOSTICS, advisory_verdicts, compare_shadow
 from runner.phase8_reuse import (
     FINGERPRINT_INPUTS,
     REUSE_ELIGIBLE_NODES,
@@ -67,6 +69,11 @@ INDEX = REPO_ROOT / SCENARIOS_REL / "index.json"
 ENACTED = "deliverable_month_moves"
 WP_SEED = "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
 MILESTONES = "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+
+#: The declared synthetic run the rerun half of subticket B was demonstrated on.
+#: Never dispatched; its manifest and its decision record both say so.
+SYNTHETIC_RUN_ID = "synthetic-rerun-2026-10-02"
+SYNTHETIC_DECISION_RECORD = "docs/tier4_orchestration_state/decision_log/demo-change-scenarios-synthetic-rerun_2026-10-02.json"
 
 
 def _index() -> dict:
@@ -636,3 +643,81 @@ class TestComparedRuns:
                 (runs / run_id / "run_manifest.json").read_text(encoding="utf-8-sig")
             )
             assert not manifest.get("reuse_decisions"), run_id
+
+
+class TestTheDeclaredSyntheticRerun:
+    """The one recorded rerun never ran, and every record that names it says so.
+
+    The manifest lives under .claude/runs/ (runtime state, gitignored), so the
+    decision record embeds it; the comparison is replayed from that copy.
+    """
+
+    @pytest.fixture(scope="class")
+    def decision(self) -> dict:
+        path = REPO_ROOT / SYNTHETIC_DECISION_RECORD
+        if not path.is_file():
+            pytest.skip("the synthetic rerun is not recorded")
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+
+    @pytest.fixture(scope="class")
+    def rerun(self) -> dict:
+        reruns = {r["run_id"]: r for r in read_reruns(REPO_ROOT, ENACTED)}
+        if SYNTHETIC_RUN_ID not in reruns:
+            pytest.skip("the synthetic rerun is not recorded")
+        return reruns[SYNTHETIC_RUN_ID]
+
+    def test_the_run_declares_itself_synthetic_and_undispatched(self, decision: dict, rerun: dict) -> None:
+        manifest = decision["the_synthetic_manifest"]
+        assert manifest["run_id"] == SYNTHETIC_RUN_ID == rerun["run_id"]
+        assert is_plain_run_id(SYNTHETIC_RUN_ID)
+        assert manifest["synthetic"]["declared"] is True
+        assert manifest["synthetic"]["dispatched"] is False
+        assert "node_states" not in manifest, "a run that never ran holds no node state"
+        assert rerun["investigation"].startswith("DECLARED SYNTHETIC RUN")
+
+    def test_the_decisions_are_what_the_reuse_layer_derived(self, decision: dict) -> None:
+        # Not typed: each decision matches the derivation stored beside it, and
+        # the derivation shows a stored fingerprint that differs from the current one.
+        manifest = decision["the_synthetic_manifest"]
+        derivation = manifest["synthetic"]["derivation"]
+        assert set(manifest["reuse_decisions"]) == set(REUSE_ELIGIBLE_NODES) == set(derivation)
+        for node_id, dec in manifest["reuse_decisions"].items():
+            derived = derivation[node_id]["reuse_decision"]
+            assert dec["status"] == ("reused" if derived["reusable"] else "not_reused")
+            assert dec["reason"] == derived["reason"]
+            if dec["reason"] == "fingerprint_mismatch":
+                assert derivation[node_id]["stored_input_fingerprint"] != derived["input_fingerprint"]
+
+    def test_the_comparison_replays_from_the_embedded_manifest(self, decision: dict, rerun: dict) -> None:
+        decisions = decision["the_synthetic_manifest"]["reuse_decisions"]
+        enactment = read_enactment(REPO_ROOT, ENACTED)
+        assert enactment is not None
+        assert [c["arm_id"] for c in rerun["comparisons"]] == [a["arm_id"] for a in enactment.arms]
+        for arm, entry in zip(enactment.arms, rerun["comparisons"]):
+            plan = json.loads((REPO_ROOT / arm["plan"]).read_text(encoding="utf-8-sig"))
+            replayed = compare_shadow(plan, decisions, run_id=SYNTHETIC_RUN_ID)
+            written = json.loads((REPO_ROOT / entry["comparison"]).read_text(encoding="utf-8-sig"))
+            assert entry["refused"] is None
+            assert written["comparison_id"] == replayed.comparison_id
+            assert entry["rows"] == written["rows"] == replayed.rows
+            assert entry["diagnostic"] == replayed.diagnostic in DIAGNOSTICS
+
+    def test_every_planner_narrower_row_is_a_transitive_hit(self, rerun: dict) -> None:
+        # D5 of the decision record: the disagreement is granularity. Each
+        # narrower row is one the planner reached only transitively.
+        narrower = rerun["planner_narrower_rows"]
+        assert narrower, "the demonstration exists to show a planner_narrower row"
+        for row in narrower:
+            assert row["scheduler"] == "rerun" and row["planner"] == "reuse"
+            assert row["planner_actions"] == ["reuse-under-policy"]
+        agreed = [r for c in rerun["comparisons"] for r in c["rows"] if r["diagnostic"] == "agreed"]
+        assert all(r["planner_actions"] == ["rerun"] for r in agreed)
+
+    def test_the_synthetic_run_is_kept_apart_from_the_dispatched_runs(self, decision: dict) -> None:
+        assert SYNTHETIC_RUN_ID not in COMPARED_RUN_IDS
+        preserved = REPO_ROOT / PRESERVED_RUN_RECORDS_REL
+        for path in preserved.glob("*.json") if preserved.is_dir() else []:
+            doc = json.loads(path.read_text(encoding="utf-8-sig"))
+            assert doc.get("run_id") != SYNTHETIC_RUN_ID, path
+        for key in decision["acceptance_criteria"]:
+            assert decision["acceptance_criteria"][key].startswith(("NOT MET", "The reason is recorded"))

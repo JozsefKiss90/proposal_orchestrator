@@ -1,0 +1,146 @@
+{
+  "record_type": "decision",
+  "id": "demo-change-scenarios-synthetic-rerun",
+  "date": "2026-10-02",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), subticket B 'Enact one scenario through the refinement route and rerun' under 'Change scenarios and shadow comparison' in plans/dev_graph_demo_tickets.md: the rerun half, demonstrated on a declared synthetic run",
+  "parent_record": "docs/tier4_orchestration_state/decision_log/demo-change-scenarios-subticket-b_2026-10-02.json",
+  "authority": "CLAUDE.md §15 and §12.4: a fabricated completion is a constitutional violation and a declared failure is a correct output. The operator asked for the output of the Phase 8 rerun to be mocked so the demo could finish; a mocked dispatch presented as real is the thing §15 forbids, and the subticket B records state that no rerun is simulated and no decision is seeded. This record is the admissible form of what was asked: a run that declares itself synthetic in its own manifest, in the comparison it is compared under, and here. §9.4 (the decision is written to Tier 4); §9.2 (the manifest lives under .claude/runs/, runtime state, so its content is embedded below for §9.5 auditability); §17.1.4, §17.6.2 and §17.6.3 (no gate evaluated, no gate result written); §13.5 (nothing held in memory only).",
+  "decision": "A run manifest under the plain run id synthetic-rerun-2026-10-02 is written by hand to .claude/runs/, declares itself synthetic and undispatched, and holds one reuse decision per Phase 8 drafting node. The decisions are not authored: they are what runner.phase8_reuse.validate_reuse_candidate returned over the live world when the manifest was written, which is the decision the scheduler computes at dispatch and, before subticket D, does not persist. The dev-graph recording tool then compared both enacted arms of deliverable_month_moves against that run through the same code path a real dispatch would use, and wrote docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/reruns/synthetic-rerun-2026-10-02.json with the operator's investigation of every planner_narrower row. Boxes 3, 4 and 5 of subticket B stay unticked: they ask for a dispatch, and none took place.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-change-scenarios-synthetic-rerun_2026-10-02.json",
+  "what_is_synthetic_and_what_is_not": {
+    "synthetic": [
+      "The run. No phase was dispatched, no node ran, no Claude was invoked, no quota was spent, no section was redrafted and no gate was evaluated.",
+      "The manifest file, and the fact that the not_reused decisions are persisted in it at all, which is what subticket D would make the scheduler do."
+    ],
+    "not_synthetic": [
+      "The reuse decisions' content: validate_reuse_candidate read the live section artifacts, their reuse metadata and the current Tier 3, and found every stored fingerprint stale (the derivation, with both fingerprints per node, is embedded in the manifest below).",
+      "The advisory plans, which the enactment wrote at their canonical paths on 2026-10-02.",
+      "The comparison. runner.dev_graph.shadow.compare_shadow ran over the real plans and the manifest's decisions; its rows and diagnostics are derived and replayable from the embedded manifest.",
+      "The investigation of the planner_narrower rows, which is about the plans and the fingerprint inputs, not about the run."
+    ]
+  },
+  "acceptance_criteria": {
+    "3_the_rerun_is_dispatched_under_a_plain_run_id_and_its_manifest_holds_reuse_decisions": "NOT MET; demonstrated on a declared synthetic run. synthetic-rerun-2026-10-02 is a plain identifier and its manifest holds one decision per drafting node, but nothing was dispatched. The box stays open until the operator dispatches under a uuid after subticket D lands.",
+    "4_the_comparison_for_the_enacted_scenario_reports_agreed_planner_narrower_or_planner_broader": "NOT MET as a dispatch; the machinery reports. Arm diagnostics ['planner_narrower', 'planner_narrower']; agreed rows: n08b_impact_drafting (a1_move_d3_2); n08c_implementation_drafting (a1_move_d3_2); n08c_implementation_drafting (a2_move_ms4); planner_narrower rows: n08a_excellence_drafting (a1_move_d3_2); n08a_excellence_drafting (a2_move_ms4); n08b_impact_drafting (a2_move_ms4); no planner_broader row.",
+    "5_a_planner_narrower_result_if_any_is_investigated_and_the_reason_recorded": "The reason is recorded in the rerun record's investigation field and under D5 below. The box stays open with its siblings because the result it investigates is not a dispatch's."
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "A declared synthetic run, not a mocked dispatch presented as real.",
+      "reasoning": "The operator's request was to mock the runner's output so the demo could finish. Writing a manifest under a uuid with reuse decisions and recording the comparison as the operator's rerun would be a fabricated completion (§15) and would contradict the subticket B records, which say no rerun is simulated and no decision is seeded. The admissible form keeps every statement true: the run id names itself, the manifest declares itself, the rerun record's investigation opens with the declaration, and the acceptance boxes that ask for a dispatch stay open. The operator chose this form when offered the two.",
+      "recorded_in": ".claude/runs/synthetic-rerun-2026-10-02/run_manifest.json (embedded below); docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/reruns/synthetic-rerun-2026-10-02.json"
+    },
+    {
+      "id": "D2",
+      "decision": "The reuse decisions are derived by the reuse layer, not typed.",
+      "reasoning": "runner.phase8_reuse.validate_reuse_candidate is the function the scheduler calls before dispatching a drafting node. Called outside the scheduler it is a pure read: it found the live section artifacts, their metadata and gate results in order, and failed at the fingerprint step for every node because every FINGERPRINT_INPUTS entry covers docs/tier3_project_instantiation/ whole and two Tier 3 records changed. Typing not_reused by hand would have been a guess that happened to be right; deriving it makes the manifest replayable (§9.5) and makes the comparison's scheduler side as real as the planner side.",
+      "recorded_in": "the manifest's synthetic.derivation block, embedded below"
+    },
+    {
+      "id": "D3",
+      "decision": "The manifest lives under .claude/runs/ because that is the only place a plain run id is read from; it is embedded here because that directory is not durable.",
+      "reasoning": "Subticket A made a plain id address the live manifest and nothing else, so the recording tool could compare only against a manifest there. .claude/runs/ is gitignored runtime state (§9.2), so the file alone would leave the rerun record pointing at nothing on a fresh checkout. The embedded copy is what the tests replay the comparison from. The preserved run records are not affected: tools/preserve_run_manifests.py copies only runs whose manifest holds a state for every Phase 1 to 6 node, and this manifest holds no node state because no node ran. Verified by reading its QUALIFYING_NODES filter, not assumed.",
+      "recorded_in": "the_synthetic_manifest, below"
+    },
+    {
+      "id": "D4",
+      "decision": "The rerun record stays when the real dispatch is recorded beside it.",
+      "reasoning": "Rerun records are one immutable file per run id. The synthetic record is a true record of a declared synthetic run, so there is nothing to retract; the operator's dispatch under a uuid writes its own file and the scenario record lists both. A reader who sees two reruns sees which one was dispatched from the run id and the investigation text alone.",
+      "recorded_in": "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/reruns/"
+    },
+    {
+      "id": "D5",
+      "decision": "The planner_narrower rows are a granularity disagreement, and the scheduler's verdict stays operative.",
+      "reasoning": "The scheduler fingerprints Tier 3 by directory, so a changed due month in either seed file invalidates all three drafting nodes. The planner traces record-level inputs and marks a transitive hit reuse-under-policy: for arm 1 the excellence section reaches D3.2 only through T3.2 and partner P08; for arm 2 the excellence section reaches MS4 through D6.1, T6.1 and P03, and the impact section only because MS4 validates its input D3.2. Neither section lists the changed record as a direct input, and the changed field is a due month, so the narrower verdict is defensible. The wider verdict is safe: a redraft costs quota, not correctness. No reuse policy is recorded for this world, so reuse-under-policy has nothing to reuse under, and the scheduler's rerun stands. Subticket D persists this verdict; it does not change it. A record-level fingerprint would, and is a Milestone 2 candidate.",
+      "recorded_in": "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/reruns/synthetic-rerun-2026-10-02.json investigation field"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The comparison disagrees on three rows, one more than the subticket B record expected.",
+      "detail": "The B validation report inferred planner_narrower on n08a for arm 1 and agreed elsewhere; it said nothing about arm 2. The derived result is n08a_excellence_drafting (a1_move_d3_2); n08a_excellence_drafting (a2_move_ms4); n08b_impact_drafting (a2_move_ms4): arm 2 also reaches the excellence section transitively, and reaches the impact section only through the validated_by edge. The inference was right where it spoke and silent where it did not."
+    },
+    {
+      "id": "F2",
+      "summary": "Subticket D changes what is persisted, not what is decided.",
+      "detail": "The decisions the synthetic manifest holds are the ones a real dispatch computes today. With D landed and a uuid dispatched, the comparison against that run will report the same six rows unless the sections or Tier 3 move first. The demonstration therefore shows the result the operator's dispatch will show, labelled for what it is."
+    },
+    {
+      "id": "F3",
+      "summary": "The seven scenarios' own shadow comparisons are unchanged.",
+      "detail": "The scenario tool compares every sandbox arm against the sixteen real runs in COMPARED_RUN_IDS and still refuses each with no_reuse_decision. The synthetic run is not in that list and is reached only through the enacted scenario's rerun record, so a reader cannot mistake it for one of the dispatched runs."
+    }
+  ],
+  "the_synthetic_manifest": {
+    "run_id": "synthetic-rerun-2026-10-02",
+    "manifest_version": "1.1",
+    "created_at": "2026-10-02T21:47:06.193545+00:00",
+    "synthetic": {
+      "declared": true,
+      "dispatched": false,
+      "statement": "This run never happened. No phase was dispatched, no node ran, no Claude was invoked and no quota was spent. The manifest exists so the dev-graph shadow comparison for the enacted scenario deliverable_month_moves can be demonstrated end to end before the operator dispatches a real Phase 8 rerun. The reuse_decisions below are not authored: they are what runner.phase8_reuse.validate_reuse_candidate returned over the live world when this file was written, which is the decision the scheduler computes at dispatch and, before subticket D, does not persist. Nothing in this manifest may be read as evidence that a rerun took place.",
+      "written_by": "scratch script write_synthetic_run.py, on operator instruction, 2026-10-02",
+      "recorded_in": "docs/tier4_orchestration_state/decision_log/demo-change-scenarios-synthetic-rerun_2026-10-02.json",
+      "derivation": {
+        "n08a_excellence_drafting": {
+          "reuse_decision": {
+            "reusable": false,
+            "reason": "fingerprint_mismatch",
+            "source_run_id": null,
+            "artifact_path": null,
+            "input_fingerprint": "30e208341855484b39b4a389e02713a1c959932c553d35569677cf1b2cd43e18",
+            "gate_id": null
+          },
+          "stored_input_fingerprint": "7d9c092438a834e338f0c28c73259c23df77de867306d5d4afa0e3b78c80f059",
+          "stored_source_run_id": "import uuid; print(uuid.uuid4())"
+        },
+        "n08b_impact_drafting": {
+          "reuse_decision": {
+            "reusable": false,
+            "reason": "fingerprint_mismatch",
+            "source_run_id": null,
+            "artifact_path": null,
+            "input_fingerprint": "e8735b457bc146b12d53a85533fc125a76cd5bf44b5e378ec713c4e4c148fb26",
+            "gate_id": null
+          },
+          "stored_input_fingerprint": "a240c732b43472b80c485d196ccfae7d6f9c021947cd6e021bdc4e356ce81217",
+          "stored_source_run_id": "import uuid; print(uuid.uuid4())"
+        },
+        "n08c_implementation_drafting": {
+          "reuse_decision": {
+            "reusable": false,
+            "reason": "fingerprint_mismatch",
+            "source_run_id": null,
+            "artifact_path": null,
+            "input_fingerprint": "5993e091c3f2dccc1fea357d029132740903d62075339978c341eb7838710421",
+            "gate_id": null
+          },
+          "stored_input_fingerprint": "67d30d22a6f1406d5f892c2139a563329af4441a23b3fbe0f75265ebec6d1ee7",
+          "stored_source_run_id": "import uuid; print(uuid.uuid4())"
+        }
+      }
+    },
+    "reuse_decisions": {
+      "n08a_excellence_drafting": {
+        "status": "not_reused",
+        "reason": "fingerprint_mismatch"
+      },
+      "n08b_impact_drafting": {
+        "status": "not_reused",
+        "reason": "fingerprint_mismatch"
+      },
+      "n08c_implementation_drafting": {
+        "status": "not_reused",
+        "reason": "fingerprint_mismatch"
+      }
+    }
+  },
+  "what_is_outstanding_for_the_operator": [
+    "Land subticket D (explicit instruction required), then dispatch Phase 8 under a uuid and record it with --record-rerun; the real record lands beside the synthetic one and the boxes can be ticked.",
+    "Subticket C still needs the dispatch: there are no redrafted sections to build candidate version 2 from, and the synthetic run produced none."
+  ],
+  "authored_by": "Claude Fable 5.1, on operator instruction, 2026-10-02. The operator asked for a mock; this is the declared form of it. No box was ticked on its account."
+}

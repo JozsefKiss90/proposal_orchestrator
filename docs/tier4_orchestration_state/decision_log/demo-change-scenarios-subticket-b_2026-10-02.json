@@ -103,5 +103,9 @@
     "Record the rerun: py -3.10 -m tools.enact_demo_change_scenario --scenario deliverable_month_moves --record-rerun --run-id <id>, then py -3.10 -m tools.run_demo_change_scenarios so the scenario record carries it. Any planner_narrower row is listed in reruns/<run id>.json; record the reason with --investigation, or in a decision log entry the rerun record can point at.",
     "Subticket C follows the rerun: candidate version 2 from the rerun's sections, imported with a supersedes edge."
   ],
-  "authored_by": "Claude Fable 5.1, on operator instruction, 2026-10-02. Two of five boxes are met; the three that need a dispatch are open, and the fact that blocks them is recorded rather than worked around."
+  "authored_by": "Claude Fable 5.1, on operator instruction, 2026-10-02. Two of five boxes are met; the three that need a dispatch are open, and the fact that blocks them is recorded rather than worked around.",
+  "amended": {
+    "date": "2026-10-02",
+    "what_changed": "The rerun half was demonstrated on a declared synthetic run, synthetic-rerun-2026-10-02, recorded in docs/tier4_orchestration_state/decision_log/demo-change-scenarios-synthetic-rerun_2026-10-02.json. Boxes 3 to 5 remain open: no dispatch took place. The statement that no rerun is simulated and no decision is seeded holds for this record's own work; the synthetic run is a separate, declared act and is not presented as the operator's rerun."
+  }
 }
