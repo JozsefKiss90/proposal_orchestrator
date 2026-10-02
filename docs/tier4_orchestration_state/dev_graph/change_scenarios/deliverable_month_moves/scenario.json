@@ -1,0 +1,111 @@
+{
+  "schema_id": "orch.dev_graph.change_scenario.v1",
+  "scenario_id": "deliverable_month_moves",
+  "title": "A deliverable's month moves across a milestone",
+  "purpose": "D3.2 is due in the month MS4 checks it. Moving it one month later puts it past the milestone, and the milestone record does not change.",
+  "arms": [
+    {
+      "arm_id": "a1_move_d3_2",
+      "kind": "change",
+      "record_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "transform": "move_deliverable_due_month",
+      "args": {
+        "deliverable_id": "D3.2",
+        "to_month": 29
+      },
+      "payload": null,
+      "expects": "recorded",
+      "purpose": "The timing change is permitted, and the milestone is reached over the edge it was already validated by.",
+      "outcome": "recorded",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:8a5b3907430795f7c3a6ee512ac7094a88291dcd51ebbad4371b7619ea82c9df",
+      "refusal": null,
+      "change": {
+        "change_id": "deliverable_month_moves__a1_move_d3_2",
+        "record_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+        "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+        "after_snapshot_id": "sha256:8a5b3907430795f7c3a6ee512ac7094a88291dcd51ebbad4371b7619ea82c9df",
+        "nodes_added": [],
+        "nodes_removed": [],
+        "nodes_changed": [
+          {
+            "id": "D3.2",
+            "kind": "direct",
+            "changed_fields": [
+              "due_month"
+            ]
+          },
+          {
+            "id": "WP3",
+            "kind": "contained",
+            "changed_fields": []
+          }
+        ],
+        "edges_added": [],
+        "edges_removed": []
+      },
+      "contract_check": {
+        "contract_id": "timing",
+        "verdict": "accepted",
+        "change_classes": [
+          "timing"
+        ],
+        "protected_hits": [],
+        "unpermitted_classes": [],
+        "unresolved": []
+      },
+      "advisory": {
+        "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/a1_move_d3_2/plan.json",
+        "plan_id": "sha256:267723b06dc034dcf2ab6b835312b5f6f7620c6a271124f6b2d536a428b5f845",
+        "nothing_changed": false,
+        "origins": [
+          "D3.2"
+        ],
+        "entry_count": 18,
+        "entries_by_kind_hit_action": {
+          "artifact/direct/rerun": 2,
+          "artifact/transitive/reuse-under-policy": 1,
+          "check/coverage_unknown/rerun": 14,
+          "record/origin/reconsider": 1
+        },
+        "every_entry_has_a_reason_path": true,
+        "newly_relevant_source_count": 15
+      },
+      "shadow_comparisons": [
+        {
+          "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json",
+            "message": "malformed_request: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
+          }
+        },
+        {
+          "run_id": "import uuid; print(uuid.uuid4())",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": "import uuid; print(uuid.uuid4())",
+            "message": "malformed_request: run_id is not a plain identifier [offender: import uuid; print(uuid.uuid4())]"
+          }
+        }
+      ]
+    }
+  ],
+  "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+  "contract": {
+    "contract_id": "timing",
+    "permitted_change_classes": [
+      "timing"
+    ],
+    "protected_node_ids": [
+      "O1",
+      "O2",
+      "O3",
+      "O4",
+      "O5",
+      "O6"
+    ],
+    "unresolved_items": []
+  },
+  "arms_matched_expectations": true
+}

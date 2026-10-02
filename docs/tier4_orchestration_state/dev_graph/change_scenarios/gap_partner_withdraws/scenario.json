@@ -1,0 +1,330 @@
+{
+  "schema_id": "orch.dev_graph.change_scenario.v1",
+  "scenario_id": "gap_partner_withdraws",
+  "title": "An Assumed gap partner withdraws before confirmation",
+  "purpose": "A withdrawal is two records, not one. The work plan must release the partner before the consortium record can drop it, and the builder enforces that rather than leaving a dangling role.",
+  "arms": [
+    {
+      "arm_id": "a1_drop_from_consortium_first",
+      "kind": "refusal_probe",
+      "record_path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "transform": "remove_partner",
+      "args": {
+        "partner_id": "P07"
+      },
+      "payload": null,
+      "expects": "dangling_edge",
+      "purpose": "The work plan still names the partner, so the snapshot would carry an edge with no endpoint. The change recorder restores the record and writes nothing.",
+      "outcome": "refused",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "refusal": {
+        "kind": "dangling_edge",
+        "offender": "P07 -contributes_to-> T2.1",
+        "message": "dangling_edge: source node 'P07' does not exist (contributes_to) [offender: P07 -contributes_to-> T2.1]"
+      },
+      "change": null,
+      "contract_check": null,
+      "advisory": null,
+      "shadow_comparisons": []
+    },
+    {
+      "arm_id": "a2_release_from_work_plan",
+      "kind": "change",
+      "record_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "transform": "release_partner_from_work_plan",
+      "args": {
+        "partner_id": "P07"
+      },
+      "payload": null,
+      "expects": "recorded",
+      "purpose": "Every task role the partner held passes to a partner the task already names.",
+      "outcome": "recorded",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:9d42d3b24c239070576bafec516275cc9bbaa4fcd33b4fa84177e6281ea5c121",
+      "refusal": null,
+      "change": {
+        "change_id": "gap_partner_withdraws__a2_release_from_work_plan",
+        "record_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+        "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+        "after_snapshot_id": "sha256:9d42d3b24c239070576bafec516275cc9bbaa4fcd33b4fa84177e6281ea5c121",
+        "nodes_added": [],
+        "nodes_removed": [],
+        "nodes_changed": [
+          {
+            "id": "T2.1",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T2.4",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T2.5",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T3.1",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T4.2",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners",
+              "responsible_partner"
+            ]
+          },
+          {
+            "id": "T4.3",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T4.5",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T5.1",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T5.2",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T6.3",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "T7.1",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners"
+            ]
+          },
+          {
+            "id": "WP2",
+            "kind": "contained",
+            "changed_fields": []
+          },
+          {
+            "id": "WP3",
+            "kind": "contained",
+            "changed_fields": []
+          },
+          {
+            "id": "WP4",
+            "kind": "contained",
+            "changed_fields": []
+          },
+          {
+            "id": "WP5",
+            "kind": "contained",
+            "changed_fields": []
+          },
+          {
+            "id": "WP6",
+            "kind": "contained",
+            "changed_fields": []
+          },
+          {
+            "id": "WP7",
+            "kind": "contained",
+            "changed_fields": []
+          }
+        ],
+        "edges_added": [
+          "T4.2 -assigned_to-> P03"
+        ],
+        "edges_removed": [
+          "P03 -contributes_to-> T4.2",
+          "P07 -contributes_to-> T2.1",
+          "P07 -contributes_to-> T2.4",
+          "P07 -contributes_to-> T2.5",
+          "P07 -contributes_to-> T3.1",
+          "P07 -contributes_to-> T4.3",
+          "P07 -contributes_to-> T4.5",
+          "P07 -contributes_to-> T5.1",
+          "P07 -contributes_to-> T5.2",
+          "P07 -contributes_to-> T6.3",
+          "P07 -contributes_to-> T7.1",
+          "T4.2 -assigned_to-> P07"
+        ]
+      },
+      "contract_check": {
+        "contract_id": "withdrawal",
+        "verdict": "accepted",
+        "change_classes": [
+          "contribution",
+          "responsibility"
+        ],
+        "protected_hits": [],
+        "unpermitted_classes": [],
+        "unresolved": []
+      },
+      "advisory": {
+        "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/gap_partner_withdraws/a2_release_from_work_plan/plan.json",
+        "plan_id": "sha256:163e2ba5373b83c0760be26628e7c39eccf6001a5366c7debf8ea6061168422f",
+        "nothing_changed": false,
+        "origins": [
+          "T2.1",
+          "T2.4",
+          "T2.5",
+          "T3.1",
+          "T4.2",
+          "T4.3",
+          "T4.5",
+          "T5.1",
+          "T5.2",
+          "T6.3",
+          "T7.1"
+        ],
+        "entry_count": 28,
+        "entries_by_kind_hit_action": {
+          "artifact/direct/rerun": 3,
+          "check/coverage_unknown/rerun": 14,
+          "record/origin/reconsider": 11
+        },
+        "every_entry_has_a_reason_path": true,
+        "newly_relevant_source_count": 15
+      },
+      "shadow_comparisons": [
+        {
+          "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json",
+            "message": "malformed_request: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
+          }
+        },
+        {
+          "run_id": "import uuid; print(uuid.uuid4())",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": "import uuid; print(uuid.uuid4())",
+            "message": "malformed_request: run_id is not a plain identifier [offender: import uuid; print(uuid.uuid4())]"
+          }
+        }
+      ]
+    },
+    {
+      "arm_id": "a3_drop_from_consortium",
+      "kind": "change",
+      "record_path": "docs/tier3_project_instantiation/consortium/partners.json",
+      "transform": "remove_partner",
+      "args": {
+        "partner_id": "P07"
+      },
+      "payload": null,
+      "expects": "recorded",
+      "purpose": "The consortium record drops the entry and the build holds.",
+      "outcome": "recorded",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:1f8572eac2a5cdee605683c11b2d74358b84eafc0f346fa56a9e36b29f752acd",
+      "refusal": null,
+      "change": {
+        "change_id": "gap_partner_withdraws__a3_drop_from_consortium",
+        "record_path": "docs/tier3_project_instantiation/consortium/partners.json",
+        "before_snapshot_id": "sha256:9d42d3b24c239070576bafec516275cc9bbaa4fcd33b4fa84177e6281ea5c121",
+        "after_snapshot_id": "sha256:1f8572eac2a5cdee605683c11b2d74358b84eafc0f346fa56a9e36b29f752acd",
+        "nodes_added": [],
+        "nodes_removed": [
+          "P07"
+        ],
+        "nodes_changed": [],
+        "edges_added": [],
+        "edges_removed": []
+      },
+      "contract_check": {
+        "contract_id": "withdrawal",
+        "verdict": "accepted",
+        "change_classes": [
+          "participant"
+        ],
+        "protected_hits": [],
+        "unpermitted_classes": [],
+        "unresolved": []
+      },
+      "advisory": {
+        "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/gap_partner_withdraws/a3_drop_from_consortium/plan.json",
+        "plan_id": "sha256:805082fbde12b97e6c852f1acb932d3ea3aa05d811926044c5e7acb7c82940a3",
+        "nothing_changed": false,
+        "origins": [
+          "P07"
+        ],
+        "entry_count": 18,
+        "entries_by_kind_hit_action": {
+          "artifact/coverage_unknown/rerun": 3,
+          "check/coverage_unknown/rerun": 14,
+          "record/origin/reconsider": 1
+        },
+        "every_entry_has_a_reason_path": true,
+        "newly_relevant_source_count": 0
+      },
+      "shadow_comparisons": [
+        {
+          "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json",
+            "message": "malformed_request: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
+          }
+        },
+        {
+          "run_id": "import uuid; print(uuid.uuid4())",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": "import uuid; print(uuid.uuid4())",
+            "message": "malformed_request: run_id is not a plain identifier [offender: import uuid; print(uuid.uuid4())]"
+          }
+        }
+      ]
+    }
+  ],
+  "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+  "contract": {
+    "contract_id": "withdrawal",
+    "permitted_change_classes": [
+      "contribution",
+      "participant",
+      "responsibility"
+    ],
+    "protected_node_ids": [
+      "O1",
+      "O2",
+      "O3",
+      "O4",
+      "O5",
+      "O6"
+    ],
+    "unresolved_items": []
+  },
+  "arms_matched_expectations": true
+}

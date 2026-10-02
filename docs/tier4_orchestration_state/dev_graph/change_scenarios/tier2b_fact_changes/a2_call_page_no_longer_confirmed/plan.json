@@ -1,0 +1,383 @@
+{
+  "schema_id": "orch.dev_graph.impact_plan.v1",
+  "plan_id": "sha256:05999da7bf031896709a911a3976612a81578ae4a6ee1475b5c35423445d26e9",
+  "advisory": true,
+  "mode": "shadow",
+  "change_id": "tier2b_fact_changes__a2_call_page_no_longer_confirmed",
+  "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+  "after_snapshot_id": "sha256:e36cabf7da59eca726575e0ad7d1f2ca8379de2d1b5276a81de0811a5c1632f1",
+  "run_records_hash": "sha256:8585e269ac49ecb65d3a463257649c632f6714e526f752394235ba75231fb24f",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+  "max_depth": 4,
+  "nothing_changed": false,
+  "change_set": {
+    "nodes": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        {
+          "id": "SRC-WP9-P75",
+          "type": "source",
+          "before_version": "sha256:5d2ed5a56a6962a29c79daf15ee0b87879ee727e0d27ce2967648a0a178a93ca",
+          "after_version": "sha256:21cebd441aec365edaecf95a23816bd660049e5e4c1bec5dc6a2edaf0284a41d",
+          "kind": "direct",
+          "changed_fields": [
+            "status"
+          ]
+        }
+      ]
+    },
+    "edges": {
+      "added": [],
+      "removed": []
+    }
+  },
+  "origins": [
+    "SRC-WP9-P75"
+  ],
+  "entries": [
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.excellence_section",
+      "path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "hit": "transitive",
+      "action": "reuse-under-policy",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP4 -constrained_by-> SRC-WP9-P75",
+        "WP4 -assigned_to-> P03",
+        "input_of:proposal_sections.excellence_section"
+      ],
+      "detail": "inputs hit: P03, P07, P08"
+    },
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.impact_section",
+      "path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "hit": "transitive",
+      "action": "reuse-under-policy",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP1 -constrained_by-> SRC-WP9-P75",
+        "input_of:proposal_sections.impact_section"
+      ],
+      "detail": "inputs hit: D1.1, D1.3, D2.1, D2.2, D3.1, D3.2, D3.3, D3.4, D4.1, D4.4, D5.3, D6.1, D6.2, D6.3, D7.1, D7.2, D7.3, D7.4, O6, P03, P04, P05, P06, P07, P08, P10, WP1, WP3, WP5, WP7"
+    },
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.implementation_section",
+      "path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "hit": "transitive",
+      "action": "reuse-under-policy",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP1 -constrained_by-> SRC-WP9-P75",
+        "input_of:proposal_sections.implementation_section"
+      ],
+      "detail": "inputs hit: D1.1, D1.2, D1.3, D2.1, D2.2, D2.3, D3.1, D3.2, D3.3, D3.4, D4.1, D4.2, D4.3, D4.4, D5.1, D5.2, D5.3, D6.1, D6.2, D6.3, D7.1, D7.2, D7.3, D7.4, MS1, MS2, MS3, MS4, MS5, MS6, MS7, MS8, O1, O2, O3, O4, O5, O6, P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, T1.1, T1.2, T1.3, T1.4, T1.5, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T3.4, T3.5, T3.6, T4.1, T4.2, T4.3, T4.4, T4.5, T5.1, T5.2, T5.3, T5.4, T6.1, T6.2, T6.3, T6.4, T6.5, T7.1, T7.2, T7.3, T7.4, T7.5, WP1, WP2, WP3, WP4, WP5, WP6, WP7"
+    },
+    {
+      "kind": "check",
+      "id": "phase1_call_analysis.gate_01_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_01_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase1_call_analysis.gate_01_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase1_call_analysis.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase1_call_analysis.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase2_concept_refinement.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase2_concept_refinement.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase3_wp_design.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase3_wp_design.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase4_gantt_milestones.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase4_gantt_milestones.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase5_impact_architecture.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase5_impact_architecture.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase6_implementation_architecture.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase6_implementation_architecture.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase7_budget_gate.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase7_budget_gate.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10a_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10a_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10a_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10b_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10b_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10b_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10c_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10c_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10c_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10d_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10d_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_11_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_11_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_12_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_12_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_12_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "record",
+      "id": "SRC-WP9-P75",
+      "type": "source",
+      "version": "sha256:21cebd441aec365edaecf95a23816bd660049e5e4c1bec5dc6a2edaf0284a41d",
+      "hit": "origin",
+      "action": "reconsider",
+      "reason_path": [
+        "changed:SRC-WP9-P75"
+      ],
+      "detail": ""
+    }
+  ],
+  "newly_relevant_sources": [
+    {
+      "id": "SRC-BIRDS-DIR",
+      "version": "sha256:533fa976e694417dea628b5bd06310633f5b75ad2dabf8837cdd261293c18f05",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-BIRDS-DIR"
+      ]
+    },
+    {
+      "id": "SRC-COPERNICUS",
+      "version": "sha256:369f53f9b287a9739d756dc20e12d80e4ef9d53827cc434f50ba5e3658979ca0",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP2 -constrained_by-> SRC-WP9-P75",
+        "WP2 -constrained_by-> SRC-WP9-P74",
+        "WP6 -constrained_by-> SRC-WP9-P74",
+        "WP6 -constrained_by-> SRC-COPERNICUS"
+      ]
+    },
+    {
+      "id": "SRC-EMBAL",
+      "version": "sha256:431e3e6c6ba2ca481a45961d9dd1fb0b483552334fdcf0874aa435e2b49c86f3",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP4 -constrained_by-> SRC-WP9-P75",
+        "WP4 -constrained_by-> SRC-EMBAL"
+      ]
+    },
+    {
+      "id": "SRC-EOSC",
+      "version": "sha256:b35c93537aa73b00e3395ed5397492d9604dc1582feda61163e9a85d3606e008",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-EOSC"
+      ]
+    },
+    {
+      "id": "SRC-EUNIS",
+      "version": "sha256:36c08650f07b0565566dfb76e7fa5e2ce03d4995758254972c1c95da012edf1d",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-EUNIS"
+      ]
+    },
+    {
+      "id": "SRC-FAIR",
+      "version": "sha256:7aff19b54765cd6407ab8ec27dc339d4333b90d15c78261aa46616e0de231dde",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-FAIR"
+      ]
+    },
+    {
+      "id": "SRC-GET",
+      "version": "sha256:a334e5f6691ebad8c0f057489df78d5af02d36270312513970e543291023413a",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-GET"
+      ]
+    },
+    {
+      "id": "SRC-HABITATS-DIR",
+      "version": "sha256:db2f38bf47414c913f00655a75aa39e5fcc0dedb3cfde7978b8d83cabb3c7249",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-HABITATS-DIR"
+      ]
+    },
+    {
+      "id": "SRC-LUCAS",
+      "version": "sha256:09237bc47c047b03245111320e077f2bee29082773a4c83b17a68e7314ca0fbd",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP4 -constrained_by-> SRC-WP9-P75",
+        "WP4 -constrained_by-> SRC-LUCAS"
+      ]
+    },
+    {
+      "id": "SRC-MSFD",
+      "version": "sha256:9f0317a50d380f16e3b3093383e5e1b88e20cdc22f516f23bf54f661478faa7d",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-MSFD"
+      ]
+    },
+    {
+      "id": "SRC-NRR",
+      "version": "sha256:eedbd97afc941b100ec4945493a75626552484117791e75b4764d91c9e3ed245",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-WP9-P75",
+        "WP7 -constrained_by-> SRC-NRR"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P73",
+      "version": "sha256:4514bf2163280de50cfe4d2d8a582333e36273e23cb52a17956d69f89a307469",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP1 -constrained_by-> SRC-WP9-P75",
+        "WP1 -constrained_by-> SRC-WP9-P73"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P74",
+      "version": "sha256:7d3075fe8de12c0396ec55c58c40010b69cbebb80791c8f2e2c569ca916d9a69",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP2 -constrained_by-> SRC-WP9-P75",
+        "WP2 -constrained_by-> SRC-WP9-P74"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P75",
+      "version": "sha256:21cebd441aec365edaecf95a23816bd660049e5e4c1bec5dc6a2edaf0284a41d",
+      "reason_path": [
+        "changed:SRC-WP9-P75"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P76",
+      "version": "sha256:b180ea022d36ebb206d1927fe1b45cae27092f88849123b50562db95d6e3d2a6",
+      "reason_path": [
+        "changed:SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-WP9-P75",
+        "WP3 -constrained_by-> SRC-WP9-P76"
+      ]
+    }
+  ]
+}

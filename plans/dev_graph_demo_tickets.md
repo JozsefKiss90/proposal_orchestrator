@@ -576,11 +576,127 @@ Each change runs under a revision contract. Scenarios that alter Tier 3 follow t
 
 **Blocked by:** First dev-graph snapshot on the demo world; Runner Phases 1 to 6 on the demo. Phase 8 steps are also blocked by Candidate Part B and the blind baseline.
 
-- [ ] Each scenario has an advisory with non-empty reason paths, a rerun and a shadow comparison result.
-- [ ] Every planner-narrower result is investigated and recorded, because it is the unsafe direction.
-- [ ] No reuse metadata is written by the planner, and the scheduler's reuse decisions are identical with and without an advisory present.
-- [ ] Revision contracts reject a change that touches a protected objective, with the node named.
-- [ ] The blind lane never includes a superseded candidate version.
+- [ ] Each scenario has an advisory with non-empty reason paths, a rerun and a shadow comparison result. — advisory yes; rerun and comparison no
+- [x] Every planner-narrower result is investigated and recorded, because it is the unsafe direction. — vacuous, and F2 is why
+- [x] No reuse metadata is written by the planner, and the scheduler's reuse decisions are identical with and without an advisory present.
+- [x] Revision contracts reject a change that touches a protected objective, with the node named.
+- [ ] The blind lane never includes a superseded candidate version. — needs a candidate version 2, which needs the rerun
+
+**Two of five met, one met vacuously, two not met.** Seven scenarios are scripted: the six the
+ticket names and one probe for criterion 4. They hold eleven arms. Eight recorded a change and
+produced an advisory, and every entry in all eight carries a reason path. Each advisory was
+compared against both runs this world holds, and all sixteen comparisons refused.
+
+A refusal is not one of the three diagnostics criterion 1 names, so its comparison half is not met
+either. The first draft of the Tier 4 record called it "met as a refusal", which the code review
+caught. The refusals are a durable result and are recorded. They are not the criterion.
+
+The decision record is `demo-change-scenarios_2026-10-02.json`: 15 decisions, 9 findings and 6
+Milestone 2 candidates, with 111 tests across three files.
+
+**The frozen world is never edited.** `record_change` writes the approved content to the record's
+own Tier 3 path. A scenario run against `docs/` would therefore edit the founding documents in
+place and move the pinned demo snapshot id. Each scenario instead copies the six files the snapshot
+declares as its inputs into a sandbox. It then checks that the copy builds the live snapshot id
+before any arm runs. All seven records carry `before_snapshot_id` equal to `sha256:706fe54f…`, and a run
+leaves `docs/tier3_project_instantiation` byte for byte unchanged.
+
+**The advisory discriminates, and that is the result worth having.** On `task_lead_moves` the three
+Part B sections receive three different verdicts from one change. The excellence section is
+`transitive` and so `reuse-under-policy`. Impact and implementation are `direct` and `rerun`.
+On `gap_partner_withdraws` arm 3 all three turn `coverage_unknown`: the removed partner is still
+in their declared inputs and no longer in the after snapshot. On `tier2b_fact_changes` all three
+are `transitive`.
+
+That is the handoff's "an unchanged check result can be retained only under an explicit valid
+policy", working on real records.
+
+**Three of the six scenarios are only expressible as a refusal, and that is the finding.** A
+partner withdrawal cannot be one change. Removing P07 while the work plan still names it in
+eleven task roles breaks the graph. The builder refuses at the first dangling edge, and
+`record_change` restores the record byte for byte (F7).
+
+Two other arms refuse because the change recorder covers five Tier 3 records. Neither of their
+files is one of the five (F3): the declaration leaving `working_assumptions.json`, and the date
+correction in `selected_call.json` that is the whole of scenario 5. Each is probed in its own arm
+with the refusal kind declared up front. The record says the engine refused, not that nobody
+tried.
+
+**Scenario 4 found the structural planner-narrower case, which no per-run comparison can see.**
+Dropping the span a claim would rest on moves the source's version but leaves its own content
+equal. The cause is that `change_set` excludes a list of objects from a node's own content. The change is
+classified `contained`, there is no origin, and the advisory reports `nothing_changed` for a change
+that withdrew evidence (F5). The rule is right where the nested list is indexed as nodes, as a work
+package's tasks are. It is wrong where the list is not indexed, and nothing distinguishes the two.
+
+**Criterion 3 is proved dynamically, not argued.** No path in any node's `FINGERPRINT_INPUTS`
+covers `change_scenarios/` or `run_records.json`, asserted directly. Running all seven scenarios
+and writing their records leaves every eligible node's input fingerprint and its full
+`ReuseDecision` byte-identical, for all three nodes, and writes no reuse metadata. The writer
+carries no clock, so a rewrite changes no byte and the before-and-after comparison is like with
+like.
+
+**Criterion 2 is met vacuously, and the vacuity is untested machinery.** Half the sixteen refusals
+come from F1, where the reader rejects the run id before the manifest is opened, and half from F2.
+The comparison path was therefore never exercised end to end on a real run here. Nothing in this
+world shows it would classify a genuine pair of verdicts correctly. `test_dev_graph_shadow.py`
+covers that over a seeded synthetic manifest. The demo adds nothing to it.
+
+A `planner_narrower` row needs a scheduler verdict of `rerun`, which comes only from a decision
+whose status is `not_reused`. The
+scheduler records both outcomes in `self._reuse_decisions`, which reaches `run_summary.json`. It
+calls `ctx.record_reuse_decision` only inside the reused branch. So a `not_reused` decision never
+reaches the run manifest the comparison reads (F2), and the comparison is blind to the one
+direction the ticket calls unsafe. `run_summary.json` is also rewritten by every dispatch. The demo
+dispatched one node at a time ending on `n08f`, so the n08a-n08c decisions were produced and then
+overwritten.
+
+Three reasons not to fix it here, on operator instruction. It changes runtime persistence. Two
+existing tests assert `get_reuse_decision` returns `None` on that path. And it would not help runs
+that have already happened. It is Milestone 2 candidate M1.
+
+**The second refusal cause is the run id.** The only run that carried Phase 8 is stored under
+`import uuid; print(uuid.uuid4())` — a mis-pasted shell command. Nothing validates a run id at
+dispatch, and `read_reuse_decisions` requires a plain identifier. That run can therefore never be
+named to a comparison (F1). `tools/preserve_run_manifests.py` already slugifies the id for its own
+file name. The defect is upstream.
+
+**`run_records.json` did not exist, and the planner refuses without it.** The schema specification
+places that file by hand. `tools/derive_dev_graph_run_records.py` derives it instead, under two
+declared rules. An artifact's inputs are the snapshot node ids its own text names, matched on a word
+boundary so `D3.2` is never found inside `D3.21`. A check's inputs are `null`, because no gate
+result in this repository names a graph node. That premise is checked by test, not assumed. The
+result is seventeen records: three artifacts declaring 3, 30 and 92 node ids, and fourteen checks.
+
+Two consequences are recorded
+rather than smoothed. No section cites a source id, so fifteen of the twenty-four sources come back
+flagged newly relevant on most scenarios (F4). That is the same root as the earlier ticket's F12.
+And a record with `null` inputs yields an entry on every plan, so `claim_loses_its_span` reports
+`nothing_changed` with fourteen entries (F8). Measured across the eight advisories: 112 of the 150
+entries are those checks, and the substantive remainder is 38.
+
+**No advisory in this world names a proposal passage.** The candidate's three passages carry an
+empty `addresses` list, and none of its 147 claims carries a verified span. The document is
+therefore joined to the project graph by no edge the planner can walk (F6). The handoff asks the planner to find
+affected proposal passages. For this candidate it cannot, and the artifact half of every plan comes
+entirely from the derived run records.
+
+**The refinement route is not exercised, and scenario 5 has no representable form.** The ticket
+asks that scenarios altering Tier 3 follow the operator manual's §5 route and never edit frozen
+founding documents in place. No scenario alters Tier 3 at all: every arm runs in a sandbox, which
+satisfies the second clause by never engaging the first. The route ends in a re-gate, which is the
+dispatch the rerun half is blocked on.
+
+Scenario 5 is the other gap. Its date correction and its topic amendment both land in
+`selected_call.json` or Tier 2B, and F3 covers neither, so the refusal is the whole of what the
+recorder can say. The second arm is a labelled proxy on the project's own confidence in the page,
+not a Tier 2B change (F9).
+
+**One verdict was left inconvenient on purpose.** `task_lead_moves` is `flagged_for_review`, not
+`accepted`. The handoff asks that unresolved participant capacity stay explicit, and that item
+names no node, so it bears on every change under its contract. Narrowing the item to nodes the
+change misses would have bought an `accepted` verdict by choosing the convenient reading.
+`deliverable_month_moves` carries no such item and is the accepted case.
 
 ## Demo report
 

@@ -1,0 +1,207 @@
+{
+  "record_type": "decision",
+  "id": "demo-change-scenarios",
+  "date": "2026-10-02",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Change scenarios and shadow comparison' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §9.1 (docs/ is the durable record), §12.1 to §12.4 (reviewability, the four status categories, a missing mandatory input is a gate failure), §13.3 (no invented project fact), §13.7 (no weakening of a gate condition to let work proceed), §17.1.4 and §17.6.2 (gate evaluation belongs to the scheduler), §17.6.3 (gate results belong to the gate evaluator) and §15 (explicit failure over fabricated completion). Also applies Proposal_Engine_Operator_Manual.md §3.1, the freeze rule: the founding documents are immutable for the run, so every scenario runs against a copy. Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "Seven scenarios are scripted and recorded: the six the ticket names and one probe for its fourth criterion. Each runs in a sandbox copy of the six files the snapshot declares as its inputs (five Tier 3 records and the imported Tier 4 candidate document), never against docs/. Each recorded arm carries a revision contract verdict, an advisory plan whose every entry has a reason path, and one shadow comparison per compared run. Two of the ticket's five boxes are met, one is met vacuously, and two are not met. Everything open is blocked by a fact about this world rather than by the work, and this record names each.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-change-scenarios_2026-10-02.json",
+  "acceptance_criteria": {
+    "1_advisory_rerun_and_comparison_per_scenario": "NOT MET: one of its three parts. The advisory part is met — eight of the eleven arms recorded a change and produced a plan, and every entry in all eight carries a reason path. The rerun part is not: dispatching a phase costs subscription quota and is the operator's act. The comparison part is not either, and the first draft of this record overstated it as 'met as a refusal'. A refusal is not one of the three diagnostics the criterion names, so the correct reading is that no comparison was made: all sixteen refused, for the two causes in F1 and F2. The refusals are the durable result and are recorded; they are not the criterion.",
+    "2_every_planner_narrower_result_investigated": "MET vacuously, and the vacuity is untested machinery rather than an absence of narrower rows. A planner_narrower row needs a scheduler decision whose status is not_reused, and F2 shows the scheduler never persists one to a run manifest, so no comparison produced a row at all — asserted by test, not assumed. But the comparison path was never exercised end to end even once in this world: eight of the sixteen refusals come from F1, where the reader rejects the run id before opening the manifest, and the other eight from F2. So no evidence here says the comparison would classify a real pair of verdicts correctly. The unit tests over the synthetic fixture do cover that; the demo world does not.",
+    "3_planner_writes_no_reuse_metadata_and_decisions_are_identical": "MET. No advisory directory appears in any node's FINGERPRINT_INPUTS, asserted directly. Running all seven scenarios and writing their records leaves every eligible node's input fingerprint and its full ReuseDecision byte-identical, checked for all three nodes. No reuse metadata is written.",
+    "4_contract_rejects_a_protected_objective_with_the_node_named": "MET. protected_objective_probe is rejected and names O1, reached as the endpoint of the added WP1 -contributes_to-> O1 edge.",
+    "5_blind_lane_never_includes_a_superseded_candidate": "NOT MET, and not reachable in this world. A superseded version needs a candidate version 2, which needs a redrafted Part B, which needs the blocked rerun. The demo holds one candidate version and no supersedes edge, so the check would be vacuous. The machinery it would exercise — hide_superseded_versions on the blind_pre_evaluation policy — is already covered by tests/runner/test_dev_graph_packages.py; nothing here adds to that."
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "Every scenario runs against a sandbox copy of the snapshot's own declared inputs, and the copy's first snapshot id is checked against the live one before any arm runs.",
+      "reasoning": "record_change writes the approved content to the record's own Tier 3 path. Running a scenario against docs/ would edit the frozen founding documents in place, which the operator manual's freeze rule forbids, and would move the pinned demo snapshot id that three Tier 4 records and every stored package name. Copying only the files the snapshot declares as its inputs makes the sandbox reproduce the live snapshot id exactly, so a scenario is anchored to the real world rather than to a reduction of it. The check is the anchor: without it a sandbox missing one record would still plan, over a smaller graph.",
+      "recorded_in": "runner/dev_graph/scenarios.py materialise_sandbox; every scenario record's before_snapshot_id; tests/runner/test_dev_graph_scenarios.py TestMaterialiseSandbox; tests/test_demo_change_scenarios.py TestTheFrozenWorldIsUntouched."
+    },
+    {
+      "id": "D2",
+      "decision": "A scenario transformation refuses rather than returning the content unchanged.",
+      "reasoning": "A transformation that silently found no target would make the arm a no-op, and the advisory over a no-op reports nothing changed — which reads exactly like a scenario that proved the planner narrow. The eight transformations therefore raise on an absent task, partner, span, source, deliverable or work package, and on a set whose value the field already holds. Nothing is invented to fill a gap (§13.3): the new responsible partner is always a partner the task already names, and the month is always a number the operator declared.",
+      "recorded_in": "runner/dev_graph/scenarios.py TRANSFORMS; tests/runner/test_dev_graph_scenarios.py, one refusal test per transformation."
+    },
+    {
+      "id": "D3",
+      "decision": "A scenario is a sequence of arms, and an arm may declare the refusal it expects. An arm whose expectation is unmet is recorded, not raised.",
+      "reasoning": "Three of the ticket's six scenarios are only expressible as a refusal: a withdrawal the work plan still names, a declaration leaving the uncertainty ledger, and a correction to the call binding. A scenario harness that treated a refusal as an error would have to drop them, and the demo would lose its three most informative results. Recording the expectation alongside the outcome also makes the record self-auditing: arms_matched_expectations is false the moment the engine's behaviour changes under it. An arm is checked for shape before it runs, so a malformed arm raises instead of being recorded as the refusal it declared.",
+      "recorded_in": "runner/dev_graph/scenarios.py Arm.expects, check_arm and ArmResult.expectation_met; the index's arms_matched_expectations; tests/runner/test_dev_graph_scenarios.py TestRunScenarioRefusalProbe and TestCheckArm."
+    },
+    {
+      "id": "D4",
+      "decision": "A shadow comparison that cannot be made is recorded as a refusal, and no decision set is constructed for it.",
+      "reasoning": "compare_shadow refuses an empty decision set rather than reporting agreement over nothing, which is correct. Deriving a decision set — from the run summary, from the eligibility table, from what the scheduler would have decided — would be fabricating scheduler state, and the whole shadow lane exists so that the planner never steers the scheduler. A refusal naming its cause is the honest result and is what the records carry.",
+      "recorded_in": "runner/dev_graph/scenarios.py _compare_one; every arm's shadow_comparisons; tests/test_demo_change_scenarios.py test_every_shadow_comparison_in_this_world_is_a_recorded_refusal."
+    },
+    {
+      "id": "D5",
+      "decision": "The advisory plans are written under each scenario's own directory, not under impact_plans/.",
+      "reasoning": "impact_plans/<hex>/plan.json is where the registered component writes a plan over a change the world holds. A scenario's change never lands in the frozen Tier 3, so a plan of it sitting at that path would invite a reader to take it for a plan over a real change — and its after_snapshot_id names a Tier 3 state docs/ does not hold. The bytes are identical to what the component writes, and plan_identity still checks each one against its id.",
+      "recorded_in": "runner/dev_graph/scenarios.py advisory_rel; the schema specification §5.13; tests/runner/test_dev_graph_scenarios.py test_the_advisory_is_the_plan_document_the_component_writes."
+    },
+    {
+      "id": "D6",
+      "decision": "run_records.json is derived from the artifacts, not hand-authored. An artifact declares the snapshot node ids its own text names; a check declares null.",
+      "reasoning": "The planner refuses without run records, and the schema specification places that file by hand. Typing a node list the artifacts already carry is the D9 lesson from the snapshot ticket: derive a document's counts, never type them. The scan is a word-boundary match, so D3.2 is never found inside D3.21. For checks the honest value is null: no gate result in this repository names a graph node, which is checked by test rather than assumed, and the planner reads null as unknown coverage and reports rerun. A declared empty list would instead assert that a check rests on no project fact.",
+      "recorded_in": "tools/derive_dev_graph_run_records.py; docs/tier4_orchestration_state/dev_graph/run_records.json; tests/test_demo_dev_graph_run_records.py."
+    },
+    {
+      "id": "D7",
+      "decision": "No run record declares a package.",
+      "reasoning": "The eighteen current evidence packages in this world are per-task integrity and blind views built by build_package. None is the view a Part B section was drafted from. Citing one as an artifact's package would misdescribe the artifact's provenance and would suppress the newly-relevant-source flag for sources that package happened to include. The consequence is visible and correct: fifteen of the twenty-four sources come back as newly relevant on most scenarios, because no run record lists a source at all.",
+      "recorded_in": "tools/derive_dev_graph_run_records.py PACKAGE_RULE; tests/test_demo_dev_graph_run_records.py test_no_record_declares_a_package; F4."
+    },
+    {
+      "id": "D8",
+      "decision": "Each advisory is compared against both runs this world holds, including the one whose run id is a mis-pasted shell command.",
+      "reasoning": "That run is the only one that carried Phase 8, so it is the run a reuse decision could have come from, and omitting it would hide F1. Its id fails the reader's plain-identifier check before the manifest is opened, which is the correct refusal and a finding about how the run was dispatched rather than about the comparison.",
+      "recorded_in": "tools/run_demo_change_scenarios.py COMPARED_RUN_IDS; F1; tests/test_demo_change_scenarios.py TestComparedRuns."
+    },
+    {
+      "id": "D9",
+      "decision": "The scheduler is not changed to persist a not_reused decision to the run manifest. The gap is recorded as a Milestone 2 candidate.",
+      "reasoning": "Persisting it would make planner_narrower detectable, which is the direction the ticket calls unsafe. It is also a change to runtime persistence that two existing tests assert against (test_preseed_suppression_scheduler.py and test_phase8_reuse_ownership.py both require get_reuse_decision to return None on the not-reused path), and it would not help this demo, whose runs have already happened. The ticket's criteria ask that the result be investigated and recorded; the next ticket asks for the defects that need Milestone 2 tickets. Recorded, on explicit operator instruction in session.",
+      "recorded_in": "F2; milestone_2_candidates M1."
+    },
+    {
+      "id": "D10",
+      "decision": "The scenario machinery lives in runner/dev_graph/scenarios.py; the catalogue of which record, which id and which contract lives in tools/run_demo_change_scenarios.py.",
+      "reasoning": "The transformations, the sandbox, the arms and the record writer are generic and carry no project noun. The ids P07, T3.1, D3.2, SRC-WP9-P75, O1 to O6 are this instance's data. Putting them in the runner would make a second instance inherit instance two's specifics, which is the property §2's agnosticism mission turns on and the agnosticism lint exists to protect for the milestone-2 graph layer.",
+      "recorded_in": "The two modules' docstrings; tests/test_demo_change_scenarios.py TestCatalogue."
+    },
+    {
+      "id": "D11",
+      "decision": "task_lead_moves is recorded as flagged_for_review, not engineered into an accepted verdict.",
+      "reasoning": "The handoff's first operational milestone asks that unresolved participant capacity remain explicit. The contract therefore carries that unresolved item, it names no node, and so it bears on every change under the contract — which makes flagged_for_review the correct verdict. Narrowing the item to nodes the change misses, to obtain an accepted verdict, would have been the convenient reading rather than the true one. deliverable_month_moves carries no such item and is the accepted case.",
+      "recorded_in": "tools/run_demo_change_scenarios.py PARTICIPANT_CAPACITY; the task_lead_moves record."
+    },
+    {
+      "id": "D12",
+      "decision": "A task's lead moving swaps the two partners' roles rather than dropping the old lead.",
+      "reasoning": "No task in this world's work plan lists its lead among its contributors, so the new lead has to leave the contributing list. Dropping the old lead entirely would combine a responsibility change with a contribution change and the advisory could not tell them apart. The swap keeps the partner set identical and isolates responsibility, which is what the handoff's walkthrough describes.",
+      "recorded_in": "runner/dev_graph/scenarios.py move_task_responsibility; tests/runner/test_dev_graph_scenarios.py test_swaps_the_two_roles_and_keeps_the_partner_set."
+    },
+    {
+      "id": "D13",
+      "decision": "The Tier 2B scenario is run as a refusal on the call binding plus a proxy on the transcribed call page, and the proxy is labelled a proxy.",
+      "reasoning": "A topic text amendment would mean rewriting the transcribed text of a work programme page, and the source intake rule requires that text be re-derivable byte for byte from the stored PDF. Writing programme text nobody published would break exactly the rule that makes a source record trustworthy. The project's own status on the page is a field the operator owns, Unresolved is already in the §12.2 vocabulary, and changing it models the real consequence: the page no longer backs what rests on it.",
+      "recorded_in": "tools/run_demo_change_scenarios.py tier2b_fact_changes; F3."
+    },
+    {
+      "id": "D14",
+      "decision": "The operator manual's §5 refinement route is not exercised, and the record says so rather than implying it was followed.",
+      "reasoning": "The ticket asks that scenarios altering Tier 3 follow the refinement route and never edit frozen founding documents in place. No scenario alters Tier 3 at all: every arm runs in a sandbox, which satisfies the second clause by never engaging the first. The route itself — edit the vault, compile to staging, review the diff, promote, re-gate — ends in a re-gate, which is the same dispatch the rerun half is blocked on. Claiming the route was followed because nothing was edited in place would be the convenient reading.",
+      "recorded_in": "This record; the validation report's criterion 1; the ticket's report section."
+    },
+    {
+      "id": "D15",
+      "decision": "The index's roll-up flag is named arms_matched_expectations, not expectations_met.",
+      "reasoning": "A reader seeing expectations_met: true at the head of the index would take it for a green summary of the ticket, which is false: two of five criteria are unmet. The flag means only that every arm did what its scenario declared, including the arms whose declaration was a refusal. The name now says that, and the schema entry states it explicitly.",
+      "recorded_in": "runner/dev_graph/scenarios.py ScenarioResult.arms_matched_expectations; the schema specification §5.13 and §5.14."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The demo's only Phase 8 run is stored under the run id 'import uuid; print(uuid.uuid4())' — a mis-pasted shell command — which the shadow comparison's reader refuses before opening the manifest.",
+      "detail": "The run id becomes a directory name and nothing validates it at dispatch. read_reuse_decisions requires a plain identifier, so the run that actually carried n08a to n08f can never be named to a comparison. tools/preserve_run_manifests.py already defends against this downstream by slugifying the id for its own file name, and its preserved copy of that run is named import-uuid-print-uuid.uuid4.json. The defect is upstream, at dispatch.",
+      "disposition": "OPEN. Recorded as Milestone 2 candidate M2."
+    },
+    {
+      "id": "F2",
+      "summary": "The scheduler persists a reuse decision to the run manifest only on the reuse branch, so a not_reused decision never reaches the manifest and planner_narrower is structurally undetectable.",
+      "detail": "dag_scheduler.py records both outcomes in self._reuse_decisions, which reaches RunSummary and run_summary.json, but calls ctx.record_reuse_decision only inside the reused branch. run_summary.json is rewritten by every dispatch under the same run id, and the demo dispatched one node at a time ending on n08f, which is not reuse-eligible, so the n08a to n08c not_reused decisions were produced and then overwritten. The shadow comparison reads the manifest. planner_narrower requires scheduler=rerun, which is not_reused, so the comparison can only ever see nodes the scheduler reused — it is blind to the one direction the ticket calls unsafe. No manifest in this world records any reuse decision, which is asserted by test.",
+      "disposition": "OPEN by decision D9. Recorded as Milestone 2 candidate M1."
+    },
+    {
+      "id": "F3",
+      "summary": "The change recorder covers five Tier 3 records, so a Tier 2B fact, a call-binding correction and an uncertainty-ledger declaration cannot be planned at all.",
+      "detail": "RECORD_PATHS is partners.json, objectives.json, workpackage_seed.json, milestones_seed.json and sources.json. The ticket's fifth scenario — the date correction from the intake ticket, or a topic amendment when the call opens — lands in selected_call.json and the Tier 2B extracted files, none of which the recorder accepts and none of which the snapshot builder indexes. The confirmation scenario has the same shape: the partner record changes in the graph, and the matching declaration leaving working_assumptions.json is invisible. Both halves are probed and refused in the records rather than asserted.",
+      "disposition": "OPEN. Recorded as Milestone 2 candidate M3."
+    },
+    {
+      "id": "F4",
+      "summary": "No Part B section cites a source id in machine-readable form, so fifteen of the twenty-four sources come back flagged as newly relevant on most scenarios.",
+      "detail": "The derived run records name project nodes — 3 for the excellence section, 30 for impact, 92 for implementation — but no source. The planner flags every reached source that no run record lists among its inputs or its package, so the flag fires for the whole reached source set. The flag is behaving correctly; the input is that the sections carry no traceable source reference, which is the same root as the earlier ticket's F12, where all 147 candidate claims reached the judge with an empty source_ref.",
+      "disposition": "OPEN. Recorded as Milestone 2 candidate M4."
+    },
+    {
+      "id": "F5",
+      "summary": "A change to a list of objects inside a record is classified contained, has no origin, and the advisory reports nothing changed — even when the list is the span set a claim would rest on.",
+      "detail": "change_set excludes a list of objects from a node's own content, because such a list is normally indexed as nodes of its own. A source's declared spans are such a list and are not indexed, so dropping the span SRC-WP9-P75#133-305 moves the source's version while its own content stays equal. The claim_loses_its_span record shows the result: one contained node change, no origin, nothing_changed true, and fourteen entries that are the change-independent coverage_unknown checks. This is the planner being narrower than the change, structurally and in every run — the unsafe direction the ticket's second criterion is about, arriving by a route the per-run comparison cannot see.",
+      "disposition": "OPEN. Recorded as Milestone 2 candidate M5."
+    },
+    {
+      "id": "F6",
+      "summary": "No Part B passage is reachable from any Tier 3 origin, so no advisory in this world names a proposal passage.",
+      "detail": "The candidate's three passages carry an empty addresses list and none of its 147 claims carries a verified span, so the document is joined to the project graph by no edge the planner can walk. The reach therefore stops inside the project layer, and the artifact half of each plan comes entirely from the derived run records. The handoff's acceptance evidence asks the planner to find affected proposal passages; it cannot, for this candidate.",
+      "disposition": "OPEN. Recorded as Milestone 2 candidate M4, with F4."
+    },
+    {
+      "id": "F7",
+      "summary": "A partner withdrawal cannot be recorded as one change, because record_change takes one record path and the intermediate state does not build.",
+      "detail": "Removing P07 from partners.json while the work plan still names it leaves eleven dangling edges, and the builder refuses on the first with kind dangling_edge. record_change restores the record byte for byte and writes nothing, which is the correct fail-closed behaviour. The consequence is that a two-record change is two change records with two advisories, and nothing ties them into one approved revision. Not a defect in the recorder; a gap in what the change vocabulary can express.",
+      "disposition": "OPEN, recorded as behaviour rather than a bug. Milestone 2 candidate M6."
+    },
+    {
+      "id": "F8",
+      "summary": "A run record with null inputs produces an entry on every plan, including a plan whose change set is empty.",
+      "detail": "All fourteen check records declare unknown coverage, so each yields a coverage_unknown rerun entry regardless of what changed. Measured over the eight advisories: 112 of the 150 entries are those checks, and the substantive remainder is 38 — four entries on six of the eight plans (one origin record and the three section artifacts), fourteen on the work-plan release, and zero on claim_loses_its_span, which reports nothing_changed and still carries fourteen entries. The entries are individually correct and collectively carry no discriminating signal. The scenario records separate them: entries_by_kind_hit_action gives the check count apart from the records, passages, evidence and artifacts.",
+      "disposition": "OPEN, recorded so the entry counts are not misread. Follows from F4's root: a check that declared coverage would not do this."
+    },
+    {
+      "id": "F9",
+      "summary": "Scenario 5 as the ticket wrote it is not represented. The recorded arm changes a Tier 3 source's status, not a Tier 2B fact.",
+      "detail": "The ticket names 'the date correction from the intake ticket or a topic text amendment when the call opens'. Both land in selected_call.json or the Tier 2B extracted files, and F3 shows the change recorder covers neither, so the scenario's first arm is the refusal and nothing else is possible through the recorder. The second arm is a proxy and is labelled one: it moves the transcribed call page's own status from Confirmed to Unresolved, which models the page no longer backing what rests on it. D13 records why no programme text was written. The honest reading is that scenario 5 has no representable form in this world, not that a substitute stood in for it.",
+      "disposition": "OPEN, by F3. Milestone 2 candidate M3."
+    }
+  ],
+  "milestone_2_candidates": [
+    {
+      "id": "M1",
+      "candidate": "Persist the not_reused reuse decision to the run manifest, so the shadow comparison can see the rerun side and planner_narrower becomes detectable.",
+      "from": "F2",
+      "note": "Changes runtime persistence. Two existing tests assert get_reuse_decision returns None on that path and would need to change with it. Also worth pairing with a durable per-dispatch home for the reuse decisions that run_summary.json currently overwrites."
+    },
+    {
+      "id": "M2",
+      "candidate": "Validate the run id at dispatch, so a mis-pasted argument cannot become a run directory the downstream readers refuse.",
+      "from": "F1"
+    },
+    {
+      "id": "M3",
+      "candidate": "Widen the change vocabulary to the facts outside the five indexed records: the call binding, Tier 2B, and the uncertainty ledger.",
+      "from": "F3",
+      "note": "The ledger is the sharpest case. working_assumptions.json is the one Tier 3 file the operator keeps touching, and every declaration leaving it changes a §12.2 status the deliverables quote."
+    },
+    {
+      "id": "M4",
+      "candidate": "Join the Part B to the graph: emit addresses on each passage and carry each claim's verified span through the candidate builder.",
+      "from": "F4, F6",
+      "note": "Closes three things at once — the planner reaching a passage, a section declaring its sources, and the empty source_ref the blind assessor saw in the earlier ticket's F12."
+    },
+    {
+      "id": "M5",
+      "candidate": "Decide what a change to a non-indexed nested list means. Either index the structure or classify the change as direct instead of contained.",
+      "from": "F5",
+      "note": "A source's declared spans are the case in hand. The rule that excludes nested object lists is right where the list is indexed and wrong where it is not, and the planner cannot tell the two apart."
+    },
+    {
+      "id": "M6",
+      "candidate": "Let one approved revision span more than one record, so a withdrawal is one change rather than two.",
+      "from": "F7"
+    }
+  ],
+  "what_is_outstanding_for_the_operator": [
+    "The rerun half of criterion 1. Each scenario's advisory is written and waiting; a real rerun means dispatching the affected phases on the changed Tier 3, which costs subscription quota and is the operator's act. Nothing here simulates one.",
+    "Criterion 5. A superseded candidate version needs a redrafted Part B, which needs the rerun above. The demo holds one candidate version and no supersedes edge.",
+    "A comparison with a real diagnostic. Until M1 lands, or until a run reuses a Phase 8 section and so writes a reused decision to its manifest, every comparison in this world refuses."
+  ],
+  "authored_by": "Claude Opus 5, on operator instruction, 2026-10-02. The two unmet criteria and the nine findings are reported as found; no scenario, advisory, comparison or reuse decision was fabricated to close a box."
+}

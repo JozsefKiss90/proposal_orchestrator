@@ -1,0 +1,110 @@
+{
+  "schema_id": "orch.dev_graph.change_scenario.v1",
+  "scenario_id": "protected_objective_probe",
+  "title": "A change that touches a protected objective",
+  "purpose": "The ticket's fourth criterion. WP1 starts serving O1, which adds a contributes_to edge whose endpoint the contract protects.",
+  "arms": [
+    {
+      "arm_id": "a1_add_protected_objective",
+      "kind": "change",
+      "record_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "transform": "add_work_package_objective",
+      "args": {
+        "wp_id": "WP1",
+        "objective_id": "O1"
+      },
+      "payload": null,
+      "expects": "recorded",
+      "purpose": "The contract rejects the change and names O1.",
+      "outcome": "recorded",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:d5725b77a5982a90ed51d80df24c8f5d1e62925e01add3c403b948d70fb643bd",
+      "refusal": null,
+      "change": {
+        "change_id": "protected_objective_probe__a1_add_protected_objective",
+        "record_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+        "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+        "after_snapshot_id": "sha256:d5725b77a5982a90ed51d80df24c8f5d1e62925e01add3c403b948d70fb643bd",
+        "nodes_added": [],
+        "nodes_removed": [],
+        "nodes_changed": [
+          {
+            "id": "WP1",
+            "kind": "direct",
+            "changed_fields": [
+              "objectives"
+            ]
+          }
+        ],
+        "edges_added": [
+          "WP1 -contributes_to-> O1"
+        ],
+        "edges_removed": []
+      },
+      "contract_check": {
+        "contract_id": "objective_protected",
+        "verdict": "rejected",
+        "change_classes": [
+          "contribution"
+        ],
+        "protected_hits": [
+          {
+            "node_id": "O1",
+            "via": [
+              "WP1 -contributes_to-> O1"
+            ]
+          }
+        ],
+        "unpermitted_classes": [],
+        "unresolved": []
+      },
+      "advisory": {
+        "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/protected_objective_probe/a1_add_protected_objective/plan.json",
+        "plan_id": "sha256:390065ca60db86e1764638f8f5cb6574bd2dcf9191069ccc659d8e857871a2b7",
+        "nothing_changed": false,
+        "origins": [
+          "WP1"
+        ],
+        "entry_count": 18,
+        "entries_by_kind_hit_action": {
+          "artifact/direct/rerun": 2,
+          "artifact/transitive/reuse-under-policy": 1,
+          "check/coverage_unknown/rerun": 14,
+          "record/origin/reconsider": 1
+        },
+        "every_entry_has_a_reason_path": true,
+        "newly_relevant_source_count": 15
+      },
+      "shadow_comparisons": [
+        {
+          "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json",
+            "message": "malformed_request: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
+          }
+        },
+        {
+          "run_id": "import uuid; print(uuid.uuid4())",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": "import uuid; print(uuid.uuid4())",
+            "message": "malformed_request: run_id is not a plain identifier [offender: import uuid; print(uuid.uuid4())]"
+          }
+        }
+      ]
+    }
+  ],
+  "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+  "contract": {
+    "contract_id": "objective_protected",
+    "permitted_change_classes": [
+      "contribution"
+    ],
+    "protected_node_ids": [
+      "O1"
+    ],
+    "unresolved_items": []
+  },
+  "arms_matched_expectations": true
+}

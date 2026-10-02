@@ -36,6 +36,11 @@ Public API (the one entry point plus its vocabulary and writers):
   against the scheduler's recorded reuse decision (agreed, planner
   narrower, planner broader); :func:`write_shadow_comparison` — the
   deterministic comparison writer. Nothing consumes it at runtime.
+* :class:`Scenario`, :class:`Arm`, :func:`run_scenario`, :data:`TRANSFORMS`,
+  :func:`materialise_sandbox` — a scripted approved change run against a copy
+  of the world's own snapshot inputs, with its contract check, its advisory
+  and its comparison; :func:`write_scenario_records` — the record writer.
+  The catalogue of scenarios is project data and lives outside this package.
 * :func:`record_esr_intake`, :func:`read_esr_intake`, :data:`ESR_AVAILABILITY`,
   :data:`PERMITTED_PURPOSES` — the ESR intake record: availability declared
   from a closed set and never inferred, bound submission and call ids, and
@@ -123,6 +128,26 @@ from runner.dev_graph.policies import (
     VIEW_POLICIES,
     VIEWS,
     ViewPolicy,
+)
+from runner.dev_graph.scenarios import (
+    ARM_KINDS,
+    RECORDED,
+    SCENARIO_INDEX_SCHEMA_ID,
+    SCENARIO_SCHEMA_ID,
+    SCENARIOS_REL,
+    TRANSFORMS,
+    Arm,
+    ArmResult,
+    Sandbox,
+    Scenario,
+    ScenarioResult,
+    advisory_rel,
+    apply_transform,
+    materialise_sandbox,
+    run_scenario,
+    scenario_rel,
+    shadow_label,
+    write_scenario_records,
 )
 from runner.dev_graph.shadow import (
     DIAGNOSTICS,
@@ -224,6 +249,24 @@ __all__ = [
     "RUN_RECORDS_SCHEMA_ID",
     "SCHEMA_ID",
     "SELECTION_REASONS",
+    "ARM_KINDS",
+    "RECORDED",
+    "Arm",
+    "ArmResult",
+    "SCENARIOS_REL",
+    "SCENARIO_INDEX_SCHEMA_ID",
+    "SCENARIO_SCHEMA_ID",
+    "Sandbox",
+    "Scenario",
+    "ScenarioResult",
+    "TRANSFORMS",
+    "advisory_rel",
+    "apply_transform",
+    "materialise_sandbox",
+    "run_scenario",
+    "scenario_rel",
+    "shadow_label",
+    "write_scenario_records",
     "SHADOW_COMPARISONS_REL",
     "SHADOW_REQUEST_REL",
     "SHADOW_SCHEMA_ID",

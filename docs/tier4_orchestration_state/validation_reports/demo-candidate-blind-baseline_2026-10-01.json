@@ -79,7 +79,7 @@
     "The candidate: tools/build_part_b_candidate.py over the three real section artifacts, then runner.dev_graph.import_document into docs/, then build_snapshot to confirm the artifact_version, passage and claim nodes and the passage spans.",
     "The blind package: harness.blind_assessment.build_blind_evidence over the real repository, which runs assert_no_leakage before it materialises a byte. The smallest complete budget was bisected against the builder, not estimated.",
     "The assessor's inputs, without the assessor: load_candidate for the scope and the candidate hash, load_profile_bundle for the profile version, and build_pack_for for every rubric and section pair, which is where the anchor map is read.",
-    "Anonymity: py -3.10 -m runner.leakage_scan over 242 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included."
+    "Anonymity: py -3.10 -m runner.leakage_scan over 261 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. The count was 242 when this report was written and moved when the change-scenario ticket added its Tier 4 records; the scan was re-run over all 261 and reports no new leak."
   ],
   "findings": [
     {
@@ -259,5 +259,12 @@
     "date": "2026-10-02",
     "what_changed": "The operator ran the subscription assessor and criterion 3 closed, so the ticket closes at four of four. The run also produced the first finding on this branch that only a blind assessor could have produced: F12, every claim reaching the judge with an empty source_ref because the converter does not carry the Tier 5 field and the materialiser reads only the verified_span the converter deliberately omits. F13 records that the low implementation scores are the demo's all-Assumed Tier 3 priced honestly, not a defect in the drafting.",
     "verified_how": "Read from the report and the artifacts, not from the run's console. The three bindings were compared against the recorded candidate hash and profile version and found identical, and checked on all six cells. Pack status was read per cell. F12 was not taken from the assessor's word: the 147 candidate claims were counted blank directly, the 180 Tier 5 entries were counted non-blank directly, and the two functions at the seam were read. No node was dispatched and no assessor call was spent in verifying any of this."
+  },
+  "amended_a_fifth_time": {
+    "date": "2026-10-02",
+    "by": "Ticket 'Change scenarios and shadow comparison', plans/dev_graph_demo_tickets.md",
+    "authority": "CLAUDE.md §9.1: docs/ is the durable record, so a stated number that a later ticket moved is corrected in place rather than left to mislead a reader. The correction records both counts and what moved between them.",
+    "what_changed": "The leakage-scan file count in what_was_checked_and_how moved from 242 to 261. The change-scenario ticket added its Tier 4 records — seven scenario records, eight advisory plans, an index, run_records.json, a decision record and a validation report — and the scan covers Tier 4. The scan was re-run over all 261 files on 2026-10-02 and reports no new leak; the eleven recorded pre-existing leaks in the 22 September purge record are unchanged.",
+    "what_did_not_change": "Nothing else in this report. The four criteria, their dispositions, the twelve findings and the status summary all stand. No scan result changed: the branch was clean of new leaks at 242 files and is clean at 261."
   }
 }

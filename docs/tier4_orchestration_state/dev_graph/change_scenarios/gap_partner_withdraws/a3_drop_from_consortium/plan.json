@@ -1,0 +1,234 @@
+{
+  "schema_id": "orch.dev_graph.impact_plan.v1",
+  "plan_id": "sha256:805082fbde12b97e6c852f1acb932d3ea3aa05d811926044c5e7acb7c82940a3",
+  "advisory": true,
+  "mode": "shadow",
+  "change_id": "gap_partner_withdraws__a3_drop_from_consortium",
+  "before_snapshot_id": "sha256:9d42d3b24c239070576bafec516275cc9bbaa4fcd33b4fa84177e6281ea5c121",
+  "after_snapshot_id": "sha256:1f8572eac2a5cdee605683c11b2d74358b84eafc0f346fa56a9e36b29f752acd",
+  "run_records_hash": "sha256:8585e269ac49ecb65d3a463257649c632f6714e526f752394235ba75231fb24f",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+  "max_depth": 4,
+  "nothing_changed": false,
+  "change_set": {
+    "nodes": {
+      "added": [],
+      "removed": [
+        {
+          "id": "P07",
+          "type": "participant"
+        }
+      ],
+      "changed": []
+    },
+    "edges": {
+      "added": [],
+      "removed": []
+    }
+  },
+  "origins": [
+    "P07"
+  ],
+  "entries": [
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.excellence_section",
+      "path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:proposal_sections.excellence_section"
+      ],
+      "detail": "input P07 absent from the after snapshot"
+    },
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.impact_section",
+      "path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:proposal_sections.impact_section"
+      ],
+      "detail": "input P07 absent from the after snapshot"
+    },
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.implementation_section",
+      "path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:proposal_sections.implementation_section"
+      ],
+      "detail": "input P07 absent from the after snapshot"
+    },
+    {
+      "kind": "check",
+      "id": "phase1_call_analysis.gate_01_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_01_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase1_call_analysis.gate_01_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase1_call_analysis.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase1_call_analysis.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase2_concept_refinement.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase2_concept_refinement.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase3_wp_design.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase3_wp_design.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase4_gantt_milestones.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase4_gantt_milestones.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase5_impact_architecture.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase5_impact_architecture.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase6_implementation_architecture.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase6_implementation_architecture.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase7_budget_gate.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase7_budget_gate.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10a_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10a_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10a_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10b_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10b_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10b_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10c_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10c_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10c_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10d_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10d_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_11_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_11_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_12_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_12_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_12_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "record",
+      "id": "P07",
+      "type": "participant",
+      "version": "sha256:fb46b9cce999ec8cfc8594b4bf09cfc071b49cbae53fe7b27482f3ee946bc8f8",
+      "hit": "origin",
+      "action": "reconsider",
+      "reason_path": [
+        "changed:P07"
+      ],
+      "detail": "removed"
+    }
+  ],
+  "newly_relevant_sources": []
+}

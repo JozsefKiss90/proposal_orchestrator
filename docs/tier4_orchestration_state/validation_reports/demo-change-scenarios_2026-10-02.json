@@ -1,0 +1,102 @@
+{
+  "report_id": "demo-change-scenarios_2026-10-02",
+  "report_kind": "change_scenario_and_shadow_comparison_validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "authority": [
+    "CLAUDE.md §12.1 to §12.4 (reviewability, the four status categories, a missing mandatory input is a gate failure), §13.3 (no invented project fact), §13.7 (no weakening of a gate condition to let work proceed) and §15 (explicit failure over fabricated completion).",
+    "§17.1.4, §17.6.2 and §17.6.3 are why nothing here evaluates a gate or writes a gate result: gate evaluation belongs to the scheduler and gate results to the gate evaluator. The scenario runner is an authoring tool, not a manifest-bound deterministic component.",
+    "§9.1 and §9.4 make this report and its decision record the durable form of what was found.",
+    "Proposal_Engine_Operator_Manual.md §3.1, the freeze rule: the founding documents are immutable for the run, which is why every scenario runs against a copy.",
+    "The ticket 'Change scenarios and shadow comparison' in plans/dev_graph_demo_tickets.md supplies the five acceptance criteria and the six scenarios. The shadow lane is advisory: nothing in it is read by the scheduler, by a gate predicate, or by the Phase 8 reuse layer."
+  ],
+  "question_asked": "Does each approved change produce an advisory with non-empty reason paths, a rerun and a shadow comparison; is every planner-narrower result investigated; does the scheduler reach the same reuse decision with and without an advisory present; does a revision contract reject a protected objective by name; and does the blind lane exclude a superseded candidate version?",
+  "answer": "Two of five met, one met vacuously, two not met. Criterion 3 is met and proved dynamically: all seven scenarios written leave every eligible node's input fingerprint and full reuse decision byte-identical, and no fingerprint input covers the advisory directory. Criterion 4 is met: the probe is rejected and names O1. Criterion 2 is met vacuously, and the vacuity is untested machinery — the scheduler never writes a not_reused decision to a run manifest (F2), and half the refusals never reach the manifest at all (F1), so no comparison in this world classified a real pair of verdicts. Criterion 1 is not met: its advisory part is (eight plans, every entry with a reason path), its rerun part is operator work, and its comparison part produced sixteen refusals and none of the three diagnostics it names. Criterion 5 is not met and is not reachable: a superseded version needs a candidate version 2, which needs the blocked rerun.",
+  "acceptance_criteria": {
+    "1_each_scenario_has_an_advisory_with_non_empty_reason_paths_a_rerun_and_a_comparison": {
+      "status": "NOT MET (one of three parts)",
+      "advisory": "MET. Eleven arms across seven scenarios; eight recorded a change and so produced a plan. every_entry_has_a_reason_path is true on all eight. The three arms with no plan are refusal probes, which is their point. Measured: 150 entries across the eight plans, of which 112 are the coverage_unknown checks this change's own run records produce (F8); the substantive remainder is 38.",
+      "rerun": "NOT MET. Dispatching a phase costs subscription quota and is the operator's act on this branch. No rerun is simulated and no reuse decision is constructed. The operator manual's §5 refinement route is likewise not exercised: no scenario alters Tier 3 at all, so the ticket's 'never edit frozen founding documents in place' holds by never engaging the route, whose last step is the same blocked re-gate.",
+      "comparison": "NOT MET. Each of the eight advisories was compared against both runs this world holds, and all sixteen refused. A refusal is a durable result and is recorded, but it is not one of the three diagnostics — agreed, planner narrower, planner broader — the criterion asks for. Causes in F1 and F2."
+    },
+    "2_every_planner_narrower_result_is_investigated_and_recorded": {
+      "status": "MET (vacuous; the vacuity is untested machinery)",
+      "evidence": "A planner_narrower row needs a scheduler verdict of rerun, which comes only from a decision whose status is not_reused. F2 shows the scheduler never persists one to a run manifest, and no manifest in this world holds any reuse decision at all — asserted by tests/test_demo_change_scenarios.py test_no_compared_run_manifest_records_a_reuse_decision. Every comparison therefore produced zero rows, asserted by test_no_planner_narrower_result_is_left_uninvestigated.",
+      "what_this_does_not_show": "That the comparison classifies a real pair of verdicts correctly. Eight of the sixteen refusals come from F1, where the reader rejects the run id before the manifest is opened, and eight from F2. The comparison path was never exercised end to end on a real run in this world. tests/runner/test_dev_graph_shadow.py covers it over a seeded synthetic manifest; the demo world adds nothing to that.",
+      "the_narrower_case_that_was_found": "F5, and no per-run comparison can see it: a change to a non-indexed nested list is classified contained, has no origin, and the advisory reports nothing changed."
+    },
+    "3_no_reuse_metadata_is_written_and_the_decisions_are_identical": {
+      "status": "MET",
+      "evidence": [
+        "test_no_fingerprint_input_covers_the_advisory_directory: no path in FINGERPRINT_INPUTS, for any of the three eligible nodes, covers change_scenarios/ or run_records.json.",
+        "test_the_input_fingerprint_is_the_same_with_an_advisory_present: for each of the three nodes, compute_input_fingerprint is unchanged after all seven scenarios are run and written.",
+        "test_the_reuse_decision_is_the_same_with_an_advisory_present: for each of the three nodes, the full ReuseDecision (reusable, reason, artifact_path, input_fingerprint, gate_id) is unchanged.",
+        "test_a_scenario_run_writes_no_reuse_metadata: the reuse directory's file list is unchanged by a run.",
+        "test_rewriting_the_records_changes_no_byte: the writer carries no clock, so the two tests above compare like with like."
+      ]
+    },
+    "4_revision_contracts_reject_a_protected_objective_with_the_node_named": {
+      "status": "MET",
+      "evidence": "protected_objective_probe adds O1 to WP1's objectives. The change set carries the added edge WP1 -contributes_to-> O1, whose endpoint O1 the contract protects, so check_revision returns rejected with protected_hits naming O1 and the edge label that touched it. Asserted by tests/test_demo_change_scenarios.py test_the_protected_objective_probe_is_rejected_and_names_the_node and, over the synthetic world, by tests/runner/test_dev_graph_scenarios.py TestRunScenarioProtectedObjective."
+    },
+    "5_the_blind_lane_never_includes_a_superseded_candidate_version": {
+      "status": "NOT MET",
+      "why": "The demo holds one candidate version and no supersedes edge. A second version needs a redrafted Part B, which needs the rerun criterion 1 is missing. Checking the criterion against a world with nothing superseded would pass without telling a reader anything, which is the same vacuity the earlier ticket recorded for its leakage pass over six empty packages.",
+      "what_exists": "The machinery the criterion would exercise is hide_superseded_versions on the blind_pre_evaluation view policy, computed from superseded_versions over the supersedes edge, and it is covered by tests/runner/test_dev_graph_packages.py. Nothing in this ticket adds to that coverage."
+    }
+  },
+  "what_was_checked_and_how": {
+    "the_frozen_world": "Every scenario copies the six files the snapshot declares as its inputs into a temporary sandbox and checks that the copy builds the live snapshot id before any arm runs. All seven scenario records carry before_snapshot_id equal to sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389, the pinned demo snapshot. tests/test_demo_change_scenarios.py compares the whole of docs/tier3_project_instantiation byte for byte across a run.",
+    "the_advisories": "Eight plan documents, each in the orch.dev_graph.impact_plan.v1 schema the registered component writes, each checked against its own plan_id by plan_identity. The three sections receive different verdicts on the same change, which is the discrimination the handoff asked for: on task_lead_moves the excellence section is transitive and reuse-under-policy, while impact and implementation are direct and rerun.",
+    "the_comparisons": "Sixteen comparisons, all refused. Eight refused because the run id 'import uuid; print(uuid.uuid4())' is not a plain identifier (F1); eight because the Phases 1 to 6 run manifest records no reuse decision (F2) — correctly, since no Phase 1 to 6 node is reuse-eligible.",
+    "the_run_records": "Seventeen records derived from the world: three artifacts (the Tier 5 sections, declaring 3, 30 and 92 node ids) and fourteen checks (every gate result, each declaring null). The premise of the null is checked: no gate result in this repository names a graph node.",
+    "the_tests": "tests/runner/test_dev_graph_scenarios.py (54 tests over the synthetic fixture), tests/test_demo_dev_graph_run_records.py (21), tests/test_demo_change_scenarios.py (36): 111 collected and green. The runner dev-graph group (tests/runner/test_dev_graph_*.py) runs 289 tests green."
+  },
+  "status_summary": {
+    "Confirmed": [
+      "The seven scenarios' arms, outcomes, contract verdicts, advisories and comparison refusals: each read back off the records on disk, and the records reproduced byte-equal from the world.",
+      "The sandbox reproduces the live snapshot id, and a run leaves Tier 3 byte for byte unchanged.",
+      "The reuse decision and the input fingerprint of all three eligible nodes are unchanged by an advisory on disk.",
+      "No gate result in this world names a graph node.",
+      "No run manifest in this world records a reuse decision."
+    ],
+    "Inferred": [
+      "That planner_narrower is undetectable from a run manifest. The inference chain: a row needs scheduler=rerun; scheduler=rerun comes only from status not_reused; dag_scheduler.py calls ctx.record_reuse_decision only inside the reused branch; the comparison reads the manifest. Each link is read off the source, and the conclusion is not tested directly because no run in this world reuses anything."
+    ],
+    "Assumed": [
+      "That the derived inputs of a Part B section are the node ids its text names. This is the operator's declaration of the derivation rule, not a measurement of what the drafter actually read. The rule is stated in the artifact and is why F4's newly-relevant-source count is what it is."
+    ],
+    "Unresolved": [
+      "Whether any scenario's advisory agrees with what the scheduler would do. Unresolved until a run records a reuse decision, by M1 or by a run that reuses a Phase 8 section.",
+      "What a change to a non-indexed nested list should mean (F5). The current answer, contained and therefore invisible, is wrong for a source's declared spans and right for a work package's tasks, and nothing distinguishes them.",
+      "Whether the shadow comparison classifies a real pair of verdicts correctly on this world's runs. Unresolved because no comparison here reached a manifest with a decision in it."
+    ]
+  },
+  "findings": [
+    "F1 — the Phase 8 run's id is a mis-pasted shell command, and the comparison's reader refuses it.",
+    "F2 — a not_reused decision never reaches the run manifest, so planner_narrower is structurally undetectable.",
+    "F3 — the change recorder covers five Tier 3 records, so Tier 2B, the call binding and the uncertainty ledger cannot be planned.",
+    "F4 — no Part B section cites a source id, so fifteen of twenty-four sources come back newly relevant.",
+    "F5 — a change to a non-indexed nested list is contained, has no origin, and reports nothing changed.",
+    "F6 — no Part B passage is reachable from any Tier 3 origin.",
+    "F7 — a partner withdrawal cannot be one change; the intermediate state does not build.",
+    "F8 — a run record with null inputs produces an entry on every plan, including an empty one.",
+    "F9 — scenario 5 as the ticket wrote it has no representable form in this world; the recorded arm is a labelled proxy.",
+    "Full detail, disposition and Milestone 2 candidates in the decision record."
+  ],
+  "recorded_in": [
+    "docs/tier4_orchestration_state/decision_log/demo-change-scenarios_2026-10-02.json",
+    "docs/tier4_orchestration_state/dev_graph/change_scenarios/index.json and the seven scenario records beside it",
+    "docs/tier4_orchestration_state/dev_graph/run_records.json",
+    "plans/dev_graph_demo_tickets.md, the ticket's own report section"
+  ],
+  "authored_by": "Claude Opus 5, on operator instruction, 2026-10-02.",
+  "note": "No gate was evaluated and no gate result written (§17.1.4, §17.6.2, §17.6.3). No phase was dispatched. Nothing in the shadow lane is read at runtime.",
+  "amended": {
+    "date": "2026-10-02",
+    "by": "the ticket's own code review, same session",
+    "what_changed": "Criterion 1's comparison half was stated as 'MET as a refusal' and is now NOT MET: a refusal is not one of the three diagnostics the criterion names. Criterion 2's vacuity is now qualified as untested machinery, with what it does not show stated separately. The refinement route is recorded as not exercised. F8 carries the measured entry split (112 checks of 150). F9 is added for scenario 5.",
+    "what_did_not_change": "No measurement. Criteria 3 and 4 stand as met on the same evidence, and the substance of the first eight findings is unchanged."
+  }
+}

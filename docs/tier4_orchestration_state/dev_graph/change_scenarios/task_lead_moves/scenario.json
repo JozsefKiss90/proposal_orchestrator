@@ -1,0 +1,135 @@
+{
+  "schema_id": "orch.dev_graph.change_scenario.v1",
+  "scenario_id": "task_lead_moves",
+  "title": "A task's lead moves between two partners",
+  "purpose": "The handoff's first operational milestone at this world's scale. The two partners swap roles on T3.1, so the change isolates responsibility and the partner set stays the same.",
+  "arms": [
+    {
+      "arm_id": "a1_move_t3_1",
+      "kind": "change",
+      "record_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "transform": "move_task_responsibility",
+      "args": {
+        "task_id": "T3.1"
+      },
+      "payload": null,
+      "expects": "recorded",
+      "purpose": "T3.1 passes from its lead to its lowest contributing partner, and the unresolved capacity item stays explicit.",
+      "outcome": "recorded",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:a577227aaced79090f222f9c62cfbcdd673deaf0574d16c824deac27c49d86e1",
+      "refusal": null,
+      "change": {
+        "change_id": "task_lead_moves__a1_move_t3_1",
+        "record_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+        "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+        "after_snapshot_id": "sha256:a577227aaced79090f222f9c62cfbcdd673deaf0574d16c824deac27c49d86e1",
+        "nodes_added": [],
+        "nodes_removed": [],
+        "nodes_changed": [
+          {
+            "id": "T3.1",
+            "kind": "direct",
+            "changed_fields": [
+              "contributing_partners",
+              "responsible_partner"
+            ]
+          },
+          {
+            "id": "WP3",
+            "kind": "contained",
+            "changed_fields": []
+          }
+        ],
+        "edges_added": [
+          "P10 -contributes_to-> T3.1",
+          "T3.1 -assigned_to-> P01"
+        ],
+        "edges_removed": [
+          "P01 -contributes_to-> T3.1",
+          "T3.1 -assigned_to-> P10"
+        ]
+      },
+      "contract_check": {
+        "contract_id": "responsibility_move",
+        "verdict": "flagged_for_review",
+        "change_classes": [
+          "contribution",
+          "responsibility"
+        ],
+        "protected_hits": [],
+        "unpermitted_classes": [],
+        "unresolved": [
+          {
+            "item_id": "participant_capacity",
+            "description": "No partner's capacity is confirmed. All twelve participations are operator declarations in working_assumptions.json.",
+            "node_ids": [],
+            "status": "unresolved",
+            "bears_on_change": true,
+            "via": []
+          }
+        ]
+      },
+      "advisory": {
+        "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/task_lead_moves/a1_move_t3_1/plan.json",
+        "plan_id": "sha256:e2dfae2b3e40ec4ab8c86d41b37eb6a2a12c74d3166f28111453f994e2a4b41c",
+        "nothing_changed": false,
+        "origins": [
+          "T3.1"
+        ],
+        "entry_count": 18,
+        "entries_by_kind_hit_action": {
+          "artifact/direct/rerun": 2,
+          "artifact/transitive/reuse-under-policy": 1,
+          "check/coverage_unknown/rerun": 14,
+          "record/origin/reconsider": 1
+        },
+        "every_entry_has_a_reason_path": true,
+        "newly_relevant_source_count": 15
+      },
+      "shadow_comparisons": [
+        {
+          "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json",
+            "message": "malformed_request: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
+          }
+        },
+        {
+          "run_id": "import uuid; print(uuid.uuid4())",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": "import uuid; print(uuid.uuid4())",
+            "message": "malformed_request: run_id is not a plain identifier [offender: import uuid; print(uuid.uuid4())]"
+          }
+        }
+      ]
+    }
+  ],
+  "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+  "contract": {
+    "contract_id": "responsibility_move",
+    "permitted_change_classes": [
+      "contribution",
+      "responsibility"
+    ],
+    "protected_node_ids": [
+      "O1",
+      "O2",
+      "O3",
+      "O4",
+      "O5",
+      "O6"
+    ],
+    "unresolved_items": [
+      {
+        "item_id": "participant_capacity",
+        "description": "No partner's capacity is confirmed. All twelve participations are operator declarations in working_assumptions.json.",
+        "node_ids": [],
+        "status": "unresolved"
+      }
+    ]
+  },
+  "arms_matched_expectations": true
+}

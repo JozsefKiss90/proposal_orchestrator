@@ -1,0 +1,97 @@
+{
+  "schema_id": "orch.dev_graph.change_scenario.v1",
+  "scenario_id": "claim_loses_its_span",
+  "title": "A claim loses its verified source span",
+  "purpose": "The span a claim would rest on is dropped from the source that declares it. The planner reports nothing changed, because a span list is a nested structure and the source's own content is equal.",
+  "arms": [
+    {
+      "arm_id": "a1_drop_the_span",
+      "kind": "change",
+      "record_path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "transform": "drop_source_span",
+      "args": {
+        "source_id": "SRC-WP9-P75",
+        "span_id": "SRC-WP9-P75#133-305"
+      },
+      "payload": null,
+      "expects": "recorded",
+      "purpose": "The source version moves, the change is classified contained, and the advisory has no origin to walk from.",
+      "outcome": "recorded",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:f0379d7f604ba221a4a42c7b117cae6ec285f29628dc2e6c90ebbd8c1ab10dd8",
+      "refusal": null,
+      "change": {
+        "change_id": "claim_loses_its_span__a1_drop_the_span",
+        "record_path": "docs/tier3_project_instantiation/source_materials/sources.json",
+        "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+        "after_snapshot_id": "sha256:f0379d7f604ba221a4a42c7b117cae6ec285f29628dc2e6c90ebbd8c1ab10dd8",
+        "nodes_added": [],
+        "nodes_removed": [],
+        "nodes_changed": [
+          {
+            "id": "SRC-WP9-P75",
+            "kind": "contained",
+            "changed_fields": []
+          }
+        ],
+        "edges_added": [],
+        "edges_removed": []
+      },
+      "contract_check": {
+        "contract_id": "evidence_withdrawal",
+        "verdict": "accepted",
+        "change_classes": [],
+        "protected_hits": [],
+        "unpermitted_classes": [],
+        "unresolved": []
+      },
+      "advisory": {
+        "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/claim_loses_its_span/a1_drop_the_span/plan.json",
+        "plan_id": "sha256:4afc268d44a32742582d387e26afd3aa93bbb9f4309bcbf1414c0d4e937ad8aa",
+        "nothing_changed": true,
+        "origins": [],
+        "entry_count": 14,
+        "entries_by_kind_hit_action": {
+          "check/coverage_unknown/rerun": 14
+        },
+        "every_entry_has_a_reason_path": true,
+        "newly_relevant_source_count": 0
+      },
+      "shadow_comparisons": [
+        {
+          "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json",
+            "message": "malformed_request: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
+          }
+        },
+        {
+          "run_id": "import uuid; print(uuid.uuid4())",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": "import uuid; print(uuid.uuid4())",
+            "message": "malformed_request: run_id is not a plain identifier [offender: import uuid; print(uuid.uuid4())]"
+          }
+        }
+      ]
+    }
+  ],
+  "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+  "contract": {
+    "contract_id": "evidence_withdrawal",
+    "permitted_change_classes": [
+      "evidence"
+    ],
+    "protected_node_ids": [
+      "O1",
+      "O2",
+      "O3",
+      "O4",
+      "O5",
+      "O6"
+    ],
+    "unresolved_items": []
+  },
+  "arms_matched_expectations": true
+}

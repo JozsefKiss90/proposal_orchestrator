@@ -381,17 +381,17 @@
     "timed_out": 0
   },
   "unattributed_after_last_gate": {
-    "invocations": 10,
-    "estimated_input_tokens": 313923,
-    "estimated_output_tokens": 10927,
-    "estimated_total_tokens": 324850,
-    "wall_clock_seconds": 656.359,
-    "span_seconds": 10242.322,
+    "invocations": 41,
+    "estimated_input_tokens": 915861,
+    "estimated_output_tokens": 79107,
+    "estimated_total_tokens": 994968,
+    "wall_clock_seconds": 5707.202,
+    "span_seconds": 74684.449,
     "first_invocation_utc": "2026-10-01T16:01:25.104668+00:00",
-    "last_invocation_utc": "2026-10-01T18:52:07.426384+00:00",
+    "last_invocation_utc": "2026-10-02T12:46:09.553566+00:00",
     "execution_modes": {
-      "cli-prompt": 6,
-      "tapm": 4
+      "cli-prompt": 13,
+      "tapm": 28
     },
     "models": [
       "claude-opus-4-8"
@@ -406,22 +406,82 @@
         "wall_clock_seconds": 251.703
       },
       "constitutional-compliance-check": {
+        "invocations": 12,
+        "estimated_input_tokens": 114528,
+        "estimated_output_tokens": 25507,
+        "wall_clock_seconds": 1793.358
+      },
+      "cross-section-consistency-check": {
         "invocations": 2,
-        "estimated_input_tokens": 19100,
-        "estimated_output_tokens": 3432,
-        "wall_clock_seconds": 192.03
+        "estimated_input_tokens": 17856,
+        "estimated_output_tokens": 5050,
+        "wall_clock_seconds": 378.922
       },
       "decision-log-update": {
-        "invocations": 2,
-        "estimated_input_tokens": 76611,
-        "estimated_output_tokens": 1381,
-        "wall_clock_seconds": 103.063
+        "invocations": 3,
+        "estimated_input_tokens": 145072,
+        "estimated_output_tokens": 2350,
+        "wall_clock_seconds": 168.11
+      },
+      "drafting-review-status": {
+        "invocations": 1,
+        "estimated_input_tokens": 3151,
+        "estimated_output_tokens": 3046,
+        "wall_clock_seconds": 164.531
+      },
+      "evaluator-criteria-review": {
+        "invocations": 1,
+        "estimated_input_tokens": 3091,
+        "estimated_output_tokens": 2998,
+        "wall_clock_seconds": 222.266
+      },
+      "g11_p08": {
+        "invocations": 1,
+        "estimated_input_tokens": 47800,
+        "estimated_output_tokens": 737,
+        "wall_clock_seconds": 146.344
+      },
+      "g11_p09": {
+        "invocations": 1,
+        "estimated_input_tokens": 47812,
+        "estimated_output_tokens": 904,
+        "wall_clock_seconds": 79.219
+      },
+      "g11_p10": {
+        "invocations": 1,
+        "estimated_input_tokens": 43662,
+        "estimated_output_tokens": 668,
+        "wall_clock_seconds": 60.39
+      },
+      "g11_p11": {
+        "invocations": 1,
+        "estimated_input_tokens": 70290,
+        "estimated_output_tokens": 890,
+        "wall_clock_seconds": 83.453
+      },
+      "g11_p12": {
+        "invocations": 1,
+        "estimated_input_tokens": 42293,
+        "estimated_output_tokens": 614,
+        "wall_clock_seconds": 46.328
+      },
+      "g11_p13": {
+        "invocations": 1,
+        "estimated_input_tokens": 42301,
+        "estimated_output_tokens": 558,
+        "wall_clock_seconds": 63.813
       },
       "gate-enforcement": {
         "invocations": 2,
         "estimated_input_tokens": 24528,
         "estimated_output_tokens": 786,
         "wall_clock_seconds": 109.563
+      },
+      "proposal-section-traceability-check": {
+        "invocations": 10,
+        "estimated_input_tokens": 119793,
+        "estimated_output_tokens": 29671,
+        "wall_clock_seconds": 2139.202
       }
     }
   },

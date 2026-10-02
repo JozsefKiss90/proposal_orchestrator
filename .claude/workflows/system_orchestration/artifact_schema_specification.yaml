@@ -3064,17 +3064,46 @@ operational_artifact_schemas:
   # ---------------------------------------------------------------------------
   # 5.8 Dev-graph run records
   # Path: docs/tier4_orchestration_state/dev_graph/run_records.json
-  # Placed by: the operator or engineer (manually_placed). The durable run
-  #   records the impact planner reads: artifacts and checks with their
-  #   declared inputs. Per-invocation consumption records are a later stage.
+  # Derived by: tools/derive_dev_graph_run_records.py, an authoring tool, from
+  #   the Tier 5 proposal sections and the Tier 4 gate results. The durable run
+  #   records the impact planner reads: artifacts and checks with their declared
+  #   inputs. Per-invocation consumption records are a later stage.
+  # Was manually_placed until 2026-10-02. The ticket 'Change scenarios and
+  #   shadow comparison' replaced hand-authoring with a declared derivation,
+  #   because typing a node list the artifacts already carry is the D9 lesson of
+  #   the snapshot ticket: derive a document's counts, never type them. The four
+  #   rule fields below carry the derivation's own rules, so the artifact states
+  #   how each record's inputs were obtained (§12.1).
   # ---------------------------------------------------------------------------
   dev_graph_run_records:
     schema_id_value: "orch.dev_graph.run_records.v1"
     canonical_path: "docs/tier4_orchestration_state/dev_graph/run_records.json"
-    provenance_class: manually_placed
+    provenance_class: derived
 
     fields:
       schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.run_records.v1".}
+      derivation_rule:
+        type: string
+        required: true
+        description: >
+          How an artifact record's inputs were obtained: the snapshot node ids
+          the artifact's own text names, matched on a word boundary so a shorter
+          id is never found inside a longer one.
+      unknown_coverage_rule:
+        type: string
+        required: true
+        description: >
+          Why a record may declare null inputs rather than an empty list. Null
+          is unknown coverage, which the planner reports as rerun; an empty list
+          would assert that the record rests on no project fact.
+      package_rule:
+        type: string
+        required: true
+        description: Why no record declares a package.
+      derived_by:
+        type: string
+        required: true
+        description: The tool that wrote the artifact, repo-relative.
       records:
         type: array
         required: true
@@ -3326,6 +3355,195 @@ operational_artifact_schemas:
       esr_availability: {type: string, required: true, enum: [unknown, unavailable, not_applicable, available], description: Declared by the operator; unknown when not declared.}
       permitted_purpose: {type: string, required: true, enum: [blind_pre_evaluation, esr_informed_review], description: The task the intake permits. The blind lane refuses esr_informed_review.}
       esr_reference: {type: string, required: false, description: Required exactly when esr_availability is available; null otherwise.}
+
+  # ---------------------------------------------------------------------------
+  # 5.13 Dev-graph change scenario record (shadow, advisory)
+  # Path: docs/tier4_orchestration_state/dev_graph/change_scenarios/<scenario_id>/scenario.json
+  # Written by: tools/run_demo_change_scenarios.py, an authoring tool. Not a
+  #   deterministic component and not bound to a manifest node.
+  # Provenance: derived. One record per scenario, with one advisory plan (5.9)
+  #   per recorded arm beside it under <scenario_id>/<arm_id>/plan.json.
+  # How it is produced: every arm runs against a sandbox copy of the records
+  #   the snapshot builder indexes, so the frozen Tier 3 is never edited in
+  #   place and the live snapshot id never moves. The sandbox's own first
+  #   snapshot id is checked against the live one before any arm runs, which
+  #   is what before_snapshot_id records.
+  # Consumed by: the operator only. Never a gate input, never read by the
+  #   scheduler or the Phase 8 reuse layer. No wall-clock field and no run id,
+  #   so a replay over the same world is byte-equal.
+  # ---------------------------------------------------------------------------
+  dev_graph_change_scenario:
+    schema_id_value: "orch.dev_graph.change_scenario.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/change_scenarios/<scenario_id>/scenario.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.change_scenario.v1".}
+      scenario_id: {type: string, required: true, description: Plain identifier; the directory name.}
+      title: {type: string, required: true}
+      purpose: {type: string, required: true, description: What the scenario demonstrates.}
+      before_snapshot_id:
+        type: string
+        required: true
+        description: >
+          The snapshot every arm started from. Equal to the live snapshot id,
+          checked when the sandbox was materialised.
+      contract:
+        type: object
+        required: true
+        description: The revision contract every arm was checked against (5.11's contract shape).
+        fields:
+          contract_id: {type: string, required: true}
+          permitted_change_classes: {type: array, required: true, item_type: string}
+          protected_node_ids: {type: array, required: true, item_type: string}
+          unresolved_items: {type: array, required: true, description: Each item's status is always "unresolved".}
+      arms_matched_expectations:
+        type: boolean
+        required: true
+        description: >
+          True only when every arm's outcome is the one it declared. It says
+          nothing about whether a ticket criterion is met: an arm that refused
+          exactly as expected matched its expectation, and a scenario can match
+          every one of them while the question it was run to answer stays open.
+      arms:
+        type: array
+        required: true
+        description: One entry per arm, in the order they ran.
+        item_schema:
+          arm_id: {type: string, required: true, description: Plain identifier; the advisory's directory name.}
+          kind: {type: string, required: true, enum: [change, refusal_probe]}
+          record_path: {type: string, required: true, description: The Tier 3 record the arm offered a new version of.}
+          transform: {type: string, required: false, nullable: true, description: The declared transformation, or null for a raw payload probe.}
+          args: {type: object, required: true, description: The transformation's declared arguments.}
+          payload:
+            type: object
+            required: true
+            nullable: true
+            description: >
+              The record content the arm offered instead of a transformation,
+              for a probe whose point is the path rather than the content. Null
+              when a transformation produced the content. Carried because it is
+              an input of the arm (§9.5).
+          expects: {type: string, required: true, description: The literal recorded, or the DevGraphError kind the arm expects to meet.}
+          purpose: {type: string, required: true}
+          outcome: {type: string, required: true, enum: [recorded, refused]}
+          expectation_met: {type: boolean, required: true}
+          sandbox_snapshot_id:
+            type: string
+            required: true
+            description: >
+              The sandbox snapshot after the arm. Equal to before_snapshot_id
+              when the arm refused, since a refused change writes nothing.
+          refusal:
+            type: object
+            required: true
+            nullable: true
+            description: Null on a recorded arm; otherwise the kind, offender and message.
+            fields:
+              kind: {type: string, required: true}
+              offender: {type: string, required: true}
+              message: {type: string, required: true}
+          change:
+            type: object
+            required: true
+            nullable: true
+            description: Null on a refused arm; otherwise the change record's identity and its diff.
+            fields:
+              change_id: {type: string, required: true}
+              record_path: {type: string, required: true}
+              before_snapshot_id: {type: string, required: true}
+              after_snapshot_id: {type: string, required: true}
+              nodes_added: {type: array, required: true, item_type: string}
+              nodes_removed: {type: array, required: true, item_type: string}
+              nodes_changed: {type: array, required: true, description: One entry per changed node with its id, its kind (direct or contained) and its changed_fields.}
+              edges_added: {type: array, required: true, item_type: string}
+              edges_removed: {type: array, required: true, item_type: string}
+          contract_check:
+            type: object
+            required: true
+            nullable: true
+            description: Null on a refused arm; otherwise the 5.11 check shape (verdict, change_classes, protected_hits, unpermitted_classes, unresolved).
+          advisory:
+            type: object
+            required: true
+            nullable: true
+            description: >
+              Null on a refused arm. What the record says about the arm's
+              advisory plan; the entries themselves stay in the plan document
+              at path, in the 5.9 schema.
+            fields:
+              path: {type: string, required: true, description: Repo-relative path of the plan document (5.9).}
+              plan_id: {type: string, required: true}
+              nothing_changed: {type: boolean, required: true}
+              origins: {type: array, required: true, item_type: string}
+              entry_count: {type: integer, required: true}
+              entries_by_kind_hit_action: {type: object, required: true, description: Entry counts keyed by kind, hit and action joined with slashes.}
+              every_entry_has_a_reason_path: {type: boolean, required: true}
+              newly_relevant_source_count: {type: integer, required: true}
+          shadow_comparisons:
+            type: array
+            required: true
+            description: >
+              One entry per compared run, in the order the caller named them.
+              A comparison that could not be made carries refused instead of a
+              diagnostic: reporting agreement over an absent decision set would
+              be a fabrication.
+            item_schema:
+              run_id: {type: string, required: true}
+              comparison_id: {type: string, required: false, description: Present only when the comparison was made (5.10).}
+              diagnostic: {type: string, required: false, enum: [agreed, planner_narrower, planner_broader]}
+              rows: {type: array, required: false, description: The 5.10 row shape.}
+              refused: {type: object, required: false, description: The kind, offender and message, when no comparison could be made.}
+
+  # ---------------------------------------------------------------------------
+  # 5.14 Dev-graph change scenario index (shadow, advisory)
+  # Path: docs/tier4_orchestration_state/dev_graph/change_scenarios/index.json
+  # Written by: tools/run_demo_change_scenarios.py, with the 5.13 records.
+  # Provenance: derived. A roll-up for the operator: one row per scenario and
+  #   one per arm, naming where the record and the advisory are. It adds no
+  #   fact the records do not carry.
+  # ---------------------------------------------------------------------------
+  dev_graph_change_scenario_index:
+    schema_id_value: "orch.dev_graph.change_scenario_index.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/change_scenarios/index.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.change_scenario_index.v1".}
+      advisory: {type: boolean, required: true, description: Always true.}
+      mode: {type: string, required: true, enum: [shadow]}
+      consumed_at_runtime: {type: boolean, required: true, description: Always false.}
+      arms_matched_expectations:
+        type: boolean
+        required: true
+        description: >
+          True only when every arm of every scenario did what it declared. Not a
+          statement that the work the scenarios were run for is complete.
+      scenarios:
+        type: array
+        required: true
+        item_schema:
+          scenario_id: {type: string, required: true}
+          title: {type: string, required: true}
+          path: {type: string, required: true, description: Repo-relative path of the 5.13 record.}
+          before_snapshot_id: {type: string, required: true}
+          arms_matched_expectations: {type: boolean, required: true}
+          arms:
+            type: array
+            required: true
+            item_schema:
+              arm_id: {type: string, required: true}
+              outcome: {type: string, required: true, enum: [recorded, refused]}
+              expectation_met: {type: boolean, required: true}
+              contract_verdict: {type: string, required: true, nullable: true, enum: [accepted, rejected, flagged_for_review]}
+              advisory: {type: string, required: true, nullable: true, description: Repo-relative path of the plan document, or null.}
+              shadow_diagnostics:
+                type: array
+                required: true
+                item_type: string
+                description: >
+                  One per compared run: the diagnostic, or the refusal kind
+                  prefixed "refused:" when no comparison could be made.
 
 # =============================================================================
 # SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS

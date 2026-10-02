@@ -1,0 +1,130 @@
+{
+  "schema_id": "orch.dev_graph.change_scenario.v1",
+  "scenario_id": "tier2b_fact_changes",
+  "title": "A Tier 2B fact changes",
+  "purpose": "The call's own facts live in Tier 2B and the call binding, neither of which the change recorder covers. The nearest graph-visible change is the project's confidence in the page it transcribed.",
+  "arms": [
+    {
+      "arm_id": "a1_correct_the_call_binding",
+      "kind": "refusal_probe",
+      "record_path": "docs/tier3_project_instantiation/call_binding/selected_call.json",
+      "transform": null,
+      "args": {},
+      "payload": {
+        "record_type": "selected_call"
+      },
+      "expects": "malformed_request",
+      "purpose": "The call binding is not a record the change recorder covers, so a date correction or a topic amendment cannot be planned.",
+      "outcome": "refused",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "refusal": {
+        "kind": "malformed_request",
+        "offender": "docs/tier3_project_instantiation/call_binding/selected_call.json",
+        "message": "malformed_request: record path is not one of ['docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json', 'docs/tier3_project_instantiation/architecture_inputs/objectives.json', 'docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json', 'docs/tier3_project_instantiation/consortium/partners.json', 'docs/tier3_project_instantiation/source_materials/sources.json'] [offender: docs/tier3_project_instantiation/call_binding/selected_call.json]"
+      },
+      "change": null,
+      "contract_check": null,
+      "advisory": null,
+      "shadow_comparisons": []
+    },
+    {
+      "arm_id": "a2_call_page_no_longer_confirmed",
+      "kind": "change",
+      "record_path": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "transform": "set_source_field",
+      "args": {
+        "source_id": "SRC-WP9-P75",
+        "field": "status",
+        "value": "Unresolved"
+      },
+      "payload": null,
+      "expects": "recorded",
+      "purpose": "The transcribed call page stops being Confirmed. The advisory then reaches every work package constrained by it.",
+      "outcome": "recorded",
+      "expectation_met": true,
+      "sandbox_snapshot_id": "sha256:e36cabf7da59eca726575e0ad7d1f2ca8379de2d1b5276a81de0811a5c1632f1",
+      "refusal": null,
+      "change": {
+        "change_id": "tier2b_fact_changes__a2_call_page_no_longer_confirmed",
+        "record_path": "docs/tier3_project_instantiation/source_materials/sources.json",
+        "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+        "after_snapshot_id": "sha256:e36cabf7da59eca726575e0ad7d1f2ca8379de2d1b5276a81de0811a5c1632f1",
+        "nodes_added": [],
+        "nodes_removed": [],
+        "nodes_changed": [
+          {
+            "id": "SRC-WP9-P75",
+            "kind": "direct",
+            "changed_fields": [
+              "status"
+            ]
+          }
+        ],
+        "edges_added": [],
+        "edges_removed": []
+      },
+      "contract_check": {
+        "contract_id": "call_correction",
+        "verdict": "accepted",
+        "change_classes": [
+          "evidence"
+        ],
+        "protected_hits": [],
+        "unpermitted_classes": [],
+        "unresolved": []
+      },
+      "advisory": {
+        "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/tier2b_fact_changes/a2_call_page_no_longer_confirmed/plan.json",
+        "plan_id": "sha256:05999da7bf031896709a911a3976612a81578ae4a6ee1475b5c35423445d26e9",
+        "nothing_changed": false,
+        "origins": [
+          "SRC-WP9-P75"
+        ],
+        "entry_count": 18,
+        "entries_by_kind_hit_action": {
+          "artifact/transitive/reuse-under-policy": 3,
+          "check/coverage_unknown/rerun": 14,
+          "record/origin/reconsider": 1
+        },
+        "every_entry_has_a_reason_path": true,
+        "newly_relevant_source_count": 15
+      },
+      "shadow_comparisons": [
+        {
+          "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json",
+            "message": "malformed_request: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
+          }
+        },
+        {
+          "run_id": "import uuid; print(uuid.uuid4())",
+          "refused": {
+            "kind": "malformed_request",
+            "offender": "import uuid; print(uuid.uuid4())",
+            "message": "malformed_request: run_id is not a plain identifier [offender: import uuid; print(uuid.uuid4())]"
+          }
+        }
+      ]
+    }
+  ],
+  "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+  "contract": {
+    "contract_id": "call_correction",
+    "permitted_change_classes": [
+      "evidence"
+    ],
+    "protected_node_ids": [
+      "O1",
+      "O2",
+      "O3",
+      "O4",
+      "O5",
+      "O6"
+    ],
+    "unresolved_items": []
+  },
+  "arms_matched_expectations": true
+}
