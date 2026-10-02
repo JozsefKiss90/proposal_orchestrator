@@ -1,0 +1,1841 @@
+{
+  "bundle_format": "part_b_json_bundle",
+  "run_id": "import uuid; print(uuid.uuid4())",
+  "assembled_draft": {
+    "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+    "run_id": "import uuid; print(uuid.uuid4())",
+    "sections": [
+      {
+        "section_id": "excellence",
+        "criterion": "Excellence",
+        "order": 1,
+        "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "word_count": 2057
+      },
+      {
+        "section_id": "impact",
+        "criterion": "Impact",
+        "order": 2,
+        "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "word_count": 3674
+      },
+      {
+        "section_id": "implementation",
+        "criterion": "Quality and efficiency of the implementation",
+        "order": 3,
+        "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "word_count": 5391
+      }
+    ],
+    "consistency_log": [
+      {
+        "check_id": "CC-01",
+        "description": "Objective consistency across Excellence and Implementation sections, cross-checked against Tier 3 objectives.",
+        "sections_checked": [
+          "excellence",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+          "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+        ]
+      },
+      {
+        "check_id": "CC-02",
+        "description": "WP reference consistency: WP IDs cited in Excellence and Impact resolve to the canonical WP1-WP7 list in Implementation.",
+        "sections_checked": [
+          "excellence",
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+          "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        ]
+      },
+      {
+        "check_id": "CC-03",
+        "description": "Partner name consistency: all partner tokens P01-P12 used in the sections match the pseudonymous legal_name tokens in Tier 3 partners.json, with no suffix or variant mismatch.",
+        "sections_checked": [
+          "excellence",
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier3_project_instantiation/consortium/partners.json",
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+          "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        ]
+      },
+      {
+        "check_id": "CC-04",
+        "description": "Deliverable ID consistency: deliverable IDs and titles cited in Impact (D2.1, D2.2, D3.1-D3.4, D4.1, D4.4, D5.3, D6.1-D6.3, D7.1-D7.4, D1.1, D1.3) match the 24-row deliverable table in Implementation.",
+        "sections_checked": [
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        ]
+      },
+      {
+        "check_id": "CC-05",
+        "description": "Milestone ID consistency: milestone references align with the MS1-MS8 milestone table and milestone_refs in Implementation; Impact asserts no conflicting milestone IDs.",
+        "sections_checked": [
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+          "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        ]
+      },
+      {
+        "check_id": "CC-06",
+        "description": "KPI consistency: all three sections state twelve indicators, each naming one deliverable, with no target numbers set because participation is unconfirmed.",
+        "sections_checked": [
+          "excellence",
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        ]
+      },
+      {
+        "check_id": "CC-07",
+        "description": "Impact claim grounding: each Impact claim cites a WP or deliverable (e.g. D2.2, D4.4, D5.3, D6.2, WP5) present in the Implementation work plan; the valuation-clause gap is flagged consistently in both sections.",
+        "sections_checked": [
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        ]
+      },
+      {
+        "check_id": "CC-08",
+        "description": "Budget/resource claim consistency: all three sections state EUR 5,000,000 per project, about two projects funded, a lump-sum regime computed externally, and person-months not yet agreed.",
+        "sections_checked": [
+          "excellence",
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_basis": "EUR 5M per project and lump-sum regime confirmed from Tier 3 selected_call.json, asserted identically across all three section artifacts"
+      },
+      {
+        "check_id": "CC-09",
+        "description": "Terminology consistency: key canonical terms (multisensory integration architecture, single agricultural pressure gradient, genome-to-space, leakage-safe split, European habitat classification/EUNIS, global ecosystem typology, EOSC, common data spaces, Copernicus/Galileo/EGNOS) are used in full and consistently across sections, with no stem-only variant.",
+        "sections_checked": [
+          "excellence",
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        ]
+      },
+      {
+        "check_id": "CC-10",
+        "description": "Section ordering and completeness: all three sections are present and ordered Excellence (B.1), Impact (B.2), Implementation (B.3), matching the RIA/IA Part B template structure.",
+        "sections_checked": [
+          "excellence",
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_basis": "Tier 2A RIA/IA application form (af_he-ria-ia_en); sub_section_ids B.1.x / B.2.x / B.3.x in the three section artifacts"
+      },
+      {
+        "check_id": "CC-11",
+        "description": "Traceability footer consistency: each section has a non-empty primary_sources array and no_unsupported_claims_declaration true; each overall_status is 'assumed' (not 'unresolved'), so the declaration is consistent with the status.",
+        "sections_checked": [
+          "excellence",
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        ]
+      },
+      {
+        "check_id": "CC-12",
+        "description": "Validation status aggregation (informational): Excellence 'assumed', Impact 'assumed', Implementation 'assumed'. No section is 'unresolved'. The uniform assumed status reflects unconfirmed consortium participation and is carried forward for downstream review.",
+        "sections_checked": [
+          "excellence",
+          "impact",
+          "implementation"
+        ],
+        "status": "consistent",
+        "inconsistency_note": null,
+        "source_refs": [
+          "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        ]
+      }
+    ],
+    "traceability_footer": {
+      "primary_sources": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+        "docs/tier3_project_instantiation/consortium/partners.json",
+        "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+        "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+      ],
+      "no_unsupported_claims_declaration": true,
+      "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
+    }
+  },
+  "sections_content": {
+    "excellence": {
+      "schema_id": "orch.tier5.excellence_section.v1",
+      "run_id": "import uuid; print(uuid.uuid4())",
+      "criterion": "Excellence",
+      "sub_sections": [
+        {
+          "sub_section_id": "B.1.1",
+          "title": "Objectives and ambition",
+          "content": "**Objective and overall ambition.** This Research and Innovation Action answers topic HORIZON-CL6-2027-01-BIODIV-01, \"Integrating Remote Sensing and in-situ observations of Biodiversity, towards a fully interoperable observation and data framework\". The topic sets three expected outcomes and asks every proposal to contribute to all three. Its destination, \"Biodiversity and ecosystem services\", adds six expected impacts and asks for a credible pathway to biodiversity recovery. The overall objective is one harmonised observation chain, from molecules to satellites, following a single agricultural pressure gradient from farmland through freshwater ecotones to coastal waters. The chain integrates omics, in-situ and remote-sensing observation under one protocol, and tests it across the terrestrial, freshwater and marine realms the scope names.\n\n**The six objectives and their pertinence.** Six objectives carry the work. Each answers at least one named expected outcome or scope requirement, so pertinence is traceable rather than asserted.\n\nO1, \"Build one multisensory integration architecture that carries omics, in-situ and remote-sensing observation on a single pressure gradient\", answers expected outcome EO-02 and scope requirements SR-01 and SR-02. Its verifiable output is a prioritised knowledge-gap and data-need analysis and an architecture specification across the molecular, plot, airborne and satellite layers. The gap analysis runs first, so the design answers what the data are missing rather than what happens to exist.\n\nO2, \"Agree joint data-collection, metadata and processing protocols, and publish them with crosswalks to the European habitat classification and the global ecosystem typology\", answers scope requirements SR-04 and SR-05. Its output is one protocol set adopted across the three cases, a crosswalk package, a provenance-tracked pipeline release, and publication to the open science cloud and the common data spaces.\n\nO3, \"Turn the multi-season field archive and the case observations into documented training and validation resources\", answers expected outcome EO-03. Its output is a published training and validation resource with a declared split protocol, in which site, season and treatment travel together into one fold.\n\nO4, \"Run three demonstration and verification cases along one agricultural pressure gradient, across the terrestrial, freshwater and marine realms\", answers expected outcome EO-01 and scope requirements SR-02 and SR-03. Its output is three harmonised observation datasets, one per realm, and a cross-case report on which harmonisation decisions survived transfer between realms.\n\nO5, \"Deliver habitat and ecosystem classification and biodiversity trend prediction at case, regional and European scales\", answers expected outcomes EO-03 and EO-01 and scope requirement SR-01. Its output is benchmarked classification models for the three cases, European-scale habitat and ecosystem maps, and trend predictions with stated uncertainty.\n\nO6, \"Carry the validated indicators into policy reporting and into farm management, so biodiversity evidence reaches the sectors that create the pressure\", answers expected outcomes EO-01 and EO-02 and scope requirements SR-03 and SR-04. Its output is a reporting-needs assessment agreed with competent authorities, an indicator decision-support release, and a usability evaluation run through a multi-country network of agricultural holdings.\n\n**Measurability and verifiability.** Each objective ends in a named, inspectable output: an analysis, a specification, a protocol, a dataset, a benchmarked model or an agreed assessment. Twelve key performance indicators track progress, and each is measured on one deliverable that exists in the work plan. Target numbers are not yet fixed. Each target is set with the confirmed consortium, so no figure here outruns a partner's commitment.\n\n**Realistic achievability.** The work is staged so each step rests on a finished one. Knowledge-gap analysis precedes the integration architecture. Joint protocols precede the field campaigns, because a case run under a protocol that later changes produces data the other cases cannot join. The three cases run in sequence, and European-scale mapping rests on the case models. The project runs over a 48-month duration. The call funds about two projects, at an indicative EU contribution near EUR 5 000 000 each, which sets the competitive frame the work plan is scaled to.\n\n**Beyond the state of the art.** The advance is a change in how biodiversity observation is reconciled, not a new sensor. Current practice reconciles several measurement cultures once inside a project and then discards the reconciliation. This project publishes that reconciliation as protocols, crosswalks and a provenance-tracked pipeline, so a group outside the consortium can reuse it. Habitat labels that stop at the project boundary become labels that carry a crosswalk to the European classification and the global ecosystem typology. Case-scale maps become European coverage with trend prediction built on the case models.\n\nFour design choices make the ambition concrete. First, one pressure gradient carries all three realms as a single causal chain, so a harmonisation decision taken in farmland is tested twice more, in realms that did not design it. This turns integration \"across terrestrial, freshwater and marine ecosystems\" into evidence rather than assertion. Second, the molecular layer is bound to the in-situ and satellite records through a published metadata standard, so a genomic and a satellite observation of the same place can be queried together. Third, a leakage-safe split keeps site, season and treatment in one fold, so a model cannot learn a site and score as though it had learned the biology. Fourth, the harmonisation decisions are taken to the bodies that maintain the classifications, and the validated indicators reach practitioners through an existing multi-country network of agricultural holdings.\n\n**R&I maturity and Technology Readiness Level.** As a Research and Innovation Action, the work sits at the research end of the idea-to-application spectrum. The topic defines its ambition through expected outcomes and scope, not through a target Technology Readiness Level, so no numeric level is claimed here. The advance is measured against current observation practice, not against a market product or a patent landscape, because the action produces methods, datasets and models rather than a product to sell. Its trajectory moves single-group field practice toward a validated, FAIR and reusable capability that holds at European scale. The remote-sensing layer is built on the European earth-observation and navigation programmes, which the topic makes an eligibility condition where satellite data are used.",
+          "word_count": 984
+        },
+        {
+          "sub_section_id": "B.1.2",
+          "title": "Methodology",
+          "content": "**Overall methodology.** The methodology is one harmonised observation chain, run from molecules to satellites along a single agricultural pressure gradient. The gradient runs from farmland, through the freshwater ecotones that receive its runoff, to the coastal waters downstream. One causal chain therefore carries the terrestrial, freshwater and marine realms the scope names. The central model is a multisensory integration architecture that reconciles molecular, plot, airborne and satellite observation under one protocol set. The method treats that reconciliation as an output to publish, not as internal scaffolding to discard.\n\n**Concepts and assumptions.** Three assumptions underpin the design. A harmonisation decision taken for farmland can be verified in two downstream realms that did not design it. Observations from different measurement cultures become comparable only once one metadata standard binds them. A model validated on leaking data learns the site rather than the biology. These assumptions turn integration across the three realms from an assertion into a testable claim.\n\n**How the methodology delivers the objectives.** The work is staged so each method rests on a finished one. A prioritised knowledge-gap and data-need analysis runs first and sets which gaps the three cases address. The joint protocols are agreed before any field campaign starts, because a case run under a protocol that later changes produces data the other cases cannot join. The three cases then run in sequence along the gradient, and each reuses the terrestrial protocol. The Cross-case verification report records which harmonisation decisions survived the transfer. European-scale mapping and trend prediction rest on the case models, so they come last.\n\n**Methodological challenges and how we overcome them.** Reconciling four measurement cultures is the first challenge. The joint protocols and one metadata standard answer it. They bind the omics records to the in-situ and satellite records. The Genome-to-space linkage report is where that binding becomes a joinable record. The second challenge is harmonisation decisions failing to transfer between realms. The sequential case design exposes any failure in the Cross-case verification report rather than hiding it.\n\nThe third challenge is data leakage in model training. A leakage-safe split keeps site, season and treatment together in one fold. The fourth challenge is interoperability beyond the project boundary. Crosswalks to the European habitat classification (EUNIS) and the global ecosystem typology, publication to EOSC and the European Common Data Spaces, and contribution to the standards bodies carry the reconciliation outside the consortium. The fifth challenge is honest reporting at European scale. Trend predictions are delivered with stated uncertainty, so a map does not claim more confidence than the case models support.\n\n**National and international R&I activities feeding the project.** The chain draws on external programmes and monitoring rather than rebuilding them. The satellite layer is built on the European earth-observation and navigation programmes, Copernicus and/or Galileo/EGNOS. The topic makes these an eligibility condition where satellite data are used. The terrestrial case ingests the Commission-steered monitoring data LUCAS grassland and EMBAL as a reference layer. The project earmarks effort for cooperation with GBIF, OBIS and LUCAS, and publishes its occurrence records to them. The training resource reworks a multi-season field archive of physiological, spectral, soil-water and weather measurements.\n\n**Establishing those links.** Each link is carried by a defined task with an assigned owner, not by a letter of intent. A standing coordination interface runs to the FuturEO earth-observation projects in the same cluster. The project takes its harmonisation decisions to the standards bodies that maintain the European habitat classification and the global ecosystem typology. Published workflows and data are linked to EOSC and the European Common Data Spaces. Where a European research infrastructure offers a service the chain needs, the project uses it rather than rebuilding it. An open place in the project's interoperability work for the Joint Research Centre attaches to the crosswalk interface, and counts towards no eligibility condition.\n\n**Interdisciplinary approach.** The approach is interdisciplinary by construction, because no single discipline spans molecules to satellites. It brings together molecular biology and genomics, in-situ ecology across farmland, freshwater and marine habitats, earth observation and geoinformatics, data engineering and artificial intelligence, and socio-ecological and policy analysis. The integration layer makes these disciplines interoperable. One protocol set, one metadata standard and the crosswalks bind a genomic observation and a satellite observation of the same place into one queryable record. Interdisciplinarity is therefore a method here, not a staffing table.\n\n**Social sciences and humanities.** Social sciences and humanities are integral, because the pressure the project observes is socio-economic in origin. The scope asks for analysis of socio-economic pressures and for links to socio-ecological and climatic data, so these disciplines enter the research content. The integration architecture ingests socio-ecological and climatic data layers alongside the biophysical ones. Socio-economic driver analysis selects each demonstration case on pressure evidence rather than on data convenience. Policy and agricultural analysis then shapes the indicators to the reporting obligations and to farm-management decisions.\n\n**Gender dimension in the research content.** The gender dimension applies to this topic, and the call binding compliance profile records a gender requirement. Sex and gender are not variables in the molecular, plot or satellite observation of ecosystems, so they are not analysed there. They are analysed where the research content involves people: the stakeholder engagement, the usability evaluation of the decision-support tools, and the farm-management uptake. There the project disaggregates practitioner and decision-maker participation and response by sex and gender. This keeps a tool from being validated on one group and deployed to another.\n\n**Open science practices.** Open science is the project's core mechanism, not an add-on, because reuse is the stated ambition. The project delivers FAIR research data, harmonisation workflows and processing protocols, as the scope requires. It publishes datasets, workflows and services to EOSC and the European Common Data Spaces. Processing runs through provenance-tracked, reproducible pipelines, released openly, so a result can be replayed. Project occurrence records go to GBIF, OBIS and LUCAS, and the training and validation resource is published with its split protocol. Harmonisation decisions are contributed to the standards bodies, so the protocols and crosswalks outlive the project.\n\n**Research data management.** A data management plan is delivered as a distinct deliverable within the first six months. The deliverable is the Data management plan and shared metadata profile. It makes research data findable, accessible, interoperable and reusable, and is updated as the data grow. It fixes the metadata standard the three cases share before the field campaigns open. The plan is therefore a condition of the integration, not a reporting formality.",
+          "word_count": 1073
+        }
+      ],
+      "validation_status": {
+        "overall_status": "assumed",
+        "claim_statuses": [
+          {
+            "claim_id": "action_type_topic",
+            "claim_summary": "The proposal is a Research and Innovation Action answering topic HORIZON-CL6-2027-01-BIODIV-01.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "claim_id": "expected_outcomes_binding",
+            "claim_summary": "The topic sets three expected outcomes (EO-01, EO-02, EO-03) and binds a proposal to contribute to all three.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+          },
+          {
+            "claim_id": "scope_requirements",
+            "claim_summary": "The topic scope requires fit-for-purpose multisensory integration (SR-01), capabilities across the three realms (SR-02), demonstration and verification cases on pressured or restoration-priority ecosystems (SR-03), FAIR data, workflows and protocols from genome to space (SR-04), and contribution to consensus on joint protocols (SR-05).",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          },
+          {
+            "claim_id": "destination_impacts_pathway",
+            "claim_summary": "The destination sets six expected impacts and asks each proposal for a credible pathway to biodiversity recovery.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+          },
+          {
+            "claim_id": "copernicus_eligibility",
+            "claim_summary": "Use of the European earth-observation and navigation programmes (Copernicus/Galileo/EGNOS) is a topic eligibility condition where satellite data are used.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+          },
+          {
+            "claim_id": "budget_envelope",
+            "claim_summary": "The call funds about two projects at an indicative EU contribution near EUR 5,000,000 each.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "claim_id": "objective_topic_mapping",
+            "claim_summary": "Each objective addresses at least one named expected outcome or scope requirement, and the Tier 2B references resolve.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+          },
+          {
+            "claim_id": "P02_participation",
+            "claim_summary": "beneficiary, university, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P10_participation",
+            "claim_summary": "beneficiary, ngo, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P03_participation",
+            "claim_summary": "beneficiary, university, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "demonstration_case_realms",
+            "claim_summary": "terrestrial P03, freshwater P07, marine P08",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P12_participation",
+            "claim_summary": "beneficiary, sme, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P05_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "project_scale",
+            "claim_summary": "7 work packages, 35 tasks, 24 deliverables, 8 milestones over 48 months",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "project_duration",
+            "claim_summary": "48 months",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "kpi_targets",
+            "claim_summary": "no target numbers set",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P09_participation",
+            "claim_summary": "beneficiary, university, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P01_participation",
+            "claim_summary": "beneficiary, research_institute, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "ria_research_maturity",
+            "claim_summary": "As a Research and Innovation Action the work sits at the research end of the idea-to-application spectrum and produces methods, datasets and models rather than a market product.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "claim_id": "no_trl_target",
+            "claim_summary": "The topic defines ambition through expected outcomes and scope rather than a target Technology Readiness Level, so no numeric level is claimed.",
+            "status": "inferred",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          },
+          {
+            "claim_id": "methodology_observation_chain",
+            "claim_summary": "The methodology is one harmonised observation chain from molecules to satellites along a single agricultural pressure gradient, carrying the terrestrial, freshwater and marine realms the scope names.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+          },
+          {
+            "claim_id": "integration_architecture_model",
+            "claim_summary": "The central model is a multisensory integration architecture reconciling molecular, plot, airborne and satellite observation under one protocol set.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+          },
+          {
+            "claim_id": "methodology_assumptions",
+            "claim_summary": "The design rests on three assumptions: a farmland harmonisation decision can be verified in two downstream realms, observations become comparable only when one metadata standard binds them, and a model on leaking data learns the site not the biology.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+          },
+          {
+            "claim_id": "staging_order_delivers_objectives",
+            "claim_summary": "The work is staged so the gap analysis precedes the architecture, joint protocols precede the campaigns, the three cases run in sequence, and European-scale mapping and trend prediction rest on the case models and come last.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "claim_id": "cross_case_verification_report",
+            "claim_summary": "A Cross-case verification report records which harmonisation decisions survived transfer between realms.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "claim_id": "metadata_standard_binding_genome_to_space",
+            "claim_summary": "One metadata standard binds the omics records to the in-situ and satellite records, and the Genome-to-space linkage report is where that binding becomes a joinable record.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "claim_id": "leakage_safe_split",
+            "claim_summary": "A leakage-safe split keeps site, season and treatment together in one fold.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+          },
+          {
+            "claim_id": "interoperability_crosswalks_eunis_get",
+            "claim_summary": "The project carries crosswalks to the European habitat classification (EUNIS) and the global ecosystem typology to make outputs usable outside the consortium.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "trend_predictions_stated_uncertainty",
+            "claim_summary": "Biodiversity trend predictions are delivered with stated uncertainty at case, regional and European scales.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "claim_id": "copernicus_galileo_egnos_eligibility",
+            "claim_summary": "The satellite layer is built on the European earth-observation and navigation programmes Copernicus and/or Galileo/EGNOS, which the topic makes an eligibility condition where satellite data are used.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "ingest_lucas_grassland_embal",
+            "claim_summary": "The terrestrial case ingests the Commission-steered monitoring data LUCAS grassland and EMBAL as a reference layer.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "cooperation_gbif_obis_lucas",
+            "claim_summary": "The project earmarks effort for cooperation with GBIF, OBIS and LUCAS and publishes its occurrence records to them.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "use_european_research_infrastructures",
+            "claim_summary": "Where a European research infrastructure offers a service the chain needs, the project uses it rather than rebuilding it.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          },
+          {
+            "claim_id": "rework_multiseason_field_archive",
+            "claim_summary": "The training resource reworks a multi-season field archive of physiological, spectral, soil-water and weather measurements.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+          },
+          {
+            "claim_id": "coordination_interface_futureo",
+            "claim_summary": "A standing coordination interface runs to the FuturEO earth-observation projects in the same cluster.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "link_eosc_common_data_spaces",
+            "claim_summary": "Published workflows and data are linked to EOSC and the European Common Data Spaces.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "jrc_open_place",
+            "claim_summary": "An open place for the Joint Research Centre attaches to the crosswalk interface and counts towards no eligibility condition.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "interdisciplinary_disciplines",
+            "claim_summary": "The approach brings together molecular biology and genomics, in-situ ecology across farmland, freshwater and marine habitats, earth observation and geoinformatics, data engineering and artificial intelligence, and socio-ecological and policy analysis.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+          },
+          {
+            "claim_id": "interdisciplinary_integration_mechanism",
+            "claim_summary": "The integration layer makes the disciplines interoperable: one protocol set, one metadata standard and the crosswalks bind a genomic and a satellite observation of the same place into one queryable record.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+          },
+          {
+            "claim_id": "ssh_relevance",
+            "claim_summary": "The scope asks for analysis of socio-economic pressures and links to socio-ecological and climatic data, so social sciences and humanities enter the research content.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          },
+          {
+            "claim_id": "ssh_integration_in_project",
+            "claim_summary": "The architecture ingests socio-ecological and climatic data layers, socio-economic driver analysis selects each case on pressure evidence, and policy and agricultural analysis shapes the indicators to reporting obligations and farm-management decisions.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "gender_requirement_recorded",
+            "claim_summary": "The gender dimension applies to this topic and the call binding compliance profile records a gender requirement.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+          },
+          {
+            "claim_id": "gender_response_human_facing",
+            "claim_summary": "Sex and gender are not variables in the biophysical observation but are analysed in the human-facing components (stakeholder engagement, usability evaluation and farm-management uptake), disaggregating practitioner and decision-maker participation and response.",
+            "status": "inferred",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "claim_id": "open_science_fair_core",
+            "claim_summary": "The project delivers FAIR research data, harmonisation workflows and processing protocols as a core mechanism, as the scope requires.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          },
+          {
+            "claim_id": "open_science_eosc_publication",
+            "claim_summary": "The project publishes datasets, workflows and services to EOSC and the European Common Data Spaces.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "provenance_reproducible_pipelines",
+            "claim_summary": "Processing runs through provenance-tracked, reproducible pipelines released openly so a result can be replayed.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "claim_id": "occurrence_records_and_training_resource_open",
+            "claim_summary": "Project occurrence records go to GBIF, OBIS and LUCAS, and the training and validation resource is published with its split protocol.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "standards_body_contribution",
+            "claim_summary": "Harmonisation decisions are contributed to the standards bodies so the protocols and crosswalks outlive the project.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "claim_id": "dmp_distinct_deliverable_fair",
+            "claim_summary": "A data management plan is delivered as a distinct deliverable within the first six months, as the Data management plan and shared metadata profile, making research data findable, accessible, interoperable and reusable.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "claim_id": "dmp_fixes_shared_metadata_before_campaigns",
+            "claim_summary": "The plan fixes the metadata standard the three cases share before the field campaigns open, making it a condition of the integration.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          }
+        ]
+      },
+      "traceability_footer": {
+        "primary_sources": [
+          {
+            "tier": 2,
+            "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+          },
+          {
+            "tier": 2,
+            "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+          },
+          {
+            "tier": 2,
+            "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/call_binding/topic_mapping.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+          },
+          {
+            "tier": 4,
+            "source_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+          },
+          {
+            "tier": 4,
+            "source_path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+          },
+          {
+            "tier": 4,
+            "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          }
+        ],
+        "no_unsupported_claims_declaration": true
+      }
+    },
+    "impact": {
+      "schema_id": "orch.tier5.impact_section.v1",
+      "run_id": "import uuid; print(uuid.uuid4())",
+      "criterion": "Impact",
+      "sub_sections": [
+        {
+          "sub_section_id": "B.2.1",
+          "title": "Project's pathways towards impact",
+          "content": "# B.2.1 Project's pathways towards impact\n\nThe project's central result is a reusable observation chain, not a single assessment. It carries measurement from molecules to satellites along one agricultural pressure gradient. The chain, its protocols and its models are released under open terms, so others run them after the project ends. The topic BIODIV-01 asks for this framework as a Research and Innovation Action. The destination Biodiversity and ecosystem services sets the longer-term impacts it must serve. Each result below maps to a topic outcome first, then to a destination impact.\n\n## (a) Unique contribution to the topic outcomes\n\nThe topic sets three expected outcomes, and the project answers each with a specific result rather than with research in general.\n\n- First outcome, fit-for-purpose assessment and trend prediction. The project delivers European-scale habitat and ecosystem classification and trend predictions that carry the uncertainty the case benchmarks measured (D6.2, D6.3). A prediction without that uncertainty is not fit for a protection or restoration decision.\n- Second outcome, capacity through integration across sensors and platforms. The project specifies one multisensory integration architecture (D2.2) and joins the molecular layer to the in-situ and satellite record through a published metadata standard. A genomic observation and a satellite observation of the same place become queryable together (D5.3).\n- Third outcome, in-situ data usable for training and validation. The project reworks a multi-season field archive into a documented training and validation resource with a declared split protocol (D6.1). Site, season and treatment travel together into one fold, so a reused model cannot learn the site and pass as though it learned the biology.\n\nOne design choice drives the contribution across all three outcomes: a single pressure gradient. The gradient runs from farmland, through the freshwater ecotones that receive its runoff, to the coastal waters downstream. The three demonstration cases therefore share one pressure and one measurement protocol. A harmonisation decision taken for farmland is tested twice more, in realms that did not design it (D4.4). A single-realm study cannot run that test. This is evidence of integration rather than an assertion of it.\n\n## (a) Contribution to the longer-term destination impacts\n\nThe destination sets six expected impacts in the longer term, and the project maps a pathway to all six.\n\n- Knowledge of biodiversity status, trends and drivers improves, because one measurement culture now spans three realms and extends to European coverage (OC3, OC6).\n- Methods and tools become available and used. The joint protocols, the crosswalk package, the provenance-tracked pipeline and the classification models are released under FAIR terms to the European Open Science Cloud and the common data spaces (D3.1 to D3.4, D6.2).\n- The biodiversity crisis is better understood, because the land-to-coast pressure pathway becomes observable, with the molecular layer joined to it (WP5).\n- Reporting authorities and stakeholders receive evidence in the form their obligations take, because a reporting-needs assessment runs before the outputs are designed (D7.1).\n- Farmers and land managers receive biodiversity indicators inside the farm-management tools they already use, through an existing multi-country user network (D7.2, D7.3).\n- Progress on international commitments becomes countable, because every habitat label carries a crosswalk to the European classification and a global ecosystem typology, and occurrence records reach the global data facilities the topic names (D3.2, D3.4).\n\nThe project delivers availability. It measures reuse rather than promising it, so a group outside the consortium can apply the released methods without asking the consortium for anything.\n\nOne clause of the fourth destination impact is only partly addressed. The project improves the evidence a biodiversity valuation rests on. It runs no valuation and claims none, because no partner carries environmental economics.\n\n## Target groups that benefit\n\nThe pathway reaches distinct groups, each through a specific output.\n\n- Ecosystem-assessment research groups and biodiversity machine-learning researchers reuse the labelled training resource and the reproducible benchmarks (D6.1, D6.2).\n- Biodiversity data-infrastructure operators and the standards bodies that maintain the European habitat classification and the global ecosystem typology receive the harmonisation decisions, each with its disposition recorded (D3.4).\n- Competent authorities carry reporting obligations under the Habitats Directive, the Birds Directive, the Marine Strategy Framework Directive and the EU Nature Restoration Regulation. They receive outputs shaped to those obligations (D7.1, D7.2).\n- Farmers, land and sea managers, and the agricultural holdings in the user network receive indicators they can act on, and are asked whether they can (D7.3).\n- The international biodiversity assessment community receives occurrence records and crosswalked labels countable in a global assessment (D3.4).\n- Policymakers and the interested public receive plain-language evidence on the biodiversity crisis, distinct from the reporting outputs above.\n\n## Quantified estimates\n\nThe project fixes twelve impact indicators. Each measures something the project delivers and controls, and each names one deliverable.\n\n| Indicator | Deliverable |\n|---|---|\n| Prioritised biodiversity knowledge gaps, each paired with its named data need | D2.1 Prioritised knowledge-gap and data-need analysis |\n| Observation datasets delivered under one protocol, one per ecosystem realm | D4.1 Terrestrial case observation dataset |\n| Harmonisation decisions tested in a realm that did not design them, and the share that survived | D4.4 Cross-case verification report |\n| Classification benchmark scores per case under the declared split, with uncertainty | D6.2 Habitat and ecosystem classification models and benchmarks |\n| European-scale maps and trend predictions published with stated uncertainty | D6.3 European-scale maps and biodiversity trend predictions |\n| Training and validation sets published with a reproducible benchmark | D6.1 Documented training and validation resource with split protocol |\n| Datasets and services registered in the open science cloud and the common data spaces | D3.4 FAIR publication and standards contribution report |\n| Share of habitat labels resolving to both the European classification and the global typology | D3.2 Interoperability crosswalk package |\n| Harmonisation decisions submitted to the standards bodies, with disposition recorded | D3.4 FAIR publication and standards contribution report |\n| Reporting obligations for which an output is accepted without rework | D7.1 Policy reporting needs assessment |\n| Holdings evaluating the indicators, and the share reporting they could act on them | D7.3 Farm-management integration and usability evaluation |\n| Molecular records joinable to an in-situ and a satellite record of the same place | D5.3 Genome-to-space linkage report |\n\nNo target numbers are fixed yet. A target is a consortium commitment, and partner participation is not yet confirmed. The consortium sets the numbers at grant preparation, so each indicator reads as a measured quantity rather than a guess.\n\n## (b) Requirements and barriers beyond the project's scope and duration\n\nSeveral conditions sit outside the project's scope and its 48-month duration. Each can change over time, so the project treats each as a measurement, not a promise.\n\n- Other R&I and standards adoption. The framework's long-term reach depends on standards bodies adopting the harmonisation decisions, and the project cannot adopt them on their behalf. It submits each decision with its disposition recorded (D3.4) and holds a standing cooperation interface to the named in-situ data frameworks and to the FuturEO programme (WP1). An unresolvable habitat label is reported to those bodies, not forced into a mapping.\n- Evolving typologies and metadata standards. The European classification and the global typology change over time. The crosswalk package (D3.2) is versioned and republished, so a label stays resolvable after a classification is revised.\n- Regulatory environment. The value of reporting-shaped outputs depends on the reporting obligations staying as the directives and the Nature Restoration Regulation define them, and those obligations may change. The reporting-needs assessment (D7.1) runs first and is repeatable, so outputs track the obligation rather than a fixed template.\n- Targeted markets and user behaviour. An indicator changes no farming decision unless a practitioner acts on it. The usability evaluation asks whether a holding could act, and reports a negative result rather than hiding it (D7.3). The route to practitioners runs through one partner's user network, and if that network is unavailable the project states the loss rather than absorbing it.\n- Data availability beyond the consortium. Environmental DNA reference libraries may be incomplete for the taxa the cases need. The project builds reference sequences for the gap taxa and reports the share of reads left unassigned (WP5). Required satellite bands or revisit frequencies may be unavailable from the European programmes, whose use is an eligibility condition for this topic. The project records every additional source and the reason the European data did not cover the need.\n\nCritical risks inherent to project management, including consortium confirmation and the budget route, are addressed in the Implementation section, not here.",
+          "word_count": 1429
+        },
+        {
+          "sub_section_id": "B.2.2",
+          "title": "Measures to maximise impact - Dissemination, exploitation and communication",
+          "content": "## B.2.2 Measures to maximise impact - Dissemination, exploitation and communication\n\nThe project treats dissemination, exploitation and communication as one planned function, not three closing activities. One work package, \"Policy uptake, sectoral mainstreaming and exploitation\" (WP7), carries them. The outline below satisfies the admissibility condition for a plan for the dissemination and exploitation of results, including communication. A more detailed plan follows as a mandatory project deliverable, updated periodically, and consolidated in the \"Dissemination, exploitation and communication plan\" (D7.4). Planning runs continuously from early in the project rather than at the end. The \"Data management plan and shared metadata profile\" (D1.1), due at month 6, fixes the open-data and FAIR commitments every dissemination measure rests on.\n\n### Target groups and the measure matched to each\n\nEach measure is chosen for the group it must reach. The reason it suits that group sits in the cell.\n\n| Target group | Primary measure | Why this measure suits the group |\n|---|---|---|\n| Scientific community: ecosystem-assessment and biodiversity machine-learning research groups | FAIR release of the training resource, benchmarks, protocols, crosswalks and pipeline to the open science cloud and the common data spaces | Researchers reuse data and code they can find and run without asking the consortium, so open release reaches them at the lowest cost |\n| Biodiversity data-infrastructure operators and the standards bodies maintaining the European habitat classification and the global ecosystem typology | Submission of the harmonisation decisions and the crosswalks, with each decision's disposition recorded | These bodies adopt a decision through their own process, so the project submits to them rather than publishing past them |\n| Competent authorities under the Habitats Directive, the Birds Directive, the Marine Strategy Framework Directive and the EU Nature Restoration Regulation | Outputs shaped to reporting obligations, starting from the \"Policy reporting needs assessment\" (D7.1) | An authority can use evidence only in the form its obligations take, so the assessment runs before the outputs are designed |\n| End users: farmers, land and sea managers, and the agricultural holdings in the user network | Indicators delivered inside farm-management tools, with a usability evaluation | An indicator changes a decision only when it reaches the tool a practitioner already uses, so the measure places it there and asks whether they can act on it |\n| The international biodiversity assessment community | Occurrence records and crosswalked labels published to the global data facilities | Evidence counts in an international assessment only when it is countable there, which a crosswalk and a global facility supply |\n| Policymakers and the public at large | Plain-language evidence on the land-to-coast pressure pathway | This group needs the finding, not the dataset, so the message is the pathway rather than the data |\n\nThe form lists financial actors as a fourth target group. The project does not claim a direct measure for them. It improves the evidence a valuation of ecosystem services would rest on, but it runs no valuation, because no partner carries environmental economics. The valuation clause of the fourth destination impact is therefore only partly addressed. The project states this rather than asserting a financial-actor pathway it cannot run.\n\n### Dissemination\n\nDissemination releases the results for reuse. The measures are open publication under FAIR terms, proportionate to a Research and Innovation Action of EUR 5,000,000 funding two projects. Open release is the main channel, because its marginal cost is low and its reach does not depend on an events budget.\n\n- The \"Joint data collection, metadata and processing protocols\" (D3.1), the \"Interoperability crosswalk package\" (D3.2) and the \"Provenance-tracked processing pipeline release\" (D3.3) are released so an external group can rerun the chain.\n- The \"Documented training and validation resource with split protocol\" (D6.1) and the \"Habitat and ecosystem classification models and benchmarks\" (D6.2) let others reproduce and extend the benchmarks.\n- The \"European-scale maps and biodiversity trend predictions\" (D6.3) and the \"Genome-to-space linkage report\" (D5.3) carry the integrated results to the assessment community.\n- Datasets and services are registered in the open science cloud and the common data spaces, reported in the \"FAIR publication and standards contribution report\" (D3.4).\n- Occurrence records reach the global biodiversity data facilities through the cooperation held in WP1 and WP3.\n\n### Exploitation\n\nExploitation turns the results into use by the sectors that create the pressure and the authorities that report on it. This is a Research and Innovation Action, not an Innovation Action, so the plan sets out use and uptake rather than a path to commercialise a single innovation.\n\n- The \"Biodiversity indicator decision-support release\" (D7.2) and the \"Farm-management integration and usability evaluation\" (D7.3) carry indicators into the tools agricultural holdings already use. The uptake channel is P05's multi-country user network, a partner whose participation is assumed.\n- A measurement protocol transfers to a second production context, which tests whether the method is exploitable beyond the case that designed it. This measure rests on P06, whose participation is assumed.\n- The harmonisation decisions are exploited as a contribution to the bodies that maintain the classifications, not kept as an internal convention.\n\n### Standardisation\n\nStandardisation is a named exploitation route here. The project submits its harmonisation decisions to the bodies maintaining the European habitat classification and the global ecosystem typology. Each decision's disposition is recorded in the \"FAIR publication and standards contribution report\" (D3.4). The scope asks the project to contribute to consensus on joint definitions, which an internal protocol does not do. The crosswalk, open-science-cloud and standards-submission measures are held by P10, whose participation is assumed.\n\n### Exploitation in the Union's interest\n\nThe beneficiaries sit in Member States and Associated Countries, under the consortium's assumed country-slot assignment. Exploitation is therefore not primarily in non-associated third countries. The justification the form asks for in that case does not apply here.\n\n### Communication\n\nCommunication explains what the project finds and why it matters, to audiences that will not read the datasets. It runs across the project rather than as a closing phase, in the stakeholder and planning task of WP7. Each message travels through a channel the project already controls rather than a generic broadcast.\n\n- To researchers and data-infrastructure operators, the message is that one reconciliation is published and reusable. The channels are the FAIR release and the standards submission.\n- To competent authorities, the message is that the evidence fits their reporting obligations. The channel is the co-designed reporting-needs assessment.\n- To practitioners, the message is that a biodiversity indicator can sit inside a farm-management tool. The channel is the user network.\n- To policymakers and the public, the message is that agricultural pressure is now observable from land to coast. The channel is plain-language evidence, distinct from the reporting outputs.\n\nThe detailed communication measures, their tools and their quantified reach are fixed at grant preparation. No target numbers are set yet, because a target is a consortium commitment and no partner's participation is confirmed.\n\n### Management of intellectual property\n\nThe intellectual-property strategy follows from what the project produces. Its results are protocols, crosswalks, datasets, models and software, not devices. The primary protection measure is copyright under open licences, which serves exploitation rather than restricting it.\n\n- Software, including the pipeline release, the classification models and the decision-support release, is released under open-source licences.\n- Datasets, the crosswalk package and the training resource are published under open, FAIR terms.\n- Patents and design rights are not the primary route, because the outputs are not patentable devices.\n- Where an SME sustains the decision-support beyond the project, its background tooling may remain a trade secret while the project's foreground results stay open. This rests on P04 and P05, partners whose participation is assumed.\n\nOpen foreground is what makes the results available and used, which is the second destination impact. Background trade secrets let an SME build a sustainable service on top of the open results. The detailed access rights belong in the consortium agreement, which is not yet drafted.\n\n### Policy feedback\n\nThe project generates policy feedback by improving the evidence base that biodiversity policy is monitored and reviewed against. It does not design policy itself.\n\n- Outputs are shaped to the reporting obligations under the Habitats Directive, the Birds Directive, the Marine Strategy Framework Directive and the EU Nature Restoration Regulation, starting from the \"Policy reporting needs assessment\" (D7.1).\n- The \"Interoperability crosswalk package\" (D3.2) makes each habitat label resolvable against the classifications these obligations use, so project evidence enters monitoring and review without rework.\n- Occurrence records and crosswalked labels make progress on international biodiversity commitments countable, which is the sixth destination impact.\n\nThe feedback is to monitoring, reporting and review, not to the drafting of new instruments. The project states this boundary rather than claiming a policy-design role it does not hold.\n\n### Follow-up after the project\n\nThe central result is a reusable observation chain, released under open terms, so use continues after the project ends and does not depend on the consortium staying together. The project measures reuse through its impact indicators rather than promising it, and no target numbers are set yet. The \"Final project report\" (D1.3) records the measures delivered and the reuse observed.",
+          "word_count": 1526
+        },
+        {
+          "sub_section_id": "B.2.3",
+          "title": "Summary",
+          "content": "# B.2.3 Summary\n\nThe canvas below summarises the impact pathway and the measures that carry it. One design choice runs through every cell: a single agricultural pressure gradient, from farmland, through the freshwater ecotones that receive its runoff, to the coastal waters downstream. Each result maps to a topic outcome first, then to a destination impact, as B.2.1 sets out.\n\n## Impact canvas\n\n### Upper row\n\n| Specific needs | Expected results | Dissemination, exploitation and communication measures |\n|---|---|---|\n| Biodiversity data exists in quantity and integrates badly. Many in-situ collections \"were not designed with Satellite Remote Sensing integration in mind\" and \"lack the structure, interface and metadata required to support advanced analytics, including AI\". Today the reconciliation of molecular, plot, airborne and satellite evidence is done once per project and discarded. Assessment and trend prediction need fit-for-purpose, interoperable data across the terrestrial, freshwater and marine realms (SR-01, SR-02). | One reusable observation chain carries measurement from molecules to satellites along the gradient. It is released as the Multisensory integration architecture specification (D2.2), the Joint data collection, metadata and processing protocols (D3.1), the Interoperability crosswalk package (D3.2) and the Provenance-tracked processing pipeline release (D3.3). It yields the Documented training and validation resource with split protocol (D6.1), the Habitat and ecosystem classification models and benchmarks (D6.2), the European-scale maps and biodiversity trend predictions (D6.3), the Genome-to-space linkage report (D5.3) and the Biodiversity indicator decision-support release (D7.2). | One work package, Policy uptake, sectoral mainstreaming and exploitation (WP7), carries all three functions, consolidated in the Dissemination, exploitation and communication plan (D7.4). The Data management plan and shared metadata profile (D1.1) fixes the open-data commitments. Dissemination releases the protocols, crosswalks, pipeline, training resource and models under FAIR terms to the European Open Science Cloud and the common data spaces. Exploitation submits the harmonisation decisions to the standards bodies, recorded in the FAIR publication and standards contribution report (D3.4), and carries indicators into farm-management tools. Communication delivers plain-language evidence on the land-to-coast pressure pathway. |\n\n### Lower row\n\n| Target groups | Outcomes | Impacts |\n|---|---|---|\n| Ecosystem-assessment and biodiversity machine-learning research groups. Biodiversity data-infrastructure operators and the standards bodies that maintain the European habitat classification and the global ecosystem typology. Competent authorities carrying EU biodiversity-reporting obligations. Farmers, land and sea managers, and the agricultural holdings reached through a multi-country user network. The international biodiversity assessment community. Policymakers and the public. | OC1: One multisensory integration architecture carries omics, in-situ, airborne and satellite observation, and it is specified from a prioritised account of what is missing rather than of what is available. OC2: A joint protocol set, a crosswalk package and a provenance-tracked pipeline make the project's harmonisation decisions usable outside it, and the decisions reach the bodies that maintain the classifications. OC3: Three demonstration cases on one agricultural pressure gradient produce comparable observation datasets across the terrestrial, freshwater and marine realms, and a report says which harmonisation decisions survived the transfer. OC4: The molecular layer joins the in-situ and remote-sensing record through a published metadata standard, so a genomic observation and a satellite observation of the same place can be queried together. OC5: A documented training and validation resource with a declared split protocol lets an external group reproduce the project's benchmarks and test its own models against them. OC6: Habitat and ecosystem classification runs at European coverage, and biodiversity trend predictions carry the uncertainty the case benchmarks measured. OC7: Competent authorities receive outputs shaped to the reporting obligations they carry, and agricultural holdings receive biodiversity indicators inside the tools they already use. | Destination Biodiversity and ecosystem services. EI-01: knowledge on biodiversity status, trends and drivers improves. EI-02: methods, models and tools are available and used. EI-03: the biodiversity crisis is better understood. EI-04: policymakers, economic sectors and society are better informed, toward better implementation of biodiversity legislation. EI-05: farmers and managers access information and test biodiversity-friendly practices. EI-06: progress on international commitments is made. |\n\nThe measures are proportionate to a Research and Innovation Action of EUR 5,000,000 funding two projects. The project delivers availability and measures reuse rather than promising it. Each impact claim carries one indicator that names one deliverable. No target numbers are fixed yet, because a target is a consortium commitment and no partner's participation is confirmed. The consortium sets them at grant preparation.",
+          "word_count": 719
+        }
+      ],
+      "validation_status": {
+        "overall_status": "assumed",
+        "claim_statuses": [
+          {
+            "claim_id": "topic_instrument",
+            "claim_summary": "BIODIV-01 is a Research and Innovation Action under the destination Biodiversity and ecosystem services",
+            "status": "confirmed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/call_binding/selected_call.json (instrument_type, destination Confirmed)"
+          },
+          {
+            "claim_id": "topic_expected_outcomes",
+            "claim_summary": "the topic sets three expected outcomes (EO-01, EO-02, EO-03)",
+            "status": "confirmed",
+            "source_ref": "Tier 2 docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+          },
+          {
+            "claim_id": "destination_expected_impacts_six",
+            "claim_summary": "the destination sets six expected impacts in the longer term (EI-01 to EI-06), at destination level not topic level, each binding at one or more",
+            "status": "confirmed",
+            "source_ref": "Tier 2 docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+          },
+          {
+            "claim_id": "P12_participation",
+            "claim_summary": "beneficiary, sme, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P12_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P09_participation",
+            "claim_summary": "beneficiary, university, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P09_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P03_participation",
+            "claim_summary": "beneficiary, university, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P03_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "demonstration_case_realms",
+            "claim_summary": "terrestrial P03, freshwater P07, marine P08",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (demonstration_case_realms)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "demonstration_case_realms",
+            "claim_summary": "terrestrial P03, freshwater P07, marine P08",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (demonstration_case_realms)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P10_participation",
+            "claim_summary": "beneficiary, ngo, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P10_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "demonstration_case_realms",
+            "claim_summary": "terrestrial P03, freshwater P07, marine P08",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (demonstration_case_realms)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P11_participation",
+            "claim_summary": "beneficiary, university, country slot C6 (AC)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P11_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "valuation_clause_partial",
+            "claim_summary": "the valuation clause of the fourth destination impact is only partly addressed; the project improves the evidence a valuation rests on but runs none, as no partner carries environmental economics",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/architecture_inputs/impacts.json (valuation_clause Unresolved)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P05_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P05_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P10_participation",
+            "claim_summary": "beneficiary, ngo, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P10_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "reporting_instruments_named",
+            "claim_summary": "the Habitats Directive, Birds Directive, Marine Strategy Framework Directive and EU Nature Restoration Regulation are the reporting obligations named for this topic",
+            "status": "confirmed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/project_brief/project_summary.json (call_phrases Confirmed, claim C14)"
+          },
+          {
+            "claim_id": "destination_target_groups",
+            "claim_summary": "the destination impacts name farmers, foresters, land and sea managers, fishers and aquaculture producers, policymakers and stakeholders, and society, as beneficiary groups",
+            "status": "confirmed",
+            "source_ref": "Tier 2 docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-03, EI-04, EI-05)"
+          },
+          {
+            "claim_id": "kpi_targets",
+            "claim_summary": "no target numbers set",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (kpi_targets)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "project_duration",
+            "claim_summary": "48 months",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (project_duration)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P10_participation",
+            "claim_summary": "beneficiary, ngo, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P10_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P10_participation",
+            "claim_summary": "beneficiary, ngo, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P10_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P11_participation",
+            "claim_summary": "beneficiary, university, country slot C6 (AC)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P11_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P05_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P05_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P09_participation",
+            "claim_summary": "beneficiary, university, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P09_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P02_participation",
+            "claim_summary": "beneficiary, university, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/working_assumptions.json (P02_participation)",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "copernicus_requirement",
+            "claim_summary": "use of the European earth observation and satellite navigation programmes is an eligibility condition for satellite data under this topic",
+            "status": "confirmed",
+            "source_ref": "Tier 3 docs/tier3_project_instantiation/project_brief/project_summary.json (call_phrase Copernicus and/or Galileo/EGNOS Confirmed, claim C03)"
+          },
+          {
+            "claim_id": "dec_plan_admissibility_and_deliverable",
+            "claim_summary": "A plan for dissemination and exploitation including communication is included here as an admissibility condition, with a more detailed plan as a mandatory deliverable updated periodically.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+          },
+          {
+            "claim_id": "wp7_carries_measures",
+            "claim_summary": "The work package \"Policy uptake, sectoral mainstreaming and exploitation\" (WP7) carries the dissemination, exploitation and communication measures.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "d7_4_consolidated_plan",
+            "claim_summary": "The \"Dissemination, exploitation and communication plan\" (D7.4) consolidates the detailed plan.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "planning_runs_continuously",
+            "claim_summary": "Dissemination and exploitation planning runs continuously across the project rather than only at the end (WP7 stakeholder and planning task).",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "claim_id": "d1_1_month6_fair",
+            "claim_summary": "The \"Data management plan and shared metadata profile\" (D1.1), due at month 6, fixes the open-data and FAIR commitments.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "ria_not_ia",
+            "claim_summary": "The action is a Research and Innovation Action, not an Innovation Action, so no path to commercialise an innovation is required.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "claim_id": "target_groups_set",
+            "claim_summary": "The target groups are the scientific community, data-infrastructure operators and standards bodies, competent authorities, farmers and land/sea managers, the international assessment community, and policymakers and the public.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+          },
+          {
+            "claim_id": "financial_actors_valuation_gap",
+            "claim_summary": "Financial actors are not a direct target because the project runs no ecosystem-services valuation (no environmental-economics partner); the fourth destination impact's valuation clause is only partly addressed.",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "dissemination_fair_release",
+            "claim_summary": "Dissemination is open FAIR publication of the protocols (D3.1), crosswalk package (D3.2), pipeline (D3.3), training resource (D6.1), models (D6.2), maps/predictions (D6.3), genome-to-space report (D5.3) and the FAIR publication and standards contribution report (D3.4), registered to the open science cloud and common data spaces.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "proportionate_to_scale",
+            "claim_summary": "The measures are proportionate to a Research and Innovation Action of EUR 5,000,000 funding two projects, with open release as the main low-cost channel.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "claim_id": "occurrence_records_global_facilities",
+            "claim_summary": "Occurrence records reach the global biodiversity data facilities through cooperation held in WP1 and WP3, which rests on P10.",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "exploitation_decision_support_deliverables",
+            "claim_summary": "The \"Biodiversity indicator decision-support release\" (D7.2) and the \"Farm-management integration and usability evaluation\" (D7.3) carry indicators into the tools agricultural holdings use.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "P05_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P06_participation",
+            "claim_summary": "beneficiary, research_institute, country slot C2 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "standardisation_submission",
+            "claim_summary": "The project submits its harmonisation decisions to the bodies maintaining the European habitat classification and the global ecosystem typology, with dispositions recorded in the \"FAIR publication and standards contribution report\" (D3.4).",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "P10_participation",
+            "claim_summary": "beneficiary, ngo, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "country_slot_assignment",
+            "claim_summary": "C1 MS, C2 MS, C3 MS, C4 AC, C5 MS, C6 AC",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "kpi_targets",
+            "claim_summary": "no target numbers set",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "ip_open_licensing_primary",
+            "claim_summary": "The primary IP protection measure is copyright under open licences, with software released open-source and datasets, crosswalks and the training resource published under open FAIR terms.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "ip_patents_not_primary",
+            "claim_summary": "Patents and design rights are not the primary route because the outputs are protocols, data, models and software rather than patentable devices.",
+            "status": "inferred",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "P04_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "consortium_agreement_not_drafted",
+            "claim_summary": "Detailed IP access rights belong in the consortium agreement, which is not yet drafted.",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "ip_supports_exploitation",
+            "claim_summary": "Open foreground maximises reuse (the destination impact that methods and tools are available and used), while background trade secrets let an SME sustain a service on top.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+          },
+          {
+            "claim_id": "policy_feedback_reporting",
+            "claim_summary": "Outputs are shaped to the reporting obligations of the Habitats Directive, the Birds Directive, the Marine Strategy Framework Directive and the EU Nature Restoration Regulation, via the \"Policy reporting needs assessment\" (D7.1) and the \"Interoperability crosswalk package\" (D3.2), feeding monitoring and review.",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "policy_feedback_international_commitments",
+            "claim_summary": "Crosswalked labels and occurrence records make progress on international biodiversity commitments countable, the sixth destination impact; the project feeds monitoring and review and does not design policy itself.",
+            "status": "confirmed",
+            "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+          },
+          {
+            "claim_id": "follow_up_open_reuse",
+            "claim_summary": "The reusable observation chain is released under open terms so use continues after the project ends, with reuse measured through the impact indicators and recorded in the \"Final project report\" (D1.3).",
+            "status": "confirmed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "need_data_integration_gap",
+            "claim_summary": "Biodiversity data integrates badly; assessment and trend prediction need fit-for-purpose interoperable data across the terrestrial, freshwater and marine realms (SR-01, SR-02).",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 2,
+              "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+            }
+          },
+          {
+            "claim_id": "need_quotes_not_designed_for_rs",
+            "claim_summary": "Many in-situ collections were not designed with satellite remote-sensing integration in mind and lack the structure, interface and metadata for advanced analytics including AI, so reconciliation is done once per project and discarded.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+            }
+          },
+          {
+            "claim_id": "central_result_observation_chain_single_gradient",
+            "claim_summary": "The central result is one reusable observation chain carrying measurement from molecules to satellites along a single agricultural pressure gradient from farmland through freshwater ecotones to coastal waters.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 4,
+              "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+            }
+          },
+          {
+            "claim_id": "named_result_deliverables",
+            "claim_summary": "The results are released as D2.2, D3.1, D3.2, D3.3, D6.1, D6.2, D6.3, D5.3 and D7.2 with those canonical titles.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 4,
+              "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+            }
+          },
+          {
+            "claim_id": "wp7_carries_dec_consolidated_d74_d11",
+            "claim_summary": "WP7 carries dissemination, exploitation and communication, consolidated in D7.4, with open-data commitments fixed in D1.1.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 4,
+              "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+            }
+          },
+          {
+            "claim_id": "fair_release_eosc_common_data_spaces",
+            "claim_summary": "Dissemination releases protocols, crosswalks, pipeline, training resource and models under FAIR terms to the European Open Science Cloud and the common data spaces.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 4,
+              "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+            }
+          },
+          {
+            "claim_id": "standards_submission_recorded_d34",
+            "claim_summary": "Exploitation submits the harmonisation decisions to the standards bodies, recorded in the FAIR publication and standards contribution report (D3.4).",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 4,
+              "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+            }
+          },
+          {
+            "claim_id": "indicators_into_farm_management_tools",
+            "claim_summary": "Exploitation carries biodiversity indicators into farm-management tools (O6, OC7, D7.2, D7.3).",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 4,
+              "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+            }
+          },
+          {
+            "claim_id": "P05_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "communication_plain_language_land_to_coast",
+            "claim_summary": "Communication delivers plain-language evidence on the land-to-coast pressure pathway.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+            }
+          },
+          {
+            "claim_id": "target_groups",
+            "claim_summary": "Target groups are research groups, data-infrastructure operators and standards bodies, competent authorities with EU biodiversity-reporting obligations, farmers and land and sea managers and agricultural holdings, the international biodiversity assessment community, and policymakers and the public.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+            }
+          },
+          {
+            "claim_id": "outcomes_oc1_to_oc7",
+            "claim_summary": "The outcomes are OC1 to OC7 as stated.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 4,
+              "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+            }
+          },
+          {
+            "claim_id": "impacts_ei01_to_ei06_destination",
+            "claim_summary": "The impacts are the six expected impacts of the destination Biodiversity and ecosystem services (EI-01 to EI-06), set at destination level.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 2,
+              "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+            }
+          },
+          {
+            "claim_id": "pathway_maps_outcome_then_impact",
+            "claim_summary": "Each result maps to a topic outcome first, then to a destination impact.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+            }
+          },
+          {
+            "claim_id": "ria_five_million_two_projects",
+            "claim_summary": "The measures are proportionate to a Research and Innovation Action of EUR 5,000,000 funding two projects.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+            }
+          },
+          {
+            "claim_id": "measures_reuse_not_promise",
+            "claim_summary": "The project delivers availability and measures reuse rather than promising it, with each impact claim carrying one indicator naming one deliverable.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+            }
+          },
+          {
+            "claim_id": "kpi_targets",
+            "claim_summary": "no target numbers set",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          }
+        ]
+      },
+      "traceability_footer": {
+        "primary_sources": [
+          {
+            "tier": 2,
+            "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+          },
+          {
+            "tier": 2,
+            "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+          },
+          {
+            "tier": 2,
+            "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+          },
+          {
+            "tier": 2,
+            "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+          },
+          {
+            "tier": 4,
+            "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "tier": 4,
+            "source_path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+          },
+          {
+            "tier": 4,
+            "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          }
+        ],
+        "no_unsupported_claims_declaration": true
+      },
+      "dec_coverage": {
+        "dissemination_addressed": true,
+        "exploitation_addressed": true,
+        "communication_addressed": true
+      },
+      "impact_pathway_refs": [
+        "PW1",
+        "PW2",
+        "PW3",
+        "PW4",
+        "PW5",
+        "PW6"
+      ]
+    },
+    "implementation": {
+      "schema_id": "orch.tier5.implementation_section.v1",
+      "run_id": "import uuid; print(uuid.uuid4())",
+      "criterion": "Implementation",
+      "sub_sections": [
+        {
+          "sub_section_id": "B.3.1",
+          "title": "Work plan and resources",
+          "content": "# B.3.1 Work plan and resources\n\n## Overall structure\n\nThe action is a Research and Innovation Action with a single EU contribution of EUR 5,000,000 per project. It runs over an assumed 48-month duration and is organised into seven work packages, 35 tasks and 24 deliverables. WP1 (Coordination, governance and the interoperability interface, lead P01) holds governance and the external coordination duties. WP2 (Knowledge gaps, data needs and the integration architecture, lead P02) prioritises the gaps and specifies the architecture. WP3 (Joint protocols, metadata and interoperability crosswalks, lead P10) turns the architecture into agreed protocols and crosswalks. WP4 (Demonstration and verification cases along the pressure gradient, lead P03) runs the three realm cases. WP5 (The omics and molecular observation layer, lead P09) joins the molecular record to the in-situ and remote-sensing record. WP6 (Training resources, habitat mapping and trend prediction, lead P12) builds the training resource, the classifiers and the European-scale maps. WP7 (Policy uptake, sectoral mainstreaming and exploitation, lead P05) carries the indicators to competent authorities and to agricultural holdings.\n\nThe design is sequential where the science requires it. The gap analysis precedes the architecture. The protocols precede the campaigns, so a case run under a protocol that changes later does not produce data the other cases cannot join. The three realm campaigns run in sequence, so each one tests whether an upstream harmonisation decision survives transfer. Model training, European scaling and exploitation follow the case datasets.\n\nEvery partner participation is unconfirmed and carried as an operator assumption. Six partners (P07 to P12) are declared gap partners whose participation no confirmed source evidences. The freshwater case rests on P07 alone and the marine case on P08 alone, so losing either removes a realm rather than delaying it (risks R01 and R02).\n\n## Timing (Gantt at deliverable granularity)\n\nThe canonical reference pack fixes deliverable due months but not work-package or milestone months. Work-package start and end months and milestone months rest on the assumed 48-month duration and are not reproduced here, because no confirmed source carries them. The assumed critical path runs through the data management plan and metadata profile, the joint protocols, the terrestrial campaign and the stress metabolomics on its plots (T1.2, T3.1, T4.1, T5.3).\n\n| Month | Deliverables due |\n|---|---|\n| M6 | D1.1 |\n| M9 | D2.1 |\n| M12 | D1.2 |\n| M14 | D2.2 |\n| M15 | D2.3 |\n| M16 | D3.1 |\n| M20 | D5.1 |\n| M22 | D7.1 |\n| M28 | D3.2, D6.1 |\n| M34 | D3.3, D5.2 |\n| M38 | D4.1, D4.2, D4.3, D5.3, D6.2 |\n| M40 | D4.4, D7.2 |\n| M42 | D3.4 |\n| M44 | D7.3 |\n| M45 | D6.3 |\n| M48 | D1.3, D7.4 |\n\n## Inter-work-package dependencies (PERT)\n\nThe structure below is taken from the Phase 3 work-package structure and is part of the assumed design. Each edge is a data input. The Phase 3 structure reports no cycle. WP1 opens the action and holds no upstream dependency. WP3 is the hub the campaign, omics, modelling and exploitation lines draw from.\n\n| From | To | Nature |\n|---|---|---|\n| WP1 | WP3 | Protocols build on the metadata profile the data management plan fixes (T3.1 on T1.2). |\n| WP2 | WP3 | Pipelines implement the integration architecture (T3.4 on T2.3). |\n| WP2 | WP4 | Cases are selected and acquisition follows the architecture (T4.1 on T2.5, T4.4 on T2.3). |\n| WP3 | WP4 | A campaign starts once the joint protocol exists (T4.1 on T3.1). |\n| WP3 | WP5 | Omics sampling follows the protocol and joins through the metadata standard (T5.1 on T3.1, T5.4 on T3.3). |\n| WP4 | WP5 | Metabolomics is measured on the terrestrial plots the campaign runs (T5.3 on T4.1). |\n| WP3 | WP6 | The training resource is documented against the joint protocol (T6.1 on T3.1). |\n| WP4 | WP6 | Models train on the observations the acquisition task produces (T6.3 on T4.4). |\n| WP2 | WP7 | The decision surface reads the architecture outputs (T7.2 on T2.3). |\n| WP4 | WP7 | A protocol transfers only once it has been run (T7.4 on T4.1). |\n\n## Table 3.1a — List of work packages\n\nPerson-months are not populated: the consortium has not agreed an effort split, and a seeded figure would read as a consortium decision no confirmed source carries. Start and end months are not reproduced, because the canonical reference pack does not fix them.\n\n| WP No | Title | Lead No | Lead Short Name | Person-Months | Start | End |\n|---|---|---|---|---|---|---|\n| WP1 | Coordination, governance and the interoperability interface | P01 | P01 | not agreed | not stated | not stated |\n| WP2 | Knowledge gaps, data needs and the integration architecture | P02 | P02 | not agreed | not stated | not stated |\n| WP3 | Joint protocols, metadata and interoperability crosswalks | P10 | P10 | not agreed | not stated | not stated |\n| WP4 | Demonstration and verification cases along the pressure gradient | P03 | P03 | not agreed | not stated | not stated |\n| WP5 | The omics and molecular observation layer | P09 | P09 | not agreed | not stated | not stated |\n| WP6 | Training resources, habitat mapping and trend prediction | P12 | P12 | not agreed | not stated | not stated |\n| WP7 | Policy uptake, sectoral mainstreaming and exploitation | P05 | P05 | not agreed | not stated | not stated |\n\n## Table 3.1b — Work package descriptions\n\nTask effort is not quantified in person-months, for the reason given above. Each task names its responsible partner, and resources are justified by the capability that carries the work until the effort split is agreed.\n\n### WP1 (lead P01) — Objectives O2\nWhy needed: the topic sets five coordination duties; WP1 holds four, and the crosswalk interface sits in WP3.\n- T1.1 Run consortium governance, reporting and quality management (P01; P02, P10).\n- T1.2 Write the shared data management plan and metadata profile (P10; P04, P09). Due M6, before WP3 opens.\n- T1.3 Hold the coordination interface to the space-agency earth observation programme the topic names (P02; P12).\n- T1.4 Agree cooperation with the named in-situ data frameworks and hold the Joint Research Centre place open (P10; P03, P08). The place counts towards no eligibility condition.\n- T1.5 Run ethics, data protection and open science compliance (P01; P11).\nDeliverables: D1.1, D1.2, D1.3.\n\n### WP2 (lead P02) — Objectives O1\nWhy needed: the scope requires the gap analysis to set the integration design, so analysis finishes before the architecture starts.\n- T2.1 Prioritise biodiversity knowledge gaps and data needs (P11; P03, P07, P08).\n- T2.2 Inventory sensor, platform and omics data streams and metadata state (P02; P09, P10, P12).\n- T2.3 Specify the multisensory integration architecture (P02; P04, P10, P12).\n- T2.4 Specify socio-ecological and climatic data layers (P11; P07).\n- T2.5 Select three demonstration cases against pressure and restoration priority (P11; P03, P07, P08).\nDeliverables: D2.1, D2.2, D2.3.\n\n### WP3 (lead P10) — Objectives O2\nWhy needed: the protocols precede the campaigns, so the three cases produce joinable data.\n- T3.1 Agree joint data collection, metadata and processing protocols (P10; P01, P07, P08, P09).\n- T3.2 Build occurrence, habitat and ecosystem typology crosswalks (P10; P08, P12).\n- T3.3 Define the omics metadata standard and bind it to the occurrence standard (P09; P10).\n- T3.4 Build provenance-tracked, reproducible processing pipelines (P04; P09, P12).\n- T3.5 Publish datasets and services to the open science cloud and the common data spaces (P10; P04).\n- T3.6 Take the harmonisation decisions to the standards bodies (P10; P08, P09).\nDeliverables: D3.1, D3.2, D3.3, D3.4.\n\n### WP4 (lead P03) — Objectives O4\nWhy needed: the three cases sit on one gradient, and each reuse of the terrestrial protocol tests whether an upstream decision transfers.\n- T4.1 Run the terrestrial campaign in farmland, grassland and field margins (P03; P01, P02, P06, P11).\n- T4.2 Run the freshwater campaign in rivers, floodplains and riparian ecotones (P07; P03, P09, P11).\n- T4.3 Run the marine campaign in coastal and benthic habitats (P08; P02, P07, P12).\n- T4.4 Acquire and process airborne and satellite observations across the cases (P02; P08, P12). Satellite use draws on the European programmes, as the eligibility condition requires.\n- T4.5 Verify which harmonisation decisions survived transfer between realms (P03; P07, P08, P10).\nDeliverables: D4.1, D4.2, D4.3, D4.4.\n\n### WP5 (lead P09) — Objectives O1, O4\nWhy needed: the second expected outcome names three omics layers. Metabolomics comes from P01, and the genomic, transcriptomic and environmental DNA layers from P09.\n- T5.1 Design environmental DNA sampling across the three cases (P09; P03, P07, P08).\n- T5.2 Run metabarcoding, sequencing and reference library work (P09; P07).\n- T5.3 Measure stress metabolomics on farmland and ecotone plots (P01; P03, P09).\n- T5.4 Bind the omics layer to in-situ and remote-sensing records (P09; P04, P10).\nDeliverables: D5.1, D5.2, D5.3.\n\n### WP6 (lead P12) — Objectives O3, O5\nWhy needed: the split protocol is fixed before any model is trained, so a benchmark cannot be chosen after the fact to suit a result.\n- T6.1 Rework the field archive into documented training and validation sets (P03; P01, P12).\n- T6.2 Fix the leakage-safe split protocol and benchmark design (P01; P03, P12). Site, season and treatment travel together into one fold.\n- T6.3 Train and benchmark habitat and ecosystem classification models (P12; P02, P07, P08).\n- T6.4 Scale the classification to European coverage (P12; P02).\n- T6.5 Predict biodiversity trends with stated uncertainty (P12; P01, P11).\nDeliverables: D6.1, D6.2, D6.3.\n\n### WP7 (lead P05) — Objectives O6\nWhy needed: the reporting-needs assessment runs early, so the outputs are shaped to the obligations rather than mapped onto them at the end.\n- T7.1 Assess reporting obligations with the competent authorities (P11; P07, P08).\n- T7.2 Engineer the decision-support surface carrying biodiversity indicators (P04; P05, P12).\n- T7.3 Integrate indicators into farm-management tools and evaluate with users (P05; P03, P04, P06).\n- T7.4 Transfer measurement protocols to a second production context (P06; P03, P05).\n- T7.5 Run stakeholder engagement, dissemination and exploitation planning (P11; P01, P05, P10).\nDeliverables: D7.1, D7.2, D7.3, D7.4.\n\n## Table 3.1c — List of deliverables\n\nType codes map the canonical deliverable type to the form taxonomy: report to R, dataset to DATA, software to OTHER, other to OTHER. D1.1 is labelled DMP, because it is the data management plan the form requires as its own type within the first six months. Dissemination level is set to PU as an indicative default, consistent with the FAIR and open-science commitment. Datasets carrying sensitive species locations or personal data may be reclassified SEN under the Grant Agreement, with the data management plan (D1.1) deciding.\n\n| Number | Deliverable name | Short description | WP | Lead | Type | Diss. | Due (month) |\n|---|---|---|---|---|---|---|---|\n| 1.1 | Data management plan and shared metadata profile | The DMP and the metadata profile the three cases share. | WP1 | P01 | DMP | PU | 6 |\n| 1.2 | Cooperation and coordination plan | Cooperation with the named data frameworks and the space-agency programme. | WP1 | P01 | OTHER | PU | 12 |\n| 1.3 | Final project report | The final report on the action. | WP1 | P01 | R | PU | 48 |\n| 2.1 | Prioritised knowledge-gap and data-need analysis | Gaps and data needs in priority order. | WP2 | P02 | R | PU | 9 |\n| 2.2 | Multisensory integration architecture specification | The architecture from molecules to satellites. | WP2 | P02 | OTHER | PU | 14 |\n| 2.3 | Demonstration case selection dossier | The three selected cases and the basis for each. | WP2 | P02 | R | PU | 15 |\n| 3.1 | Joint data collection, metadata and processing protocols | The protocols adopted across the three cases. | WP3 | P10 | OTHER | PU | 16 |\n| 3.2 | Interoperability crosswalk package | Crosswalks for occurrence, habitat and ecosystem classifications. | WP3 | P10 | DATA | PU | 28 |\n| 3.3 | Provenance-tracked processing pipeline release | The reproducible processing pipeline. | WP3 | P10 | OTHER | PU | 34 |\n| 3.4 | FAIR publication and standards contribution report | Publication to the cloud and data spaces, and the standards contribution. | WP3 | P10 | R | PU | 42 |\n| 4.1 | Terrestrial case observation dataset | The harmonised terrestrial dataset. | WP4 | P03 | DATA | PU | 38 |\n| 4.2 | Freshwater case observation dataset | The harmonised freshwater dataset. | WP4 | P03 | DATA | PU | 38 |\n| 4.3 | Marine case dataset and the airborne and satellite layer | The marine dataset and the airborne and satellite layer behind the cases. | WP4 | P03 | DATA | PU | 38 |\n| 4.4 | Cross-case verification report | Which harmonisation decisions survived transfer between realms. | WP4 | P03 | R | PU | 40 |\n| 5.1 | Omics sampling and analysis protocol | The omics protocol for the three cases. | WP5 | P09 | OTHER | PU | 20 |\n| 5.2 | Molecular observation dataset with standardised metadata | The molecular dataset with standardised metadata. | WP5 | P09 | DATA | PU | 34 |\n| 5.3 | Genome-to-space linkage report | A molecular record joined to an in-situ and a satellite record. | WP5 | P09 | R | PU | 38 |\n| 6.1 | Documented training and validation resource with split protocol | The training resource with its declared split protocol. | WP6 | P12 | DATA | PU | 28 |\n| 6.2 | Habitat and ecosystem classification models and benchmarks | The classifiers and their case benchmarks. | WP6 | P12 | OTHER | PU | 38 |\n| 6.3 | European-scale maps and biodiversity trend predictions | Maps and trend predictions with stated uncertainty. | WP6 | P12 | DATA | PU | 45 |\n| 7.1 | Policy reporting needs assessment | The reporting obligations the outputs must carry. | WP7 | P05 | R | PU | 22 |\n| 7.2 | Biodiversity indicator decision-support release | The indicator decision-support surface. | WP7 | P05 | OTHER | PU | 40 |\n| 7.3 | Farm-management integration and usability evaluation | Integration into farm tools and the usability evaluation. | WP7 | P05 | R | PU | 44 |\n| 7.4 | Dissemination, exploitation and communication plan | The dissemination, exploitation and communication plan. | WP7 | P05 | OTHER | PU | 48 |\n\nThe data management plan (D1.1) meets the form requirement for a DMP within the first six months. The dissemination, exploitation and communication plan (D7.4) is scheduled at month 48, later than the form expectation of a plan within the first six months. This timing tension is flagged for resolution rather than concealed.\n\n## Table 3.1d — List of milestones\n\nMilestone months are not reproduced, because the canonical reference pack does not fix them. The means of verification are the Phase 3 verifiable criteria.\n\n| No | Milestone name | Related WPs | Due (month) | Means of verification |\n|---|---|---|---|---|\n| MS1 | Knowledge gaps prioritised | WP2 | not stated | The gap analysis is delivered and names, in priority order, the gaps the cases address and the data each needs. |\n| MS2 | Architecture and joint protocols agreed | WP1, WP2, WP3 | not stated | The architecture, the case selection and the joint protocols are delivered, and every partner running a campaign has adopted the protocol in writing. |\n| MS3 | All three campaigns running under the joint protocol | WP1, WP5, WP7 | not stated | Each campaign has collected one field round, the omics protocol is delivered, and the reporting-needs assessment states what the outputs must carry. |\n| MS4 | Training resource documented and the crosswalks published | WP3, WP6 | not stated | The training resource is published with its split protocol, and the crosswalk package resolves every habitat label to the European classification and the global typology. |\n| MS5 | Omics layer joined to the observation record | WP3, WP5 | not stated | The molecular dataset, the linkage report and the pipeline release are delivered, and a molecular record joins an in-situ and a satellite record through the metadata. |\n| MS6 | Three realms delivered and the models benchmarked | WP4, WP6 | not stated | The three case datasets are delivered under one protocol, and the models report benchmark scores on each under the declared split. |\n| MS7 | Cross-case verification complete and the indicators released | WP4, WP7 | not stated | The verification report states which harmonisation decisions survived transfer, and the indicator release is available to the user network. |\n| MS8 | European coverage delivered and the exploitation route settled | WP1, WP3, WP6, WP7 | not stated | The European-scale maps and trend predictions are published with stated uncertainty, the usability evaluation is reported, and the exploitation plan names each output route. |\n\n## Table 3.1e — Critical risks for implementation\n\nThese risks are the operator judgement on a design the consortium has not confirmed. Likelihood and severity use Low, Medium and High.\n\n| Risk | Likelihood / Severity | WPs | Mitigation |\n|---|---|---|---|\n| R01 The freshwater realm rests on one unconfirmed partner | M / H | WP4, WP5 | Identify a second freshwater partner before the grant agreement. If P07 does not join, the freshwater case is withdrawn and the scope is answered in two realms, stated rather than absorbed. |\n| R02 The marine realm rests on one unconfirmed partner | M / H | WP4, WP3 | As R01. Losing P08 also removes the marine occurrence-record contribution, which P10 then carries for the terrestrial and freshwater records only. |\n| R03 The consortium geography is thin for a topic asking for use cases across countries | H / M | WP4, WP7 | Ten of twelve partners sit in three country slots. Broaden the user network and the stakeholder work across more countries before submission. |\n| R04 The composition condition is met only under assumption | M / H | WP1 | Confirm at least three independent beneficiaries in three countries, one in a Member State, before submission. The Joint Research Centre place counts towards nothing. |\n| R05 No methodology vault backs the concept | H / M | WP2, WP6 | Author the methodology before drafting Part B, so the excellence case is lifted from evidence. Until then every mechanism claim stays assumed. |\n| R06 A joint protocol is agreed late and a campaign runs under a protocol that changes | M / H | WP3, WP4, WP5 | MS2 gates every campaign. A campaign may not start before the protocol is delivered and adopted in writing. A later change is a recorded revision. |\n| R07 The crosswalk does not resolve for some habitats | H / M | WP3 | Report the unresolved labels rather than forcing a mapping, and carry them to the standards bodies. |\n| R08 Environmental DNA reference libraries are incomplete for the taxa the cases need | H / M | WP5 | Build reference sequences for the gap taxa inside the project, and report the share of reads that remained unassigned. |\n| R09 A field season is lost to weather, access or permitting | M / M | WP4 | Each campaign spans several annual cycles, so one lost season does not end a case. Secure access and permits before the campaign starts. |\n| R10 The classification models learn the site rather than the biology | M / H | WP6 | Fix the split protocol in T6.2 before any model is trained. Report benchmarks under the declared split and no other. |\n| R11 Practitioners do not act on the indicators | M / M | WP7 | The usability evaluation asks whether a holding could act. A negative result is reported, because an indicator nobody acts on is a finding about the indicator. |\n| R12 The budget arrives late or inconsistent with the structure, and Phase 8 stays blocked | M / H | WP1 | This is a lump-sum topic, so the repository computes no figure. Prepare the request as soon as the design is gated, and treat a missing response as a blocking failure. |\n| R13 Required satellite data is unavailable from the European programmes for a band or revisit | L / M | WP4, WP6 | The condition permits other data in addition. Record every additional source and the reason the European data did not cover the need. |\n\n## Table 3.1f — Summary of staff effort\n\nPerson-months are not agreed. No partner participation is confirmed, so a seeded effort figure would read as a consortium decision the project cannot evidence. The work-package leader is marked (L) in each column. The person-month cells are populated once the effort split is agreed in the next phase and against the validated budget.\n\n| Partner | WP1 | WP2 | WP3 | WP4 | WP5 | WP6 | WP7 | Total |\n|---|---|---|---|---|---|---|---|---|\n| P01 | TBD (L) | TBD | TBD | TBD | TBD | TBD | TBD | TBD |\n| P02 | TBD | TBD (L) | | TBD | | TBD | | TBD |\n| P03 | TBD | TBD | | TBD (L) | TBD | TBD | TBD | TBD |\n| P04 | TBD | TBD | TBD | | TBD | | TBD | TBD |\n| P05 | | | | | | | TBD (L) | TBD |\n| P06 | | | | TBD | | | TBD | TBD |\n| P07 | | TBD | TBD | TBD | TBD | TBD | TBD | TBD |\n| P08 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |\n| P09 | TBD | TBD | TBD | TBD | TBD (L) | | | TBD |\n| P10 | TBD | TBD | TBD (L) | TBD | TBD | | TBD | TBD |\n| P11 | TBD | TBD | | TBD | | TBD | TBD | TBD |\n| P12 | TBD | TBD | TBD | TBD | | TBD (L) | TBD | TBD |\n\n## Table 3.1g — Subcontracting costs items\n\nCore tasks are performed by the beneficiaries, as the form requires, and no subcontracting of core tasks is foreseen. Subcontracting cost items and their justification are set with the validated lump-sum budget, which the external Lump Sum Budget Planner computes. No cost figures are stated here, because the repository computes none for a lump-sum topic.\n\n| Participant | Cost (EUR) | Description and justification |\n|---|---|---|\n| (all) | to be set with the validated budget | None foreseen for core tasks. |\n\n## Table 3.1h — Purchase costs items (major equipment)\n\nThe 15% threshold on personnel costs cannot be computed before the validated budget, because the budget is lump-sum and computed externally. No major equipment purchase has been identified at this stage. Any item crossing the threshold is justified against the budget table in Part A once the budget is received and validated.\n\n| Participant | Cost (EUR) | Justification |\n|---|---|---|\n| (none at this stage) | to be set with the validated budget | None identified. |\n\n## Status and open points\n\nThe work-plan structure, the leads, the case-realm assignments, the milestones, the risks and the effort are the operator design intent for a consortium whose participation is not confirmed. They are carried as assumptions, not as evidenced facts. The deliverable titles, types and due months reproduce the canonical reference pack. The detailed budget, the person-month effort and the subcontracting and purchase cost items depend on the validated lump-sum budget and are not finalised here.",
+          "word_count": 4083
+        },
+        {
+          "sub_section_id": "B.3.2",
+          "title": "Capacity of participants and consortium as a whole",
+          "content": "# B.3.2 Capacity of participants and consortium as a whole\n\n## One consortium built as the genome-to-space chain\n\nThe topic asks for one observation chain, from molecules to satellites, not a set of parallel tools. The consortium is assembled as that chain. Twelve partners, P01 to P12, cover the six objectives and the seven work packages. Each observation layer carries one lead, and each demonstration realm carries one lead. Every partner's participation is an operator assumption, so the coverage below is design intent rather than confirmed membership.\n\n## Disciplinary and inter-disciplinary coverage\n\nThe consortium spans twelve disciplines, joined along the integration chain.\n\n| Partner | Discipline | Contribution to the action |\n|---|---|---|\n| P01 | plant physiology and stress metabolomics | in-situ physiological and metabolomic measurement; statistical design and leakage-safe validation |\n| P02 | geoinformatics and remote sensing | sensor harmonisation from field spectroscopy through aerial survey to satellite earth observation |\n| P03 | agronomy | the multi-season field archive and the terrestrial case along the agricultural pressure gradient |\n| P04 | software engineering | reproducible pipelines, provenance and the decision-support surface |\n| P05 | farm-management information systems | the route carrying biodiversity indicators into farm-management tools |\n| P06 | horticultural research | transfer of the measurement protocols to a second production context and country |\n| P07 | freshwater ecology | the freshwater case and the floodplain and riparian ecotone observations |\n| P08 | marine and coastal science | the marine case and the marine occurrence and reporting records |\n| P09 | biodiversity genomics | the genomic, transcriptomic and environmental DNA layer and the omics metadata standard |\n| P10 | biodiversity data infrastructure | the crosswalks, the metadata profile and the open-science-cloud link |\n| P11 | socio-ecological systems | pressure analysis, socio-economic drivers and policy-reporting needs |\n| P12 | earth observation analytics and AI | European-scale habitat mapping and biodiversity trend prediction |\n\nThe inter-disciplinary join is the project's method, not a by-product. Omics (P01, P09), in-situ ecology (P03, P07, P08), remote sensing (P02, P12), data infrastructure (P10, P04) and socio-ecological analysis (P11) meet on one metadata standard and one pressure gradient.\n\n## Social sciences and humanities, open science and gender\n\nP11 carries the social-science capability. It analyses the socio-economic drivers behind each case and translates reporting obligations into data needs. This answers the scope requirement to take socio-economic pressures into account.\n\nOpen science rests on P10 and P04. P10 holds FAIR metadata practice and the integration of services into the European open science cloud. P04 holds the provenance tracking that makes the pipelines reproducible. The compliance profile requires FAIR data and links to the open science cloud and the common data spaces, and these two partners carry that duty.\n\nThe compliance profile requires a gender equality plan and an ethics review. No partner records dedicated expertise in the gender dimension of research content. This is a gap, flagged rather than concealed: the gender-of-R&I expertise must be added, through a partner or an advisory role, before submission.\n\n## Access to critical infrastructure\n\nEach activity rests on infrastructure a partner already operates, so the project reworks existing capacity rather than building it.\n- Field and laboratory: P03's multi-season field-experiment archive and precision-agriculture instrumentation; P01's metabolomics platform; P09's sequencing, bioinformatics and reference libraries.\n- Observation: P02's hyperspectral imaging, field spectroscopy and uncrewed aerial survey; P12's scalable cloud processing for European-scale earth observation.\n- Data facilities: P10's national species-occurrence data facility, which publishes to a global biodiversity data facility; P08's route to a global marine biodiversity data facility.\n- Uptake: P05's multi-country user network of agricultural holdings.\n\nThe project also reaches external infrastructure through named interfaces. P10 holds cooperation with the in-situ data collection frameworks the topic names, and the open-science-cloud and common-data-space link. P02 and P12 hold coordination with the space-agency earth observation programme the topic names. Access to all of this is assumed, because no partner's participation is confirmed.\n\n## How the partners complement one another\n\nThree chains make the consortium one system.\n\nGenome to space. P09 contributes the genomic and transcriptomic record and P01 the metabolomic record. These join the in-situ plots of P03, P07 and P08, the aerial and satellite layer of P02, and the European-scale maps of P12, through the metadata standard P10 and P09 define.\n\nCatchment to coast. The three realms sit on one agricultural pressure gradient. P03 runs farmland and grassland, P07 the freshwater ecotones receiving the runoff, and P08 the coastal waters downstream. A harmonisation decision taken in farmland is tested again in each realm.\n\nPressure to sector. P11 analyses the pressures and the reporting needs. P10 and P04 turn the outputs into a decision surface. P05 carries the indicators into farm-management tools, and P08 and P07 carry the marine and freshwater indicators to the competent authorities.\n\n## Valid role and resources for each participant\n\nEach partner holds one management role, and the twelve roles do not overlap. P01 coordinates. P02 is scientific and technical coordinator. P10 leads data management and interoperability, P09 the omics integration, P12 the analytics and prediction, and P04 the software and reproducibility. P03, P07 and P08 lead the terrestrial, freshwater and marine cases. P05 leads exploitation and uptake, P11 policy and stakeholder work, and P06 the protocol transfer.\n\nResources follow the role. Until the consortium agrees the effort split, each role is justified by the declared capability that carries it. Person-months and the detailed budget are set with the validated lump-sum budget, which an external planner computes, so no effort or cost figure is fixed here. Detailed intellectual-property access rights belong in the consortium agreement, which is not yet drafted; the grant-default allocation applies until then.\n\n## Industrial and commercial involvement\n\nThree partners are SMEs, and they own the project's routes to use. P04 engineers the reproducible processing and the decision-support surface. P05 carries biodiversity indicators into farm-management tools through its multi-country user network. P12 holds the European-scale habitat mapping and trend-prediction product.\n\nThis involvement matches the exploitation measures in section 2.2. The scope names agriculture as a sector that biodiversity data must reach, and P05's existing network is the channel that reaches it. P12 and P04 own the analytical and software products the exploitation plan carries forward.\n\n## Other countries and international organisations\n\nEvery partner is a beneficiary and an independent legal entity, placed in a Member State or an Associated Country slot. Four slots are Member State and two are Associated Country, P08 and P11. Member States and Associated Countries are both funding limbs under the General Annexes, so both Associated-Country partners are eligible for funding without a separate case. The essentiality clause applies only to an entity outside those limbs, and no participant sits outside them, so it is not triggered here.\n\nNo participation restriction binds the consortium. The destination, Biodiversity and ecosystem services, is on the list that exempts a Research and Innovation Action from the restriction on entities established in China, and no partner sits in a restricted country. The consortium holds no affiliated entities, so none is counted towards the composition minimum.\n\n## What is assumed, and what it costs\n\nThe composition condition is met only under assumption. The six derived partners, P01 to P06, span two Member State slots, one short of the Tier 1 minimum. Every partner that adds a third country, P07 to P12, is a fictional gap partner carried as an operator declaration. The condition therefore holds on the strength of those declarations, not on confirmed membership.\n\nTwo consequences follow for implementation. The freshwater realm rests on P07 alone and the marine realm on P08 alone, so losing either withdraws a realm rather than delaying it. The geography is thin: ten of the twelve partners sit in three country slots. Both are carried as risks in section 3.1 and must be resolved before the grant agreement.",
+          "word_count": 1308
+        }
+      ],
+      "validation_status": {
+        "overall_status": "assumed",
+        "claim_statuses": [
+          {
+            "claim_id": "instrument_ria_contribution",
+            "claim_summary": "The action is a HORIZON-RIA with a single EU contribution of EUR 5,000,000 per project.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "claim_id": "budget_regime_lump_sum",
+            "claim_summary": "The budget regime is lump-sum, computed by the external planner, so the cost-level tables (3.1g, 3.1h) carry no internally generated figures.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "claim_id": "project_duration",
+            "claim_summary": "48 months",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "project_scale",
+            "claim_summary": "7 work packages, 35 tasks, 24 deliverables, 8 milestones over 48 months",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "work_package_leads",
+            "claim_summary": "WP1 P01, WP2 P02, WP3 P10, WP4 P03, WP5 P09, WP6 P12, WP7 P05",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "coordinator",
+            "claim_summary": "P01",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "demonstration_case_realms",
+            "claim_summary": "terrestrial P03, freshwater P07, marine P08",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "effort_shares",
+            "claim_summary": "not agreed; workpackage_seed.json carries no person-months",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "project_scale",
+            "claim_summary": "7 work packages, 35 tasks, 24 deliverables, 8 milestones over 48 months",
+            "status": "assumed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "project_scale",
+            "claim_summary": "7 work packages, 35 tasks, 24 deliverables, 8 milestones over 48 months",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "critical_risks_assumed",
+            "claim_summary": "The critical-risk register R01 to R13 with likelihood, severity, affected work packages and mitigations is the operator judgement on an unconfirmed design.",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "project_scale",
+            "claim_summary": "7 work packages, 35 tasks, 24 deliverables, 8 milestones over 48 months",
+            "status": "assumed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "deliverable_dissemination_level_pu",
+            "claim_summary": "Deliverable dissemination level is set to PU as an indicative default consistent with the FAIR and open-science commitment, with sensitive datasets possibly reclassified SEN via the DMP.",
+            "status": "inferred",
+            "source_ref": "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+          },
+          {
+            "claim_id": "dmp_within_first_six_months",
+            "claim_summary": "D1.1 is the data management plan, delivered at month 6, meeting the form requirement for a DMP within the first six months.",
+            "status": "inferred",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          },
+          {
+            "claim_id": "dissemination_plan_timing",
+            "claim_summary": "The dissemination, exploitation and communication plan (D7.4) is scheduled at month 48, later than the form expectation of a plan within the first six months; flagged for resolution.",
+            "status": "assumed",
+            "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "occurrence_records_global_facilities",
+            "claim_summary": "Occurrence records reach the global biodiversity data facilities through cooperation held in WP1 and WP3, which rests on P10.",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P01_participation",
+            "claim_summary": "beneficiary, research_institute, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P02_participation",
+            "claim_summary": "beneficiary, university, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P03_participation",
+            "claim_summary": "beneficiary, university, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P04_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P05_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P06_participation",
+            "claim_summary": "beneficiary, research_institute, country slot C2 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P07_participation",
+            "claim_summary": "beneficiary, research_institute, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P08_participation",
+            "claim_summary": "beneficiary, university, country slot C4 (AC)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P09_participation",
+            "claim_summary": "beneficiary, university, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P10_participation",
+            "claim_summary": "beneficiary, ngo, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P11_participation",
+            "claim_summary": "beneficiary, university, country slot C6 (AC)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P12_participation",
+            "claim_summary": "beneficiary, sme, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "topic_coordination_requirements",
+            "claim_summary": "WP1 and WP3 earmark coordination with the space-agency earth observation programme, the named in-situ data frameworks, the open science cloud and common data spaces, and hold the Joint Research Centre place open, per the topic cross-cutting requirements.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+          },
+          {
+            "claim_id": "scope_three_realms",
+            "claim_summary": "The scope requires technical capabilities answering use cases across terrestrial, freshwater and marine ecosystems in Member States and Associated Countries (SR-02).",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 2,
+              "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+            }
+          },
+          {
+            "claim_id": "scope_socioeconomic_pressures",
+            "claim_summary": "The scope requires demonstration cases to take socio-economic pressures into account (SR-03).",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 2,
+              "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+            }
+          },
+          {
+            "claim_id": "scope_fair_data_infrastructures",
+            "claim_summary": "The scope requires FAIR data, harmonisation workflows and processing protocols linked to relevant data infrastructures (SR-04).",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 2,
+              "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+            }
+          },
+          {
+            "claim_id": "composition_condition_rule_tier1",
+            "claim_summary": "The Tier 1 composition condition requires three independent beneficiaries established in three different countries, at least one in a Member State and at least two others in Member States or Associated Countries.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 1,
+              "source_path": "docs/tier1_normative_framework/extracted/participation_rules.json"
+            }
+          },
+          {
+            "claim_id": "ms_ac_funding_limbs",
+            "claim_summary": "Member States and Associated Countries are funding limbs under the General Annexes, so entities established in them are eligible for funding without a separate case.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 1,
+              "source_path": "docs/tier1_normative_framework/extracted/participation_rules.json"
+            }
+          },
+          {
+            "claim_id": "essentiality_clause_scope",
+            "claim_summary": "The essentiality/other-countries funding clause applies only to an entity established outside the listed funding limbs.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 1,
+              "source_path": "docs/tier1_normative_framework/extracted/participation_rules.json"
+            }
+          },
+          {
+            "claim_id": "affiliated_entities_no_count",
+            "claim_summary": "Affiliated entities do not sign the grant agreement and do not count towards the minimum composition.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 1,
+              "source_path": "docs/tier1_normative_framework/extracted/participation_rules.json"
+            }
+          },
+          {
+            "claim_id": "china_restriction_exempt_destination",
+            "claim_summary": "The destination Biodiversity and ecosystem services is on the list that exempts an RIA from the restriction on entities established in China.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 1,
+              "source_path": "docs/tier1_normative_framework/extracted/participation_rules.json"
+            }
+          },
+          {
+            "claim_id": "gender_plan_required",
+            "claim_summary": "A gender equality plan is required for this call.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+            }
+          },
+          {
+            "claim_id": "ethics_review_required",
+            "claim_summary": "An ethics review is required for this call.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+            }
+          },
+          {
+            "claim_id": "open_science_fair_requirement",
+            "claim_summary": "The compliance profile requires FAIR data and links to the European open science cloud and the common data spaces.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+            }
+          },
+          {
+            "claim_id": "gender_dimension_expertise_gap",
+            "claim_summary": "No partner records dedicated expertise in the gender dimension of research content.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/consortium/partners.json"
+            }
+          },
+          {
+            "claim_id": "budget_lump_sum_external",
+            "claim_summary": "The topic is lump-sum, so the budget is computed by an external planner and no effort or cost figure is fixed in this section.",
+            "status": "confirmed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+            }
+          },
+          {
+            "claim_id": "P01_participation",
+            "claim_summary": "beneficiary, research_institute, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P02_participation",
+            "claim_summary": "beneficiary, university, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P03_participation",
+            "claim_summary": "beneficiary, university, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P04_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P05_participation",
+            "claim_summary": "beneficiary, sme, country slot C1 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P06_participation",
+            "claim_summary": "beneficiary, research_institute, country slot C2 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P07_participation",
+            "claim_summary": "beneficiary, research_institute, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P08_participation",
+            "claim_summary": "beneficiary, university, country slot C4 (AC)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P09_participation",
+            "claim_summary": "beneficiary, university, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P10_participation",
+            "claim_summary": "beneficiary, ngo, country slot C3 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P11_participation",
+            "claim_summary": "beneficiary, university, country slot C6 (AC)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "P12_participation",
+            "claim_summary": "beneficiary, sme, country slot C5 (MS)",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "coordinator",
+            "claim_summary": "P01",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "work_package_leads",
+            "claim_summary": "WP1 P01, WP2 P02, WP3 P10, WP4 P03, WP5 P09, WP6 P12, WP7 P05",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "demonstration_case_realms",
+            "claim_summary": "terrestrial P03, freshwater P07, marine P08",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "country_slot_assignment",
+            "claim_summary": "C1 MS, C2 MS, C3 MS, C4 AC, C5 MS, C6 AC",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "composition_condition",
+            "claim_summary": "met only under assumption",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "occurrence_records_global_facilities",
+            "claim_summary": "Occurrence records reach the global biodiversity data facilities through cooperation held in WP1 and WP3, which rests on P10.",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "consortium_agreement_not_drafted",
+            "claim_summary": "Detailed IP access rights belong in the consortium agreement, which is not yet drafted.",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          },
+          {
+            "claim_id": "effort_shares",
+            "claim_summary": "not agreed; workpackage_seed.json carries no person-months",
+            "status": "assumed",
+            "source_ref": {
+              "tier": 3,
+              "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+            },
+            "assumption_declared": true
+          }
+        ]
+      },
+      "traceability_footer": {
+        "primary_sources": [
+          {
+            "tier": 1,
+            "source_path": "docs/tier1_normative_framework/extracted/participation_rules.json"
+          },
+          {
+            "tier": 2,
+            "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/consortium/partners.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/consortium/roles.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+          },
+          {
+            "tier": 3,
+            "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+          },
+          {
+            "tier": 4,
+            "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          },
+          {
+            "tier": 4,
+            "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+          }
+        ],
+        "no_unsupported_claims_declaration": true
+      },
+      "gantt_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json",
+      "milestone_refs": [
+        "MS1",
+        "MS2",
+        "MS3",
+        "MS4",
+        "MS5",
+        "MS6",
+        "MS7",
+        "MS8"
+      ],
+      "risk_register_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+      "wp_table_refs": [
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ]
+    }
+  }
+}
