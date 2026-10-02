@@ -40,7 +40,15 @@ from runner.dev_graph import (
 )
 from runner.dev_graph.builder import WP_SEED_REL
 from runner.dev_graph.identity import HASH_PREFIX
+from runner.dev_graph.schema import ERROR_KINDS
+from runner.dev_graph.shadow import read_reuse_decisions
 from runner.paths import find_repo_root
+from runner.run_context import (
+    PRESERVED_RUN_RECORD_SCHEMA_ID,
+    PRESERVED_RUN_RECORDS_REL,
+    RUNS_DIR_REL,
+    run_id_slug,
+)
 
 FIXTURE = find_repo_root() / "tests" / "fixtures" / "dev_graph_synthetic"
 CANDIDATE = Path("docs/tier5_deliverables/candidates/synthetic_candidate.json")
@@ -210,7 +218,7 @@ class TestRefusals:
         plan = _t03_moved_plan(world)
         with pytest.raises(DevGraphError) as exc:
             compare_shadow(plan, {}, run_id="run-x")
-        assert exc.value.kind == "malformed_request"
+        assert exc.value.kind == "no_reuse_decision"
 
     def test_a_decision_without_a_closed_status_is_refused(self, world: Path):
         plan = _t03_moved_plan(world)
@@ -231,11 +239,14 @@ class TestRefusals:
         with pytest.raises(DevGraphError):
             compare_shadow(None, {NODE: REUSED}, run_id="run-x")  # type: ignore[arg-type]
 
-    def test_a_bad_run_id_is_refused(self, world: Path):
+    def test_a_run_id_that_is_not_a_plain_identifier_is_recorded_not_refused(self, world: Path):
+        # The comparison's run id names the run inside the artifact; it is
+        # not a path. A run whose id is unsafe for the file system is read
+        # through its preserved record, and the comparison must still name
+        # it truthfully.
         plan = _t03_moved_plan(world)
-        with pytest.raises(DevGraphError) as exc:
-            compare_shadow(plan, {NODE: REUSED}, run_id="bad id")
-        assert exc.value.kind == "malformed_request"
+        comparison = compare_shadow(plan, {NODE: REUSED}, run_id="bad id")
+        assert comparison.run_id == "bad id"
 
 
 # --------------------------------------------------------------------------- #
@@ -352,3 +363,143 @@ class TestDecisionLog:
         for diagnostic in DIAGNOSTICS:
             assert diagnostic in text
         assert "evaluate_gate" in text and "gate_09" in text
+
+
+# --------------------------------------------------------------------------- #
+# Naming a run whose id is not a plain identifier
+# --------------------------------------------------------------------------- #
+
+
+MISPASTED_RUN_ID = "import uuid; print(uuid.uuid4())"
+
+
+def _seed_preserved(
+    root: Path, run_id: str, decisions: object, *, schema_id: str = PRESERVED_RUN_RECORD_SCHEMA_ID
+) -> Path:
+    path = root / PRESERVED_RUN_RECORDS_REL / f"{run_id_slug(run_id)}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    doc: dict = {"schema_id": schema_id, "run_id": run_id, "node_states": {}, "reuse_decisions": decisions}
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    return path
+
+
+class TestPreservedRunRecordFallback:
+    """The reader accepts the record ``tools/preserve_run_manifests.py``
+    writes under the run id's slug, with the true run id inside."""
+
+    def test_a_live_manifest_is_still_read_first(self, world: Path):
+        _seed_manifest(world, "run-live", {NODE: REUSED})
+        _seed_preserved(world, "run-live", {NODE: NOT_REUSED})
+
+        assert read_reuse_decisions(world, "run-live") == {NODE: REUSED}
+
+    def test_a_plain_id_is_never_served_from_a_preserved_copy(self, world: Path):
+        # A Tier 4 copy can go stale after a later dispatch under the same
+        # id. For an id that can address the live layout, an absent live
+        # manifest is an absent run, not a cue to read the copy.
+        _seed_preserved(world, "run-gone", {NODE: NOT_REUSED})
+
+        with pytest.raises(DevGraphError) as exc:
+            read_reuse_decisions(world, "run-gone")
+        assert exc.value.kind == "malformed_request" and RUNS_DIR_REL in exc.value.offender
+
+    def test_the_mispasted_run_id_is_read_by_slug(self, world: Path):
+        _seed_preserved(world, MISPASTED_RUN_ID, {NODE: NOT_REUSED})
+
+        assert read_reuse_decisions(world, MISPASTED_RUN_ID) == {NODE: NOT_REUSED}
+
+    def test_the_live_runs_directory_is_never_probed_with_an_unsafe_id(self, world: Path, monkeypatch):
+        # The live layout is only ever addressed with a plain identifier; an
+        # unsafe id goes straight to the preserved record by slug.
+        probed: list[str] = []
+        real_is_file = Path.is_file
+
+        def spy(self: Path) -> bool:
+            probed.append(self.as_posix())
+            return real_is_file(self)
+
+        monkeypatch.setattr(Path, "is_file", spy)
+        with pytest.raises(DevGraphError):
+            read_reuse_decisions(world, MISPASTED_RUN_ID)
+        assert not any(".claude/runs" in p for p in probed)
+
+    def test_a_preserved_record_naming_a_different_run_is_refused(self, world: Path):
+        path = _seed_preserved(world, MISPASTED_RUN_ID, {NODE: NOT_REUSED})
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc["run_id"] = "someone-else"
+        path.write_text(json.dumps(doc), encoding="utf-8")
+
+        with pytest.raises(DevGraphError) as exc:
+            read_reuse_decisions(world, MISPASTED_RUN_ID)
+        assert exc.value.kind == "malformed_record" and "different run" in str(exc.value)
+
+    def test_a_preserved_record_of_another_schema_is_refused(self, world: Path):
+        _seed_preserved(world, MISPASTED_RUN_ID, {NODE: NOT_REUSED}, schema_id="orch.something.else.v1")
+
+        with pytest.raises(DevGraphError) as exc:
+            read_reuse_decisions(world, MISPASTED_RUN_ID)
+        assert exc.value.kind == "malformed_record"
+
+    def test_an_unsafe_id_with_no_preserved_record_is_a_malformed_request(self, world: Path):
+        with pytest.raises(DevGraphError) as exc:
+            read_reuse_decisions(world, "no such run")
+        assert exc.value.kind == "malformed_request"
+        assert PRESERVED_RUN_RECORDS_REL in exc.value.offender
+
+
+class TestARunWithNoDecision:
+    """A run that recorded nothing is a fact about the run, not a bad request."""
+
+    def test_a_manifest_without_the_key_is_refused_as_no_reuse_decision(self, world: Path):
+        path = _seed_manifest(world, "run-fresh", {})
+        path.write_text(json.dumps({"run_id": "run-fresh"}), encoding="utf-8")
+
+        with pytest.raises(DevGraphError) as exc:
+            read_reuse_decisions(world, "run-fresh")
+        assert exc.value.kind == "no_reuse_decision"
+
+    def test_a_preserved_record_with_a_null_map_is_refused_as_no_reuse_decision(self, world: Path):
+        _seed_preserved(world, MISPASTED_RUN_ID, None)
+
+        with pytest.raises(DevGraphError) as exc:
+            read_reuse_decisions(world, MISPASTED_RUN_ID)
+        assert exc.value.kind == "no_reuse_decision"
+        assert exc.value.offender.endswith("import-uuid-print-uuid.uuid4.json")
+
+    def test_an_empty_decision_map_is_no_reuse_decision_too(self, world: Path):
+        plan = _t03_moved_plan(world)
+        with pytest.raises(DevGraphError) as exc:
+            compare_shadow(plan, {}, run_id="run-x")
+        assert exc.value.kind == "no_reuse_decision"
+
+    def test_the_kind_is_in_the_closed_set(self):
+        assert "no_reuse_decision" in ERROR_KINDS
+
+
+class TestComparingUnderTheTrueRunId:
+    def test_the_comparison_reports_the_true_run_id_even_when_it_is_not_plain(self, world: Path):
+        plan = _nothing_changed_plan(world)
+        comparison = compare_shadow(plan, {NODE: NOT_REUSED}, run_id=MISPASTED_RUN_ID)
+
+        assert comparison.run_id == MISPASTED_RUN_ID
+        assert comparison.to_dict()["run_id"] == MISPASTED_RUN_ID
+
+    def test_an_empty_or_non_string_run_id_is_still_refused(self, world: Path):
+        plan = _t03_moved_plan(world)
+        for bad in ("", None, 3):
+            with pytest.raises(DevGraphError) as exc:
+                compare_shadow(plan, {NODE: REUSED}, run_id=bad)  # type: ignore[arg-type]
+            assert exc.value.kind == "malformed_request"
+
+    def test_the_writer_compares_the_mispasted_run_through_the_preserved_record(self, world: Path):
+        _seed_preserved(world, MISPASTED_RUN_ID, {NODE: NOT_REUSED})
+        _nothing_changed_plan(world)
+        plan_id = _write_plan(world, "CR-NOOP")
+        (world / SHADOW_REQUEST_REL).write_text(
+            json.dumps({"plan_id": plan_id, "run_id": MISPASTED_RUN_ID}), encoding="utf-8"
+        )
+
+        [written] = write_shadow_comparison(world)
+        doc = json.loads(written.read_text(encoding="utf-8"))
+        assert doc["run_id"] == MISPASTED_RUN_ID
+        assert doc["diagnostic"] in DIAGNOSTICS

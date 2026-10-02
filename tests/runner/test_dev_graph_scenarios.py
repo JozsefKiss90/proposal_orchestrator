@@ -464,7 +464,9 @@ class TestRunScenario:
         self, planning_world: Path, tmp_path: Path
     ) -> None:
         # The comparison refuses rather than reporting agreement over an
-        # empty decision set. That refusal is the result, not an error.
+        # empty decision set. That refusal is the result, not an error, and
+        # its kind says the run holds no decision rather than blaming the
+        # request (subticket A).
         result = run_scenario(
             planning_world,
             _move_t03(),
@@ -474,7 +476,7 @@ class TestRunScenario:
 
         shadow = result.arms[0].shadow[0]
         assert shadow.get("diagnostic") is None
-        assert shadow["refused"]["kind"] == "malformed_request"
+        assert shadow["refused"]["kind"] == "no_reuse_decision"
 
     def test_the_world_is_byte_for_byte_unchanged(
         self, planning_world: Path, tmp_path: Path

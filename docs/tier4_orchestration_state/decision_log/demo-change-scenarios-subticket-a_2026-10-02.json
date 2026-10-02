@@ -1,0 +1,79 @@
+{
+  "record_type": "decision",
+  "id": "demo-change-scenarios-subticket-a",
+  "date": "2026-10-02",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), subticket A 'Name the Phase 8 run to the comparison' under 'Change scenarios and shadow comparison' in plans/dev_graph_demo_tickets.md",
+  "parent_record": "docs/tier4_orchestration_state/decision_log/demo-change-scenarios_2026-10-02.json",
+  "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4. Applies §9.1 (docs/ is the durable record, which is why a run manifest under .claude/runs is reached through its Tier 4 copy), §9.6 (the schema registry reflects the repository, so the preserved record schema is registered), §12.1 (an output names its inputs), §12.4 and §15 (a refusal is a correct output; nothing is fabricated to make a comparison succeed), §17.1 (the DAG scheduler is not touched; the check sits in the CLI entry point before RunContext). Not a constitutional amendment; §14.5 is not engaged.",
+  "decision": "The run id rule has one owner, runner.run_context, and is enforced at the CLI entry point before a run directory can exist. The shadow comparison's reader reaches a run through its live manifest when the id is a plain identifier, and otherwise through the record tools/preserve_run_manifests.py keeps under the id's slug, checked to name the run asked for. The comparison records the true run id. All eight advisories were compared again against the Phase 8 run and the result is recorded: the run is reached and holds no reuse decision, so the comparison refuses with the new kind no_reuse_decision, which is a fact about the run and not about the request.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-change-scenarios-subticket-a_2026-10-02.json",
+  "acceptance_criteria": {
+    "1_a_non_plain_run_id_fails_at_the_entry_point_with_the_rule_named": "MET. runner/__main__.py refuses --run-id before RunContext.load_or_initialize, exit code 3 (configuration error), message naming the rule from RUN_ID_RULE. tests/runner/test_run_id_rule.py pins the exit code, the message and that no .claude/runs directory is created, in text and in --json mode. Every run id the existing test suite passes to main() satisfies the rule, so nothing else changed behaviour.",
+    "2_the_comparison_reads_the_preserved_manifest_by_slug_and_reports_the_true_run_id": "MET. runner/dev_graph/shadow.py locate_run_manifest serves a plain identifier from .claude/runs/<id>/run_manifest.json and nothing else, and an id that is not a plain identifier from docs/tier4_orchestration_state/run_records/<slug>.json; the preserved record must carry orch.run_record.preserved.v1 and name the requested run. compare_shadow records the run id as given and no longer requires it to be plain, because inside the artifact it names a run and is not a path. tests/runner/test_dev_graph_shadow.py covers the slug read of the mis-pasted id, that a plain id is never served from a copy, that the live directory is never probed with an unsafe id, schema and run-id mismatch refusals, and the writer end to end.",
+    "3_the_eight_advisories_compared_against_the_phase_8_run_return_a_diagnostic_or_a_non_malformed_request_refusal": "MET as a refusal of kind no_reuse_decision, offender docs/tier4_orchestration_state/run_records/import-uuid-print-uuid.uuid4.json, in all eight recorded arms. The run is reached and its manifest holds no reuse_decisions key. That is F2 (subticket D): the three drafting nodes ran fresh and the scheduler persists a decision only when it reuses. A diagnostic cannot come from this run until a run records a decision. tests/test_demo_change_scenarios.py pins eight comparisons against the true run id, none of them malformed_request, each naming the preserved record."
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "The run id rule, its sentence for the operator, the slug and the preserved-record layout live in runner.run_context, and both the CLI and the shadow reader import them.",
+      "reasoning": "A run id is a directory name under .claude/runs, which run_context owns, so what a run id may be is run_context's to say. The ticket asks for the same rule in the entry point and the reader; a shared owner makes drift impossible rather than tested-against. tools/preserve_run_manifests.py had its own slug function; it now uses the shared one, and a test pins that the mis-pasted id still slugifies to the file name already on disk.",
+      "recorded_in": "runner/run_context.py RUN_ID_RE, RUN_ID_RULE, is_plain_run_id, run_id_slug, PRESERVED_RUN_RECORDS_REL, PRESERVED_RUN_RECORD_SCHEMA_ID"
+    },
+    {
+      "id": "D1b",
+      "decision": "A plain run id is never served from its preserved copy; only an id that cannot address the live layout is.",
+      "reasoning": "A first draft fell back to the Tier 4 copy whenever the live manifest was absent. The code review pointed at F3: a copy goes stale silently after a later dispatch, and the comparison artifact does not record which source it read. For a plain id the live manifest is the record, and its absence is an absent run. The copy is the only route for an id that cannot be spelled into the live path, which is the case the ticket names.",
+      "recorded_in": "runner/dev_graph/shadow.py locate_run_manifest"
+    },
+    {
+      "id": "D2",
+      "decision": "The check sits in the CLI entry point, not in RunContext and not in the scheduler.",
+      "reasoning": "The ticket names the entry point and says the DAG scheduler is not touched. RunContext.initialize is also called directly by tests and tools with ids of their own; widening the check there would change a constructor's contract for a defect that enters only through the command line.",
+      "recorded_in": "runner/__main__.py, before RunContext.load_or_initialize"
+    },
+    {
+      "id": "D3",
+      "decision": "A run that holds no reuse decision refuses with a new closed-set kind, no_reuse_decision, in place of malformed_request.",
+      "reasoning": "The request named a run that exists. Reporting that as a malformed request would blame the operator for a fact about the run and would make the ticket's third box unreadable: every honest result for the Phase 8 run would carry the kind the box excludes. The kind is added to ERROR_KINDS with its own comment; an empty decision map and a missing key are both this kind.",
+      "recorded_in": "runner/dev_graph/schema.py ERROR_KINDS; runner/dev_graph/shadow.py _decisions, read_reuse_decisions"
+    },
+    {
+      "id": "D4",
+      "decision": "The preserve tool copies an absent reuse_decisions key as null, never as an empty map, and its note describes the run it copied.",
+      "reasoning": "The reader now distinguishes the two, so the copy must keep the distinction. The previous note asserted that the run was a Phases 1 to 6 run and that no dispatched node could decide; for the Phase 8 run that was false, and the preserved copy of that run was also stale, taken when the run held six nodes rather than thirteen. Both preserved records were rewritten by the tool and are byte-equal under --check. The new --check test turns a stale copy into a red suite after any later dispatch under the same run id; rerunning the tool is the one-command fix, and the trade-off is accepted so that staleness is noticed rather than read.",
+      "recorded_in": "tools/preserve_run_manifests.py _reuse_decisions_note; docs/tier4_orchestration_state/run_records/*.json"
+    },
+    {
+      "id": "D5",
+      "decision": "The preserved record schema orch.run_record.preserved.v1 is registered in docs/index/schema_registry.json.",
+      "reasoning": "The reader now depends on that schema id as a contract. §9.6 requires the registries to reflect the repository, and the schema had not been registered when the tool was first written.",
+      "recorded_in": "docs/index/schema_registry.json"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The Phase 8 run's manifest holds no reuse_decisions key, so naming it to the comparison yields no_reuse_decision, not a diagnostic.",
+      "detail": "The three drafting nodes n08a, n08b and n08c were dispatched and ran fresh. The scheduler calls record_reuse_decision only on the reuse branch, so nothing durable records what they decided (parent record F2). Subticket A removes the id as a cause of refusal; it cannot and does not supply a decision. The first comparison with a diagnostic needs subticket D or a run that reuses a section.",
+      "disposition": "OPEN. Subticket D (Milestone 2 candidate M1)."
+    },
+    {
+      "id": "F2",
+      "summary": "The mis-pasted id also left two stray Tier 4 files whose names were derived from it.",
+      "detail": "docs/tier4_orchestration_state/decision_log/decision-log-update_import u.json and docs/tier4_orchestration_state/validation_reports/milestone-consistency-check_import u.json and proposal-section-traceability-check_import u.json carry the first word of the mis-pasted id in their file names. They are Phase 8 outputs of that run and are left as they are: renaming them would detach them from the run that wrote them. The entry-point check prevents new ones.",
+      "disposition": "RECORDED. No action in this subticket."
+    },
+    {
+      "id": "F3",
+      "summary": "The preserved copy of the Phase 8 run was stale and its note was false for that run.",
+      "detail": "It was written on 2026-09-30 when the run held six released nodes; the run then dispatched n07 and n08a to n08f. Its reuse_decisions_note called it a Phases 1 to 6 run. Nothing checked the copy against the manifest after the later dispatches. tests/test_preserve_run_manifests.py now runs the tool's --check mode against the live world when .claude/runs is present.",
+      "disposition": "CLOSED by rerunning the tool (D4)."
+    }
+  ],
+  "what_is_outstanding_for_the_operator": [
+    "Subticket B: enact deliverable_month_moves through the refinement route and dispatch the rerun under a plain run id. The entry point now refuses an id that is not one.",
+    "Subticket D: persist the not_reused decision, so a comparison against a fresh run can return a diagnostic rather than no_reuse_decision."
+  ],
+  "authored_by": "Claude Fable 5.1, on operator instruction, 2026-10-02. The third box is met by a refusal that names the run's own state; no decision was seeded and no manifest was edited to make a diagnostic appear."
+}

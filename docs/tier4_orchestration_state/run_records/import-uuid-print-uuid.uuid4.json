@@ -2,6 +2,7 @@
   "schema_id": "orch.run_record.preserved.v1",
   "run_id": "import uuid; print(uuid.uuid4())",
   "run_id_is_a_uuid": false,
+  "run_id_is_a_plain_identifier": false,
   "copied_from": ".claude/runs/import uuid; print(uuid.uuid4())",
   "manifest_version": "1.1",
   "library_version": "1.0",
@@ -13,7 +14,14 @@
     "n03_wp_design": "released",
     "n04_gantt_milestones": "released",
     "n05_impact_architecture": "released",
-    "n06_implementation_architecture": "released"
+    "n06_implementation_architecture": "released",
+    "n07_budget_gate": "released",
+    "n08c_implementation_drafting": "released",
+    "n08d_assembly": "released",
+    "n08a_excellence_drafting": "released",
+    "n08f_revision": "released",
+    "n08b_impact_drafting": "released",
+    "n08e_evaluator_review": "released"
   },
   "node_failure_details": {
     "n01_call_analysis": {
@@ -51,25 +59,67 @@
       "exit_gate_evaluated": true,
       "failure_reason": null,
       "failure_category": null
+    },
+    "n07_budget_gate": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08a_excellence_drafting": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08c_implementation_drafting": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08b_impact_drafting": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08d_assembly": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08e_evaluator_review": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08f_revision": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
     }
   },
-  "reuse_decisions": {},
-  "reuse_decisions_note": "Empty is the correct record for a Phases 1 to 6 run, not a missing one: the reuse layer covers only the three Phase 8 drafting nodes, so no node dispatched here can produce a reuse decision.",
+  "reuse_decisions": null,
+  "reuse_decisions_note": "The manifest holds no reuse_decisions key. The reuse-eligible nodes n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting were dispatched, so each produced a decision. The scheduler persists a decision to the manifest only when it reuses, and these nodes ran fresh. A not_reused decision reaches run_summary.json only. The next dispatch under the same run id overwrites that file. Nothing durable records what they decided.",
   "reuse_policy": {
     "reuse_policy_for_run": "import uuid; print(uuid.uuid4())",
     "approved_artifacts": []
   },
   "surviving_run_summary": {
     "overall_status": "pass",
-    "phase_scope": 6,
+    "phase_scope": null,
     "dispatched_nodes": [
-      "n06_implementation_architecture"
+      "n08f_revision"
     ],
-    "started_at": "2026-09-30T23:37:55.557021+00:00",
-    "completed_at": "2026-09-30T23:46:18.057808+00:00",
+    "started_at": "2026-10-02T12:30:24.601019+00:00",
+    "completed_at": "2026-10-02T12:47:13.484221+00:00",
     "gate_results_index": {
-      "phase_06_gate": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json"
+      "gate_12_constitutional_compliance": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_12_result.json"
     }
   },
-  "run_summary_caveat": "A run summary is rewritten by each dispatch under the same run id. This run dispatched 6 phases, so the summary preserved here describes only its last dispatch: n06_implementation_architecture. The node states and reuse decisions above come from the manifest, which is cumulative and loses nothing."
+  "run_summary_caveat": "A run summary is rewritten by each dispatch under the same run id. This run dispatched 13 nodes, so the summary preserved here describes only its last dispatch: n08f_revision. The node states and reuse decisions above come from the manifest, which is cumulative and loses nothing."
 }

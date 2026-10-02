@@ -264,6 +264,10 @@ ERROR_KINDS: frozenset[str] = frozenset(
         "immutable_record",
         "missing_snapshot",
         "malformed_snapshot",
+        # Shadow comparison (runner.dev_graph.shadow): the named run exists
+        # and recorded no reuse decision. A fact about the run, not a bad
+        # request.
+        "no_reuse_decision",
     }
 )
 

@@ -44,6 +44,7 @@ HARD_BLOCK propagation state
 from __future__ import annotations
 
 import json
+import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,6 +61,45 @@ RUNS_DIR_REL: str = ".claude/runs"
 
 RUN_MANIFEST_FILENAME: str = "run_manifest.json"
 REUSE_POLICY_FILENAME: str = "reuse_policy.json"
+
+# ---------------------------------------------------------------------------
+# Run identity
+# ---------------------------------------------------------------------------
+# A run id is a directory name under RUNS_DIR_REL, so what a run id may be is
+# this module's to say. The CLI entry point enforces the rule before a run
+# directory exists; the dev-graph shadow comparison imports the same rule to
+# decide whether an id may address the live layout at all. One owner, so the
+# two cannot drift.
+
+#: The rule, as a regular expression: a plain identifier.
+RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
+#: The rule, as a sentence for the operator who typed the id.
+RUN_ID_RULE: str = (
+    "a run id must start with a letter or digit and contain only letters, "
+    "digits, '_', '.' and '-'"
+)
+
+
+def is_plain_run_id(run_id: object) -> bool:
+    """``True`` when *run_id* is a string satisfying :data:`RUN_ID_RE`."""
+    return isinstance(run_id, str) and RUN_ID_RE.match(run_id) is not None
+
+
+#: Where ``tools/preserve_run_manifests.py`` copies a run manifest into the
+#: durable record (§9.1), one file per run, named by :func:`run_id_slug`.
+PRESERVED_RUN_RECORDS_REL: str = "docs/tier4_orchestration_state/run_records"
+PRESERVED_RUN_RECORD_SCHEMA_ID: str = "orch.run_record.preserved.v1"
+
+
+def run_id_slug(run_id: str) -> str:
+    """A file-safe name for *run_id*, which may predate the rule above.
+
+    A plain identifier is its own slug. Anything else has every run of
+    other characters replaced by one ``-`` and leading dots and dashes
+    stripped, so the result always satisfies :data:`RUN_ID_RE`.
+    """
+    cleaned = re.sub(r"[^A-Za-z0-9._-]+", "-", str(run_id)).lstrip("-.").rstrip("-")
+    return (cleaned or "unnamed-run")[:80]
 
 #: All valid node-state values (permanent + runner-internal).
 NODE_STATES: frozenset[str] = frozenset(

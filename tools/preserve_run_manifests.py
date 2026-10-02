@@ -14,10 +14,19 @@ same run id, so for a run dispatched one phase at a time only the last survives.
 That is recorded as a fact about the run rather than quietly presented as the
 whole of it.
 
-A run id is used in file names, and nothing validates it: a mis-pasted argument
-becomes a directory name. So the output file is named by a slug derived from the
-run id, with the true run id recorded inside, and runs whose ids slugify the same
-are refused rather than silently merged.
+A run id is used in file names, and until the CLI learned to refuse one that
+breaks the rule, a mis-pasted argument became a directory name. So the output
+file is named by the slug ``runner.run_context`` derives from the run id, with
+the true run id recorded inside, and runs whose ids slugify the same are refused
+rather than silently merged. The dev-graph shadow comparison reads the record by
+that slug when the live layout cannot be addressed with the id, so this copy is
+the only way such a run can ever be named to a comparison.
+
+A run that went on to dispatch Phase 8 is copied whole. Its manifest may hold
+no ``reuse_decisions`` key at all: the scheduler persists a decision to the
+manifest only when it reuses, and a run whose drafting nodes all ran fresh
+records nothing durable. That absence is copied as ``null``, never coerced to
+an empty map, and the note beside it says which it was.
 
 Run it from the repository root::
 
@@ -41,10 +50,16 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from runner.atomic_write import atomic_write_json, canonical_json_bytes  # noqa: E402
+from runner.phase8_reuse import REUSE_ELIGIBLE_NODES  # noqa: E402
+from runner.run_context import (  # noqa: E402
+    PRESERVED_RUN_RECORD_SCHEMA_ID,
+    PRESERVED_RUN_RECORDS_REL,
+    RUN_MANIFEST_FILENAME,
+    RUNS_DIR_REL,
+    is_plain_run_id,
+    run_id_slug,
+)
 
-SCHEMA_ID = "orch.run_record.preserved.v1"
-RUNS_REL = ".claude/runs"
-OUTPUT_DIR_REL = "docs/tier4_orchestration_state/run_records"
 
 #: A run qualifies only when its manifest holds a state for every one of these.
 #: The ticket's subject is the Phase 1 to 6 sequence, so a run that dispatched
@@ -64,10 +79,30 @@ class PreservationError(RuntimeError):
     """Two runs cannot be told apart, or a manifest is unreadable."""
 
 
-def slug(run_id: str) -> str:
-    """A file-safe name for *run_id*, which nothing validates upstream."""
-    cleaned = re.sub(r"[^A-Za-z0-9._-]+", "-", run_id).strip("-")
-    return (cleaned or "unnamed-run")[:80]
+def _reuse_decisions_note(states: dict[str, Any], decisions: Any) -> str:
+    """What the copied ``reuse_decisions`` value means for this run."""
+    eligible = sorted(n for n in REUSE_ELIGIBLE_NODES if n in states)
+    if not eligible:
+        return (
+            "An absent or empty map is the correct record for a run that dispatched "
+            "none of the reuse-eligible nodes, not a missing one: the reuse layer covers only "
+            "the Phase 8 drafting nodes, so no node dispatched here can produce a "
+            "reuse decision."
+        )
+    if decisions is None:
+        return (
+            "The manifest holds no reuse_decisions key. The reuse-eligible nodes "
+            + ", ".join(eligible)
+            + " were dispatched, so each produced a decision. The scheduler "
+            "persists a decision to the manifest only when it reuses, and these "
+            "nodes ran fresh. A not_reused decision reaches run_summary.json only. "
+            "The next dispatch under the same run id overwrites that file. Nothing "
+            "durable records what they decided."
+        )
+    return (
+        "The reuse-eligible nodes " + ", ".join(eligible) + " were dispatched; "
+        "the map above is what the manifest records for them, copied as is."
+    )
 
 
 def _read(path: Path) -> Any:
@@ -77,7 +112,7 @@ def _read(path: Path) -> Any:
 def collect(repo_root: Path) -> list[dict[str, Any]]:
     """One preserved record per qualifying run, ordered by the manifest clock."""
     records: list[dict[str, Any]] = []
-    for manifest_path in sorted((repo_root / RUNS_REL).glob("*/run_manifest.json")):
+    for manifest_path in sorted((repo_root / RUNS_DIR_REL).glob(f"*/{RUN_MANIFEST_FILENAME}")):
         manifest = _read(manifest_path)
         states = manifest.get("node_states") or {}
         if not all(node in states for node in QUALIFYING_NODES):
@@ -91,7 +126,7 @@ def collect(repo_root: Path) -> list[dict[str, Any]]:
         dispatched = (summary or {}).get("dispatched_nodes") or []
         records.append(
             {
-                "schema_id": SCHEMA_ID,
+                "schema_id": PRESERVED_RUN_RECORD_SCHEMA_ID,
                 "run_id": manifest["run_id"],
                 "run_id_is_a_uuid": bool(
                     re.fullmatch(
@@ -100,6 +135,7 @@ def collect(repo_root: Path) -> list[dict[str, Any]]:
                         str(manifest["run_id"]),
                     )
                 ),
+                "run_id_is_a_plain_identifier": is_plain_run_id(manifest["run_id"]),
                 "copied_from": str(directory.relative_to(repo_root)).replace("\\", "/"),
                 "manifest_version": manifest.get("manifest_version"),
                 "library_version": manifest.get("library_version"),
@@ -107,12 +143,9 @@ def collect(repo_root: Path) -> list[dict[str, Any]]:
                 "created_at": manifest.get("created_at"),
                 "node_states": states,
                 "node_failure_details": manifest.get("node_failure_details") or {},
-                "reuse_decisions": manifest.get("reuse_decisions") or {},
-                "reuse_decisions_note": (
-                    "Empty is the correct record for a Phases 1 to 6 run, not a "
-                    "missing one: the reuse layer covers only the three Phase 8 "
-                    "drafting nodes, so no node dispatched here can produce a "
-                    "reuse decision."
+                "reuse_decisions": manifest.get("reuse_decisions"),
+                "reuse_decisions_note": _reuse_decisions_note(
+                    states, manifest.get("reuse_decisions")
                 ),
                 "reuse_policy": _read(policy_path) if policy_path.exists() else None,
                 "surviving_run_summary": (
@@ -131,7 +164,7 @@ def collect(repo_root: Path) -> list[dict[str, Any]]:
                     "A run summary is rewritten by each dispatch under the same run "
                     "id. This run dispatched "
                     + str(len(states))
-                    + " phases, so the summary preserved here describes only its "
+                    + " nodes, so the summary preserved here describes only its "
                     "last dispatch: " + ", ".join(dispatched or ["none recorded"])
                     + ". The node states and reuse decisions above come from the "
                     "manifest, which is cumulative and loses nothing."
@@ -143,7 +176,7 @@ def collect(repo_root: Path) -> list[dict[str, Any]]:
 
     seen: dict[str, str] = {}
     for record in records:
-        name = slug(str(record["run_id"]))
+        name = run_id_slug(str(record["run_id"]))
         if name in seen and seen[name] != record["run_id"]:
             raise PreservationError(
                 f"two run ids slugify to {name!r}: {seen[name]!r} and "
@@ -177,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not records:
         print(
-            f"[BLOCKED] no run under {RUNS_REL} holds a state for every one of "
+            f"[BLOCKED] no run under {RUNS_DIR_REL} holds a state for every one of "
             f"{list(QUALIFYING_NODES)}; there is nothing to preserve.",
             file=sys.stderr,
         )
@@ -185,7 +218,7 @@ def main(argv: list[str] | None = None) -> int:
 
     differs = False
     for record in records:
-        target = repo_root / OUTPUT_DIR_REL / f"{slug(str(record['run_id']))}.json"
+        target = repo_root / PRESERVED_RUN_RECORDS_REL / f"{run_id_slug(str(record['run_id']))}.json"
         expected = canonical_json_bytes(record)
         if args.check:
             if not target.exists() or target.read_bytes() != expected:
@@ -194,12 +227,13 @@ def main(argv: list[str] | None = None) -> int:
             continue
         atomic_write_json(record, target)
         released = sum(1 for s in record["node_states"].values() if s == "released")
-        print(f"Wrote {OUTPUT_DIR_REL}/{target.name}")
+        print(f"Wrote {PRESERVED_RUN_RECORDS_REL}/{target.name}")
         print(f"  run_id {record['run_id']!r}")
         print(
             f"  {released}/{len(record['node_states'])} nodes released, "
-            f"{len(record['reuse_decisions'])} reuse decision(s), "
-            f"uuid={record['run_id_is_a_uuid']}"
+            f"{len(record['reuse_decisions'] or {})} reuse decision(s), "
+            f"uuid={record['run_id_is_a_uuid']} "
+            f"plain_id={record['run_id_is_a_plain_identifier']}"
         )
 
     if args.check:

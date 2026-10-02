@@ -718,9 +718,19 @@ diagnostics recorded in the scenario records.
 
 **Blocked by:** nothing. Milestone 2 candidate M2, from F1.
 
-- [ ] A run id that is not a plain identifier fails at the entry point, with the rule named.
-- [ ] The comparison reads the preserved manifest by slug and reports the true run id.
-- [ ] The eight advisories compared against the Phase 8 run return a diagnostic or a refusal whose kind is not `malformed_request`.
+- [x] A run id that is not a plain identifier fails at the entry point, with the rule named.
+- [x] The comparison reads the preserved manifest by slug and reports the true run id.
+- [x] The eight advisories compared against the Phase 8 run return a diagnostic or a refusal whose kind is not `malformed_request`.
+
+**Done 2026-10-02.** Record: `docs/tier4_orchestration_state/decision_log/demo-change-scenarios-subticket-a_2026-10-02.json`.
+The rule has one owner, `runner/run_context.py`, and the CLI refuses an id that breaks it with exit
+code 3 before a run directory exists. The reader reaches a run through its live manifest when the id
+is plain, else through the preserved record under its slug, checked to name the run asked for. The
+comparison records the true run id. All eight comparisons against the Phase 8 run now refuse with
+the new kind `no_reuse_decision`, offender the preserved record: the run is reached and its manifest
+holds no `reuse_decisions` key, which is F2 and subticket D's to close. The preserved copy of that
+run was stale (six nodes, not thirteen) and its note called it a Phases 1 to 6 run; both preserved
+records were rewritten. Three stray Tier 4 files named from the mis-pasted id are left as they are.
 
 #### B. Enact one scenario through the refinement route and rerun
 

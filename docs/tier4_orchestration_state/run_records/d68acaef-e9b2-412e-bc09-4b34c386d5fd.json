@@ -2,6 +2,7 @@
   "schema_id": "orch.run_record.preserved.v1",
   "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
   "run_id_is_a_uuid": true,
+  "run_id_is_a_plain_identifier": true,
   "copied_from": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd",
   "manifest_version": "1.1",
   "library_version": "1.0",
@@ -53,8 +54,8 @@
       "failure_category": null
     }
   },
-  "reuse_decisions": {},
-  "reuse_decisions_note": "Empty is the correct record for a Phases 1 to 6 run, not a missing one: the reuse layer covers only the three Phase 8 drafting nodes, so no node dispatched here can produce a reuse decision.",
+  "reuse_decisions": null,
+  "reuse_decisions_note": "An absent or empty map is the correct record for a run that dispatched none of the reuse-eligible nodes, not a missing one: the reuse layer covers only the Phase 8 drafting nodes, so no node dispatched here can produce a reuse decision.",
   "reuse_policy": {
     "reuse_policy_for_run": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
     "approved_artifacts": []
@@ -71,5 +72,5 @@
       "phase_06_gate": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json"
     }
   },
-  "run_summary_caveat": "A run summary is rewritten by each dispatch under the same run id. This run dispatched 6 phases, so the summary preserved here describes only its last dispatch: n06_implementation_architecture. The node states and reuse decisions above come from the manifest, which is cumulative and loses nothing."
+  "run_summary_caveat": "A run summary is rewritten by each dispatch under the same run id. This run dispatched 6 nodes, so the summary preserved here describes only its last dispatch: n06_implementation_architecture. The node states and reuse decisions above come from the manifest, which is cumulative and loses nothing."
 }

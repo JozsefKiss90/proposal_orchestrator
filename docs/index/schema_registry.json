@@ -120,6 +120,13 @@
       "description": "Shadow comparison of a planner advisory against the reuse decision a run manifest recorded: one diagnostic (agreed, planner_narrower, planner_broader) with a row per node; never consumed at runtime"
     },
     {
+      "schema_id": "orch.run_record.preserved.v1",
+      "artifact": "<run id slug>.json",
+      "canonical_path": "docs/tier4_orchestration_state/run_records/",
+      "provenance_class": "derived",
+      "description": "Tier 4 copy of a run manifest, written by tools/preserve_run_manifests.py. The file is named by runner.run_context.run_id_slug and carries the true run id inside. It holds node states, failure metadata, reuse decisions (null when the manifest holds no key), the reuse policy and the surviving run summary. The shadow comparison reads it by slug when a run id cannot address .claude/runs."
+    },
+    {
       "schema_id": "orch.dev_graph.revision_record.v1",
       "artifact": "<revision_id>.json",
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/revisions/",

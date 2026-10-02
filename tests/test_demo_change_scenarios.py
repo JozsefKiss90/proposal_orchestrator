@@ -43,6 +43,7 @@ from runner.phase8_reuse import (
     compute_input_fingerprint,
     validate_reuse_candidate,
 )
+from runner.run_context import PRESERVED_RUN_RECORDS_REL, is_plain_run_id, run_id_slug
 from tools.run_demo_change_scenarios import (
     COMPARED_RUN_IDS,
     SCENARIOS,
@@ -187,7 +188,9 @@ class TestRecordsOnDisk:
     def test_every_shadow_comparison_in_this_world_is_a_recorded_refusal(self) -> None:
         # No run manifest in the demo world records a reuse decision, so the
         # comparison refuses rather than reporting agreement over nothing.
-        # This is the ticket's open half, recorded as what it is.
+        # This is the ticket's open half, recorded as what it is. Since
+        # subticket A the refusal is the run's, not the request's: both runs
+        # are reached and found to hold no decision (subticket D is why).
         diagnostics = {
             d
             for s in _index()["scenarios"]
@@ -195,8 +198,31 @@ class TestRecordsOnDisk:
             for d in a["shadow_diagnostics"]
         }
 
-        assert diagnostics
-        assert all(d.startswith("refused:") for d in diagnostics)
+        assert diagnostics == {"refused:no_reuse_decision"}
+
+    def test_the_phase_8_run_is_named_to_every_comparison_through_its_preserved_record(self) -> None:
+        # Subticket A, third box. The run that carried Phase 8 is stored under
+        # a mis-pasted shell command as its id. Every advisory is now compared
+        # against it by its true id, read through the record the preserve tool
+        # keeps under the id's slug, and what comes back is not a refusal of
+        # the request.
+        mispasted = COMPARED_RUN_IDS[1]
+        assert not is_plain_run_id(mispasted)
+        preserved = f"{PRESERVED_RUN_RECORDS_REL}/{run_id_slug(mispasted)}.json"
+        assert (REPO_ROOT / preserved).is_file()
+
+        seen = 0
+        for scenario in _index()["scenarios"]:
+            record = json.loads((REPO_ROOT / scenario["path"]).read_text(encoding="utf-8-sig"))
+            for arm in record["arms"]:
+                for comparison in arm["shadow_comparisons"]:
+                    if comparison["run_id"] != mispasted:
+                        continue
+                    seen += 1
+                    assert "diagnostic" in comparison or comparison["refused"]["kind"] != "malformed_request"
+                    if "refused" in comparison:
+                        assert comparison["refused"]["offender"] == preserved
+        assert seen == 8, "one comparison against the Phase 8 run per recorded arm"
 
     def test_no_planner_narrower_result_is_left_uninvestigated(self) -> None:
         # Criterion 2. A planner_narrower row needs a scheduler decision whose
@@ -407,6 +433,9 @@ class TestComparedRuns:
 
     def test_no_compared_run_manifest_records_a_reuse_decision(self) -> None:
         # The premise of every recorded refusal, checked rather than assumed.
+        # The Phase 8 run's manifest holds no reuse_decisions key at all: its
+        # drafting nodes ran fresh, and a not_reused decision is never
+        # persisted to the manifest (subticket D).
         runs = REPO_ROOT / ".claude" / "runs"
         if not runs.is_dir():
             pytest.skip("runtime run state is gitignored under §9.2")

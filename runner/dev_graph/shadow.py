@@ -60,7 +60,14 @@ from runner.dev_graph.impact import (
     plan_nothing_changed,
 )
 from runner.dev_graph.schema import DevGraphError
-from runner.run_context import RUN_MANIFEST_FILENAME, RUNS_DIR_REL
+from runner.run_context import (
+    PRESERVED_RUN_RECORD_SCHEMA_ID,
+    PRESERVED_RUN_RECORDS_REL,
+    RUN_MANIFEST_FILENAME,
+    RUNS_DIR_REL,
+    is_plain_run_id,
+    run_id_slug,
+)
 
 SHADOW_SCHEMA_ID = "orch.dev_graph.shadow_comparison.v1"
 
@@ -69,9 +76,12 @@ _DEV_GRAPH = "docs/tier4_orchestration_state/dev_graph"
 SHADOW_COMPARISONS_REL = f"{_DEV_GRAPH}/shadow_comparisons"
 #: The operator request the writer reads: ``{"plan_id": ..., "run_id": ...}``.
 SHADOW_REQUEST_REL = f"{_DEV_GRAPH}/shadow_request.json"
-#: The run manifest layout is owned by ``runner.run_context`` and imported
-#: from there, so a move cannot leave this reader silently pointing at nothing.
-#: Read here, never written.
+#: The run manifest layout, the run id rule and the preserved-record layout
+#: are owned by ``runner.run_context`` and imported from there, so a move
+#: cannot leave this reader silently pointing at nothing. Read here, never
+#: written. The live layout is addressed only with a plain run id; a run
+#: whose id breaks the rule is reachable only through the record
+#: ``tools/preserve_run_manifests.py`` writes under its slug.
 _RUNS_DIR_REL = RUNS_DIR_REL
 _RUN_MANIFEST = RUN_MANIFEST_FILENAME
 
@@ -80,6 +90,9 @@ VERDICTS: frozenset[str] = frozenset({"rerun", "reuse"})
 _DECISION_STATUSES: Mapping[str, str] = {"reused": "reuse", "not_reused": "rerun"}
 _RANK: Mapping[str, int] = {"agreed": 0, "planner_narrower": 1, "planner_broader": 2}
 
+#: Node ids and reuse-decision keys. The same shape as ``RUN_ID_RE`` in
+#: ``runner.run_context`` by coincidence, not by contract: a node id is a
+#: manifest concept and a run id a directory name, and they may diverge.
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 _SHORT_HEX = 16
 
@@ -139,7 +152,7 @@ def _decisions(raw: Any) -> dict[str, dict[str, Any]]:
     if not isinstance(raw, Mapping):
         raise _refuse("malformed_record", "reuse_decisions", "reuse_decisions must be a mapping")
     if not raw:
-        raise _refuse("malformed_request", "reuse_decisions", "no reuse decision recorded for the run")
+        raise _refuse("no_reuse_decision", "reuse_decisions", "no reuse decision recorded for the run")
     out: dict[str, dict[str, Any]] = {}
     for node_id in sorted(raw):
         dec = raw[node_id]
@@ -190,15 +203,21 @@ def compare_shadow(
 ) -> ShadowComparison:
     """Compare the advisory *plan* with the scheduler's *reuse_decisions*.
 
+    *run_id* names the compared run inside the artifact; it is never used
+    as a path here, so an id that is not a plain identifier is recorded as
+    it is rather than refused (the reader decides where such a run's
+    manifest can be found).
+
     Raises :class:`DevGraphError` with kind ``malformed_record`` on a plan
-    or decision of the wrong shape, ``malformed_request`` on a bad run id,
-    an empty decision set, or a node with no artifact binding. Deterministic:
-    identical inputs yield an identical comparison and id.
+    or decision of the wrong shape, ``no_reuse_decision`` on an empty
+    decision set, ``malformed_request`` on an empty run id or a node with
+    no artifact binding. Deterministic: identical inputs yield an identical
+    comparison and id.
     """
     plan_doc = _plan_dict(plan)
     decisions = _decisions(reuse_decisions)
-    if not isinstance(run_id, str) or not _ID_RE.match(run_id):
-        raise _refuse("malformed_request", str(run_id), "run_id is not a plain identifier")
+    if not isinstance(run_id, str) or not run_id:
+        raise _refuse("malformed_request", str(run_id), "run_id must be a non-empty string")
     bindings = dict(_default_artifact_paths() if artifact_paths is None else artifact_paths)
 
     rows: list[dict[str, Any]] = []
@@ -280,18 +299,59 @@ def read_plan(repo_root: Path, plan_id: str) -> dict[str, Any]:
     return doc
 
 
+def locate_run_manifest(repo_root: Path, run_id: str) -> str:
+    """The repo-relative path of the manifest for *run_id*, or refuse.
+
+    A plain identifier addresses the live manifest under
+    ``.claude/runs/<run_id>/`` and nothing else: the id is a directory name
+    there, and a stale Tier 4 copy must not stand in for a live manifest
+    that is simply absent. An id that is not a plain identifier cannot be
+    spelled into that path at all, so it is served from the record
+    ``tools/preserve_run_manifests.py`` writes under the id's slug, which
+    carries the true run id inside and is checked against the one asked
+    for. A run not held where its id says is a ``malformed_request``.
+    """
+    if not isinstance(run_id, str) or not run_id:
+        raise _refuse("malformed_request", str(run_id), "run_id must be a non-empty string")
+    root = Path(repo_root)
+    if is_plain_run_id(run_id):
+        live = f"{_RUNS_DIR_REL}/{run_id}/{_RUN_MANIFEST}"
+        if (root / live).is_file():
+            return live
+        raise _refuse("malformed_request", live, "run manifest not found")
+    preserved = f"{PRESERVED_RUN_RECORDS_REL}/{run_id_slug(run_id)}.json"
+    if (root / preserved).is_file():
+        return preserved
+    raise _refuse(
+        "malformed_request",
+        preserved,
+        f"run id is not a plain identifier and no preserved run record exists at {preserved}",
+    )
+
+
 def read_reuse_decisions(repo_root: Path, run_id: str) -> dict[str, Any]:
-    """The ``reuse_decisions`` map of the run manifest for *run_id*. A plain
-    read: the manifest is never written from here."""
-    if not isinstance(run_id, str) or not _ID_RE.match(run_id):
-        raise _refuse("malformed_request", str(run_id), "run_id is not a plain identifier")
-    rel = f"{_RUNS_DIR_REL}/{run_id}/{_RUN_MANIFEST}"
+    """The ``reuse_decisions`` map recorded for *run_id*. A plain read: the
+    manifest is never written from here.
+
+    The manifest is the one :func:`locate_run_manifest` names. A preserved
+    record must carry the preserved schema id and name the run asked for,
+    else it is ``malformed_record``. A manifest that records no decision
+    — no key, or a null or empty map — is ``no_reuse_decision``: a fact
+    about the run, not a bad request.
+    """
+    rel = locate_run_manifest(repo_root, run_id)
     doc = _read_json(Path(repo_root) / rel, rel, "run manifest")
     if not isinstance(doc, dict):
         raise _refuse("malformed_record", rel, "run manifest is not an object")
+    if rel.startswith(PRESERVED_RUN_RECORDS_REL):
+        if doc.get("schema_id") != PRESERVED_RUN_RECORD_SCHEMA_ID:
+            raise _refuse("malformed_record", rel, f"preserved run record is not a {PRESERVED_RUN_RECORD_SCHEMA_ID} document")
+        if doc.get("run_id") != run_id:
+            raise _refuse("malformed_record", rel, f"preserved run record names a different run: {doc.get('run_id')!r}")
     decisions = doc.get("reuse_decisions")
     if decisions is None:
-        raise _refuse("malformed_request", rel, "run manifest records no reuse decision")
+        what = "preserved run record" if rel.startswith(PRESERVED_RUN_RECORDS_REL) else "run manifest"
+        raise _refuse("no_reuse_decision", rel, f"{what} records no reuse decision")
     return decisions
 
 

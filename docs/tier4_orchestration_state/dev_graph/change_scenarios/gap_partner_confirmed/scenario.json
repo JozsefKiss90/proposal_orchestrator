@@ -70,17 +70,17 @@
         {
           "run_id": "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
           "refused": {
-            "kind": "malformed_request",
+            "kind": "no_reuse_decision",
             "offender": ".claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json",
-            "message": "malformed_request: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
+            "message": "no_reuse_decision: run manifest records no reuse decision [offender: .claude/runs/d68acaef-e9b2-412e-bc09-4b34c386d5fd/run_manifest.json]"
           }
         },
         {
           "run_id": "import uuid; print(uuid.uuid4())",
           "refused": {
-            "kind": "malformed_request",
-            "offender": "import uuid; print(uuid.uuid4())",
-            "message": "malformed_request: run_id is not a plain identifier [offender: import uuid; print(uuid.uuid4())]"
+            "kind": "no_reuse_decision",
+            "offender": "docs/tier4_orchestration_state/run_records/import-uuid-print-uuid.uuid4.json",
+            "message": "no_reuse_decision: preserved run record records no reuse decision [offender: docs/tier4_orchestration_state/run_records/import-uuid-print-uuid.uuid4.json]"
           }
         }
       ]

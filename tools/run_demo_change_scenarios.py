@@ -83,8 +83,12 @@ WORKING_ASSUMPTIONS = "docs/tier3_project_instantiation/working_assumptions.json
 #: The runs whose recorded reuse decisions each advisory is compared against.
 #: Both are runs this world actually holds: the Phases 1 to 6 run, and the run
 #: that carried Phase 8. The second was dispatched under a mis-pasted shell
-#: command as its run id, which the comparison's reader refuses outright — that
-#: refusal is a finding and is recorded, not worked around.
+#: command as its run id. The live layout cannot be addressed with that id, so
+#: the comparison's reader finds the run through the record
+#: ``tools/preserve_run_manifests.py`` keeps under its slug, with the true run
+#: id inside; the comparison names the run by that true id. What it finds there
+#: is recorded, not worked around: the run's manifest holds no reuse decision,
+#: because the scheduler persists one only when it reuses (subticket D).
 COMPARED_RUN_IDS: tuple[str, ...] = (
     "d68acaef-e9b2-412e-bc09-4b34c386d5fd",
     "import uuid; print(uuid.uuid4())",

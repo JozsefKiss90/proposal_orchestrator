@@ -12,7 +12,8 @@ Exit codes
 
 Arguments
 ---------
---run-id        (required) Run UUID.
+--run-id        (required) Run id: a plain identifier (letters, digits, '_', '.', '-',
+                starting with a letter or digit). Normally a UUID.
 --repo-root     Repository root path (default: auto-discovered via find_repo_root).
 --library-path  Path to gate_rules_library.yaml (default: repo_root / LIBRARY_REL_PATH).
 --manifest-path Path to manifest.compile.yaml (default: repo_root / MANIFEST_REL_PATH).
@@ -50,7 +51,7 @@ from runner.dag_scheduler import (
 from runner.gate_library import LIBRARY_REL_PATH
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.paths import find_repo_root
-from runner.run_context import RunContext
+from runner.run_context import RUN_ID_RULE, RunContext, is_plain_run_id
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +101,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         prog="python -m runner",
         description="Run the proposal orchestration DAG.",
     )
-    parser.add_argument("--run-id", required=True, help="Run UUID.")
+    parser.add_argument("--run-id", required=True, help=f"Run id, normally a UUID; {RUN_ID_RULE}.")
     parser.add_argument(
         "--repo-root",
         default=None,
@@ -244,6 +245,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     # ------------------------------------------------------------------
     # Configuration / initialisation (exit code 3 on any failure here)
     # ------------------------------------------------------------------
+
+    # The run id becomes a directory name under .claude/runs and is what a
+    # later comparison names the run by. An id that breaks the rule is
+    # refused here, before RunContext can turn it into a run directory.
+    if not is_plain_run_id(args.run_id):
+        _err(f"--run-id {args.run_id!r} is not a plain identifier: {RUN_ID_RULE}")
+        return 3
 
     try:
         repo_root: Path = (

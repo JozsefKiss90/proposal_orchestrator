@@ -79,7 +79,7 @@
     "The candidate: tools/build_part_b_candidate.py over the three real section artifacts, then runner.dev_graph.import_document into docs/, then build_snapshot to confirm the artifact_version, passage and claim nodes and the passage spans.",
     "The blind package: harness.blind_assessment.build_blind_evidence over the real repository, which runs assert_no_leakage before it materialises a byte. The smallest complete budget was bisected against the builder, not estimated.",
     "The assessor's inputs, without the assessor: load_candidate for the scope and the candidate hash, load_profile_bundle for the profile version, and build_pack_for for every rubric and section pair, which is where the anchor map is read.",
-    "Anonymity: py -3.10 -m runner.leakage_scan over 261 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. The count was 242 when this report was written and moved when the change-scenario ticket added its Tier 4 records; the scan was re-run over all 261 and reports no new leak."
+    "Anonymity: py -3.10 -m runner.leakage_scan over 263 files in Tier 3, Tier 4, Tier 5 and the vault, this report and its decision record included. The count was 242 when this report was written and moved when the change-scenario ticket added its Tier 4 records; the scan was re-run over all 261 and reports no new leak. It moved again to 263 when subticket A added its decision record and validation report; the scan was re-run over all 263 and reports no new leak."
   ],
   "findings": [
     {
