@@ -155,8 +155,14 @@ Return a single JSON object:
 }
 ```
 
-- `findings` and `revision_actions` may be empty arrays if no material
-  weaknesses are found — this is a valid outcome.
+- `revision_actions` MUST be non-empty. Gate 11 predicate `g10_p04`
+  (`revision_action_list_present`) fails a review packet whose
+  `revision_actions` array is absent or empty, and node n08f has nothing to
+  revise without it. If the draft is strong, record the lowest-severity
+  improvements you did find rather than returning an empty list.
+- `findings` may be empty for an individual criterion, but every entry in
+  `revision_actions` must carry a `finding_id`, so a wholly empty `findings`
+  array cannot yield a valid packet either.
 - Do NOT include `artifact_status` (runner-stamped post-gate).
 
 ## Output Schema
