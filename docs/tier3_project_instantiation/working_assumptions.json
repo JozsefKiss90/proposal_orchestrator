@@ -178,6 +178,54 @@
       "declared_on": "2026-09-30T00:00:00Z",
       "rationale": "The topic's call extract carries expected outcomes and no expected impacts. The six expected impacts this project answers are on pages 47 and 48 of the work programme, under the destination heading, and were transcribed for impacts.json. The fourth straddles the page break and its tail carries no bullet marker, so the destination sets six, not seven. Phase 1 writes Tier 2B extracted/expected_impacts.json and may coin different identifiers from the DEST-IMPACT-n ones used here; the join is re-established at that point. Finding F3.",
       "checklist_ref": "CALL_BINDING"
+    },
+    {
+      "key": "valuation_clause_partial",
+      "value": "the valuation clause of the fourth destination impact is only partly addressed; the project improves the evidence a valuation rests on but runs none, as no partner carries environmental economics",
+      "declared_by": "operator",
+      "declared_on": "2026-10-02T00:00:00Z",
+      "rationale": "The destination's fourth expected impact carries a valuation clause that this project does not run, because no partner carries environmental economics. architecture_inputs/impacts.json records the disposition as Unresolved. The operator adopts it as a declared scope boundary: the limit is stated, not open. Demo instance; the consortium is fictional.",
+      "checklist_ref": "IMPACT"
+    },
+    {
+      "key": "financial_actors_valuation_gap",
+      "value": "Financial actors are not a direct target because the project runs no ecosystem-services valuation (no environmental-economics partner); the fourth destination impact's valuation clause is only partly addressed.",
+      "declared_by": "operator",
+      "declared_on": "2026-10-02T00:00:00Z",
+      "rationale": "The target-group consequence of the valuation boundary declared in valuation_clause_partial. Financial actors are excluded from the impact pathway for the same stated reason. Demo instance; the consortium is fictional.",
+      "checklist_ref": "IMPACT"
+    },
+    {
+      "key": "occurrence_records_global_facilities",
+      "value": "Occurrence records reach the global biodiversity data facilities through cooperation held in WP1 and WP3, which rests on P10.",
+      "declared_by": "operator",
+      "declared_on": "2026-10-02T00:00:00Z",
+      "rationale": "P10 is an Assumed gap partner, so its cooperation with the global biodiversity data facilities is adopted rather than evidenced. No Tier 3 record confirms the cooperation. Demo instance; P10 is fictional.",
+      "checklist_ref": "CONSORTIUM"
+    },
+    {
+      "key": "consortium_agreement_not_drafted",
+      "value": "Detailed IP access rights belong in the consortium agreement, which is not yet drafted.",
+      "declared_by": "operator",
+      "declared_on": "2026-10-02T00:00:00Z",
+      "rationale": "The consortium agreement is written after grant preparation, so detailed access rights cannot be evidenced at proposal stage. The operator adopts the grant-default allocation, to be confirmed in the agreement. Mirrors the instance-one placement_ip_ownership declaration. Demo instance.",
+      "checklist_ref": "IP"
+    },
+    {
+      "key": "critical_risks_assumed",
+      "value": "The critical-risk register R01 to R13 with likelihood, severity, affected work packages and mitigations is the operator judgement on an unconfirmed design.",
+      "declared_by": "operator",
+      "declared_on": "2026-10-02T00:00:00Z",
+      "rationale": "architecture_inputs/risks.json carries the register as operator judgement over a consortium that is itself Assumed. No partner has confirmed a risk or a mitigation. Demo instance; the consortium is fictional.",
+      "checklist_ref": "IMPLEMENTATION"
+    },
+    {
+      "key": "dissemination_plan_timing",
+      "value": "The dissemination, exploitation and communication plan (D7.4) is scheduled at month 48, later than the form expectation of a plan within the first six months; flagged for resolution.",
+      "declared_by": "operator",
+      "declared_on": "2026-10-02T00:00:00Z",
+      "rationale": "KNOWN DEVIATION, NOT AN EVIDENCE GAP. architecture_inputs/workpackage_seed.json sets D7.4 due_month 48, the final month of a 48-month project, for a plan the application form expects within the first six. The drafter found a real Tier 3 scheduling error. Correcting due_month would stale the Phase 3, 4 and 6 gates by content fingerprint and force a full Phase 8 re-draft, which the demo does not justify. The operator adopts the deviation consciously so the demo can complete, and records it as a candidate Milestone 2 ticket for the demo report. Do not read this declaration as evidence that month 48 is correct.",
+      "checklist_ref": "IMPLEMENTATION"
     }
   ],
   "_value_note": "A declaration's 'value' carries the fact the operator declares, not its status. The status is Assumed for every declaration and the shared reader stamps it (runner/working_assumptions.py DECLARED_STATUS), so writing 'Assumed' into 'value' would both duplicate it and break the schema's contract: the W1 predicate compares 'value' against a claim's claim_summary. Each *_participation value is derived from the partner's own record in partners.json, so a declaration cannot drift from the registry."

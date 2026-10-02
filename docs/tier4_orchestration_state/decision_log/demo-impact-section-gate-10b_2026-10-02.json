@@ -1,0 +1,41 @@
+{
+  "record_id": "demo-impact-section-gate-10b",
+  "date": "2026-10-02",
+  "branch": "dev_graph_demo",
+  "trigger": "The operator dispatched py -3.10 -m runner --run-id <id> --node 8b. The node drafted all three impact sub-sections and reached blocked_at_exit with failure_origin exit_gate. gate_10b_impact_completeness passed 12 of 14 deterministic predicates and failed g09b_p07 (no_unresolved_material_claims) and g09b_p10 (canonical_terms_preserved). The drafting itself succeeded and cost roughly 36 minutes of quota.",
+  "operator_instruction": {
+    "given": "2026-10-02, in session",
+    "text": "Complete the dev-graph demo tickets. The draft is entirely fictional, so the operator does not require the unresolved claims to be resolved on their merits.",
+    "constitutional_basis": "CLAUDE.md section 1 - explicit in-session human instruction, scoped to this instantiation. It does not amend the constitution.",
+    "what_it_does_not_suspend": "Nothing. The route taken below uses the sanctioned operator-declaration mechanism, so no clause is overridden. Section 13.3 still binds: no project fact was invented, and every declaration records that the consortium is fictional. This is weaker than the ticket A override, which did suspend six clauses for the fictional budget."
+  },
+  "findings": {
+    "F12_four_claims_had_no_backing_declaration": {
+      "status": "fixed",
+      "what": "The drafter emitted four claims as unresolved. assumption_applier flips unresolved to assumed only where claim_id matches a key in working_assumptions.json, so all four survived into the section and g09b_p07 blocked on the roll-up.",
+      "the_two_groups": {
+        "tier3_sourced": "valuation_clause_partial and financial_actors_valuation_gap both trace to architecture_inputs/impacts.json, which declares valuation_clause as Unresolved. The drafter mirrored Tier 3 faithfully. The disposition recorded there is a stated scope boundary with a rationale, not missing information, which reads as Assumed under section 12.2 rather than Unresolved.",
+        "undeclared": "occurrence_records_global_facilities cited working_assumptions.json but matched none of its 22 keys, so the drafter coined an id with nothing to key on. consortium_agreement_not_drafted repeats the instance-one placement_ip_ownership case."
+      },
+      "fix": "Four operator declarations added to docs/tier3_project_instantiation/working_assumptions.json, each with value set to the claim's own summary so the W1 equality holds, and each rationale recording that the consortium is fictional. The applier now flips all four to assumed and the roll-up settles at assumed.",
+      "not_done": "architecture_inputs/impacts.json still records valuation_clause as Unresolved. The declaration adopts the boundary at claim level without editing the Tier 3 seed, so the frozen founding record is untouched and the next draft of this section will raise the same claim and be flipped the same way."
+    },
+    "F13_the_drafter_paraphrased_canonical_outcome_titles": {
+      "status": "fixed",
+      "what": "In the B.2.3 impact-pathway table the drafter rendered every outcome as 'OCn: <compressed restatement>'. canonical_terms_preserved fails only when an id carries a title-like appositive that contradicts the canonical title; a bare id, or an id with a short role phrase, passes. The drafter chose the one rendering that is checked and then shortened inside it. Five of seven were caught; OC1 and OC4 were paraphrased too and passed only on the matcher's tolerance.",
+      "fix": "All seven appositives in B.2.3.draft.json replaced with the canonical titles from canonical_reference_pack.json, verbatim. Making all seven canonical rather than only the five that failed keeps the cell internally consistent and removes the tolerance dependency.",
+      "prose_rule_conflict": "The active prose profile caps a sentence at 25 words and the canonical titles run 28 to 35. The cap governs the drafter's own prose, not the transcription of a canonical identifier, so the two do not actually conflict here. The drafter appears to have applied the cap to a quotation. A prompt directive distinguishing the two is the durable fix and is not yet written.",
+      "open": "F13 is fixed in the artifact, not in the drafter. The next section this drafter writes can repeat it."
+    }
+  },
+  "verification_before_dispatch": {
+    "method": "The assembled artifact was simulated offline from the three corrected drafts with the applier's flip applied, and the three relevant predicates were run against it. No Claude call, no canonical write.",
+    "result": "g09b_p07 pass, g09b_p10 pass, W1 assumed_claims_are_operator_declared pass. Claim mix 37 confirmed, 30 assumed, 1 inferred, 0 unresolved; roll-up assumed."
+  },
+  "rerun_economics": {
+    "finding": "Re-dispatching n08b costs no drafting quota. agent_runtime skips decomposed drafting when section_drafts/<slug>/section_spine.json carries the current run_id, and the assembler recomposes from the drafts on disk. The spine for impact carries this run id.",
+    "consequence": "The corrections above were made in the draft files rather than through --preseed-phase8-sections, so the real applier and assembler still run and the gate evaluates a genuinely pipeline-produced artifact.",
+    "caution": "Deleting section_drafts/impact/ forces a full re-draft and loses both corrections."
+  },
+  "authored_by": "Session of 2026-10-02, branch dev_graph_demo, ticket 'Candidate Part B and the blind baseline' in plans/dev_graph_demo_tickets.md."
+}

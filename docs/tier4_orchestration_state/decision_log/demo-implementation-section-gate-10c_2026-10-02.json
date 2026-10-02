@@ -1,0 +1,38 @@
+{
+  "record_id": "demo-implementation-section-gate-10c",
+  "date": "2026-10-02",
+  "branch": "dev_graph_demo",
+  "trigger": "The operator dispatched py -3.10 -m runner --run-id <id> --node 8c. n08c drafted B.3.1 and B.3.2 in about 25 minutes and reached blocked_at_exit with failure_origin exit_gate. gate_10c_implementation_completeness passed 12 of 13 deterministic predicates and failed only g09c_p07 (no_unresolved_material_claims).",
+  "what_the_dispatch_proved": {
+    "f13_did_not_recur": "g09c_p10 (canonical_terms_preserved) PASSED on a section this drafter wrote with no prompt change. The canonical-title paraphrase seen in the impact B.2.3 pathway table is therefore table-rendering-specific, not a general drafter habit. The prompt directive considered after n08b is not yet justified on this evidence.",
+    "the_remaining_failure_is_the_same_class_as_f12": "Two claims emitted unresolved with no backing declaration in working_assumptions.json."
+  },
+  "findings": {
+    "F14_critical_risk_register_is_operator_judgement": {
+      "status": "fixed",
+      "what": "architecture_inputs/risks.json carries R01 to R13 as operator judgement over a consortium that is itself Assumed. No partner has confirmed a risk or a mitigation, so the drafter had no evidence to cite and emitted the claim unresolved.",
+      "fix": "Operator declaration critical_risks_assumed added, value set to the claim's own summary verbatim so the W1 equality holds."
+    },
+    "F15_the_dec_plan_is_scheduled_in_the_final_month": {
+      "status": "carried_as_a_known_deviation",
+      "severity": "real_defect_in_tier3",
+      "what": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json sets D7.4, the dissemination, exploitation and communication plan, to due_month 48 on a 48-month project. The application form expects such a plan within the first six months. The drafter read Tier 3 correctly and flagged a genuine scheduling error.",
+      "this_is_not_an_evidence_gap": "Unlike F12 and F14, nothing here is missing. Two sources conflict: the Tier 3 schedule and the Tier 2A form expectation. Under section 12.2 that is properly Unresolved, and section 12.3 asks for explicit resolution rather than a convenient pick.",
+      "why_it_was_not_fixed": "Correcting due_month would change workpackage_seed.json, which ST-1 content fingerprinting uses to stale the Phase 3, 4 and 6 gates, forcing reruns of n03, n04 and n06 and then a full Phase 8 re-draft at roughly 26 minutes per section. The demo does not justify that cascade.",
+      "what_was_done_instead": "Operator declaration dissemination_plan_timing adopts the deviation consciously. Its rationale states in full that this is a known deviation and not evidence that month 48 is correct, so a later reader cannot mistake the declaration for a resolution.",
+      "carry_forward": "Candidate Milestone 2 ticket. Belongs in the demo report's defect list under plans/dev_graph_demo_tickets.md, 'Demo report', criterion 2."
+    }
+  },
+  "operator_instruction": {
+    "given": "2026-10-02, in session",
+    "text": "Complete the dev-graph demo tickets. The draft is entirely fictional, so the operator does not require the unresolved claims to be resolved on their merits.",
+    "constitutional_basis": "CLAUDE.md section 1 - explicit in-session human instruction, scoped to this instantiation.",
+    "scope_note": "As with the impact section, the declaration route is sanctioned, so no clause is suspended. F15 is the one place where the instruction does real work: a declaration is being used to carry a contradiction rather than an absence, and the record says so rather than hiding it."
+  },
+  "verification_before_dispatch": {
+    "method": "The assembled artifact was simulated offline from the two corrected drafts with the applier's flip applied, and the predicates were run against it. No Claude call, no canonical write.",
+    "result": "g09c_p07 pass, g09c_p10 pass, W1 pass. Claim mix 16 confirmed, 44 assumed, 2 inferred, 0 unresolved; roll-up assumed."
+  },
+  "state": "n08c reset from blocked_at_exit to pending. n08a and n08b are released. The re-dispatch skips drafting (current-run section_spine.json present) and costs only the components, the two audit skills and the exit gate.",
+  "authored_by": "Session of 2026-10-02, branch dev_graph_demo, ticket 'Candidate Part B and the blind baseline' in plans/dev_graph_demo_tickets.md."
+}
