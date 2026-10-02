@@ -1,0 +1,217 @@
+{
+  "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+  "run_id": "import uuid; print(uuid.uuid4())",
+  "sections": [
+    {
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "order": 1,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "word_count": 2057
+    },
+    {
+      "section_id": "impact",
+      "criterion": "Impact",
+      "order": 2,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "word_count": 3674
+    },
+    {
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "order": 3,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "word_count": 5391
+    }
+  ],
+  "consistency_log": [
+    {
+      "check_id": "CC-01",
+      "description": "Objective consistency across Excellence and Implementation sections, cross-checked against Tier 3 objectives.",
+      "sections_checked": [
+        "excellence",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      ]
+    },
+    {
+      "check_id": "CC-02",
+      "description": "WP reference consistency: WP IDs cited in Excellence and Impact resolve to the canonical WP1-WP7 list in Implementation.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-03",
+      "description": "Partner name consistency: all partner tokens P01-P12 used in the sections match the pseudonymous legal_name tokens in Tier 3 partners.json, with no suffix or variant mismatch.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier3_project_instantiation/consortium/partners.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-04",
+      "description": "Deliverable ID consistency: deliverable IDs and titles cited in Impact (D2.1, D2.2, D3.1-D3.4, D4.1, D4.4, D5.3, D6.1-D6.3, D7.1-D7.4, D1.1, D1.3) match the 24-row deliverable table in Implementation.",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-05",
+      "description": "Milestone ID consistency: milestone references align with the MS1-MS8 milestone table and milestone_refs in Implementation; Impact asserts no conflicting milestone IDs.",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-06",
+      "description": "KPI consistency: all three sections state twelve indicators, each naming one deliverable, with no target numbers set because participation is unconfirmed.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-07",
+      "description": "Impact claim grounding: each Impact claim cites a WP or deliverable (e.g. D2.2, D4.4, D5.3, D6.2, WP5) present in the Implementation work plan; the valuation-clause gap is flagged consistently in both sections.",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-08",
+      "description": "Budget/resource claim consistency: all three sections state EUR 5,000,000 per project, about two projects funded, a lump-sum regime computed externally, and person-months not yet agreed.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_basis": "EUR 5M per project and lump-sum regime confirmed from Tier 3 selected_call.json, asserted identically across all three section artifacts"
+    },
+    {
+      "check_id": "CC-09",
+      "description": "Terminology consistency: key canonical terms (multisensory integration architecture, single agricultural pressure gradient, genome-to-space, leakage-safe split, European habitat classification/EUNIS, global ecosystem typology, EOSC, common data spaces, Copernicus/Galileo/EGNOS) are used in full and consistently across sections, with no stem-only variant.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-10",
+      "description": "Section ordering and completeness: all three sections are present and ordered Excellence (B.1), Impact (B.2), Implementation (B.3), matching the RIA/IA Part B template structure.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_basis": "Tier 2A RIA/IA application form (af_he-ria-ia_en); sub_section_ids B.1.x / B.2.x / B.3.x in the three section artifacts"
+    },
+    {
+      "check_id": "CC-11",
+      "description": "Traceability footer consistency: each section has a non-empty primary_sources array and no_unsupported_claims_declaration true; each overall_status is 'assumed' (not 'unresolved'), so the declaration is consistent with the status.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-12",
+      "description": "Validation status aggregation (informational): Excellence 'assumed', Impact 'assumed', Implementation 'assumed'. No section is 'unresolved'. The uniform assumed status reflects unconfirmed consortium participation and is carried forward for downstream review.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    }
+  ],
+  "traceability_footer": {
+    "primary_sources": [
+      "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+      "docs/tier3_project_instantiation/consortium/partners.json",
+      "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+      "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+    ],
+    "no_unsupported_claims_declaration": true,
+    "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
+  }
+}

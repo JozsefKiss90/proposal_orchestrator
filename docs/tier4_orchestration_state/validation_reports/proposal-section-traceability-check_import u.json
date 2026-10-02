@@ -1,280 +1,75 @@
 {
-  "report_id": "traceability_implementation_section_traceability_auditor_2026-10-02T00:00:00Z",
+  "report_id": "traceability_part_b_assembled_draft_proposal_integrator_2026-10-02T00:00:00Z",
   "skill_id": "proposal-section-traceability-check",
-  "invoking_agent": "traceability_auditor",
+  "invoking_agent": "proposal_integrator",
   "run_id_reference": "import uuid; print(uuid.uuid4())",
-  "section_id_audited": "implementation_section",
-  "outputs_written": [
-    "docs/tier4_orchestration_state/validation_reports/traceability_implementation_section_traceability_auditor_2026-10-02T000000Z.json"
-  ],
+  "section_id_audited": "part_b_assembled_draft",
+  "audit_mode": "assembled_structural_index",
   "claim_audit_results": [
     {
-      "claim_id": "C1",
-      "claim_summary": "Action is a HORIZON-RIA with a single EU contribution of EUR 5,000,000 per project.",
+      "claim_id": "ASSEMBLY-01",
+      "claim_summary": "Assembled draft carries schema_id orch.tier5.part_b_assembled_draft.v1 and a non-empty sections[] array (3 entries).",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json (instrument_type RIA, expected_eu_contribution_per_project_eur 5000000)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
-      "claim_id": "C2",
-      "claim_summary": "The action runs over an assumed 48-month duration.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (project_duration); selected_call.json field_status.project_duration = Assumed",
-      "flag_reason": "Operator-declared assumption; no Tier 2B source carries a duration condition."
-    },
-    {
-      "claim_id": "C3",
-      "claim_summary": "Seven work packages, 35 tasks and 24 deliverables.",
-      "status": "assumed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-      "flag_reason": "Design structure over an unconfirmed consortium; declared assumption."
-    },
-    {
-      "claim_id": "C4",
-      "claim_summary": "WP leads: WP1 P01, WP2 P02, WP3 P10, WP4 P03, WP5 P09, WP6 P12, WP7 P05.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (work_package_leads)",
-      "flag_reason": "Lead assignment is operator design intent; participation unconfirmed."
-    },
-    {
-      "claim_id": "C5",
-      "claim_summary": "Sequential design and the inter-WP dependency (PERT) edges.",
-      "status": "assumed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-      "flag_reason": "Phase 3 design structure; declared assumption."
-    },
-    {
-      "claim_id": "C6",
-      "claim_summary": "Every partner participation is unconfirmed and carried as an assumption; six partners (P07-P12) are gap partners no confirmed source evidences.",
+      "claim_id": "ASSEMBLY-02",
+      "claim_summary": "sections[] references exactly excellence, impact, implementation, and each artifact_path exists on disk.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (participation_status = Assumed for all twelve; P07-P12 capability_basis = fictional)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
-      "claim_id": "C7",
-      "claim_summary": "Freshwater case rests on P07 alone and marine case on P08 alone (R01, R02).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
-      "flag_reason": "Operator risk judgement on an unconfirmed design."
-    },
-    {
-      "claim_id": "C8",
-      "claim_summary": "Deliverable due-month schedule (the Gantt table) fixes deliverable due months.",
+      "claim_id": "ASSEMBLY-03",
+      "claim_summary": "Section order is excellence=1, impact=2, implementation=3.",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
-      "claim_id": "C9",
-      "claim_summary": "Assumed critical path runs through T1.2, T3.1, T4.1, T5.3.",
-      "status": "assumed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-      "flag_reason": "Critical path derived from an assumed design and duration; declared assumption."
-    },
-    {
-      "claim_id": "C10",
-      "claim_summary": "Deliverable list (titles, types, due months) reproduces the canonical reference pack.",
+      "claim_id": "ASSEMBLY-04",
+      "claim_summary": "All three referenced sections expose a non-empty traceability_footer.primary_sources (excellence 16, impact 15, implementation 13).",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
       "flag_reason": null
     },
     {
-      "claim_id": "C11",
-      "claim_summary": "D1.1 is the data management plan at month 6, meeting the form requirement for a DMP within the first six months.",
-      "status": "inferred",
-      "source_ref": "Source: canonical_reference_pack.json fixes D1.1 (DMP) due M6; claim derives satisfaction of the Tier 2A DMP-within-six-months form requirement from that due month.",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C12",
-      "claim_summary": "Deliverable dissemination level set to PU as an indicative default consistent with FAIR and open science, with sensitive datasets reclassifiable SEN via the DMP.",
-      "status": "inferred",
-      "source_ref": "Source: compliance_profile.json open_science_requirements (FAIR); claim derives the PU default and the SEN reclassification route as a logical consequence of the open-science commitment.",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C13",
-      "claim_summary": "D7.4 dissemination plan at month 48 is later than the form expectation of a plan within the first six months; flagged for resolution.",
-      "status": "assumed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": "Timing tension declared and flagged rather than concealed."
-    },
-    {
-      "claim_id": "C14",
-      "claim_summary": "Critical-risk register R01-R13 with likelihood, severity, affected WPs and mitigations.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
-      "flag_reason": "Operator judgement on an unconfirmed design; declared assumption."
-    },
-    {
-      "claim_id": "C15",
-      "claim_summary": "Person-months are not agreed; the effort split is open until the next phase and the validated budget.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (effort_shares)",
-      "flag_reason": "No consortium-agreed effort split exists; declared assumption."
-    },
-    {
-      "claim_id": "C16",
-      "claim_summary": "The topic is lump-sum, so the repository computes no cost figure; tables 3.1g and 3.1h carry no internal figures.",
+      "claim_id": "ASSEMBLY-05",
+      "claim_summary": "All three referenced sections declare traceability_footer.no_unsupported_claims_declaration=true.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json (budget_regime lump_sum)",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/impact_section.json",
       "flag_reason": null
     },
     {
-      "claim_id": "C17",
-      "claim_summary": "Core tasks are performed by beneficiaries and no subcontracting of core tasks is foreseen.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Design intent pending the validated budget; declared assumption."
-    },
-    {
-      "claim_id": "C18",
-      "claim_summary": "The 15% equipment threshold on personnel costs cannot be computed before the validated budget because the budget is lump-sum.",
-      "status": "inferred",
-      "source_ref": "Source: selected_call.json budget_regime lump_sum; claim derives that the personnel-cost threshold is non-computable internally from the lump-sum regime.",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C19",
-      "claim_summary": "The topic asks for one observation chain from molecules to satellites (genome to space).",
+      "claim_id": "ASSEMBLY-06",
+      "claim_summary": "All three sections have validation_status.overall_status=assumed (not unresolved) and non-empty claim_statuses[].",
       "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-01, SR-04, SR-05)",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
       "flag_reason": null
     },
     {
-      "claim_id": "C20",
-      "claim_summary": "Twelve partners P01-P12 cover the six objectives and seven work packages.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Coverage mapping over an unconfirmed consortium; declared assumption."
-    },
-    {
-      "claim_id": "C21",
-      "claim_summary": "Per-partner discipline and capability assignments (P01 plant physiology through P12 earth observation analytics).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (capability_basis derived/fictional, field_status Assumed)",
-      "flag_reason": "Capabilities are derived or fictional and carried as Assumed per partners.json field_status."
-    },
-    {
-      "claim_id": "C22",
-      "claim_summary": "The scope requires demonstration cases to take socio-economic pressures into account (SR-03), carried by P11.",
+      "claim_id": "ASSEMBLY-07",
+      "claim_summary": "consistency_log present and non-empty (CC-01..CC-12); every entry status is consistent, none inconsistency_flagged or unresolved.",
       "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-03)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
-      "claim_id": "C23",
-      "claim_summary": "The compliance profile requires FAIR data and links to the open science cloud and common data spaces, carried by P10 and P04.",
+      "claim_id": "ASSEMBLY-08",
+      "claim_summary": "Assembled draft traceability_footer present with non-empty primary_sources (7) and no_unsupported_claims_declaration=true, consistent with the three section-level true declarations.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/compliance_profile.json (open_science_requirements)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C24",
-      "claim_summary": "A gender equality plan and an ethics review are required for this call.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/compliance_profile.json (gender_plan_required true, ethics_review_required true)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C25",
-      "claim_summary": "No partner records dedicated expertise in the gender dimension of research content (a flagged gap).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (no partner capability names gender-of-R&I content)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C26",
-      "claim_summary": "Each activity rests on infrastructure a partner already operates (field, laboratory, observation, data facilities, uptake network).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (capabilities)",
-      "flag_reason": "Infrastructure access rests on Assumed, unconfirmed participation."
-    },
-    {
-      "claim_id": "C27",
-      "claim_summary": "Three SMEs (P04, P05, P12) own the project's routes to use.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (organisation_type sme; roles Assumed)",
-      "flag_reason": "Exploitation roles are design intent over unconfirmed participation."
-    },
-    {
-      "claim_id": "C28",
-      "claim_summary": "Country slots: four Member State and two Associated Country (P08 and P11 are AC).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (country_slot_assignment)",
-      "flag_reason": "Slot assignment is declared Assumed per partners.json and working_assumptions.json."
-    },
-    {
-      "claim_id": "C29",
-      "claim_summary": "Member States and Associated Countries are both funding limbs under the General Annexes.",
-      "status": "confirmed",
-      "source_ref": "docs/tier1_normative_framework/extracted/participation_rules.json (entities_eligible_for_funding)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C30",
-      "claim_summary": "The essentiality clause applies only to an entity established outside the listed funding limbs.",
-      "status": "confirmed",
-      "source_ref": "docs/tier1_normative_framework/extracted/participation_rules.json (entities_eligible_for_funding.other_countries)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C31",
-      "claim_summary": "The destination Biodiversity and ecosystem services exempts an RIA from the China participation restriction.",
-      "status": "confirmed",
-      "source_ref": "docs/tier1_normative_framework/extracted/participation_rules.json (country_restrictions.china.research_and_innovation_actions.exempt_destinations)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C32",
-      "claim_summary": "The consortium holds no affiliated entities, so none is counted towards the composition minimum.",
-      "status": "confirmed",
-      "source_ref": "docs/tier1_normative_framework/extracted/participation_rules.json (affiliated_entities_count_towards_the_minimum false); partners.json (all independent beneficiaries)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C33",
-      "claim_summary": "The composition condition is met only under assumption; the derived six (P01-P06) span two Member State slots, one short of the Tier 1 minimum.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json; partners.json composition_condition = met only under assumption",
-      "flag_reason": "Condition holds on operator declarations, not confirmed membership."
-    },
-    {
-      "claim_id": "C34",
-      "claim_summary": "P01 coordinates; twelve non-overlapping management roles are assigned.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/roles.json; working_assumptions.json (coordinator P01)",
-      "flag_reason": "Coordinator and role assignment declared Assumed; participation unconfirmed."
-    },
-    {
-      "claim_id": "C35",
-      "claim_summary": "Detailed IP access rights belong in the consortium agreement, which is not yet drafted; the grant-default allocation applies until then.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Declared assumption pending the consortium agreement."
-    },
-    {
-      "claim_id": "C36",
-      "claim_summary": "The scope requires capabilities answering use cases across terrestrial, freshwater and marine ecosystems in Member States and Associated Countries (SR-02).",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-02)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C37",
-      "claim_summary": "WP1 and WP3 earmark coordination with the space-agency EO programme and named in-situ data frameworks, the EOSC/common-data-space link, and hold the JRC place open.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP1 tasks T1.3, T1.4; WP3 interface)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     }
   ],
   "summary": {
-    "total_claims": 37,
-    "confirmed": 16,
-    "inferred": 3,
-    "assumed": 18,
+    "total_claims": 8,
+    "confirmed": 8,
+    "inferred": 0,
+    "assumed": 0,
     "unresolved": 0
   },
-  "no_unsupported_claims_declaration": false,
+  "no_unsupported_claims_declaration": true,
   "timestamp": "2026-10-02T00:00:00Z"
 }

@@ -1,0 +1,35 @@
+﻿# Allowlist: drop everything, then re-include the engine.
+*
+
+# --- orchestration engine: scheduler, agent runtime, skill runtime,
+# --- gate evaluator, predicates, transport, dev-graph, graph compiler
+!runner/
+!runner/**
+runner/benchmark/
+
+# --- eval / integrity harness
+!harness/
+!harness/**
+harness/**/.gitkeep
+
+# --- deterministic components and graph tooling
+!tools/
+!tools/*.py
+tools/diag_*.py
+tools/author_*.py
+
+# --- workflow binding: manifest, catalogs, gate rules, node specs (§16.2)
+!.claude/
+!.claude/workflows/
+!.claude/workflows/system_orchestration/
+!.claude/workflows/system_orchestration/*.yaml
+!.claude/workflows/system_orchestration/workflow_phases/
+!.claude/workflows/system_orchestration/workflow_phases/*.yaml
+.claude/workflows/system_orchestration/*.bak-*
+
+!.claude/workflows/system_orchestration/workflow_phases/*.yaml
+.claude/workflows/system_orchestration/*.bak-*
+
+# --- the constitution names the layers; the manifest declares the deps
+!CLAUDE.md
+!pyproject.toml

@@ -1,112 +1,110 @@
 {
-  "report_id": "compliance_check_implementation_section_implementation_writer_2026-10-02T00:00:00Z",
+  "report_id": "compliance_check_part_b_assembled_draft_proposal_integrator_2026-10-02T00:00:00Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "implementation_writer",
+  "invoking_agent": "proposal_integrator",
   "run_id_reference": "import uuid; print(uuid.uuid4())",
-  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
       "prohibition_description": "Grant Agreement Annex templates used as the governing structural schema for proposal writing.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "The only structural authority referenced is the Tier 2A RIA/IA application form (CC-10: 'Tier 2A RIA/IA application form (af_he-ria-ia_en)', 'RIA/IA Part B template structure'). No Grant Agreement Annex, Model Grant Agreement Annex, or AGA template is cited as a schema source."
     },
     {
       "prohibition_id": "13.2",
       "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "This is an index/consistency artifact; its derivation_note states it 'adds only section index and cross-section consistency findings' and inherits claim traceability from the referenced section artifacts. The call-related items it records are attributed: budget regime to Tier 3 selected_call.json (CC-08 source_basis) and template structure to Tier 2A (CC-10 source_basis). The artifact introduces no new unattributed call-constraint claim. Note: no Tier 2B path appears in the footer, which is acceptable for this consistency-layer artifact because call-constraint claim grounding is deferred to the child section artifacts per the derivation_note."
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, budget figures) not present in Tier 3.",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment) not present in Tier 3.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "Project-fact items carry Tier 3 / Tier 4 source references: partner tokens P01-P12 to Tier 3 partners.json (CC-03), objectives to Tier 3 objectives.json (CC-01), WP structure to Tier 4 phase3_wp_design/wp_structure.json, deliverables/milestones to the Implementation section, and the EUR 5,000,000 figure to Tier 3 selected_call.json (CC-08 source_basis). The traceability_footer.primary_sources lists these Tier 3 and Tier 4 artifacts."
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Phase 8 activity before the budget gate (Phase 7) has passed, or budget-dependent claims without a passing gate.",
+      "prohibition_description": "Commencing Phase 8 activity before the budget gate (Phase 7) has passed; budget-dependent content asserted as confirmed without a passed gate.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "The TAPM input boundary limits reads to CLAUDE.md and artifact_path, so the existence of phase7_budget_gate/budget_gate_assessment.json was not read directly. On the artifact's own content: the only budget figure referenced is the call-level funding parameter (CC-08: 'EUR 5,000,000 per project', 'about two projects funded', 'a lump-sum regime computed externally'), sourced to Tier 3 selected_call.json and consistent with §8.1 external lump-sum computation. Budget-dependent effort and targets are explicitly flagged as unconfirmed, not asserted as finalized: 'person-months not yet agreed' (CC-08), 'no target numbers set because participation is unconfirmed' (CC-06), and the valuation-clause gap is 'flagged consistently in both sections' (CC-07). No finalized budget-dependent claim is asserted."
     },
     {
       "prohibition_id": "13.5",
       "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "Not checkable from artifact content alone; this prohibition concerns runtime memory-versus-Tier-4 persistence and is enforced by the decision-log-update skill, not by auditing a single deliverable artifact. Recorded pass per skill spec Check 13.5."
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "A workflow or skill becoming a de facto constitutional authority.",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "Not directly checkable from a deliverable artifact. The artifact does not redefine phase, tier, or gate meanings. Recorded pass per skill spec Check 13.6."
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silently reordering phases or weakening gate conditions.",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow progress with incomplete inputs.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "This Phase 8 assembled draft references only upstream phase outputs (Tier 3 inputs, Phase 3 wp_structure, Phase 5 impact_architecture). It references no phase higher than its own and no out-of-order dependency. CC-10 records the canonical Excellence (B.1), Impact (B.2), Implementation (B.3) ordering."
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalising proposal text with incomplete/unvalidated source state without flagging the gap.",
+      "prohibition_description": "Finalising proposal text when source state is incomplete, contradictory, or unvalidated, without explicitly flagging the gap.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "CC-11 and CC-12 report each section's overall_status as 'assumed', not 'unresolved'. The incomplete state is explicitly flagged throughout: 'uniform assumed status reflects unconfirmed consortium participation' (CC-12), person-months 'not yet agreed' (CC-08), KPI targets not set 'because participation is unconfirmed' (CC-06), and the valuation-clause gap flagged (CC-07). The gap is surfaced, not papered over."
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Using generic programme knowledge as a substitute for Tier 1 source documents.",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe rules as a substitute for Tier 1 documents when present.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "The artifact makes no freestanding Tier 1 regulatory claim (participation conditions, grant agreement terms, financial regulation) requiring a Tier 1 citation. The lump-sum regime it mentions is attributed as a call attribute from Tier 3 selected_call.json, and template structure is attributed to Tier 2A. No unattributed regulatory assertion is present. Severity would be major if violated."
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1–4.",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific Tier 1-4 inputs.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "traceability_footer.no_unsupported_claims_declaration is true, and primary_sources is a non-empty array citing the three section artifacts plus Tier 3 objectives.json, Tier 3 partners.json, Tier 4 wp_structure.json, and Tier 4 impact_architecture.json. Every consistency_log entry carries source_refs or source_basis. The artifact has no unresolved claim lacking a source_ref."
     },
     {
       "prohibition_id": "13.11",
       "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project assumptions.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "Not checkable from a Tier 5 deliverable artifact; this concerns writes to Tier 1/2 source files. Recorded pass per skill spec Check 13.11."
     },
     {
       "prohibition_id": "13.12",
       "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "reason": "Not directly checkable from a deliverable artifact. Recorded pass per skill spec Check 13.12."
     }
   ],
   "summary": {
     "total_prohibitions_checked": 12,
     "violations_found": 0
-  },
-  "check_notes": {
-    "13.1": "schema_id is orch.tier5.implementation_section.v1, an application-form section schema. Content references to the Grant Agreement (SEN reclassification via the DMP) and to the grant-default IP allocation are compliance citations, not structural authorities. No 'Annex N', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' is used to govern section structure.",
-    "13.2": "Call-requirement claims (scope requirements SR-02/03/04) carry a Tier 2B reference in traceability_footer.primary_sources[] (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json) and in the matching claim_statuses entries.",
-    "13.3": "All partner, capability, role, lead, and realm-assignment claims carry Tier 3 references in traceability_footer.primary_sources[] (working_assumptions.json, partners.json, roles.json, architecture_inputs/*) and in claim_statuses. Unconfirmed partners are explicitly carried as declared operator assumptions, not asserted as facts.",
-    "13.4": "This is a Phase 8 artifact. docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json exists with gate_pass_declaration: 'pass', so Phase 8 is legitimately open. The single EUR figure (EUR 5,000,000) is the confirmed call-level EU contribution from selected_call.json, not an internally generated project budget. All budget-dependent content (person-months, Tables 3.1f/3.1g/3.1h) is explicitly deferred to the validated lump-sum budget and not finalised.",
-    "13.5": "Not checkable from artifact content alone; enforced by the decision-log-update skill. Recorded pass as non-applicable to artifact-level inspection.",
-    "13.6": "Not checkable from an artifact. Recorded pass as non-applicable to artifact-level inspection.",
-    "13.7": "Terminal Phase 8 drafting artifact; it references only earlier-phase outputs (Phase 3 WP structure, Phase 4 Gantt, Phase 6 implementation architecture). No reference to a phase higher than the current one.",
-    "13.8": "validation_status.overall_status is 'assumed', not 'unresolved'; no claim_statuses entry has status 'unresolved'. Gaps (unconfirmed consortium, gender-dimension expertise, DMP/dissemination-plan timing tension, single-partner realms) are explicitly flagged in the Status and open points and risk tables rather than concealed.",
-    "13.9": "Regulatory claims (composition condition, MS/AC funding limbs, essentiality clause, affiliated entities, China-restriction exemption) carry a Tier 1 reference in traceability_footer.primary_sources[] (docs/tier1_normative_framework/extracted/participation_rules.json) and in claim_statuses.",
-    "13.10": "traceability_footer.no_unsupported_claims_declaration is true; every claim_statuses entry carries a source_ref; no unresolved claim lacks a source.",
-    "13.11": "Not checkable from a deliverable artifact. Recorded pass as non-applicable to artifact-level inspection.",
-    "13.12": "Not checkable from an artifact. Recorded pass as non-applicable to artifact-level inspection."
   },
   "timestamp": "2026-10-02T00:00:00Z"
 }
