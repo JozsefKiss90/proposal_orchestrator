@@ -1,0 +1,174 @@
+{
+  "record_type": "decision",
+  "id": "demo-report_2026-10-03",
+  "date": "2026-10-03",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Demo report' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §12.1 and §12.2 (reviewable, four status categories), §15 (a declared gap over a fabricated completion). Not a constitutional amendment.",
+  "decision": "The demo report is written to plans/reports/dev_graph_demo_report_2026-10-03.md. It answers the four questions the scope record fixed, with every number read from a Tier 4 artifact named beside it, and lists the open defects as twenty-six candidate Milestone 2 tickets. The ticket closes with the change-scenarios ticket still partially open: its subtickets B (boxes 3 to 5), C, D and E are recorded in the report as pending, which the ticket's own blocking clause permits.",
+  "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-report_2026-10-03.json",
+  "report": "plans/reports/dev_graph_demo_report_2026-10-03.md",
+  "acceptance_criteria": {
+    "1_every_scope_question_has_an_answer_backed_by_a_tier_4_artifact": "MET. Four questions, four answers, each row of the report's first table names the artifact it reads. The planner question is answered on a declared synthetic run and says so; no real-rerun answer exists and none is claimed.",
+    "2_defects_found_are_listed_as_candidate_milestone_2_tickets": "MET. Twenty-six candidates, M1 to M26. M1 to M6 keep the ids the change-scenarios record gave them; M7 to M26 are drawn from the findings of every other demo record and name their source.",
+    "3_the_leakage_test_passes_on_the_whole_branch": "MET as the scan defines it. runner.leakage_scan over 322 files: no new leak, exit 0. 11 pre-existing hits remain, all in docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json, which names the project it purged and which this branch does not rewrite. The report says NOT CLEAN and no new leak, in those words."
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "decision": "The report lives under plans/reports/ and the figures that carry its conclusions are pinned by tests/test_demo_report.py, which re-derives them from the same artifacts.",
+      "reasoning": "The ticket asks for a report under plans/. A report is prose and goes stale; the test is what keeps its numbers the artifacts' own, the rule every demo record has followed."
+    },
+    {
+      "id": "D2",
+      "decision": "The planner question is answered as 'not measurable on a real rerun', with the synthetic run's result given as a demonstration and labelled as such.",
+      "reasoning": "Sixteen of sixteen real comparisons refused. The only diagnostic comes from synthetic-rerun-2026-10-02, whose manifest declares it was never dispatched. Reporting that as the planner's agreement rate would present a demonstration as a measurement (§15)."
+    },
+    {
+      "id": "D3",
+      "decision": "The recommendation on fine-grained reuse is to keep the whole-Tier-3 fingerprint operative until M1 lands and one real dispatch is compared.",
+      "reasoning": "Both sides of the evidence are in the report. The deciding fact is that the planner cannot see two classes of change at all (change-scenarios F5, F6), both in the unsafe direction, and that no reuse policy exists to apply a narrower verdict under."
+    },
+    {
+      "id": "D4",
+      "decision": "The blind-baseline report's pinned scan file count is moved to the count after this ticket's two Tier 4 records.",
+      "reasoning": "tests/test_demo_candidate_blind_baseline.py re-derives the count and was red at HEAD because the synthetic-rerun commit added five Tier 4 files without moving it. The sentence is amended, as subtickets A and B amended it, and the amendment is dated."
+    },
+    {
+      "id": "D5",
+      "decision": "The ticket closes with subtickets B (boxes 3 to 5), C, D and E open and recorded as pending.",
+      "reasoning": "The ticket's blocking clause says B and C may stay open and the report then records them as pending. D needs explicit operator instruction and E is the operator's call; neither is this ticket's to do."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "finding": "Five of the demo's own tests are red at HEAD. Three are stale pins of a state the demo has since left: the Phase 8 hard block, Phase 1's ownership of Tier 2B extracted/, and the intake's stale-files finding, all recorded unfixed in the phases 1 to 6 record (F8). One is the Tier 5 fictional-label box of ticket A, red by design until the label is written (M20). The fifth, the blind-baseline scan count, was caused by the synthetic-rerun commit and is fixed here.",
+      "status": "the fifth fixed here; the three stale pins carried as M26; the label as M20"
+    },
+    {
+      "id": "F2",
+      "finding": "One open box outside the change-scenarios subtickets is a live constitutional requirement: Tier 5 content derived from the fictional budget carries no label (ticket A in plans/tickets_budget_and_blind_lane.md; CLAUDE.md §13.8). Its test is red by design.",
+      "status": "recorded as M20; not this ticket's to fix"
+    },
+    {
+      "id": "F3",
+      "finding": "No Tier 4 artifact records the snapshot build time, so the report measures it: 0.02 s in process over three runs, 5.1 s for the full check including 18 packages and interpreter start, on 2026-10-03.",
+      "status": "measured here, not carried from a record"
+    },
+    {
+      "id": "F4",
+      "finding": "The Phase 8 cost is not attributed by the cost tool (n07 record G4). The report derives it by subtracting the Phase 7 figures that record states from the unattributed block.",
+      "status": "Inferred, labelled so"
+    }
+  ],
+  "figures_derived_for_the_report": {
+    "commits_on_the_branch_at_c23666e": 41,
+    "first_snapshot": {
+      "node_count": 116,
+      "edge_count": 305
+    },
+    "current_snapshot": {
+      "snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+      "node_count": 267,
+      "edge_count": 455
+    },
+    "packages": {
+      "count": 18,
+      "incomplete": 18,
+      "budget": 3000,
+      "exclusions_by_reason_total": {
+        "not_relevant": 38,
+        "over_budget": 1224,
+        "policy_forbidden": 5
+      },
+      "not_confirmed_items": 248
+    },
+    "scenarios": {
+      "count": 7,
+      "arms": 12,
+      "change_arms": 9,
+      "comparisons": 18,
+      "refused": 18
+    },
+    "synthetic_rerun": {
+      "run_id": "synthetic-rerun-2026-10-02",
+      "rows": 6,
+      "planner_narrower": 3,
+      "planner_broader": 0
+    },
+    "gates": {
+      "results": 14,
+      "all_pass": true,
+      "predicates_passed": 143
+    },
+    "run_cost": {
+      "d68acaef-e9b2-412e-bc09-4b34c386d5fd": {
+        "invocations": 27,
+        "estimated_input_tokens": 491140,
+        "estimated_output_tokens": 83967,
+        "estimated_total_tokens": 575107,
+        "wall_clock_seconds": 3108.012,
+        "span_seconds": 4835.449,
+        "first_invocation_utc": "2026-09-30T17:15:29.206390+00:00",
+        "last_invocation_utc": "2026-09-30T18:36:04.655645+00:00",
+        "execution_modes": {
+          "cli-prompt": 6,
+          "tapm": 21
+        },
+        "models": [
+          "claude-opus-4-8"
+        ],
+        "failed": 0,
+        "timed_out": 0,
+        "unattributed_invocations": 0,
+        "unattributed_tokens": 0
+      },
+      "import uuid; print(uuid.uuid4())": {
+        "invocations": 27,
+        "estimated_input_tokens": 499590,
+        "estimated_output_tokens": 86196,
+        "estimated_total_tokens": 585786,
+        "wall_clock_seconds": 3042.834,
+        "span_seconds": 4894.015,
+        "first_invocation_utc": "2026-09-30T22:23:10.655866+00:00",
+        "last_invocation_utc": "2026-09-30T23:44:44.670368+00:00",
+        "execution_modes": {
+          "cli-prompt": 6,
+          "tapm": 21
+        },
+        "models": [
+          "claude-opus-4-8"
+        ],
+        "failed": 0,
+        "timed_out": 0,
+        "unattributed_invocations": 41,
+        "unattributed_tokens": 994968
+      }
+    },
+    "blind_report": {
+      "scope": "complete",
+      "assessor_pin": "claude-sonnet-5@claude-cli-subscription@2026-10-02",
+      "cells": [
+        0.35,
+        0.547,
+        0.78,
+        0.797,
+        0.323,
+        0.283
+      ]
+    },
+    "leakage_scan": {
+      "files_scanned": 322,
+      "new_leaks": 0,
+      "pre_existing_hits": 11
+    }
+  },
+  "what_is_outstanding_for_the_operator": [
+    "Subticket D (explicit instruction), one Phase 8 dispatch under a uuid, --record-rerun, then subticket C.",
+    "Subticket E, or its retirement to Milestone 2 as M3.",
+    "The Tier 5 fictional-budget label (M20).",
+    "Whether to open Milestone 2 from the twenty-six candidates in the report's section 8."
+  ],
+  "authored_by": "Claude Fable 5.1, on operator instruction, 2026-10-03."
+}

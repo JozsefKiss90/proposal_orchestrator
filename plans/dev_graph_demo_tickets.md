@@ -833,6 +833,13 @@ lands in the demo or waits for Milestone 2.
 
 **Blocked by:** Change scenarios and shadow comparison. Subtickets B and C may stay open; the report then records them as pending.
 
-- [ ] Every scope question has an answer backed by a Tier 4 artifact.
-- [ ] Defects found are listed as candidate Milestone 2 tickets.
-- [ ] The leakage test passes on the whole branch.
+- [x] Every scope question has an answer backed by a Tier 4 artifact.
+- [x] Defects found are listed as candidate Milestone 2 tickets.
+- [x] The leakage test passes on the whole branch. — no new leak over 322 files; 11 recorded pre-existing hits in the 22 September purge record
+
+**Done 2026-10-03.** Report: `plans/reports/dev_graph_demo_report_2026-10-03.md`. Records:
+`docs/tier4_orchestration_state/decision_log/demo-report_2026-10-03.json` and the validation report of the
+same name. Subtickets B (boxes 3 to 5), C, D and E of the change-scenarios ticket stay open and the
+report records them as pending, which this ticket's blocking clause permits. The planner question is
+answered on the declared synthetic run and says so; twenty-six defects are listed as candidates M1 to
+M26.

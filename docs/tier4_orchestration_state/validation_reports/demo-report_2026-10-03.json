@@ -1,0 +1,150 @@
+{
+  "report_id": "demo-report_2026-10-03",
+  "report_kind": "demo_report_validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "authority": [
+    "CLAUDE.md §12.1 to §12.4 and §15.",
+    "The ticket 'Demo report' in plans/dev_graph_demo_tickets.md supplies the three acceptance boxes.",
+    "The scope record decision_log/dev-graph-demo-scope_2026-09-29.json supplies the four questions."
+  ],
+  "question_asked": "Does the demo report answer every scope question from a Tier 4 artifact, list the defects as Milestone 2 candidates, and does the leakage test pass on the whole branch?",
+  "answer": "Three of three. Every one of the four scope questions is answered in the report's first table with the artifact it reads, and tests/test_demo_report.py re-derives the figures. Twenty-six defects are listed as candidates M1 to M26 with their source records. The leakage scan over 322 files reports no new leak and 11 recorded pre-existing hits in the 22 September purge record, exit 0.",
+  "what_ran": {
+    "leakage_scan": "py -3.10 -m runner.leakage_scan: 322 files in Tier 3, Tier 4, Tier 5 and the vault, this ticket's two records included; 0 new leaks; 11 pre-existing hits, all in decision_log/project-purge-clean-engine-base_2026-09-22.json; exit 0.",
+    "derivation_checks": "tools.build_demo_dev_graph --check (38 of 38 artifacts up to date); tools.run_demo_change_scenarios --check (7 scenarios OK); tools.derive_dev_graph_run_records --check (17 records unchanged); tools.preserve_run_manifests --check (2 records unchanged); tools.derive_run_phase_costs --check (unchanged). All run 2026-10-03.",
+    "snapshot_build_time": "build_snapshot in process, three runs: 0.021 s, 0.016 s, 0.016 s. Full check mode 5.1 s wall-clock.",
+    "test_suite": "py -3.10 -m pytest -q on 2026-10-03: 47 failed, 6060 passed, 77 skipped, 5 errors in 258 s, measured before this report's own placeholder check was filled, so the committed state is 46 failed. Before this ticket the suite showed 47 failed and 5 errors; the one failure this ticket removes is the blind-baseline scan count."
+  },
+  "status_summary": {
+    "Confirmed": [
+      "Snapshot counts, package completeness and exclusions, scenario arms and comparison refusals, gate results, blind report bindings and cell scores, and the scan count: each read from the artifact the report names.",
+      "The five derivation tools reproduce their artifacts.",
+      "No new leak on the branch."
+    ],
+    "Inferred": [
+      "The Phase 8 cost, by subtracting the Phase 7 figures the n07 record states from the cost tool's unattributed block.",
+      "Attribution of invocations to phases 1 to 6, as the cost records themselves label it."
+    ],
+    "Assumed": [
+      "That the synthetic run's three planner_narrower rows are what a real dispatch after subticket D will report. The reuse decisions were derived over the live world, but no dispatch has confirmed them."
+    ],
+    "Unresolved": [
+      "The planner's agreement with a real rerun. No real comparison has produced a diagnostic.",
+      "The monetary cost of the runs. No provider rate was priced and none is substituted.",
+      "The three stale test pins (M26) and the Tier 5 fictional-budget label (M20), whose test is red by design."
+    ]
+  },
+  "figures": {
+    "commits_on_the_branch_at_c23666e": 41,
+    "first_snapshot": {
+      "node_count": 116,
+      "edge_count": 305
+    },
+    "current_snapshot": {
+      "snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+      "node_count": 267,
+      "edge_count": 455
+    },
+    "packages": {
+      "count": 18,
+      "incomplete": 18,
+      "budget": 3000,
+      "exclusions_by_reason_total": {
+        "not_relevant": 38,
+        "over_budget": 1224,
+        "policy_forbidden": 5
+      },
+      "not_confirmed_items": 248
+    },
+    "scenarios": {
+      "count": 7,
+      "arms": 12,
+      "change_arms": 9,
+      "comparisons": 18,
+      "refused": 18
+    },
+    "synthetic_rerun": {
+      "run_id": "synthetic-rerun-2026-10-02",
+      "rows": 6,
+      "planner_narrower": 3,
+      "planner_broader": 0
+    },
+    "gates": {
+      "results": 14,
+      "all_pass": true,
+      "predicates_passed": 143
+    },
+    "run_cost": {
+      "d68acaef-e9b2-412e-bc09-4b34c386d5fd": {
+        "invocations": 27,
+        "estimated_input_tokens": 491140,
+        "estimated_output_tokens": 83967,
+        "estimated_total_tokens": 575107,
+        "wall_clock_seconds": 3108.012,
+        "span_seconds": 4835.449,
+        "first_invocation_utc": "2026-09-30T17:15:29.206390+00:00",
+        "last_invocation_utc": "2026-09-30T18:36:04.655645+00:00",
+        "execution_modes": {
+          "cli-prompt": 6,
+          "tapm": 21
+        },
+        "models": [
+          "claude-opus-4-8"
+        ],
+        "failed": 0,
+        "timed_out": 0,
+        "unattributed_invocations": 0,
+        "unattributed_tokens": 0
+      },
+      "import uuid; print(uuid.uuid4())": {
+        "invocations": 27,
+        "estimated_input_tokens": 499590,
+        "estimated_output_tokens": 86196,
+        "estimated_total_tokens": 585786,
+        "wall_clock_seconds": 3042.834,
+        "span_seconds": 4894.015,
+        "first_invocation_utc": "2026-09-30T22:23:10.655866+00:00",
+        "last_invocation_utc": "2026-09-30T23:44:44.670368+00:00",
+        "execution_modes": {
+          "cli-prompt": 6,
+          "tapm": 21
+        },
+        "models": [
+          "claude-opus-4-8"
+        ],
+        "failed": 0,
+        "timed_out": 0,
+        "unattributed_invocations": 41,
+        "unattributed_tokens": 994968
+      }
+    },
+    "blind_report": {
+      "scope": "complete",
+      "assessor_pin": "claude-sonnet-5@claude-cli-subscription@2026-10-02",
+      "cells": [
+        0.35,
+        0.547,
+        0.78,
+        0.797,
+        0.323,
+        0.283
+      ]
+    },
+    "leakage_scan": {
+      "files_scanned": 322,
+      "new_leaks": 0,
+      "pre_existing_hits": 11
+    }
+  },
+  "recorded_in": [
+    "plans/reports/dev_graph_demo_report_2026-10-03.md",
+    "docs/tier4_orchestration_state/decision_log/demo-report_2026-10-03.json",
+    "plans/dev_graph_demo_tickets.md",
+    "tests/test_demo_report.py",
+    "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json (scan count amended)"
+  ],
+  "authored_by": "Claude Fable 5.1, on operator instruction, 2026-10-03.",
+  "note": "No gate was evaluated, no phase dispatched, no manifest edited. The report is prose under plans/; this record and its tests are what make its numbers checkable."
+}
