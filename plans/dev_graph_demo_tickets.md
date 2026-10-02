@@ -345,9 +345,9 @@ recorded unfixed as F1 and F2. Ten findings and seven decisions are in
 **Blocked by:** Budget request and the Phase 7 gate; RIA pre-evaluation profile in the harness.
 
 - [x] Phase 8 reaches released, or its blocking gate is recorded.
-- [ ] Candidate version 1 is a document snapshot with state imported, with passages linked by span.
-- [ ] The blind report carries the candidate hash, profile version and assessor pin, and is labelled complete or partial.
-- [ ] The leakage guard confirms no historical-feedback item entered the package.
+- [x] Candidate version 1 is a document snapshot with state imported, with passages linked by span.
+- [x] The blind report carries the candidate hash, profile version and assessor pin, and is labelled complete or partial.
+- [x] The leakage guard confirms no historical-feedback item entered the package.
 
 **Outcome: one of four.** The blocking gate is recorded from the gate's own predicates. No node
 was dispatched and no gate result was written. The planner response is absent, so `g08_p02`
@@ -371,6 +371,139 @@ Criteria 2, 3 and 4 wait on a Phase 8 dispatch and on nothing else. No constitut
 stands in front of them, and ticket B closed the F1 defect that would have failed criterion 3.
 Phase 8 drafting is now permitted under §13.4 for the first time on this branch. Every figure it
 draws on is fictional, so §13.8 applies to the first section written.
+
+**Amended 2 October 2026: three of four are closed.** The operator dispatched n08a to n08f one
+node at a time, and every Phase 8 node released. `gate_12_constitutional_compliance` passed 8 of
+8 deterministic predicates and 6 of 6 semantic ones, the first gate on this branch with semantic
+predicates bound. Criterion 1 therefore stands on its first branch, not its second.
+
+Criterion 2 is closed. `tools/build_part_b_candidate.py` converted the three section artifacts
+and `import_document` wrote `DEMO-BIODIV-2027_part_b@1101b2a653c543a4` with state `imported`.
+The demo snapshot moved from 116 nodes of 7 types to 267 of 10: one `artifact_version`, three
+passages and 147 claims arrived with it. Each passage carries its span over the rendered
+document, and the seven declared sub-sections `B.1.1` to `B.3.2` are carried verbatim.
+
+Criterion 4 is closed over the package the criterion actually names, not over the six the
+1 October report could reach. `assert_no_leakage` ran over the blind-view package built around
+candidate version 1: 151 items, three of them passages and 147 claims, clean. That is the pass
+F6 said the earlier one was not, because a historical-feedback tag rides on exactly those types.
+Commitments are still zero, so F6's commitment half stays open.
+
+**Criterion 3 is the one box left, and no defect stands behind it.** Every input the blind
+report binds was verified offline against the real candidate: `load_candidate` resolves all
+three profile-required sections, so the scope is `complete`; the candidate hash and the profile
+version are derived; and `build_pack_for` ran for all six rubric-and-section pairs with the
+anchor map closing on every one. What remains is the call to the pinned assessor, which is the
+operator's step:
+
+```
+py -3.10 -m harness.commands.blind_assessment assess --document DEMO-BIODIV-2027_part_b \
+  --profile harness/profiles/ria_default.json --intake demo-biodiv-2027-part-b-v1
+```
+
+**Amended again, 2 October 2026: the assessor now speaks the Max subscription.** The operator
+ran that command. Groq rejected the key with HTTP 401 on a well-formed 56-character `gsk_`
+token, so the key is revoked, expired or belongs to a closed account. The run proved more than
+the offline rehearsal did before it stopped: the snapshot resolved, the blind package built,
+`assert_no_leakage` passed and the three section artifacts were materialised. Only the grades
+are missing.
+
+Rather than hold an API key, the operator chose the subscription. The harness refuses the
+`claude_cli` transport in two places, and both refusals govern the *default-built* backend.
+`Judge` names the injected backend as the seam for callers that wire their own transport, and
+makes transport independence the caller's responsibility there.
+`harness/commands/_subscription_judge.py` is that caller, and its docstring states the trade.
+**Model independence survives** — `JudgeConfig` still refuses every model in `drafter_models()`,
+so the assessor can never be the `claude-opus-4-8` that wrote these sections. **Context
+independence survives, and the blind lane rests on it** — the transport is called with
+`tools=None`, so the assessor has no `Read` and no `Glob` and cannot open the drafting context,
+the assembled draft or the phase outputs. **Transport, vendor and family independence do not
+survive.** A same-family assessor shares the drafter's priors and is a weaker check on phrasing
+than a different-family one. The pin is where that is declared:
+`claude-sonnet-5@claude-cli-subscription@2026-10-02`.
+
+The outstanding command is now:
+
+```
+py -3.10 -m harness.commands.blind_assessment assess --document DEMO-BIODIV-2027_part_b \
+  --profile harness/profiles/ria_default.json --intake demo-biodiv-2027-part-b-v1 \
+  --transport claude-cli --assessor-model claude-sonnet-5 \
+  --assessor-version claude-cli-subscription@2026-10-02
+```
+
+The two pin flags are not optional. `.env.harness` is loaded with `override=True` and still
+holds the Groq pin, so an exported variable loses to the file and the CLI would be asked for
+`llama-3.3-70b-versatile`. The file itself was not edited: it keeps its key and its pin, and the
+E5f lane that shares it is untouched. The alternative also stays open — rotate the Groq key and
+drop the four flags to run the same assessment over the independent transport.
+
+**A third finding, and the largest, found by rehearsing that lane end to end.** F9: one
+provider's free-tier rate limit was deciding how much of the Part B the assessor may read.
+`MAX_PACK_TOKEN_BUDGET` was `GROQ_TPM_LIMIT - 2048 - 900 = 3052`, and the pack builder refused
+anything larger. Over the six candidate packs that cap drops **111 of 266 relevant items** and
+truncates every cell; the implementation workplan cell loses 32 of its 53. The rubric system
+prompt then tells the assessor that a truncated pack means "you must not return `passed: true`".
+Every grade was therefore predetermined before a model read anything, and the report would have
+measured the rate limit rather than the proposal. The ceiling is now a parameter the transport
+declares. It still defaults to the old value, so the Groq lane is unchanged and a test pins that
+it still refuses an oversized budget. All six packs complete at 10501, bisected rather than
+estimated; the uncapped default is 32768. Lifting the ceiling does not lift the floor: a budget
+that is still too small reports `insufficient_context` exactly as before.
+
+F10: the 401 printed a traceback rather than failing closed, because no transport error sat in
+the command's fail-closed set. Fixed — both transports now print one line and exit 2. F11: three
+real-data probes in `tests/harness/test_evidence_pack.py` fail on this branch and failed before
+this act, because they read the RIA sections with the MSCA-PF anchor spelling `1.1`. Recorded so
+they are not read as a regression from it, and offered as a Milestone 2 candidate.
+
+**Closed 2 October 2026: four of four.** The operator ran the subscription command and the
+assessor graded all six cells. `harness/blind_reports/blind_e518c50023ee_0001.json` carries the
+candidate hash, the profile version and the pin
+`claude-sonnet-5@claude-cli-subscription@2026-10-02`, labelled scope `complete`, with
+`partial_coverage` empty and no missing section. The three bindings repeat on every cell, so no
+cell can be read apart from the candidate and the assessor that produced it. The provenance log
+holds 18 entries, six cells at n=3. Criterion 3 is met and the ticket closes.
+
+The F9 fix held in the live run. All six packs report status `complete` at budget 32768, between
+2430 and 6565 tokens, so the ceiling that would have truncated five of the six and forbidden
+every pass is gone. The grades discriminate rather than flatten: impact passes both cells at
+0.780 and 0.797, excellence fails at 0.350 and 0.547, implementation fails at 0.323 and 0.283.
+Two clean passes of six. The report is advisory and never run-blocking.
+
+**F12, and the lane earned its keep.** Four of the six cells fail for one systematic reason, and
+the assessor named it in all six without being asked: every claim-ledger entry it was shown
+carries an empty `source_ref`. That is true, and it was checked rather than taken on the
+assessor's word. All 147 claims in the candidate are blank, including the 90 declared
+`confirmed`; all 180 entries in the three Tier 5 sections carry a real source. The break is a
+seam between two components that are each correct alone.
+`tools/build_part_b_candidate.py::_claims` maps `claim_id`, `status` and `claim_summary` onto the
+graph's claim shape and never carries `source_ref`, and its docstring explains, rightly, that it
+leaves `verified_span` absent because inventing offsets would defeat the claim verifier.
+`materialise_candidate` then derives `source_ref` from `verified_span["id"]` alone — the one
+field the converter deliberately never writes — so it resolves to the empty string. The harness
+is faithful throughout: the pack renders `source_ref=` verbatim and the assessor judged what it
+was shown. Under §12.2 a `confirmed` claim is one directly evidenced by a named source, and in
+the candidate the name is gone, so the candidate understates its own traceability. Open, and a
+Milestone 2 candidate. **No deterministic gate caught this, because every component passed its
+own contract. The blind assessor is the only thing on this branch that has found it.**
+
+F13 is recorded so the scores are not misread. The two implementation cells score lowest because
+the person-months read TBD, the resources defer to a future lump-sum response, and all twelve
+partner participations are assumed. That is the demo's all-Assumed Tier 3 being priced honestly,
+and the sections concede it in the prose the assessor quotes back. Not a defect.
+
+**Two findings, both from converting a real Part B rather than a fixture.** F7: the builder had
+no mapping for an `assumed` claim and refused the Part B outright. The graph has no
+`evidence_strength` that yields Assumed, because Assumed is declared rather than evidenced, and
+the importer admits exactly one override for it. Carrying such a claim on strength alone would
+have landed 85 of the demo's 180 claims as Unresolved and discarded the operator declaration.
+F8: a Tier 5 `claim_id` is a declaration key, not an occurrence id — all three sections assert
+`project_duration`, and the assembler concatenates the per-sub-section ledgers without
+deduplicating, so one declaration arrives up to six times with an identical status and summary.
+The builder now scopes each claim id to its section, collapses an exact repeat and refuses a
+repeat that disagrees. F8 also records that the demo dev-graph builder never prunes: 54 package
+directories now hold 18 current packages, and the 1 October count of "36 evidence packages, 6 of
+them blind" included a superseded snapshot's 18 and 3.
 
 **F7: nothing converted a Phase 8 draft into a candidate, and it is now built.** Criterion 2
 says the draft is "imported as candidate version 1". Phase 8 writes three section artifacts

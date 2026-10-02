@@ -1,43 +1,62 @@
 """
-The demo's candidate Part B and blind baseline: what is recorded, and what is blocked.
+The demo's candidate Part B and blind baseline: what is recorded, and what is left.
 
 Ticket "Candidate Part B and the blind baseline" in ``plans/dev_graph_demo_tickets.md``.
-Three of its four criteria are not met, and these tests pin why so none can be quietly
-reported as done later.  Two unrelated blocks account for the first two:
+All four criteria are met and these tests pin how, so none can later be quietly un-met.
 
-1. **Phase 8 is frozen.**  BIODIV-01 is a lump-sum RIA, and ``gate_09`` has not
-   passed, so CLAUDE.md §8.4 and §13.4 freeze every Phase 8 node.  There is therefore
-   no Part B, and drafting one here — by the runner or by hand — is the violation the
-   gate exists to prevent.  When this ticket ran, the block was simply an empty
-   ``received/``.  Ticket A in ``plans/tickets_budget_and_blind_lane.md`` has since
-   placed one fictional response there under an operator override, which leaves the
-   block intact: ``validation/`` and ``budget_gate_assessment.json`` are the Phase 7
-   node's to write, and dispatching that node is the operator's step.
-2. **The blind lane's document route could feed neither shipped profile — F1, now
-   fixed.**  ``materialise_candidate`` synthesised one sub-section named for its
-   section, while the RIA rubrics anchor on ``B.1.1`` to ``B.3.2`` and the MSCA-PF
-   rubrics on ``1.1`` to ``3.2``, so the anchor map failed closed and no report was
-   written.  This criterion would have failed with Part B in hand, which is why it was
-   a finding and not a wait.  Ticket B in ``plans/tickets_budget_and_blind_lane.md``
-   closed it: a section declares its sub-sections, and the materialiser emits them.
-   What remains here is the half that was never a defect — a document declaring none
-   still fails closed — and ``tests/harness/test_blind_document_subsections.py`` owns
-   the fix.
+**Criterion 1 — met.** The operator dispatched n08a to n08f one node at a time and every
+Phase 8 node released. ``gate_12_constitutional_compliance`` passed 8 of 8 deterministic
+predicates and 6 of 6 semantic ones, the first gate on this branch with semantic
+predicates bound.
 
-The fourth criterion asks the leakage guard about the package built around candidate
-version 1.  The guard runs clean over all 6 blind packages the demo world holds, but
-those hold no passage, claim or commitment item, so they cannot carry the leak it looks
-for (F6).  Its box stays open.
+**Criterion 2 — met.** ``tools/build_part_b_candidate.py`` converted the three section
+artifacts and ``import_document`` wrote candidate version 1. Two rules had to be found
+first, because no fixture had exercised them (F7, F8): ``assumed`` has no
+``evidence_strength``, so such a claim carries ``unconfirmed`` plus a declared status;
+and a Tier 5 ``claim_id`` is a declaration key, not an occurrence id, so a claim's
+identity is ``(section_id, claim_id)``.
 
-What this module does deliver: the ESR intake record with availability
-``not_applicable``, and the recorded Phase 8 block.
+**Criterion 4 — met, over the package the criterion names.** F6 observed that a clean
+leakage pass over the task-seeded packages is uninformative, because a historical
+feedback tag rides on passages, claims and commitments and those packages hold none.
+The candidate package holds 3 passages and 147 claims, so it could carry the leak. It
+does not.
+
+**Criterion 3 — met.** The operator ran the assessor over the Max subscription and the
+report binds the candidate hash, the profile version and the pin on its header and on
+each of its six cells, labelled scope ``complete``. The criterion asks what the report
+binds and how it is labelled; it never asked the candidate to grade well, and four of
+the six cells fail. The single systematic reason they fail is F12, which is the thing
+this lane exists to find: every claim reaches the assessor with an empty ``source_ref``,
+because the converter does not carry the Tier 5 field and ``materialise_candidate``
+reads only the ``verified_span`` the converter deliberately omits. No deterministic gate
+caught it — each component passes its own contract — and the blind assessor named it in
+all six cells unprompted. ``TestTheAssessorsReport`` pins both halves: the bindings that
+close the criterion, and the blank field that F12 is open against, so the day F12 is
+fixed these tests fail and say so.
+
+Two earlier blocks are now history, kept because each was a finding rather than a wait.
+``gate_09`` froze every Phase 8 node until ticket A placed a fictional budget response
+under an operator override and the Phase 7 dispatch passed it 9 of 9. And F1: the
+document route could feed neither shipped profile, because ``materialise_candidate``
+synthesised one sub-section named for its section while the RIA rubrics anchor on
+``B.1.1`` to ``B.3.2`` and the MSCA-PF rubrics on ``1.1`` to ``3.2``. Ticket B closed it
+— a section declares its sub-sections and the materialiser emits them — and
+``tests/harness/test_blind_document_subsections.py`` owns the fix. What remains here is
+the half that was never a defect: a document declaring no sub-sections still fails
+closed.
+
+F9 is pinned here too, and it is the newest: the evidence pack's budget ceiling was
+derived from one provider's free-tier rate limit, which truncated all six cells and so
+predetermined every grade. The ceiling now belongs to the assessor's transport.
 
 No runner phase is dispatched and no gate result is written: gate evaluation belongs to
-the scheduler and gate results to the gate evaluator (§17.1.4, §17.6.3).  What runs is
+the scheduler and gate results to the gate evaluator (§17.1.4, §17.6.3). What runs is
 the gate's own predicate functions, which are pure, and the harness lane, which is
-out-of-band QA and never a runtime gate.  The F1 reproduction imports its document into
-a copy of the synthetic fixture under ``tmp_path``, never into ``docs/``: a real import
-would move the demo snapshot id that three Tier 4 records cite.
+out-of-band QA and never a runtime gate. The F1 reproduction still imports its document
+into a copy of the synthetic fixture under ``tmp_path``; the one record under ``docs/``
+is the real Part B, imported deliberately, and it moved the demo snapshot id that three
+Tier 4 records cite — so those records were rewritten with it.
 """
 
 from __future__ import annotations
@@ -50,7 +69,7 @@ import pytest
 import yaml
 
 import harness.blind_assessment as ba
-from harness.evidence_pack import EvidencePackError
+from harness.evidence_pack import EvidencePackError, pack_forbids_clean_pass
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
 from harness.rubrics import load_profile_bundle
@@ -77,10 +96,18 @@ TIER_5_REL = "docs/tier5_deliverables"
 INTAKE_ID = "demo-biodiv-2027-part-b-v1"
 DOCUMENT_ID = "DEMO-BIODIV-2027_part_b"
 RIA_PROFILE_REL = "harness/profiles/ria_default.json"
+RUN_MANIFEST_REL = ".claude/runs/import uuid; print(uuid.uuid4())/run_manifest.json"
+SUMMARY_REL = "docs/tier4_orchestration_state/dev_graph/demo_snapshot_summary.json"
 MSCA_PROFILE_REL = "harness/profiles/msca_pf_default.json"
 
-#: Ticket 8 pinned the demo snapshot.  Writing the intake must not move it.
-DEMO_SNAPSHOT_ID = "sha256:93b18297a8703157e77e08d1a3c97abd240f752b63b711ca0b3037f6141bd836"
+#: The demo snapshot after candidate version 1 was imported.  Ticket 8 pinned
+#: the Tier-3-only snapshot at 116 nodes; importing Part B added one
+#: artifact_version, three passages and 147 claims and moved the id.  Writing
+#: the intake still must not move it, which is what the intake test checks.
+DEMO_SNAPSHOT_ID = "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389"
+
+#: The document node candidate version 1 landed as.
+DOCUMENT_NODE_ID = "DEMO-BIODIV-2027_part_b@1101b2a653c543a4"
 
 REPORT_REL = (
     "docs/tier4_orchestration_state/validation_reports/"
@@ -219,32 +246,83 @@ class TestThePhase8BlockIsLifted:
         assert gate["absent_artifacts_behavior"] == "blocking_gate_failure"
         assert "e07_to_08a" in gate["blocking_edges"]
 
-    def test_phase_8_has_produced_nothing(self):
-        assert _files(PHASE_8_REL) == []
+    def test_every_phase_8_node_released(self):
+        """The operator dispatched n08a to n08f one at a time, fixing each
+        exit gate offline before the next."""
+        states = _json(RUN_MANIFEST_REL)["node_states"]
+        assert {states[node] for node in PHASE_8_NODE_IDS} == {"released"}
 
-    def test_tier_5_holds_nothing_but_placeholders(self):
-        assert _files(TIER_5_REL) == []
-        assert (REPO / TIER_5_REL / "proposal_sections" / ".gitkeep").is_file()
+    def test_the_terminal_gate_passed_on_both_halves(self):
+        """gate_12 is the first gate on this branch with semantic predicates
+        bound, so its six Claude judges ran where no earlier gate had any."""
+        gate = _json(f"{PHASE_8_REL}/gate_12_result.json")
+        assert gate["status"] == "pass"
+        assert gate["deterministic_predicates"]["failed"] == []
+        assert gate["semantic_predicates"]["failed"] == []
+        assert gate["skipped_semantic"] is False
+        assert len(gate["deterministic_predicates"]["passed"]) == 8
+        assert len(gate["semantic_predicates"]["passed"]) == 6
+
+    def test_tier_5_holds_the_part_b_phase_8_wrote(self):
+        names = {path.name for path in _files(TIER_5_REL)}
+        assert {
+            "excellence_section.json",
+            "impact_section.json",
+            "implementation_section.json",
+        } <= names
 
 
 # ---------------------------------------------------------------------------
-# 2. Criterion 2: there is no candidate version 1, and why
+# 2. Criterion 2: candidate version 1, imported with its passages spanned
 # ---------------------------------------------------------------------------
 
 
-class TestNoCandidateVersionExists:
-    def test_no_document_record_exists(self):
-        assert read_document_records(REPO) == []
-        assert not (REPO / DOCUMENTS_REL).exists()
+class TestCandidateVersionOneExists:
+    def test_one_document_record_exists_and_its_state_is_imported(self):
+        records = read_document_records(REPO)
+        assert len(records) == 1
+        _rel, record = records[0]
+        assert record["document_id"] == DOCUMENT_ID
+        assert record["state"] == "imported"
 
-    def test_the_demo_snapshot_holds_no_document_node(self, demo_snapshot):
+    def test_the_demo_snapshot_holds_the_document_node(self, demo_snapshot):
         assert demo_snapshot.snapshot_id == DEMO_SNAPSHOT_ID
-        assert [n for n in demo_snapshot.nodes if n["type"] == "artifact_version"] == []
+        versions = [
+            n for n in demo_snapshot.nodes if n["type"] == "artifact_version"
+        ]
+        assert [n["id"] for n in versions] == [DOCUMENT_NODE_ID]
 
-    def test_resolving_the_part_b_document_is_refused(self, demo_snapshot):
-        with pytest.raises(ba.BlindAssessmentError) as exc:
-            ba.resolve_document(demo_snapshot, DOCUMENT_ID)
-        assert "no document snapshot named" in str(exc.value)
+    def test_resolving_the_part_b_document_succeeds(self, demo_snapshot):
+        node = ba.resolve_document(demo_snapshot, DOCUMENT_ID)
+        assert node["id"] == DOCUMENT_NODE_ID
+
+    def test_every_passage_is_linked_by_span(self, demo_snapshot):
+        """Criterion 2's own words. A passage without a span would be linked
+        by title, and a title is not a position in the rendered document."""
+        passages = [n for n in demo_snapshot.nodes if n["type"] == "passage"]
+        assert len(passages) == 3
+        for passage in passages:
+            span = passage["content"]["span"]
+            assert span["end"] > span["start"] >= 0
+
+    def test_the_declared_sub_sections_are_the_rubrics_anchors(
+        self, demo_snapshot, ria_bundle
+    ):
+        """Carried verbatim from Phase 8. A renumbered one would break grading
+        silently, because the anchor map fails closed on an absent anchor."""
+        declared = {
+            str(sub["sub_section_id"])
+            for n in demo_snapshot.nodes
+            if n["type"] == "passage"
+            for sub in n["content"].get("sub_sections") or []
+        }
+        anchors = {
+            anchor
+            for rubric in ria_bundle.rubric_set.rubrics
+            for anchor in rubric.anchor_sub_section_ids
+        }
+        assert anchors
+        assert anchors <= declared
 
 
 # ---------------------------------------------------------------------------
@@ -274,6 +352,8 @@ class TestTheEsrIntakeRecord:
         assert read_esr_intake(REPO, INTAKE_ID).submission_id == "NOT_SUBMITTED"
 
     def test_writing_it_did_not_move_the_demo_snapshot(self, demo_snapshot):
+        """An intake is not a graph record. The snapshot id did move since
+        ticket 8, and candidate version 1 moved it, not this record."""
         assert demo_snapshot.snapshot_id == DEMO_SNAPSHOT_ID
 
     def test_an_esr_informed_purpose_would_be_refused_by_the_blind_lane(self):
@@ -304,22 +384,147 @@ def stored_packages() -> list[Package]:
         items = json.loads(
             (directory / "package.json").read_text(encoding="utf-8-sig")
         )["items"]
-        out.append(Package(manifest=pkg_manifest, items=tuple(items)))
+        package = Package(manifest=pkg_manifest, items=tuple(items))
+        object.__setattr__(package, "directory_name", directory.name)
+        out.append(package)
     return out
 
 
 @pytest.fixture(scope="module")
-def blind_packages(stored_packages) -> list[Package]:
-    return [p for p in stored_packages if p.manifest.get("view") == ba.BLIND_VIEW]
+def live_packages(stored_packages) -> list[Package]:
+    """The packages the current snapshot's build wrote.
+
+    ``tools/build_demo_dev_graph.py`` writes content-addressed packages and
+    never removes the previous generation, so the directory listing holds more
+    than one snapshot's worth (F8). The builder's own summary names the live
+    set, so that is what is read here rather than the listing.
+    """
+    summary = _json(SUMMARY_REL)
+    live = {Path(entry["path"]).name for entry in summary["packages"]}
+    return [p for p in stored_packages if p.directory_name in live]
+
+
+@pytest.fixture(scope="module")
+def blind_packages(live_packages) -> list[Package]:
+    return [p for p in live_packages if p.manifest.get("view") == ba.BLIND_VIEW]
+
+
+@pytest.fixture(scope="module")
+def candidate_sections(tmp_path_factory):
+    """The materialised candidate's section artifacts, kept on disk.
+
+    ``candidate_package`` discards its temporary directory; the pack-ceiling
+    tests need the files themselves, so this fixture holds them for the module.
+    """
+    out = tmp_path_factory.mktemp("candidate_v1")
+    evidence = ba.build_blind_evidence(
+        REPO,
+        DOCUMENT_ID,
+        profile_version=load_profile_bundle(RIA_PROFILE_REL, repo_root=REPO).version,
+        out_dir=out,
+    )
+    candidate = ba.load_candidate(
+        evidence.candidate_dir,
+        load_profile_bundle(RIA_PROFILE_REL, repo_root=REPO).profile,
+    )
+    return candidate
+
+
+class TestThePackCeilingBelongsToTheTransport:
+    """F9: a Groq rate limit was deciding how much of the Part B is assessable.
+
+    ``MAX_PACK_TOKEN_BUDGET`` is ``GROQ_TPM_LIMIT - 2048 - 900``.  Under it every
+    one of the six cells is truncated, and the rubric system prompt instructs the
+    assessor not to return ``passed: true`` on a truncated pack — so the whole
+    report would have been a predetermined fail describing the cap rather than
+    the proposal.  The ceiling is now the assessor transport's to declare, and a
+    transport with no per-minute token cap declares none.
+    """
+
+    @staticmethod
+    def _cells(bundle, candidate):
+        return [
+            (rubric, candidate.sections[section_id])
+            for rubric in bundle.rubric_set.rubrics
+            for section_id in bundle.profile.section_ids_for(rubric.criterion_id)
+            if section_id in candidate.sections
+        ]
+
+    def test_every_cell_is_truncated_under_the_providers_cap(
+        self, ria_bundle, candidate_sections
+    ):
+        from harness.evidence_pack import DEFAULT_PACK_TOKEN_BUDGET, PACK_COMPLETE
+        from harness.rubrics import build_pack_for
+
+        cells = self._cells(ria_bundle, candidate_sections)
+        assert len(cells) == 6
+        for rubric, path in cells:
+            pack = build_pack_for(rubric, path, token_budget=DEFAULT_PACK_TOKEN_BUDGET)
+            assert pack.status != PACK_COMPLETE, rubric.expectation_key
+
+    def test_every_cell_completes_once_the_ceiling_is_the_transports(
+        self, ria_bundle, candidate_sections
+    ):
+        from harness.evidence_pack import (
+            PACK_COMPLETE,
+            UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
+        )
+        from harness.rubrics import build_pack_for
+
+        for rubric, path in self._cells(ria_bundle, candidate_sections):
+            pack = build_pack_for(
+                rubric,
+                path,
+                token_budget=UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
+                max_token_budget=None,
+            )
+            assert pack.status == PACK_COMPLETE, rubric.expectation_key
+            assert not pack_forbids_clean_pass(pack)
+
+    def test_the_capped_transport_is_still_capped(self, ria_bundle, candidate_sections):
+        """Lifting it for one transport must not lift it for the other: the Groq
+        lane still cannot be handed a budget its TPM ceiling cannot carry."""
+        from harness.evidence_pack import MAX_PACK_TOKEN_BUDGET
+        from harness.rubrics import build_pack_for
+
+        rubric, path = self._cells(ria_bundle, candidate_sections)[0]
+        with pytest.raises(EvidencePackError, match="TPM"):
+            build_pack_for(rubric, path, token_budget=MAX_PACK_TOKEN_BUDGET + 1)
+
+
+@pytest.fixture(scope="module")
+def candidate_package():
+    """The package criterion 4 names: the one built around candidate v1."""
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as out:
+        evidence = ba.build_blind_evidence(
+            REPO,
+            DOCUMENT_ID,
+            profile_version=load_profile_bundle(
+                RIA_PROFILE_REL, repo_root=REPO
+            ).version,
+            out_dir=Path(out),
+        )
+        return evidence.package
 
 
 class TestTheLeakageGuardIsCleanOnTheDemoWorld:
-    def test_the_demo_world_holds_the_blind_packages_the_report_counts(
-        self, stored_packages, blind_packages
+    def test_the_live_packages_are_the_summarys_and_the_rest_are_history(
+        self, stored_packages, live_packages, blind_packages
     ):
-        assert len(stored_packages) == 36
-        assert len(blind_packages) == 6
+        """F8: the directory listing holds more than one generation.
+
+        The 1 October evidence counted 36 directories and 6 blind packages.
+        18 of those directories, 3 of them blind, belonged to a snapshot that
+        no longer exists.
+        """
+        assert len(live_packages) == 18
+        assert len(blind_packages) == 3
         assert {p.manifest["task"] for p in blind_packages} == {"T1.1", "T3.1", "T4.1"}
+        assert len(stored_packages) > len(live_packages)
+        for package in live_packages:
+            assert package.manifest["snapshot_id"] == DEMO_SNAPSHOT_ID
 
     def test_every_blind_package_passes_the_guard(self, blind_packages):
         for package in blind_packages:
@@ -335,31 +540,42 @@ class TestTheLeakageGuardIsCleanOnTheDemoWorld:
         kinds = {i.get("type") for p in blind_packages for i in p.items}
         assert not kinds & ba.LEAKAGE_FORBIDDEN_TYPES
 
-    def test_the_packages_cannot_carry_the_leak_the_guard_looks_for(
-        self, blind_packages
-    ):
-        """F6: the clean pass is correct, and it is uninformative.
+    def test_the_task_packages_still_cannot_carry_the_leak(self, blind_packages):
+        """F6, for the task-seeded packages: the clean pass is uninformative.
 
         A historical-feedback tag rides on a document's passages, claims and
-        commitments.  The demo world has no document, so the packages hold
-        none of those three types and no item in them could carry a tag.
+        commitments.  These packages are seeded on a task, so they hold none
+        of those three types and no item in them could carry a tag.  Criterion
+        4 is answered by the candidate package below, not by these.
         """
         counts: dict[str, int] = {}
         for package in blind_packages:
             for item in package.items:
                 counts[item["type"]] = counts.get(item["type"], 0) + 1
-        assert counts == {
-            "task": 50,
-            "participant": 22,
-            "work_package": 6,
-            "source": 4,
-            "deliverable": 2,
-        }
+        assert counts
         for kind in ("passage", "claim", "commitment"):
             assert kind not in counts
 
-    def test_there_is_no_document_whose_tags_could_leak(self):
-        assert read_document_records(REPO) == []
+    def test_the_candidate_package_can_carry_it_and_does_not(self, candidate_package):
+        """Criterion 4, over the package it names. This is the pass F6 said
+        the earlier one was not."""
+        counts: dict[str, int] = {}
+        for item in candidate_package.items:
+            counts[item["type"]] = counts.get(item["type"], 0) + 1
+        assert counts["passage"] == 3
+        assert counts["claim"] == 147
+        assert sum(counts.values()) == 151
+        ba.assert_no_leakage(candidate_package)
+        for item in candidate_package.items:
+            tags = (item.get("content") or {}).get("tags") or []
+            assert not set(tags) & HISTORICAL_FEEDBACK_TAGS, item.get("id")
+
+    def test_the_one_document_carries_no_tag_to_leak(self):
+        """An untagged candidate carries no ``tags`` key anywhere, so nothing
+        derived from it can carry one either."""
+        records = read_document_records(REPO)
+        assert len(records) == 1
+        assert "tags" not in records[0][1]
 
     def test_the_guard_refuses_a_planted_item_so_a_pass_is_not_vacuous(
         self, blind_packages
@@ -574,8 +790,11 @@ class TestTheDocumentRouteCannotFeedTheRiaProfile:
             )
         assert "assess through the document route to stamp an intake" in str(exc.value)
 
-    def test_no_document_was_written_into_the_repository(self):
-        assert read_document_records(REPO) == []
+    def test_the_only_document_in_the_repository_is_candidate_version_1(self):
+        """The F1 reproduction still imports into ``tmp_path``. The one record
+        under ``docs/`` is the real Part B, imported deliberately."""
+        records = read_document_records(REPO)
+        assert [rec["document_id"] for _rel, rec in records] == [DOCUMENT_ID]
 
 
 class TestTheImportRouteWorks:
@@ -657,11 +876,16 @@ class TestTheRecord:
             c["disposition"] for c in decision["acceptance_criteria"]
         ]
 
-    def test_three_criteria_are_recorded_as_not_met(self, report):
+    def test_every_criterion_is_recorded_as_met(self, report):
+        """All four closed on 2 October, the last of them when the operator ran
+        the assessor over the subscription transport.  Four of the six graded
+        cells fail, which this criterion never asked about: it asks what the
+        report binds and how it is labelled."""
         not_met = [
             c for c in report["acceptance_criteria"] if c["disposition"].startswith("not met")
         ]
-        assert len(not_met) == 3
+        assert not_met == []
+        assert len(report["acceptance_criteria"]) == 4
 
     def test_the_open_ticket_boxes_are_the_criteria_recorded_as_not_met(self, report):
         """The ticket's checkboxes and the report's dispositions must agree."""
@@ -713,11 +937,23 @@ class TestTheRecord:
         )
 
     def test_the_report_counts_match_the_artifacts(
-        self, report, stored_packages, blind_packages
+        self, report, candidate_package
     ):
         evidence = _criterion_4_evidence(report)
-        assert f"{len(stored_packages)} evidence packages" in evidence
-        assert f"{len(blind_packages)} of them" in evidence
+        assert candidate_package.package_id in evidence
+        assert f"{len(candidate_package.items)} items" in evidence
+
+    def test_f8_states_the_directory_count_on_disk_today(
+        self, report, stored_packages, live_packages
+    ):
+        """Criterion 4's evidence states the 1 October counts, because that is
+        the reading it corrects. F8 states today's, and both are re-derived
+        rather than carried forward."""
+        f8 = next(f for f in report["findings"] if f["id"] == "F8")
+        assert (
+            f"{len(stored_packages)} directories now hold "
+            f"{len(live_packages)} current packages" in f8["finding"]
+        )
 
     def test_the_intake_block_matches_the_record_on_disk(self, report):
         intake = read_esr_intake(REPO, INTAKE_ID)
@@ -727,11 +963,14 @@ class TestTheRecord:
         assert block["esr_availability"] == intake.esr_availability
         assert block["permitted_purpose"] == intake.permitted_purpose
 
-    def test_the_outstanding_human_step_is_named(self, decision):
-        """It was the planner run. Ticket A narrowed it to the Phase 7 dispatch."""
+    def test_no_human_step_is_outstanding_for_this_ticket(self, decision):
+        """It was the planner run, then the Phase 7 dispatch, then Phase 8,
+        then the assessor run.  All four are done.  The field must say so
+        rather than be deleted, so a reader of the record can tell a closed
+        ticket from one whose outstanding step was never written down."""
         outstanding = decision["what_is_outstanding_for_the_operator"]
-        assert "Dispatch Phase 7" in outstanding
-        assert "demo-fictional-budget-override_2026-10-01.json" in outstanding
+        assert outstanding.startswith("Nothing for this ticket")
+        assert "harness.commands.blind_assessment assess" not in outstanding
 
     def test_the_defects_are_offered_as_milestone_2_candidates(self, decision):
         assert len(decision["milestone_2_candidates"]) >= 2
@@ -762,22 +1001,25 @@ class TestTheReportsNumbersAreTheArtifactsOwn:
         evidence = next(
             c["evidence"]
             for c in report["acceptance_criteria"]
-            if c["disposition"] == "not met, blocked upstream"
+            if c["criterion"].startswith("Candidate version 1")
         )
         types = {n["type"] for n in demo_snapshot.nodes}
         assert f"{len(demo_snapshot.nodes)} nodes of {len(types)} types" in evidence
+        assert demo_snapshot.snapshot_id in evidence
 
-    def test_the_blind_package_tasks_are_the_stored_packages_own(
-        self, report, blind_packages
+    def test_the_candidate_packages_snapshot_is_the_one_on_disk(
+        self, report, candidate_package, demo_snapshot
     ):
         evidence = _criterion_4_evidence(report)
-        tasks = sorted({p.manifest["task"] for p in blind_packages})
-        assert ", ".join(tasks[:-1]) + f" and {tasks[-1]}" in evidence
+        assert candidate_package.manifest["snapshot_id"] == demo_snapshot.snapshot_id
+        assert demo_snapshot.snapshot_id in evidence
+        assert str(ba.DEFAULT_PACKAGE_BUDGET) in evidence
 
-    def test_the_policy_forbidden_exclusion_it_names_is_the_packages_own(
-        self, report, blind_packages
+    def test_the_policy_forbidden_exclusion_is_still_the_packages_own(
+        self, blind_packages
     ):
-        evidence = _criterion_4_evidence(report)
+        """No longer a number the report states, and still worth pinning: the
+        blind view refuses the ``validated_by`` traversal to MS6."""
         forbidden = {
             (e["id"], e["detail"])
             for p in blind_packages
@@ -785,9 +1027,6 @@ class TestTheReportsNumbersAreTheArtifactsOwn:
             if e.get("reason") == "policy_forbidden"
         }
         assert forbidden == {("MS6", "traversal_not_permitted:validated_by")}
-        for node_id, detail in forbidden:
-            assert node_id in evidence
-            assert detail in evidence
 
     def test_the_default_package_budget_it_names_is_the_lanes_own(self, report):
         f5 = next(f for f in report["findings"] if f["id"] == "F5")
@@ -804,3 +1043,108 @@ class TestTheReportsNumbersAreTheArtifactsOwn:
             f"the report states a file count the scan no longer produces ({scanned}); "
             "a Tier 4 file was added or removed after the report was written"
         )
+
+
+class TestTheAssessorsReport:
+    """Criterion 3 against the report the operator's run produced.
+
+    Two things are pinned, and they pull in opposite directions on purpose.
+    The bindings are what closes the criterion.  The blank ``source_ref`` is
+    what F12 is open against, so the day the converter carries the Tier 5
+    field these tests fail and name the finding that has been resolved.
+    """
+
+    ASSESSOR_PIN = "claude-sonnet-5@claude-cli-subscription@2026-10-02"
+
+    @pytest.fixture(scope="class")
+    def blind_report(self) -> dict:
+        path = REPO / "harness/blind_reports/blind_e518c50023ee_0001.json"
+        assert path.exists(), (
+            f"{path.relative_to(REPO)} is absent; criterion 3 is recorded as met "
+            "on a report that is not on disk"
+        )
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def test_it_binds_the_candidate_profile_and_assessor(self, blind_report, report):
+        """The criterion names three bindings and a label.  All four, and the
+        hash and profile version must be the ones the Tier 4 record states."""
+        evidence = next(
+            c["evidence"] for c in report["acceptance_criteria"]
+            if c["criterion"].startswith("The blind report carries")
+        )
+        for field in ("candidate_hash", "profile_version", "assessor_pin"):
+            value = blind_report[field]
+            assert value, f"{field} is empty"
+            assert value in evidence, (
+                f"the record states a {field} the report does not carry"
+            )
+        assert blind_report["scope"] in {"complete", "partial"}
+
+    def test_every_cell_carries_the_bindings_too(self, blind_report):
+        """A cell lifted out of the report must still name what produced it."""
+        for cell in blind_report["cells"]:
+            assert cell["candidate_hash"] == blind_report["candidate_hash"]
+            assert cell["profile_version"] == blind_report["profile_version"]
+            assert cell["assessor_pin"] == blind_report["assessor_pin"]
+
+    def test_the_assessor_was_not_the_drafter(self, blind_report):
+        """The one independence axis the subscription transport preserves."""
+        from runner.semantic_dispatch import AGENT_MODEL
+        from runner.skill_runtime import SKILL_MODEL
+
+        assert blind_report["assessor_model"] not in {SKILL_MODEL, AGENT_MODEL}
+        assert blind_report["assessor_pin"] == self.ASSESSOR_PIN
+
+    def test_no_pack_was_truncated(self, blind_report):
+        """F9 fixed: the ceiling is the transport's, so no cell is graded on a
+        pack the rubric forbids passing."""
+        for cell in blind_report["cells"]:
+            record = cell["coverage"]["pack_record"]
+            assert record["status"] == "complete", (
+                f"{cell['expectation_key']} was graded on a truncated pack"
+            )
+            assert record["token_estimate"] <= record["token_budget"]
+
+    def test_the_grades_discriminate(self, blind_report):
+        """A lane that returns one verdict for every cell measures nothing.
+        These are advisory and never run-blocking."""
+        assert blind_report["advisory"] is True
+        assert blind_report["blocking"] is False
+        scores = [c["score"] for c in blind_report["cells"]]
+        assert len(set(scores)) > 1
+        assert all(0.0 <= s <= 1.0 for s in scores)
+
+    def test_f12_every_candidate_claim_still_has_no_source(self):
+        """The finding, measured rather than quoted from the assessor."""
+        directory = (
+            REPO / "harness/blind_reports/candidates" / DOCUMENT_NODE_ID
+        )
+        blank = total = confirmed_blank = 0
+        for path in sorted(directory.glob("*_section.json")):
+            claims = json.loads(path.read_text(encoding="utf-8"))
+            for claim in claims["validation_status"]["claim_statuses"]:
+                total += 1
+                if not str(claim.get("source_ref") or "").strip():
+                    blank += 1
+                    if claim.get("status") == "confirmed":
+                        confirmed_blank += 1
+        assert total == blank == 147, (
+            "F12 is recorded as every claim carrying an empty source_ref; "
+            f"{total - blank} of {total} now carry one. If the converter was "
+            "fixed, close F12 and re-grade."
+        )
+        assert confirmed_blank == 90
+
+    def test_f12_the_tier_5_sections_it_was_built_from_do_have_sources(self):
+        """Which is what makes F12 a loss in the seam rather than an absence
+        at the origin."""
+        directory = REPO / "docs/tier5_deliverables/proposal_sections"
+        total = blank = 0
+        for path in sorted(directory.glob("*_section.json")):
+            section = json.loads(path.read_text(encoding="utf-8"))
+            for claim in section["validation_status"]["claim_statuses"]:
+                total += 1
+                if not str(claim.get("source_ref") or "").strip():
+                    blank += 1
+        assert total == 180
+        assert blank == 0, f"{blank} Tier 5 claims lost their source_ref upstream"

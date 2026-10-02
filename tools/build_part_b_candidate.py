@@ -27,7 +27,8 @@ renamed or renumbered a sub-section would break grading silently. Every
 **What it refuses.** A missing section artifact, a wrong ``schema_id``, a
 ``criterion`` that disagrees with the schema, an ``artifact_status`` of
 ``invalid``, a section with no sub-sections, a sub-section with no title or
-content, a duplicate id, and an unknown claim status. It then checks the
+content, a duplicate id, an unknown claim status, and one claim id declared
+twice in a section under two different summaries or statuses. It then checks the
 finished candidate against ``normalise_candidate`` — the validator the importer
 itself runs — so identifier shape is judged once, by its owner, rather than by
 a second copy of the rule here.
@@ -72,6 +73,16 @@ CANDIDATES_REL = "docs/tier5_deliverables/candidates"
 #: Phase 8's section artifacts.
 SECTIONS_REL = "docs/tier5_deliverables/proposal_sections"
 
+#: Joins a section id to a Tier 5 claim id to form the candidate's claim id.
+#: A Tier 5 ``claim_id`` is a **declaration key**, not an occurrence id: one
+#: declaration is asserted by as many sections as rely on it, and all three
+#: Phase 8 sections assert ``project_duration``. A graph claim node, by
+#: contrast, belongs to exactly one section and its id is unique across the
+#: document, so ``(section_id, claim_id)`` is the identity and the bare claim id
+#: is not. The join is mechanical and reversible: split on the separator and the
+#: Tier 5 id is the remainder. ``.`` is already legal in a graph identifier.
+CLAIM_KEY_SEPARATOR = "."
+
 #: Every claim carries this approval. Nothing approved the demo's Part B, and
 #: ``pending`` says so; ``approved`` would assert a review that never happened.
 CLAIM_APPROVAL = "pending"
@@ -81,10 +92,25 @@ CLAIM_APPROVAL = "pending"
 #: own lookup, so this map is the only translation and it is one way.
 #: ``inferred`` maps to ``inference`` rather than ``synthesis``: both resolve to
 #: Inferred, and a drafted claim marked inferred was reasoned to, not composed.
+#: ``assumed`` maps to ``unconfirmed`` because the graph has no strength for it
+#: (``EVIDENCE_STRENGTHS`` holds four values and Assumed is not among them);
+#: see :data:`DECLARED_STATUS_BY_STATUS`.
 EVIDENCE_STRENGTH_BY_STATUS: dict[str, str] = {
     "confirmed": "source_grounded",
     "inferred": "inference",
+    "assumed": "unconfirmed",
     "unresolved": "unconfirmed",
+}
+
+#: The one status the builder must declare rather than let the graph derive.
+#: ``EVIDENCE_TO_STATUS`` maps ``unconfirmed`` to Unresolved, so an ``assumed``
+#: claim would arrive as Unresolved and lose the operator declaration that
+#: ``assumption_applier`` made. ``normalise_candidate`` admits exactly one
+#: override for this reason — "only Assumed over Unresolved may be declared" —
+#: and this is that override, not a second copy of the lookup. Every other
+#: status is derived.
+DECLARED_STATUS_BY_STATUS: dict[str, str] = {
+    "assumed": "Assumed",
 }
 
 
@@ -233,6 +259,12 @@ def _claims(spec: SectionSpec, raw: dict[str, Any]) -> list[dict[str, Any]]:
     ``verified_span`` is always absent. A Tier 5 ``source_ref`` is a path plus
     an id, never an offset range, and inventing offsets would defeat the claim
     verifier that checks a span against real source text.
+
+    Each claim id is scoped to its section (:data:`CLAIM_KEY_SEPARATOR`), and an
+    exact repeat within one section collapses to one claim. The assembler
+    concatenates the per-sub-section ledgers without deduplicating, so a
+    declaration cited in four sub-sections arrives four times with identical
+    status and summary. A repeat that disagrees is refused, not merged.
     """
     validation = raw.get("validation_status")
     if not isinstance(validation, dict):
@@ -243,6 +275,7 @@ def _claims(spec: SectionSpec, raw: dict[str, Any]) -> list[dict[str, Any]]:
             f"{spec.section_id}: validation_status.claim_statuses must be a list"
         )
     out: list[dict[str, Any]] = []
+    by_key: dict[str, dict[str, str]] = {}
     for index, entry in enumerate(statuses):
         where = f"{spec.section_id}.claim_statuses[{index}]"
         if not isinstance(entry, dict):
@@ -257,15 +290,34 @@ def _claims(spec: SectionSpec, raw: dict[str, Any]) -> list[dict[str, Any]]:
                 f"{sorted(EVIDENCE_STRENGTH_BY_STATUS)}"
             )
         summary = entry.get("claim_summary")
-        out.append(
-            {
-                "claim_id": claim_id,
-                "section_id": spec.section_id,
-                "text": summary if isinstance(summary, str) else "",
-                "evidence_strength": EVIDENCE_STRENGTH_BY_STATUS[status],
-                "approval": CLAIM_APPROVAL,
-            }
-        )
+        text = summary if isinstance(summary, str) else ""
+        key = f"{spec.section_id}{CLAIM_KEY_SEPARATOR}{claim_id}"
+        prior = by_key.get(key)
+        if prior is not None:
+            # The same declaration asserted twice in one section's ledger, with
+            # the same status and the same summary, carries nothing the first
+            # entry did not. Two entries that disagree are a contradiction and
+            # §12.3 forbids resolving one by picking a side.
+            if prior["text"] != text or prior["status"] != status:
+                raise BuilderError(
+                    f"{where}: {claim_id!r} is declared twice in "
+                    f"{spec.section_id} with different content "
+                    f"({prior['status']!r}/{prior['text'][:40]!r} vs "
+                    f"{status!r}/{text[:40]!r})"
+                )
+            continue
+        claim: dict[str, Any] = {
+            "claim_id": key,
+            "section_id": spec.section_id,
+            "text": text,
+            "evidence_strength": EVIDENCE_STRENGTH_BY_STATUS[status],
+            "approval": CLAIM_APPROVAL,
+        }
+        declared = DECLARED_STATUS_BY_STATUS.get(status)
+        if declared is not None:
+            claim["declared_status"] = declared
+        by_key[key] = {"text": text, "status": status}
+        out.append(claim)
     return out
 
 
@@ -308,8 +360,9 @@ def build_candidate(
         for claim in _claims(spec, raw):
             if claim["claim_id"] in seen_claims:
                 raise BuilderError(
-                    f"claim_id {claim['claim_id']!r} is declared by more than "
-                    "one section; the importer rejects a duplicate"
+                    f"claim key {claim['claim_id']!r} is built twice. The key "
+                    "is section-scoped, so this is a collision between two "
+                    "sections carrying the same id, not a repeated declaration"
                 )
             seen_claims.add(claim["claim_id"])
             claims.append(claim)

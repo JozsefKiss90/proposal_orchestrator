@@ -55,6 +55,8 @@ from harness.blind_assessment import (
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
+    MAX_PACK_TOKEN_BUDGET,
+    UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
     EvidencePackError,
 )
 from harness.expectation_coverage import CoverageError
@@ -87,13 +89,45 @@ def _env_int(name: str, default: int) -> int:
 
 
 def _live_judge(args: argparse.Namespace, repo_root: Path) -> Judge:
-    """The live assessor: ``.env.harness`` pin + the paced/retrying backend."""
+    """The live assessor: the ``.env.harness`` pin over the chosen transport.
+
+    Two transports, one pin.  ``openai-compatible`` is the default and the
+    independent path: a non-drafter model at a non-Claude endpoint.
+    ``claude-cli`` speaks the Max subscription instead, which trades transport
+    and vendor independence for needing no API key; the model-level guard and
+    the assessor's blindness both survive that trade.  See
+    ``harness/commands/_subscription_judge.py`` for what each axis costs.
+    """
+    import dataclasses
+
     from harness.commands._common import load_harness_env
-    from harness.commands.freeze_grounding_baselines import build_paced_judge
-    from harness.judge import resolve_judge_config
+    from harness.judge import JudgeConfig, resolve_judge_config
 
     load_harness_env()
-    cfg = resolve_judge_config()  # fail-closed if the assessor pin is unset
+    if args.assessor_model and args.assessor_version:
+        # Both flags given: the pin need not exist in the environment at all.
+        cfg = JudgeConfig(model=args.assessor_model, version=args.assessor_version)
+    else:
+        cfg = resolve_judge_config()  # fail-closed if the assessor pin is unset
+        if args.assessor_model or args.assessor_version:
+            cfg = dataclasses.replace(
+                cfg,
+                model=args.assessor_model or cfg.model,
+                version=args.assessor_version or cfg.version,
+            )
+    if args.transport == TRANSPORT_CLAUDE_CLI:
+        from harness.commands._subscription_judge import build_subscription_judge
+
+        judge, _backend = build_subscription_judge(
+            cfg,
+            prov_path=repo_root / args.provenance,
+            timeout_seconds=args.cli_timeout,
+            max_retries=args.max_retries,
+        )
+        return judge
+
+    from harness.commands.freeze_grounding_baselines import build_paced_judge
+
     judge, _wrapper = build_paced_judge(
         cfg,
         tpm=args.tpm,
@@ -102,6 +136,14 @@ def _live_judge(args: argparse.Namespace, repo_root: Path) -> Judge:
         prov_path=repo_root / args.provenance,
     )
     return judge
+
+
+#: The independent default: a non-drafter model at a non-Claude endpoint.
+TRANSPORT_OPENAI = "openai-compatible"
+
+#: The Max subscription.  No API key, weaker independence (see
+#: ``harness/commands/_subscription_judge.py``).
+TRANSPORT_CLAUDE_CLI = "claude-cli"
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -133,14 +175,54 @@ def _parser() -> argparse.ArgumentParser:
     p_assess.add_argument("--out-dir", default=str(DEFAULT_REPORTS_DIR),
                           help="directory for the new report file (never overwritten)")
     p_assess.add_argument("--provenance", default=str(DEFAULT_PROVENANCE_PATH))
-    p_assess.add_argument("--budget", type=int, default=DEFAULT_PACK_TOKEN_BUDGET,
-                          help="evidence-pack token budget per expectation")
+    p_assess.add_argument("--budget", type=int, default=None,
+                          help=(
+                              "evidence-pack token budget per expectation. "
+                              f"Default {DEFAULT_PACK_TOKEN_BUDGET} on a "
+                              "transport with a token-per-minute ceiling, "
+                              f"{UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET} on one "
+                              "without. A truncated pack is graded as "
+                              "insufficient context, never as a clean pass"
+                          ))
     p_assess.add_argument("--span-fraction", type=float, default=DEFAULT_SPAN_BUDGET_FRACTION)
     p_assess.add_argument("--n", type=int, default=MIN_MAJORITY_SAMPLES,
                           help="assessor samples per verdict (majority; N>=3)")
     p_assess.add_argument("--tpm", type=int, default=_env_int("HARNESS_TPM_BUDGET", 5500))
     p_assess.add_argument("--rpm", type=int, default=_env_int("HARNESS_RPM_BUDGET", 28))
     p_assess.add_argument("--max-retries", type=int, default=_env_int("HARNESS_MAX_RETRIES", 6))
+    p_assess.add_argument(
+        "--transport",
+        choices=[TRANSPORT_OPENAI, TRANSPORT_CLAUDE_CLI],
+        default=os.environ.get("HARNESS_ASSESSOR_TRANSPORT", TRANSPORT_OPENAI),
+        help=(
+            "assessor transport. %(default)s by default: a non-drafter model at "
+            "a non-Claude endpoint, which is the independent path. "
+            f"'{TRANSPORT_CLAUDE_CLI}' speaks the Max subscription instead and "
+            "needs no API key, at the cost of transport and vendor "
+            "independence; HARNESS_JUDGE_MODEL must then be a Claude pin and "
+            "HARNESS_JUDGE_VERSION should name the transport"
+        ),
+    )
+    p_assess.add_argument(
+        "--assessor-model", default=None,
+        help=(
+            "override the HARNESS_JUDGE_MODEL pin for this run. Needed because "
+            "the harness env file is loaded with override=True, so an exported "
+            "variable cannot win against it. Must still not be a drafter model"
+        ),
+    )
+    p_assess.add_argument(
+        "--assessor-version", default=None,
+        help=(
+            "override the HARNESS_JUDGE_VERSION pin for this run. The report "
+            "records model@version and nothing else about the assessor, so this "
+            "tag is where a non-default transport is declared"
+        ),
+    )
+    p_assess.add_argument(
+        "--cli-timeout", type=int, default=_env_int("HARNESS_CLI_TIMEOUT", 300),
+        help="per-call wall-clock limit for the claude-cli transport, in seconds",
+    )
 
     p_verify = sub.add_parser("verify", help="re-bind a persisted report to a candidate")
     p_verify.add_argument("--report", required=True)
@@ -148,6 +230,26 @@ def _parser() -> argparse.ArgumentParser:
     p_verify.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
     p_verify.add_argument("--profile", default=None)
     return ap
+
+
+def _is_transport_failure(exc: BaseException) -> bool:
+    """Whether *exc* came from an assessor transport rather than the harness.
+
+    Imported lazily: neither transport is pulled in by importing this command,
+    and the ``claude-cli`` one is only ever imported when it is selected.
+    """
+    try:
+        from runner.transport.errors import OpenAICompatTransportError
+    except Exception:  # pragma: no cover - the transport package is optional
+        OpenAICompatTransportError = ()  # type: ignore[assignment]
+    try:
+        from runner.claude_transport import ClaudeTransportError
+    except Exception:  # pragma: no cover
+        ClaudeTransportError = ()  # type: ignore[assignment]
+    candidates = tuple(
+        t for t in (OpenAICompatTransportError, ClaudeTransportError) if t
+    )
+    return bool(candidates) and isinstance(exc, candidates)
 
 
 def main(
@@ -175,6 +277,18 @@ def main(
             out_dir = repo_root / out_dir
         graph_root = Path(args.graph_root).resolve() if args.graph_root else repo_root
         intake = read_esr_intake(graph_root, args.intake) if args.intake else None
+        # The pack ceiling belongs to the transport, not to the proposal.  A
+        # per-minute token cap is the OpenAI-compatible provider's; the CLI has
+        # none, so there the operator's budget alone governs.
+        uncapped = args.transport == TRANSPORT_CLAUDE_CLI
+        max_token_budget = None if uncapped else MAX_PACK_TOKEN_BUDGET
+        token_budget = args.budget
+        if token_budget is None:
+            token_budget = (
+                UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET
+                if uncapped
+                else DEFAULT_PACK_TOKEN_BUDGET
+            )
         evidence = None
         if args.document:
             # Snapshot, blind-view package, leakage guard, materialisation —
@@ -194,7 +308,8 @@ def main(
             args.candidate,
             evidence=evidence,
             intake=intake,
-            token_budget=args.budget,
+            token_budget=token_budget,
+            max_token_budget=max_token_budget,
             span_budget_fraction=args.span_fraction,
             n=args.n,
             clock=clock,
@@ -206,6 +321,19 @@ def main(
         return 1 if report.scope == SCOPE_PARTIAL else 0
     except _CLI_ERRORS as exc:
         print(f"blind assessment could not run (fail-closed): {exc}", file=sys.stderr)
+        return 2
+    except Exception as exc:
+        # A transport failure — a rejected key, an unreachable endpoint, a CLI
+        # that will not spawn — is a fail-closed condition like any other, and
+        # the operator should read one line rather than a traceback.  Checked
+        # lazily so importing this command pulls in neither transport.
+        if not _is_transport_failure(exc):
+            raise
+        print(
+            f"the assessor transport failed (fail-closed, nothing written): "
+            f"{type(exc).__name__}: {exc}",
+            file=sys.stderr,
+        )
         return 2
 
 

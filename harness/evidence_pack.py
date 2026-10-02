@@ -101,9 +101,18 @@ APPROX_CHARS_PER_TOKEN: int = 4
 #: TPM ceiling.
 RUBRIC_PROMPT_ALLOWANCE: int = 900
 
-#: Hard cap on any pack budget: one judge call (pack + rubric prompt +
-#: completion budget) must fit under the TPM ceiling *by construction*.  With
-#: the judge's default completion budget this is 6000 − 2048 − 900 = 3052.
+#: Hard cap on a pack budget **for a transport with a per-minute token
+#: ceiling**: one judge call (pack + rubric prompt + completion budget) must fit
+#: under that ceiling *by construction*.  With the judge's default completion
+#: budget this is 6000 − 2048 − 900 = 3052.
+#:
+#: This is a property of the assessor's transport, not of the proposal.  A
+#: transport without a TPM ceiling — the ``claude`` CLI over a subscription —
+#: has no reason to obey it, and obeying it there truncates the evidence for
+#: nothing: measured on the demo candidate, the cap drops 111 of 266 relevant
+#: items and so forces every cell to ``insufficient_context``, which the rubric
+#: prompt reads as "you must not return passed: true".  Pass
+#: ``max_token_budget=None`` to :func:`build_evidence_pack` on such a transport.
 MAX_PACK_TOKEN_BUDGET: int = (
     GROQ_TPM_LIMIT - DEFAULT_JUDGE_MAX_TOKENS - RUBRIC_PROMPT_ALLOWANCE
 )
@@ -115,6 +124,14 @@ MAX_PACK_TOKEN_BUDGET: int = (
 #: so the N is paced across minute windows by E5f, one clean-fitting call per
 #: window.
 DEFAULT_PACK_TOKEN_BUDGET: int = 3000
+
+#: Default pack budget for a transport with no TPM ceiling.  Not derived from a
+#: rate limit — there is none to derive from — so it is a chosen constant with a
+#: stated basis: the demo candidate's six packs all complete at 10501 tokens
+#: (bisected, not estimated), and this leaves roughly 3x headroom for a longer
+#: Part B.  A pack that still does not fit says so in its status; the budget is
+#: never silently stretched to make one fit.
+UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET: int = 32768
 
 #: Fraction of the usable budget offered to prose spans before claims fill the
 #: remainder (a pack needs both: prose answers "addressed?", claims answer
@@ -492,6 +509,7 @@ def build_evidence_pack(
     anchor_sub_section_ids: Sequence[str] = (),
     token_budget: int = DEFAULT_PACK_TOKEN_BUDGET,
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
+    max_token_budget: int | None = MAX_PACK_TOKEN_BUDGET,
 ) -> EvidencePack:
     """Deterministically build the evidence pack for one ``(expectation, section)``.
 
@@ -508,19 +526,30 @@ def build_evidence_pack(
     4. Status: :data:`PACK_COMPLETE` iff nothing relevant was excluded for
        budget, else :data:`PACK_INSUFFICIENT_CONTEXT` (explicit, never silent).
 
+    *max_token_budget* is the assessor transport's ceiling on one call.  It
+    defaults to :data:`MAX_PACK_TOKEN_BUDGET`, which guarantees a single judge
+    call fits under the :data:`GROQ_TPM_LIMIT`.  Pass ``None`` for a transport
+    with no per-minute token ceiling, where *token_budget* alone governs; the
+    selection pipeline is unchanged either way, and a pack that does not fit
+    still reports :data:`PACK_INSUFFICIENT_CONTEXT` rather than growing.
+
     Raises :class:`EvidencePackError` on an unusable section artifact, a
     declared anchor absent from the section, an empty term list, or a budget
-    outside ``(0, MAX_PACK_TOKEN_BUDGET]`` — the hard cap is what guarantees a
-    single judge call fits under the :data:`GROQ_TPM_LIMIT` ceiling.
+    outside ``(0, max_token_budget]``.
     """
     if not str(expectation_key).strip():
         raise EvidencePackError("expectation_key must be non-empty.")
-    if not 0 < token_budget <= MAX_PACK_TOKEN_BUDGET:
+    if token_budget <= 0:
         raise EvidencePackError(
-            f"token_budget must be in (0, {MAX_PACK_TOKEN_BUDGET}] so one judge "
+            f"token_budget must be positive; got {token_budget}."
+        )
+    if max_token_budget is not None and token_budget > max_token_budget:
+        raise EvidencePackError(
+            f"token_budget must be in (0, {max_token_budget}] so one judge "
             f"call (pack + rubric prompt allowance {RUBRIC_PROMPT_ALLOWANCE} + "
             f"completion budget {DEFAULT_JUDGE_MAX_TOKENS}) fits the "
-            f"{GROQ_TPM_LIMIT}-TPM ceiling; got {token_budget}."
+            f"assessor transport's TPM ceiling; got {token_budget}. A transport "
+            f"without a TPM ceiling passes max_token_budget=None."
         )
     if not 0.0 < span_budget_fraction < 1.0:
         raise EvidencePackError(

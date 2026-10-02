@@ -54,13 +54,18 @@ REPO = find_repo_root()
 #: The Tier 3 records the builder reads on this world. Milestone 1's node-type
 #: set has no outcome, impact or risk type, so `outcomes.json`, `impacts.json`
 #: and `risks.json` are not indexed; see finding F3 of the ticket's report.
-EXPECTED_INPUTS = (
+#: The Tier 3 records the builder reads. It also reads every document record
+#: under ``DOCUMENTS_REL``, whose filename is a content hash and therefore moves
+#: with Part B, so those are derived from disk rather than listed here.
+EXPECTED_TIER_3_INPUTS = (
     "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
     "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
     "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
     "docs/tier3_project_instantiation/consortium/partners.json",
     "docs/tier3_project_instantiation/source_materials/sources.json",
 )
+
+DOCUMENTS_REL = "docs/tier4_orchestration_state/dev_graph/documents"
 
 WP_SEED = "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
 
@@ -108,7 +113,22 @@ class TestTheSnapshot:
 
 class TestTheBuildWasClean:
     def test_the_builder_read_exactly_these_records(self, snapshot: Snapshot):
-        assert snapshot.inputs == EXPECTED_INPUTS
+        """Tier 3 plus the document records, and nothing else.
+
+        The second group arrived with candidate version 1: the Part B the
+        builder converts from Phase 8's sections is imported as a document
+        snapshot, so the snapshot now reads it too.
+        """
+        docs = tuple(
+            sorted(
+                path.relative_to(REPO).as_posix()
+                for path in (REPO / DOCUMENTS_REL).rglob("*.json")
+            )
+        )
+        assert docs, "no document record on disk; candidate version 1 is absent"
+        assert snapshot.inputs == tuple(
+            sorted(EXPECTED_TIER_3_INPUTS + docs)
+        )
 
     def test_the_three_unindexed_seeds_exist_but_are_not_read(self, snapshot: Snapshot):
         seeds = REPO / "docs/tier3_project_instantiation/architecture_inputs"
@@ -253,20 +273,36 @@ class TestHonesty:
             listed = {u["id"] for u in m["unresolved"] if u["kind"] == "declared_status"}
             assert (included & assumed) <= listed
 
-    def test_the_world_holds_no_claim_to_list(self, snapshot: Snapshot):
-        """Tier 5 is empty, so the criterion's claim half has nothing to check.
-
-        It is checked against the fixture in
-        `tests/runner/test_dev_graph_packages.py`. Recorded here so the gap is
-        visible rather than silently passing.
+    def test_the_world_holds_the_claims_part_b_declared(self, snapshot: Snapshot):
+        """F6 recorded that the demo world held no claim, which made a clean
+        leakage pass vacuous. Candidate version 1 closed that: every claim here
+        is one a Phase 8 section declared in its own ``validation_status``.
         """
-        assert not any(n["type"] == "claim" for n in snapshot.nodes)
+        claims = [n for n in snapshot.nodes if n["type"] == "claim"]
+        assert claims
+        sections = {
+            n["content"]["section_id"]
+            for n in snapshot.nodes
+            if n["type"] == "passage"
+        }
+        assert sections
+        for claim in claims:
+            assert claim["content"]["section_id"] in sections
 
-    def test_only_a_source_is_confirmed_on_this_world(self, snapshot: Snapshot):
-        confirmed = {n["id"] for n in snapshot.nodes if declared_status(n) == "Confirmed"}
+    def test_nothing_but_a_source_or_a_part_b_claim_is_confirmed(
+        self, snapshot: Snapshot
+    ):
+        """The Tier 3 world is wholly Assumed apart from its transcribed
+        sources. The only other Confirmed nodes are Part B's own confirmed
+        claims, which carry ``source_grounded`` from the section that declared
+        them, so no partner, work package or deliverable became Confirmed.
+        """
         types = {n["id"]: n["type"] for n in snapshot.nodes}
+        confirmed = {n["id"] for n in snapshot.nodes if declared_status(n) == "Confirmed"}
         assert confirmed
-        assert all(types[i] == "source" for i in confirmed)
+        assert all(types[i] in {"source", "claim"} for i in confirmed)
+        assert any(types[i] == "source" for i in confirmed)
+        assert any(types[i] == "claim" for i in confirmed)
 
 
 class TestTheCounts:

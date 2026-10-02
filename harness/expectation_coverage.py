@@ -60,6 +60,7 @@ from typing import Any
 
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
+    MAX_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
     EvidencePack,
     clean_pass,
@@ -236,6 +237,7 @@ def grade_expectation(
     *,
     token_budget: int = DEFAULT_PACK_TOKEN_BUDGET,
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
+    max_token_budget: int | None = MAX_PACK_TOKEN_BUDGET,
     n: int = MIN_MAJORITY_SAMPLES,
 ) -> CoverageGrade:
     """Build the rubric's evidence pack over *section_path* and grade it.
@@ -249,5 +251,6 @@ def grade_expectation(
         section_path,
         token_budget=token_budget,
         span_budget_fraction=span_budget_fraction,
+        max_token_budget=max_token_budget,
     )
     return grade_coverage(judge, rubric, pack, n=n)

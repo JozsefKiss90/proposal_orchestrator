@@ -52,6 +52,7 @@ from typing import Any, Mapping
 
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
+    MAX_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
     EvidencePack,
     EvidencePackError,
@@ -487,6 +488,7 @@ def build_pack_for(
     *,
     token_budget: int = DEFAULT_PACK_TOKEN_BUDGET,
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
+    max_token_budget: int | None = MAX_PACK_TOKEN_BUDGET,
 ) -> EvidencePack:
     """Build the evidence pack for *rubric* over one section artifact.
 
@@ -502,6 +504,7 @@ def build_pack_for(
         selection_terms=rubric.selection_terms,
         anchor_sub_section_ids=rubric.anchor_sub_section_ids,
         token_budget=token_budget,
+        max_token_budget=max_token_budget,
         span_budget_fraction=span_budget_fraction,
     )
 

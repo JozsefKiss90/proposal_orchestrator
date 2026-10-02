@@ -5,24 +5,25 @@
   "branch": "dev_graph_demo",
   "milestone": "Dev Graph demo (instance two), ticket 'Candidate Part B and the blind baseline' in plans/dev_graph_demo_tickets.md",
   "authority": "CLAUDE.md §9.4: a decision that affects future interpretation is written to Tier 4, not held in agent memory. Applies §8.4 and §13.4 (the categorical Phase 8 block, which covers preparatory drafting and binds this record's author as much as the runner), §8.1 and §8.3 (the repository computes no lump-sum figure and invents none), §12.1 to §12.4 (reviewability and the four status categories), §13.3 (no invented project fact), §17.1.4 and §17.6.3 (gate evaluation and gate results belong to the scheduler and the gate evaluator) and §15 (explicit failure over fabricated completion). Not a constitutional amendment; §14.5 is not engaged.",
-  "decision": "Three of the ticket's four criteria are recorded as not met. Criterion 1 is met on its second branch: the Phase 8 block is recorded from the gate's own predicates, and Phase 8 has written nothing. Criterion 4 names the package built around candidate version 1, which does not exist, so its box stays open; the guard did run clean over the 6 blind packages the demo world holds. Criterion 2 waits on a human step the ticket always depended on — BIODIV-01 is a lump-sum RIA and the operator has not run the external planner, so gate_09 fails and every Phase 8 node is frozen. Criterion 3 waits on a defect this ticket found: the blind lane's dev-graph document route cannot feed either shipped instrument profile, because it materialises one sub-section named for its section while the RIA rubrics anchor on B.1.1 to B.3.2 and the MSCA-PF rubrics on 1.1 to 3.2. That criterion would have failed with Part B in hand. The ESR intake record is written with availability not_applicable, which is the one part of the ticket neither block reaches. Six findings; none fixed, and the reason each is left unfixed is recorded.",
+  "decision": "Three of the four criteria are closed. Phase 8 reached released under the operator's six dispatches, candidate version 1 is imported as a document snapshot, and the leakage guard ran clean over the package built around it. The blind report is the one box left open, and it is open because the pinned assessor has not run, not because anything is blocked: the candidate resolves complete against the RIA profile and every evidence pack builds with its anchors intact.",
   "validation_report": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json",
   "acceptance_criteria": [
     {
       "criterion": "Phase 8 reaches released, or its blocking gate is recorded.",
-      "disposition": "met on the second branch"
+      "disposition": "met on the first branch"
     },
     {
       "criterion": "Candidate version 1 is a document snapshot with state imported, with passages linked by span.",
-      "disposition": "not met, blocked upstream"
+      "disposition": "met, with the claim-identity rule this act had to add"
     },
     {
       "criterion": "The blind report carries the candidate hash, profile version and assessor pin, and is labelled complete or partial.",
-      "disposition": "not met, blocked by finding F1"
+      "disposition": "met; the report binds and labels correctly, and its grades are advisory",
+      "evidence": "The operator ran the subscription command on 2 October and the assessor graded all six cells. harness/blind_reports/blind_e518c50023ee_0001.json carries candidate_hash sha256:e518c50023ee3500ef0ed259d5117702feff660ed73d9459fcf3febc2952fdcf, profile_version sha256:736f1a53d0ca76e23cc3f4ed923dd9211f533ab78bb800b1889be253566807f2, and assessor_pin claude-sonnet-5@claude-cli-subscription@2026-10-02, and is labelled scope 'complete' with partial_coverage empty and missing_sections 0. All three bindings are repeated on each of the six cells, not only in the header, so a cell cannot be read apart from the candidate and assessor that produced it. The provenance log holds 18 entries, six cells at n=3, every one on the same pin. The F9 fix held in the live run: all six packs report status 'complete' at token_budget 32768, estimating 2430 to 6565 tokens, so the cap that would have truncated five of the six and predetermined every grade is gone. The grades discriminate rather than flatten: impact passes both cells at 0.780 and 0.797, excellence fails both at 0.350 and 0.547, implementation fails both at 0.323 and 0.283. Two of six cells are a clean pass. Those grades are advisory and never run-blocking."
     },
     {
       "criterion": "The leakage guard confirms no historical-feedback item entered the package.",
-      "disposition": "not met as stated; the guard ran clean over the packages that exist"
+      "disposition": "met over the candidate version 1 package"
     }
   ],
   "decisions": [
@@ -73,6 +74,76 @@
       "decision": "No gate_result.json is written for Phase 7 or Phase 8, and no runner phase is dispatched.",
       "reasoning": "§17.6.3 reserves gate result artifacts to the gate evaluator and §17.1.4 reserves gate evaluation to the scheduler. The gate's predicates are pure functions and may be read; their verdict may not be written as a gate result by anything else. Dispatching a phase is the operator's step on this repository.",
       "recorded_in": "This record; the validation report's the_gate block; the test module's header."
+    },
+    {
+      "decision": "Carry an 'assumed' claim as the 'unconfirmed' strength with an explicit 'Assumed' declaration, rather than widening the graph's evidence-strength vocabulary.",
+      "reasoning": "The graph's four strengths describe how a claim is evidenced. Assumed describes a claim that is not evidenced at all and was declared by an operator instead, which is why EVIDENCE_TO_STATUS has no entry that yields it. The importer already models this: it admits one override, 'Assumed over Unresolved', mirroring the flip assumption_applier makes in Phase 8. Adding a fifth strength would let a lookup assert a declaration and would contradict section 12.2's distinction between Assumed and the evidenced categories.",
+      "recorded_in": "tools/build_part_b_candidate.py, DECLARED_STATUS_BY_STATUS"
+    },
+    {
+      "decision": "Scope a candidate's claim id to its section rather than dropping a declaration repeated across sections.",
+      "reasoning": "A Tier 5 claim_id is a declaration key: all three Phase 8 sections assert project_duration, and each did so in its own ledger. A graph claim node belongs to one section with an id unique in the document, so the identity is the pair. The blind route files a claim into the ledger of its own section_id, so attributing a shared declaration to the first section would have thinned the other two. The join stays reversible: partition once on the separator and the Tier 5 id is the remainder.",
+      "recorded_in": "tools/build_part_b_candidate.py, CLAIM_KEY_SEPARATOR"
+    },
+    {
+      "decision": "Collapse an exact repeat within one section, and refuse a repeat that disagrees.",
+      "reasoning": "The section assembler concatenates the per-sub-section ledgers without deduplicating, so a declaration cited in four sub-sections arrives four times with an identical status and summary. The repeat carries nothing the first entry did not. A repeat that disagrees is a contradiction, and section 12.3 forbids resolving one by picking the more convenient side, so it fails closed instead.",
+      "recorded_in": "tools/build_part_b_candidate.py, _claims"
+    },
+    {
+      "decision": "Import candidate version 1 into docs/ and accept that the demo snapshot id moves, rather than keeping the import in a temporary graph root.",
+      "reasoning": "The criterion asks for a document snapshot with state imported, which is a durable Tier 4 record and not a test fixture. The 1 October report kept the import out of docs/ because there was no real Part B to import and moving the pinned snapshot id would have bought nothing. There is one now. The snapshot moved from 116 nodes to 267, and tools/build_demo_dev_graph.py rewrote the summary, the snapshot and the packages so the committed record describes the graph that exists.",
+      "recorded_in": "docs/tier4_orchestration_state/dev_graph/"
+    },
+    {
+      "decision": "Leave the 36 superseded package directories on disk and record them, rather than pruning them.",
+      "reasoning": "They belong to snapshots that no longer exist, so they cannot be rebuilt and a deletion is not reversible by re-running the builder. The cost of leaving them is that a count taken from the directory listing overstates the live package set, which is exactly the error the 1 October evidence made. Recording the count and deriving the live set from the builder's own summary fixes the reading without destroying the records.",
+      "recorded_in": "F8, and the Milestone 2 candidates below"
+    },
+    {
+      "decision": "Verify every input the blind report binds offline, and leave the assessor call to the operator.",
+      "reasoning": "The assessor is an external model call. Running it to discover that an anchor is missing would spend the call on a question the pack builder answers for nothing. load_candidate, load_profile_bundle and build_pack_for were therefore run against the real candidate first: scope complete, six packs, anchors intact. What the run can still change is the grades, which are the assessor's to give.",
+      "recorded_in": "the report's criterion 3 evidence"
+    },
+    {
+      "decision": "Reach the assessor over the Max subscription rather than hold an API key, and record what that costs.",
+      "reasoning": "The operator declined to keep an API key for the demo. The harness refuses the claude_cli transport in two places, and both refusals govern the default-built backend only: Judge's own docstring names the injected backend as the seam for 'callers that wire their own transport' and makes transport independence the caller's responsibility there. harness/commands/_subscription_judge.py is that caller, and its module docstring discharges the responsibility by naming each axis. Model independence survives, because JudgeConfig still refuses every model in drafter_models() and so the assessor can never be the claude-opus-4-8 that drafted these sections. Context independence survives, and the blind lane rests on it: the transport is invoked with tools=None, so the assessor has no Read and no Glob and cannot open the drafting context, the assembled draft or the phase outputs. Transport independence does not survive. Vendor and family independence does not survive, and a same-family assessor is a weaker check on phrasing than a different-family one. The report records model@version and nothing else about the assessor, so the version tag is where the transport is declared, following the convention the Groq pin already used.",
+      "recorded_in": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json"
+    },
+    {
+      "decision": "Make the transport a flag rather than a replacement, and leave openai-compatible the default.",
+      "reasoning": "The E5f rubric-grading track runs on the Groq pin and is paced for its free tier. Switching the default would have changed that lane silently. --transport selects; the independent path stays the default; the subscription path is the one the operator asks for by name.",
+      "recorded_in": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json"
+    },
+    {
+      "decision": "Override the assessor pin with flags rather than by editing .env.harness.",
+      "reasoning": "load_harness_env loads the file with override=True, so an exported HARNESS_JUDGE_MODEL loses to the file and the operator cannot redirect one run from the shell. Editing the file instead would have unpinned the Groq lane that shares it. --assessor-model and --assessor-version win for one invocation and change no file; the file keeps its key and its own pin. The flags are a pin override and not a guard bypass: an overridden pin naming a drafter model is still refused.",
+      "recorded_in": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json"
+    },
+    {
+      "decision": "Lift the evidence-pack ceiling for the transport that has no rate limit, and for no other.",
+      "reasoning": "See F9. The alternative offered was to decouple the cap from the provider on both transports; the operator chose the narrower change, so the Groq lane still cannot be handed a budget its TPM ceiling cannot carry, and a test pins that it still refuses one.",
+      "recorded_in": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json"
+    },
+    {
+      "decision": "Run the whole lane against a replaced transport before handing the command over.",
+      "reasoning": "The same rule this ticket has followed throughout: the operator's calls must not be spent discovering something a free check would have found. The rehearsal is what surfaced F9, and it surfaced it by returning six cells that could not have passed.",
+      "recorded_in": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json"
+    },
+    {
+      "decision": "Close the ticket on the criterion as written, and record F12 against Milestone 2 rather than reopening it.",
+      "reasoning": "Criterion 3 asks that the report carry the candidate hash, the profile version and the assessor pin, and be labelled complete or partial. It does so, on the header and on each of the six cells, and the label is 'complete'. The criterion does not ask the candidate to score well, and it must not: a blind pre-evaluation that only closes on a good grade is not a measurement. Four of six cells fail, and the systematic reason is F12, a defect in the route that builds the candidate rather than in the report that binds it. Holding the ticket open until the proposal grades better would confuse the lane working with the proposal being good.",
+      "recorded_in": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json"
+    },
+    {
+      "decision": "Verify the assessor's central claim against the artifacts before recording it as a finding.",
+      "reasoning": "The assessor said in all six cells that every ledger entry carries an empty source_ref. An advisory judgment is not evidence, and 13.3 forbids recording a project fact that has not been read. So the 147 candidate claims were counted blank directly, the 180 Tier 5 entries were counted non-blank directly, and the two functions at the seam were read until the mechanism was explicit. The assessor was right, and F12 records the mechanism rather than the observation. This also fixes where the defect is not: the harness renders the field verbatim and is faithful, and the converter's choice to leave verified_span absent is correct and documented.",
+      "recorded_in": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json"
+    },
+    {
+      "decision": "Record the low implementation scores as not a defect, in the same register as the defects.",
+      "reasoning": "F13. The demo's Tier 3 is almost entirely Assumed by construction, the sections concede it in the prose the assessor quotes back, and a blind assessor pricing that at roughly 0.3 is the lane working as specified. Left unrecorded next to F12, a reader of the report would take six scores and infer six defects. 12.2 distinguishes Assumed from Unresolved precisely so that a declared assumption is not read as a failure.",
+      "recorded_in": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json"
     }
   ],
   "findings": [
@@ -105,14 +176,54 @@
       "id": "F5",
       "summary": "The demo's 6 blind packages are all incomplete at budget 3000, and build_blind_evidence refuses an incomplete package.",
       "disposition": "recorded; no change made, because no real package is built yet"
+    },
+    {
+      "id": "F7",
+      "finding": "The candidate builder had no mapping for an 'assumed' claim, so it refused the real Part B outright. CLAUDE.md section 12.2 defines four status categories and the builder's EVIDENCE_STRENGTH_BY_STATUS covered three. The omission is not an oversight in the lookup: the graph has no evidence_strength that yields Assumed, because Assumed is declared rather than evidenced. normalise_candidate admits exactly one override for this — 'only Assumed over Unresolved may be declared' — mirroring the flip assumption_applier makes. Carrying an assumed claim on strength alone would have landed it as Unresolved and silently discarded the operator declaration. The demo's Part B carries 85 such claims out of 180.",
+      "disposition": "FIXED. The builder maps 'assumed' to the 'unconfirmed' strength and declares 'Assumed' alongside it, through DECLARED_STATUS_BY_STATUS. Every other status is still derived by the graph. The declaration survives into the blind assessor's ledger: 11, 17 and 24 assumed claims reach the three materialised sections."
+    },
+    {
+      "id": "F8",
+      "finding": "Two counting defects, found by converting a real Part B. First, a Tier 5 claim_id is a declaration key, not an occurrence id. All three sections assert project_duration, and the section assembler concatenates the per-sub-section ledgers without deduplicating, so one declaration arrives up to six times in one section with an identical status and summary. 180 ledger entries carry 122 distinct ids. A graph claim node belongs to one section and its id is unique across the document, so the identity is the pair. Second, the demo dev-graph builder never prunes: a snapshot shift leaves the previous generation's package directories on disk, so 54 directories now hold 18 current packages. The 1 October evidence for criterion 4 counted 36 directories and 6 blind packages, of which 18 and 3 belonged to a superseded snapshot.",
+      "disposition": "The first half is FIXED: the builder scopes each claim id to its section, collapses an exact repeat, and refuses a repeat that disagrees rather than picking a side (section 12.3). 180 entries become 147 claims. The second half is recorded unfixed and offered as a Milestone 2 candidate: pruning a superseded generation deletes records that cannot be rebuilt, which is the operator's call and not this act's."
+    },
+    {
+      "id": "F9",
+      "finding": "One provider's free-tier rate limit was deciding how much of the Part B the assessor is allowed to read. MAX_PACK_TOKEN_BUDGET was defined as GROQ_TPM_LIMIT - DEFAULT_JUDGE_MAX_TOKENS - RUBRIC_PROMPT_ALLOWANCE = 6000 - 2048 - 900 = 3052, and build_evidence_pack refused any larger budget outright. Measured over the six candidate packs at the shipped default of 3000, that cap drops 111 of 266 relevant items and truncates every single cell; the implementation workplan cell loses 32 of its 53. The rubric system prompt then tells the assessor that a pack marked insufficient_context means 'you must not return passed: true'. Every grade in the report was therefore predetermined before any model read anything, and the report would have measured the rate limit rather than the proposal. The number is a property of the assessor's transport, not of the proposal or of the harness.",
+      "disposition": "FIXED. The ceiling is now a parameter, max_token_budget, threaded through build_evidence_pack, build_pack_for, grade_expectation and assess_candidate. It still defaults to MAX_PACK_TOKEN_BUDGET, so every existing caller and the whole Groq lane are byte-for-byte unchanged; a transport with no per-minute token ceiling passes None, and then the operator's --budget alone governs. Lifting the ceiling does not lift the floor: a budget that is still too small reports insufficient_context exactly as before, and is never silently stretched to make a pack fit. The smallest budget at which all six candidate packs complete is 10501, bisected rather than estimated; UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET is 32768, a chosen constant whose basis is that measurement plus roughly threefold headroom."
+    },
+    {
+      "id": "F10",
+      "finding": "A rejected API key printed a traceback instead of failing closed. blind_assessment's main converts a closed set of errors to exit code 2 with one readable line, and no transport error was in that set, so the 401 propagated out of assess_candidate through runpy and the operator read a twelve-frame stack trace for a configuration problem. The module docstring describes the command as fail-closed throughout.",
+      "disposition": "FIXED. A transport failure on either transport now prints one line and returns exit 2, like every other fail-closed condition. The check is lazy, so importing the command still pulls in neither transport, and it re-raises anything that is not a transport error rather than swallowing it. SubscriptionJudgeError was additionally made a JudgeError so a mismatched assessor pin lands in the same path."
+    },
+    {
+      "id": "F11",
+      "finding": "Three real-data probes in tests/harness/test_evidence_pack.py (TestRealSections) fail on this branch, and they failed before this act. They read docs/tier5_deliverables/proposal_sections/ with the harness default rubrics, whose anchors are the MSCA-PF spelling '1.1', while Phase 8 wrote RIA sections declaring 'B.1.1' and 'B.1.2'. The anchor map fails closed, which is correct behaviour meeting a probe that hardcodes one instrument's spelling. The same mismatch is the F1 that ticket B fixed for the document route; the direct-section route still carries it in its test fixtures.",
+      "disposition": "OPEN, and out of this ticket's scope. A Milestone 2 candidate: the probe should resolve its anchors from the profile that matches the sections on disk, rather than assuming MSCA-PF. Recorded here so the three failures are not read as a regression from this act."
+    },
+    {
+      "id": "F12",
+      "finding": "Every claim reaches the assessor with no source. All 147 claims in the candidate carry source_ref '', including the 90 declared 'confirmed', and the assessor named this in all six cells unprompted: 'every ledger entry carries an empty source_ref'. Upstream the field is intact. The three Tier 5 sections hold 180 claim_statuses entries and not one is blank; excellence_section's first is docs/tier3_project_instantiation/call_binding/selected_call.json. The break is a seam between two components that are each correct alone. tools/build_part_b_candidate.py::_claims maps claim_id, status and claim_summary onto the graph's claim shape and does not carry source_ref; its docstring explains, correctly, that it leaves verified_span absent because inventing offsets would defeat the claim verifier. harness/blind_assessment.py::materialise_candidate then derives source_ref from verified_span['id'] alone, which is the one field the converter deliberately never writes, so it resolves to ''. The harness is faithful throughout: evidence_pack renders the field verbatim as 'source_ref=' and the assessor judged what it was shown. Under CLAUDE.md 12.2 a 'confirmed' claim is one directly evidenced by a named source in Tier 1-3; in the candidate the name is gone, so the candidate understates its own traceability against a Tier 5 state that has it.",
+      "disposition": "OPEN, and out of this ticket's scope. The criterion asks what the report binds and how it is labelled, and the report binds and labels correctly. A Milestone 2 candidate, and the first finding on this branch produced by the blind assessor rather than by a deterministic check: no gate caught it, because every component passed its own contract. The fix is to carry the Tier 5 source_ref through the converter into the graph claim, and to have materialise_candidate prefer it over the absent verified_span rather than fall back to ''. Until then, every grounding judgment in a blind report on this route is made against a blank field and understates the candidate."
+    },
+    {
+      "id": "F13",
+      "finding": "The two implementation cells score lowest, at 0.323 and 0.283, and the assessor's reasoning is that the load-bearing figures are not grounded: every person-month in Tables 3.1a and 3.1f reads 'not agreed' or 'TBD', the resources are deferred to a future lump-sum response, the risk register is flagged assumed, and all twelve partner_participation entries are assumed. That is not a defect in the draft. It is the demo's Tier 3 being almost entirely Assumed by construction, which ticket 4 recorded and 13.8 required the sections to concede, and the sections do concede it, in the prose the assessor quotes back: 'Every partner's participation is an operator assumption'.",
+      "disposition": "NOT A DEFECT, recorded so the scores are not read as one. The blind assessor priced an all-Assumed Tier 3 at roughly 0.3 on implementation and the drafts told it so plainly, which is the lane working. A real project would close these by confirming the consortium and receiving the budget; the fictional one cannot and must not."
     }
   ],
   "milestone_2_candidates": [
     "Fix F1: decide where a section's sub-section structure lives, then make the document route feed a shipped profile. The failing case exists.",
     "Fix F3: let an intake declare that no submission exists.",
-    "Re-run this ticket after the operator dispatches Phase 7 and Phase 8 reaches released. Criteria 2 and 3 are the only ones outstanding, and every Phase 8 figure will trace to the fictional budget, which §13.8 requires the deliverable to say."
+    "Re-run this ticket after the operator dispatches Phase 7 and Phase 8 reaches released. Criteria 2 and 3 are the only ones outstanding, and every Phase 8 figure will trace to the fictional budget, which §13.8 requires the deliverable to say.",
+    "Deduplicate the section assembler's claim ledger. It concatenates the per-sub-section ledgers, so one declaration lands up to six times in a section with an identical status and summary. The candidate builder collapses them, which fixes the reader and not the artifact.",
+    "Prune or index superseded dev-graph package directories. tools/build_demo_dev_graph.py writes content-addressed packages and never removes the previous generation, so 54 directories now hold 18 current packages and a directory count overstates the live set.",
+    "Resolve the real-section probes' anchors from the profile that matches the sections on disk instead of hardcoding the MSCA-PF spelling (F11).",
+    "Give the blind report a first-class assessor transport field, so the transport is structured data rather than a convention inside the version tag.",
+    "Carry the Tier 5 source_ref through tools/build_part_b_candidate.py into the graph claim, and have materialise_candidate prefer it over the absent verified_span instead of falling back to the empty string (F12). Until then every grounding judgment in a blind report on this route is made against a blank field."
   ],
-  "what_is_outstanding_for_the_operator": "Dispatch Phase 7. The node then writes the validation artifact to docs/integrations/lump_sum_budget_planner/validation/ and budget_gate_assessment.json to phase7_budget_gate/, and gate_09 can reach pass. The external planner run this record named is no longer outstanding: no planner exists for this repository, so ticket A authored a fictional response under the operator override at docs/tier4_orchestration_state/decision_log/demo-fictional-budget-override_2026-10-01.json. Criterion 3 additionally needs F1 fixed, which is ticket B.",
+  "what_is_outstanding_for_the_operator": "Nothing for this ticket. All four criteria are met and the ticket closes. The working tree is uncommitted: the subscription-assessor act (two new harness modules, six modified, two test modules), both Tier 4 records, the ticket, and the untracked blind report and candidate directory under harness/blind_reports/. The next ticket is 13, change scenarios and shadow comparison.",
   "authored_by": "Implementation of the ticket 'Candidate Part B and the blind baseline'. No runner phase was dispatched. No gate result was written. No proposal text was drafted.",
   "amended": {
     "date": "2026-10-01",
@@ -131,6 +242,22 @@
       "by": "Ticket B, plans/tickets_budget_and_blind_lane.md",
       "what_changed": "F1 and F2 are fixed, so their dispositions no longer read 'recorded unfixed'. Criterion 3 is no longer blocked by a defect. It now waits only on a Part B, which Phase 8 produces once the operator dispatches Phase 7 and Phase 8.",
       "what_did_not_change": "Criterion 3's disposition stays 'not met': there is still no candidate version 1 to grade. What changed is the reason — a defect became a wait. Criteria 2 and 4 are untouched, and D5's judgement that a demo ticket should not settle the fix stands: ticket B settled it, not this ticket."
+    },
+    {
+      "date": "2026-10-02",
+      "by": "Finishing the dev graph demo; this ticket's own criteria 1, 2 and 4.",
+      "what_changed": "The four dispositions are copied from the amended report. Six decisions and two findings are added, all from converting a real Part B rather than a fixture. The outstanding operator step is now the assessor run and nothing else.",
+      "what_did_not_change": "The eight decisions recorded on 1 October stand. F3, F4, F5 and F6's commitment half are unchanged."
     }
-  ]
+  ],
+  "amended_a_third_time": {
+    "date": "2026-10-02",
+    "by": "assistant, at the operator's instruction",
+    "what_changed": "The operator ran the outstanding command and Groq rejected the key (HTTP 401). Rather than rotate it, the operator chose the Max subscription, so the assessor transport became selectable: --transport claude-cli reaches the local claude CLI through an injected judge backend, which is the seam Judge documents for callers that wire their own transport. Rehearsing that lane end to end surfaced F9, the evidence-pack ceiling derived from Groq's rate limit, which had predetermined every grade; the ceiling is now the transport's to declare. F10 records that the 401 printed a traceback instead of failing closed, now fixed. F11 records three pre-existing real-data probe failures so they are not read as a regression. Criterion 3's evidence was rewritten around what the operator's own run proved.",
+    "what_did_not_change": "Criteria 1, 2 and 4 and their evidence. The candidate, its hash, the snapshot, the profile version and the package are all identical: this act changed how the assessor is reached and how much of the pack it may read, not what is assessed. The Groq lane is unchanged, down to the default ceiling and the pin in .env.harness, which was not edited. No runner phase was dispatched and no gate result written."
+  },
+  "amended_a_fourth_time": {
+    "date": "2026-10-02",
+    "what_changed": "Criterion 3 closed on the operator's subscription run, so the ticket closes at four of four. Three decisions added, F12 and F13 copied from the report, and one Milestone 2 candidate. Nothing was dispatched and no assessor call was spent in recording this."
+  }
 }

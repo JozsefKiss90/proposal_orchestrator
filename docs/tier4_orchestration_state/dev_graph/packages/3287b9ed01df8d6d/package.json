@@ -1,0 +1,433 @@
+{
+  "schema_id": "orch.dev_graph.evidence_package.v1",
+  "package_id": "sha256:3287b9ed01df8d6d82f120aef79cb2d2eeada7e202a25cd5ec39ba94698df10a",
+  "package_hash": "sha256:9f1f134d5dcf6f68c1d7cd10a54d9c154b7c02d65f2f61ac77275f629edd143d",
+  "items": [
+    {
+      "id": "T1.1",
+      "type": "task",
+      "version": "sha256:e251e508029f2b257bca1700fc83ce29107a8aea44ee1aea5c5d264fcbe0f2eb",
+      "content": {
+        "task_id": "T1.1",
+        "title": "Run consortium governance, reporting and quality management",
+        "responsible_partner": "P01",
+        "contributing_partners": [
+          "P02",
+          "P10"
+        ],
+        "dependencies": [],
+        "start_month": 1,
+        "end_month": 48,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "P01",
+      "type": "participant",
+      "version": "sha256:bc1bd341f95ed6a7f99220399291e0809994a02b7d265415c2d968642bc6341e",
+      "content": {
+        "partner_id": "P01",
+        "legal_name": "P01",
+        "country": "C1",
+        "country_slot": "C1",
+        "country_slot_class": "MS",
+        "organisation_type": "research_institute",
+        "organisation_description": "Public research organisation, agricultural institute",
+        "sector": "agricultural research",
+        "is_coordinator": true,
+        "independent_legal_entity": true,
+        "participation_role": "beneficiary",
+        "capability_basis": "derived",
+        "participation_status": "Assumed",
+        "capabilities": [
+          "plant physiology and stress metabolomics",
+          "plant phenotyping under controlled and field conditions",
+          "statistical experimental design",
+          "instrument and model calibration",
+          "leakage-safe predictive validation"
+        ],
+        "role_in_the_action": "Coordinator. Owns the in-situ physiological and metabolomic measurement chain, and the statistical design and validation protocol the whole data-integration chain is tested against.",
+        "personnel_roles": [
+          "senior plant physiologist, P01",
+          "metabolomics platform scientist, P01",
+          "statistician, P01"
+        ]
+      }
+    },
+    {
+      "id": "WP1",
+      "type": "work_package",
+      "version": "sha256:3ca98580604d846367bd9e2f9b7d5cf26095bb7e8f9a200c0d16e0f0b1be99d1",
+      "content": {
+        "wp_id": "WP1",
+        "id": "WP1",
+        "title": "Coordination, governance and the interoperability interface",
+        "lead_partner": "P01",
+        "start_month": 1,
+        "end_month": 48,
+        "objectives": [
+          "O2"
+        ],
+        "constraints": [
+          "SRC-WP9-P73",
+          "SRC-WP9-P75"
+        ],
+        "validation_status": "Assumed",
+        "source_ref": "roles.json management_roles (coordinator, P01) and coordination_interfaces; concept note, 'Coordination the topic requires'",
+        "note": "The topic sets five coordination duties and this work package holds four of them. The fifth, the crosswalk interface, sits in WP3 with the partner that owns it.",
+        "tasks": [
+          {
+            "task_id": "T1.1",
+            "title": "Run consortium governance, reporting and quality management",
+            "responsible_partner": "P01",
+            "contributing_partners": [
+              "P02",
+              "P10"
+            ],
+            "dependencies": [],
+            "start_month": 1,
+            "end_month": 48,
+            "validation_status": "Assumed"
+          },
+          {
+            "task_id": "T1.2",
+            "title": "Write the data management plan and the metadata profile the three cases share",
+            "responsible_partner": "P10",
+            "contributing_partners": [
+              "P04",
+              "P09"
+            ],
+            "dependencies": [],
+            "start_month": 1,
+            "end_month": 6,
+            "validation_status": "Assumed",
+            "note": "Sits in the management work package because it is due at M6, before WP3 opens. WP3 then builds the protocols on it."
+          },
+          {
+            "task_id": "T1.3",
+            "title": "Hold the coordination interface to the space-agency earth observation programme the topic names",
+            "responsible_partner": "P02",
+            "contributing_partners": [
+              "P12"
+            ],
+            "dependencies": [],
+            "start_month": 1,
+            "end_month": 48,
+            "validation_status": "Assumed",
+            "source_ref": "Call extract $.cross_cutting_requirements.esa_futureo_coordination; span SRC-WP9-P76#442-459"
+          },
+          {
+            "task_id": "T1.4",
+            "title": "Agree cooperation with the named in-situ data frameworks and hold the Joint Research Centre place open",
+            "responsible_partner": "P10",
+            "contributing_partners": [
+              "P03",
+              "P08"
+            ],
+            "dependencies": [],
+            "start_month": 1,
+            "end_month": 12,
+            "validation_status": "Assumed",
+            "source_ref": "Call extract $.cross_cutting_requirements.gbif_obis_lucas_cooperation and .jrc_participation; spans SRC-WP9-P75#2390-2407 and SRC-WP9-P73#1231-1289",
+            "note": "The topic asks for earmarked resources. The place for the Joint Research Centre is held open and counted towards no eligibility condition."
+          },
+          {
+            "task_id": "T1.5",
+            "title": "Run ethics, data protection and open science compliance",
+            "responsible_partner": "P01",
+            "contributing_partners": [
+              "P11"
+            ],
+            "dependencies": [],
+            "start_month": 1,
+            "end_month": 48,
+            "validation_status": "Assumed"
+          }
+        ],
+        "deliverables": [
+          {
+            "deliverable_id": "D1.1",
+            "title": "Data management plan and shared metadata profile",
+            "due_month": 6,
+            "type": "plan",
+            "produced_by": [
+              "T1.2"
+            ],
+            "validation_status": "Assumed"
+          },
+          {
+            "deliverable_id": "D1.2",
+            "title": "Cooperation and coordination plan for the named data frameworks and the space-agency programme",
+            "due_month": 12,
+            "type": "plan",
+            "produced_by": [
+              "T1.3",
+              "T1.4"
+            ],
+            "validation_status": "Assumed"
+          },
+          {
+            "deliverable_id": "D1.3",
+            "title": "Final project report",
+            "due_month": 48,
+            "type": "report",
+            "produced_by": [
+              "T1.1",
+              "T1.5"
+            ],
+            "validation_status": "Assumed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "SRC-WP9-P73",
+      "type": "source",
+      "version": "sha256:4514bf2163280de50cfe4d2d8a582333e36273e23cb52a17956d69f89a307469",
+      "content": {
+        "source_id": "SRC-WP9-P73",
+        "title": "Horizon Europe Work Programme 2026-2027, Part 9, page 73",
+        "kind": "call_document_page",
+        "status": "Confirmed",
+        "what_the_page_carries": "The topic header: type of action, budget regime, and the two topic-level eligibility exceptions (the Joint Research Centre place, and the Copernicus or Galileo/EGNOS condition).",
+        "citation": {
+          "cited_as": "European Commission, Horizon Europe Work Programme 2026-2027, Part 9: Food, Bioeconomy, Natural Resources, Agriculture and Environment, page 73.",
+          "document_id": "tier2b.wp9.horizon-2026-2027",
+          "page": 73
+        },
+        "resolves_to": {
+          "class": "stored_document",
+          "stored_path": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/wp-9-food-bioeconomy-natural-resources-agriculture-and-environment_horizon-2026-2027_en.pdf",
+          "document_id": "tier2b.wp9.horizon-2026-2027",
+          "page": 73,
+          "what_it_holds": "Page 73 of the work programme PDF stored in this repository and registered as tier2b.wp9.horizon-2026-2027."
+        },
+        "transcription": {
+          "state": "transcribed",
+          "method": "pymupdf_page_text_whitespace_normalised",
+          "replay": "runner.source_index.read_page_text(stored_path, page). The verifier re-runs it and compares byte for byte, so this text cannot drift from the stored document."
+        },
+        "text": "Horizon Europe - Work Programme 2026-2027 Food, Bioeconomy, Natural Resources, Agriculture and Environment Part 9 - Page 73 of 360 Proposals should foresee appropriate resources to ensure close cooperation with the EC Knowledge Centre for Biodiversity (KCBD) and its Science Service. 2027 Consolidating biodiversity knowledge for nature and society Proposals are invited against the following topic(s): HORIZON-CL6-2027-01-BIODIV-01: Integrating Remote Sensing and in-situ observations of Biodiversity, towards a fully interoperable observation and data framework Call: Call 01 - single stage (2027) Specific conditions Expected EU contribution per project The Commission estimates that an EU contribution of around EUR 5.00 million would allow these outcomes to be addressed appropriately. Nonetheless, this does not preclude submission and selection of a proposal requesting different amounts. Indicative budget The total indicative budget for the topic is EUR 10.00 million. Type of Action Research and Innovation Actions Eligibility conditions The conditions are described in General Annex B. The following exceptions apply: The Joint Research Centre (JRC) may participate as member of the consortium selected for funding as a beneficiary with zero funding, or as an associated partner. The JRC will not participate in the preparation and submission of the proposal - see General Annex B. If projects use satellite-based earth observation, positioning, navigation and/or related timing data and services, beneficiaries must make use of Copernicus and/or Galileo/EGNOS (other data and services may additionally be used). Legal and financial set-up of the Grant Agreements The rules are described in General Annex G. The following exceptions apply: Eligible costs will take the form of a lump sum as defined in the Decision of 7 July 2021 authorising the use of lump sum contributions under the Horizon Europe Programme – the Framework Programme for Research and Innovation (2021-2027) – and in actions under the",
+        "spans": [
+          {
+            "span_id": "SRC-WP9-P73#657-895",
+            "start": 657,
+            "end": 895,
+            "quote": "The Commission estimates that an EU contribution of around EUR 5.00 million would allow these outcomes to be addressed appropriately. Nonetheless, this does not preclude submission and selection of a proposal requesting different amounts.",
+            "tier2b_refs": [
+              "$.budget_source_spans[0]"
+            ],
+            "claim_refs": [],
+            "requirement_refs": []
+          },
+          {
+            "span_id": "SRC-WP9-P73#914-977",
+            "start": 914,
+            "end": 977,
+            "quote": "The total indicative budget for the topic is EUR 10.00 million.",
+            "tier2b_refs": [
+              "$.budget_source_spans[1]"
+            ],
+            "claim_refs": [],
+            "requirement_refs": []
+          },
+          {
+            "span_id": "SRC-WP9-P73#978-1024",
+            "start": 978,
+            "end": 1024,
+            "quote": "Type of Action Research and Innovation Actions",
+            "tier2b_refs": [
+              "$.type_of_action_source_span"
+            ],
+            "claim_refs": [],
+            "requirement_refs": []
+          },
+          {
+            "span_id": "SRC-WP9-P73#1129-1392",
+            "start": 1129,
+            "end": 1392,
+            "quote": "The Joint Research Centre (JRC) may participate as member of the consortium selected for funding as a beneficiary with zero funding, or as an associated partner. The JRC will not participate in the preparation and submission of the proposal - see General Annex B.",
+            "tier2b_refs": [
+              "$.eligibility_restrictions.exceptions[0].source_span",
+              "$.cross_cutting_requirements.jrc_participation.source_span"
+            ],
+            "claim_refs": [],
+            "requirement_refs": []
+          },
+          {
+            "span_id": "SRC-WP9-P73#1231-1289",
+            "start": 1231,
+            "end": 1289,
+            "quote": "beneficiary with zero funding, or as an associated partner",
+            "tier2b_refs": [],
+            "claim_refs": [
+              "C22"
+            ],
+            "requirement_refs": [
+              "CC-jrc_participation"
+            ]
+          },
+          {
+            "span_id": "SRC-WP9-P73#1393-1623",
+            "start": 1393,
+            "end": 1623,
+            "quote": "If projects use satellite-based earth observation, positioning, navigation and/or related timing data and services, beneficiaries must make use of Copernicus and/or Galileo/EGNOS (other data and services may additionally be used).",
+            "tier2b_refs": [
+              "$.eligibility_restrictions.exceptions[1].source_span",
+              "$.cross_cutting_requirements.copernicus_galileo_egnos.source_span"
+            ],
+            "claim_refs": [],
+            "requirement_refs": []
+          },
+          {
+            "span_id": "SRC-WP9-P73#1540-1571",
+            "start": 1540,
+            "end": 1571,
+            "quote": "Copernicus and/or Galileo/EGNOS",
+            "tier2b_refs": [],
+            "claim_refs": [
+              "C03"
+            ],
+            "requirement_refs": [
+              "CC-copernicus_galileo_egnos",
+              "EO2"
+            ]
+          },
+          {
+            "span_id": "SRC-WP9-P73#1751-2014",
+            "start": 1751,
+            "end": 2014,
+            "quote": "Eligible costs will take the form of a lump sum as defined in the Decision of 7 July 2021 authorising the use of lump sum contributions under the Horizon Europe Programme – the Framework Programme for Research and Innovation (2021-2027) – and in actions under the",
+            "tier2b_refs": [
+              "$.budget_regime_source_spans[0]"
+            ],
+            "claim_refs": [],
+            "requirement_refs": []
+          }
+        ],
+        "relied_on_for": [
+          {
+            "what": "The action type, and the two eligibility conditions the consortium design answers: the open Joint Research Centre place, and the obligation to use Copernicus or Galileo/EGNOS once the project uses satellite data.",
+            "claim_refs": [
+              "C03",
+              "C22"
+            ],
+            "span_refs": [
+              "SRC-WP9-P73#657-895",
+              "SRC-WP9-P73#914-977",
+              "SRC-WP9-P73#978-1024",
+              "SRC-WP9-P73#1129-1392",
+              "SRC-WP9-P73#1231-1289",
+              "SRC-WP9-P73#1393-1623",
+              "SRC-WP9-P73#1540-1571",
+              "SRC-WP9-P73#1751-2014"
+            ],
+            "status": "Confirmed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T1.5",
+      "type": "task",
+      "version": "sha256:bab52e90f0c9b71f67fc183b8afa7a7b4b447ecd9f146dc453af08e47e41fafb",
+      "content": {
+        "task_id": "T1.5",
+        "title": "Run ethics, data protection and open science compliance",
+        "responsible_partner": "P01",
+        "contributing_partners": [
+          "P11"
+        ],
+        "dependencies": [],
+        "start_month": 1,
+        "end_month": 48,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T5.3",
+      "type": "task",
+      "version": "sha256:6e69d34736e8fcce01030a671e4dcfef115600a60366bd8dfa84e533e1575798",
+      "content": {
+        "task_id": "T5.3",
+        "title": "Measure stress metabolomics on the farmland plots and the ecotone plots",
+        "responsible_partner": "P01",
+        "contributing_partners": [
+          "P03",
+          "P09"
+        ],
+        "dependencies": [
+          "T4.1"
+        ],
+        "start_month": 18,
+        "end_month": 34,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T6.2",
+      "type": "task",
+      "version": "sha256:c14ff1517bb4897c615c71b3bd724dd302b35e5087ac396ede3ddfe234bbfa14",
+      "content": {
+        "task_id": "T6.2",
+        "title": "Fix the leakage-safe split protocol and the benchmark design",
+        "responsible_partner": "P01",
+        "contributing_partners": [
+          "P03",
+          "P12"
+        ],
+        "dependencies": [],
+        "start_month": 16,
+        "end_month": 26,
+        "validation_status": "Assumed",
+        "note": "Site, season and treatment travel together into one fold, so a model cannot learn a site and score as though it had learned the biology."
+      }
+    },
+    {
+      "id": "T4.1",
+      "type": "task",
+      "version": "sha256:56354d8abf35fdee4786d8946f4898f00ba5d553f00a5be07dc947bf940ec9c7",
+      "content": {
+        "task_id": "T4.1",
+        "title": "Run the terrestrial campaign in farmland, grassland and field margins",
+        "responsible_partner": "P03",
+        "contributing_partners": [
+          "P01",
+          "P02",
+          "P06",
+          "P11"
+        ],
+        "dependencies": [
+          "T2.5",
+          "T3.1"
+        ],
+        "start_month": 16,
+        "end_month": 36,
+        "validation_status": "Assumed"
+      }
+    },
+    {
+      "id": "T5.4",
+      "type": "task",
+      "version": "sha256:92379a3843360c2af575b112e3654a4fdba209f0ae7931e68ba22f17124a898d",
+      "content": {
+        "task_id": "T5.4",
+        "title": "Bind the omics layer to the in-situ and remote-sensing records",
+        "responsible_partner": "P09",
+        "contributing_partners": [
+          "P04",
+          "P10"
+        ],
+        "dependencies": [
+          "T3.3",
+          "T5.2",
+          "T5.3"
+        ],
+        "start_month": 24,
+        "end_month": 38,
+        "validation_status": "Assumed",
+        "note": "This task is where the phrase 'from genome to space' becomes a joinable record rather than a figure of speech."
+      }
+    }
+  ]
+}

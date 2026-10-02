@@ -44,6 +44,7 @@ from runner.dev_graph.schema import DevGraphError
 from tools.build_part_b_candidate import (
     CANDIDATES_REL,
     CLAIM_APPROVAL,
+    CLAIM_KEY_SEPARATOR,
     EVIDENCE_STRENGTH_BY_STATUS,
     SECTION_SPECS,
     BuilderError,
@@ -502,13 +503,142 @@ class TestClaimsComeFromTheArtifactsOwnValidationStatus:
             ],
         )
         claims = {c["claim_id"]: c for c in candidate["claims"]}
-        assert set(claims) == {"CL-1", "CL-2"}
-        assert claims["CL-1"]["evidence_strength"] == (
+        assert set(claims) == {
+            "excellence_section.CL-1",
+            "excellence_section.CL-2",
+        }
+        first = claims["excellence_section.CL-1"]
+        assert first["evidence_strength"] == (
             EVIDENCE_STRENGTH_BY_STATUS["confirmed"]
         )
-        assert claims["CL-1"]["text"] == "A confirmed thing."
+        assert first["text"] == "A confirmed thing."
         assert all(c["section_id"] == "excellence_section" for c in claims.values())
         assert all(c["approval"] == CLAIM_APPROVAL for c in claims.values())
+
+    def test_the_claim_id_is_the_tier_5_id_scoped_to_its_section(
+        self, world, ria_bundle
+    ):
+        """A Tier 5 claim id is a declaration key, not an occurrence id.
+
+        All three Phase 8 sections assert ``project_duration``, and a graph
+        claim node belongs to one section with an id unique in the document.
+        So ``(section_id, claim_id)`` is the identity. The join is reversible:
+        partition once on the separator.
+        """
+        candidate = self._with_claims(
+            world,
+            ria_bundle,
+            [
+                {
+                    "claim_id": "CL-1",
+                    "claim_summary": "A confirmed thing.",
+                    "status": "confirmed",
+                    "source_ref": "docs/tier3_x/y.json#a",
+                }
+            ],
+        )
+        built = {c["claim_id"] for c in candidate["claims"]}
+        assert "excellence_section.CL-1" in built
+        for claim in candidate["claims"]:
+            section, _, tier5 = claim["claim_id"].partition(CLAIM_KEY_SEPARATOR)
+            assert section == claim["section_id"]
+            assert tier5
+
+    def test_the_same_declaration_in_two_sections_becomes_two_claims(
+        self, world, ria_bundle
+    ):
+        """Not a collision. Each section's ledger asserted it, and the blind
+        route files a claim into the ledger of its own ``section_id``, so
+        dropping the repeats would thin every section but the first."""
+
+        def dupe(spec, artifact):
+            artifact["validation_status"]["claim_statuses"] = [
+                {
+                    "claim_id": "project_duration",
+                    "claim_summary": "48 months",
+                    "status": "assumed",
+                    "source_ref": "docs/tier3_x/y.json#a",
+                }
+            ]
+
+        candidate = _build(world, ria_bundle, mutate=dupe)
+        ids = [c["claim_id"] for c in candidate["claims"]]
+        assert sorted(ids) == [
+            "excellence_section.project_duration",
+            "impact_section.project_duration",
+            "implementation_section.project_duration",
+        ]
+        normalise_candidate(candidate, "built")
+
+    def test_an_exact_repeat_within_one_section_collapses(self, world, ria_bundle):
+        """The assembler concatenates the per-sub-section ledgers without
+        deduplicating, so a declaration cited in four sub-sections arrives four
+        times with identical status and summary. The repeat carries nothing."""
+        entry = {
+            "claim_id": "CL-1",
+            "claim_summary": "A thing.",
+            "status": "confirmed",
+            "source_ref": "docs/tier3_x/y.json#a",
+        }
+        candidate = self._with_claims(
+            world, ria_bundle, [entry, dict(entry), dict(entry)]
+        )
+        assert [c["claim_id"] for c in candidate["claims"]] == [
+            "excellence_section.CL-1"
+        ]
+
+    def test_a_repeat_that_disagrees_refuses(self, world, ria_bundle):
+        """Section 12.3 forbids resolving a contradiction by picking a side."""
+        with pytest.raises(BuilderError, match="declared twice"):
+            self._with_claims(
+                world,
+                ria_bundle,
+                [
+                    {
+                        "claim_id": "CL-1",
+                        "claim_summary": "A thing.",
+                        "status": "confirmed",
+                        "source_ref": "docs/tier3_x/y.json#a",
+                    },
+                    {
+                        "claim_id": "CL-1",
+                        "claim_summary": "A different thing.",
+                        "status": "confirmed",
+                        "source_ref": "docs/tier3_x/y.json#a",
+                    },
+                ],
+            )
+
+    def test_an_assumed_claim_declares_its_status(self, world, ria_bundle):
+        """The graph has no ``evidence_strength`` for Assumed.
+
+        ``EVIDENCE_TO_STATUS`` maps ``unconfirmed`` to Unresolved, so an
+        ``assumed`` claim carried on strength alone would arrive as Unresolved
+        and lose the operator declaration ``assumption_applier`` made.
+        ``normalise_candidate`` admits exactly one override for this, and the
+        builder uses that one. The demo's Part B carries 85 such claims.
+        """
+        candidate = self._with_claims(
+            world,
+            ria_bundle,
+            [
+                {
+                    "claim_id": "CL-1",
+                    "claim_summary": "An assumed thing.",
+                    "status": "assumed",
+                    "source_ref": "docs/tier3_x/y.json#a",
+                }
+            ],
+        )
+        built = {c["claim_id"]: c for c in candidate["claims"]}
+        claim = built["excellence_section.CL-1"]
+        assert claim["evidence_strength"] == "unconfirmed"
+        assert claim["declared_status"] == "Assumed"
+        normalised = normalise_candidate(candidate, "built")
+        derived = {
+            c["claim_id"]: c["declared_status"] for c in normalised["claims"]
+        }
+        assert derived["excellence_section.CL-1"] == "Assumed"
 
     def test_the_graph_derives_declared_status_not_the_builder(
         self, world, ria_bundle
@@ -517,7 +647,9 @@ class TestClaimsComeFromTheArtifactsOwnValidationStatus:
 
         ``declared_status`` comes from the graph's own ``EVIDENCE_TO_STATUS``
         lookup inside ``normalise_candidate``. Emitting it here would be a
-        second copy of that lookup, free to contradict it.
+        second copy of that lookup, free to contradict it. The single exception
+        is ``assumed``, which no strength yields; that case is the one
+        declaration the importer sanctions and has its own test above.
         """
         candidate = self._with_claims(
             world,
@@ -540,7 +672,10 @@ class TestClaimsComeFromTheArtifactsOwnValidationStatus:
         assert all("declared_status" not in c for c in candidate["claims"])
         normalised = normalise_candidate(candidate, "built")
         derived = {c["claim_id"]: c["declared_status"] for c in normalised["claims"]}
-        assert derived == {"CL-1": "Confirmed", "CL-2": "Inferred"}
+        assert derived == {
+            "excellence_section.CL-1": "Confirmed",
+            "excellence_section.CL-2": "Inferred",
+        }
 
     def test_no_claim_carries_a_verified_span(self, world, ria_bundle):
         """A Tier 5 ``source_ref`` is a path plus an id, never an offset range.
@@ -595,23 +730,6 @@ class TestClaimsComeFromTheArtifactsOwnValidationStatus:
                 ],
             )
 
-    def test_a_duplicate_claim_id_across_sections_refuses(self, world, ria_bundle):
-        """``normalise_candidate`` rejects a duplicate, so catch it with a
-        message naming the builder rather than letting the importer raise."""
-
-        def dupe(spec, artifact):
-            artifact["validation_status"]["claim_statuses"] = [
-                {
-                    "claim_id": "CL-SAME",
-                    "claim_summary": "A thing.",
-                    "status": "confirmed",
-                    "source_ref": "docs/tier3_x/y.json#a",
-                }
-            ]
-
-        with pytest.raises(BuilderError, match="CL-SAME"):
-            _build(world, ria_bundle, mutate=dupe)
-
     def test_a_carried_claim_reaches_the_grader_without_a_source_ref(
         self, world, ria_bundle, tmp_path
     ):
@@ -662,7 +780,9 @@ class TestClaimsComeFromTheArtifactsOwnValidationStatus:
             .get("validation_status", {})
             .get("claim_statuses", [])
         ]
-        carried = [e for e in ledgers if e.get("claim_id") == "CL-1"]
+        carried = [
+            e for e in ledgers if e.get("claim_id") == "excellence_section.CL-1"
+        ]
         assert carried, "the claim did not survive into the materialised candidate"
         assert carried[0]["claim_summary"] == "A thing with a recorded source."
         assert carried[0]["status"] == "confirmed"

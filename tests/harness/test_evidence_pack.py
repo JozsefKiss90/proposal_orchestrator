@@ -192,6 +192,31 @@ class TestBudget:
         with pytest.raises(ep.EvidencePackError):
             _build(section_path, token_budget=0)
 
+    def test_a_transport_without_a_tpm_ceiling_may_exceed_the_cap(self, section_path):
+        """The cap is the provider's rate limit, not a property of the proposal.
+
+        Measured on the demo candidate, obeying it where no such limit exists
+        drops 111 of 266 relevant items, and the rubric prompt reads a truncated
+        pack as "you must not return passed: true" — so the grade would describe
+        the cap rather than the Part B.
+        """
+        over_the_cap = ep.MAX_PACK_TOKEN_BUDGET + 1
+        pack = _build(section_path, token_budget=over_the_cap, max_token_budget=None)
+        assert pack.token_budget == over_the_cap
+
+    def test_lifting_the_ceiling_does_not_lift_the_floor(self, section_path):
+        """``None`` removes the provider ceiling and nothing else: a budget that
+        is still too small is still reported, never silently stretched."""
+        pack = _build(section_path, token_budget=120, max_token_budget=None)
+        assert pack.status == ep.PACK_INSUFFICIENT_CONTEXT
+        with pytest.raises(ep.EvidencePackError, match="positive"):
+            _build(section_path, token_budget=0, max_token_budget=None)
+
+    def test_the_uncapped_default_is_stated_and_above_the_measured_need(self):
+        """10501 is the bisected budget at which all six demo packs complete."""
+        assert ep.UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET > 10501
+        assert ep.UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET > ep.MAX_PACK_TOKEN_BUDGET
+
     def test_hard_cap_leaves_room_for_one_judge_call(self):
         assert (
             ep.MAX_PACK_TOKEN_BUDGET

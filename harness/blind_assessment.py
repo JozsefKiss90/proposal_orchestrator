@@ -83,7 +83,11 @@ from runner.dev_graph import (
     build_snapshot,
 )
 from runner.dev_graph.schema import CURRENT_DOCUMENT_STATES
-from harness.evidence_pack import DEFAULT_PACK_TOKEN_BUDGET, DEFAULT_SPAN_BUDGET_FRACTION
+from harness.evidence_pack import (
+    DEFAULT_PACK_TOKEN_BUDGET,
+    DEFAULT_SPAN_BUDGET_FRACTION,
+    MAX_PACK_TOKEN_BUDGET,
+)
 from harness.expectation_coverage import CoverageGrade, grade_expectation
 from harness.judge import Judge
 from harness.profile import PreEvaluationProfile, canonical_hash
@@ -743,6 +747,7 @@ def assess_candidate(
     intake: EsrIntake | None = None,
     token_budget: int = DEFAULT_PACK_TOKEN_BUDGET,
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
+    max_token_budget: int | None = MAX_PACK_TOKEN_BUDGET,
     n: int = MIN_MAJORITY_SAMPLES,
     clock: Clock | None = None,
 ) -> BlindAssessmentReport:
@@ -789,6 +794,7 @@ def assess_candidate(
                 path,
                 token_budget=token_budget,
                 span_budget_fraction=span_budget_fraction,
+                max_token_budget=max_token_budget,
                 n=n,
             )
             cells.append(
