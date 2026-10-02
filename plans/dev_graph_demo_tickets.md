@@ -576,11 +576,11 @@ Each change runs under a revision contract. Scenarios that alter Tier 3 follow t
 
 **Blocked by:** First dev-graph snapshot on the demo world; Runner Phases 1 to 6 on the demo. Phase 8 steps are also blocked by Candidate Part B and the blind baseline.
 
-- [ ] Each scenario has an advisory with non-empty reason paths, a rerun and a shadow comparison result. — advisory yes; rerun and comparison no
+- [ ] Each scenario has an advisory with non-empty reason paths, a rerun and a shadow comparison result. — advisory yes; rerun and comparison no (subtickets A and B)
 - [x] Every planner-narrower result is investigated and recorded, because it is the unsafe direction. — vacuous, and F2 is why
 - [x] No reuse metadata is written by the planner, and the scheduler's reuse decisions are identical with and without an advisory present.
 - [x] Revision contracts reject a change that touches a protected objective, with the node named.
-- [ ] The blind lane never includes a superseded candidate version. — needs a candidate version 2, which needs the rerun
+- [ ] The blind lane never includes a superseded candidate version. — needs a candidate version 2, which needs the rerun (subticket C)
 
 **Two of five met, one met vacuously, two not met.** Seven scenarios are scripted: the six the
 ticket names and one probe for criterion 4. They hold eleven arms. Eight recorded a change and
@@ -698,11 +698,101 @@ names no node, so it bears on every change under its contract. Narrowing the ite
 change misses would have bought an `accepted` verdict by choosing the convenient reading.
 `deliverable_month_moves` carries no such item and is the accepted case.
 
+### Subtickets: what closes the open boxes
+
+The parent ticket stopped at two of five. Each open half is listed below as its own subticket,
+with the finding that blocks it and the component it may touch. Subtickets A, D and E are engine
+work. Subtickets B and C are operator acts that spend quota. F4, F5, F6, F7 and F8 stay
+Milestone 2 candidates M4, M5 and M6 and are not subtickets of this demo.
+
+#### A. Name the Phase 8 run to the comparison
+
+**What to build:** Two things that together let a comparison name the only run that carried Phase
+8. First, the CLI entry point rejects a `--run-id` that `read_reuse_decisions` would refuse, with
+the same identifier rule, so a mis-pasted argument fails at dispatch and never becomes a run
+directory. The DAG scheduler is not touched. Second, the comparison reader accepts the preserved
+manifest that `tools/preserve_run_manifests.py` writes under its slug, with the true run id
+recorded inside, so the existing run `import uuid; print(uuid.uuid4())` can be named without
+renaming its directory. The eight advisories are then compared again against that run and the
+diagnostics recorded in the scenario records.
+
+**Blocked by:** nothing. Milestone 2 candidate M2, from F1.
+
+- [ ] A run id that is not a plain identifier fails at the entry point, with the rule named.
+- [ ] The comparison reads the preserved manifest by slug and reports the true run id.
+- [ ] The eight advisories compared against the Phase 8 run return a diagnostic or a refusal whose kind is not `malformed_request`.
+
+#### B. Enact one scenario through the refinement route and rerun
+
+**What to build:** One scenario leaves the sandbox. `deliverable_month_moves` is the candidate:
+its contract verdict is `accepted` and it touches one record. The change is recorded against
+`docs/` through the operator manual's refine cycle (Part IV, §5.1), so the Tier 3 record gains a
+new version and the founding document is not edited in place. The snapshot id moves, and the new
+id is pinned in the scenario record as `after_snapshot_id`. The operator then dispatches the Phase
+8 nodes the advisory marked `rerun` under a plain run id, and the comparison runs against that
+run. The result is one of the three diagnostics, recorded next to the advisory.
+
+**Blocked by:** Subticket A. Dispatch is an operator act (quota).
+
+- [ ] The Tier 3 record carries a new version and the prior version is intact.
+- [ ] The scenario record names the before and after snapshot ids.
+- [ ] The rerun is dispatched under a plain run id and its manifest holds reuse decisions.
+- [ ] The comparison for the enacted scenario reports `agreed`, `planner_narrower` or `planner_broader`.
+- [ ] A `planner_narrower` result, if any, is investigated and the reason recorded.
+
+#### C. Candidate version 2 and the superseded blind lane
+
+**What to build:** After the rerun, the candidate builder produces a Part B version 2 from the
+rerun's sections. `import_document` imports it with a `supersedes` reference to version 1. The
+blind lane runs on version 2 only and its report marks the version 1 report as not applicable.
+
+**Blocked by:** Subticket B.
+
+- [ ] Version 2 is imported with a `supersedes` edge to version 1.
+- [ ] The blind lane's package set contains no passage from version 1.
+- [ ] The version 2 blind report names the version 1 report as not applicable.
+- [ ] The leakage scan passes over the new version.
+
+#### D. Persist the `not_reused` decision to the run manifest
+
+**What to build:** The scheduler calls `ctx.record_reuse_decision` only on the reuse branch, so a
+`not_reused` decision reaches `run_summary.json` and nothing durable. The fix records both
+outcomes to the manifest and gives the per-dispatch decisions a home that a later dispatch does
+not overwrite. Two tests assert that `get_reuse_decision` returns `None` on the not-reused path;
+they change with it. This makes `planner_narrower` detectable and takes the vacuity out of
+criterion 2.
+
+**Blocked by:** explicit operator instruction. It changes runtime persistence, which the demo's
+constraints exclude, and it was deferred on operator instruction in the parent ticket. Milestone 2
+candidate M1, from F2.
+
+- [ ] A `not_reused` decision is readable from the run manifest after the dispatch ends.
+- [ ] A later dispatch in the same run does not overwrite an earlier node's decision.
+- [ ] The two tests that pinned `None` are re-pointed, not deleted.
+- [ ] A seeded `planner_narrower` pair is classified as such by the comparison.
+
+#### E. Make scenario 5 and the ledger declaration recordable
+
+**What to build:** The change recorder covers five Tier 3 records. Scenario 5 lands in
+`selected_call.json` or Tier 2B, and scenario 3's second half lands in `working_assumptions.json`.
+The recorder is widened to those two Tier 3 files, with a declared rule for what a change to a
+ledger declaration means for the §12.2 status the deliverables quote. The two refusal-probe arms
+(`tier2b_fact_changes/a1`, `gap_partner_confirmed/a2`) become change arms and are rerun through
+the advisory. A Tier 2B text amendment stays out of scope until Tier 2B is a snapshot input.
+
+**Blocked by:** nothing. Milestone 2 candidate M3, from F3 and F9. The operator decides whether it
+lands in the demo or waits for Milestone 2.
+
+- [ ] A date correction in `selected_call.json` is recorded, planned and compared.
+- [ ] A declaration leaving `working_assumptions.json` is recorded, planned and compared.
+- [ ] The rule for a status change caused by a ledger declaration is written down and tested.
+- [ ] The F9 proxy arm is retired or relabelled as what it is.
+
 ## Demo report
 
 **What to build:** A report under `plans/` that answers the questions fixed in the scope record, with numbers: snapshot size and build time, packages that went incomplete and why, planner agreement per scenario, fail-closed errors found on real records, run cost, and the defects that need Milestone 2 tickets. It ends with the evidence for and against enabling fine-grained reuse.
 
-**Blocked by:** Change scenarios and shadow comparison.
+**Blocked by:** Change scenarios and shadow comparison. Subtickets B and C may stay open; the report then records them as pending.
 
 - [ ] Every scope question has an answer backed by a Tier 4 artifact.
 - [ ] Defects found are listed as candidate Milestone 2 tickets.
