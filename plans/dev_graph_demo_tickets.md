@@ -744,11 +744,27 @@ run. The result is one of the three diagnostics, recorded next to the advisory.
 
 **Blocked by:** Subticket A. Dispatch is an operator act (quota).
 
-- [ ] The Tier 3 record carries a new version and the prior version is intact.
-- [ ] The scenario record names the before and after snapshot ids.
+- [x] The Tier 3 record carries a new version and the prior version is intact.
+- [x] The scenario record names the before and after snapshot ids.
 - [ ] The rerun is dispatched under a plain run id and its manifest holds reuse decisions.
 - [ ] The comparison for the enacted scenario reports `agreed`, `planner_narrower` or `planner_broader`.
 - [ ] A `planner_narrower` result, if any, is investigated and the reason recorded.
+
+**Enacted 2026-10-02, two of five.** Record:
+`docs/tier4_orchestration_state/decision_log/demo-change-scenarios-subticket-b_2026-10-02.json`.
+The one-record premise did not hold: MS4 gathers D3.2 and is due in the month D3.2 was, so moving
+the deliverable alone leaves a milestone due before what it checks, which the seeds' own timing rule
+rejects. The contract accepted it anyway, because it knows timing as a class and no cross-record
+rule. The scenario gained a second arm that moves MS4, and `tools/enact_demo_change_scenario.py`
+recorded both on the world through the change recorder: prior versions archived by hash, two change
+records, the snapshot moved from `sha256:706fe54f…` to `sha256:68c0a8b7…`, the enactment pinned
+beside the scenario, and Tier 3 refrozen by a superseding entry. This instance has no vault, so the
+§5.1 cycle's guarantees are met through the recorder rather than the compile. The scenario tool now
+replays the enacted scenario from the archived versions and records that it reproduces. The three
+rerun boxes stay open and cannot close before subticket D: every Phase 8 fingerprint covers the whole
+of Tier 3, so a rerun redrafts every section and persists no decision, and the comparison would
+refuse. Once D lands, `--record-rerun --run-id <id>` writes the comparison; expect `planner_narrower`
+on n08a for the first arm.
 
 #### C. Candidate version 2 and the superseded blind lane
 

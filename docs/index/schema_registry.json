@@ -127,6 +127,34 @@
       "description": "Tier 4 copy of a run manifest, written by tools/preserve_run_manifests.py. The file is named by runner.run_context.run_id_slug and carries the true run id inside. It holds node states, failure metadata, reuse decisions (null when the manifest holds no key), the reuse policy and the surviving run summary. The shadow comparison reads it by slug when a run id cannot address .claude/runs."
     },
     {
+      "schema_id": "orch.dev_graph.change_scenario.v1",
+      "artifact": "<scenario_id>/scenario.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/",
+      "provenance_class": "derived",
+      "description": "One scripted change scenario run in a sandbox: its contract, its arms with outcome, change set, contract verdict, advisory summary and shadow comparisons, and for an enacted scenario whether the replay reproduced the enacted snapshots; written by tools/run_demo_change_scenarios.py through runner.dev_graph.scenarios"
+    },
+    {
+      "schema_id": "orch.dev_graph.change_scenario_index.v1",
+      "artifact": "index.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/index.json",
+      "provenance_class": "derived",
+      "description": "Roll-up of every change scenario: record path, before snapshot id, enactment path when the world holds one, and per arm the outcome, verdict, advisory path and shadow diagnostics"
+    },
+    {
+      "schema_id": "orch.dev_graph.scenario_enactment.v1",
+      "artifact": "<scenario_id>/enactment.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/",
+      "provenance_class": "derived",
+      "description": "A scenario recorded on the world itself: one change record per accepted arm with before and after snapshot ids and record versions, the advisory plan at its canonical path and what it asks of each reuse-eligible node; written once by runner.dev_graph.scenarios.enact_scenario"
+    },
+    {
+      "schema_id": "orch.dev_graph.scenario_rerun.v1",
+      "artifact": "<scenario_id>/reruns/<run_id>.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/",
+      "provenance_class": "derived",
+      "description": "One dispatched run compared with every enacted arm's advisory: one shadow comparison or recorded refusal per arm, every planner_narrower row listed for investigation, and the recorded reason once there is one; written once per run id by runner.dev_graph.scenarios.record_rerun"
+    },
+    {
       "schema_id": "orch.dev_graph.revision_record.v1",
       "artifact": "<revision_id>.json",
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/revisions/",

@@ -3,8 +3,10 @@
 ``tools/run_demo_change_scenarios.py`` scripts the six changes the ticket
 'Change scenarios and shadow comparison' names, plus the probe criterion 4
 asks for. Each runs in a sandbox copy of the frozen Tier 3, so the demo's
-founding documents are never edited in place and the demo snapshot id never
-moves.
+founding documents are never edited in place. One scenario has since been
+enacted on the world itself through the change recorder (subticket B), so the
+demo snapshot id has moved once, by exactly that change, and that scenario is
+replayed from the record versions the change recorder archived.
 
 Three groups of test:
 
@@ -29,21 +31,29 @@ import yaml
 
 from runner.atomic_write import canonical_json_bytes
 from runner.dev_graph.builder import build_snapshot
+from runner.dev_graph.changes import load_snapshot, read_record_version
 from runner.dev_graph.impact import RUN_RECORDS_REL
 from runner.dev_graph.scenarios import (
     SCENARIO_INDEX_SCHEMA_ID,
     SCENARIOS_REL,
     advisory_rel,
+    enactment_rel,
+    read_enactment,
+    read_reruns,
+    reruns_rel,
     run_scenario,
     scenario_rel,
     write_scenario_records,
 )
+from runner.dev_graph.shadow import DIAGNOSTICS, advisory_verdicts
 from runner.phase8_reuse import (
+    FINGERPRINT_INPUTS,
     REUSE_ELIGIBLE_NODES,
     compute_input_fingerprint,
     validate_reuse_candidate,
 )
 from runner.run_context import PRESERVED_RUN_RECORDS_REL, is_plain_run_id, run_id_slug
+from tools.enact_demo_change_scenario import main as enact_main
 from tools.run_demo_change_scenarios import (
     COMPARED_RUN_IDS,
     SCENARIOS,
@@ -52,6 +62,11 @@ from tools.run_demo_change_scenarios import (
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INDEX = REPO_ROOT / SCENARIOS_REL / "index.json"
+
+#: The one scenario subticket B enacted on the world itself.
+ENACTED = "deliverable_month_moves"
+WP_SEED = "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+MILESTONES = "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
 
 
 def _index() -> dict:
@@ -222,7 +237,11 @@ class TestRecordsOnDisk:
                     assert "diagnostic" in comparison or comparison["refused"]["kind"] != "malformed_request"
                     if "refused" in comparison:
                         assert comparison["refused"]["offender"] == preserved
-        assert seen == 8, "one comparison against the Phase 8 run per recorded arm"
+        recorded = sum(
+            1 for s in _index()["scenarios"] for a in s["arms"] if a["outcome"] == "recorded"
+        )
+        assert recorded >= 8
+        assert seen == recorded, "one comparison against the Phase 8 run per recorded arm"
 
     def test_no_planner_narrower_result_is_left_uninvestigated(self) -> None:
         # Criterion 2. A planner_narrower row needs a scheduler decision whose
@@ -291,16 +310,33 @@ class TestTheArtifactsMatchTheirDeclaredSchemas:
                 assert set(arm) == declared, (scenario["scenario_id"], arm["arm_id"])
         assert seen
 
+    def test_the_enactment_record(self) -> None:
+        self._compare("dev_graph_scenario_enactment", enactment_rel(ENACTED))
+
+    def test_every_rerun_record(self) -> None:
+        # Skips until the operator's first rerun is recorded; then each must match.
+        reruns = sorted((REPO_ROOT / reruns_rel(ENACTED)).glob("*.json"))
+        if not reruns:
+            pytest.skip("no rerun recorded yet")
+        for path in reruns:
+            self._compare("dev_graph_scenario_rerun", path.relative_to(REPO_ROOT).as_posix())
+
     def test_the_run_records_artifact_is_no_longer_declared_hand_placed(self) -> None:
         # It was manually_placed until a tool started deriving it. A spec that
         # still said so would send a reader to the wrong author.
         assert self._declared("dev_graph_run_records")["provenance_class"] == "derived"
 
 
-class TestTheFrozenWorldIsUntouched:
-    """The freeze rule: the scenarios copy, they never edit in place."""
+class TestTheWorldMovedByTheEnactedChangeOnly:
+    """The freeze rule: the scenarios copy, they never edit in place.
 
-    def test_the_demo_snapshot_id_has_not_moved(self) -> None:
+    One scenario left the sandbox through the change recorder (subticket B).
+    The live snapshot is that enactment's after snapshot and nothing else
+    moved it; every other scenario starts from the live world, and the
+    enacted one from the world it was enacted on.
+    """
+
+    def test_the_committed_snapshot_is_the_live_build(self) -> None:
         stored = json.loads(
             (REPO_ROOT / "docs/tier4_orchestration_state/dev_graph/snapshot.json").read_text(
                 encoding="utf-8-sig"
@@ -309,11 +345,23 @@ class TestTheFrozenWorldIsUntouched:
 
         assert build_snapshot(REPO_ROOT).snapshot_id == stored["snapshot_id"]
 
-    def test_every_scenario_started_from_the_demo_snapshot(self) -> None:
+    def test_the_live_snapshot_is_the_enactments_after_snapshot(self) -> None:
+        enactment = read_enactment(REPO_ROOT, ENACTED)
+
+        assert enactment is not None
+        assert build_snapshot(REPO_ROOT).snapshot_id == enactment.after_snapshot_id
+
+    def test_every_scenario_started_from_the_world_it_was_run_over(self) -> None:
         live = build_snapshot(REPO_ROOT).snapshot_id
 
         for scenario in _index()["scenarios"]:
-            assert scenario["before_snapshot_id"] == live
+            if scenario["enacted"] is None:
+                assert scenario["before_snapshot_id"] == live, scenario["scenario_id"]
+            else:
+                enactment = read_enactment(REPO_ROOT, scenario["scenario_id"])
+                assert enactment is not None
+                assert scenario["enacted"] == enactment.path
+                assert scenario["before_snapshot_id"] == enactment.before_snapshot_id
 
     @staticmethod
     def _frozen_world() -> dict[str, bytes]:
@@ -342,6 +390,149 @@ class TestTheFrozenWorldIsUntouched:
         run_all(REPO_ROOT, tmp_path / "sandboxes")
 
         assert self._frozen_world() == before
+
+
+class TestTheEnactment:
+    """Subticket B: one scenario left the sandbox through the refine route.
+
+    The first two boxes are read off the records: the Tier 3 records carry a
+    new version with the prior version intact, and the scenario record names
+    the before and after snapshot ids. The rerun boxes are the operator's and
+    are read here only once a rerun is recorded.
+    """
+
+    @pytest.fixture(scope="class")
+    def enactment(self):
+        enactment = read_enactment(REPO_ROOT, ENACTED)
+        assert enactment is not None, f"{ENACTED} is not enacted"
+        return enactment
+
+    @pytest.fixture(scope="class")
+    def record(self) -> dict:
+        return json.loads((REPO_ROOT / scenario_rel(ENACTED)).read_text(encoding="utf-8-sig"))
+
+    @staticmethod
+    def _deliverable(content: dict, deliverable_id: str) -> dict:
+        return next(
+            d
+            for wp in content["work_packages"]
+            for d in wp["deliverables"]
+            if d["deliverable_id"] == deliverable_id
+        )
+
+    @staticmethod
+    def _milestone(content: dict, milestone_id: str) -> dict:
+        return next(m for m in content["milestones"] if m["milestone_id"] == milestone_id)
+
+    def test_the_two_records_carry_the_new_version(self, enactment) -> None:
+        # Box 1, first half. D3.2 moved past MS4 and MS4 followed it.
+        wp = json.loads((REPO_ROOT / WP_SEED).read_text(encoding="utf-8-sig"))
+        ms = json.loads((REPO_ROOT / MILESTONES).read_text(encoding="utf-8-sig"))
+
+        assert self._deliverable(wp, "D3.2")["due_month"] == 29
+        assert self._milestone(ms, "MS4")["due_month"] == 29
+        assert "D3.2" in self._milestone(ms, "MS4")["deliverables"]
+        by_record = {a["record_path"]: a for a in enactment.arms}
+        assert read_record_version(REPO_ROOT, by_record[WP_SEED]["after_record_version"]) == wp
+        assert read_record_version(REPO_ROOT, by_record[MILESTONES]["after_record_version"]) == ms
+
+    def test_the_prior_versions_are_intact(self, enactment) -> None:
+        # Box 1, second half. read_record_version refuses an archive that does
+        # not hash to its version, so a readable archive is an intact one.
+        by_record = {a["record_path"]: a for a in enactment.arms}
+        wp_before = read_record_version(REPO_ROOT, by_record[WP_SEED]["before_record_version"])
+        ms_before = read_record_version(REPO_ROOT, by_record[MILESTONES]["before_record_version"])
+
+        assert self._deliverable(wp_before, "D3.2")["due_month"] == 28
+        assert self._milestone(ms_before, "MS4")["due_month"] == 28
+        for arm in enactment.arms:
+            change = json.loads(
+                (REPO_ROOT / arm["change_record"]).read_text(encoding="utf-8-sig")
+            )
+            assert change["approval"] == "approved"
+            assert change["before"]["record_version"] == arm["before_record_version"]
+            assert change["after"]["record_version"] == arm["after_record_version"]
+
+    def test_the_scenario_record_names_the_before_and_after_snapshot_ids(
+        self, enactment, record: dict
+    ) -> None:
+        # Box 2. Both ids name stored snapshots, and the live world is the after.
+        assert record["enacted"]["before_snapshot_id"] == enactment.before_snapshot_id
+        assert record["enacted"]["after_snapshot_id"] == enactment.after_snapshot_id
+        assert record["before_snapshot_id"] == enactment.before_snapshot_id
+        assert load_snapshot(REPO_ROOT, enactment.before_snapshot_id).snapshot_id
+        assert load_snapshot(REPO_ROOT, enactment.after_snapshot_id).snapshot_id
+        assert build_snapshot(REPO_ROOT).snapshot_id == enactment.after_snapshot_id
+        assert enactment.before_snapshot_id != enactment.after_snapshot_id
+
+    def test_the_replay_reproduces_the_enacted_change(self, record: dict) -> None:
+        assert record["enacted"]["reproduced"] is True
+        assert record["arms_matched_expectations"] is True
+        assert [a["arm_id"] for a in record["arms"]] == ["a1_move_d3_2", "a2_move_ms4"]
+        assert [a["contract_check"]["verdict"] for a in record["arms"]] == ["accepted", "accepted"]
+
+    def test_the_milestone_arm_is_what_the_timing_rule_requires(self, record: dict) -> None:
+        # The ticket's one-record premise: the contract accepts the first arm
+        # alone, and the seeds' own rule (a milestone is not due before what it
+        # gathers) is what made the second arm necessary. Both are timing.
+        first, second = record["arms"]
+        assert first["contract_check"]["change_classes"] == ["timing"]
+        assert second["contract_check"]["change_classes"] == ["timing"]
+        assert [c["id"] for c in second["change"]["nodes_changed"] if c["kind"] == "direct"] == ["MS4"]
+
+    def test_each_arm_records_what_the_advisory_asks_of_the_scheduler(self, enactment) -> None:
+        # Derived from the plan on disk, never typed. The first arm asks a rerun
+        # of two drafting nodes and a reuse of one, so a rerun can disagree with
+        # the planner in both directions.
+        for arm in enactment.arms:
+            plan = json.loads((REPO_ROOT / arm["plan"]).read_text(encoding="utf-8-sig"))
+            assert plan["change_id"] == arm["change_id"]
+            assert arm["scheduler_verdicts"] == advisory_verdicts(plan)
+            assert set(arm["scheduler_verdicts"]) == set(REUSE_ELIGIBLE_NODES)
+        first = enactment.arms[0]["scheduler_verdicts"]
+        assert "rerun" in first.values() and "reuse" in first.values()
+
+    def test_a_rerun_before_subticket_d_can_record_no_decision(self) -> None:
+        # The premise of the open rerun boxes, checked rather than assumed:
+        # every drafting node's fingerprint covers the whole of Tier 3, so a
+        # rerun over the enacted change finds every candidate stale and
+        # redrafts, and a not_reused decision is not persisted (subticket D).
+        for node_id in REUSE_ELIGIBLE_NODES:
+            assert "docs/tier3_project_instantiation/" in FINGERPRINT_INPUTS[node_id], node_id
+
+    def test_the_rerun_boxes_are_open_until_a_rerun_is_recorded(self, record: dict) -> None:
+        reruns = read_reruns(REPO_ROOT, ENACTED)
+
+        assert [r["run_id"] for r in record["enacted"]["reruns"]] == [r["run_id"] for r in reruns]
+        for summary, rerun in zip(record["enacted"]["reruns"], reruns):
+            refused = {f"refused:{c['refused']['kind']}" for c in rerun["comparisons"] if c["refused"]}
+            assert set(summary["diagnostics"]) <= DIAGNOSTICS | refused
+            if rerun["planner_narrower_rows"]:
+                assert rerun["investigation"], "a planner_narrower result is left uninvestigated"
+
+
+class TestTheEnactTool:
+    """The operator's tool refuses before it writes, and says why."""
+
+    def test_an_enacted_scenario_is_not_enacted_twice(self, capsys) -> None:
+        assert enact_main(["--scenario", ENACTED]) == 1
+        assert "immutable_record" in capsys.readouterr().err
+
+    def test_a_scenario_outside_the_catalogue_is_refused(self, capsys) -> None:
+        assert enact_main(["--scenario", "not_a_scenario"]) == 1
+        assert "not_a_scenario" in capsys.readouterr().err
+
+    def test_a_rerun_under_a_non_plain_run_id_is_refused_before_anything_is_read(
+        self, capsys
+    ) -> None:
+        before = read_reruns(REPO_ROOT, ENACTED)
+        assert enact_main(["--scenario", ENACTED, "--record-rerun", "--run-id", "bad id"]) == 2
+        assert "not a plain identifier" in capsys.readouterr().err
+        assert read_reruns(REPO_ROOT, ENACTED) == before
+
+    def test_a_rerun_needs_a_run_id(self) -> None:
+        with pytest.raises(SystemExit):
+            enact_main(["--scenario", ENACTED, "--record-rerun"])
 
 
 class TestTheAdvisoryIsNotConsumed:

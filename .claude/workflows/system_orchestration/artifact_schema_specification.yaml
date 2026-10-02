@@ -3405,6 +3405,27 @@ operational_artifact_schemas:
           nothing about whether a ticket criterion is met: an arm that refused
           exactly as expected matched its expectation, and a scenario can match
           every one of them while the question it was run to answer stays open.
+          For an enacted scenario it also requires that the replay reproduced
+          the enacted snapshots.
+      enacted:
+        type: object
+        required: true
+        nullable: true
+        description: >
+          Null for a scenario the world does not hold. Otherwise what the record
+          says about the enactment (5.15) this run replayed: the sandbox started
+          from the archived record versions the enactment names, and reproduced
+          says whether every arm rebuilt the snapshot the enactment recorded.
+        fields:
+          path: {type: string, required: true, description: Repo-relative path of the enactment record (5.15).}
+          before_snapshot_id: {type: string, required: true}
+          after_snapshot_id: {type: string, required: true}
+          change_ids: {type: array, required: true, item_type: string}
+          reproduced: {type: boolean, required: true}
+          reruns:
+            type: array
+            required: true
+            description: One entry per recorded rerun (5.16), ordered by run id; empty until the operator's first rerun is recorded. Each carries the record's path, run id, one diagnostic label per arm, the count of planner_narrower rows and whether they are investigated.
       arms:
         type: array
         required: true
@@ -3527,6 +3548,7 @@ operational_artifact_schemas:
           title: {type: string, required: true}
           path: {type: string, required: true, description: Repo-relative path of the 5.13 record.}
           before_snapshot_id: {type: string, required: true}
+          enacted: {type: string, required: true, nullable: true, description: Repo-relative path of the enactment record (5.15), or null.}
           arms_matched_expectations: {type: boolean, required: true}
           arms:
             type: array
@@ -3544,6 +3566,89 @@ operational_artifact_schemas:
                 description: >
                   One per compared run: the diagnostic, or the refusal kind
                   prefixed "refused:" when no comparison could be made.
+
+  # ---------------------------------------------------------------------------
+  # 5.15 Scenario enactment
+  # Path: docs/tier4_orchestration_state/dev_graph/change_scenarios/<scenario_id>/enactment.json
+  # Written once by runner.dev_graph.scenarios.enact_scenario when a scenario's
+  # arms are recorded on the world itself through the change recorder (5.7).
+  # ---------------------------------------------------------------------------
+  dev_graph_scenario_enactment:
+    schema_id_value: "orch.dev_graph.scenario_enactment.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/change_scenarios/<scenario_id>/enactment.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.scenario_enactment.v1".}
+      scenario_id: {type: string, required: true, description: Plain identifier; the directory name.}
+      before_snapshot_id: {type: string, required: true, description: The live snapshot before the first arm.}
+      after_snapshot_id: {type: string, required: true, description: The live snapshot after the last arm.}
+      arms:
+        type: array
+        required: true
+        description: One entry per arm, in the order recorded. Every arm is a change the contract accepted.
+        item_schema:
+          arm_id: {type: string, required: true}
+          change_id: {type: string, required: true, description: The change record's id (5.7), the scenario id and the arm id joined by two underscores.}
+          change_record: {type: string, required: true, description: Repo-relative path of the change record.}
+          record_path: {type: string, required: true, description: The Tier 3 record the arm changed.}
+          before_snapshot_id: {type: string, required: true}
+          after_snapshot_id: {type: string, required: true}
+          before_record_version: {type: string, required: true, description: Archived content version of the record before the arm (5.8).}
+          after_record_version: {type: string, required: true}
+          contract_verdict: {type: string, required: true, enum: [accepted]}
+          plan: {type: string, required: true, description: Repo-relative path of the arm's advisory plan at its canonical path (5.9).}
+          plan_id: {type: string, required: true}
+          scheduler_verdicts:
+            type: object
+            required: true
+            description: >
+              What the advisory asks of each reuse-eligible node, "reuse" or
+              "rerun", keyed by node id. The planner's half of a comparison on
+              its own, recorded before any run exists to compare against.
+
+  # ---------------------------------------------------------------------------
+  # 5.16 Scenario rerun comparison
+  # Path: docs/tier4_orchestration_state/dev_graph/change_scenarios/<scenario_id>/reruns/<run_id>.json
+  # Written once per run id by runner.dev_graph.scenarios.record_rerun after the
+  # operator dispatched that run over the enacted change. A run that could only
+  # be refused stays recorded and does not block recording the next run.
+  # ---------------------------------------------------------------------------
+  dev_graph_scenario_rerun:
+    schema_id_value: "orch.dev_graph.scenario_rerun.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/change_scenarios/<scenario_id>/reruns/<run_id>.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.scenario_rerun.v1".}
+      scenario_id: {type: string, required: true}
+      enactment: {type: string, required: true, description: Repo-relative path of the enactment record (5.15).}
+      run_id: {type: string, required: true, description: The dispatched run, a plain identifier.}
+      comparisons:
+        type: array
+        required: true
+        description: One entry per enacted arm, in order. A comparison that could not be made carries refused.
+        item_schema:
+          arm_id: {type: string, required: true}
+          change_id: {type: string, required: true}
+          plan_id: {type: string, required: true}
+          comparison: {type: string, required: true, nullable: true, description: Repo-relative path of the shadow comparison (5.10), or null when refused.}
+          diagnostic: {type: string, required: true, nullable: true, enum: [agreed, planner_narrower, planner_broader]}
+          rows: {type: array, required: true, description: The comparison's rows (5.10); empty when refused.}
+          refused:
+            type: object
+            required: true
+            nullable: true
+            description: Null when the comparison was made; otherwise the kind, offender and message.
+      planner_narrower_rows:
+        type: array
+        required: true
+        description: Every row of every comparison whose diagnostic is planner_narrower, each with its arm_id; the rows the ticket asks to have investigated.
+      investigation:
+        type: string
+        required: true
+        nullable: true
+        description: The operator's recorded reason for the planner_narrower rows, or null while none is recorded.
 
 # =============================================================================
 # SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS

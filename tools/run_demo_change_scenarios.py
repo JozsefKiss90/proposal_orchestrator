@@ -9,9 +9,16 @@ decision log rather than simulated here.
 
 Every scenario runs in a sandbox copy of the files the snapshot declares as
 its inputs, so the frozen founding documents are never edited in place
-(the operator manual's freeze rule, §3.1) and the demo snapshot id never moves.
-The sandbox's first snapshot id is checked against the live one, so a scenario
-is anchored to the real world rather than to a reduction of it.
+(the operator manual's freeze rule, §3.1). The sandbox's first snapshot id is
+checked against the live one, so a scenario is anchored to the real world
+rather than to a reduction of it.
+
+One scenario has left the sandbox. ``tools/enact_demo_change_scenario.py``
+records a scenario's arms on the world itself through the change recorder,
+which archives the prior version of each record; the enactment is written
+beside the scenario. A scenario the world holds is replayed here from those
+archived versions, and its record says whether the replay reproduced the
+enacted snapshots. The other scenarios keep running over the current world.
 
 The catalogue below is this project's data: which record, which id, which
 contract. The machinery — the transformations, the sandbox, the arms, the
@@ -32,6 +39,10 @@ What each scenario demonstrates, and where the ticket's six map:
    ``selected_call.json`` to the change recorder refuses, and the graph-visible
    proxy is the project's own confidence in the call page it transcribed.
 6. ``deliverable_month_moves`` — a deliverable's month crosses its milestone.
+   Two arms: the deliverable moves, which the contract accepts although the
+   milestone that gathers it is then due before it; then the milestone follows,
+   which is what the work plan's own timing rule requires. This is the scenario
+   subticket B enacted.
 
 A seventh, ``protected_objective_probe``, is the ticket's fourth criterion: a
 change that touches a protected objective must be rejected with the node named.
@@ -58,6 +69,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from runner.dev_graph.builder import (  # noqa: E402
+    MILESTONES_REL,
     PARTNERS_REL,
     SOURCES_REL,
     WP_SEED_REL,
@@ -68,6 +80,7 @@ from runner.dev_graph.scenarios import (  # noqa: E402
     Arm,
     Scenario,
     ScenarioResult,
+    read_enactment,
     run_scenario,
     shadow_label,
     write_scenario_records,
@@ -75,6 +88,7 @@ from runner.dev_graph.scenarios import (  # noqa: E402
 from runner.dev_graph.impact import read_run_records  # noqa: E402
 
 WP_SEED = WP_SEED_REL.as_posix()
+MILESTONES = MILESTONES_REL.as_posix()
 PARTNERS = PARTNERS_REL.as_posix()
 SOURCES = SOURCES_REL.as_posix()
 SELECTED_CALL = "docs/tier3_project_instantiation/call_binding/selected_call.json"
@@ -313,7 +327,10 @@ SCENARIOS: tuple[Scenario, ...] = (
         title="A deliverable's month moves across a milestone",
         purpose=(
             "D3.2 is due in the month MS4 checks it. Moving it one month later "
-            "puts it past the milestone, and the milestone record does not change."
+            "puts it past the milestone. The contract accepts that on its own, "
+            "because it knows timing as a class and not the work plan's rule "
+            "that a milestone is not due before what it gathers; the second arm "
+            "moves MS4 after it, which is what enacting the first requires."
         ),
         contract=_contract("timing", ("timing",)),
         arms=(
@@ -327,6 +344,19 @@ SCENARIOS: tuple[Scenario, ...] = (
                 purpose=(
                     "The timing change is permitted, and the milestone is reached "
                     "over the edge it was already validated by."
+                ),
+            ),
+            Arm(
+                arm_id="a2_move_ms4",
+                kind="change",
+                record_path=MILESTONES,
+                transform="move_milestone_due_month",
+                args={"milestone_id": "MS4", "to_month": 29},
+                expects=RECORDED,
+                purpose=(
+                    "MS4 gathers D3.2 and is due in month 28. Left there it would "
+                    "check a deliverable not yet due, which the seeds' own timing "
+                    "rule rejects; the milestone follows the deliverable."
                 ),
             ),
         ),
@@ -362,7 +392,8 @@ def run_all(repo_root: Path | str, sandbox_base: Path | str) -> list[ScenarioRes
     """Run every scenario in its own sandbox under *sandbox_base*.
 
     *repo_root* is read only: the records change in the sandboxes and the run
-    manifests and run records come from the real world.
+    manifests and run records come from the real world. A scenario the world
+    holds an enactment of is replayed from the archived versions it names.
     """
     root = Path(repo_root)
     base = Path(sandbox_base)
@@ -374,6 +405,7 @@ def run_all(repo_root: Path | str, sandbox_base: Path | str) -> list[ScenarioRes
             base / scenario.scenario_id,
             run_ids=COMPARED_RUN_IDS,
             run_records=records,
+            enactment=read_enactment(root, scenario.scenario_id),
         )
         for scenario in SCENARIOS
     ]
@@ -381,7 +413,10 @@ def run_all(repo_root: Path | str, sandbox_base: Path | str) -> list[ScenarioRes
 
 def _report(results: list[ScenarioResult]) -> None:
     for result in results:
-        print(f"{result.scenario.scenario_id}:")
+        enacted = "" if result.enacted is None else (
+            " [enacted, reproduced]" if result.enacted["reproduced"] else " [enacted, NOT REPRODUCED]"
+        )
+        print(f"{result.scenario.scenario_id}:{enacted}")
         for arm in result.arms:
             verdict = "-" if arm.check is None else arm.check.verdict
             advisory = (

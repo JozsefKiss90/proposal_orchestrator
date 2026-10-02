@@ -19,13 +19,13 @@
       "purpose": "The partner's declared participation status moves to Confirmed.",
       "outcome": "recorded",
       "expectation_met": true,
-      "sandbox_snapshot_id": "sha256:ceef9a2340a3c5c5dade29f2e41341d330b26968e73d87d5ab499de02c756c95",
+      "sandbox_snapshot_id": "sha256:86cc36b821b728f1745825611de42ffe7884cf89e29ecc3d69d4dffabeb5e5f7",
       "refusal": null,
       "change": {
         "change_id": "gap_partner_confirmed__a1_confirm_participation",
         "record_path": "docs/tier3_project_instantiation/consortium/partners.json",
-        "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
-        "after_snapshot_id": "sha256:ceef9a2340a3c5c5dade29f2e41341d330b26968e73d87d5ab499de02c756c95",
+        "before_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+        "after_snapshot_id": "sha256:86cc36b821b728f1745825611de42ffe7884cf89e29ecc3d69d4dffabeb5e5f7",
         "nodes_added": [],
         "nodes_removed": [],
         "nodes_changed": [
@@ -52,7 +52,7 @@
       },
       "advisory": {
         "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/gap_partner_confirmed/a1_confirm_participation/plan.json",
-        "plan_id": "sha256:ee3cb680a03319e156d42fd17d3b6c4a018f27f41bf2f98709008eb7b153a7f6",
+        "plan_id": "sha256:d1167fad29d5bc183e1e51a0133b458ccfd0da14d6aee5f153d42d3018fb4701",
         "nothing_changed": false,
         "origins": [
           "P07"
@@ -99,7 +99,7 @@
       "purpose": "The uncertainty ledger is not one of the five records the change recorder covers, so the declaration leaving it is invisible to the planner. The operator must carry that half.",
       "outcome": "refused",
       "expectation_met": true,
-      "sandbox_snapshot_id": "sha256:ceef9a2340a3c5c5dade29f2e41341d330b26968e73d87d5ab499de02c756c95",
+      "sandbox_snapshot_id": "sha256:86cc36b821b728f1745825611de42ffe7884cf89e29ecc3d69d4dffabeb5e5f7",
       "refusal": {
         "kind": "malformed_request",
         "offender": "docs/tier3_project_instantiation/working_assumptions.json",
@@ -111,7 +111,7 @@
       "shadow_comparisons": []
     }
   ],
-  "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+  "before_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
   "contract": {
     "contract_id": "confirmation",
     "permitted_change_classes": [
@@ -127,5 +127,6 @@
     ],
     "unresolved_items": []
   },
-  "arms_matched_expectations": true
+  "arms_matched_expectations": true,
+  "enacted": null
 }

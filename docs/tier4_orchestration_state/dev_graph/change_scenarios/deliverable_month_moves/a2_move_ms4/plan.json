@@ -1,0 +1,328 @@
+{
+  "schema_id": "orch.dev_graph.impact_plan.v1",
+  "plan_id": "sha256:0ba55f7af0f1f7109a37e6a08fae0c7c17f1f8ce9756a207de2e74cf3ee6fb06",
+  "advisory": true,
+  "mode": "shadow",
+  "change_id": "deliverable_month_moves__a2_move_ms4",
+  "before_snapshot_id": "sha256:8a5b3907430795f7c3a6ee512ac7094a88291dcd51ebbad4371b7619ea82c9df",
+  "after_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+  "run_records_hash": "sha256:8585e269ac49ecb65d3a463257649c632f6714e526f752394235ba75231fb24f",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+  "max_depth": 4,
+  "nothing_changed": false,
+  "change_set": {
+    "nodes": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        {
+          "id": "MS4",
+          "type": "milestone",
+          "before_version": "sha256:bdfb0f6ac6f0ffa67b34cf04a1823bc9ba027e8e305c46e66e136b30ed20da20",
+          "after_version": "sha256:40e734fc8be378c339db94922b4a3af9f58b49a9486f9fd4071993e326b24227",
+          "kind": "direct",
+          "changed_fields": [
+            "due_month"
+          ]
+        }
+      ]
+    },
+    "edges": {
+      "added": [],
+      "removed": []
+    }
+  },
+  "origins": [
+    "MS4"
+  ],
+  "entries": [
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.excellence_section",
+      "path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "hit": "transitive",
+      "action": "reuse-under-policy",
+      "reason_path": [
+        "changed:MS4",
+        "D6.1 -validated_by-> MS4",
+        "T6.1 -produces-> D6.1",
+        "T6.1 -assigned_to-> P03",
+        "input_of:proposal_sections.excellence_section"
+      ],
+      "detail": "inputs hit: P03, P07, P08"
+    },
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.impact_section",
+      "path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "hit": "transitive",
+      "action": "reuse-under-policy",
+      "reason_path": [
+        "changed:MS4",
+        "D3.2 -validated_by-> MS4",
+        "input_of:proposal_sections.impact_section"
+      ],
+      "detail": "inputs hit: D3.1, D3.2, D3.3, D3.4, D5.3, D6.1, D6.2, D6.3, P03, P04, P07, P08, P10, WP1, WP3, WP5, WP7"
+    },
+    {
+      "kind": "artifact",
+      "id": "proposal_sections.implementation_section",
+      "path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "hit": "direct",
+      "action": "rerun",
+      "reason_path": [
+        "changed:MS4",
+        "input_of:proposal_sections.implementation_section"
+      ],
+      "detail": "inputs hit: D3.1, D3.2, D3.3, D3.4, D5.3, D6.1, D6.2, D6.3, MS2, MS4, MS5, MS6, MS8, O2, O3, O5, P01, P02, P03, P04, P07, P08, P09, P10, P11, P12, T1.1, T1.2, T1.3, T1.4, T1.5, T2.1, T2.2, T2.3, T2.5, T3.1, T3.2, T3.3, T3.4, T3.5, T3.6, T4.1, T4.2, T4.3, T4.4, T4.5, T5.1, T5.2, T5.3, T5.4, T6.1, T6.2, T6.3, T6.4, T6.5, T7.1, T7.2, T7.3, T7.4, T7.5, WP1, WP2, WP3, WP4, WP5, WP6, WP7"
+    },
+    {
+      "kind": "check",
+      "id": "phase1_call_analysis.gate_01_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_01_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase1_call_analysis.gate_01_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase1_call_analysis.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase1_call_analysis.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase2_concept_refinement.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase2_concept_refinement.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase3_wp_design.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase3_wp_design.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase4_gantt_milestones.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase4_gantt_milestones.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase5_impact_architecture.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase5_impact_architecture.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase6_implementation_architecture.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase6_implementation_architecture.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase7_budget_gate.gate_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase7_budget_gate.gate_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10a_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10a_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10a_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10b_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10b_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10b_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10c_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10c_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10c_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_10d_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_10d_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_11_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_11_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "check",
+      "id": "phase8_drafting_review.gate_12_result",
+      "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_12_result.json",
+      "hit": "coverage_unknown",
+      "action": "rerun",
+      "reason_path": [
+        "coverage_unknown:phase8_drafting_review.gate_12_result"
+      ],
+      "detail": "no declared inputs"
+    },
+    {
+      "kind": "record",
+      "id": "MS4",
+      "type": "milestone",
+      "version": "sha256:40e734fc8be378c339db94922b4a3af9f58b49a9486f9fd4071993e326b24227",
+      "hit": "origin",
+      "action": "reconsider",
+      "reason_path": [
+        "changed:MS4"
+      ],
+      "detail": ""
+    }
+  ],
+  "newly_relevant_sources": [
+    {
+      "id": "SRC-COPERNICUS",
+      "version": "sha256:369f53f9b287a9739d756dc20e12d80e4ef9d53827cc434f50ba5e3658979ca0",
+      "reason_path": [
+        "changed:MS4",
+        "D6.1 -validated_by-> MS4",
+        "WP6 -produces-> D6.1",
+        "WP6 -constrained_by-> SRC-COPERNICUS"
+      ]
+    },
+    {
+      "id": "SRC-EOSC",
+      "version": "sha256:b35c93537aa73b00e3395ed5397492d9604dc1582feda61163e9a85d3606e008",
+      "reason_path": [
+        "changed:MS4",
+        "D3.2 -validated_by-> MS4",
+        "WP3 -produces-> D3.2",
+        "WP3 -constrained_by-> SRC-EOSC"
+      ]
+    },
+    {
+      "id": "SRC-EUNIS",
+      "version": "sha256:36c08650f07b0565566dfb76e7fa5e2ce03d4995758254972c1c95da012edf1d",
+      "reason_path": [
+        "changed:MS4",
+        "D3.2 -validated_by-> MS4",
+        "WP3 -produces-> D3.2",
+        "WP3 -constrained_by-> SRC-EUNIS"
+      ]
+    },
+    {
+      "id": "SRC-FAIR",
+      "version": "sha256:7aff19b54765cd6407ab8ec27dc339d4333b90d15c78261aa46616e0de231dde",
+      "reason_path": [
+        "changed:MS4",
+        "D3.2 -validated_by-> MS4",
+        "WP3 -produces-> D3.2",
+        "WP3 -constrained_by-> SRC-FAIR"
+      ]
+    },
+    {
+      "id": "SRC-GET",
+      "version": "sha256:a334e5f6691ebad8c0f057489df78d5af02d36270312513970e543291023413a",
+      "reason_path": [
+        "changed:MS4",
+        "D3.2 -validated_by-> MS4",
+        "WP3 -produces-> D3.2",
+        "WP3 -constrained_by-> SRC-GET"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P74",
+      "version": "sha256:7d3075fe8de12c0396ec55c58c40010b69cbebb80791c8f2e2c569ca916d9a69",
+      "reason_path": [
+        "changed:MS4",
+        "D6.1 -validated_by-> MS4",
+        "WP6 -produces-> D6.1",
+        "WP6 -constrained_by-> SRC-WP9-P74"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P75",
+      "version": "sha256:5d2ed5a56a6962a29c79daf15ee0b87879ee727e0d27ce2967648a0a178a93ca",
+      "reason_path": [
+        "changed:MS4",
+        "D3.2 -validated_by-> MS4",
+        "WP3 -produces-> D3.2",
+        "WP3 -constrained_by-> SRC-WP9-P75"
+      ]
+    },
+    {
+      "id": "SRC-WP9-P76",
+      "version": "sha256:b180ea022d36ebb206d1927fe1b45cae27092f88849123b50562db95d6e3d2a6",
+      "reason_path": [
+        "changed:MS4",
+        "D3.2 -validated_by-> MS4",
+        "WP3 -produces-> D3.2",
+        "WP3 -constrained_by-> SRC-WP9-P76"
+      ]
+    }
+  ]
+}

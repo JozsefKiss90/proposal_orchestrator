@@ -10,6 +10,7 @@ here dispatches a phase, evaluates a gate or writes reuse metadata.
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import shutil
 from pathlib import Path
@@ -19,21 +20,30 @@ import pytest
 
 from runner.dev_graph.builder import build_snapshot
 from runner.dev_graph.documents import import_document
-from runner.dev_graph.impact import plan_identity
+from runner.dev_graph.changes import read_record_version, record_change
+from runner.dev_graph.impact import IMPACT_PLANS_REL, plan_identity
 from runner.dev_graph.scenarios import (
+    ENACTMENT_SCHEMA_ID,
+    RERUN_SCHEMA_ID,
     SCENARIO_SCHEMA_ID,
     SCENARIOS_REL,
     Arm,
     Scenario,
     ScenarioResult,
     apply_transform,
+    enact_scenario,
+    enactment_rel,
     materialise_sandbox,
+    read_enactment,
+    read_reruns,
+    record_rerun,
+    rerun_rel,
     run_scenario,
     shadow_label,
     write_scenario_records,
 )
 from runner.dev_graph.schema import DevGraphError
-from runner.dev_graph.shadow import DIAGNOSTICS
+from runner.dev_graph.shadow import DIAGNOSTICS, SHADOW_COMPARISONS_REL
 from runner.paths import find_repo_root
 
 FIXTURE = find_repo_root() / "tests" / "fixtures" / "dev_graph_synthetic"
@@ -862,3 +872,551 @@ class TestTransformRegistry:
 
         assert exc.value.kind == "malformed_request"
         assert "rewrite_everything" in str(exc.value)
+
+
+# ---------------------------------------------------------------------------
+# Enacting a scenario on the world itself (subticket B)
+# ---------------------------------------------------------------------------
+
+MILESTONES = "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+
+
+def _deliverable(content: dict, deliverable_id: str) -> dict:
+    return next(
+        d
+        for wp in content["work_packages"]
+        for d in wp["deliverables"]
+        if d["deliverable_id"] == deliverable_id
+    )
+
+
+def _timing_scenario() -> Scenario:
+    """D1.1 moves one month past MS1, and MS1 follows it.
+
+    The fixture mirrors the demo: the deliverable is due in the month the
+    milestone checks it, so the first arm alone leaves the milestone stale
+    and the second arm is what the world's own timing rule requires.
+    """
+    return Scenario(
+        scenario_id="deliverable_and_milestone_move",
+        title="A deliverable and the milestone that checks it move together",
+        purpose="Two timing changes, two records, one enactment.",
+        contract={
+            "contract_id": "timing",
+            "permitted_change_classes": ["timing"],
+            "protected_node_ids": ["OBJ-1", "OBJ-2"],
+        },
+        arms=(
+            Arm(
+                arm_id="a1_move_d1_1",
+                kind="change",
+                record_path=WP_SEED,
+                transform="move_deliverable_due_month",
+                args={"deliverable_id": "D1.1", "to_month": 19},
+                expects="recorded",
+                purpose="The deliverable moves past its milestone.",
+            ),
+            Arm(
+                arm_id="a2_move_ms1",
+                kind="change",
+                record_path=MILESTONES,
+                transform="move_milestone_due_month",
+                args={"milestone_id": "MS1", "to_month": 19},
+                expects="recorded",
+                purpose="The milestone is not due before what it gathers.",
+            ),
+        ),
+    )
+
+
+def _protected_scenario() -> Scenario:
+    return Scenario(
+        scenario_id="protected_objective",
+        title="A work package starts serving a protected objective",
+        purpose="Rejected by the contract.",
+        contract={
+            "contract_id": "objective_protected",
+            "permitted_change_classes": ["contribution"],
+            "protected_node_ids": ["OBJ-1"],
+        },
+        arms=(
+            Arm(
+                arm_id="a1",
+                kind="change",
+                record_path=WP_SEED,
+                transform="add_work_package_objective",
+                args={"wp_id": "WP1", "objective_id": "OBJ-1"},
+                expects="recorded",
+                purpose="Names the protected objective.",
+            ),
+        ),
+    )
+
+
+class TestMoveMilestoneDueMonth:
+    def test_moves_the_month(self, world: Path) -> None:
+        content = _read(world, MILESTONES)
+
+        out = apply_transform(
+            "move_milestone_due_month", content, {"milestone_id": "MS1", "to_month": 20}
+        )
+
+        assert out["milestones"][0]["due_month"] == 20
+        assert content["milestones"][0]["due_month"] == 18
+
+    def test_refuses_a_month_the_milestone_already_holds(self, world: Path) -> None:
+        with pytest.raises(DevGraphError) as exc:
+            apply_transform(
+                "move_milestone_due_month",
+                _read(world, MILESTONES),
+                {"milestone_id": "MS1", "to_month": 18},
+            )
+
+        assert exc.value.kind == "malformed_request"
+        assert exc.value.offender == "MS1"
+
+    def test_refuses_an_unknown_milestone(self, world: Path) -> None:
+        with pytest.raises(DevGraphError) as exc:
+            apply_transform(
+                "move_milestone_due_month",
+                _read(world, MILESTONES),
+                {"milestone_id": "MS9", "to_month": 20},
+            )
+
+        assert exc.value.kind == "malformed_request"
+
+
+class TestMaterialiseSandboxFromArchivedVersions:
+    """A sandbox can start from the world as it was before a recorded change."""
+
+    def test_the_sandbox_starts_from_the_archived_version(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        new = apply_transform(
+            "move_milestone_due_month",
+            _read(planning_world, MILESTONES),
+            {"milestone_id": "MS1", "to_month": 30},
+        )
+        record = record_change(planning_world, MILESTONES, new, change_id="ms1_moves")
+
+        sandbox = materialise_sandbox(
+            planning_world,
+            tmp_path / "sandbox",
+            record_versions={MILESTONES: record.before_record_version},
+            expected_snapshot_id=record.before_snapshot_id,
+        )
+
+        assert sandbox.snapshot.snapshot_id == record.before_snapshot_id
+        assert _read(sandbox.root, MILESTONES)["milestones"][0]["due_month"] == 18
+        assert _read(planning_world, MILESTONES)["milestones"][0]["due_month"] == 30
+
+    def test_refuses_when_the_versions_do_not_build_the_expected_snapshot(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        new = apply_transform(
+            "move_milestone_due_month",
+            _read(planning_world, MILESTONES),
+            {"milestone_id": "MS1", "to_month": 30},
+        )
+        record = record_change(planning_world, MILESTONES, new, change_id="ms1_moves")
+
+        with pytest.raises(DevGraphError) as exc:
+            materialise_sandbox(
+                planning_world,
+                tmp_path / "sandbox",
+                record_versions={MILESTONES: record.before_record_version},
+                expected_snapshot_id="sha256:" + "0" * 64,
+            )
+
+        assert exc.value.kind == "malformed_request"
+
+    def test_refuses_a_version_the_world_does_not_hold(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        with pytest.raises(DevGraphError) as exc:
+            materialise_sandbox(
+                planning_world,
+                tmp_path / "sandbox",
+                record_versions={MILESTONES: "sha256:" + "1" * 64},
+                expected_snapshot_id="sha256:" + "2" * 64,
+            )
+
+        assert exc.value.kind == "malformed_request"
+        assert not (tmp_path / "sandbox").exists()
+
+    def test_refuses_archived_versions_without_the_snapshot_they_build(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        # The live id is never what archived versions build, so the call
+        # would always refuse later for the wrong reason.
+        with pytest.raises(DevGraphError) as exc:
+            materialise_sandbox(
+                planning_world,
+                tmp_path / "sandbox",
+                record_versions={MILESTONES: "sha256:" + "1" * 64},
+            )
+
+        assert exc.value.kind == "malformed_request"
+        assert "expected_snapshot_id" in str(exc.value)
+
+
+class TestEnactScenario:
+    """The one route by which a scenario leaves the sandbox."""
+
+    def test_records_every_arm_on_the_world_and_archives_the_prior_versions(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        enactment = enact_scenario(
+            planning_world, _timing_scenario(), sandbox_dir=tmp_path / "sandbox"
+        )
+
+        assert _deliverable(_read(planning_world, WP_SEED), "D1.1")["due_month"] == 19
+        assert _read(planning_world, MILESTONES)["milestones"][0]["due_month"] == 19
+        first, second = enactment.arms
+        before_wp = read_record_version(planning_world, first["before_record_version"])
+        before_ms = read_record_version(planning_world, second["before_record_version"])
+        assert _deliverable(before_wp, "D1.1")["due_month"] == 18
+        assert before_ms["milestones"][0]["due_month"] == 18
+        assert enactment.before_snapshot_id == first["before_snapshot_id"]
+        assert first["after_snapshot_id"] == second["before_snapshot_id"]
+        assert enactment.after_snapshot_id == second["after_snapshot_id"]
+        assert build_snapshot(planning_world).snapshot_id == enactment.after_snapshot_id
+
+    def test_writes_an_immutable_record_beside_the_scenario(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        enactment = enact_scenario(
+            planning_world, _timing_scenario(), sandbox_dir=tmp_path / "sandbox"
+        )
+
+        assert enactment.path == enactment_rel("deliverable_and_milestone_move")
+        doc = _read(planning_world, enactment.path)
+        assert doc["schema_id"] == ENACTMENT_SCHEMA_ID
+        assert doc["scenario_id"] == "deliverable_and_milestone_move"
+        assert [a["change_id"] for a in doc["arms"]] == [
+            "deliverable_and_milestone_move__a1_move_d1_1",
+            "deliverable_and_milestone_move__a2_move_ms1",
+        ]
+        assert [a["contract_verdict"] for a in doc["arms"]] == ["accepted", "accepted"]
+        for arm in doc["arms"]:
+            assert (planning_world / arm["change_record"]).is_file()
+        assert read_enactment(planning_world, "deliverable_and_milestone_move") == enactment
+        assert read_enactment(planning_world, "never_enacted") is None
+
+    def test_each_arm_has_a_plan_at_the_canonical_path_and_a_verdict_per_node(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        from runner.phase8_reuse import REUSE_ELIGIBLE_NODES
+
+        enactment = enact_scenario(
+            planning_world, _timing_scenario(), sandbox_dir=tmp_path / "sandbox"
+        )
+
+        for arm in enactment.arms:
+            plan_path = planning_world / arm["plan"]
+            assert arm["plan"].startswith(IMPACT_PLANS_REL + "/")
+            assert plan_path.is_file()
+            plan = json.loads(plan_path.read_text(encoding="utf-8-sig"))
+            assert plan["plan_id"] == arm["plan_id"]
+            assert plan["change_id"] == arm["change_id"]
+            assert set(arm["scheduler_verdicts"]) == set(REUSE_ELIGIBLE_NODES)
+            assert set(arm["scheduler_verdicts"].values()) <= {"reuse", "rerun"}
+
+    def test_refuses_a_scenario_whose_arm_the_contract_does_not_accept(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        content = _read(planning_world, WP_SEED)
+        content["work_packages"][0]["objectives"] = ["OBJ-2"]
+        (planning_world / WP_SEED).write_text(json.dumps(content), encoding="utf-8")
+        before = _tree(planning_world)
+
+        with pytest.raises(DevGraphError) as exc:
+            enact_scenario(
+                planning_world, _protected_scenario(), sandbox_dir=tmp_path / "sandbox"
+            )
+
+        assert exc.value.kind == "malformed_request"
+        assert "rejected" in str(exc.value)
+        assert _tree(planning_world) == before
+
+    def test_refuses_a_scenario_with_a_refusal_probe(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        scenario = Scenario(
+            scenario_id="probe",
+            title="A probe",
+            purpose="Not enactable.",
+            contract={
+                "contract_id": "timing",
+                "permitted_change_classes": ["timing"],
+                "protected_node_ids": [],
+            },
+            arms=(
+                Arm(
+                    arm_id="a1",
+                    kind="refusal_probe",
+                    record_path=PARTNERS,
+                    transform="remove_partner",
+                    args={"partner_id": "P01"},
+                    expects="dangling_edge",
+                    purpose="Expected to refuse.",
+                ),
+            ),
+        )
+        before = _tree(planning_world)
+
+        with pytest.raises(DevGraphError) as exc:
+            enact_scenario(planning_world, scenario, sandbox_dir=tmp_path / "sandbox")
+
+        assert exc.value.kind == "malformed_request"
+        assert _tree(planning_world) == before
+
+    def test_refuses_a_scenario_with_no_arm(self, planning_world: Path, tmp_path: Path) -> None:
+        scenario = dataclasses.replace(_timing_scenario(), arms=())
+        before = _tree(planning_world)
+
+        with pytest.raises(DevGraphError) as exc:
+            enact_scenario(planning_world, scenario, sandbox_dir=tmp_path / "sandbox")
+
+        assert exc.value.kind == "malformed_request"
+        assert _tree(planning_world) == before
+
+    def test_a_failure_on_a_later_arm_names_the_change_records_already_on_the_world(
+        self, planning_world: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import runner.dev_graph.scenarios as scenarios_module
+
+        real = scenarios_module.write_impact_plan
+        calls: list[str] = []
+
+        def failing_second(root: Path, change_id: str | None = None) -> list[Path]:
+            calls.append(str(change_id))
+            if len(calls) == 2:
+                raise DevGraphError("malformed_request", str(change_id), "planner down")
+            return real(root, change_id=change_id)
+
+        monkeypatch.setattr(scenarios_module, "write_impact_plan", failing_second)
+
+        with pytest.raises(DevGraphError) as exc:
+            enact_scenario(planning_world, _timing_scenario(), sandbox_dir=tmp_path / "sandbox")
+
+        assert exc.value.kind == "malformed_request"
+        assert "partial enactment" in str(exc.value)
+        assert "deliverable_and_milestone_move__a1_move_d1_1" in str(exc.value)
+        assert read_enactment(planning_world, "deliverable_and_milestone_move") is None
+        # The first arm is on the world, as the message says.
+        assert _deliverable(_read(planning_world, WP_SEED), "D1.1")["due_month"] == 19
+        assert _read(planning_world, MILESTONES)["milestones"][0]["due_month"] == 19
+
+    def test_refuses_to_enact_a_scenario_twice(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        enact_scenario(planning_world, _timing_scenario(), sandbox_dir=tmp_path / "one")
+        before = _tree(planning_world)
+
+        with pytest.raises(DevGraphError) as exc:
+            enact_scenario(planning_world, _timing_scenario(), sandbox_dir=tmp_path / "two")
+
+        assert exc.value.kind == "immutable_record"
+        assert _tree(planning_world) == before
+
+
+class TestRunScenarioOverAnEnactedScenario:
+    """An enacted scenario is replayed from the archived versions."""
+
+    def test_replays_from_the_archived_versions_and_reproduces_the_change(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        enactment = enact_scenario(
+            planning_world, _timing_scenario(), sandbox_dir=tmp_path / "enact"
+        )
+
+        result = run_scenario(
+            planning_world, _timing_scenario(), tmp_path / "replay", enactment=enactment
+        )
+
+        assert result.before_snapshot_id == enactment.before_snapshot_id
+        assert result.arms_matched_expectations is True
+        assert [a.change["after_snapshot_id"] for a in result.arms if a.change] == [
+            arm["after_snapshot_id"] for arm in enactment.arms
+        ]
+        doc = result.to_dict()
+        assert doc["enacted"]["path"] == enactment.path
+        assert doc["enacted"]["before_snapshot_id"] == enactment.before_snapshot_id
+        assert doc["enacted"]["after_snapshot_id"] == enactment.after_snapshot_id
+        assert doc["enacted"]["reproduced"] is True
+        assert doc["enacted"]["reruns"] == []
+
+    def test_without_the_enactment_the_scenario_no_longer_runs_on_the_moved_world(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        # The point of the replay: once the change is on the world, the
+        # scripted arm finds nothing to change and refuses.
+        enact_scenario(planning_world, _timing_scenario(), sandbox_dir=tmp_path / "enact")
+
+        result = run_scenario(planning_world, _timing_scenario(), tmp_path / "plain")
+
+        assert result.arms[0].outcome == "refused"
+        assert result.arms_matched_expectations is False
+
+    def test_a_scenario_that_is_not_enacted_records_no_enactment(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        result = run_scenario(planning_world, _move_t03(), tmp_path / "sandbox")
+
+        assert result.to_dict()["enacted"] is None
+
+    def test_an_enactment_the_replay_does_not_reproduce_is_reported(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        enactment = enact_scenario(
+            planning_world, _timing_scenario(), sandbox_dir=tmp_path / "enact"
+        )
+        tampered_arms = list(enactment.arms)
+        tampered_arms[-1] = {**tampered_arms[-1], "after_snapshot_id": "sha256:" + "f" * 64}
+        tampered = dataclasses.replace(
+            enactment, arms=tuple(tampered_arms), after_snapshot_id="sha256:" + "f" * 64
+        )
+
+        result = run_scenario(
+            planning_world, _timing_scenario(), tmp_path / "replay", enactment=tampered
+        )
+
+        assert result.to_dict()["enacted"]["reproduced"] is False
+        assert result.arms_matched_expectations is False
+
+    def test_the_index_names_the_enactment(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        enactment = enact_scenario(
+            planning_world, _timing_scenario(), sandbox_dir=tmp_path / "enact"
+        )
+        results = [
+            run_scenario(
+                planning_world, _timing_scenario(), tmp_path / "replay", enactment=enactment
+            ),
+            run_scenario(planning_world, _move_t03(), tmp_path / "other"),
+        ]
+
+        written = write_scenario_records(tmp_path / "out", results)
+
+        index = json.loads(
+            next(p for p in written if p.name == "index.json").read_text(encoding="utf-8")
+        )
+        assert [s["enacted"] for s in index["scenarios"]] == [enactment.path, None]
+
+
+class TestRecordRerun:
+    """The operator's rerun, compared against every arm's advisory."""
+
+    def _enacted(self, planning_world: Path, tmp_path: Path):
+        return enact_scenario(
+            planning_world, _timing_scenario(), sandbox_dir=tmp_path / "enact"
+        )
+
+    def test_compares_each_arm_plan_against_the_run_and_writes_the_record(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        self._enacted(planning_world, tmp_path)
+
+        path = record_rerun(planning_world, "deliverable_and_milestone_move", RUN_WITH_DECISION)
+
+        assert path == rerun_rel("deliverable_and_milestone_move", RUN_WITH_DECISION)
+        doc = _read(planning_world, path)
+        assert doc["schema_id"] == RERUN_SCHEMA_ID
+        assert doc["run_id"] == RUN_WITH_DECISION
+        assert [c["arm_id"] for c in doc["comparisons"]] == ["a1_move_d1_1", "a2_move_ms1"]
+        for comparison in doc["comparisons"]:
+            assert comparison["refused"] is None
+            assert comparison["diagnostic"] in DIAGNOSTICS
+            assert comparison["comparison"].startswith(SHADOW_COMPARISONS_REL + "/")
+            assert (planning_world / comparison["comparison"]).is_file()
+        assert doc["investigation"] is None
+
+    def test_lists_every_planner_narrower_row_for_investigation(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        self._enacted(planning_world, tmp_path)
+        doc = _read(
+            planning_world,
+            record_rerun(
+                planning_world,
+                "deliverable_and_milestone_move",
+                RUN_WITH_DECISION,
+                investigation="looked at",
+            ),
+        )
+
+        narrower = [
+            {"arm_id": c["arm_id"], **row}
+            for c in doc["comparisons"]
+            for row in c["rows"]
+            if row["diagnostic"] == "planner_narrower"
+        ]
+        assert doc["planner_narrower_rows"] == narrower
+        assert doc["investigation"] == "looked at"
+
+    def test_a_run_with_no_decision_is_recorded_as_a_refusal(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        self._enacted(planning_world, tmp_path)
+
+        doc = _read(
+            planning_world,
+            record_rerun(planning_world, "deliverable_and_milestone_move", RUN_WITHOUT_DECISION),
+        )
+
+        for comparison in doc["comparisons"]:
+            assert comparison["diagnostic"] is None
+            assert comparison["comparison"] is None
+            assert comparison["refused"]["kind"] == "no_reuse_decision"
+        assert doc["planner_narrower_rows"] == []
+
+    def test_refuses_without_an_enactment(self, planning_world: Path) -> None:
+        with pytest.raises(DevGraphError) as exc:
+            record_rerun(planning_world, "deliverable_and_milestone_move", RUN_WITH_DECISION)
+
+        assert exc.value.kind == "malformed_request"
+
+    def test_refuses_the_same_run_twice_and_records_another_run_beside_it(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        # A run that could only be refused must not lock out the run that can
+        # be compared: one immutable record per run id.
+        self._enacted(planning_world, tmp_path)
+        record_rerun(planning_world, "deliverable_and_milestone_move", RUN_WITHOUT_DECISION)
+
+        with pytest.raises(DevGraphError) as exc:
+            record_rerun(planning_world, "deliverable_and_milestone_move", RUN_WITHOUT_DECISION)
+        assert exc.value.kind == "immutable_record"
+
+        record_rerun(planning_world, "deliverable_and_milestone_move", RUN_WITH_DECISION)
+        reruns = read_reruns(planning_world, "deliverable_and_milestone_move")
+        assert [r["run_id"] for r in reruns] == sorted([RUN_WITH_DECISION, RUN_WITHOUT_DECISION])
+
+    def test_refuses_a_run_id_that_is_not_a_plain_identifier(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        self._enacted(planning_world, tmp_path)
+
+        with pytest.raises(DevGraphError) as exc:
+            record_rerun(planning_world, "deliverable_and_milestone_move", "bad id")
+
+        assert exc.value.kind == "malformed_request"
+        assert read_reruns(planning_world, "deliverable_and_milestone_move") == []
+
+    def test_the_scenario_record_carries_the_rerun(
+        self, planning_world: Path, tmp_path: Path
+    ) -> None:
+        enactment = self._enacted(planning_world, tmp_path)
+        record_rerun(planning_world, "deliverable_and_milestone_move", RUN_WITH_DECISION)
+
+        result = run_scenario(
+            planning_world, _timing_scenario(), tmp_path / "replay", enactment=enactment
+        )
+
+        (rerun,) = result.to_dict()["enacted"]["reruns"]
+        assert rerun["path"] == rerun_rel("deliverable_and_milestone_move", RUN_WITH_DECISION)
+        assert rerun["run_id"] == RUN_WITH_DECISION
+        assert len(rerun["diagnostics"]) == 2
+        assert set(rerun["diagnostics"]) <= DIAGNOSTICS

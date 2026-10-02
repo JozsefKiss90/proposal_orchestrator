@@ -1,0 +1,175 @@
+{
+  "schema_id": "orch.dev_graph.record_version.v1",
+  "path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+  "content_version": "sha256:8bdfbb7baa1e072a4d86b632a53e11e0e33996eed684ce9dbeb41d9457acea5b",
+  "content": {
+    "_provenance": {
+      "record_type": "tier3_milestones_seed",
+      "collection_key": "milestones",
+      "authority": [
+        "CLAUDE.md §5 Tier 3, §7 Phase 4, §12.2 status categories, §13.3 no fabricated project facts"
+      ],
+      "source": [
+        "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+        "docs/tier3_project_instantiation/project_brief/concept_note.md"
+      ],
+      "baseline_record": "docs/tier4_orchestration_state/decision_log/demo-architecture-seeds_2026-09-30.json",
+      "schema_ref": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml -> tier3_source_schemas.milestones_seed: milestone_id, title, due_month, verifiable_criterion.",
+      "field_mapping": "'deliverables' is additive to the declared schema. runner/dev_graph/builder.py reads it and writes a deliverable -> validated_by -> milestone edge, which is how a milestone gathers evidence from more than one work package.",
+      "scope_note": "Eight milestones. The verifiable criterion here names the evidence that must exist; Phase 4 assigns the responsible party and reconciles the criterion with the finished Gantt (CLAUDE.md §7 Phase 4)."
+    },
+    "spine_status": "pseudonymous_demo",
+    "milestones": [
+      {
+        "milestone_id": "MS1",
+        "title": "Knowledge gaps prioritised",
+        "due_month": 9,
+        "verifiable_criterion": "The gap analysis is delivered and names, in priority order, the biodiversity knowledge gaps the three cases will address and the data each one needs.",
+        "deliverables": [
+          "D2.1"
+        ],
+        "linked_work_packages": [
+          "WP2"
+        ],
+        "responsible_partner": "P11",
+        "validation_status": "Assumed",
+        "source_ref": "Call extract $.scope_requirements[1]; span SRC-WP9-P75#336-417"
+      },
+      {
+        "milestone_id": "MS2",
+        "title": "Architecture and joint protocols agreed",
+        "due_month": 16,
+        "verifiable_criterion": "The integration architecture, the case selection and the joint collection, metadata and processing protocols are all delivered, and every partner running a campaign has adopted the protocol in writing.",
+        "deliverables": [
+          "D1.1",
+          "D2.2",
+          "D2.3",
+          "D3.1"
+        ],
+        "linked_work_packages": [
+          "WP1",
+          "WP2",
+          "WP3"
+        ],
+        "responsible_partner": "P10",
+        "validation_status": "Assumed",
+        "note": "The gate before any campaign starts. A case run under a protocol that changes later produces data the other two cases cannot join."
+      },
+      {
+        "milestone_id": "MS3",
+        "title": "All three campaigns running under the joint protocol",
+        "due_month": 22,
+        "verifiable_criterion": "The terrestrial, freshwater and marine campaigns have each collected at least one field round, the omics sampling protocol is delivered, and the reporting-needs assessment states what the outputs must carry.",
+        "deliverables": [
+          "D1.2",
+          "D5.1",
+          "D7.1"
+        ],
+        "linked_work_packages": [
+          "WP1",
+          "WP5",
+          "WP7"
+        ],
+        "responsible_partner": "P03",
+        "validation_status": "Assumed"
+      },
+      {
+        "milestone_id": "MS4",
+        "title": "Training resource documented and the crosswalks published",
+        "due_month": 28,
+        "verifiable_criterion": "The training and validation resource is published with its split protocol, and the crosswalk package resolves every habitat label the project uses to the European classification and the global typology.",
+        "deliverables": [
+          "D3.2",
+          "D6.1"
+        ],
+        "linked_work_packages": [
+          "WP3",
+          "WP6"
+        ],
+        "responsible_partner": "P12",
+        "validation_status": "Assumed"
+      },
+      {
+        "milestone_id": "MS5",
+        "title": "Omics layer joined to the observation record",
+        "due_month": 38,
+        "verifiable_criterion": "The molecular dataset, the genome-to-space linkage report and the processing pipeline release are delivered, and a molecular record can be joined to an in-situ and a satellite record through the published metadata.",
+        "deliverables": [
+          "D3.3",
+          "D5.2",
+          "D5.3"
+        ],
+        "linked_work_packages": [
+          "WP3",
+          "WP5"
+        ],
+        "responsible_partner": "P09",
+        "validation_status": "Assumed"
+      },
+      {
+        "milestone_id": "MS6",
+        "title": "Three realms delivered and the models benchmarked",
+        "due_month": 38,
+        "verifiable_criterion": "The three case datasets are delivered under one protocol, and the classification models report benchmark scores on each of them under the declared split.",
+        "deliverables": [
+          "D4.1",
+          "D4.2",
+          "D4.3",
+          "D6.2"
+        ],
+        "linked_work_packages": [
+          "WP4",
+          "WP6"
+        ],
+        "responsible_partner": "P02",
+        "validation_status": "Assumed",
+        "note": "The second scope requirement is answered here or not at all. Each realm rests on one partner, so losing P07 or P08 removes a realm rather than delaying it."
+      },
+      {
+        "milestone_id": "MS7",
+        "title": "Cross-case verification complete and the indicators released",
+        "due_month": 40,
+        "verifiable_criterion": "The verification report states which harmonisation decisions survived transfer between realms and which did not, and the indicator decision-support release is available to the user network.",
+        "deliverables": [
+          "D4.4",
+          "D7.2"
+        ],
+        "linked_work_packages": [
+          "WP4",
+          "WP7"
+        ],
+        "responsible_partner": "P03",
+        "validation_status": "Assumed"
+      },
+      {
+        "milestone_id": "MS8",
+        "title": "European coverage delivered and the exploitation route settled",
+        "due_month": 48,
+        "verifiable_criterion": "The European-scale maps and trend predictions are published with stated uncertainty, the usability evaluation is reported, and the exploitation plan names the route each output takes after the project.",
+        "deliverables": [
+          "D1.3",
+          "D3.4",
+          "D6.3",
+          "D7.3",
+          "D7.4"
+        ],
+        "linked_work_packages": [
+          "WP1",
+          "WP3",
+          "WP6",
+          "WP7"
+        ],
+        "responsible_partner": "P01",
+        "validation_status": "Assumed"
+      }
+    ],
+    "cross_work_package_note": "Seven of the eight milestones gather deliverables from more than one work package. That is what makes a milestone a synchronisation point rather than a work package's own end date, and it is what the shadow impact planner has to propagate across when a deliverable moves.",
+    "field_status": {
+      "milestones": "Assumed. Derived from the work package schedule, which rests on the operator's duration choice.",
+      "verifiable_criteria": "Assumed. Phase 4 confirms each criterion against the finished Gantt and assigns the responsible party formally.",
+      "responsible_partner": "Assumed. Every partner's participation is Assumed."
+    },
+    "authored_by": "Ticket 'Architecture seeds and the uncertainty ledger', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-30.",
+    "note": "Every deliverable of workpackage_seed.json is gathered by exactly one milestone, and no milestone falls before a deliverable it gathers. Checked by tests/test_demo_architecture_seeds.py."
+  }
+}

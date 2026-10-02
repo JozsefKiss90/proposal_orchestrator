@@ -1,0 +1,65 @@
+{
+  "report_id": "demo-change-scenarios-subticket-b_2026-10-02",
+  "report_kind": "scenario_enactment_validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two)",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "authority": [
+    "CLAUDE.md §12.1 to §12.4 (reviewability, the four status categories, a missing input is a failure not a fabrication) and §15 (explicit failure over fabricated completion).",
+    "§9.1 and §9.5: the prior version of each changed Tier 3 record is archived by content hash under Tier 4, and the enactment is replayed from those versions on every run of the scenario tool, so what this report says is re-derived rather than carried.",
+    "Proposal_Engine_Operator_Manual.md §3.1 (the freeze rule; the freeze is superseded by a new entry) and §5.1 (the refine cycle, whose guarantees are met through the change recorder because this instance has no vault).",
+    "§17.1, §17.6.2: no gate was evaluated, no phase dispatched, the scheduler untouched.",
+    "Subticket B of the ticket 'Change scenarios and shadow comparison' in plans/dev_graph_demo_tickets.md supplies the five acceptance boxes."
+  ],
+  "question_asked": "Does the Tier 3 record carry a new version with the prior version intact; does the scenario record name the before and after snapshot ids; is the rerun dispatched under a plain run id with reuse decisions in its manifest; does the comparison for the enacted scenario report a diagnostic; and is any planner_narrower result investigated?",
+  "answer": "Two of five met, three open. The scenario deliverable_month_moves is enacted on the world through the dev-graph change recorder as two changes, because the work plan's own timing rule requires MS4 to follow D3.2: both Tier 3 records carry a new version and their prior versions are archived and readable. The scenario record names the before snapshot sha256:706fe54f… and the after snapshot sha256:68c0a8b7…, which is the live build, and says the replay from the archived versions reproduced them. The three rerun boxes are the operator's and are not simulated. Before subticket D lands they cannot be met: every Phase 8 fingerprint covers the whole of Tier 3, so a rerun redrafts every section and records no decision, and the comparison refuses with no_reuse_decision.",
+  "acceptance_criteria": {
+    "1_the_tier_3_record_carries_a_new_version_and_the_prior_version_is_intact": "MET for both records the enactment touched. tests/test_demo_change_scenarios.py TestTheEnactment: D3.2 is due in month 29 and MS4 in month 29 on the live records; the archived before versions hold 28 and 28 and hash to the versions the change records name; both change records are approved.",
+    "2_the_scenario_record_names_the_before_and_after_snapshot_ids": "MET. The scenario record's enacted block carries both ids, both are stored snapshots that load under their id, the live build is the after id, and the replay is recorded as reproduced.",
+    "3_the_rerun_is_dispatched_under_a_plain_run_id_and_its_manifest_holds_reuse_decisions": "OPEN (operator act). The entry point refuses a non-plain id since subticket A. The manifest cannot hold a decision before subticket D: the scheduler persists one only on the reuse branch and every candidate is stale after a Tier 3 change.",
+    "4_the_comparison_for_the_enacted_scenario_reports_agreed_planner_narrower_or_planner_broader": "OPEN, blocked by the same fact. The recording tool is in place and tested on a synthetic world with a run that holds a decision and one that does not.",
+    "5_a_planner_narrower_result_if_any_is_investigated_and_the_reason_recorded": "OPEN. Each rerun record (one per run id under reruns/) lists every planner_narrower row and carries the operator's reason once given. The row to expect is n08a_excellence_drafting for arm 1: the advisory asks reuse under policy, the scheduler's fingerprint will say rerun."
+  },
+  "what_was_checked_and_how": {
+    "the_enactment": "tools/enact_demo_change_scenario.py --scenario deliverable_month_moves rehearsed both arms in a sandbox, found both accepted by the timing contract, and recorded them on the world through record_change. The live changes rebuilt the rehearsed snapshots. Two change records, four archived record versions and three stored snapshots were written; the enactment record names them all.",
+    "the_replay": "tools/run_demo_change_scenarios.py was rerun. The enacted scenario's sandbox was materialised from the archived before versions, built the enactment's before snapshot, and both arms rebuilt the enacted after snapshots; the record says reproduced. The six other scenarios ran over the moved world and met their expectations. Both this tool's and tools/build_demo_dev_graph.py's --check modes pass, and tools/derive_dev_graph_run_records.py --check finds the run records unchanged.",
+    "the_freeze": "docs/tier4_orchestration_state/decision_log/demo-tier3-refreeze-deliverable-month-moves_2026-10-02.json supersedes the live freeze record. Its writer re-derived every fingerprint, permitted a change in the two named records and no other, and aborted on an absent change. tests/test_demo_architecture_seeds.py TestTheFreeze resolves the live record through the supersedes chain and finds every fingerprint current.",
+    "the_engine": "tests/runner/test_dev_graph_scenarios.py on the synthetic world: the milestone transform moves and refuses; a sandbox starts from an archived version and refuses a version the world does not hold or an unexpected snapshot; an enactment records every arm, archives the prior versions, writes its plans at the canonical path, refuses a rejected arm, a refusal probe and a second enactment, and writes nothing when it refuses; a replay reproduces the enactment and a tampered enactment is reported, not reproduced; a rerun record compares each arm against a run with a decision and records a refusal against one without.",
+    "the_premise_of_the_open_boxes": "tests/test_demo_change_scenarios.py pins that every reuse-eligible node's fingerprint input list contains docs/tier3_project_instantiation/, which is why a rerun over this change can record no decision before subticket D.",
+    "the_blind_baseline": "Its tests now read the archived snapshot the baseline bound and rebuild the criterion-4 package over a sandbox at that snapshot, so the report keeps being checked against the world it describes. Its F8 package-directory count was re-derived from disk."
+  },
+  "status_summary": {
+    "Confirmed": [
+      "D3.2 is due in month 29 and MS4 in month 29 on the live Tier 3 records; both prior versions are archived and hash to the versions the change records name.",
+      "The scenario record and the enactment record name sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389 as before and sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573 as after; the live build is the after.",
+      "The replay from the archived versions reproduces both enacted snapshots.",
+      "Every Phase 8 drafting node's fingerprint covers docs/tier3_project_instantiation/ whole.",
+      "The scenario tool, the snapshot builder and the run-record deriver reproduce their artifacts byte-equal."
+    ],
+    "Inferred": [
+      "Once subticket D persists not_reused, the comparison for arm 1 will report planner_narrower on n08a_excellence_drafting and agreed on the other two nodes: the advisory reaches n08a transitively and asks reuse under policy, the fingerprint will say rerun."
+    ],
+    "Assumed": [],
+    "Unresolved": [
+      "Boxes 3, 4 and 5: the rerun, its comparison and the investigation of any planner_narrower row. Operator acts, blocked as a matter of fact by subticket D."
+    ]
+  },
+  "findings": [
+    "F1 — the one-record premise fails Tier 3's own timing rule; the enactment is two arms and the contract's blindness to cross-record invariants is a Milestone 2 candidate.",
+    "F2 — a rerun before subticket D records no decision and the comparison refuses; land D first.",
+    "F3 — this instance has no vault; the §5.1 cycle's guarantees are met through the change recorder.",
+    "F4 — the scenario schemas were unregistered since the parent ticket; closed.",
+    "F5 — a third package generation sits beside the first two; nothing prunes.",
+    "F6 — the change recorder versions content, not bytes; the live file is re-serialised and the archive is read back by hash."
+  ],
+  "recorded_in": [
+    "docs/tier4_orchestration_state/decision_log/demo-change-scenarios-subticket-b_2026-10-02.json",
+    "docs/tier4_orchestration_state/decision_log/demo-tier3-refreeze-deliverable-month-moves_2026-10-02.json",
+    "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/enactment.json and scenario.json",
+    "docs/tier4_orchestration_state/dev_graph/changes/, record_versions/, snapshots/, impact_plans/",
+    "docs/index/schema_registry.json; .claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+    "plans/dev_graph_demo_tickets.md, subticket B"
+  ],
+  "authored_by": "Claude Fable 5.1, on operator instruction, 2026-10-02.",
+  "note": "No gate was evaluated and no gate result written (§17.1.4, §17.6.2, §17.6.3). No phase was dispatched. No manifest was edited. The Tier 3 write went through the change recorder on the operator instruction the subticket constitutes."
+}

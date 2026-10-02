@@ -75,9 +75,11 @@ from harness.provenance import ProvenanceLog
 from harness.rubrics import load_profile_bundle
 from runner.dag_scheduler import _HARD_BLOCK_GATE
 from runner.dev_graph import build_snapshot, import_document, read_esr_intake
+from runner.dev_graph.changes import load_snapshot
 from runner.dev_graph.documents import DOCUMENTS_REL, read_document_records
 from runner.dev_graph.packages import PACKAGES_REL, Package
 from runner.dev_graph.policies import HISTORICAL_FEEDBACK_TAGS
+from runner.dev_graph.scenarios import materialise_sandbox, read_enactment, versions_before
 from runner.gate_evaluator import HARD_BLOCK_GATE
 from runner.leakage_scan import iter_scanned_files
 from runner.predicates.file_predicates import dir_non_empty
@@ -104,7 +106,13 @@ MSCA_PROFILE_REL = "harness/profiles/msca_pf_default.json"
 #: the Tier-3-only snapshot at 116 nodes; importing Part B added one
 #: artifact_version, three passages and 147 claims and moved the id.  Writing
 #: the intake still must not move it, which is what the intake test checks.
+#: Subticket B then enacted a change through the change recorder and moved the
+#: live id once more. This is the snapshot the blind baseline bound; it is
+#: archived under dev_graph/snapshots by that enactment and read from there.
 DEMO_SNAPSHOT_ID = "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389"
+
+#: The scenario whose enactment moved the live snapshot off DEMO_SNAPSHOT_ID.
+ENACTED_SCENARIO = "deliverable_month_moves"
 
 #: The document node candidate version 1 landed as.
 DOCUMENT_NODE_ID = "DEMO-BIODIV-2027_part_b@1101b2a653c543a4"
@@ -141,7 +149,26 @@ def manifest() -> dict:
 
 @pytest.fixture(scope="module")
 def demo_snapshot():
-    return build_snapshot(REPO)
+    """The snapshot the blind baseline bound, read from the archive.
+
+    The live build has moved on by one enacted change; what this report's
+    numbers must match is the snapshot they were taken over.
+    """
+    return load_snapshot(REPO, DEMO_SNAPSHOT_ID)
+
+
+def _baseline_world(out: Path) -> Path:
+    """A sandbox at DEMO_SNAPSHOT_ID: the live inputs with the enacted records
+    put back to the versions the change recorder archived."""
+    enactment = read_enactment(REPO, ENACTED_SCENARIO)
+    if enactment is None:
+        return REPO
+    return materialise_sandbox(
+        REPO,
+        out / "world",
+        record_versions=versions_before(enactment),
+        expected_snapshot_id=DEMO_SNAPSHOT_ID,
+    ).root
 
 
 @pytest.fixture(scope="module")
@@ -418,10 +445,10 @@ def candidate_sections(tmp_path_factory):
     """
     out = tmp_path_factory.mktemp("candidate_v1")
     evidence = ba.build_blind_evidence(
-        REPO,
+        _baseline_world(out),
         DOCUMENT_ID,
         profile_version=load_profile_bundle(RIA_PROFILE_REL, repo_root=REPO).version,
-        out_dir=out,
+        out_dir=out / "evidence",
     )
     candidate = ba.load_candidate(
         evidence.candidate_dir,
@@ -499,12 +526,12 @@ def candidate_package():
 
     with tempfile.TemporaryDirectory() as out:
         evidence = ba.build_blind_evidence(
-            REPO,
+            _baseline_world(Path(out)),
             DOCUMENT_ID,
             profile_version=load_profile_bundle(
                 RIA_PROFILE_REL, repo_root=REPO
             ).version,
-            out_dir=Path(out),
+            out_dir=Path(out) / "evidence",
         )
         return evidence.package
 
@@ -523,8 +550,12 @@ class TestTheLeakageGuardIsCleanOnTheDemoWorld:
         assert len(blind_packages) == 3
         assert {p.manifest["task"] for p in blind_packages} == {"T1.1", "T3.1", "T4.1"}
         assert len(stored_packages) > len(live_packages)
+        # The live set binds the live snapshot, which subticket B's enactment
+        # moved off the baseline's; the baseline's own generation is history.
+        live = build_snapshot(REPO).snapshot_id
         for package in live_packages:
-            assert package.manifest["snapshot_id"] == DEMO_SNAPSHOT_ID
+            assert package.manifest["snapshot_id"] == live
+        assert any(p.manifest["snapshot_id"] == DEMO_SNAPSHOT_ID for p in stored_packages)
 
     def test_every_blind_package_passes_the_guard(self, blind_packages):
         for package in blind_packages:

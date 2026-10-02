@@ -494,8 +494,13 @@ def read_impact_request(repo_root: Path) -> str:
     return raw["change_id"]
 
 
-def write_impact_plan(repo_root: Path) -> list[Path]:
+def write_impact_plan(repo_root: Path, change_id: str | None = None) -> list[Path]:
     """Plan the change named by the request and write the advisory plan.
+
+    *change_id* names the change directly; when it is ``None`` the change is
+    the one :data:`IMPACT_REQUEST_REL` names, which is how the registered
+    component is driven. Either way the plan is the same document at the same
+    path.
 
     Returns the one absolute path written. The plan directory is named by
     the first sixteen hex characters of the plan id (as the package writer
@@ -504,7 +509,9 @@ def write_impact_plan(repo_root: Path) -> list[Path]:
     snapshot is missing or malformed.
     """
     root = Path(repo_root)
-    change = read_change_record(root, read_impact_request(root))
+    change = read_change_record(
+        root, read_impact_request(root) if change_id is None else change_id
+    )
     before = load_snapshot(root, change.before_snapshot_id)
     after = load_snapshot(root, change.after_snapshot_id)
     plan = plan_impact(before, after, read_run_records(root), change_id=change.change_id)

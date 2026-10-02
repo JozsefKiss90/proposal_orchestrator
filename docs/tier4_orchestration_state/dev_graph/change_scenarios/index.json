@@ -9,7 +9,8 @@
       "scenario_id": "task_lead_moves",
       "title": "A task's lead moves between two partners",
       "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/task_lead_moves/scenario.json",
-      "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "before_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+      "enacted": null,
       "arms_matched_expectations": true,
       "arms": [
         {
@@ -29,7 +30,8 @@
       "scenario_id": "gap_partner_withdraws",
       "title": "An Assumed gap partner withdraws before confirmation",
       "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/gap_partner_withdraws/scenario.json",
-      "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "before_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+      "enacted": null,
       "arms_matched_expectations": true,
       "arms": [
         {
@@ -68,7 +70,8 @@
       "scenario_id": "gap_partner_confirmed",
       "title": "An Assumed gap partner is confirmed",
       "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/gap_partner_confirmed/scenario.json",
-      "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "before_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+      "enacted": null,
       "arms_matched_expectations": true,
       "arms": [
         {
@@ -96,7 +99,8 @@
       "scenario_id": "claim_loses_its_span",
       "title": "A claim loses its verified source span",
       "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/claim_loses_its_span/scenario.json",
-      "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "before_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+      "enacted": null,
       "arms_matched_expectations": true,
       "arms": [
         {
@@ -116,7 +120,8 @@
       "scenario_id": "tier2b_fact_changes",
       "title": "A Tier 2B fact changes",
       "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/tier2b_fact_changes/scenario.json",
-      "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "before_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+      "enacted": null,
       "arms_matched_expectations": true,
       "arms": [
         {
@@ -145,6 +150,7 @@
       "title": "A deliverable's month moves across a milestone",
       "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/scenario.json",
       "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "enacted": "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/enactment.json",
       "arms_matched_expectations": true,
       "arms": [
         {
@@ -157,6 +163,17 @@
             "refused:no_reuse_decision",
             "refused:no_reuse_decision"
           ]
+        },
+        {
+          "arm_id": "a2_move_ms4",
+          "outcome": "recorded",
+          "expectation_met": true,
+          "contract_verdict": "accepted",
+          "advisory": "docs/tier4_orchestration_state/dev_graph/change_scenarios/deliverable_month_moves/a2_move_ms4/plan.json",
+          "shadow_diagnostics": [
+            "refused:no_reuse_decision",
+            "refused:no_reuse_decision"
+          ]
         }
       ]
     },
@@ -164,7 +181,8 @@
       "scenario_id": "protected_objective_probe",
       "title": "A change that touches a protected objective",
       "path": "docs/tier4_orchestration_state/dev_graph/change_scenarios/protected_objective_probe/scenario.json",
-      "before_snapshot_id": "sha256:706fe54fd85ebda600d70b02c80ce6ca1e12e2697b373a45cf730ef03504e389",
+      "before_snapshot_id": "sha256:68c0a8b75235fe00649de7c56a08b18d151edbda0fd5921656473aef2f64d573",
+      "enacted": null,
       "arms_matched_expectations": true,
       "arms": [
         {

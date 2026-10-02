@@ -20,6 +20,18 @@ Two properties make a scenario replayable:
   unchanged, so a scenario can never become a silent no-op and no
   transformation ever invents a partner, a task or a month (§13.3).
 
+One route leads out of the sandbox. :func:`enact_scenario` records a
+scenario's arms on the world itself, through the same change recorder, and
+only after a sandbox run has shown every arm to be a change the contract
+accepts. The prior version of each record is archived by the recorder, the
+enactment is written once beside the scenario, and from then on the scenario
+is replayed from those archived versions (:func:`materialise_sandbox` with
+``record_versions``), so the record on disk keeps reproducing the change the
+world holds. :func:`record_rerun` compares each enacted arm's advisory with
+the reuse decisions of a run the operator dispatched afterwards, one immutable
+record per run id, so a run that could only be refused does not stand in the
+way of the one that can be compared.
+
 Constitutional authority:
     Subordinate to CLAUDE.md. Evaluates no gate, invokes no Claude, invents
     no facts (§13.3). The scenario catalogue — which records, which ids —
@@ -37,8 +49,18 @@ from typing import Any, Callable, Mapping
 
 from runner.atomic_write import atomic_write_json
 from runner.dev_graph.builder import Snapshot, build_snapshot
-from runner.dev_graph.changes import ChangeRecord, load_snapshot, record_change
-from runner.dev_graph.impact import ImpactPlan, plan_impact, read_run_records
+from runner.dev_graph.changes import (
+    ChangeRecord,
+    load_snapshot,
+    read_record_version,
+    record_change,
+)
+from runner.dev_graph.impact import (
+    ImpactPlan,
+    plan_impact,
+    read_run_records,
+    write_impact_plan,
+)
 from runner.dev_graph.revisions import (
     ContractCheck,
     RevisionContract,
@@ -46,10 +68,20 @@ from runner.dev_graph.revisions import (
     normalise_contract,
 )
 from runner.dev_graph.schema import DevGraphError
-from runner.dev_graph.shadow import compare_shadow, read_reuse_decisions
+from runner.dev_graph.shadow import (
+    advisory_verdicts,
+    compare_shadow,
+    read_reuse_decisions,
+    write_shadow_comparison,
+)
+from runner.run_context import RUN_ID_RULE, is_plain_run_id
 
 SCENARIO_SCHEMA_ID = "orch.dev_graph.change_scenario.v1"
 SCENARIO_INDEX_SCHEMA_ID = "orch.dev_graph.change_scenario_index.v1"
+#: Written once when a scenario's arms are recorded on the world itself.
+ENACTMENT_SCHEMA_ID = "orch.dev_graph.scenario_enactment.v1"
+#: Written once per dispatched run when it is compared with the enacted arms.
+RERUN_SCHEMA_ID = "orch.dev_graph.scenario_rerun.v1"
 
 _DEV_GRAPH = "docs/tier4_orchestration_state/dev_graph"
 #: One directory per scenario: its record, and one advisory per recorded arm.
@@ -69,6 +101,13 @@ def _arg(args: Mapping[str, Any], key: str, transform: str) -> str:
     if not isinstance(value, str) or not value:
         raise _refuse(transform, f"{transform}: argument {key!r} must be a non-empty string")
     return value
+
+
+def _month_arg(args: Mapping[str, Any], transform: str) -> int:
+    to_month = args.get("to_month")
+    if not isinstance(to_month, int) or isinstance(to_month, bool) or to_month < 1:
+        raise _refuse(transform, f"{transform}: argument 'to_month' must be a month number")
+    return to_month
 
 
 def _tasks(content: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -253,12 +292,7 @@ def move_deliverable_due_month(
 ) -> dict[str, Any]:
     """Move the deliverable ``deliverable_id`` to month ``to_month``."""
     deliverable_id = _arg(args, "deliverable_id", "move_deliverable_due_month")
-    to_month = args.get("to_month")
-    if not isinstance(to_month, int) or isinstance(to_month, bool) or to_month < 1:
-        raise _refuse(
-            "move_deliverable_due_month",
-            "move_deliverable_due_month: argument 'to_month' must be a month number",
-        )
+    to_month = _month_arg(args, "move_deliverable_due_month")
     out = copy.deepcopy(dict(content))
     found = next(
         (
@@ -275,6 +309,28 @@ def move_deliverable_due_month(
         raise _refuse(
             deliverable_id,
             f"{deliverable_id} is already due in month {to_month}; the arm would change nothing",
+        )
+    found["due_month"] = to_month
+    return out
+
+
+def move_milestone_due_month(
+    content: Mapping[str, Any], args: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Move the milestone ``milestone_id`` to month ``to_month``.
+
+    The milestone record's own change. A deliverable that moves past the
+    milestone that gathers it leaves the milestone due before what it
+    checks; this is the arm that follows it.
+    """
+    milestone_id = _arg(args, "milestone_id", "move_milestone_due_month")
+    to_month = _month_arg(args, "move_milestone_due_month")
+    out = copy.deepcopy(dict(content))
+    found = _entry(out, "milestones", "milestone_id", milestone_id)
+    if found.get("due_month") == to_month:
+        raise _refuse(
+            milestone_id,
+            f"{milestone_id} is already due in month {to_month}; the arm would change nothing",
         )
     found["due_month"] = to_month
     return out
@@ -302,6 +358,7 @@ TRANSFORMS: Mapping[str, Transform] = {
     "add_work_package_objective": add_work_package_objective,
     "drop_source_span": drop_source_span,
     "move_deliverable_due_month": move_deliverable_due_month,
+    "move_milestone_due_month": move_milestone_due_month,
     "move_task_responsibility": move_task_responsibility,
     "release_partner_from_work_plan": release_partner_from_work_plan,
     "remove_partner": remove_partner,
@@ -342,7 +399,13 @@ class Sandbox:
     inputs: tuple[str, ...]
 
 
-def materialise_sandbox(repo_root: Path | str, dest: Path | str) -> Sandbox:
+def materialise_sandbox(
+    repo_root: Path | str,
+    dest: Path | str,
+    *,
+    record_versions: Mapping[str, str] | None = None,
+    expected_snapshot_id: str | None = None,
+) -> Sandbox:
     """Copy *repo_root*'s snapshot inputs into *dest* and build there.
 
     The copy covers exactly the files the snapshot declares as its inputs,
@@ -350,12 +413,28 @@ def materialise_sandbox(repo_root: Path | str, dest: Path | str) -> Sandbox:
     arm is anchored to the real world rather than to a reduction of it.
     That equality is checked, not assumed.
 
+    *record_versions* (``{record path: archived content version}``) starts
+    the sandbox from the world as it was before a recorded change: each
+    named record is replaced by the version the change recorder archived
+    under :data:`runner.dev_graph.changes.RECORD_VERSIONS_REL`, and the
+    sandbox must then build *expected_snapshot_id* (the change's before
+    snapshot) rather than the live id. This is how an enacted scenario is
+    replayed over the world it was enacted on.
+
     Raises :class:`DevGraphError` with kind ``malformed_request`` when the
-    source world declares no inputs, when *dest* already holds records, or
-    when the copy does not reproduce the source snapshot id.
+    source world declares no inputs, when *dest* already holds records, when
+    *record_versions* is given without *expected_snapshot_id* (the live id
+    can never be what archived versions build), when an archived version is
+    not held, or when the copy does not reproduce the expected snapshot id.
     """
     source = Path(repo_root)
     target = Path(dest)
+    if record_versions and expected_snapshot_id is None:
+        raise _refuse(
+            target.as_posix(),
+            "record_versions name the world before a change; pass the expected_snapshot_id "
+            "that world builds",
+        )
     live = build_snapshot(source)
     if not live.inputs:
         raise _refuse(
@@ -363,16 +442,25 @@ def materialise_sandbox(repo_root: Path | str, dest: Path | str) -> Sandbox:
         )
     if target.exists() and any(target.rglob("*")):
         raise _refuse(target.as_posix(), f"{target.as_posix()} is not an empty sandbox")
+    # Read every archived version before writing anything, so a version the
+    # world does not hold refuses with an empty sandbox behind it.
+    archived = {
+        rel: read_record_version(source, version)
+        for rel, version in sorted((record_versions or {}).items())
+    }
     for rel in live.inputs:
         out = target / rel
         out.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source / rel, out)
+    for rel, content in archived.items():
+        atomic_write_json(content, target / rel)
+    expected = live.snapshot_id if expected_snapshot_id is None else expected_snapshot_id
     built = build_snapshot(target)
-    if built.snapshot_id != live.snapshot_id:
+    if built.snapshot_id != expected:
         raise _refuse(
             target.as_posix(),
-            f"the sandbox builds {built.snapshot_id} but {source.as_posix()} "
-            f"builds {live.snapshot_id}",
+            f"the sandbox builds {built.snapshot_id} but was expected to build {expected}"
+            + ("" if expected_snapshot_id is not None else f" ({source.as_posix()}'s own)"),
         )
     return Sandbox(
         root=target, snapshot=built, source_root=source, inputs=tuple(live.inputs)
@@ -547,6 +635,9 @@ class ScenarioResult:
     before_snapshot_id: str
     contract: RevisionContract
     arms: tuple[ArmResult, ...]
+    enacted: dict[str, Any] | None = None
+    """What the record says about the enactment this run replayed, or
+    ``None`` for a scenario the world does not hold."""
 
     @property
     def arms_matched_expectations(self) -> bool:
@@ -555,9 +646,11 @@ class ScenarioResult:
         This says nothing about whether a ticket criterion is met. An arm
         that refused exactly as expected matched its expectation, and a
         scenario can match every one of them while the question it was run
-        to answer stays open.
+        to answer stays open. A replay of an enacted scenario that does not
+        reproduce the enacted snapshots did not do what was declared either.
         """
-        return all(a.expectation_met for a in self.arms)
+        reproduced = self.enacted is None or self.enacted["reproduced"]
+        return reproduced and all(a.expectation_met for a in self.arms)
 
     def to_dict(self) -> dict[str, Any]:
         sid = self.scenario.scenario_id
@@ -567,6 +660,7 @@ class ScenarioResult:
             "before_snapshot_id": self.before_snapshot_id,
             "contract": self.contract.to_dict(),
             "arms_matched_expectations": self.arms_matched_expectations,
+            "enacted": dict(self.enacted) if self.enacted is not None else None,
             "arms": [a.to_dict(sid) for a in self.arms],
         }
 
@@ -696,12 +790,19 @@ def run_scenario(
     *,
     run_ids: tuple[str, ...] = (),
     run_records: list[dict[str, Any]] | None = None,
+    enactment: Enactment | None = None,
 ) -> ScenarioResult:
     """Run the arms of *scenario* in a sandbox over *repo_root*, in order.
 
     *repo_root* is read and never written: the records change in the
     sandbox, while the run records and the run manifests are read from the
     real world.
+
+    With *enactment*, the sandbox starts from the archived versions the
+    enactment names rather than from the live records, and the result says
+    whether the replay reproduced the enacted snapshots arm for arm. Without
+    it, a scenario the world already holds finds nothing to change and its
+    arms refuse, which is reported as an unmet expectation.
 
     An arm whose expectation is not met is reported, not raised, so one
     surprising arm does not hide the arms after it. Raises
@@ -710,7 +811,15 @@ def run_scenario(
     """
     root = Path(repo_root)
     contract = normalise_contract(dict(scenario.contract))
-    sandbox = materialise_sandbox(root, sandbox_dir)
+    if enactment is None:
+        sandbox = materialise_sandbox(root, sandbox_dir)
+    else:
+        sandbox = materialise_sandbox(
+            root,
+            sandbox_dir,
+            record_versions=versions_before(enactment),
+            expected_snapshot_id=enactment.before_snapshot_id,
+        )
     results = [
         _run_arm(
             root,
@@ -728,7 +837,347 @@ def run_scenario(
         before_snapshot_id=sandbox.snapshot.snapshot_id,
         contract=contract,
         arms=tuple(results),
+        enacted=None if enactment is None else _enacted_summary(root, enactment, results),
     )
+
+
+def versions_before(enactment: Enactment) -> dict[str, str]:
+    """Each touched record's archived version before the first arm that touched it.
+
+    The ``record_versions`` a sandbox needs to start from the world the
+    enactment was made on.
+    """
+    versions: dict[str, str] = {}
+    for arm in enactment.arms:
+        versions.setdefault(arm["record_path"], arm["before_record_version"])
+    return versions
+
+
+def _enacted_summary(
+    repo_root: Path, enactment: Enactment, results: list[ArmResult]
+) -> dict[str, Any]:
+    replayed = [a.change["after_snapshot_id"] if a.change else None for a in results]
+    enacted = [arm["after_snapshot_id"] for arm in enactment.arms]
+    return {
+        "path": enactment.path,
+        "before_snapshot_id": enactment.before_snapshot_id,
+        "after_snapshot_id": enactment.after_snapshot_id,
+        "change_ids": [arm["change_id"] for arm in enactment.arms],
+        "reproduced": replayed == enacted,
+        "reruns": [
+            {
+                "path": rerun_rel(enactment.scenario_id, rerun["run_id"]),
+                "run_id": rerun["run_id"],
+                "diagnostics": [shadow_label(c) for c in rerun["comparisons"]],
+                "planner_narrower_rows": len(rerun["planner_narrower_rows"]),
+                "investigated": rerun["investigation"] is not None,
+            }
+            for rerun in read_reruns(repo_root, enactment.scenario_id)
+        ],
+    }
+
+
+# ---------------------------------------------------------------------------
+# Enacting a scenario on the world itself
+# ---------------------------------------------------------------------------
+
+
+def enactment_rel(scenario_id: str) -> str:
+    """Where a scenario's enactment is written, relative to the repo root."""
+    return f"{SCENARIOS_REL}/{scenario_id}/enactment.json"
+
+
+def reruns_rel(scenario_id: str) -> str:
+    """The directory holding one rerun record per dispatched run."""
+    return f"{SCENARIOS_REL}/{scenario_id}/reruns"
+
+
+def rerun_rel(scenario_id: str, run_id: str) -> str:
+    """Where the comparison against *run_id* is written, relative to the repo root."""
+    return f"{reruns_rel(scenario_id)}/{run_id}.json"
+
+
+@dataclass(frozen=True)
+class Enactment:
+    """A scenario recorded on the world itself: one change record per arm."""
+
+    scenario_id: str
+    before_snapshot_id: str
+    after_snapshot_id: str
+    arms: tuple[dict[str, Any], ...]
+    """Per arm, in order: ``arm_id``, ``change_id``, ``change_record``,
+    ``record_path``, the before and after snapshot ids and record versions,
+    ``contract_verdict``, the advisory ``plan`` path and ``plan_id``, and
+    ``scheduler_verdicts`` (what the advisory asks of each reuse-eligible
+    node)."""
+    path: str
+    """Repo-relative POSIX path of the enactment record."""
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_id": ENACTMENT_SCHEMA_ID,
+            "scenario_id": self.scenario_id,
+            "before_snapshot_id": self.before_snapshot_id,
+            "after_snapshot_id": self.after_snapshot_id,
+            "arms": [dict(a) for a in self.arms],
+        }
+
+
+def enact_scenario(
+    repo_root: Path | str,
+    scenario: Scenario,
+    *,
+    sandbox_dir: Path | str,
+    run_records: list[dict[str, Any]] | None = None,
+) -> Enactment:
+    """Record every arm of *scenario* on *repo_root* itself, in order.
+
+    The scenario is first run in a sandbox under *sandbox_dir*. Only when
+    every arm is a change the contract accepts does anything reach the
+    world: each arm's transformation is then applied to the live record
+    through :func:`runner.dev_graph.changes.record_change`, which archives
+    the prior version, stores both snapshots and writes the change record.
+    Each arm's advisory plan is written at its canonical path and the
+    enactment record once beside the scenario.
+
+    Raises :class:`DevGraphError` with kind ``immutable_record`` when the
+    scenario is already enacted, and ``malformed_request`` when the scenario
+    has no arm or an arm is a refusal probe, refused, or not accepted by the
+    contract; nothing is written in those cases.
+
+    The arms are recorded one by one, and each is a change record the moment
+    it is written. Should a later arm fail (``malformed_record`` when the
+    live change does not rebuild the rehearsed snapshot, which the copy
+    rules out, or a plan writer refusal), the arms already recorded stay
+    recorded, no enactment is written, and the error names the change ids
+    on disk so the operator can reconcile them from their archived versions.
+    """
+    root = Path(repo_root)
+    sid = scenario.scenario_id
+    rel = enactment_rel(sid)
+    if (root / rel).is_file():
+        raise DevGraphError("immutable_record", rel, f"scenario {sid} is already enacted")
+    if not scenario.arms:
+        raise _refuse(sid, f"scenario {sid} has no arm to enact")
+
+    rehearsal = run_scenario(root, scenario, sandbox_dir, run_records=run_records)
+    for result in rehearsal.arms:
+        where = f"{sid}/{result.arm.arm_id}"
+        if result.arm.kind != "change":
+            raise _refuse(where, f"arm {where} is a {result.arm.kind}; only a change is enacted")
+        if result.outcome != RECORDED or result.check is None:
+            assert result.refusal is not None
+            raise _refuse(where, f"arm {where} refused in rehearsal: {result.refusal['message']}")
+        if result.check.verdict != "accepted":
+            raise _refuse(
+                where,
+                f"arm {where} is {result.check.verdict} by contract "
+                f"{rehearsal.contract.contract_id}; only an accepted change is enacted",
+            )
+
+    arms: list[dict[str, Any]] = []
+    try:
+        for result in rehearsal.arms:
+            arms.append(_enact_arm(root, sid, result))
+    except DevGraphError as exc:
+        if not arms:
+            raise
+        recorded = ", ".join(a["change_id"] for a in arms)
+        raise DevGraphError(
+            exc.kind,
+            exc.offender,
+            f"{exc} [partial enactment of {sid}: change records {recorded} are on the world "
+            f"and no enactment was written; reconcile them from their archived versions]",
+        ) from exc
+
+    enactment = Enactment(
+        scenario_id=sid,
+        before_snapshot_id=arms[0]["before_snapshot_id"],
+        after_snapshot_id=arms[-1]["after_snapshot_id"],
+        arms=tuple(arms),
+        path=rel,
+    )
+    atomic_write_json(enactment.to_dict(), root / rel)
+    return enactment
+
+
+def _enact_arm(root: Path, sid: str, result: ArmResult) -> dict[str, Any]:
+    """Record one rehearsed arm on the world and plan it."""
+    arm = result.arm
+    assert arm.transform is not None and result.check is not None  # rehearsed by the caller
+    live = json.loads((root / arm.record_path).read_text(encoding="utf-8-sig"))
+    record = record_change(
+        root,
+        arm.record_path,
+        apply_transform(arm.transform, live, arm.args),
+        change_id=f"{sid}__{arm.arm_id}",
+    )
+    rehearsed = result.change["after_snapshot_id"] if result.change else None
+    if record.after_snapshot_id != rehearsed:
+        raise DevGraphError(
+            "malformed_record",
+            record.path,
+            f"the live change builds {record.after_snapshot_id} but the rehearsal built {rehearsed}",
+        )
+    plan_path = write_impact_plan(root, change_id=record.change_id)[0]
+    plan = json.loads(plan_path.read_text(encoding="utf-8-sig"))
+    return {
+        "arm_id": arm.arm_id,
+        "change_id": record.change_id,
+        "change_record": record.path,
+        "record_path": record.record_path,
+        "before_snapshot_id": record.before_snapshot_id,
+        "after_snapshot_id": record.after_snapshot_id,
+        "before_record_version": record.before_record_version,
+        "after_record_version": record.after_record_version,
+        "contract_verdict": result.check.verdict,
+        "plan": plan_path.relative_to(root).as_posix(),
+        "plan_id": plan["plan_id"],
+        "scheduler_verdicts": advisory_verdicts(plan),
+    }
+
+
+def read_enactment(repo_root: Path | str, scenario_id: str) -> Enactment | None:
+    """The enactment of *scenario_id*, or ``None`` when the world holds none.
+
+    Raises :class:`DevGraphError` with kind ``malformed_record`` on a record
+    of another schema or naming another scenario.
+    """
+    root = Path(repo_root)
+    rel = enactment_rel(scenario_id)
+    path = root / rel
+    if not path.is_file():
+        return None
+    doc = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(doc, dict) or doc.get("schema_id") != ENACTMENT_SCHEMA_ID:
+        raise DevGraphError("malformed_record", rel, f"not a {ENACTMENT_SCHEMA_ID} document")
+    if doc.get("scenario_id") != scenario_id:
+        raise DevGraphError(
+            "malformed_record", rel, f"enactment names {doc.get('scenario_id')!r}, not {scenario_id!r}"
+        )
+    arms = doc.get("arms")
+    if not isinstance(arms, list) or not arms or not all(isinstance(a, dict) for a in arms):
+        raise DevGraphError("malformed_record", rel, "enactment holds no arms")
+    return Enactment(
+        scenario_id=scenario_id,
+        before_snapshot_id=str(doc["before_snapshot_id"]),
+        after_snapshot_id=str(doc["after_snapshot_id"]),
+        arms=tuple(dict(a) for a in arms),
+        path=rel,
+    )
+
+
+def read_rerun(repo_root: Path | str, scenario_id: str, run_id: str) -> dict[str, Any] | None:
+    """The recorded comparison of *scenario_id* against *run_id*, or ``None``.
+
+    Raises :class:`DevGraphError` with kind ``malformed_record`` on a record
+    of another schema or naming another scenario or run.
+    """
+    root = Path(repo_root)
+    rel = rerun_rel(scenario_id, run_id)
+    path = root / rel
+    if not path.is_file():
+        return None
+    doc = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(doc, dict) or doc.get("schema_id") != RERUN_SCHEMA_ID:
+        raise DevGraphError("malformed_record", rel, f"not a {RERUN_SCHEMA_ID} document")
+    if doc.get("scenario_id") != scenario_id or doc.get("run_id") != run_id:
+        raise DevGraphError(
+            "malformed_record",
+            rel,
+            f"rerun names {doc.get('scenario_id')!r} against {doc.get('run_id')!r}, "
+            f"not {scenario_id!r} against {run_id!r}",
+        )
+    return doc
+
+
+def read_reruns(repo_root: Path | str, scenario_id: str) -> list[dict[str, Any]]:
+    """Every recorded rerun of *scenario_id*, ordered by run id.
+
+    Run ids carry no order in time; the record itself is the order-free
+    account of what each dispatched run was found to hold.
+    """
+    root = Path(repo_root)
+    directory = root / reruns_rel(scenario_id)
+    if not directory.is_dir():
+        return []
+    reruns = [read_rerun(root, scenario_id, p.stem) for p in sorted(directory.glob("*.json"))]
+    return [r for r in reruns if r is not None]
+
+
+def record_rerun(
+    repo_root: Path | str,
+    scenario_id: str,
+    run_id: str,
+    *,
+    investigation: str | None = None,
+) -> str:
+    """Compare each enacted arm's advisory with the reuse decisions of *run_id*.
+
+    One shadow comparison per arm, written at its canonical path by
+    :func:`runner.dev_graph.shadow.write_shadow_comparison`; a comparison
+    that cannot be made is recorded as a refusal, never as agreement. Every
+    ``planner_narrower`` row is listed for investigation, and
+    *investigation* is the operator's recorded reason once there is one.
+    Returns the repo-relative path of the rerun record, written once per
+    run id: a run that could only be refused stays recorded and does not
+    stand in the way of recording the next run.
+
+    Raises :class:`DevGraphError` with kind ``malformed_request`` when the
+    scenario is not enacted or *run_id* is not a plain identifier (it names
+    the record file), and ``immutable_record`` when that run is already
+    recorded.
+    """
+    root = Path(repo_root)
+    if not is_plain_run_id(run_id):
+        raise _refuse(str(run_id), f"run id {run_id!r} is not a plain identifier: {RUN_ID_RULE}")
+    rel = rerun_rel(scenario_id, run_id)
+    if (root / rel).is_file():
+        raise DevGraphError(
+            "immutable_record", rel, f"the rerun of {scenario_id} against {run_id} is already recorded"
+        )
+    enactment = read_enactment(root, scenario_id)
+    if enactment is None:
+        raise _refuse(enactment_rel(scenario_id), f"scenario {scenario_id} is not enacted")
+
+    comparisons: list[dict[str, Any]] = []
+    for arm in enactment.arms:
+        entry: dict[str, Any] = {
+            "arm_id": arm["arm_id"],
+            "change_id": arm["change_id"],
+            "plan_id": arm["plan_id"],
+            "comparison": None,
+            "diagnostic": None,
+            "rows": [],
+            "refused": None,
+        }
+        try:
+            written = write_shadow_comparison(root, plan_id=arm["plan_id"], run_id=run_id)[0]
+        except DevGraphError as exc:
+            entry["refused"] = _refusal(exc)
+        else:
+            comparison = json.loads(written.read_text(encoding="utf-8-sig"))
+            entry["comparison"] = written.relative_to(root).as_posix()
+            entry["diagnostic"] = comparison["diagnostic"]
+            entry["rows"] = list(comparison["rows"])
+        comparisons.append(entry)
+
+    doc = {
+        "schema_id": RERUN_SCHEMA_ID,
+        "scenario_id": scenario_id,
+        "enactment": enactment.path,
+        "run_id": run_id,
+        "comparisons": comparisons,
+        "planner_narrower_rows": [
+            {"arm_id": c["arm_id"], **row}
+            for c in comparisons
+            for row in c["rows"]
+            if row.get("diagnostic") == "planner_narrower"
+        ],
+        "investigation": investigation,
+    }
+    atomic_write_json(doc, root / rel)
+    return rel
 
 
 # ---------------------------------------------------------------------------
@@ -789,6 +1238,7 @@ def write_scenario_records(
                 "title": result.scenario.title,
                 "path": scenario_rel(sid),
                 "before_snapshot_id": result.before_snapshot_id,
+                "enacted": None if result.enacted is None else result.enacted["path"],
                 "arms_matched_expectations": result.arms_matched_expectations,
                 "arms": [
                     {

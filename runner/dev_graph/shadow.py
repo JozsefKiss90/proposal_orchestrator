@@ -194,6 +194,26 @@ def _planner_verdict(plan: Mapping[str, Any], artifact_path: str) -> tuple[str, 
     return "reuse", record_ids, actions, "the advisory retains the result only under an explicit policy"
 
 
+def advisory_verdicts(
+    plan: ImpactPlan | Mapping[str, Any],
+    artifact_paths: Mapping[str, str] | None = None,
+) -> dict[str, str]:
+    """What the advisory asks of the scheduler for each reuse-eligible node.
+
+    ``{node_id: "reuse" | "rerun"}`` over the nodes *artifact_paths* binds
+    (by default the scheduler's own reuse-eligible nodes), read from the plan
+    exactly as :func:`compare_shadow` reads it. This is the planner's half of a
+    comparison on its own, for recording what a rerun would have to dispatch
+    before any run exists to compare against. Raises ``malformed_record`` on
+    a plan of the wrong shape.
+    """
+    plan_doc = _plan_dict(plan)
+    bindings = dict(_default_artifact_paths() if artifact_paths is None else artifact_paths)
+    return {
+        node_id: _planner_verdict(plan_doc, path)[0] for node_id, path in sorted(bindings.items())
+    }
+
+
 def compare_shadow(
     plan: ImpactPlan | Mapping[str, Any],
     reuse_decisions: Mapping[str, Mapping[str, Any]],
@@ -355,8 +375,15 @@ def read_reuse_decisions(repo_root: Path, run_id: str) -> dict[str, Any]:
     return decisions
 
 
-def write_shadow_comparison(repo_root: Path) -> list[Path]:
+def write_shadow_comparison(
+    repo_root: Path, *, plan_id: str | None = None, run_id: str | None = None
+) -> list[Path]:
     """Compare the plan and run named by the request; write the comparison.
+
+    *plan_id* and *run_id* name the pair directly; when both are ``None`` the
+    pair is the one :data:`SHADOW_REQUEST_REL` names, which is how the
+    registered component is driven. Naming only one of the two is a
+    ``malformed_request``.
 
     Returns the one absolute path written. The directory is named by the
     first sixteen hex characters of the comparison id, so the same plan
@@ -365,7 +392,12 @@ def write_shadow_comparison(repo_root: Path) -> list[Path]:
     manifest is missing or malformed.
     """
     root = Path(repo_root)
-    plan_id, run_id = read_shadow_request(root)
+    if (plan_id is None) != (run_id is None):
+        raise _refuse(
+            "malformed_request", SHADOW_REQUEST_REL, "name both plan_id and run_id, or neither"
+        )
+    if plan_id is None or run_id is None:
+        plan_id, run_id = read_shadow_request(root)
     plan = read_plan(root, plan_id)
     comparison = compare_shadow(plan, read_reuse_decisions(root, run_id), run_id=run_id)
     target = root / SHADOW_COMPARISONS_REL / comparison.comparison_id[len(HASH_PREFIX):][:_SHORT_HEX] / "comparison.json"
