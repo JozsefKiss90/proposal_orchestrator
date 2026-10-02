@@ -1,0 +1,562 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/transport/errors.py",
+   "type": "file",
+   "name": "errors.py",
+   "filePath": "runner/transport/errors.py",
+   "summary": "Transport-layer error taxonomy for the OpenAI-compatible backends: an ErrorCategory enum aligned with the SkillResult failure categories, typed exceptions carrying retryability metadata, and an HTTP status-to-exception normalizer.",
+   "tags": [
+    "error-handling",
+    "exception",
+    "taxonomy",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/errors.py:ErrorCategory",
+   "type": "class",
+   "name": "ErrorCategory",
+   "filePath": "runner/transport/errors.py",
+   "lineRange": [
+    24,
+    50
+   ],
+   "summary": "String enum of transport failure categories - rate limited, provider error, auth failure, malformed request, model not found, timeout - each annotated with whether it is retryable.",
+   "tags": [
+    "error-handling",
+    "taxonomy",
+    "enum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/errors.py:OpenAICompatTransportError",
+   "type": "class",
+   "name": "OpenAICompatTransportError",
+   "filePath": "runner/transport/errors.py",
+   "lineRange": [
+    58,
+    78
+   ],
+   "summary": "Base transport exception for OpenAI-compatible backends, carrying its error category, retryability flag and a truncated response body for diagnostics.",
+   "tags": [
+    "error-handling",
+    "exception",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/errors.py:OpenAICompatAuthError",
+   "type": "class",
+   "name": "OpenAICompatAuthError",
+   "filePath": "runner/transport/errors.py",
+   "lineRange": [
+    81,
+    82
+   ],
+   "summary": "Raised on HTTP 401/403 or an AWS access-denied error; non-retryable.",
+   "tags": [
+    "error-handling",
+    "exception",
+    "authentication"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/errors.py:OpenAICompatRateLimitError",
+   "type": "class",
+   "name": "OpenAICompatRateLimitError",
+   "filePath": "runner/transport/errors.py",
+   "lineRange": [
+    85,
+    86
+   ],
+   "summary": "Raised on HTTP 429 or a provider throttling exception; retryable.",
+   "tags": [
+    "error-handling",
+    "exception",
+    "rate-limiting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/errors.py:OpenAICompatProviderError",
+   "type": "class",
+   "name": "OpenAICompatProviderError",
+   "filePath": "runner/transport/errors.py",
+   "lineRange": [
+    89,
+    90
+   ],
+   "summary": "Raised on provider-side 5xx, service-unavailable or internal-failure responses; retryable.",
+   "tags": [
+    "error-handling",
+    "exception",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/errors.py:OpenAICompatTimeoutError",
+   "type": "class",
+   "name": "OpenAICompatTimeoutError",
+   "filePath": "runner/transport/errors.py",
+   "lineRange": [
+    93,
+    94
+   ],
+   "summary": "Raised when a provider request exceeds its timeout.",
+   "tags": [
+    "error-handling",
+    "exception",
+    "timeout-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/errors.py:OpenAICompatModelNotFoundError",
+   "type": "class",
+   "name": "OpenAICompatModelNotFoundError",
+   "filePath": "runner/transport/errors.py",
+   "lineRange": [
+    97,
+    98
+   ],
+   "summary": "Raised on HTTP 404 or a missing-resource error naming an unknown model; non-retryable.",
+   "tags": [
+    "error-handling",
+    "exception",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/errors.py:normalize_http_error",
+   "type": "function",
+   "name": "normalize_http_error",
+   "filePath": "runner/transport/errors.py",
+   "lineRange": [
+    118,
+    155
+   ],
+   "summary": "Maps an HTTP status code and response body onto a typed transport exception carrying its category and retryability metadata.",
+   "tags": [
+    "error-handling",
+    "http",
+    "classification"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/transport/openai_compatible.py",
+   "type": "file",
+   "name": "openai_compatible.py",
+   "filePath": "runner/transport/openai_compatible.py",
+   "summary": "HTTP backend implementing the ToolLoopBackend protocol by POSTing to any OpenAI Chat Completions endpoint - used for Bedrock via bedrock-mantle, Together AI and Ollama. Requires httpx, which the config factory imports lazily.",
+   "tags": [
+    "transport",
+    "backend",
+    "http-client",
+    "adapter",
+    "llm-invocation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:runner/transport/openai_compatible.py:OpenAICompatBackend",
+   "type": "class",
+   "name": "OpenAICompatBackend",
+   "filePath": "runner/transport/openai_compatible.py",
+   "lineRange": [
+    48,
+    253
+   ],
+   "summary": "Callable backend that builds the chat-completions payload, posts it with httpx, normalizes HTTP errors into the shared taxonomy, and extracts the message text, tool calls and token usage.",
+   "tags": [
+    "transport",
+    "http-client",
+    "adapter",
+    "error-handling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/transport/tool_executor.py",
+   "type": "file",
+   "name": "tool_executor.py",
+   "filePath": "runner/transport/tool_executor.py",
+   "summary": "Local Read/Glob tool executor that emulates the file access Claude Code provides natively, for non-Claude backends whose tool loop Python must drive. Read-only by construction, with path authorisation applied after symlink resolution and every denial returned as a structured tool error.",
+   "tags": [
+    "tool-execution",
+    "security",
+    "sandboxing",
+    "filesystem",
+    "transport"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Containment is checked with Path.resolve() plus Path.relative_to, which is what makes `../` escapes and symlink traversal out of the declared input roots impossible rather than merely detected."
+  },
+  {
+   "id": "class:runner/transport/tool_executor.py:ToolExecutor",
+   "type": "class",
+   "name": "ToolExecutor",
+   "filePath": "runner/transport/tool_executor.py",
+   "lineRange": [
+    165,
+    393
+   ],
+   "summary": "Honours or denies a model's Read/Glob tool calls against the repository root and the skill's declared input prefixes, tracking bytes read and files touched; it exposes no write, edit or delete tool at all.",
+   "tags": [
+    "tool-execution",
+    "security",
+    "sandboxing",
+    "filesystem"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/transport/tool_executor.py:is_within",
+   "type": "function",
+   "name": "is_within",
+   "filePath": "runner/transport/tool_executor.py",
+   "lineRange": [
+    136,
+    152
+   ],
+   "summary": "Returns whether a resolved path lies inside a resolved root - the symlink- and `../`-safe containment check every authorisation path depends on.",
+   "tags": [
+    "security",
+    "path-validation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/transport/tool_loop.py",
+   "type": "file",
+   "name": "tool_loop.py",
+   "filePath": "runner/transport/tool_loop.py",
+   "summary": "Drives the iterative request to tool_calls to execute to re-send cycle for backends without native Read/Glob support, bounded by a max-round limit and deliberately decoupled from any particular HTTP client.",
+   "tags": [
+    "tool-execution",
+    "loop",
+    "tapm",
+    "adapter",
+    "transport"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:runner/transport/tool_loop.py:ToolLoopResponse",
+   "type": "class",
+   "name": "ToolLoopResponse",
+   "filePath": "runner/transport/tool_loop.py",
+   "lineRange": [
+    61,
+    81
+   ],
+   "summary": "Dataclass capturing a loop outcome - the final text, rounds taken, tool calls executed and accumulated token usage.",
+   "tags": [
+    "data-model",
+    "tool-execution",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/tool_loop.py:ToolLoopBackend",
+   "type": "class",
+   "name": "ToolLoopBackend",
+   "filePath": "runner/transport/tool_loop.py",
+   "lineRange": [
+    89,
+    112
+   ],
+   "summary": "Protocol a backend must satisfy to be driven by the tool loop: callable on a message list, returning a response dict.",
+   "tags": [
+    "protocol",
+    "type-definition",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/tool_loop.py:FakeBackend",
+   "type": "class",
+   "name": "FakeBackend",
+   "filePath": "runner/transport/tool_loop.py",
+   "lineRange": [
+    120,
+    155
+   ],
+   "summary": "Test double returning a pre-programmed sequence of responses, including synthetic tool calls, so the loop can be exercised without a live provider.",
+   "tags": [
+    "test-double",
+    "testing",
+    "tool-execution"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/tool_loop.py:run_tool_loop",
+   "type": "function",
+   "name": "run_tool_loop",
+   "filePath": "runner/transport/tool_loop.py",
+   "lineRange": [
+    163,
+    284
+   ],
+   "summary": "Runs the tool-call loop against a backend callable, executing each honoured Read/Glob call through the sandboxed executor, injecting structured errors for unknown tool names or malformed arguments, and stopping after max_rounds to bound runaway model behaviour.",
+   "tags": [
+    "tool-execution",
+    "loop",
+    "fail-closed",
+    "transport"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:ErrorCategory",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:ErrorCategory",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatTransportError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatTransportError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatAuthError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatAuthError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatRateLimitError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatRateLimitError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatProviderError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatProviderError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatTimeoutError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatTimeoutError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatModelNotFoundError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "class:runner/transport/errors.py:OpenAICompatModelNotFoundError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "function:runner/transport/errors.py:normalize_http_error",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/errors.py",
+   "target": "function:runner/transport/errors.py:normalize_http_error",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/openai_compatible.py",
+   "target": "class:runner/transport/openai_compatible.py:OpenAICompatBackend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/openai_compatible.py",
+   "target": "class:runner/transport/openai_compatible.py:OpenAICompatBackend",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/tool_executor.py",
+   "target": "class:runner/transport/tool_executor.py:ToolExecutor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/tool_executor.py",
+   "target": "class:runner/transport/tool_executor.py:ToolExecutor",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/tool_executor.py",
+   "target": "function:runner/transport/tool_executor.py:is_within",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/tool_executor.py",
+   "target": "function:runner/transport/tool_executor.py:is_within",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "class:runner/transport/tool_loop.py:ToolLoopResponse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "class:runner/transport/tool_loop.py:ToolLoopResponse",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "class:runner/transport/tool_loop.py:ToolLoopBackend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "class:runner/transport/tool_loop.py:ToolLoopBackend",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "class:runner/transport/tool_loop.py:FakeBackend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "class:runner/transport/tool_loop.py:FakeBackend",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "function:runner/transport/tool_loop.py:run_tool_loop",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "function:runner/transport/tool_loop.py:run_tool_loop",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/openai_compatible.py",
+   "target": "file:runner/transport/errors.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/transport/tool_loop.py",
+   "target": "file:runner/transport/tool_executor.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "class:runner/transport/openai_compatible.py:OpenAICompatBackend",
+   "target": "function:runner/transport/errors.py:normalize_http_error",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/transport/tool_loop.py:run_tool_loop",
+   "target": "class:runner/transport/tool_executor.py:ToolExecutor",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

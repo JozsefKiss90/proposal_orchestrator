@@ -1,0 +1,1470 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/predicates/gate_pass_predicates.py",
+   "type": "file",
+   "name": "gate_pass_predicates.py",
+   "filePath": "runner/predicates/gate_pass_predicates.py",
+   "summary": "Verifies an upstream gate result exists at its canonical path, declares the required schema_id, records status pass, belongs to the current run and is fresh with respect to its upstream inputs - where freshness is decided by content fingerprint, with file mtime used only as a trigger (ST-1).",
+   "tags": [
+    "predicate",
+    "gate-freshness",
+    "upstream-verification",
+    "fingerprint"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/predicates/phase8_section_predicates.py",
+   "type": "file",
+   "name": "phase8_section_predicates.py",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "summary": "Deterministic preflight checks over Phase 8 section drafts that catch stale run_ids, partner-name conflation, deliverable identity corruption, canonical-term drift and lost measurable targets before the cross-section gate runs.",
+   "tags": [
+    "predicate",
+    "phase8",
+    "drift-detection",
+    "text-analysis"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Deliberately fails only on contradictory explicit attachments, never on merely absent context, so ID-only prose references stay legal."
+  },
+  {
+   "id": "file:runner/predicates/schema_predicates.py",
+   "type": "file",
+   "name": "schema_predicates.py",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "summary": "The largest predicate module: field-presence and canonical-shape checks over artifacts, including instrument/schema agreement, lump-sum interface-contract conformance, unit-cost budget resolution, risk register, ethics and governance completeness, review findings, and checkpoint provenance validation.",
+   "tags": [
+    "predicate",
+    "schema-validation",
+    "budget-gate",
+    "canonical-fields"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/predicates/scope_coverage_predicates.py",
+   "type": "file",
+   "name": "scope_coverage_predicates.py",
+   "filePath": "runner/predicates/scope_coverage_predicates.py",
+   "summary": "Phase 2 predicate asserting that every mandatory Tier 2B scope requirement has an explicit entry in the concept refinement summary's scope_coverage, replacing a semantic check that could not distinguish 'covered but not logged' from 'not covered'.",
+   "tags": [
+    "predicate",
+    "scope-coverage",
+    "phase2",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/predicates/source_ref_predicates.py",
+   "type": "file",
+   "name": "source_ref_predicates.py",
+   "filePath": "runner/predicates/source_ref_predicates.py",
+   "summary": "Traceability predicates confirming that every extracted Tier 2B fact and every topic mapping entry carries a non-empty source reference; an absent reference in a structurally valid artifact fails as POLICY_VIOLATION.",
+   "tags": [
+    "predicate",
+    "traceability",
+    "source-reference",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/gate_pass_predicates.py:_parse_iso8601",
+   "type": "function",
+   "name": "_parse_iso8601",
+   "filePath": "runner/predicates/gate_pass_predicates.py",
+   "lineRange": [
+    62,
+    80
+   ],
+   "summary": "Parses a gate result's evaluated_at timestamp into an aware datetime, returning None when it is unusable.",
+   "tags": [
+    "parsing",
+    "timestamp",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/gate_pass_predicates.py:_mtime_suspect_inputs",
+   "type": "function",
+   "name": "_mtime_suspect_inputs",
+   "filePath": "runner/predicates/gate_pass_predicates.py",
+   "lineRange": [
+    83,
+    112
+   ],
+   "summary": "Lists the gate's upstream inputs whose mtime is later than its evaluated_at - the trigger set whose content fingerprints are then compared.",
+   "tags": [
+    "gate-freshness",
+    "filesystem",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/gate_pass_predicates.py:_check_continuation_acceptance",
+   "type": "function",
+   "name": "_check_continuation_acceptance",
+   "filePath": "runner/predicates/gate_pass_predicates.py",
+   "lineRange": [
+    115,
+    153
+   ],
+   "summary": "Decides whether a gate result recorded under a different run_id may be accepted as a continuation of the current run.",
+   "tags": [
+    "gate-freshness",
+    "run-ownership",
+    "policy"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/gate_pass_predicates.py:is_gate_fresh",
+   "type": "function",
+   "name": "is_gate_fresh",
+   "filePath": "runner/predicates/gate_pass_predicates.py",
+   "lineRange": [
+    156,
+    258
+   ],
+   "summary": "Judges a gate result fresh or stale by recomputing the content fingerprint of each mtime-suspect upstream input and comparing it with the recorded one, so a touched but unchanged file no longer invalidates a gate (ST-1).",
+   "tags": [
+    "gate-freshness",
+    "content-fingerprint",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/gate_pass_predicates.py:gate_pass_recorded",
+   "type": "function",
+   "name": "gate_pass_recorded",
+   "filePath": "runner/predicates/gate_pass_predicates.py",
+   "lineRange": [
+    261,
+    543
+   ],
+   "summary": "Gate predicate: an upstream gate result must exist at its canonical path, declare the required schema_id and versions, record status pass, belong to this run and be fresh - the mechanism that makes upstream gates mandatory for downstream phases.",
+   "tags": [
+    "predicate",
+    "upstream-verification",
+    "gate-freshness",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_read_json",
+   "type": "function",
+   "name": "_read_json",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    44,
+    85
+   ],
+   "summary": "Defensive JSON reader for Phase 8 section artifacts, returning a categorised failing result rather than raising.",
+   "tags": [
+    "json-parsing",
+    "error-handling",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_is_title_attempt",
+   "type": "function",
+   "name": "_is_title_attempt",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    118,
+    136
+   ],
+   "summary": "Decides whether a found appositive is an attempt at the canonical title, so a genuine paraphrase is flagged while unrelated prose is not.",
+   "tags": [
+    "text-analysis",
+    "drift-detection",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_find_appositives",
+   "type": "function",
+   "name": "_find_appositives",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    146,
+    159
+   ],
+   "summary": "Finds the appositive phrases attached to an entity id in the drafted prose.",
+   "tags": [
+    "text-analysis",
+    "regex",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_appositive_is_other_entity",
+   "type": "function",
+   "name": "_appositive_is_other_entity",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    162,
+    204
+   ],
+   "summary": "Checks whether an appositive attached to one id actually names a different canonical entity, which is the conflation signature the predicate reports.",
+   "tags": [
+    "text-analysis",
+    "drift-detection",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_find_truncated_legal_name",
+   "type": "function",
+   "name": "_find_truncated_legal_name",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    207,
+    222
+   ],
+   "summary": "Detects a partner's legal name rendered in truncated form in the prose.",
+   "tags": [
+    "text-analysis",
+    "consortium",
+    "drift-detection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_check_partner_conflation",
+   "type": "function",
+   "name": "_check_partner_conflation",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    225,
+    250
+   ],
+   "summary": "Checks that a partner's short name and legal name are not swapped or merged with another partner's in the drafted content.",
+   "tags": [
+    "text-analysis",
+    "consortium",
+    "drift-detection"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_extract_attached_wps",
+   "type": "function",
+   "name": "_extract_attached_wps",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    253,
+    269
+   ],
+   "summary": "Extracts the work-package attributions the prose explicitly attaches to a deliverable id.",
+   "tags": [
+    "text-analysis",
+    "deliverables",
+    "extraction"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_extract_attached_months",
+   "type": "function",
+   "name": "_extract_attached_months",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    272,
+    287
+   ],
+   "summary": "Extracts the due months the prose explicitly attaches to a deliverable id.",
+   "tags": [
+    "text-analysis",
+    "deliverables",
+    "extraction"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:no_stale_run_id",
+   "type": "function",
+   "name": "no_stale_run_id",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    295,
+    335
+   ],
+   "summary": "Gate predicate: the section artifact must declare the current run_id, catching a draft carried over from an earlier run.",
+   "tags": [
+    "predicate",
+    "run-ownership",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:partner_names_preserved",
+   "type": "function",
+   "name": "partner_names_preserved",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    343,
+    443
+   ],
+   "summary": "Gate predicate: partner short and legal names in the drafted section must match the canonical pack without conflation or truncation.",
+   "tags": [
+    "predicate",
+    "consortium",
+    "drift-detection",
+    "phase8"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:deliverable_identity_preserved",
+   "type": "function",
+   "name": "deliverable_identity_preserved",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    462,
+    630
+   ],
+   "summary": "Gate predicate: a deliverable referenced in the prose must not be given a contradictory title, work package or due month relative to the canonical pack.",
+   "tags": [
+    "predicate",
+    "deliverables",
+    "drift-detection",
+    "phase8"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:canonical_terms_preserved",
+   "type": "function",
+   "name": "canonical_terms_preserved",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    638,
+    765
+   ],
+   "summary": "Gate predicate: canonical terms from the pack must appear verbatim rather than paraphrased, the check that caught drafters rewriting canonical outcome titles.",
+   "tags": [
+    "predicate",
+    "terminology",
+    "drift-detection",
+    "phase8"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_detect_section_type",
+   "type": "function",
+   "name": "_detect_section_type",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    793,
+    805
+   ],
+   "summary": "Infers which criterion section an artifact path belongs to, so the quantitative checks apply the right expectations.",
+   "tags": [
+    "utility",
+    "phase8",
+    "classification"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:_check_quantitative_components",
+   "type": "function",
+   "name": "_check_quantitative_components",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    808,
+    840
+   ],
+   "summary": "Checks that every numeric component of a measurable target survives in the drafted content.",
+   "tags": [
+    "text-analysis",
+    "metrics",
+    "drift-detection"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/phase8_section_predicates.py:measurable_targets_preserved",
+   "type": "function",
+   "name": "measurable_targets_preserved",
+   "filePath": "runner/predicates/phase8_section_predicates.py",
+   "lineRange": [
+    843,
+    964
+   ],
+   "summary": "Gate predicate: each objective's measurable target must keep its quantitative components in the drafted section, so a number is never softened into prose.",
+   "tags": [
+    "predicate",
+    "metrics",
+    "drift-detection",
+    "phase8"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:_read_json_object",
+   "type": "function",
+   "name": "_read_json_object",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    136,
+    215
+   ],
+   "summary": "Defensive JSON object reader shared by the schema predicates, mapping read and parse problems onto the canonical failure categories.",
+   "tags": [
+    "json-parsing",
+    "error-handling",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:json_field_present",
+   "type": "function",
+   "name": "json_field_present",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    223,
+    282
+   ],
+   "summary": "Gate predicate: the named top-level field must be present and non-empty in the artifact.",
+   "tags": [
+    "predicate",
+    "schema-validation",
+    "field-presence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:json_fields_present",
+   "type": "function",
+   "name": "json_fields_present",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    285,
+    354
+   ],
+   "summary": "Gate predicate: every named field must be present and non-empty, reporting all missing fields at once rather than the first.",
+   "tags": [
+    "predicate",
+    "schema-validation",
+    "field-presence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:instrument_type_matches_schema",
+   "type": "function",
+   "name": "instrument_type_matches_schema",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    357,
+    510
+   ],
+   "summary": "Gate predicate: the instrument declared in the selected call must match the instrument the loaded section schema describes, preventing a proposal drafted against the wrong application form.",
+   "tags": [
+    "predicate",
+    "instrument-schema",
+    "cross-artifact"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:interface_contract_conforms",
+   "type": "function",
+   "name": "interface_contract_conforms",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    513,
+    780
+   ],
+   "summary": "Gate predicate: a received lump-sum budget response must conform to the interface contract, distinguishing a planner-shaped contract from a JSON-Schema-shaped one so a response is validated rather than waved through.",
+   "tags": [
+    "predicate",
+    "budget-gate",
+    "interface-contract",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:risk_register_populated",
+   "type": "function",
+   "name": "risk_register_populated",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    788,
+    889
+   ],
+   "summary": "Gate predicate: the implementation architecture's risk register must carry risks with mitigation measures, not an empty placeholder.",
+   "tags": [
+    "predicate",
+    "risk-register",
+    "implementation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:ethics_assessment_explicit",
+   "type": "function",
+   "name": "ethics_assessment_explicit",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    892,
+    1076
+   ],
+   "summary": "Gate predicate: ethics flags must be explicitly stated rather than omitted, enforcing the Phase 6 rule that silence is not an answer.",
+   "tags": [
+    "predicate",
+    "ethics",
+    "implementation",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:governance_matrix_present",
+   "type": "function",
+   "name": "governance_matrix_present",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1079,
+    1167
+   ],
+   "summary": "Gate predicate: the management structure must declare a decision-making matrix with assigned, non-overlapping roles.",
+   "tags": [
+    "predicate",
+    "governance",
+    "implementation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:no_blocking_inconsistencies",
+   "type": "function",
+   "name": "no_blocking_inconsistencies",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1170,
+    1267
+   ],
+   "summary": "Gate predicate: the artifact must declare no unresolved blocking inconsistency, the honest-failure check that keeps a known contradiction from passing as complete.",
+   "tags": [
+    "predicate",
+    "consistency-check",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:unit_cost_budget_resolved",
+   "type": "function",
+   "name": "unit_cost_budget_resolved",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1270,
+    1367
+   ],
+   "summary": "Gate predicate for unit-cost instruments: every budget component, host-dependent lines included, must resolve to Confirmed or an operator-declared Assumed before the budget gate can pass.",
+   "tags": [
+    "predicate",
+    "budget-gate",
+    "unit-cost",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:budget_gate_confirmation_present",
+   "type": "function",
+   "name": "budget_gate_confirmation_present",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1370,
+    1451
+   ],
+   "summary": "Gate predicate: the Phase 7 budget gate assessment must record its confirmation of receipt and structural consistency, the artifact that unblocks Phase 8.",
+   "tags": [
+    "predicate",
+    "budget-gate",
+    "phase7"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:findings_categorised_by_severity",
+   "type": "function",
+   "name": "findings_categorised_by_severity",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1454,
+    1566
+   ],
+   "summary": "Gate predicate: every review finding must carry a severity category, so a critical finding cannot hide in an uncategorised list.",
+   "tags": [
+    "predicate",
+    "review",
+    "phase8"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:revision_action_list_present",
+   "type": "function",
+   "name": "revision_action_list_present",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1569,
+    1639
+   ],
+   "summary": "Gate predicate: the review packet must carry an actionable revision list rather than prose commentary alone.",
+   "tags": [
+    "predicate",
+    "review",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:all_critical_revisions_resolved",
+   "type": "function",
+   "name": "all_critical_revisions_resolved",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1642,
+    1764
+   ],
+   "summary": "Gate predicate: every revision marked critical must be resolved before the final compliance gate passes.",
+   "tags": [
+    "predicate",
+    "review",
+    "phase8",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:_read_gate_result_json",
+   "type": "function",
+   "name": "_read_gate_result_json",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1767,
+    1781
+   ],
+   "summary": "Reads a gate result JSON file for provenance validation, returning None when it is unreadable.",
+   "tags": [
+    "json-parsing",
+    "gate-results",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:_validate_checkpoint_provenance",
+   "type": "function",
+   "name": "_validate_checkpoint_provenance",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1784,
+    1932
+   ],
+   "summary": "Validates a published checkpoint's provenance quad against the gate results it claims, so a checkpoint cannot assert a pass the gate results do not show.",
+   "tags": [
+    "provenance",
+    "checkpoint",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/schema_predicates.py:checkpoint_published",
+   "type": "function",
+   "name": "checkpoint_published",
+   "filePath": "runner/predicates/schema_predicates.py",
+   "lineRange": [
+    1935,
+    2033
+   ],
+   "summary": "Gate predicate: a durable checkpoint must exist with a valid provenance quad, the cross-run evidence that a validated phase state was actually published.",
+   "tags": [
+    "predicate",
+    "checkpoint",
+    "provenance"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/scope_coverage_predicates.py:_read_json",
+   "type": "function",
+   "name": "_read_json",
+   "filePath": "runner/predicates/scope_coverage_predicates.py",
+   "lineRange": [
+    56,
+    104
+   ],
+   "summary": "Defensive JSON reader for the Phase 2 scope artifacts, returning a categorised failing result on any read or parse problem.",
+   "tags": [
+    "json-parsing",
+    "error-handling",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/scope_coverage_predicates.py:all_mandatory_scope_covered",
+   "type": "function",
+   "name": "all_mandatory_scope_covered",
+   "filePath": "runner/predicates/scope_coverage_predicates.py",
+   "lineRange": [
+    107,
+    330
+   ],
+   "summary": "Gate predicate: every mandatory Tier 2B scope requirement must have an explicit scope_coverage entry, and any unresolved entry must be matched by a logged scope conflict.",
+   "tags": [
+    "predicate",
+    "scope-coverage",
+    "phase2",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/source_ref_predicates.py:_read_json",
+   "type": "function",
+   "name": "_read_json",
+   "filePath": "runner/predicates/source_ref_predicates.py",
+   "lineRange": [
+    147,
+    214
+   ],
+   "summary": "Defensive JSON reader for the traceability predicates, mapping read and parse problems onto canonical failure categories.",
+   "tags": [
+    "json-parsing",
+    "error-handling",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/source_ref_predicates.py:_ref_value_is_present",
+   "type": "function",
+   "name": "_ref_value_is_present",
+   "filePath": "runner/predicates/source_ref_predicates.py",
+   "lineRange": [
+    217,
+    231
+   ],
+   "summary": "Decides whether a source-reference value counts as present, rejecting empty strings and placeholder values.",
+   "tags": [
+    "traceability",
+    "validation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/source_ref_predicates.py:_extract_entries_for_source_ref",
+   "type": "function",
+   "name": "_extract_entries_for_source_ref",
+   "filePath": "runner/predicates/source_ref_predicates.py",
+   "lineRange": [
+    245,
+    307
+   ],
+   "summary": "Collects the entries of a Tier 2B extracted artifact that must each carry a source reference.",
+   "tags": [
+    "extraction",
+    "traceability",
+    "tier2b"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/source_ref_predicates.py:_extract_mapping_entries",
+   "type": "function",
+   "name": "_extract_mapping_entries",
+   "filePath": "runner/predicates/source_ref_predicates.py",
+   "lineRange": [
+    310,
+    366
+   ],
+   "summary": "Collects the mapping entries of a topic-mapping artifact that must each carry a source reference.",
+   "tags": [
+    "extraction",
+    "traceability",
+    "topic-mapping"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/source_ref_predicates.py:source_refs_present",
+   "type": "function",
+   "name": "source_refs_present",
+   "filePath": "runner/predicates/source_ref_predicates.py",
+   "lineRange": [
+    374,
+    488
+   ],
+   "summary": "Gate predicate: every relevant entry in an extracted artifact must carry a non-empty source reference, so no extracted fact is unattributed.",
+   "tags": [
+    "predicate",
+    "traceability",
+    "tier2b",
+    "policy-violation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/source_ref_predicates.py:all_mappings_have_source_refs",
+   "type": "function",
+   "name": "all_mappings_have_source_refs",
+   "filePath": "runner/predicates/source_ref_predicates.py",
+   "lineRange": [
+    491,
+    621
+   ],
+   "summary": "Gate predicate: every topic-mapping entry must cite its source section, which is what makes the Phase 2 mapping auditable.",
+   "tags": [
+    "predicate",
+    "traceability",
+    "topic-mapping",
+    "phase2"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "function:runner/predicates/gate_pass_predicates.py:_parse_iso8601",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "function:runner/predicates/gate_pass_predicates.py:_mtime_suspect_inputs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "function:runner/predicates/gate_pass_predicates.py:_check_continuation_acceptance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "function:runner/predicates/gate_pass_predicates.py:is_gate_fresh",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "function:runner/predicates/gate_pass_predicates.py:gate_pass_recorded",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_read_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_is_title_attempt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_find_appositives",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_appositive_is_other_entity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_find_truncated_legal_name",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_check_partner_conflation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_extract_attached_wps",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_extract_attached_months",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:no_stale_run_id",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:partner_names_preserved",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:deliverable_identity_preserved",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:canonical_terms_preserved",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_detect_section_type",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:_check_quantitative_components",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:measurable_targets_preserved",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:_read_json_object",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:json_field_present",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:json_fields_present",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:instrument_type_matches_schema",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:interface_contract_conforms",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:risk_register_populated",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:ethics_assessment_explicit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:governance_matrix_present",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:no_blocking_inconsistencies",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:unit_cost_budget_resolved",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:budget_gate_confirmation_present",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:findings_categorised_by_severity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:revision_action_list_present",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:all_critical_revisions_resolved",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:_read_gate_result_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:_validate_checkpoint_provenance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:checkpoint_published",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/scope_coverage_predicates.py",
+   "target": "function:runner/predicates/scope_coverage_predicates.py:_read_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/scope_coverage_predicates.py",
+   "target": "function:runner/predicates/scope_coverage_predicates.py:all_mandatory_scope_covered",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "function:runner/predicates/source_ref_predicates.py:_read_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "function:runner/predicates/source_ref_predicates.py:_ref_value_is_present",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "function:runner/predicates/source_ref_predicates.py:_extract_entries_for_source_ref",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "function:runner/predicates/source_ref_predicates.py:_extract_mapping_entries",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "function:runner/predicates/source_ref_predicates.py:source_refs_present",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "function:runner/predicates/source_ref_predicates.py:all_mappings_have_source_refs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "function:runner/predicates/gate_pass_predicates.py:is_gate_fresh",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "function:runner/predicates/gate_pass_predicates.py:gate_pass_recorded",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:no_stale_run_id",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:partner_names_preserved",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:deliverable_identity_preserved",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:canonical_terms_preserved",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "function:runner/predicates/phase8_section_predicates.py:measurable_targets_preserved",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:json_field_present",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:json_fields_present",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:instrument_type_matches_schema",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:interface_contract_conforms",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:risk_register_populated",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:ethics_assessment_explicit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:governance_matrix_present",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:no_blocking_inconsistencies",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:unit_cost_budget_resolved",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:budget_gate_confirmation_present",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:findings_categorised_by_severity",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:revision_action_list_present",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:all_critical_revisions_resolved",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "function:runner/predicates/schema_predicates.py:checkpoint_published",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/scope_coverage_predicates.py",
+   "target": "function:runner/predicates/scope_coverage_predicates.py:all_mandatory_scope_covered",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "function:runner/predicates/source_ref_predicates.py:source_refs_present",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "function:runner/predicates/source_ref_predicates.py:all_mappings_have_source_refs",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "file:runner/fingerprints.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "file:runner/gate_result_registry.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "file:runner/upstream_inputs.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/gate_pass_predicates.py",
+   "target": "file:runner/versions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/phase8_section_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "file:runner/interface_contract.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/schema_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/scope_coverage_predicates.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/scope_coverage_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/source_ref_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/predicates/gate_pass_predicates.py:is_gate_fresh",
+   "target": "function:runner/fingerprints.py:fingerprint_path",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/predicates/gate_pass_predicates.py:gate_pass_recorded",
+   "target": "function:runner/paths.py:resolve_repo_path",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/predicates/schema_predicates.py:interface_contract_conforms",
+   "target": "function:runner/interface_contract.py:validate_payload",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/predicates/schema_predicates.py:interface_contract_conforms",
+   "target": "function:runner/interface_contract.py:is_planner_contract",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

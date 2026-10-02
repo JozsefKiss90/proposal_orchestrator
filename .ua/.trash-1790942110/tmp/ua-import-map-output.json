@@ -1,0 +1,625 @@
+{
+  "scriptCompleted": true,
+  "stats": {
+    "filesScanned": 159,
+    "filesWithImports": 90,
+    "totalEdges": 365
+  },
+  "failures": [],
+  "importMap": {
+    ".claude/workflows/system_orchestration/agent_catalog.yaml": [],
+    ".claude/workflows/system_orchestration/artifact_schema_specification.yaml": [],
+    ".claude/workflows/system_orchestration/design_notes.yaml": [],
+    ".claude/workflows/system_orchestration/gate_rules_library.yaml": [],
+    ".claude/workflows/system_orchestration/global_rules.yaml": [],
+    ".claude/workflows/system_orchestration/integration_rules.yaml": [],
+    ".claude/workflows/system_orchestration/manifest.compile.yaml": [],
+    ".claude/workflows/system_orchestration/meta.yaml": [],
+    ".claude/workflows/system_orchestration/quality_gates.yaml": [],
+    ".claude/workflows/system_orchestration/skill_catalog.yaml": [],
+    ".claude/workflows/system_orchestration/state_rules.yaml": [],
+    ".claude/workflows/system_orchestration/tier_bindings.yaml": [],
+    ".claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml": [],
+    ".claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml": [],
+    ".claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml": [],
+    ".claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml": [],
+    ".claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml": [],
+    ".claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml": [],
+    ".claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml": [],
+    ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml": [],
+    "CLAUDE.md": [],
+    "harness/HARNESS.md": [],
+    "harness/__init__.py": [
+      "harness/calibration.py",
+      "harness/faithfulness.py",
+      "harness/gold_set.py",
+      "harness/jsonl_log.py",
+      "harness/judge.py",
+      "harness/provenance.py",
+      "harness/report.py",
+      "harness/routing.py",
+      "harness/verdict.py"
+    ],
+    "harness/blind_assessment.py": [
+      "harness/evidence_pack.py",
+      "harness/expectation_coverage.py",
+      "harness/judge.py",
+      "harness/profile.py",
+      "harness/rubrics.py",
+      "harness/verdict.py",
+      "runner/atomic_write.py",
+      "runner/dev_graph/__init__.py",
+      "runner/dev_graph/schema.py"
+    ],
+    "harness/calibration.py": [
+      "harness/faithfulness.py",
+      "harness/gold_set.py",
+      "harness/jsonl_log.py",
+      "harness/judge.py",
+      "harness/provenance.py"
+    ],
+    "harness/claim_ledger.py": [
+      "harness/faithfulness.py",
+      "harness/judge.py",
+      "harness/materiality.py",
+      "harness/provenance.py",
+      "harness/report.py",
+      "harness/routing.py",
+      "harness/verdict.py",
+      "runner/json_extract.py"
+    ],
+    "harness/commands/__init__.py": [],
+    "harness/commands/_common.py": [
+      "runner/paths.py"
+    ],
+    "harness/commands/blind_assessment.py": [
+      "harness/blind_assessment.py",
+      "harness/evidence_pack.py",
+      "harness/expectation_coverage.py",
+      "harness/expectations.py",
+      "harness/judge.py",
+      "harness/profile.py",
+      "harness/routing.py",
+      "harness/rubrics.py",
+      "harness/verdict.py",
+      "runner/dev_graph/__init__.py"
+    ],
+    "harness/commands/faithfulness_calibration.py": [
+      "harness/calibration.py",
+      "harness/commands/_common.py",
+      "harness/commands/freeze_grounding_baselines.py",
+      "harness/faithfulness.py",
+      "harness/gold_set.py",
+      "harness/judge.py",
+      "harness/provenance.py",
+      "runner/transport/config.py"
+    ],
+    "harness/commands/freeze_grounding_baselines.py": [
+      "harness/commands/_common.py",
+      "harness/judge.py",
+      "harness/provenance.py",
+      "harness/regression.py",
+      "harness/status_faithfulness.py",
+      "runner/transport/config.py",
+      "runner/transport/errors.py",
+      "runner/working_assumptions.py"
+    ],
+    "harness/commands/rubric_grading_run.py": [
+      "harness/evidence_pack.py",
+      "harness/expectation_coverage.py",
+      "harness/expectation_grounding.py",
+      "harness/expectations.py",
+      "harness/judge.py",
+      "harness/profile.py",
+      "harness/regression.py",
+      "harness/rubric.py",
+      "harness/rubrics.py",
+      "harness/verdict.py",
+      "runner/atomic_write.py",
+      "runner/working_assumptions.py"
+    ],
+    "harness/evaluator_scorecard_msca_pf.json": [],
+    "harness/evaluator_scorecard_msca_pf.md": [],
+    "harness/evaluator_scorecard_ria.json": [],
+    "harness/evidence_pack.py": [
+      "harness/judge.py",
+      "harness/status_faithfulness.py"
+    ],
+    "harness/expectation_coverage.py": [
+      "harness/evidence_pack.py",
+      "harness/judge.py",
+      "harness/provenance.py",
+      "harness/routing.py",
+      "harness/rubrics.py",
+      "harness/verdict.py"
+    ],
+    "harness/expectation_grounding.py": [
+      "harness/evidence_pack.py",
+      "harness/judge.py",
+      "harness/rubrics.py",
+      "harness/status_faithfulness.py",
+      "harness/verdict.py",
+      "runner/working_assumptions.py"
+    ],
+    "harness/expectations.py": [
+      "harness/profile.py",
+      "harness/regression.py"
+    ],
+    "harness/faithfulness.py": [
+      "harness/gold_set.py",
+      "harness/judge.py",
+      "runner/paths.py"
+    ],
+    "harness/gold_set.py": [
+      "runner/atomic_write.py"
+    ],
+    "harness/gold_sets/README.md": [],
+    "harness/jsonl_log.py": [
+      "runner/atomic_write.py"
+    ],
+    "harness/judge.py": [
+      "harness/provenance.py",
+      "harness/verdict.py",
+      "runner/json_extract.py"
+    ],
+    "harness/labeling/LABELLING_GUIDE.md": [],
+    "harness/labeling/e3.1-materiality-calibration_TEMPLATE.json": [],
+    "harness/ledger_granularity.py": [
+      "harness/claim_ledger.py",
+      "harness/regression.py",
+      "harness/status_faithfulness.py",
+      "runner/atomic_write.py"
+    ],
+    "harness/materiality.py": [
+      "harness/calibration.py",
+      "harness/faithfulness.py",
+      "harness/gold_set.py",
+      "harness/judge.py",
+      "harness/verdict.py",
+      "runner/atomic_write.py"
+    ],
+    "harness/materiality_calibration.py": [],
+    "harness/materiality_sets/README.md": [],
+    "harness/profile.py": [],
+    "harness/profiles/msca_pf_default.json": [],
+    "harness/profiles/ria_default.json": [],
+    "harness/provenance.py": [
+      "harness/jsonl_log.py",
+      "harness/verdict.py"
+    ],
+    "harness/regression.py": [
+      "harness/claim_ledger.py",
+      "harness/judge.py",
+      "harness/status_faithfulness.py",
+      "runner/atomic_write.py",
+      "runner/working_assumptions.py"
+    ],
+    "harness/regression_baselines/README.md": [],
+    "harness/report.py": [
+      "harness/routing.py",
+      "harness/verdict.py"
+    ],
+    "harness/routing.py": [],
+    "harness/rubric.py": [
+      "harness/evidence_pack.py",
+      "harness/expectation_coverage.py",
+      "harness/expectation_grounding.py",
+      "harness/expectations.py",
+      "harness/judge.py",
+      "harness/profile.py",
+      "harness/provenance.py",
+      "harness/rubrics.py",
+      "harness/status_faithfulness.py",
+      "harness/verdict.py",
+      "runner/atomic_write.py",
+      "runner/working_assumptions.py"
+    ],
+    "harness/rubrics.py": [
+      "harness/evidence_pack.py",
+      "harness/expectations.py",
+      "harness/profile.py",
+      "harness/provenance.py"
+    ],
+    "harness/rubrics_msca_pf.json": [],
+    "harness/rubrics_ria.json": [],
+    "harness/status_calibration.py": [
+      "harness/judge.py",
+      "harness/report.py",
+      "harness/routing.py",
+      "harness/status_faithfulness.py",
+      "harness/verdict.py",
+      "runner/working_assumptions.py"
+    ],
+    "harness/status_faithfulness.py": [
+      "harness/faithfulness.py",
+      "harness/judge.py",
+      "harness/report.py",
+      "harness/routing.py",
+      "harness/verdict.py",
+      "runner/atomic_write.py",
+      "runner/paths.py",
+      "runner/working_assumptions.py"
+    ],
+    "harness/verdict.py": [],
+    "pyproject.toml": [],
+    "runner/__init__.py": [],
+    "runner/__main__.py": [
+      "runner/dag_scheduler.py",
+      "runner/gate_library.py",
+      "runner/manifest_reader.py",
+      "runner/paths.py",
+      "runner/run_context.py"
+    ],
+    "runner/agent_runtime.py": [
+      "runner/decomposed_drafting.py",
+      "runner/deterministic_components.py",
+      "runner/node_resolver.py",
+      "runner/phase8_skip_binding.py",
+      "runner/runtime_models.py",
+      "runner/section_assembler.py",
+      "runner/skill_runtime.py"
+    ],
+    "runner/agnosticism_lint.py": [],
+    "runner/assumption_applier.py": [
+      "runner/atomic_write.py",
+      "runner/claim_status.py",
+      "runner/section_assembler.py",
+      "runner/working_assumptions.py"
+    ],
+    "runner/atomic_write.py": [],
+    "runner/budget_request.py": [
+      "runner/atomic_write.py",
+      "runner/instrument_profile.py",
+      "runner/interface_contract.py"
+    ],
+    "runner/call_slicer.py": [],
+    "runner/checkpoint_publisher.py": [
+      "runner/atomic_write.py",
+      "runner/gate_result_registry.py",
+      "runner/run_context.py"
+    ],
+    "runner/claim_status.py": [],
+    "runner/claude_transport.py": [],
+    "runner/consortium_composition.py": [],
+    "runner/dag_scheduler.py": [
+      "runner/agent_runtime.py",
+      "runner/call_slicer.py",
+      "runner/deterministic_components.py",
+      "runner/gate_evaluator.py",
+      "runner/gate_result_registry.py",
+      "runner/manifest_reader.py",
+      "runner/node_resolver.py",
+      "runner/paths.py",
+      "runner/phase8_preseed.py",
+      "runner/phase8_reuse.py",
+      "runner/phase8_skip_binding.py",
+      "runner/predicates/gate_pass_predicates.py",
+      "runner/run_context.py",
+      "runner/runtime_models.py",
+      "runner/versions.py"
+    ],
+    "runner/decomposed_drafting.py": [
+      "runner/atomic_write.py",
+      "runner/claim_status.py",
+      "runner/instrument_profile.py",
+      "runner/section_assembler.py"
+    ],
+    "runner/dependency_normalizer.py": [],
+    "runner/deterministic_components.py": [
+      "runner/runtime_models.py"
+    ],
+    "runner/dev_graph/__init__.py": [
+      "runner/dev_graph/builder.py",
+      "runner/dev_graph/changes.py",
+      "runner/dev_graph/documents.py",
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/impact.py",
+      "runner/dev_graph/intake.py",
+      "runner/dev_graph/packages.py",
+      "runner/dev_graph/policies.py",
+      "runner/dev_graph/revisions.py",
+      "runner/dev_graph/schema.py",
+      "runner/dev_graph/shadow.py",
+      "runner/dev_graph/writer.py"
+    ],
+    "runner/dev_graph/builder.py": [
+      "runner/dev_graph/documents.py",
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/schema.py"
+    ],
+    "runner/dev_graph/changes.py": [
+      "runner/atomic_write.py",
+      "runner/dev_graph/builder.py",
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/schema.py"
+    ],
+    "runner/dev_graph/documents.py": [
+      "runner/atomic_write.py",
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/schema.py",
+      "runner/graph_schema.py"
+    ],
+    "runner/dev_graph/identity.py": [],
+    "runner/dev_graph/impact.py": [
+      "runner/atomic_write.py",
+      "runner/dev_graph/builder.py",
+      "runner/dev_graph/changes.py",
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/policies.py",
+      "runner/dev_graph/schema.py"
+    ],
+    "runner/dev_graph/intake.py": [
+      "runner/atomic_write.py",
+      "runner/dev_graph/schema.py"
+    ],
+    "runner/dev_graph/packages.py": [
+      "runner/atomic_write.py",
+      "runner/claim_status.py",
+      "runner/dev_graph/builder.py",
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/policies.py",
+      "runner/dev_graph/schema.py"
+    ],
+    "runner/dev_graph/policies.py": [
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/schema.py"
+    ],
+    "runner/dev_graph/revisions.py": [
+      "runner/atomic_write.py",
+      "runner/dev_graph/builder.py",
+      "runner/dev_graph/changes.py",
+      "runner/dev_graph/documents.py",
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/policies.py",
+      "runner/dev_graph/schema.py"
+    ],
+    "runner/dev_graph/schema.py": [],
+    "runner/dev_graph/shadow.py": [
+      "runner/atomic_write.py",
+      "runner/dev_graph/identity.py",
+      "runner/dev_graph/impact.py",
+      "runner/dev_graph/schema.py",
+      "runner/run_context.py"
+    ],
+    "runner/dev_graph/writer.py": [
+      "runner/atomic_write.py",
+      "runner/dev_graph/builder.py"
+    ],
+    "runner/docx_exporter.py": [
+      "runner/atomic_write.py"
+    ],
+    "runner/final_export_writer.py": [
+      "runner/atomic_write.py"
+    ],
+    "runner/fingerprints.py": [
+      "runner/paths.py"
+    ],
+    "runner/gate_evaluator.py": [
+      "runner/fingerprints.py",
+      "runner/gate_library.py",
+      "runner/gate_result_registry.py",
+      "runner/manifest_reader.py",
+      "runner/paths.py",
+      "runner/predicates/coverage_predicates.py",
+      "runner/predicates/criterion_predicates.py",
+      "runner/predicates/cycle_predicates.py",
+      "runner/predicates/file_predicates.py",
+      "runner/predicates/gate_pass_predicates.py",
+      "runner/predicates/phase8_section_predicates.py",
+      "runner/predicates/schema_predicates.py",
+      "runner/predicates/scope_coverage_predicates.py",
+      "runner/predicates/source_ref_predicates.py",
+      "runner/predicates/timeline_predicates.py",
+      "runner/predicates/types.py",
+      "runner/run_context.py",
+      "runner/semantic_dispatch.py",
+      "runner/upstream_inputs.py",
+      "runner/versions.py"
+    ],
+    "runner/gate_library.py": [
+      "runner/versions.py"
+    ],
+    "runner/gate_result_registry.py": [],
+    "runner/graph_canonical_pack.py": [
+      "runner/atomic_write.py",
+      "runner/graph_config.py",
+      "runner/graph_schema.py",
+      "runner/vault_reader.py",
+      "runner/working_assumptions.py"
+    ],
+    "runner/graph_claim_verifier.py": [
+      "runner/graph_config.py",
+      "runner/graph_schema.py",
+      "runner/vault_reader.py"
+    ],
+    "runner/graph_compiler.py": [
+      "runner/atomic_write.py",
+      "runner/graph_config.py",
+      "runner/graph_schema.py",
+      "runner/vault_reader.py"
+    ],
+    "runner/graph_config.py": [
+      "runner/graph_schema.py"
+    ],
+    "runner/graph_determinism_check.py": [
+      "runner/graph_compiler.py",
+      "runner/graph_config.py",
+      "runner/vault_reader.py"
+    ],
+    "runner/graph_projector.py": [
+      "runner/atomic_write.py",
+      "runner/graph_config.py",
+      "runner/graph_schema.py"
+    ],
+    "runner/graph_schema.py": [],
+    "runner/instrument_profile.py": [],
+    "runner/interface_contract.py": [],
+    "runner/json_extract.py": [],
+    "runner/leakage_scan.py": [
+      "runner/agnosticism_lint.py",
+      "runner/consortium_composition.py"
+    ],
+    "runner/manifest_reader.py": [],
+    "runner/node_resolver.py": [
+      "runner/manifest_reader.py"
+    ],
+    "runner/paths.py": [],
+    "runner/persistence_policy.py": [],
+    "runner/phase8_canonical_pack.py": [
+      "runner/atomic_write.py",
+      "runner/working_assumptions.py"
+    ],
+    "runner/phase8_preseed.py": [
+      "runner/claim_status.py",
+      "runner/phase8_skip_binding.py"
+    ],
+    "runner/phase8_reuse.py": [
+      "runner/claim_status.py",
+      "runner/phase8_skip_binding.py"
+    ],
+    "runner/phase8_skip_binding.py": [],
+    "runner/predicates/__init__.py": [
+      "runner/predicates/coverage_predicates.py",
+      "runner/predicates/criterion_predicates.py",
+      "runner/predicates/cycle_predicates.py",
+      "runner/predicates/file_predicates.py",
+      "runner/predicates/gate_pass_predicates.py",
+      "runner/predicates/phase8_section_predicates.py",
+      "runner/predicates/schema_predicates.py",
+      "runner/predicates/scope_coverage_predicates.py",
+      "runner/predicates/source_ref_predicates.py",
+      "runner/predicates/timeline_predicates.py",
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/coverage_predicates.py": [
+      "runner/paths.py",
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/criterion_predicates.py": [
+      "runner/claim_status.py",
+      "runner/paths.py",
+      "runner/predicates/types.py",
+      "runner/working_assumptions.py"
+    ],
+    "runner/predicates/cycle_predicates.py": [
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/file_predicates.py": [
+      "runner/paths.py",
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/gate_pass_predicates.py": [
+      "runner/fingerprints.py",
+      "runner/gate_result_registry.py",
+      "runner/paths.py",
+      "runner/predicates/types.py",
+      "runner/upstream_inputs.py",
+      "runner/versions.py"
+    ],
+    "runner/predicates/phase8_section_predicates.py": [
+      "runner/paths.py",
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/schema_predicates.py": [
+      "runner/interface_contract.py",
+      "runner/paths.py",
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/scope_coverage_predicates.py": [
+      "runner/paths.py",
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/source_ref_predicates.py": [
+      "runner/paths.py",
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/timeline_predicates.py": [
+      "runner/predicates/types.py"
+    ],
+    "runner/predicates/types.py": [],
+    "runner/run_context.py": [
+      "runner/versions.py"
+    ],
+    "runner/runtime_models.py": [],
+    "runner/section_assembler.py": [
+      "runner/atomic_write.py"
+    ],
+    "runner/semantic_dispatch.py": [
+      "runner/claude_transport.py",
+      "runner/json_extract.py",
+      "runner/paths.py",
+      "runner/transport/config.py"
+    ],
+    "runner/skill_runtime.py": [
+      "runner/claude_transport.py",
+      "runner/runtime_models.py",
+      "runner/transport/config.py",
+      "runner/transport/tool_executor.py",
+      "runner/transport/tool_loop.py"
+    ],
+    "runner/source_index.py": [
+      "runner/dev_graph/builder.py"
+    ],
+    "runner/transport/__init__.py": [
+      "runner/transport/capabilities.py",
+      "runner/transport/config.py",
+      "runner/transport/errors.py",
+      "runner/transport/tool_executor.py",
+      "runner/transport/tool_loop.py"
+    ],
+    "runner/transport/bedrock_converse.py": [
+      "runner/transport/errors.py"
+    ],
+    "runner/transport/capabilities.py": [],
+    "runner/transport/config.py": [
+      "runner/transport/capabilities.py"
+    ],
+    "runner/transport/errors.py": [],
+    "runner/transport/openai_compatible.py": [
+      "runner/transport/errors.py"
+    ],
+    "runner/transport/tool_executor.py": [],
+    "runner/transport/tool_loop.py": [
+      "runner/transport/tool_executor.py"
+    ],
+    "runner/unit_cost_budget.py": [
+      "runner/atomic_write.py",
+      "runner/instrument_profile.py",
+      "runner/working_assumptions.py"
+    ],
+    "runner/upstream_inputs.py": [],
+    "runner/vault_reader.py": [
+      "runner/graph_config.py",
+      "runner/graph_schema.py"
+    ],
+    "runner/vault_scaffold.py": [
+      "runner/graph_config.py",
+      "runner/vault_reader.py"
+    ],
+    "runner/versions.py": [],
+    "runner/working_assumptions.py": [],
+    "tools/backfill_gate_result_schema_id.py": [
+      "runner/gate_result_registry.py"
+    ],
+    "tools/build_demo_dev_graph.py": [
+      "runner/atomic_write.py",
+      "runner/dev_graph/__init__.py",
+      "runner/paths.py"
+    ],
+    "tools/build_part_b_candidate.py": [
+      "runner/atomic_write.py",
+      "runner/decomposed_drafting.py",
+      "runner/dev_graph/documents.py",
+      "runner/dev_graph/schema.py",
+      "runner/phase8_preseed.py"
+    ],
+    "tools/derive_run_phase_costs.py": [
+      "runner/atomic_write.py"
+    ],
+    "tools/preserve_run_manifests.py": [
+      "runner/atomic_write.py"
+    ],
+    "tools/promote_graph_staging.py": [],
+    "tools/prose_detect.py": []
+  }
+}

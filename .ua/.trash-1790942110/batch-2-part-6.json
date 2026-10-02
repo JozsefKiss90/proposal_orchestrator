@@ -1,0 +1,1143 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/unit_cost_budget.py",
+   "type": "file",
+   "name": "unit_cost_budget.py",
+   "filePath": "runner/unit_cost_budget.py",
+   "summary": "Deterministic unit-cost budget deriver: computes a unit-cost (MSCA-style) budget as confirmed months times published rates times host-country coefficient, in a pure core plus a component wrapper that resolves inputs from durable state and writes the artifact atomically.",
+   "tags": [
+    "deterministic-component",
+    "budget",
+    "unit-cost",
+    "phase7",
+    "determinism"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Determinism is the anti-fabrication guarantee here, closed by a byte-equal replay check; an unresolved host coefficient still yields every host-independent line plus an explicit unresolved marker."
+  },
+  {
+   "id": "function:runner/unit_cost_budget.py:_monthly_rate",
+   "type": "function",
+   "name": "_monthly_rate",
+   "filePath": "runner/unit_cost_budget.py",
+   "lineRange": [
+    134,
+    152
+   ],
+   "summary": "Looks up one monthly published unit rate for a researcher group and budget line, refusing an absent rate.",
+   "tags": [
+    "lookup",
+    "budget",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/unit_cost_budget.py:compute_unit_cost_budget",
+   "type": "function",
+   "name": "compute_unit_cost_budget",
+   "filePath": "runner/unit_cost_budget.py",
+   "lineRange": [
+    155,
+    282
+   ],
+   "summary": "The pure figure: given confirmed months, the rate table and the host coefficient it returns every derived line item and the total, marking the host-dependent line unresolved when the coefficient is absent.",
+   "tags": [
+    "pure-function",
+    "budget",
+    "determinism",
+    "unit-cost"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/unit_cost_budget.py:_read_json",
+   "type": "function",
+   "name": "_read_json",
+   "filePath": "runner/unit_cost_budget.py",
+   "lineRange": [
+    290,
+    303
+   ],
+   "summary": "Reads one durable input artifact, raising `UnitCostBudgetError` when absent or malformed.",
+   "tags": [
+    "io",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/unit_cost_budget.py:_resolve_confirmed_months",
+   "type": "function",
+   "name": "_resolve_confirmed_months",
+   "filePath": "runner/unit_cost_budget.py",
+   "lineRange": [
+    306,
+    352
+   ],
+   "summary": "Resolves the confirmed effort months from the call binding or an operator declaration, never from an estimate.",
+   "tags": [
+    "resolver",
+    "budget",
+    "claim-status"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/unit_cost_budget.py:_lookup_coefficient",
+   "type": "function",
+   "name": "_lookup_coefficient",
+   "filePath": "runner/unit_cost_budget.py",
+   "lineRange": [
+    355,
+    368
+   ],
+   "summary": "Looks up the published country-correction coefficient for the host country.",
+   "tags": [
+    "lookup",
+    "budget",
+    "tier2b"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/unit_cost_budget.py:_resolve_host_country",
+   "type": "function",
+   "name": "_resolve_host_country",
+   "filePath": "runner/unit_cost_budget.py",
+   "lineRange": [
+    371,
+    408
+   ],
+   "summary": "Resolves the host country from the call binding or an operator declaration, leaving it unresolved rather than guessing.",
+   "tags": [
+    "resolver",
+    "budget",
+    "claim-status"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/unit_cost_budget.py:derive_unit_cost_budget",
+   "type": "function",
+   "name": "derive_unit_cost_budget",
+   "filePath": "runner/unit_cost_budget.py",
+   "lineRange": [
+    416,
+    583
+   ],
+   "summary": "Component entry point: resolves rates, months and host country from durable state, calls the pure core and writes the budget artifact with its pass/fail gate declaration.",
+   "tags": [
+    "entry-point",
+    "deterministic-component",
+    "budget",
+    "atomic-write"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:tools/build_demo_dev_graph.py",
+   "type": "file",
+   "name": "build_demo_dev_graph.py",
+   "filePath": "tools/build_demo_dev_graph.py",
+   "summary": "Authoring tool that writes the first dev-graph snapshot over the populated demo Tier 3 records plus one bounded evidence package per view policy for three structurally chosen seed tasks, bisecting the minimum budget at which each package fits and completes.",
+   "tags": [
+    "script",
+    "cli",
+    "dev-graph",
+    "authoring-tool",
+    "idempotent"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Idempotent and content-derived: `--check` writes nothing and exits non-zero if any artifact would change."
+  },
+  {
+   "id": "function:tools/build_demo_dev_graph.py:_package",
+   "type": "function",
+   "name": "_package",
+   "filePath": "tools/build_demo_dev_graph.py",
+   "lineRange": [
+    87,
+    97
+   ],
+   "summary": "Builds one evidence package for a seed task under one view and budget.",
+   "tags": [
+    "dev-graph",
+    "evidence-package"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/build_demo_dev_graph.py:count_by",
+   "type": "function",
+   "name": "count_by",
+   "filePath": "tools/build_demo_dev_graph.py",
+   "lineRange": [
+    100,
+    105
+   ],
+   "summary": "Counts items grouped by a declared key, so every reported count is derived rather than typed.",
+   "tags": [
+    "utility",
+    "aggregation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/build_demo_dev_graph.py:_minimum_budget",
+   "type": "function",
+   "name": "_minimum_budget",
+   "filePath": "tools/build_demo_dev_graph.py",
+   "lineRange": [
+    108,
+    125
+   ],
+   "summary": "Bisects the smallest budget at which a predicate over the built package holds, so \"incomplete\" comes with a measurement.",
+   "tags": [
+    "bisection",
+    "measurement",
+    "budgeting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/build_demo_dev_graph.py:_package_row",
+   "type": "function",
+   "name": "_package_row",
+   "filePath": "tools/build_demo_dev_graph.py",
+   "lineRange": [
+    136,
+    173
+   ],
+   "summary": "Builds the summary row for one package: its derived counts and both bisected minimum budgets.",
+   "tags": [
+    "reporting",
+    "derivation",
+    "aggregation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/build_demo_dev_graph.py:build",
+   "type": "function",
+   "name": "build",
+   "filePath": "tools/build_demo_dev_graph.py",
+   "lineRange": [
+    185,
+    223
+   ],
+   "summary": "Writes the snapshot and every package, returning the full derived run summary.",
+   "tags": [
+    "entry-point",
+    "dev-graph",
+    "orchestration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/build_demo_dev_graph.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/build_demo_dev_graph.py",
+   "lineRange": [
+    228,
+    253
+   ],
+   "summary": "CLI entry point supporting write and `--check` modes.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "idempotent"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/build_part_b_candidate.py",
+   "type": "file",
+   "name": "build_part_b_candidate.py",
+   "filePath": "tools/build_part_b_candidate.py",
+   "summary": "Converter that turns Phase 8's Tier 5 section artifacts into a blind-lane candidate document, the missing route from a drafted Part B to a graded one. Deterministic and Claude-free: every field is copied verbatim and nothing is repaired.",
+   "tags": [
+    "script",
+    "cli",
+    "converter",
+    "blind-lane",
+    "deterministic"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Every `sub_section_id` is carried verbatim because the rubric anchor map fails closed on an absent anchor, so a renumbered sub-section would break grading silently."
+  },
+  {
+   "id": "class:tools/build_part_b_candidate.py:SectionSpec",
+   "type": "class",
+   "name": "SectionSpec",
+   "filePath": "tools/build_part_b_candidate.py",
+   "lineRange": [
+    96,
+    106
+   ],
+   "summary": "Declares one expected section: its slug, criterion, artifact path and schema identity.",
+   "tags": [
+    "data-model",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/build_part_b_candidate.py:_section_specs",
+   "type": "function",
+   "name": "_section_specs",
+   "filePath": "tools/build_part_b_candidate.py",
+   "lineRange": [
+    114,
+    148
+   ],
+   "summary": "Returns the expected section specs the converter requires to be present.",
+   "tags": [
+    "configuration",
+    "factory"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/build_part_b_candidate.py:_read_section",
+   "type": "function",
+   "name": "_read_section",
+   "filePath": "tools/build_part_b_candidate.py",
+   "lineRange": [
+    154,
+    191
+   ],
+   "summary": "Reads and refuses one section artifact: a wrong schema id, a disagreeing criterion, an invalid artifact status or no sub-sections.",
+   "tags": [
+    "validation",
+    "io",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/build_part_b_candidate.py:_sub_sections",
+   "type": "function",
+   "name": "_sub_sections",
+   "filePath": "tools/build_part_b_candidate.py",
+   "lineRange": [
+    194,
+    227
+   ],
+   "summary": "Copies each sub-section's id, title and content verbatim into candidate sections, refusing a duplicate or empty one.",
+   "tags": [
+    "verbatim-copy",
+    "validation",
+    "conversion"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/build_part_b_candidate.py:_claims",
+   "type": "function",
+   "name": "_claims",
+   "filePath": "tools/build_part_b_candidate.py",
+   "lineRange": [
+    230,
+    269
+   ],
+   "summary": "Converts each claim status into a candidate claim, refusing an unknown status rather than mapping it.",
+   "tags": [
+    "conversion",
+    "claim-status",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/build_part_b_candidate.py:build_candidate",
+   "type": "function",
+   "name": "build_candidate",
+   "filePath": "tools/build_part_b_candidate.py",
+   "lineRange": [
+    272,
+    342
+   ],
+   "summary": "Builds the whole candidate and re-checks it against the importer's own normaliser, so identifier shape is judged once by its owner.",
+   "tags": [
+    "entry-point",
+    "conversion",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:tools/build_part_b_candidate.py:write_candidate",
+   "type": "function",
+   "name": "write_candidate",
+   "filePath": "tools/build_part_b_candidate.py",
+   "lineRange": [
+    350,
+    368
+   ],
+   "summary": "Writes the candidate to its canonical path atomically.",
+   "tags": [
+    "atomic-write",
+    "io"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/build_part_b_candidate.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/build_part_b_candidate.py",
+   "lineRange": [
+    371,
+    444
+   ],
+   "summary": "CLI entry point supporting write and `--check` modes.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "idempotent"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:tools/derive_run_phase_costs.py",
+   "type": "file",
+   "name": "derive_run_phase_costs.py",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "summary": "Recovers per-phase invocation counts, tokens and wall clock for a run by partitioning the append-only transport ledger on the phase gates' evaluation timestamps — the attribution the ledger supports but does not record, since every row carries a null node id.",
+   "tags": [
+    "script",
+    "cli",
+    "analytics",
+    "measurement",
+    "observability"
+   ],
+   "complexity": "complex",
+   "languageNotes": "The attribution is explicitly Inferred, resting on two structural checks that both fail closed; monetary cost is written as null because no rate exists to price the tokens against."
+  },
+  {
+   "id": "function:tools/derive_run_phase_costs.py:collect_phase_gates",
+   "type": "function",
+   "name": "collect_phase_gates",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "lineRange": [
+    87,
+    128
+   ],
+   "summary": "Collects each phase gate's result and evaluation timestamp, checking they ascend with phase number and share one run id.",
+   "tags": [
+    "measurement",
+    "validation",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/derive_run_phase_costs.py:resolve_run_id",
+   "type": "function",
+   "name": "resolve_run_id",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "lineRange": [
+    131,
+    151
+   ],
+   "summary": "Resolves which run to measure, refusing a requested id the gate results do not agree on.",
+   "tags": [
+    "resolution",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/derive_run_phase_costs.py:read_ledger",
+   "type": "function",
+   "name": "read_ledger",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "lineRange": [
+    154,
+    173
+   ],
+   "summary": "Reads the append-only transport invocation ledger for a run.",
+   "tags": [
+    "io",
+    "observability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/derive_run_phase_costs.py:read_monetary_cost",
+   "type": "function",
+   "name": "read_monetary_cost",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "lineRange": [
+    176,
+    215
+   ],
+   "summary": "Attempts to resolve a monetary rate, returning unresolved rather than substituting a figure.",
+   "tags": [
+    "measurement",
+    "claim-status",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/derive_run_phase_costs.py:partition",
+   "type": "function",
+   "name": "partition",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "lineRange": [
+    221,
+    244
+   ],
+   "summary": "Partitions the ledger rows into per-phase windows on the gate boundaries.",
+   "tags": [
+    "measurement",
+    "partitioning",
+    "derivation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/derive_run_phase_costs.py:_measure",
+   "type": "function",
+   "name": "_measure",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "lineRange": [
+    247,
+    312
+   ],
+   "summary": "Measures one partition: invocation count, token totals and wall clock, all derived off the rows.",
+   "tags": [
+    "measurement",
+    "aggregation",
+    "derivation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/derive_run_phase_costs.py:build_record",
+   "type": "function",
+   "name": "build_record",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "lineRange": [
+    315,
+    390
+   ],
+   "summary": "Builds the whole per-phase cost record, with every number measured and no clock in the artifact.",
+   "tags": [
+    "entry-point",
+    "measurement",
+    "determinism"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:tools/derive_run_phase_costs.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/derive_run_phase_costs.py",
+   "lineRange": [
+    400,
+    476
+   ],
+   "summary": "CLI entry point supporting write and `--check` modes.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "idempotent"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:tools/preserve_run_manifests.py",
+   "type": "file",
+   "name": "preserve_run_manifests.py",
+   "filePath": "tools/preserve_run_manifests.py",
+   "summary": "Copies the run manifests that dispatched the workflow phases out of gitignored runtime state into the durable Tier 4 record, preserving the run id, node states, per-node failure metadata and reuse decisions. It copies and never edits a manifest.",
+   "tags": [
+    "script",
+    "cli",
+    "preservation",
+    "run-records",
+    "tier4"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Output files are named by a slug derived from the run id with the true id recorded inside, and two runs whose ids slugify alike are refused rather than silently merged."
+  },
+  {
+   "id": "function:tools/preserve_run_manifests.py:slug",
+   "type": "function",
+   "name": "slug",
+   "filePath": "tools/preserve_run_manifests.py",
+   "lineRange": [
+    67,
+    70
+   ],
+   "summary": "Derives the filename slug from a run id, since nothing validates a pasted run id.",
+   "tags": [
+    "utility",
+    "normalization",
+    "safety"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/preserve_run_manifests.py:collect",
+   "type": "function",
+   "name": "collect",
+   "filePath": "tools/preserve_run_manifests.py",
+   "lineRange": [
+    77,
+    153
+   ],
+   "summary": "Collects each run's manifest fields, reuse policy and surviving run summary, refusing two runs that slugify to the same name.",
+   "tags": [
+    "entry-point",
+    "io",
+    "preservation",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:tools/preserve_run_manifests.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/preserve_run_manifests.py",
+   "lineRange": [
+    156,
+    209
+   ],
+   "summary": "CLI entry point supporting write and `--check` modes.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "idempotent"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:_monthly_rate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:compute_unit_cost_budget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:compute_unit_cost_budget",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:_read_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:_resolve_confirmed_months",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:_lookup_coefficient",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:_resolve_host_country",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:derive_unit_cost_budget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "function:runner/unit_cost_budget.py:derive_unit_cost_budget",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:_package",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:count_by",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:count_by",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:_minimum_budget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:_package_row",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:build",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:build",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "function:tools/build_demo_dev_graph.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "class:tools/build_part_b_candidate.py:SectionSpec",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "class:tools/build_part_b_candidate.py:SectionSpec",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:_section_specs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:_read_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:_sub_sections",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:_claims",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:build_candidate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:build_candidate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:write_candidate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:write_candidate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "function:tools/build_part_b_candidate.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:collect_phase_gates",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:collect_phase_gates",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:resolve_run_id",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:resolve_run_id",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:read_ledger",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:read_ledger",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:read_monetary_cost",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:read_monetary_cost",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:partition",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:partition",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:_measure",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:build_record",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:build_record",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "function:tools/derive_run_phase_costs.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/preserve_run_manifests.py",
+   "target": "function:tools/preserve_run_manifests.py:slug",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/preserve_run_manifests.py",
+   "target": "function:tools/preserve_run_manifests.py:slug",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/preserve_run_manifests.py",
+   "target": "function:tools/preserve_run_manifests.py:collect",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/preserve_run_manifests.py",
+   "target": "function:tools/preserve_run_manifests.py:collect",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/preserve_run_manifests.py",
+   "target": "function:tools/preserve_run_manifests.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/preserve_run_manifests.py",
+   "target": "function:tools/preserve_run_manifests.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "file:runner/instrument_profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/unit_cost_budget.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "file:runner/dev_graph/__init__.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/build_demo_dev_graph.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "file:runner/decomposed_drafting.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "file:runner/dev_graph/documents.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/build_part_b_candidate.py",
+   "target": "file:runner/phase8_preseed.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/derive_run_phase_costs.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/preserve_run_manifests.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/unit_cost_budget.py:derive_unit_cost_budget",
+   "target": "function:runner/working_assumptions.py:load_working_assumptions",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/unit_cost_budget.py:derive_unit_cost_budget",
+   "target": "function:runner/instrument_profile.py:owns_budget_regime",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/unit_cost_budget.py:derive_unit_cost_budget",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/build_demo_dev_graph.py:build",
+   "target": "function:runner/dev_graph/writer.py:write_snapshot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/build_demo_dev_graph.py:_package",
+   "target": "function:runner/dev_graph/packages.py:build_package",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/build_demo_dev_graph.py:main",
+   "target": "function:runner/paths.py:find_repo_root",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/build_part_b_candidate.py:build_candidate",
+   "target": "function:runner/dev_graph/documents.py:normalise_candidate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/build_part_b_candidate.py:write_candidate",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/derive_run_phase_costs.py:build_record",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/preserve_run_manifests.py:collect",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

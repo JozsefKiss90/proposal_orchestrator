@@ -1,0 +1,781 @@
+##### harness/__init__.py
+Evaluation & Integrity Harness — out-of-band QA substrate (ticket E1).
+
+This package is the out-of-band scaffolding every harness metric (E2–E9) stands
+on.  It is **architecturally distinct from the runtime DAG**: ``harness`` may
+import ``runner`` (to reuse the transport and read the deterministic predicate
+registry), but ``runner`` never imports ``harness`` — an enforced one-way
+dependency that makes "the harness is never a runtime gate" a structural fact,
+not a promise.  A test (``tests/harness/test_boundary.py``) guards the direction.
+
+The substrate, and the guardrails each piece enforces:
+
+* :mod:`harness.verdict` — verdicts typed ``Inferred``, never ``Confirmed``; the
+  N≥3 majority-vote scaffold for any score that will inform a decision.
+* :mod:`harness.provenance` — ``{judge_model, judge_version, prompt_hash, score,
+  rationale}`` logged for every verdict.
+* :mod:`harness.routing` — deterministic-first routing: a property a deterministic
+  predicate can check is never judged; the judge runs only in the semantic gap.
+* :mod:`harness.judge` — a pinned, non-drafter judge (temp 0) over the
+  OpenAI-compatible transport; grader–generator independence and no silent repair.
+* :mod:`harness.report` — reporting-only output; advisory to a human, never a
+  fail-closed runtime gate.
+
+The boundary between this harness and the runtime is documented in
+``harness/HARNESS.md``.
+
+Constitutional authority:
+    Subordinate to CLAUDE.md.  Nothing in this package evaluates a gate, invokes
+ 
+
+##### harness/blind_assessment.py
+Candidate-bound blind assessment — one candidate, one profile, one pinned assessor.
+
+The blind pre-evaluation lane assesses a *specified* candidate against a
+versioned pre-evaluation profile with an injectable assessor, without running
+the production pipeline.  The report is bound to what it judged: every report
+and every cell carries the candidate's content hash, the profile version and
+the assessor pin.  A report loaded against a candidate whose hash differs is
+rejected, so a verdict can never be re-attached to a different draft.
+
+What this module enforces, in code:
+
+* **Candidate binding.**  The candidate hash is the harness's formatting-
+  invariant artifact hash (:func:`~harness.profile.canonical_hash`) over the
+  parsed section artifacts, keyed by section id — whitespace, key order and a
+  BOM are inert; a changed sentence is not.  :func:`load_report` recomputes the
+  hash from disk and raises :class:`CandidateHashMismatch` naming both hashes.
+* **Coverage scope is explicit.**  The profile's criterion-to-section map
+  names the sections a candidate must hold.  A candidate missing one is still
+  assessed over what it holds, but the report is labelled
+  :data:`SCOPE_PARTIAL` and carries the missing sections by name.  A candidate
+  holding none of them is refused.
+* **The assessor is the existing judge.**  Each cell is one
+  :func:`~harness.expectation_coverage.grade_expectation` call: the rubric's
+  versioned pack, an N≥3 majority panel, provenance for every sample.  A
+  
+
+##### harness/calibration.py
+Judge-reliability calibration — the advisory→gating mechanism (E1.5).
+
+The guardrails say the harness is *"advisory to a human, not auto-blocking,
+until judge reliability is characterized."*  Without a mechanism, that clause has
+no teeth and the harness is advisory forever.  This module is the mechanism: it
+measures the pinned judge's precision/recall on a **human-labeled** faithfulness
+gold set, records ``{judge_model, judge_version, precision, recall}``, and turns
+that into a graduation decision — until a *fresh, applicable, above-threshold*
+calibration exists, every metric stays CI-advisory (human-decided).
+
+Two properties make it fail-safe:
+
+* **Repin re-opens advisory-only.**  A calibration is valid only for the exact
+  ``{judge_model, judge_version}`` it was measured on.  Change either and the
+  stored calibration no longer applies — :func:`graduation_for` returns advisory
+  until the new pin is re-characterized.
+* **Undefined ⇒ not graduated.**  A precision/recall that can't be computed (no
+  positive predictions, empty class) is treated as *not* meeting the bar, never
+  as a pass.
+
+The confusion matrix takes the **positive class = "supported"** (the judge's
+``passed=True``).  In that frame a false positive — judge blesses a claim its
+source does not support — is the integrity-critical error (a "gap masked as
+confirmed" the judge failed to catch), so ``precision`` (of the supported
+verdict) is the number that most directly bounds how often the judge blesses a
+gap.  Bot
+
+##### harness/claim_ledger.py
+Claim-ledger completeness — the "escaped claim" detector (E3, headline signal #2).
+
+The pipeline's anti-fabrication predicates all watch the **ledger side**: every
+logged claim has a status, a ``source_ref``, a declaration where assumed.  None
+of them read the *prose*.  A drafter that asserts a fact in a section's
+``content`` without ever emitting a ``claim_id`` for it has fabricated **around**
+the ledger — the threat the W1 predicate cannot reach, and the output-side gap
+in CLAUDE.md §10.5: *"Unattributed claims must be flagged, not asserted."*
+
+This module closes that gap with a three-stage, judge-assisted diff:
+
+1. **Decompose** — prose is chunked deterministically (whole paragraphs) and an
+   independent judge decomposes each chunk into **atomic assertions**,
+   *exhaustively* ("do not filter for importance" — materiality is a separate
+   classifier, which also removes the incentive for the decomposer to silently
+   drop borderline content).
+2. **Classify materiality** — each assertion runs through the deployed §10.5
+   classifier (:func:`harness.materiality.classify_materiality`).  Non-material
+   prose (transitions, framing, definitional description) is excluded from the
+   diff but *counted and visible*, never silently dropped.
+3. **Match against the ledger** — each material assertion is matched **by
+   meaning** against the section's claim records.  ``claim_id`` is *not* a key
+   (real ledgers repeat ids across drafting blocks — three unrelated ``C01``\ s
+   in excell
+
+##### harness/commands/_common.py
+Shared bootstrap for the harness module commands.
+
+Two things every command needs and nothing else should re-implement: the repo
+root (anchored on this file, so the commands work from any working directory)
+and the ``.env.harness`` loader, which must run from ``main()`` — never at
+import — so importing a command module does not mutate ``os.environ``.
+
+##### harness/commands/blind_assessment.py
+Candidate-bound blind assessment — the harness module command.
+
+Assesses one specified candidate (a directory of section artifacts) against a
+pre-evaluation profile with the pinned, non-drafter assessor, without running
+the production pipeline, and writes a bound report
+(:mod:`harness.blind_assessment`).  A second sub-command re-binds a persisted
+report to the candidate on disk and rejects it when the candidate changed.
+
+Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
+
+    py -3.10 -m harness.commands.blind_assessment assess --candidate <dir>
+    py -3.10 -m harness.commands.blind_assessment assess --document <id> [--graph-root <repo>] [--intake <id>]
+    py -3.10 -m harness.commands.blind_assessment verify --report <file> --candidate <dir>
+
+``--document`` names a document snapshot in the dev-graph (a node id or a
+document id with one current version).  The evidence is then built by the
+dev-graph package builder under the blind pre-evaluation view policy,
+checked by the leakage guard, and materialised under ``<out-dir>/candidates/``
+before the assessor is even constructed.  A leaked item is a hard failure
+(exit 2, nothing written).  ``--intake`` names an ESR intake record; its
+availability is stamped on the report and a purpose other than a blind
+assessment is refused.
+
+Exit codes: ``0`` complete assessment written (or report verified); ``1``
+partial assessment written — the candidate lacks profile-required sections,
+named in the report (advi
+
+##### harness/commands/faithfulness_calibration.py
+E1.5 faithfulness-calibration runner (turnkey, resumable) — "run the first calibration".
+
+Loads the human-labeled gold set, runs the pinned non-drafter judge over every
+pair through the freeze runner's paced/retry backend (so ~42 calls don't trip
+Groq's 6k tokens/min limit), computes precision/recall, applies the graduation
+threshold, and writes a decision-log DRAFT.
+
+Robust by construction (learned from the v1 loss of a full run to one flaky JSON
+on the last pair):
+  * **Per-pair checkpoint.** Predictions are persisted after every pair to
+    `harness/gold_sets/faithfulness_calibration_checkpoint.json`. A crash, a
+    daily-cap (TPD) 429, or a Ctrl-C loses nothing — re-run and it resumes,
+    judging only the pairs it hasn't done (cheap on a fresh quota).
+  * **Malformed-JSON salvage.** Groq's Llama occasionally emits a valid decision
+    in slightly-invalid JSON (e.g. a doubled closing quote). The harness parser
+    rejects it (no silent repair — correct for the runtime judge). Here, for
+    *calibration*, we read the judge's explicit `"passed": true|false` out of the
+    rejected response and log it as salvaged — we measure the judge's decision,
+    not its JSON hygiene. A pair with no recoverable verdict after retries is
+    EXCLUDED (logged), never allowed to abort the run.
+
+Run FROM THE REPO ROOT, on a fresh Groq daily quota (~42 calls ≈ 86k of 100k/day;
+if it stops on the daily cap, re-run to resume):
+
+    py -3.10 -m harness.commands.faithfulness_calibration
+
+Judge co
+
+##### harness/commands/freeze_grounding_baselines.py
+Resilient E4 judge-lane grounding-baseline freeze — safe on a rate-limited judge.
+
+Freezes the *judge half* of the E4 regression golden-set: runs E2 status-aware
+faithfulness over each committed Part B section under the pinned, non-drafter
+judge and writes one ``<section_id>.grounding.json`` baseline next to the
+deterministic ``*.golden.json`` fingerprints (``harness/regression_baselines/``).
+
+Why this exists instead of a one-liner
+--------------------------------------
+``harness.regression``'s CLI only freezes the DETERMINISTIC lane.  The judge
+lane (``freeze_section_grounding``) is a Python function, and on a rate-limited
+judge — Groq free tier for ``llama-3.3-70b-versatile`` is 30 RPM / 6,000 TPM /
+1,000 RPD — a naive ~400-call burst trips the per-minute token cap.  The
+transport marks a 429 ``retryable`` (``runner/transport/errors.py``) but nothing
+acts on it, and E2's per-claim loop is out of reach of any outer pacing.  So
+this runner injects a single choke-point backend wrapper (the one place every
+judge call passes through) that:
+
+  * paces every judge call under a TPM/RPM budget, using the backend's REAL
+    ``last_usage`` token counts (not an estimate), and
+  * retries the provider's own ``retryable`` errors (429 / 500 / 502 / 503 /
+    timeout) with exponential backoff, honouring a "try again in Ns" hint when
+    the provider sends one,
+
+then freezes SECTION-BY-SECTION with resume: a section already frozen under the
+current judge pin is skipped on re-run, so a stall
+
+##### harness/commands/rubric_grading_run.py
+E5f — the first real E5 rubric-grid grading run under the judge budget.
+
+Drives the E5a–E5e machinery (``harness.rubric``) over the three committed
+Part B sections with the pinned, non-drafter judge, and produces the two E5f
+artifacts:
+
+* the frozen grid report (``harness/rubric_reports/rubric_report.json`` — the
+  file the ``harness_rubric`` standing lane re-renders), and
+* the E4 rubric-lane baseline
+  (``harness/regression_baselines/rubric_grid.rubric.json``), frozen via
+  :func:`harness.regression.freeze_rubric_baseline` with the budget accounting
+  embedded — so a later prompt/model change can be diffed with
+  ``py -3.10 -m harness.regression rubric-check``.
+
+Reuses the ``freeze_grounding_baselines`` backend pattern: ``.env.harness``
+auto-load, token-accurate TPM/RPM pacing, retry on the transport's own
+retryable errors — plus what E5f adds on top:
+
+* **Budget math recorded before the run.**  The full call/token plan (9
+  expectations × mapped sections × N≥3, coverage + grounding, cross-pack
+  claim dedup) is computed offline and written to
+  ``harness/rubric_reports/rubric_run_budget.json`` *before* the first judge
+  call.  If the plan does not fit one Groq free-tier day, the recorded plan is
+  an explicit multi-day resume — never a silently reduced N or a shrunken
+  pack.  ``--plan-only`` stops after this step.
+* **Per-cell checkpoint, resumable.**  Every completed (expectation, section)
+  cell and the cross-expectation verdict cache are persisted after each cell
+  (an
+
+##### harness/evidence_pack.py
+Deterministic evidence-pack builder — the judge-budget contract (E5b).
+
+The E5 rubric grader judges each profile evaluator expectation against a
+Tier-5 section, but the judge budget (Groq free tier: **6k tokens/minute**,
+100k/day) makes "send the section" impossible by construction — Excellence
+alone is ~120KB of prose plus a 146-entry claim ledger.  This module owns the
+contract that keeps E5 inside that ceiling: per ``(expectation, section)`` it
+deterministically selects the prose spans and ``claim_statuses`` entries that
+*bear on* the expectation, caps the pack to a token budget that provably fits
+one judge call under the TPM ceiling, and records **everything it excluded and
+why** — a silent cap would read as "the section says nothing more", which is
+exactly the false negative an integrity harness must not manufacture.
+
+Selection is deterministic and versioned, no judge involved:
+
+* **Term matching.**  Each expectation carries an authored ``selection_terms``
+  list (versioned data in the profile's rubric-set file, E5b).  A paragraph
+  or claim is a candidate iff it matches at least one term (case-insensitive,
+  word-boundary, phrases allowed).
+* **Anchor sub-sections.**  The proposal's Part B mirrors the evaluation form:
+  each aspect has a dedicated sub-section (``1.1``…``3.2``).  A rubric may
+  declare its anchor sub-section(s); their paragraphs get a fixed score bonus
+  (:data:`ANCHOR_SCORE_BONUS`) so the section's *dedicated answer* to the
+  expectation dominates the p
+
+##### harness/expectation_coverage.py
+Coverage-axis grader — "does the section substantively address this expectation?" (E5c).
+
+The first of E5's two axes.  Per profile evaluator expectation, the judge is
+asked one question over the E5b evidence pack: *does the section, as evidenced
+by this pack, substantively address (and ground) the expectation* — the
+semantic residue the deterministic ``instrument_sections_addressed`` predicate
+cannot reach.  The predicate proves a section artifact exists and is non-empty;
+only a judge can say whether the prose actually answers the evaluator's
+question.  The grounding axis (E5d) is a separate metric built on E2; the two
+are combined — never blended — by E5e.
+
+What this module enforces, in code:
+
+* **Routing.**  Every grade is routed through
+  :func:`~harness.routing.assert_judgeable` under a property key
+  (:func:`coverage_property_key`) that is *distinct* from any deterministic
+  predicate name — if the key ever collides with the runtime's
+  ``PREDICATE_REGISTRY``, grading raises
+  :class:`~harness.routing.DeterministicCoverageError` instead of silently
+  double-checking a proof with an opinion.  The routing decision is recorded on
+  the grade.
+* **N≥3 majority.**  The verdict is an
+  :meth:`~harness.judge.Judge.evaluate_majority` panel (never a single
+  sample) — the guardrails' rule wherever a score will inform a decision.
+  Every member and the combined majority are typed ``Inferred``.
+* **Provenance is mandatory.**  ``grade_coverage`` refuses a judge without an
+  attached
+
+##### harness/expectation_grounding.py
+Grounding-axis grader — E2 aggregation per evaluator expectation (E5d).
+
+The second of E5's two axes.  Per profile evaluator expectation, this module
+answers "is what the section says *traceable to grounded claims*?" — and it
+deliberately contributes **no faithfulness judgment of its own**.  E2
+(:mod:`harness.status_faithfulness`) stays the single system-of-record for
+"does the source entail the claim"; E5d derives its grade from the claims in
+the E5b evidence pack and E2's per-claim verdicts, adding only the
+*aggregation*: the per-expectation grounding rate and the weakest-link claim.
+The coverage axis (E5c) is a separate metric; the two are combined — never
+blended — by E5e, whose headline output is the high-coverage / weak-grounding
+contradiction cell.
+
+What this module enforces, in code:
+
+* **One system-of-record, zero new faithfulness prompts.**  Any claim that
+  still needs judging goes through E2's
+  :func:`~harness.status_faithfulness.evaluate_claim` — this module renders no
+  prompt and never invokes the judge directly (a test pins both, statically
+  and behaviorally).  Every row of the grade is traceable to an individual E2
+  :class:`~harness.status_faithfulness.ClaimFaithfulness` verdict.
+* **Verdict reuse, no duplicate judge calls.**  Where the section has already
+  been judged (a :class:`~harness.status_faithfulness.StatusFaithfulnessResult`
+  is supplied), its verdicts are reused — with a fail-closed consistency check,
+  because a stale result silently re-attrib
+
+##### harness/expectations.py
+Expectation substrate — registry loader + applicability filter + criterion↔section map (E5a).
+
+The E5 rubric grader grades the Tier-5 sections against the evaluator
+expectations of the instrument a pre-evaluation profile names
+(:mod:`harness.profile`).  Those expectations live in two places with two roles:
+
+* the **raw upstream extraction** — the Tier-2A evaluator expectation registry
+  the profile points at, which may hold rows for instrument variants that
+  must **not** be graded for the profile's instrument; and
+* the **binding, human-verified subset** — the profile's scorecard file, the
+  verbatim freeze of the official evaluation form, whose aspects are the
+  applicable set.
+
+This module derives the applicability filter **deterministically from the
+``[OPTION for …]`` applicability tags** under the profile's tag grammar, and
+then requires the result to *reproduce* the scorecard exactly — the scorecard
+is the anchor the filter reproduces, never a second hand-maintained copy, and
+the filter is never a hand-copied constant.  Any divergence (a registry row
+added/dropped/reworded, an unrecognised tag, an unmapped criterion, a stale
+scorecard against a newer form version) **fails closed**: the loader raises
+rather than silently grading a subset.  A scorecard-excluded aspect the
+registry no longer carries is recorded as absent — it is not graded either
+way, so the scorecard is still reproduced.
+
+Each expectation is addressable by a stable ``expectation_key`` — the scorecard
+aspe
+
+##### harness/faithfulness.py
+The atomic faithfulness question — "does this source support this claim?" (E1.5).
+
+Calibration (:mod:`harness.calibration`) measures the judge's precision/recall on
+*faithfulness verdicts*, so it needs a way to ask the judge exactly one bounded
+question about a ``(claim, source)`` pair and read back a boolean: **is the claim
+supported by the source it cites?**  This module owns that minimal primitive —
+the prompt and the judge wiring — and nothing more.
+
+It is deliberately the *atomic* unit, not the E2 metric.  E2 (status-aware
+faithfulness) will build on the same question by partitioning claims by ``status``
+and applying status-specific thresholds (``confirmed`` → ≈1.0 vs source;
+``assumed`` → vs the declared value; ``inferred`` → softer); that partitioning is
+E2's, not built here.  Keeping the primitive separate means E1.5 and E2 ask the
+judge the same question the gold set is labeled against.
+
+The judge answers with the default verdict schema: ``passed`` is ``True`` iff the
+source supports the claim.  As always the verdict is ``Inferred`` and never
+overrides a deterministic predicate — faithfulness (semantic entailment) is
+precisely the gap no predicate can check.
+
+Constitutional authority:
+    Subordinate to CLAUDE.md.  Out-of-band QA substrate.  See ``harness/HARNESS.md``.
+
+##### harness/gold_set.py
+The human-labeled faithfulness gold set (E1.5).
+
+Judge-reliability calibration needs a small set of ``(claim, source_ref,
+supported?)`` triples where ``supported?`` is a **human** ground-truth label —
+not the engine's own ``status``.  The distinction is the whole point: the engine
+may stamp a claim ``confirmed`` while its cited source does not actually support
+it ("a gap masked as confirmed"), so the engine's ``status`` is a *prior/candidate*,
+never the gold label.  A human reads the claim against its source and records
+whether the source genuinely supports it; the calibration
+(:mod:`harness.calibration`) then measures whether the pinned judge agrees.
+
+This module owns the gold-set data model, a **fail-closed** loader (an unlabeled
+pair cannot be used for calibration — you cannot characterize a judge against
+labels that don't exist), and a deterministic seeder that draws candidate pairs
+from the real ``validation_status.claim_statuses`` of a Phase-8 section.  The
+seeder emits *unlabeled templates*; it never fabricates the human label (an AI
+labeling the gold set for an AI judge would reintroduce exactly the
+grader–generator correlation the harness exists to avoid).
+
+Constitutional authority:
+    Subordinate to CLAUDE.md.  Out-of-band QA substrate; reads a Tier-5 section
+    only to seed candidates and writes only harness-owned gold-set files.  See
+    ``harness/HARNESS.md``.
+
+##### harness/jsonl_log.py
+Shared append-only JSONL log — one JSON object per line, atomic rewrite (E1.5).
+
+The harness keeps two out-of-band audit trails with the same shape: the
+per-verdict :class:`~harness.provenance.ProvenanceLog` and the per-run
+:class:`~harness.calibration.CalibrationLog` (and E2+ will add more).  Each is an
+append-only JSONL file rewritten atomically on every append (Python owns the
+write, §9/§17.5.3; a reader never sees a torn line).  This base consolidates that
+machinery — ``__init__`` seeds from any pre-existing file, ``append_dict`` mirrors
+in memory and atomically re-serializes — so each concrete log only supplies its
+filename prefix and a typed ``append`` that serializes its record type.
+
+Volume is low (verdicts/runs per QA pass), so the read-once/rewrite-per-append
+cost is immaterial and buys torn-write safety plus trivial testability.  Nothing
+in :mod:`runner` reads these files.
+
+Constitutional authority:
+    Subordinate to CLAUDE.md.  Out-of-band QA substrate.  See ``harness/HARNESS.md``.
+
+##### harness/judge.py
+The independent judge — pinned, non-drafter, over the OpenAI-compatible transport (E1).
+
+The harness's one privileged capability: an LLM-as-judge for the *semantic gap* no
+deterministic predicate can reach.  Three guardrails shape it, and this module is
+where they are enforced in code, not merely documented:
+
+* **Grader/generator independence.**  The judge must be a *different* model from
+  the drafter/in-run reviewer, over a *different* transport.  An in-run reviewer
+  that shares the drafter's blind spots cannot be the unbiased grader of its own
+  pipeline (strategy §1).  :class:`JudgeConfig` rejects any drafter model, and
+  the default backend rejects the ``claude_cli`` transport, so the judge always
+  speaks over the OpenAI-compatible path to a non-drafter model.
+* **Pin + determinism.**  Model and version are pinned; temperature is 0.  A
+  repin re-opens E1.5's advisory-only state, so both are recorded on every
+  verdict's provenance.
+* **No silent repair.**  A malformed judge response is a failure, not an
+  auto-correctable condition (mirrors §17.6.5).  The judge raises rather than
+  improvising a verdict.
+
+Every verdict is typed :data:`~harness.verdict.EVIDENCE_TYPE_INFERRED` and, when a
+:class:`~harness.provenance.ProvenanceLog` is attached, logged before it is
+returned — so "provenance for every verdict" is structural, not a convention.
+
+The judge is injectable: pass a ``backend`` callable (the
+:class:`~runner.transport.tool_loop.ToolLoopBackend` shape) and no networ
+
+##### harness/ledger_granularity.py
+LG-1 — Coarse claim ledger, measured.
+
+Deterministic measurement of the claim-ledger granularity gap between the two
+generations of the same three Part B sections:
+
+* **graph-sourced** (current ``docs/tier5_deliverables/proposal_sections/*.json``,
+  the milestone-2 graph run) — the milestone-2 compiler emits one node-level
+  ``proposal_section`` claim per sub-section (a "table of contents" ledger); and
+* **drafter-era** — the granular per-assertion ledger the monolithic drafter
+  produced, preserved byte-for-byte in the E4 regression golden baselines
+  (``harness/regression_baselines/*.golden.json``, frozen 2026-07-21).
+
+The prose under both ledgers is **byte-identical** (verified here per
+sub-section), so the ledger is the only variable and the cardinality deficit is
+exact rather than confounded by content drift.
+
+This composes existing harness primitives only — E4's deterministic golden-set
+comparison (:mod:`harness.regression`), E2's claim loader
+(:mod:`harness.status_faithfulness`), and E3's prose surface
+(:mod:`harness.claim_ledger` / :mod:`harness.materiality`). It lives in the
+out-of-band harness package (not ``scripts/``, which must stay harness-free) and
+runs **offline, with no judge and no DAG run**: the judge-scored layers of E2
+(per-claim faithfulness) and E3 (semantic decomposition + coverage) require an
+independent, non-Claude judge endpoint, which is not configured under this repo's
+subscription-only ``claude_cli`` transport (the harness structurally refuses th
+
+##### harness/materiality.py
+The §10.5 materiality classifier + its ledger-anchored calibration (E3).
+
+The escaped-claim detector (:mod:`harness.claim_ledger`) is self-defeating
+without a materiality threshold: prose is full of transitions, framing, and
+definitional/method description that legitimately carries no ``claim_id``, and
+flagging all of it floods the "unledgered assertion" set until the check is
+ignored.  This module owns the bar that separates a **material claim** — one
+CLAUDE.md §10.5 requires to be attributed or flagged — from non-material prose.
+
+Two anchors, per the ticket:
+
+* **Constitutional (what).**  §10.5, quoted verbatim in the classifier prompt
+  (:data:`SECTION_10_5`): *"Unattributed claims must be flagged, not asserted."*
+  The constitution never defines *which* sentences count, so §10.5 alone cannot
+  drive a classifier.
+* **Empirical (which).**  The engine's own 406-entry claim ledger is its
+  enumeration of what it treats as material-and-attributable.
+  :func:`seed_materiality_positives` turns real ``claim_summary`` values into
+  auto-labeled positive examples (this is the *engine's* enumeration, not an AI
+  fabricating gold labels); negative examples (framing / transition /
+  definitional spans) are seeded as **unlabeled candidates**
+  (:func:`seed_negative_candidates`) for a *human* to label — the E1.5
+  discipline: an AI labeling gold for an AI judge would reintroduce the
+  grader–generator correlation the harness exists to avoid.
+
+:func:`calibrate_materiality` measures the 
+
+##### harness/profile.py
+Pre-evaluation profile — the versioned configuration bundle the harness grades under.
+
+A profile names everything that used to be a call-specific literal in harness
+Python: the registry instrument type the expectation loader filters on, the
+option-tag grammar (applicable variant, known variants, the prefix vocabulary),
+the criterion-to-section mapping, the scorecard (scale, weights, thresholds)
+and rubric-set files, and the form name the assessor system prompt cites.  The
+profile *document* is pure configuration; this module parses it fail-closed and
+owns the version arithmetic.  Loading the bundled components (substrate, rubric
+set, scoring) lives in :func:`harness.rubrics.load_profile_bundle`, which sits
+on top of the expectation and rubric loaders.
+
+Versioning follows the rubric-set pattern: the profile document, the scorecard
+file and the rubric set are each content-hashed, and the profile version is a
+hash over those three pins — so any bundled component change moves the
+version, and the profile document must carry the scorecard ID + version and
+the rubric-set ID + version that the loaded files actually hold (a bijection
+check, never a silent re-bind).
+
+Constitutional authority:
+    Subordinate to CLAUDE.md.  Out-of-band QA; reads harness-owned
+    configuration read-only and writes nothing.  Never a runtime gate.  See
+    ``harness/HARNESS.md``.
+
+##### harness/provenance.py
+Judge-verdict provenance — the audit trail for every score (E1).
+
+The guardrails require, for every judge verdict, a provenance record carrying
+``{judge_model, judge_version, prompt_hash, score, rationale}`` — the same
+discipline the pipeline already applies to ``reinstantiation_provenance.json``
+and the decision log.  It exists so an ``Inferred`` score can be traced back to
+*which* pinned judge said it, on *which* prompt, and why: without that, a
+merge-advisory score is an unattributable opinion, and E1.5's judge-reliability
+calibration (precision/recall vs a gold set) has nothing to calibrate against.
+
+This module owns three things and nothing else:
+
+* :func:`prompt_hash` — a stable content hash of the (system, user) prompt pair,
+  so two verdicts on the same prompt are provably comparable and a prompt change
+  is visible as a hash change.
+* :class:`ProvenanceRecord` — the immutable five-field record (plus supplementary
+  context), which cannot be constructed with a non-``Inferred`` evidence type.
+* :class:`ProvenanceLog` — an append-only JSONL sink written atomically via the
+  house ``atomic_write`` helper (Python owns every write, §9/§17.5.3).
+
+It performs no judging and makes no network call; the judge
+(:mod:`harness.judge`) builds records from its :class:`~harness.verdict.Verdict`
+outputs and appends them here.
+
+Constitutional authority:
+    Subordinate to CLAUDE.md.  Out-of-band QA substrate; writes only to the
+    harness's own report directory, never to a canonical T
+
+##### harness/regression.py
+Regression golden-set — frozen baselines for the Tier-5 sections (E4).
+
+The safety net the length-lift work lacks: a prompt change, a drafting soft-cap
+lift (D2/D3), or a model swap regenerates the Phase-8 sections, and nothing
+today would notice if the redraft silently *lost* a claim, weakened a
+``confirmed`` to an ``inferred``, swapped a claim's evidential basis
+(``source_ref``), or dropped a sub-section.  E4 freezes the current section
+JSONs as golden baselines and diffs any future artifact against them, so a
+regression of integrity or quality is *surfaced to a human* instead of sliding
+through.
+
+Two lanes, mirroring the harness's deterministic-first routing:
+
+* **Deterministic fingerprint lane (zero judge, runs offline in CI).**
+  :func:`freeze_section_fingerprint` snapshots a section's claim ledger
+  (matched by *meaning* — ``(claim_summary, status, source_ref)`` — never by
+  bare ``claim_id``, the E3 lesson), its per-sub-section prose hashes, and a
+  canonical whole-artifact hash.  :func:`compare_section` diffs a current
+  artifact against the frozen fingerprint and classifies every drift:
+  a removed claim, a status change, or a source-ref change is a **breaking**
+  regression finding; an added claim, prose growth, or a confirmed-share drop
+  is advisory context.  Prose that changed while the ledger did not is called
+  out explicitly — that is the escaped-claim risk zone (re-run E2/E3 on it).
+* **Judge lane (E2 reuse, pending a live judge).**
+  :func:`freeze_section_gr
+
+##### harness/report.py
+Reporting-only output — advisory to a human, never a runtime gate (E1).
+
+The harness's terminal artifact.  It aggregates a metric's :class:`Verdict` /
+:class:`MajorityVerdict` findings and the :class:`RoutingDecision`s that governed
+them into a single serializable object — and it is, by construction, *advisory*:
+
+* ``advisory`` is always ``True`` and ``blocking`` is always ``False``; a report
+  cannot be constructed otherwise.
+* There is deliberately **no** method that yields a gate pass/fail the scheduler
+  could consume.  A report is data for a human (a merge/release decision), not a
+  control signal for a run.
+
+This is the code face of the load-bearing invariant: **no eval metric wires into
+the runtime DAG as a fail-closed gate** (strategy §2).  The 138 predicates +
+byte-equal CI checks remain the only blocking runtime gates; the harness gates
+*decisions about the pipeline*, and even there it advises — it does not
+auto-block — until judge reliability is characterized (E1.5).  The prose of that
+boundary lives in ``harness/HARNESS.md``; this module makes it structural.
+
+Constitutional authority:
+    Subordinate to CLAUDE.md.  Out-of-band QA substrate.  See ``harness/HARNESS.md``.
+
+##### harness/routing.py
+Deterministic-first routing — the judge runs only in the semantic gap (E1).
+
+The load-bearing rule of the whole harness (strategy §0/§2, guardrails):
+
+    For any property a deterministic predicate *can* check, the predicate is
+    authoritative; the judge runs only where no deterministic check exists, and
+    a green judge never overrides a red predicate.
+
+Re-implementing a deterministic check as an LLM judge would trade a proof for a
+probabilistic opinion — a regression.  This module is the mechanism that
+prevents it.  A *property* is named by a key; if that key is the name of a
+deterministic predicate the runtime actually dispatches
+(``runner.gate_evaluator.PREDICATE_REGISTRY``), routing refuses to judge it.
+Otherwise the property sits in the semantic gap and a judge may run.
+
+Deliberately, the *semantic* in-run gates (``semantic_dispatch.SEMANTIC_REGISTRY``
+— e.g. ``no_unsupported_tier5_claims``) are **not** treated as deterministic
+coverage.  They are themselves same-model-family LLM judgments inside the system
+under test, which the strategy says must not be trusted alone; the out-of-band
+judge legitimately *re-checks* them with an independent model.  Only the
+deterministic predicate set preempts the judge.
+
+The semantic property a metric judges must therefore carry a name *distinct*
+from the deterministic predicate whose gap it fills — e.g. the deterministic
+``source_refs_present`` (a field is non-blank) leaves open the semantic
+``source_entails_claim`` (the cited sourc
+
+##### harness/rubric.py
+Contradiction detector + rubric report — the E5c × E5d combination (E5e).
+
+E5's two axes stay separate all the way to the report: **coverage** (E5c,
+"does the section substantively address this expectation?") and **grounding**
+(E5d, "is what it says traceable to grounded claims?").  This module owns the
+deterministic combination rule over the two — the 2×2 grid whose headline cell
+is the **high-coverage / weak-grounding contradiction**: the section answers
+the evaluator's question well while the answer does not rest on grounded
+claims.  A single blended score would average exactly that cell away, which is
+why no blend exists anywhere in this module — structurally: :class:`RubricReport`
+carries no blended field, and the renderer prints the two axes side by side.
+
+What this module enforces, in code:
+
+* **Deterministic combination, no judge.**  :func:`combine_axes` is arithmetic
+  over one :class:`~harness.expectation_coverage.CoverageGrade` and one
+  :class:`~harness.expectation_grounding.GroundingGrade`; it renders no prompt
+  and invokes nothing.  The *covered* axis of the cell uses the judge's **raw
+  majority** (``judge_passed``), not the clean ``passed`` — the E5b truncation
+  override forces ``passed=False`` over an ``insufficient_context`` pack, and
+  letting that override move a genuinely-covered expectation out of the
+  contradiction column would *hide* the headline cell behind the budget.  Both
+  clean bits stay on the cell and in the render, so the override remains
+ 
+
+##### harness/rubrics.py
+Rubric set — versioned, scorecard-traceable rubrics + prompt rendering (E5b).
+
+The E5 grader asks, per profile evaluator expectation, one integrity-framed
+question: *does the section address AND ground this expectation* — never "is
+this good prose".  This module owns the rubric side of that contract:
+
+* **Rubrics are versioned data, not inline strings** — the profile's rubric-set
+  file carries, per expectation, the rubric text, evaluation steps, pass
+  threshold, and the deterministic selection basis (``selection_terms`` +
+  ``anchor_sub_section_ids``) the evidence-pack builder uses.  A rubric change
+  is a data-file diff with a fingerprint change, not a silent prompt edit.
+* **Rubric wording traces to the scorecard.**  Each rubric's
+  ``expectation_text`` must be byte-identical to the matching aspect ``text``
+  in the profile's scorecard file (the human-verified verbatim freeze of the
+  official evaluation form), and ``expectation_key`` equals the scorecard
+  aspect ``id`` — so any rubric is auditable to a page of the official form.
+  The loader cross-checks the rubric set against the E5a substrate and
+  **fails closed** on any divergence: a missing/extra rubric, a paraphrased
+  expectation text, a criterion mismatch, or a rubric set built against a
+  different scorecard version.
+* **Prompt pinning.**  The rendered (system, user) prompt pair is hashed with
+  the house :func:`~harness.provenance.prompt_hash` (recorded on every judge
+  verdict's provenance); :func:`rubric_fin
+
+##### harness/status_calibration.py
+Claim-status calibration — mislabel drift in both directions (E3).
+
+The engine's ``status`` vocabulary (CLAUDE.md §12.2) is a *promise about
+evidence*: ``confirmed`` promises direct source support, ``inferred`` promises
+only grounded synthesis.  E2 polices the promise a claim *makes*; this module
+polices whether the label itself has **drifted** from the evidence:
+
+* **Overclaimed** (:data:`DRIFT_OVERCLAIMED`, ``confirmed_not_grounded``) — a
+  ``confirmed`` claim whose own source does not support it.  This is E2's
+  ``SEVERITY_INTEGRITY`` finding wearing its calibration hat, so the check
+  **reuses E2**: pass an existing
+  :class:`~harness.status_faithfulness.StatusFaithfulnessResult` and zero
+  additional judge calls are spent on the confirmed direction; without one, E2
+  is run internally over the confirmed claims.  A **hard** finding.
+* **Underclaimed** (:data:`DRIFT_UNDERCLAIMED`, ``inferred_fully_grounded``) —
+  an ``inferred`` claim that would clear the **confirmed bar**: its source
+  states or clearly entails it.  Mislabelling down is integrity-*safe* but
+  calibration-*wrong* (it understates the proposal's evidence base and blurs
+  what ``inferred`` means), so it is a **soft, advisory** drift finding.  The
+  judge is asked the confirmed-bar question — E2's own strict standard
+  (:func:`~harness.status_faithfulness.build_faithfulness_prompt_for_status`
+  with ``confirmed``) applied counterfactually to the inferred claim — and the
+  bar decision delegates verbatim to E2'
+
+##### harness/status_faithfulness.py
+Status-aware faithfulness — the "gap masked as confirmed" detector (E2).
+
+Headline integrity signal #1.  The pipeline stamps every Tier-5 claim with a
+``status`` (``confirmed`` / ``inferred`` / ``assumed``) and a ``source_ref``, and
+a deterministic predicate can check that a ``source_ref`` field is *non-blank*.
+No predicate can check the thing that actually matters: whether the cited source
+genuinely **supports** the sentence it is cited for.  A ``confirmed`` claim whose
+own source does not support it is a *gap masked as confirmed* — the exact threat
+the strategy (§1/§2) says the same-model-family in-run reviewer cannot be trusted
+to catch alone.  This module is that missing check, run by the independent,
+out-of-band judge.
+
+It is not one metric but three, partitioned by the engine's own ``status`` —
+because the standard of faithfulness differs by what the status *claims*:
+
+* ``confirmed`` → judged **strictly** against its ``source_ref``.  A confirmed
+  claim must be directly evidenced (faithfulness ≈ 1.0); an unsupported one is a
+  **hard integrity finding** (:data:`SEVERITY_INTEGRITY`).
+* ``assumed`` → judged against the **operator-declared value** in
+  ``working_assumptions.json``, *not* the source (an assumption has no source to
+  cite — it was consciously declared).  This complements the W1 predicate, which
+  checks the declaration *exists*: E2 checks the claim faithfully represents its
+  *content*.  A mismatch is content drift (:data:`SEVERITY_CONTENT_DRIFT`).
+* ``infer
+
+##### harness/verdict.py
+Judge verdict vocabulary — typed ``Inferred``, never ``Confirmed`` (E1).
+
+A harness verdict is the out-of-band judge's opinion about a semantic property
+no deterministic predicate can reach (does the source *entail* the sentence, is
+a ``confirmed`` claim genuinely grounded, did an assertion escape the ledger).
+Because an LLM-as-judge is stochastic and can be confidently wrong (strategy
+§2/§10), its output is **evidence, not proof**.  The harness therefore stamps
+every verdict with the CLAUDE.md §12.2 status ``Inferred`` — *"derived by
+logical reasoning from confirmed evidence"* — and it is impossible to construct
+a verdict typed ``Confirmed``.  This mirrors the pipeline's own discipline: a
+score raised by a judge may *advise* a human decision about the pipeline, but it
+never certifies a fact and never fail-closes a run.
+
+This module is pure: no I/O, no network, no domain reasoning — just the verdict
+types and the N≥3 majority-vote scaffold the guardrails require *"where a score
+will inform a decision."*  The judge (:mod:`harness.judge`) produces
+:class:`Verdict` objects; the provenance log (:mod:`harness.provenance`) records
+them; the report (:mod:`harness.report`) aggregates them.  None of that lives
+here.
+
+Constitutional authority:
+    Subordinate to CLAUDE.md.  Out-of-band QA substrate.  This module does not
+    evaluate gates, invoke agents, write canonical artifacts, or modify
+    scheduler state.  See ``harness/HARNESS.md``.
+
+##### runner/working_assumptions.py
+Tier 3 ``working_assumptions.json`` declaration substrate — the shared reader
+(CLAUDE.md §9 / §12.2, ticket 15).
+
+``working_assumptions.json`` is the Tier 3 file convention by which a **human
+operator** declares working assumptions.  It is the single mechanism that turns
+an *honest block* into a *conscious green* (MILESTONE1_DECISION_RECORD.md D11):
+the engine defaults to blocking on unconfirmed spine facts (researcher / host /
+call), and the operator may declare those facts as working assumptions —
+flagged ``Assumed``, never ``Confirmed`` — to unblock the run consciously.
+
+**Two consumers, one reader (D11/D12).**  A single host declaration must unlock
+*both* gates from one source:
+
+  * the **budget gate** (ticket 8, ``runner/unit_cost_budget.py``) reads the
+    declared host country to resolve the unit-cost living-allowance
+    coefficient, and
+  * the **claim layer** (ticket 9, the ``assumed_claims_are_operator_declared``
+    W1 predicate) reads the declarations to confirm that every ``status:
+    assumed`` claim maps by ``claim_id`` to a ``manually_placed`` declaration
+    whose declared value equals the claim's ``claim_summary``.
+
+The host is a *semantic* declaration, not a prose claim: the budget reads it by
+key (``declared_value("host_country")`` → an ISO code), while the applier/W1
+reach the spine claims it backs through :meth:`WorkingAssumptions.by_checklist_ref`
+(e.g. ``HOST``).  So the operator declares the host **once** and both gates
+resolve from that one entry (D

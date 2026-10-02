@@ -1,0 +1,3066 @@
+{
+  "scriptCompleted": true,
+  "entryPointCandidates": [
+    {
+      "id": "file:runner/__main__.py",
+      "score": 5,
+      "name": "__main__.py",
+      "type": "file",
+      "summary": "CLI entry point for the DAG scheduler, invoked as `python -m runner`. Parses run scoping flags (--run-id, --phase, --node, --dry-run), loads the manifest graph and run context, optionally bootstraps phase prerequisites, dispatches the scheduler, and maps the run outcome onto four distinct process exit codes."
+    },
+    {
+      "id": "file:harness/__init__.py",
+      "score": 3,
+      "name": "__init__.py",
+      "type": "file",
+      "summary": "Package root for the out-of-band evaluation and integrity harness; re-exports the E1 substrate (verdict, provenance, routing, judge, report, calibration, gold set) and documents the enforced one-way dependency boundary in which harness may import runner but never the reverse."
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_ria.json",
+      "score": 3,
+      "name": "evaluator_scorecard_ria.json",
+      "type": "config",
+      "summary": "Machine-readable RIA/IA evaluator scorecard transcribed from the EU Grants Evaluation form (HE RIA and IA) V4.0, pp.4-5: the 0-5 scoring scale with its level descriptions, the three criteria (Excellence, Impact, Implementation) each carrying a threshold score of 3, and the six verbatim aspect texts the harness grades against."
+    },
+    {
+      "id": "config:harness/rubrics_ria.json",
+      "score": 3,
+      "name": "rubrics_ria.json",
+      "type": "config",
+      "summary": "RIA rubric set (ria_ia_rubrics v1.0.0) binding each of the six scorecard aspects to an integrity-framed grading rubric with evaluation steps, a 0.6 pass threshold, selection terms and the Part B sub-section anchors (B.1.1 through B.3.2) that Phase 8 writes."
+    },
+    {
+      "id": "file:harness/blind_assessment.py",
+      "score": 2,
+      "name": "blind_assessment.py",
+      "type": "file",
+      "summary": "Candidate-bound blind pre-evaluation lane: materialises a candidate from section artifacts or a dev-graph document, enforces a leakage guard, grades each criterion cell with the pinned non-drafter assessor, and writes a report bound to the candidate hash, profile version and assessor pin."
+    },
+    {
+      "id": "file:harness/claim_ledger.py",
+      "score": 2,
+      "name": "claim_ledger.py",
+      "type": "file",
+      "summary": "Escaped-claim detector (E3): decomposes section prose into atomic assertions with an independent judge, filters them through the materiality classifier, and matches the material remainder by meaning against the section's claim ledger to surface facts asserted without any claim_id."
+    },
+    {
+      "id": "file:harness/commands/blind_assessment.py",
+      "score": 2,
+      "name": "blind_assessment.py",
+      "type": "file",
+      "summary": "Command-line entry point for the blind assessment lane: assesses one candidate directory or dev-graph document against a pre-evaluation profile, or re-binds a persisted report to the candidate on disk and rejects it when the candidate changed."
+    },
+    {
+      "id": "file:harness/commands/faithfulness_calibration.py",
+      "score": 2,
+      "name": "faithfulness_calibration.py",
+      "type": "file",
+      "summary": "Turnkey, resumable runner for the E1.5 faithfulness calibration: judges every gold-set pair through a paced/retrying backend, checkpoints predictions per pair, salvages verdicts from malformed judge JSON, and writes a decision-log draft with the graduation outcome."
+    }
+  ],
+  "fanInRanking": [
+    {
+      "id": "file:runner/atomic_write.py",
+      "fanIn": 34,
+      "name": "atomic_write.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/paths.py",
+      "fanIn": 20,
+      "name": "paths.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/judge.py",
+      "fanIn": 19,
+      "name": "judge.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/verdict.py",
+      "fanIn": 15,
+      "name": "verdict.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/gate_evaluator.py",
+      "fanIn": 15,
+      "name": "gate_evaluator.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/dev_graph/schema.py",
+      "fanIn": 13,
+      "name": "schema.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/manifest_reader.py",
+      "fanIn": 13,
+      "name": "manifest_reader.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/working_assumptions.py",
+      "fanIn": 12,
+      "name": "working_assumptions.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/predicates/types.py",
+      "fanIn": 12,
+      "name": "types.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/dag_scheduler.py",
+      "fanIn": 12,
+      "name": "dag_scheduler.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/profile.py",
+      "fanIn": 11,
+      "name": "profile.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/rubrics.py",
+      "fanIn": 11,
+      "name": "rubrics.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/node_resolver.py",
+      "fanIn": 11,
+      "name": "node_resolver.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/provenance.py",
+      "fanIn": 10,
+      "name": "provenance.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/dev_graph/identity.py",
+      "fanIn": 9,
+      "name": "identity.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/routing.py",
+      "fanIn": 8,
+      "name": "routing.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/status_faithfulness.py",
+      "fanIn": 8,
+      "name": "status_faithfulness.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/section_assembler.py",
+      "fanIn": 8,
+      "name": "section_assembler.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/run_context.py",
+      "fanIn": 8,
+      "name": "run_context.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/graph_config.py",
+      "fanIn": 8,
+      "name": "graph_config.py",
+      "type": "file"
+    }
+  ],
+  "fanOutRanking": [
+    {
+      "id": "document:harness/HARNESS.md",
+      "fanOut": 28,
+      "name": "HARNESS.md",
+      "type": "document"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanOut": 27,
+      "name": "artifact_schema_specification.yaml",
+      "type": "config"
+    },
+    {
+      "id": "document:CLAUDE.md",
+      "fanOut": 24,
+      "name": "CLAUDE.md",
+      "type": "document"
+    },
+    {
+      "id": "file:runner/gate_evaluator.py",
+      "fanOut": 20,
+      "name": "gate_evaluator.py",
+      "type": "file"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "fanOut": 19,
+      "name": "phase_08_drafting_review.yaml",
+      "type": "config"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+      "fanOut": 16,
+      "name": "manifest.compile.yaml",
+      "type": "config"
+    },
+    {
+      "id": "file:runner/dag_scheduler.py",
+      "fanOut": 15,
+      "name": "dag_scheduler.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/deterministic_components.py",
+      "fanOut": 14,
+      "name": "deterministic_components.py",
+      "type": "file"
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json",
+      "fanOut": 13,
+      "name": "rubrics_msca_pf.json",
+      "type": "config"
+    },
+    {
+      "id": "file:harness/commands/rubric_grading_run.py",
+      "fanOut": 12,
+      "name": "rubric_grading_run.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/rubric.py",
+      "fanOut": 12,
+      "name": "rubric.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/dev_graph/__init__.py",
+      "fanOut": 12,
+      "name": "__init__.py",
+      "type": "file"
+    },
+    {
+      "id": "file:runner/predicates/__init__.py",
+      "fanOut": 11,
+      "name": "__init__.py",
+      "type": "file"
+    },
+    {
+      "id": "config:harness/rubrics_ria.json",
+      "fanOut": 11,
+      "name": "rubrics_ria.json",
+      "type": "config"
+    },
+    {
+      "id": "file:harness/commands/blind_assessment.py",
+      "fanOut": 10,
+      "name": "blind_assessment.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/__init__.py",
+      "fanOut": 9,
+      "name": "__init__.py",
+      "type": "file"
+    },
+    {
+      "id": "file:harness/blind_assessment.py",
+      "fanOut": 9,
+      "name": "blind_assessment.py",
+      "type": "file"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/meta.yaml",
+      "fanOut": 9,
+      "name": "meta.yaml",
+      "type": "config"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "fanOut": 9,
+      "name": "phase_07_budget_gate.yaml",
+      "type": "config"
+    },
+    {
+      "id": "file:harness/claim_ledger.py",
+      "fanOut": 8,
+      "name": "claim_ledger.py",
+      "type": "file"
+    }
+  ],
+  "importFanInRanking": [
+    {
+      "id": "file:runner/atomic_write.py",
+      "importFanIn": 33,
+      "name": "atomic_write.py"
+    },
+    {
+      "id": "file:harness/judge.py",
+      "importFanIn": 17,
+      "name": "judge.py"
+    },
+    {
+      "id": "file:runner/paths.py",
+      "importFanIn": 17,
+      "name": "paths.py"
+    },
+    {
+      "id": "file:harness/verdict.py",
+      "importFanIn": 14,
+      "name": "verdict.py"
+    },
+    {
+      "id": "file:runner/working_assumptions.py",
+      "importFanIn": 12,
+      "name": "working_assumptions.py"
+    },
+    {
+      "id": "file:runner/dev_graph/schema.py",
+      "importFanIn": 12,
+      "name": "schema.py"
+    },
+    {
+      "id": "file:runner/predicates/types.py",
+      "importFanIn": 12,
+      "name": "types.py"
+    },
+    {
+      "id": "file:harness/provenance.py",
+      "importFanIn": 9,
+      "name": "provenance.py"
+    },
+    {
+      "id": "file:runner/dev_graph/identity.py",
+      "importFanIn": 9,
+      "name": "identity.py"
+    },
+    {
+      "id": "file:harness/evidence_pack.py",
+      "importFanIn": 7,
+      "name": "evidence_pack.py"
+    },
+    {
+      "id": "file:harness/routing.py",
+      "importFanIn": 7,
+      "name": "routing.py"
+    },
+    {
+      "id": "file:harness/status_faithfulness.py",
+      "importFanIn": 7,
+      "name": "status_faithfulness.py"
+    },
+    {
+      "id": "file:runner/dev_graph/builder.py",
+      "importFanIn": 7,
+      "name": "builder.py"
+    },
+    {
+      "id": "file:runner/graph_config.py",
+      "importFanIn": 7,
+      "name": "graph_config.py"
+    },
+    {
+      "id": "file:runner/graph_schema.py",
+      "importFanIn": 7,
+      "name": "graph_schema.py"
+    },
+    {
+      "id": "file:harness/faithfulness.py",
+      "importFanIn": 6,
+      "name": "faithfulness.py"
+    },
+    {
+      "id": "file:harness/profile.py",
+      "importFanIn": 6,
+      "name": "profile.py"
+    },
+    {
+      "id": "file:harness/rubrics.py",
+      "importFanIn": 6,
+      "name": "rubrics.py"
+    },
+    {
+      "id": "file:runner/claim_status.py",
+      "importFanIn": 6,
+      "name": "claim_status.py"
+    },
+    {
+      "id": "file:harness/gold_set.py",
+      "importFanIn": 5,
+      "name": "gold_set.py"
+    }
+  ],
+  "bfsTraversal": {
+    "startNode": "file:runner/__main__.py",
+    "order": [
+      "file:runner/__main__.py",
+      "file:runner/dag_scheduler.py",
+      "file:runner/gate_library.py",
+      "file:runner/manifest_reader.py",
+      "file:runner/paths.py",
+      "file:runner/run_context.py",
+      "file:runner/agent_runtime.py",
+      "file:runner/call_slicer.py",
+      "file:runner/deterministic_components.py",
+      "file:runner/gate_evaluator.py",
+      "file:runner/gate_result_registry.py",
+      "file:runner/node_resolver.py",
+      "file:runner/phase8_preseed.py",
+      "file:runner/phase8_reuse.py",
+      "file:runner/phase8_skip_binding.py",
+      "file:runner/predicates/gate_pass_predicates.py",
+      "file:runner/runtime_models.py",
+      "file:runner/versions.py",
+      "file:runner/decomposed_drafting.py",
+      "file:runner/section_assembler.py",
+      "file:runner/skill_runtime.py",
+      "file:runner/fingerprints.py",
+      "file:runner/predicates/coverage_predicates.py",
+      "file:runner/predicates/criterion_predicates.py",
+      "file:runner/predicates/cycle_predicates.py",
+      "file:runner/predicates/file_predicates.py",
+      "file:runner/predicates/phase8_section_predicates.py",
+      "file:runner/predicates/schema_predicates.py",
+      "file:runner/predicates/scope_coverage_predicates.py",
+      "file:runner/predicates/source_ref_predicates.py",
+      "file:runner/predicates/timeline_predicates.py",
+      "file:runner/predicates/types.py",
+      "file:runner/semantic_dispatch.py",
+      "file:runner/upstream_inputs.py",
+      "file:runner/claim_status.py",
+      "file:runner/atomic_write.py",
+      "file:runner/instrument_profile.py",
+      "file:runner/claude_transport.py",
+      "file:runner/transport/config.py",
+      "file:runner/transport/tool_executor.py",
+      "file:runner/transport/tool_loop.py",
+      "file:runner/working_assumptions.py",
+      "file:runner/interface_contract.py",
+      "file:runner/json_extract.py",
+      "file:runner/transport/capabilities.py"
+    ],
+    "depthMap": {
+      "file:runner/__main__.py": 0,
+      "file:runner/dag_scheduler.py": 1,
+      "file:runner/gate_library.py": 1,
+      "file:runner/manifest_reader.py": 1,
+      "file:runner/paths.py": 1,
+      "file:runner/run_context.py": 1,
+      "file:runner/agent_runtime.py": 2,
+      "file:runner/call_slicer.py": 2,
+      "file:runner/deterministic_components.py": 2,
+      "file:runner/gate_evaluator.py": 2,
+      "file:runner/gate_result_registry.py": 2,
+      "file:runner/node_resolver.py": 2,
+      "file:runner/phase8_preseed.py": 2,
+      "file:runner/phase8_reuse.py": 2,
+      "file:runner/phase8_skip_binding.py": 2,
+      "file:runner/predicates/gate_pass_predicates.py": 2,
+      "file:runner/runtime_models.py": 2,
+      "file:runner/versions.py": 2,
+      "file:runner/decomposed_drafting.py": 3,
+      "file:runner/section_assembler.py": 3,
+      "file:runner/skill_runtime.py": 3,
+      "file:runner/fingerprints.py": 3,
+      "file:runner/predicates/coverage_predicates.py": 3,
+      "file:runner/predicates/criterion_predicates.py": 3,
+      "file:runner/predicates/cycle_predicates.py": 3,
+      "file:runner/predicates/file_predicates.py": 3,
+      "file:runner/predicates/phase8_section_predicates.py": 3,
+      "file:runner/predicates/schema_predicates.py": 3,
+      "file:runner/predicates/scope_coverage_predicates.py": 3,
+      "file:runner/predicates/source_ref_predicates.py": 3,
+      "file:runner/predicates/timeline_predicates.py": 3,
+      "file:runner/predicates/types.py": 3,
+      "file:runner/semantic_dispatch.py": 3,
+      "file:runner/upstream_inputs.py": 3,
+      "file:runner/claim_status.py": 3,
+      "file:runner/atomic_write.py": 4,
+      "file:runner/instrument_profile.py": 4,
+      "file:runner/claude_transport.py": 4,
+      "file:runner/transport/config.py": 4,
+      "file:runner/transport/tool_executor.py": 4,
+      "file:runner/transport/tool_loop.py": 4,
+      "file:runner/working_assumptions.py": 4,
+      "file:runner/interface_contract.py": 4,
+      "file:runner/json_extract.py": 4,
+      "file:runner/transport/capabilities.py": 5
+    },
+    "byDepth": {
+      "0": [
+        "file:runner/__main__.py"
+      ],
+      "1": [
+        "file:runner/dag_scheduler.py",
+        "file:runner/gate_library.py",
+        "file:runner/manifest_reader.py",
+        "file:runner/paths.py",
+        "file:runner/run_context.py"
+      ],
+      "2": [
+        "file:runner/agent_runtime.py",
+        "file:runner/call_slicer.py",
+        "file:runner/deterministic_components.py",
+        "file:runner/gate_evaluator.py",
+        "file:runner/gate_result_registry.py",
+        "file:runner/node_resolver.py",
+        "file:runner/phase8_preseed.py",
+        "file:runner/phase8_reuse.py",
+        "file:runner/phase8_skip_binding.py",
+        "file:runner/predicates/gate_pass_predicates.py",
+        "file:runner/runtime_models.py",
+        "file:runner/versions.py"
+      ],
+      "3": [
+        "file:runner/decomposed_drafting.py",
+        "file:runner/section_assembler.py",
+        "file:runner/skill_runtime.py",
+        "file:runner/fingerprints.py",
+        "file:runner/predicates/coverage_predicates.py",
+        "file:runner/predicates/criterion_predicates.py",
+        "file:runner/predicates/cycle_predicates.py",
+        "file:runner/predicates/file_predicates.py",
+        "file:runner/predicates/phase8_section_predicates.py",
+        "file:runner/predicates/schema_predicates.py",
+        "file:runner/predicates/scope_coverage_predicates.py",
+        "file:runner/predicates/source_ref_predicates.py",
+        "file:runner/predicates/timeline_predicates.py",
+        "file:runner/predicates/types.py",
+        "file:runner/semantic_dispatch.py",
+        "file:runner/upstream_inputs.py",
+        "file:runner/claim_status.py"
+      ],
+      "4": [
+        "file:runner/atomic_write.py",
+        "file:runner/instrument_profile.py",
+        "file:runner/claude_transport.py",
+        "file:runner/transport/config.py",
+        "file:runner/transport/tool_executor.py",
+        "file:runner/transport/tool_loop.py",
+        "file:runner/working_assumptions.py",
+        "file:runner/interface_contract.py",
+        "file:runner/json_extract.py"
+      ],
+      "5": [
+        "file:runner/transport/capabilities.py"
+      ]
+    }
+  },
+  "nonCodeFiles": {
+    "documentation": [
+      {
+        "id": "document:harness/HARNESS.md",
+        "name": "HARNESS.md",
+        "type": "document",
+        "filePath": "harness/HARNESS.md",
+        "summary": "Specification document for the out-of-band evaluation and integrity harness, defining its substrate (E1/E1.5), the two headline signals E2 (status-aware faithfulness) and E3 (claim-ledger completeness plus status calibration), the E4 regression golden-set, the pre-evaluation profile layer and the blind-assessment lane. It is the authority for the harness's load-bearing invariant: no eval metric may wire into the runtime DAG as a fail-closed gate."
+      },
+      {
+        "id": "document:harness/evaluator_scorecard_msca_pf.md",
+        "name": "evaluator_scorecard_msca_pf.md",
+        "type": "document",
+        "filePath": "harness/evaluator_scorecard_msca_pf.md",
+        "summary": "Human-readable mirror of the MSCA-PF evaluator scorecard, listing every criterion, weight and aspect text with its form page and option tag, plus the PF scoping rule that decides which registry aspects are graded and which are excluded."
+      },
+      {
+        "id": "document:CLAUDE.md",
+        "name": "CLAUDE.md",
+        "type": "document",
+        "filePath": "CLAUDE.md",
+        "summary": "The repository constitution and highest interpretive authority: it defines the programme-agnostic proposal-orchestration mission, a ten-level authority hierarchy, the six-tier document model (Tier 1 normative framework through Tier 5 deliverables), the eight canonical gated phases, the budget-integration rules, twelve categories of forbidden action, the agent derivation and execution binding rules, and the three-layer runtime execution architecture. Every agent, skill and workflow in the repository is subordinate to it, and five formal amendment records track how it has changed."
+      },
+      {
+        "id": "document:harness/gold_sets/README.md",
+        "name": "README.md",
+        "type": "document",
+        "filePath": "harness/gold_sets/README.md",
+        "summary": "Explains the E1.5 faithfulness gold sets — human-labelled (claim, source_ref, supported?) triples used to calibrate the judge — and states the independence rule: the `supported` label is human ground truth, deliberately not the engine's own status, and an AI must never fill it."
+      },
+      {
+        "id": "document:harness/labeling/LABELLING_GUIDE.md",
+        "name": "LABELLING_GUIDE.md",
+        "type": "document",
+        "filePath": "harness/labeling/LABELLING_GUIDE.md",
+        "summary": "Hand-labelling rubric for the E3.1 materiality calibration: the single question a labeller asks of each text span, worked examples of material versus non-material prose, tie-breaks for edge cases, and the independence rule that a human — never an AI — writes the answer key."
+      },
+      {
+        "id": "document:harness/materiality_sets/README.md",
+        "name": "README.md",
+        "type": "document",
+        "filePath": "harness/materiality_sets/README.md",
+        "summary": "Documents the E3 materiality calibration data and its two-anchor rule: positives are the engine's own claim-ledger enumeration and may legitimately be auto-labelled, while negatives are a human's call and are shipped unlabelled. Also states what becomes measurable at each stage of labelling."
+      },
+      {
+        "id": "document:harness/regression_baselines/README.md",
+        "name": "README.md",
+        "type": "document",
+        "filePath": "harness/regression_baselines/README.md",
+        "summary": "Describes the E4 regression golden baselines — frozen per-section fingerprints covering the claim ledger, per-sub-section prose hashes and a formatting-invariant whole-artifact hash — what integrity drift the golden diff catches, and why the lane is merge-advisory and human-decided rather than run-blocking."
+      }
+    ],
+    "infrastructure": [],
+    "data": [
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1",
+        "name": "orch.phase1.call_analysis_summary.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 1 call_analysis_summary.json Tier 4 phase output capturing extracted call analysis."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1",
+        "name": "orch.phase2.concept_refinement_summary.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 2 concept_refinement_summary.json Tier 4 phase output recording call-aligned concept refinement."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1",
+        "name": "orch.phase3.wp_structure.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 3 wp_structure.json artifact holding work packages, tasks, deliverables and dependencies."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1",
+        "name": "orch.phase4.gantt.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 4 gantt.json artifact assigning every task to months across the project duration."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1",
+        "name": "orch.phase4.scheduling_constraints.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 4 scheduling_constraints.json artifact produced by deterministic dependency normalization."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1",
+        "name": "orch.phase5.impact_architecture.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 5 impact_architecture.json artifact holding output-to-outcome-to-impact pathways and KPIs."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1",
+        "name": "orch.phase6.implementation_architecture.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 6 implementation_architecture.json artifact holding governance structure, risk register and ethics flags."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1",
+        "name": "orch.phase7.budget_gate_assessment.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 7 budget_gate_assessment.json artifact recording budget presence and structural consistency."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1",
+        "name": "orch.phase8.drafting_review_status.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Phase 8 drafting_review_status.json artifact tracking section drafting and review disposition."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1",
+        "name": "orch.checkpoints.phase8_checkpoint.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the durable phase8_checkpoint.json carrying the cross-run checkpoint provenance quad."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1",
+        "name": "orch.tier5.assembled_draft.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Deprecated assembled_draft.json schema, superseded by orch.tier5.part_b_assembled_draft.v1."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1",
+        "name": "orch.tier5.excellence_section.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Tier 5 excellence_section.json deliverable drafted in Phase 8a."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1",
+        "name": "orch.tier5.impact_section.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Tier 5 impact_section.json deliverable drafted in Phase 8b."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.implementation_section.v1",
+        "name": "orch.tier5.implementation_section.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Tier 5 implementation_section.json deliverable drafted in Phase 8c."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1",
+        "name": "orch.tier5.part_b_assembled_draft.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for part_b_assembled_draft.json, the cross-section assembly product checked by gate_10d."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.review_packet.v1",
+        "name": "orch.tier5.review_packet.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Tier 5 review_packet.json produced by evaluator-style review in Phase 8e."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1",
+        "name": "orch.tier5.final_export.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the Tier 5 final_export.json written by the deterministic final export component."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.proposal_section.v1",
+        "name": "orch.tier5.proposal_section.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Generic proposal_section schema applied to each per-section JSON artifact under proposal_sections/."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1",
+        "name": "orch.gate_result.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for gate_result artifacts, which are written exclusively by the gate evaluator."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1",
+        "name": "orch.operational.run_manifest.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for per-run run_manifest artifacts recording run identity and node outcomes."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1",
+        "name": "orch.dev_graph.snapshot.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for the dev_graph snapshot.json capturing the projected graph state."
+      },
+      {
+        "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.document_snapshot.v1",
+        "name": "orch.dev_graph.document_snapshot.v1",
+        "type": "schema",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "Schema for per-document dev_graph snapshots keyed by document id and content hash."
+      }
+    ],
+    "config": [
+      {
+        "id": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+        "name": "manifest.compile.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/manifest.compile.yaml",
+        "summary": "The compiled workflow manifest and executable spine of the engine: it declares the DAG execution model, a node_registry of 13 phase nodes binding each to its agent, skills, deterministic components and entry/exit gates, a 17-entry edge_registry of gate-guarded transitions, a 14-entry gate_registry and a 31-entry artifact registry. Its gate_registry predicate_refs are authoritative over which gate predicates actually execute."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+        "name": "agent_catalog.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/agent_catalog.yaml",
+        "summary": "Declares the 20 workflow agents with their role, constitutional scope, declared tier reads and writes, explicit must_not prohibitions and phase alignment. Named by the constitution as an authoritative source of agent scope; three agents are cross-phase and proposal_writer is marked deprecated by the Phase 8 refactor."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+        "name": "skill_catalog.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/skill_catalog.yaml",
+        "summary": "Declares the 27 skills, each an atomic single-Claude-invocation unit, with its execution mode (predominantly TAPM), output contract, purpose, consuming agents, declared tier reads and writes and constitutional constraints. A skill may never invoke another skill."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+        "name": "gate_rules_library.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/gate_rules_library.yaml",
+        "summary": "The machine-evaluable predicate library behind all 14 gates: 149 declared predicates, each carrying a predicate_id, type, evaluation function, args, prose condition and operator-facing fail message. The manifest's predicate_refs select which of these actually run."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+        "name": "quality_gates.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/quality_gates.yaml",
+        "summary": "The prose-level definition of the 15 quality gates: name, description, evaluation point, fail action and the human-readable conditions each gate enforces. Budget Consistency is the only gate flagged bypass_prohibited, matching the constitution's categorical Phase 8 block."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "name": "artifact_schema_specification.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+        "summary": "The canonical artifact schema specification: field-level schemas for Tier 4 phase outputs, Tier 5 deliverables, proposal sections, gate results, operational and dev-graph artifacts, Tier 3 sources, Tier 2A/2B extracts and integration validation, plus a 22-entry schema_id_registry mapping each schema_id to its artifact and section. Agent output that diverges from these schemas is a failure, not an alternative valid reading."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+        "name": "tier_bindings.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/tier_bindings.yaml",
+        "summary": "Maps the workflow onto the repository document model: for Tier 1 through Tier 5 plus integrations and runtime it declares the root path, role, subpaths, extracted artifacts, read authority and write constraint, including the Tier 2A constraint against treating grant agreement annexes as a proposal schema."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+        "name": "global_rules.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/global_rules.yaml",
+        "summary": "Cross-cutting invariants binding every phase: determinism, failure on missing required inputs, mandatory tier traceability, durable Tier 4 writes, prohibitions on fabricating project facts, call constraints and budget estimates, the budget-gate-before-finalization rule and the evaluation-success optimisation target."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+        "name": "state_rules.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/state_rules.yaml",
+        "summary": "Rules governing orchestration state: Tier 4 durability, checkpoint preservation, decision logging, deterministic rerun behaviour, conflict logging, the agent-memory boundary, the four-value validation status vocabulary (Confirmed, Inferred, Assumed, Unresolved) and index maintenance."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+        "name": "integration_rules.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/integration_rules.yaml",
+        "summary": "Governs the Lump Sum Budget Planner exchange: interface contract location, request and response exchange directories, what the repository may and must not do, request preparation and response validation rules, failure modes and the prohibition on substituting internally generated budget figures."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/meta.yaml",
+        "name": "meta.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/meta.yaml",
+        "summary": "Workflow package metadata: name, version 1.1, a constitutional authority pointer to CLAUDE.md with its hierarchy position and amendment rule, repository scope (programme-agnostic, multi-instrument, project-specificity triggers), the 16-entry ordered package_sources load list and the compiled entry point manifest.compile.yaml."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+        "name": "design_notes.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/design_notes.yaml",
+        "summary": "Records the design rationale behind the orchestration specification: why the workflow is universal and authoritative, evaluator orientation, Tier 3 as the project container, formalised dependency mapping, the Phase 8 substep split, the budget gate design, constitutional subordination and the package model."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+        "name": "phase_01_call_analysis.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+        "summary": "Node specification for Phase 1 (Call Analysis): binds the call_analyzer agent and five extraction skills to parse the work programme and call topic into the six Tier 2B extracted files plus the Tier 2A section and evaluator registries. Its gate requires all six extracted files non-empty with source section references and a resolved instrument type."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+        "name": "phase_02_concept_refinement.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+        "summary": "Node specification for Phase 2 (Concept Refinement): binds the concept_refiner agent to align the Tier 3 concept note with the confirmed call scope and vocabulary, writing topic_mapping.json and compliance_profile.json back to Tier 3. Its gate requires a complete topic mapping with source references and no unresolved scope conflicts against Tier 2B."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+        "name": "phase_03_wp_design.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+        "summary": "Node specification for Phase 3 (Work Package Design and Dependency Mapping): binds the wp_designer agent to build work packages, tasks, deliverables, milestones and an acyclic inter-WP dependency map from Tier 3 objectives and consortium data. Its gate requires every WP to carry objectives, tasks, at least one deliverable, a responsible lead and declared dependencies, with the WP count inside the Tier 2A instrument limit and no dependency cycles."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+        "name": "phase_04_gantt_milestones.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+        "summary": "Node specification for Phase 4 (Gantt and Milestones): binds the gantt_designer agent plus the deterministic dependency_normalizer component to assign every task to months, define milestones with verifiable criteria and derive scheduling_constraints.json. Its gate requires all tasks scheduled within the call duration, every milestone verifiable, a critical path consistent with the dependency map, and the normalized constraints written to Tier 4."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+        "name": "phase_05_impact_architecture.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+        "summary": "Node specification for Phase 5 (Impact Architecture): binds the impact_architect agent to build the output-to-outcome-to-impact pathway with KPIs, dissemination, exploitation, communication and sustainability logic. Its gate requires every Tier 2B expected impact to have at least one mapped project output and every KPI to trace to a named WP deliverable, with no impact claim asserted without a project mechanism."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+        "name": "phase_06_implementation_architecture.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+        "summary": "Node specification for Phase 6 (Implementation Architecture): binds the implementation_architect agent to define the management structure, governance and decision-making matrix, quality assurance plan, populated risk register, ethics self-assessment and any instrument-mandated gender and diversity plan. Its gate requires ethics flags to be stated explicitly rather than omitted and all management roles to be assigned to named Tier 3 partners."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+        "name": "phase_07_budget_gate.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+        "summary": "Node specification for Phase 7 (Budget Gate): binds the budget_gate_validator agent to confirm a validated external Lump Sum Budget Planner response exists and is structurally consistent with the Phase 3 WP structure, Phase 4 timeline and Phase 6 consortium roles, without computing any figure itself. The gate is marked mandatory with bypass_prohibited, and a pre_gate_action delegates request preparation to budget_interface_coordinator when no response is present."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+        "name": "phase_08_drafting_review.yaml",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+        "summary": "Node specification for Phase 8 (Drafting and Review), the only phase decomposed into substeps: three parallel criterion-aligned drafting nodes (Excellence, Impact, Implementation), then sequential assembly, evaluator-style review and revision. It depends on all seven preceding phases and its gate aggregates gate_10a-d, gate_11, resolved critical revision actions, the final export and a published Phase 8 checkpoint."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting",
+        "name": "phase_08a_excellence_drafting",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+        "summary": "Substep 8a: binds the excellence_writer agent and the excellence-section-drafting skill to produce excellence_section.json covering objectives, relation to work programme, concept and methodology, ambition, interdisciplinarity and gender dimension. Runs in parallel with 8b and 8c and must verify the budget gate has passed before producing any content."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting",
+        "name": "phase_08b_impact_drafting",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+        "summary": "Substep 8b: binds the impact_writer agent and the impact-section-drafting skill to produce impact_section.json, mapping every Tier 2B expected impact to a Phase 5 pathway and populating impact_pathway_refs and dec_coverage. Runs in parallel with 8a and 8c and forbids fabricated coverage of an expected impact no project output addresses."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting",
+        "name": "phase_08c_implementation_drafting",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+        "summary": "Substep 8c: binds the implementation_writer agent and the implementation-section-drafting skill to produce implementation_section.json covering the work plan, Gantt, deliverables and milestones tables, management structure, risk management, consortium and resources. Populates wp_table_refs, gantt_ref, milestone_refs and risk_register_ref from the Phase 3, 4 and 6 artifacts without redesigning them."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+        "name": "phase_08d_assembly",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+        "summary": "Substep 8d: binds the proposal_integrator agent and the cross-section-consistency-check skill to assemble the three criterion sections into part_b_assembled_draft.json in Part B order, recording cross-section findings in a consistency_log. It depends on substeps 8a, 8b and 8c and is forbidden from rewriting section content — inconsistencies are flagged, never silently normalised."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review",
+        "name": "phase_08e_evaluator_review",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+        "summary": "Substep 8e: binds the evaluator_reviewer agent and the evaluator-criteria-review skill to simulate evaluator assessment of the assembled draft against the Phase 1 evaluation matrix, producing review_packet.json with weaknesses categorised critical, major or minor and a prioritised revision action list. It depends on substep 8d and may not revise the draft itself."
+      },
+      {
+        "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision",
+        "name": "phase_08f_revision",
+        "type": "config",
+        "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+        "summary": "Substep 8f: binds the revision_integrator agent plus the deterministic checkpoint_publisher component to apply critical then major revision actions, write the final export and publish phase8_checkpoint.json to Tier 4. It depends on substep 8e and must flag unresolvable gaps in the revision log rather than fabricate content."
+      },
+      {
+        "id": "config:harness/evaluator_scorecard_ria.json",
+        "name": "evaluator_scorecard_ria.json",
+        "type": "config",
+        "filePath": "harness/evaluator_scorecard_ria.json",
+        "summary": "Machine-readable RIA/IA evaluator scorecard transcribed from the EU Grants Evaluation form (HE RIA and IA) V4.0, pp.4-5: the 0-5 scoring scale with its level descriptions, the three criteria (Excellence, Impact, Implementation) each carrying a threshold score of 3, and the six verbatim aspect texts the harness grades against."
+      },
+      {
+        "id": "config:harness/evaluator_scorecard_msca_pf.json",
+        "name": "evaluator_scorecard_msca_pf.json",
+        "type": "config",
+        "filePath": "harness/evaluator_scorecard_msca_pf.json",
+        "summary": "Machine-readable MSCA Postdoctoral Fellowship evaluator scorecard transcribed from the HE MSCA Evaluation Form V2.2, pp.4-6: the 0-5 scale, the 50/30/20 criterion weighting against a 70/100 overall pass threshold, the nine PF-scoped aspects, and the COFUND-only recruiting-institution aspect explicitly excluded from grading."
+      },
+      {
+        "id": "config:harness/rubrics_ria.json",
+        "name": "rubrics_ria.json",
+        "type": "config",
+        "filePath": "harness/rubrics_ria.json",
+        "summary": "RIA rubric set (ria_ia_rubrics v1.0.0) binding each of the six scorecard aspects to an integrity-framed grading rubric with evaluation steps, a 0.6 pass threshold, selection terms and the Part B sub-section anchors (B.1.1 through B.3.2) that Phase 8 writes."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json",
+        "name": "rubrics_msca_pf.json",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "MSCA-PF rubric set (msca_pf_rubrics v1.0.0) binding each of the nine PF-scoped scorecard aspects to an integrity-framed grading rubric with evaluation steps, a 0.6 pass threshold, selection terms and the sub-section anchors 1.1 through 3.2."
+      },
+      {
+        "id": "config:harness/rubrics_ria.json:ria-exc-objectives",
+        "name": "ria-exc-objectives",
+        "type": "config",
+        "filePath": "harness/rubrics_ria.json",
+        "summary": "Integrity rubric for the excellence aspect: Clarity and pertinence of the project’s objectives, and the extent to which the proposed work is ambitious, and goes beyond the state of the art. Graded against sub-section anchor B.1.1 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_ria.json:ria-exc-methodology",
+        "name": "ria-exc-methodology",
+        "type": "config",
+        "filePath": "harness/rubrics_ria.json",
+        "summary": "Integrity rubric for the excellence aspect: Soundness of the proposed methodology, including the underlying concepts, models, assumptions, inter-disciplinary approaches, appropriate... Graded against sub-section anchor B.1.2 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_ria.json:ria-imp-pathways",
+        "name": "ria-imp-pathways",
+        "type": "config",
+        "filePath": "harness/rubrics_ria.json",
+        "summary": "Integrity rubric for the impact aspect: Credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme. Graded against sub-section anchor B.2.1 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_ria.json:ria-imp-measures",
+        "name": "ria-imp-measures",
+        "type": "config",
+        "filePath": "harness/rubrics_ria.json",
+        "summary": "Integrity rubric for the impact aspect: Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including... Graded against sub-section anchor B.2.2 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_ria.json:ria-impl-workplan",
+        "name": "ria-impl-workplan",
+        "type": "config",
+        "filePath": "harness/rubrics_ria.json",
+        "summary": "Integrity rubric for the implementation aspect: Quality and effectiveness of the work plan, assessment of risks, and appropriateness of the effort assigned to work packages, and the resources... Graded against sub-section anchor B.3.1 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_ria.json:ria-impl-capacity",
+        "name": "ria-impl-capacity",
+        "type": "config",
+        "filePath": "harness/rubrics_ria.json",
+        "summary": "Integrity rubric for the implementation aspect: Capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise. Graded against sub-section anchor B.3.2 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:exc-obj",
+        "name": "exc-obj",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the excellence aspect: Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of... Graded against sub-section anchor 1.1 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:exc-method",
+        "name": "exc-method",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the excellence aspect: Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if... Graded against sub-section anchor 1.2 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:exc-supervision",
+        "name": "exc-supervision",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the excellence aspect: Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host. Graded against sub-section anchor 1.3 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:exc-researcher",
+        "name": "exc-researcher",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the excellence aspect: Quality and appropriateness of the researcher's professional experience, competences and skills. Graded against sub-section anchor 1.4 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:imp-career",
+        "name": "imp-career",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the impact aspect: Credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development. Graded against sub-section anchor 2.1 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:imp-dissemination",
+        "name": "imp-dissemination",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the impact aspect: Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including... Graded against sub-section anchor 2.2 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:imp-magnitude",
+        "name": "imp-magnitude",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the impact aspect: The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts. Graded against sub-section anchor 2.3 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:impl-workplan",
+        "name": "impl-workplan",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the implementation aspect: Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages. Graded against sub-section anchor 3.1 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/rubrics_msca_pf.json:impl-host",
+        "name": "impl-host",
+        "type": "config",
+        "filePath": "harness/rubrics_msca_pf.json",
+        "summary": "Integrity rubric for the implementation aspect: Quality and capacity of the host institutions and participating organisations, including hosting arrangements. Graded against sub-section anchor 3.2 with a pass threshold of 0.6."
+      },
+      {
+        "id": "config:harness/evaluator_scorecard_ria.json:excellence",
+        "name": "excellence",
+        "type": "config",
+        "filePath": "harness/evaluator_scorecard_ria.json",
+        "summary": "Scorecard criterion Excellence (Score 1, unweighted, weight_pct carrying the placeholder value 1, form page 4) covering the aspects ria-exc-objectives, ria-exc-methodology. Individual threshold score 3."
+      },
+      {
+        "id": "config:harness/evaluator_scorecard_ria.json:impact",
+        "name": "impact",
+        "type": "config",
+        "filePath": "harness/evaluator_scorecard_ria.json",
+        "summary": "Scorecard criterion Impact (Score 2, unweighted, weight_pct carrying the placeholder value 1, form page 4-5) covering the aspects ria-imp-pathways, ria-imp-measures. Individual threshold score 3."
+      },
+      {
+        "id": "config:harness/evaluator_scorecard_ria.json:implementation",
+        "name": "implementation",
+        "type": "config",
+        "filePath": "harness/evaluator_scorecard_ria.json",
+        "summary": "Scorecard criterion Quality and efficiency of the implementation (Score 3, unweighted, weight_pct carrying the placeholder value 1, form page 5) covering the aspects ria-impl-workplan, ria-impl-capacity. Individual threshold score 3."
+      },
+      {
+        "id": "config:harness/evaluator_scorecard_msca_pf.json:excellence",
+        "name": "excellence",
+        "type": "config",
+        "filePath": "harness/evaluator_scorecard_msca_pf.json",
+        "summary": "Scorecard criterion Excellence (Score 1, weight 50%, form page 4-5) covering the aspects exc-obj, exc-method, exc-supervision, exc-researcher."
+      },
+      {
+        "id": "config:harness/evaluator_scorecard_msca_pf.json:impact",
+        "name": "impact",
+        "type": "config",
+        "filePath": "harness/evaluator_scorecard_msca_pf.json",
+        "summary": "Scorecard criterion Impact (Score 2, weight 30%, form page 5-6) covering the aspects imp-career, imp-dissemination, imp-magnitude."
+      },
+      {
+        "id": "config:harness/evaluator_scorecard_msca_pf.json:implementation",
+        "name": "implementation",
+        "type": "config",
+        "filePath": "harness/evaluator_scorecard_msca_pf.json",
+        "summary": "Scorecard criterion Quality and efficiency of the implementation (Score 3, weight 20%, form page 6) covering the aspects impl-workplan, impl-host."
+      },
+      {
+        "id": "config:harness/labeling/e3.1-materiality-calibration_TEMPLATE.json",
+        "name": "e3.1-materiality-calibration_TEMPLATE.json",
+        "type": "config",
+        "filePath": "harness/labeling/e3.1-materiality-calibration_TEMPLATE.json",
+        "summary": "Skeleton decision record for the E3.1 materiality-classifier calibration: placeholders for the judge model and pin, gold-set counts, the precision and escape-recall metrics, the operator's threshold policy (0.85 / 0.80), and the advisory-versus-gating decision keyed to that exact judge version."
+      },
+      {
+        "id": "config:harness/profiles/msca_pf_default.json",
+        "name": "msca_pf_default.json",
+        "type": "config",
+        "filePath": "harness/profiles/msca_pf_default.json",
+        "summary": "Default pre-evaluation profile for MSCA Postdoctoral Fellowships, a single-researcher instrument: it binds the evaluator expectation registry, the option-tag grammar for the five MSCA variants, the three evaluation criteria and their section ids, and the MSCA-PF scorecard and rubric set."
+      },
+      {
+        "id": "config:harness/profiles/ria_default.json",
+        "name": "ria_default.json",
+        "type": "config",
+        "filePath": "harness/profiles/ria_default.json",
+        "summary": "Default pre-evaluation profile for the Horizon Europe Research and Innovation Action, a collaborative multi-partner instrument: the parallel form of the MSCA-PF profile, binding the same registry and three criteria to the RIA/IA evaluation form, scorecard and rubric set."
+      },
+      {
+        "id": "config:pyproject.toml",
+        "name": "pyproject.toml",
+        "type": "config",
+        "filePath": "pyproject.toml",
+        "summary": "Minimal project file carrying pytest configuration only: the test path, repo-root import path, verbose output, and two custom markers registering the harness's advisory lanes — `harness_regression` for the E4 golden-set comparison and `harness_rubric` for the E5 rubric grid, both explicitly never run-blocking."
+      }
+    ]
+  },
+  "nonCodeByExt": [
+    {
+      "id": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+      "name": "manifest.compile.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/manifest.compile.yaml",
+      "fanIn": 3,
+      "fanOut": 16
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+      "name": "agent_catalog.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/agent_catalog.yaml",
+      "fanIn": 3,
+      "fanOut": 1
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+      "name": "skill_catalog.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/skill_catalog.yaml",
+      "fanIn": 2,
+      "fanOut": 2
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+      "name": "gate_rules_library.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/gate_rules_library.yaml",
+      "fanIn": 1,
+      "fanOut": 2
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+      "name": "quality_gates.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/quality_gates.yaml",
+      "fanIn": 3,
+      "fanOut": 1
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "name": "artifact_schema_specification.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 2,
+      "fanOut": 27
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+      "name": "tier_bindings.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/tier_bindings.yaml",
+      "fanIn": 3,
+      "fanOut": 1
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+      "name": "global_rules.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/global_rules.yaml",
+      "fanIn": 2,
+      "fanOut": 2
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+      "name": "state_rules.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/state_rules.yaml",
+      "fanIn": 2,
+      "fanOut": 2
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+      "name": "integration_rules.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/integration_rules.yaml",
+      "fanIn": 3,
+      "fanOut": 2
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/meta.yaml",
+      "name": "meta.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/meta.yaml",
+      "fanIn": 1,
+      "fanOut": 9
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+      "name": "design_notes.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/design_notes.yaml",
+      "fanIn": 1,
+      "fanOut": 5
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1",
+      "name": "orch.phase1.call_analysis_summary.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1",
+      "name": "orch.phase2.concept_refinement_summary.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1",
+      "name": "orch.phase3.wp_structure.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1",
+      "name": "orch.phase4.gantt.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1",
+      "name": "orch.phase4.scheduling_constraints.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1",
+      "name": "orch.phase5.impact_architecture.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1",
+      "name": "orch.phase6.implementation_architecture.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1",
+      "name": "orch.phase7.budget_gate_assessment.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1",
+      "name": "orch.phase8.drafting_review_status.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1",
+      "name": "orch.checkpoints.phase8_checkpoint.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 1
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1",
+      "name": "orch.tier5.assembled_draft.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1",
+      "name": "orch.tier5.excellence_section.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1",
+      "name": "orch.tier5.impact_section.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.implementation_section.v1",
+      "name": "orch.tier5.implementation_section.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1",
+      "name": "orch.tier5.part_b_assembled_draft.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.review_packet.v1",
+      "name": "orch.tier5.review_packet.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1",
+      "name": "orch.tier5.final_export.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 1
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.proposal_section.v1",
+      "name": "orch.tier5.proposal_section.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1",
+      "name": "orch.gate_result.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 1
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1",
+      "name": "orch.operational.run_manifest.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 1
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1",
+      "name": "orch.dev_graph.snapshot.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 1
+    },
+    {
+      "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.document_snapshot.v1",
+      "name": "orch.dev_graph.document_snapshot.v1",
+      "type": "schema",
+      "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "name": "phase_01_call_analysis.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "fanIn": 2,
+      "fanOut": 4
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "name": "phase_02_concept_refinement.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "fanIn": 3,
+      "fanOut": 5
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "name": "phase_03_wp_design.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "fanIn": 5,
+      "fanOut": 5
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "name": "phase_04_gantt_milestones.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "fanIn": 3,
+      "fanOut": 6
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "name": "phase_05_impact_architecture.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "fanIn": 2,
+      "fanOut": 6
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "name": "phase_06_implementation_architecture.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "fanIn": 2,
+      "fanOut": 7
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "name": "phase_07_budget_gate.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "fanIn": 1,
+      "fanOut": 9
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "name": "phase_08_drafting_review.yaml",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "fanIn": 0,
+      "fanOut": 19
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting",
+      "name": "phase_08a_excellence_drafting",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "fanIn": 2,
+      "fanOut": 0
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting",
+      "name": "phase_08b_impact_drafting",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "fanIn": 2,
+      "fanOut": 0
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting",
+      "name": "phase_08c_implementation_drafting",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "fanIn": 2,
+      "fanOut": 0
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+      "name": "phase_08d_assembly",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "fanIn": 2,
+      "fanOut": 3
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review",
+      "name": "phase_08e_evaluator_review",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "fanIn": 2,
+      "fanOut": 1
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision",
+      "name": "phase_08f_revision",
+      "type": "config",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "fanIn": 1,
+      "fanOut": 3
+    },
+    {
+      "id": "document:harness/HARNESS.md",
+      "name": "HARNESS.md",
+      "type": "document",
+      "filePath": "harness/HARNESS.md",
+      "fanIn": 0,
+      "fanOut": 28
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_ria.json",
+      "name": "evaluator_scorecard_ria.json",
+      "type": "config",
+      "filePath": "harness/evaluator_scorecard_ria.json",
+      "fanIn": 1,
+      "fanOut": 8
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_msca_pf.json",
+      "name": "evaluator_scorecard_msca_pf.json",
+      "type": "config",
+      "filePath": "harness/evaluator_scorecard_msca_pf.json",
+      "fanIn": 3,
+      "fanOut": 7
+    },
+    {
+      "id": "document:harness/evaluator_scorecard_msca_pf.md",
+      "name": "evaluator_scorecard_msca_pf.md",
+      "type": "document",
+      "filePath": "harness/evaluator_scorecard_msca_pf.md",
+      "fanIn": 0,
+      "fanOut": 1
+    },
+    {
+      "id": "config:harness/rubrics_ria.json",
+      "name": "rubrics_ria.json",
+      "type": "config",
+      "filePath": "harness/rubrics_ria.json",
+      "fanIn": 1,
+      "fanOut": 11
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json",
+      "name": "rubrics_msca_pf.json",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 2,
+      "fanOut": 13
+    },
+    {
+      "id": "config:harness/rubrics_ria.json:ria-exc-objectives",
+      "name": "ria-exc-objectives",
+      "type": "config",
+      "filePath": "harness/rubrics_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_ria.json:ria-exc-methodology",
+      "name": "ria-exc-methodology",
+      "type": "config",
+      "filePath": "harness/rubrics_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_ria.json:ria-imp-pathways",
+      "name": "ria-imp-pathways",
+      "type": "config",
+      "filePath": "harness/rubrics_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_ria.json:ria-imp-measures",
+      "name": "ria-imp-measures",
+      "type": "config",
+      "filePath": "harness/rubrics_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_ria.json:ria-impl-workplan",
+      "name": "ria-impl-workplan",
+      "type": "config",
+      "filePath": "harness/rubrics_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_ria.json:ria-impl-capacity",
+      "name": "ria-impl-capacity",
+      "type": "config",
+      "filePath": "harness/rubrics_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:exc-obj",
+      "name": "exc-obj",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:exc-method",
+      "name": "exc-method",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:exc-supervision",
+      "name": "exc-supervision",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:exc-researcher",
+      "name": "exc-researcher",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:imp-career",
+      "name": "imp-career",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:imp-dissemination",
+      "name": "imp-dissemination",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:imp-magnitude",
+      "name": "imp-magnitude",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:impl-workplan",
+      "name": "impl-workplan",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json:impl-host",
+      "name": "impl-host",
+      "type": "config",
+      "filePath": "harness/rubrics_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_ria.json:excellence",
+      "name": "excellence",
+      "type": "config",
+      "filePath": "harness/evaluator_scorecard_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_ria.json:impact",
+      "name": "impact",
+      "type": "config",
+      "filePath": "harness/evaluator_scorecard_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_ria.json:implementation",
+      "name": "implementation",
+      "type": "config",
+      "filePath": "harness/evaluator_scorecard_ria.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_msca_pf.json:excellence",
+      "name": "excellence",
+      "type": "config",
+      "filePath": "harness/evaluator_scorecard_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_msca_pf.json:impact",
+      "name": "impact",
+      "type": "config",
+      "filePath": "harness/evaluator_scorecard_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_msca_pf.json:implementation",
+      "name": "implementation",
+      "type": "config",
+      "filePath": "harness/evaluator_scorecard_msca_pf.json",
+      "fanIn": 1,
+      "fanOut": 0
+    },
+    {
+      "id": "document:CLAUDE.md",
+      "name": "CLAUDE.md",
+      "type": "document",
+      "filePath": "CLAUDE.md",
+      "fanIn": 1,
+      "fanOut": 24
+    },
+    {
+      "id": "document:harness/gold_sets/README.md",
+      "name": "README.md",
+      "type": "document",
+      "filePath": "harness/gold_sets/README.md",
+      "fanIn": 0,
+      "fanOut": 2
+    },
+    {
+      "id": "document:harness/labeling/LABELLING_GUIDE.md",
+      "name": "LABELLING_GUIDE.md",
+      "type": "document",
+      "filePath": "harness/labeling/LABELLING_GUIDE.md",
+      "fanIn": 1,
+      "fanOut": 2
+    },
+    {
+      "id": "config:harness/labeling/e3.1-materiality-calibration_TEMPLATE.json",
+      "name": "e3.1-materiality-calibration_TEMPLATE.json",
+      "type": "config",
+      "filePath": "harness/labeling/e3.1-materiality-calibration_TEMPLATE.json",
+      "fanIn": 0,
+      "fanOut": 2
+    },
+    {
+      "id": "document:harness/materiality_sets/README.md",
+      "name": "README.md",
+      "type": "document",
+      "filePath": "harness/materiality_sets/README.md",
+      "fanIn": 0,
+      "fanOut": 2
+    },
+    {
+      "id": "config:harness/profiles/msca_pf_default.json",
+      "name": "msca_pf_default.json",
+      "type": "config",
+      "filePath": "harness/profiles/msca_pf_default.json",
+      "fanIn": 2,
+      "fanOut": 1
+    },
+    {
+      "id": "config:harness/profiles/ria_default.json",
+      "name": "ria_default.json",
+      "type": "config",
+      "filePath": "harness/profiles/ria_default.json",
+      "fanIn": 1,
+      "fanOut": 2
+    },
+    {
+      "id": "document:harness/regression_baselines/README.md",
+      "name": "README.md",
+      "type": "document",
+      "filePath": "harness/regression_baselines/README.md",
+      "fanIn": 0,
+      "fanOut": 1
+    },
+    {
+      "id": "config:pyproject.toml",
+      "name": "pyproject.toml",
+      "type": "config",
+      "filePath": "pyproject.toml",
+      "fanIn": 0,
+      "fanOut": 2
+    }
+  ],
+  "clusters": [],
+  "topRelationSources": [
+    {
+      "id": "document:harness/HARNESS.md",
+      "type": "documents",
+      "count": 27,
+      "name": "HARNESS.md"
+    },
+    {
+      "id": "document:CLAUDE.md",
+      "type": "documents",
+      "count": 24,
+      "name": "CLAUDE.md"
+    },
+    {
+      "id": "file:runner/deterministic_components.py",
+      "type": "depends_on",
+      "count": 13,
+      "name": "deterministic_components.py"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+      "type": "depends_on",
+      "count": 9,
+      "name": "manifest.compile.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/meta.yaml",
+      "type": "depends_on",
+      "count": 9,
+      "name": "meta.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+      "type": "configures",
+      "count": 7,
+      "name": "manifest.compile.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "type": "depends_on",
+      "count": 7,
+      "name": "phase_08_drafting_review.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "type": "configures",
+      "count": 6,
+      "name": "phase_07_budget_gate.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "type": "configures",
+      "count": 6,
+      "name": "phase_08_drafting_review.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+      "type": "documents",
+      "count": 5,
+      "name": "design_notes.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "type": "defines_schema",
+      "count": 5,
+      "name": "artifact_schema_specification.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "type": "configures",
+      "count": 5,
+      "name": "phase_04_gantt_milestones.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "type": "configures",
+      "count": 4,
+      "name": "phase_01_call_analysis.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "type": "configures",
+      "count": 4,
+      "name": "phase_02_concept_refinement.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "type": "configures",
+      "count": 4,
+      "name": "phase_03_wp_design.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "type": "configures",
+      "count": 4,
+      "name": "phase_05_impact_architecture.yaml"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "type": "configures",
+      "count": 4,
+      "name": "phase_06_implementation_architecture.yaml"
+    },
+    {
+      "id": "config:harness/rubrics_ria.json",
+      "type": "configures",
+      "count": 4,
+      "name": "rubrics_ria.json"
+    },
+    {
+      "id": "config:harness/rubrics_msca_pf.json",
+      "type": "configures",
+      "count": 4,
+      "name": "rubrics_msca_pf.json"
+    },
+    {
+      "id": "config:harness/evaluator_scorecard_ria.json",
+      "type": "configures",
+      "count": 4,
+      "name": "evaluator_scorecard_ria.json"
+    }
+  ],
+  "edgeTypeCounts": {
+    "imports": 365,
+    "depends_on": 66,
+    "contains": 49,
+    "documents": 64,
+    "configures": 79,
+    "defines_schema": 10,
+    "related": 6
+  },
+  "layers": {
+    "count": 10,
+    "list": [
+      {
+        "id": "layer:constitution",
+        "name": "Constitution & Project Root",
+        "description": "The repository constitution (CLAUDE.md) — the highest interpretive authority above every prompt, skill, workflow and agent instruction — together with the project build and dependency metadata that defines the package."
+      },
+      {
+        "id": "layer:workflow-specification",
+        "name": "Workflow Specification Spine",
+        "description": "The declarative binding authority under .claude/workflows/system_orchestration: the compiled manifest that binds nodes to agents, skills, gate conditions and deterministic components, the agent and skill catalogues, the gate rules library, the eight per-phase node specs with their Phase-8 substeps, and the artifact schema specification with its 22 canonical artifact schemas."
+      },
+      {
+        "id": "layer:orchestration-runtime",
+        "name": "Orchestration Runtime Stack",
+        "description": "The three-layer execution stack with exactly one caller each — DAGScheduler dispatching nodes, run_agent() sequencing a node body, run_skill() invoking Claude — plus the CLI entry point, manifest and node resolution, run-context persistence, runtime result contracts, the Step-0 call slicer and the Phase-8 reuse, preseed and skip-binding resolvers."
+      },
+      {
+        "id": "layer:gate-evaluation",
+        "name": "Gate Evaluation",
+        "description": "Gate machinery owned exclusively by the scheduler: the gate evaluator (the single code-level caller of evaluate_gate), the gate rule library, the gate result registry, and the ten modules of atomic predicates that decide coverage, criteria, cycles, files, schemas, source refs, timelines and upstream gate passes."
+      },
+      {
+        "id": "layer:deterministic-components",
+        "name": "Deterministic Components",
+        "description": "Claude-free, node-body-scoped passes that read declared artifacts and write canonical ones under a byte-equal-replay or pure-lookup guarantee — distinct in kind from skills, which are defined by invoking a model: the component binding substrate plus the section assembler, assumption applier, canonical-pack deriver, unit-cost budget deriver, budget request builder, dependency normaliser, consortium-composition evaluator, instrument profile resolver, checkpoint publisher and the DOCX and final-export writers."
+      },
+      {
+        "id": "layer:model-transport",
+        "name": "Model Transport",
+        "description": "The transport boundary to the language model: the shared claude_transport adapter driving the local claude CLI in TAPM and cli-prompt modes, alternative Bedrock and OpenAI-compatible backends, transport configuration and capability negotiation, the tool-executor and tool loop, and the non-repairing JSON response extractor."
+      },
+      {
+        "id": "layer:graph-substrate",
+        "name": "Graph Substrate",
+        "description": "The deliberately programme-agnostic knowledge-graph layer: the bidirectional Obsidian-vault to docs/ compiler and projector pair, the claim verifier and determinism-check auditors, the graph schema and config, the vault reader and scaffold, the dev_graph package that builds revisions, impact, packages and shadow snapshots over the repository own artifacts, and the agnosticism lint that proves no project vocabulary leaks in."
+      },
+      {
+        "id": "layer:shared-foundation",
+        "name": "Shared Foundation",
+        "description": "Low-level primitives every other layer rests on, led by atomic_write (33 importers) and paths (17): atomic artifact writing, canonical path resolution, version and upstream-input resolution, the diagnostic persistence policy, the shared working-assumptions reader, the four-value Confirmed/Inferred/Assumed/Unresolved status vocabulary, content fingerprinting for gate staleness, the Tier 3 source-index verifier and the anonymity leakage scan."
+      },
+      {
+        "id": "layer:evaluation-harness",
+        "name": "Evaluation Harness",
+        "description": "The out-of-band QA track behind a strict one-way boundary — it reads engine artifacts and imports runner, and the engine never imports it, with zero runner-to-harness edges in the graph: verdict, provenance, routing and judge substrate, coverage, grounding, faithfulness and contradiction graders, the claim ledger, evidence packs, calibration and regression machinery, the blind pre-evaluation lane, CLI command drivers, and the per-instrument rubric, scorecard, profile and gold-set assets. Its results are advisory and never run-blocking."
+      },
+      {
+        "id": "layer:operator-tooling",
+        "name": "Operator Tooling",
+        "description": "Standalone operator scripts that import the engine but are never imported by it: dev-graph and Part B candidate builders, run phase-cost derivation, run-manifest preservation, a gate-result schema_id backfill, graph staging promotion and the prose detector."
+      }
+    ]
+  },
+  "nodeSummaryIndex": {
+    "file:harness/__init__.py": {
+      "name": "__init__.py",
+      "type": "file",
+      "summary": "Package root for the out-of-band evaluation and integrity harness; re-exports the E1 substrate (verdict, provenance, routing, judge, report, calibration, gold set) and documents the enforced one-way dependency boundary in which harness may import runner but never the reverse."
+    },
+    "file:harness/blind_assessment.py": {
+      "name": "blind_assessment.py",
+      "type": "file",
+      "summary": "Candidate-bound blind pre-evaluation lane: materialises a candidate from section artifacts or a dev-graph document, enforces a leakage guard, grades each criterion cell with the pinned non-drafter assessor, and writes a report bound to the candidate hash, profile version and assessor pin."
+    },
+    "file:harness/calibration.py": {
+      "name": "calibration.py",
+      "type": "file",
+      "summary": "Judge-reliability calibration (E1.5): measures the pinned judge's precision and recall against a human-labeled faithfulness gold set and turns the result into a graduation decision that keeps every harness metric advisory until a fresh, applicable, above-threshold calibration exists."
+    },
+    "file:harness/claim_ledger.py": {
+      "name": "claim_ledger.py",
+      "type": "file",
+      "summary": "Escaped-claim detector (E3): decomposes section prose into atomic assertions with an independent judge, filters them through the materiality classifier, and matches the material remainder by meaning against the section's claim ledger to surface facts asserted without any claim_id."
+    },
+    "file:harness/commands/_common.py": {
+      "name": "_common.py",
+      "type": "file",
+      "summary": "Shared bootstrap for the harness module commands: resolves the repo root anchored on this file and loads .env.harness from main() rather than at import, so importing a command never mutates os.environ."
+    },
+    "file:harness/commands/blind_assessment.py": {
+      "name": "blind_assessment.py",
+      "type": "file",
+      "summary": "Command-line entry point for the blind assessment lane: assesses one candidate directory or dev-graph document against a pre-evaluation profile, or re-binds a persisted report to the candidate on disk and rejects it when the candidate changed."
+    },
+    "file:harness/commands/faithfulness_calibration.py": {
+      "name": "faithfulness_calibration.py",
+      "type": "file",
+      "summary": "Turnkey, resumable runner for the E1.5 faithfulness calibration: judges every gold-set pair through a paced/retrying backend, checkpoints predictions per pair, salvages verdicts from malformed judge JSON, and writes a decision-log draft with the graduation outcome."
+    },
+    "file:harness/commands/freeze_grounding_baselines.py": {
+      "name": "freeze_grounding_baselines.py",
+      "type": "file",
+      "summary": "Freezes the judge half of the E4 regression golden set section by section, injecting a single paced and retrying backend choke point so a rate-limited judge (TPM/RPM caps, 429s) cannot abort the run; already frozen sections are skipped on re-run."
+    },
+    "file:harness/commands/rubric_grading_run.py": {
+      "name": "rubric_grading_run.py",
+      "type": "file",
+      "summary": "Drives the E5 rubric grid over the committed Part B sections under an explicit judge budget: computes and records the full call/token plan before the first judge call, checkpoints every grid cell for multi-day resume, and freezes both the grid report and the E4 rubric-lane baseline."
+    },
+    "file:harness/evidence_pack.py": {
+      "name": "evidence_pack.py",
+      "type": "file",
+      "summary": "Deterministic evidence-pack builder that keeps each rubric judge call inside the token budget: selects the prose spans and claim-ledger entries bearing on an expectation by versioned term matching and anchor sub-section bonuses, then records every excluded item and the reason it was dropped."
+    },
+    "file:harness/expectation_coverage.py": {
+      "name": "expectation_coverage.py",
+      "type": "file",
+      "summary": "Coverage-axis grader (E5c): asks the judge, over one evidence pack, whether the section substantively addresses a profile evaluator expectation, routing the property through the deterministic-first router and requiring an N>=3 majority panel with mandatory provenance."
+    },
+    "file:harness/expectation_grounding.py": {
+      "name": "expectation_grounding.py",
+      "type": "file",
+      "summary": "Grounding-axis grader (E5d): aggregates the status-aware faithfulness verdicts for the claims in an evidence pack into a per-expectation grounding rate and weakest-link claim, contributing no faithfulness judgment of its own and reusing existing verdicts under a fail-closed consistency check."
+    },
+    "file:harness/expectations.py": {
+      "name": "expectations.py",
+      "type": "file",
+      "summary": "Expectation substrate loader (E5a): derives the applicable evaluator expectation set from the Tier-2A registry by parsing [OPTION for ...] applicability tags under the profile's grammar, then requires the result to reproduce the profile scorecard exactly and fails closed on any divergence."
+    },
+    "file:harness/faithfulness.py": {
+      "name": "faithfulness.py",
+      "type": "file",
+      "summary": "The atomic faithfulness primitive: renders the bounded prompt asking whether a cited source supports one claim and reads back a boolean verdict, so calibration and the E2 metric ask the judge exactly the question the gold set is labeled against."
+    },
+    "file:harness/gold_set.py": {
+      "name": "gold_set.py",
+      "type": "file",
+      "summary": "Human-labeled faithfulness gold set: the (claim, source_ref, supported?) data model, a fail-closed loader that refuses unlabeled pairs, a content hash, and a deterministic seeder that emits unlabeled templates from a Phase-8 section's claim statuses without ever fabricating the human label."
+    },
+    "file:harness/jsonl_log.py": {
+      "name": "jsonl_log.py",
+      "type": "file",
+      "summary": "Shared append-only JSONL log base: seeds from any pre-existing file, mirrors records in memory, and atomically re-serializes the whole file on every append so a reader never sees a torn line."
+    },
+    "file:harness/judge.py": {
+      "name": "judge.py",
+      "type": "file",
+      "summary": "The independent judge: a pinned, temperature-zero, non-drafter model over the OpenAI-compatible transport that enforces grader/generator independence, refuses to silently repair a malformed response, and logs provenance for every verdict before returning it."
+    },
+    "file:harness/ledger_granularity.py": {
+      "name": "ledger_granularity.py",
+      "type": "file",
+      "summary": "Offline, judge-free measurement of the claim-ledger granularity gap between the graph-sourced sections and the drafter-era ledgers preserved in the E4 golden baselines, verifying the prose is byte-identical so the cardinality deficit is exact rather than confounded by content drift."
+    },
+    "file:harness/materiality.py": {
+      "name": "materiality.py",
+      "type": "file",
+      "summary": "The CLAUDE.md section 10.5 materiality classifier and its ledger-anchored calibration: separates a material, attributable claim from framing and definitional prose, seeding positives from the engine's own claim ledger and leaving negative candidates unlabeled for a human."
+    },
+    "file:harness/profile.py": {
+      "name": "profile.py",
+      "type": "file",
+      "summary": "Pre-evaluation profile parser: turns the versioned configuration bundle (instrument type, option-tag grammar, criterion-to-section map, scorecard and rubric-set pins) into typed objects fail-closed, and owns the version arithmetic that hashes the profile over its bundled component pins."
+    },
+    "file:harness/provenance.py": {
+      "name": "provenance.py",
+      "type": "file",
+      "summary": "Judge-verdict provenance: a stable content hash over the (system, user) prompt pair, an immutable record carrying judge model, version, prompt hash, score and rationale that cannot be built with a non-Inferred evidence type, and an append-only JSONL sink."
+    },
+    "file:harness/regression.py": {
+      "name": "regression.py",
+      "type": "file",
+      "summary": "Regression golden set (E4): freezes each Tier-5 section's claim ledger, per-sub-section prose hashes and canonical artifact hash as a baseline, then diffs a current artifact against it and classifies lost claims, status weakenings and source-ref swaps as breaking regressions; also owns the grounding and rubric baselines."
+    },
+    "file:harness/report.py": {
+      "name": "report.py",
+      "type": "file",
+      "summary": "The harness's terminal artifact: aggregates a metric's verdicts and routing decisions into one serializable report that is advisory by construction, with no method that could yield a gate pass/fail for the scheduler."
+    },
+    "file:harness/routing.py": {
+      "name": "routing.py",
+      "type": "file",
+      "summary": "Deterministic-first routing authority: refuses to judge any property whose key names a deterministic predicate the runtime actually dispatches, while deliberately treating the in-run semantic registry as non-deterministic so the independent judge may legitimately re-check it."
+    },
+    "file:harness/rubric.py": {
+      "name": "rubric.py",
+      "type": "file",
+      "summary": "Contradiction detector and rubric grid report (E5e): deterministically combines the coverage and grounding axes into a 2x2 grid whose headline cell is high coverage with weak grounding, carrying no blended score anywhere so that cell can never be averaged away; also renders the report and owns the grading CLI."
+    },
+    "file:harness/rubrics.py": {
+      "name": "rubrics.py",
+      "type": "file",
+      "summary": "Rubric set loader (E5b): parses the profile's versioned rubric file, cross-checks every rubric's expectation text byte-for-byte against the scorecard aspect and the E5a substrate, fails closed on divergence, and renders and hashes the pinned (system, user) rubric prompt pair."
+    },
+    "file:harness/status_calibration.py": {
+      "name": "status_calibration.py",
+      "type": "file",
+      "summary": "Claim-status calibration (E3): detects label drift in both directions, reusing E2 verdicts to find overclaimed confirmed claims as hard findings and asking the confirmed-bar question counterfactually to flag underclaimed inferred claims as soft advisory drift."
+    },
+    "file:harness/status_faithfulness.py": {
+      "name": "status_faithfulness.py",
+      "type": "file",
+      "summary": "Status-aware faithfulness (E2), the gap-masked-as-confirmed detector: partitions Tier-5 claims by status and judges each against the standard its status claims - confirmed strictly against its source_ref, assumed against the operator-declared value, inferred softly - and owns the baseline freeze and invariance comparison."
+    },
+    "file:harness/verdict.py": {
+      "name": "verdict.py",
+      "type": "file",
+      "summary": "Judge verdict vocabulary: pure types that stamp every verdict with the section 12.2 status Inferred and make a Confirmed verdict impossible to construct, plus the N>=3 majority-vote scaffold required wherever a score will inform a decision."
+    },
+    "file:runner/working_assumptions.py": {
+      "name": "working_assumptions.py",
+      "type": "file",
+      "summary": "Shared reader for the Tier 3 working_assumptions.json declaration file, the single mechanism by which a human operator turns an honest block into a conscious green; one parse serves both the unit-cost budget gate (by declared key) and the claim layer's W1 predicate (by checklist ref)."
+    },
+    "file:runner/assumption_applier.py": {
+      "name": "assumption_applier.py",
+      "type": "file",
+      "summary": "Deterministic component that flips drafted claims from `unresolved` to `assumed` wherever a Tier 3 operator declaration backs them, then re-derives the section spine's overall status. Implements the constitution's mode-beta \"conscious green\" without inventing any claim."
+    },
+    "file:runner/atomic_write.py": {
+      "name": "atomic_write.py",
+      "type": "file",
+      "summary": "Shared atomic-write helpers (temp file plus rename) that every deterministic component and exporter uses to publish canonical artifacts. Owns the canonical JSON serialisation that the byte-equal replay checks depend on."
+    },
+    "file:runner/budget_request.py": {
+      "name": "budget_request.py",
+      "type": "file",
+      "summary": "Deterministic composer of the lump-sum budget request sent to the external Lump Sum Budget Planner. Every effort and cost field carries an explicit \"requires external computation\" sentinel, so the repository prepares the request without computing any budget figure."
+    },
+    "file:runner/claim_status.py": {
+      "name": "claim_status.py",
+      "type": "file",
+      "summary": "Single source of truth for the constitution's four-value validation vocabulary and its worst-wins ordering. Pure lookups with no I/O, so both the drafter and the assumption applier derive a section's overall status identically."
+    },
+    "file:runner/decomposed_drafting.py": {
+      "name": "decomposed_drafting.py",
+      "type": "file",
+      "summary": "Drafting driver that replaces one monolithic Claude call per section with one bounded call per sub-section, passing prior drafts forward as sequential context. Writes the per-sub-section drafts and the section spine that the deterministic assembler then composes."
+    },
+    "file:runner/dev_graph/__init__.py": {
+      "name": "__init__.py",
+      "type": "file",
+      "summary": "Public API barrel for the dev graph — a rebuildable operational index over the repository's authoritative records. Re-exports the snapshot builder, closed vocabularies, document import, evidence packaging, change recording, impact planning, revisions, shadow comparison and ESR intake."
+    },
+    "file:runner/dev_graph/builder.py": {
+      "name": "builder.py",
+      "type": "file",
+      "summary": "Builds the immutable dev-graph snapshot: reads the Tier 3 records that own project facts, derives typed nodes and edges from their declared keys, validates against the closed schema and returns a content-addressed `Snapshot`. The graph owns nothing and a rebuild from the same records is byte-identical."
+    },
+    "file:runner/dev_graph/changes.py": {
+      "name": "changes.py",
+      "type": "file",
+      "summary": "Records an operator-approved new version of one Tier 3 record while keeping the old one: archives the prior content, stores the before/after snapshots content-addressed, and writes one immutable change record carrying the pure snapshot diff."
+    },
+    "file:runner/dev_graph/documents.py": {
+      "name": "documents.py",
+      "type": "file",
+      "summary": "Imports a candidate proposal document as an immutable, content-versioned record — the snapshot builder's only source for document, passage, claim and commitment nodes. Re-importing identical content is a no-op; the same content under a different lifecycle state is refused."
+    },
+    "file:runner/dev_graph/identity.py": {
+      "name": "identity.py",
+      "type": "file",
+      "summary": "Dev-graph identity primitives: canonical JSON serialisation, a record's content-hash version, and the content-derived snapshot id. Reads no clock, path or filesystem stamp, so two builds over the same content agree byte for byte."
+    },
+    "file:runner/dev_graph/impact.py": {
+      "name": "impact.py",
+      "type": "file",
+      "summary": "Shadow impact planner: given the snapshots before and after an approved change plus the durable run records, it returns an advisory plan naming each affected record, passage, artifact or check with a reason path, a hit kind and one action from a closed set."
+    },
+    "file:runner/dev_graph/intake.py": {
+      "name": "intake.py",
+      "type": "file",
+      "summary": "Records what is known about an Evaluation Summary Report at intake, from a closed availability set and never by inference. One immutable record per intake id: identical content is a no-op, different content under the same id is refused."
+    },
+    "file:runner/dev_graph/packages.py": {
+      "name": "packages.py",
+      "type": "file",
+      "summary": "Builds a bounded, task-scoped evidence package under one view policy and one budget, returning the included items plus a manifest saying what was included and why, what was excluded and why, what is unresolved, and whether the package is complete."
+    },
+    "file:runner/dev_graph/policies.py": {
+      "name": "policies.py",
+      "type": "file",
+      "summary": "Configuration data for the six dev-graph view policies — permitted node types and traversals, maximum depth, forbidden types and tags — plus a content-hash policy version so a policy edit can never silently reinterpret an existing package."
+    },
+    "file:runner/dev_graph/revisions.py": {
+      "name": "revisions.py",
+      "type": "file",
+      "summary": "Three closed operations over declared data: checking a proposed change set against a revision contract, creating a superseding candidate version with provenance, and deciding whether an existing assessment still applies. Also hosts the registered revision-record writer component."
+    },
+    "file:runner/dev_graph/schema.py": {
+      "name": "schema.py",
+      "type": "file",
+      "summary": "The dev graph's closed vocabularies as data: the node-type set and the relationship set, each relationship declaring its permitted endpoint pairs, direction, cardinality and whether it is a domain link or an execution dependency. Also owns the fail-closed graph validator."
+    },
+    "file:runner/dev_graph/shadow.py": {
+      "name": "shadow.py",
+      "type": "file",
+      "summary": "Compares the impact planner's advisory against the reuse decision the scheduler actually recorded, emitting one diagnostic from a closed set (agreed, planner narrower, planner broader). Pure shadow mode: nothing consumes the diagnostic at runtime."
+    },
+    "file:runner/dev_graph/writer.py": {
+      "name": "writer.py",
+      "type": "file",
+      "summary": "The registered deterministic component behind the dev-graph index: builds the snapshot and writes it atomically to its canonical Tier 4 path. The snapshot carries no run id and no clock, so a replay from the same records is byte-equal."
+    },
+    "file:runner/docx_exporter.py": {
+      "name": "docx_exporter.py",
+      "type": "file",
+      "summary": "Renders the assembled Part B (or whatever individual section artifacts exist) into a Microsoft Word `.docx` under Tier 5 final exports. Invents no content: every heading and paragraph is copied verbatim from the section JSON."
+    },
+    "file:runner/final_export_writer.py": {
+      "name": "final_export_writer.py",
+      "type": "file",
+      "summary": "Deterministic node-body component for the revision phase that writes the terminal Tier 5 export artifacts: a self-contained JSON bundle embedding the assembled draft and every referenced section verbatim, plus the schema-bound export manifest."
+    },
+    "file:runner/instrument_profile.py": {
+      "name": "instrument_profile.py",
+      "type": "file",
+      "summary": "Resolves a per-instrument profile — mandatory sub-sections, hard page limit, budget regime and phases in scope — from the two Tier 2A extracted registries keyed on the selected call's instrument type, so no instrument literal is baked into the drafting path."
+    },
+    "file:runner/interface_contract.py": {
+      "name": "interface_contract.py",
+      "type": "file",
+      "summary": "Validator for the Lump Sum Budget Planner interface contract, interpreting that document on its own terms rather than as a JSON Schema (which would accept every payload). Pure, with no I/O or run state, and used by both the request composer and the response-side gate predicate."
+    },
+    "file:runner/phase8_canonical_pack.py": {
+      "name": "phase8_canonical_pack.py",
+      "type": "file",
+      "summary": "Deterministic builder of the canonical reference pack that Phase 8 drafting skills use for objective, work-package, deliverable, partner and outcome identities. Confirmed Tier 3/4 values are lifted verbatim; operator declarations are quarantined in a separate provenance-tagged array."
+    },
+    "file:runner/section_assembler.py": {
+      "name": "section_assembler.py",
+      "type": "file",
+      "summary": "Deterministic section assembler: array-appends the per-sub-section drafts into the Tier 5 section artifact in spine order, carrying claim statuses and declarations verbatim and deriving exactly two things — each sub-section's word count and the de-duplicated union of source refs."
+    },
+    "file:runner/source_index.py": {
+      "name": "source_index.py",
+      "type": "file",
+      "summary": "Verifier for the Tier 3 source index, enforcing the one rule the snapshot builder cannot: a source carries verbatim text only when that text can be re-derived byte for byte from a file stored in this repository. Everything else is a reference, which carries no text and therefore no verifiable span."
+    },
+    "file:runner/unit_cost_budget.py": {
+      "name": "unit_cost_budget.py",
+      "type": "file",
+      "summary": "Deterministic unit-cost budget deriver: computes a unit-cost (MSCA-style) budget as confirmed months times published rates times host-country coefficient, in a pure core plus a component wrapper that resolves inputs from durable state and writes the artifact atomically."
+    },
+    "file:tools/build_demo_dev_graph.py": {
+      "name": "build_demo_dev_graph.py",
+      "type": "file",
+      "summary": "Authoring tool that writes the first dev-graph snapshot over the populated demo Tier 3 records plus one bounded evidence package per view policy for three structurally chosen seed tasks, bisecting the minimum budget at which each package fits and completes."
+    },
+    "file:tools/build_part_b_candidate.py": {
+      "name": "build_part_b_candidate.py",
+      "type": "file",
+      "summary": "Converter that turns Phase 8's Tier 5 section artifacts into a blind-lane candidate document, the missing route from a drafted Part B to a graded one. Deterministic and Claude-free: every field is copied verbatim and nothing is repaired."
+    },
+    "file:tools/derive_run_phase_costs.py": {
+      "name": "derive_run_phase_costs.py",
+      "type": "file",
+      "summary": "Recovers per-phase invocation counts, tokens and wall clock for a run by partitioning the append-only transport ledger on the phase gates' evaluation timestamps — the attribution the ledger supports but does not record, since every row carries a null node id."
+    },
+    "file:tools/preserve_run_manifests.py": {
+      "name": "preserve_run_manifests.py",
+      "type": "file",
+      "summary": "Copies the run manifests that dispatched the workflow phases out of gitignored runtime state into the durable Tier 4 record, preserving the run id, node states, per-node failure metadata and reuse decisions. It copies and never edits a manifest."
+    },
+    "file:runner/fingerprints.py": {
+      "name": "fingerprints.py",
+      "type": "file",
+      "summary": "Single source of truth for reducing a gate input artifact to a deterministic SHA-256 content fingerprint. Imported by both the writer side (gate_evaluator, which stamps input_artifact_fingerprints into every gate result) and the reader side (is_gate_fresh), so content-based staleness cannot diverge."
+    },
+    "file:runner/gate_evaluator.py": {
+      "name": "gate_evaluator.py",
+      "type": "file",
+      "summary": "The sole entry point for evaluating one gate: resolves predicates from the compiled manifest's predicate_refs, runs every deterministic predicate without fast-fail, dispatches semantic predicates only when all deterministic ones pass, writes the canonical Tier 4 GateResult, updates node state and propagates HARD_BLOCK from the budget gate."
+    },
+    "file:runner/gate_library.py": {
+      "name": "gate_library.py",
+      "type": "file",
+      "summary": "Loader and validator for gate_rules_library.yaml, the implementation registry that maps each gate_id to its executable predicates, and refuses to load when the library's manifest_version disagrees with the runner's."
+    },
+    "file:runner/gate_result_registry.py": {
+      "name": "gate_result_registry.py",
+      "type": "file",
+      "summary": "Authoritative table of canonical Tier 4 gate result paths, plus the shared gate-result schema_id, Tier 4 root and version-field constants that the evaluator, the gate_pass_recorded predicate and the backfill tool all read instead of re-hardcoding."
+    },
+    "file:runner/paths.py": {
+      "name": "paths.py",
+      "type": "file",
+      "summary": "Deterministic repository-root discovery (an ancestor holding both CLAUDE.md and .git/) and repo-relative artifact path resolution. Every predicate resolves paths through it rather than inlining path logic."
+    },
+    "file:runner/predicates/__init__.py": {
+      "name": "__init__.py",
+      "type": "file",
+      "summary": "Package barrel that re-exports every gate predicate implementation and the shared failure-category constants under one public namespace, grouped by the implementation step that introduced them."
+    },
+    "file:runner/predicates/coverage_predicates.py": {
+      "name": "coverage_predicates.py",
+      "type": "file",
+      "summary": "Cross-artifact join predicates checking coverage between work packages, partners, budget lines, expected impacts, KPIs, Gantt tasks and drafted sections. Mismatches between two present artifacts fail as CROSS_ARTIFACT_INCONSISTENCY rather than as a malformed input."
+    },
+    "file:runner/predicates/criterion_predicates.py": {
+      "name": "criterion_predicates.py",
+      "type": "file",
+      "summary": "Phase 8 criterion-aligned predicates for gates 10a-10d: schema_id agreement, claim-status discipline (no unresolved material claims, assumed claims operator-declared, declared facts not silently inferred), impact and implementation coverage, and cross-section consistency against canonical Tier 3 data."
+    },
+    "file:runner/predicates/cycle_predicates.py": {
+      "name": "cycle_predicates.py",
+      "type": "file",
+      "summary": "Holds the single cycle-detection predicate: reads the dependency_map of the Phase 3 wp_structure.json and proves the work-package and task dependency graph is acyclic, reporting the offending cycle when it is not."
+    },
+    "file:runner/predicates/file_predicates.py": {
+      "name": "file_predicates.py",
+      "type": "file",
+      "summary": "Stateless filesystem predicates (exists, non_empty, non_empty_json, dir_non_empty) plus artifact_owned_by_run, the run-ownership check that separates an artifact written by the current run from one legitimately reused under the reuse policy."
+    },
+    "file:runner/predicates/gate_pass_predicates.py": {
+      "name": "gate_pass_predicates.py",
+      "type": "file",
+      "summary": "Verifies an upstream gate result exists at its canonical path, declares the required schema_id, records status pass, belongs to the current run and is fresh with respect to its upstream inputs - where freshness is decided by content fingerprint, with file mtime used only as a trigger (ST-1)."
+    },
+    "file:runner/predicates/phase8_section_predicates.py": {
+      "name": "phase8_section_predicates.py",
+      "type": "file",
+      "summary": "Deterministic preflight checks over Phase 8 section drafts that catch stale run_ids, partner-name conflation, deliverable identity corruption, canonical-term drift and lost measurable targets before the cross-section gate runs."
+    },
+    "file:runner/predicates/schema_predicates.py": {
+      "name": "schema_predicates.py",
+      "type": "file",
+      "summary": "The largest predicate module: field-presence and canonical-shape checks over artifacts, including instrument/schema agreement, lump-sum interface-contract conformance, unit-cost budget resolution, risk register, ethics and governance completeness, review findings, and checkpoint provenance validation."
+    },
+    "file:runner/predicates/scope_coverage_predicates.py": {
+      "name": "scope_coverage_predicates.py",
+      "type": "file",
+      "summary": "Phase 2 predicate asserting that every mandatory Tier 2B scope requirement has an explicit entry in the concept refinement summary's scope_coverage, replacing a semantic check that could not distinguish 'covered but not logged' from 'not covered'."
+    },
+    "file:runner/predicates/source_ref_predicates.py": {
+      "name": "source_ref_predicates.py",
+      "type": "file",
+      "summary": "Traceability predicates confirming that every extracted Tier 2B fact and every topic mapping entry carries a non-empty source reference; an absent reference in a structurally valid artifact fails as POLICY_VIOLATION."
+    },
+    "file:runner/predicates/timeline_predicates.py": {
+      "name": "timeline_predicates.py",
+      "type": "file",
+      "summary": "Scheduling-consistency predicates over the Phase 4 Gantt: timeline within the call-specified duration, every milestone carrying a verifiable criterion, work-package count within the instrument limit, a declared critical path, and dependency/schedule agreement."
+    },
+    "file:runner/predicates/types.py": {
+      "name": "types.py",
+      "type": "file",
+      "summary": "Defines PredicateResult, the uniform return type of every gate predicate, together with the five canonical failure-category constants that drive gate triage and the GateResult writer."
+    },
+    "file:runner/upstream_inputs.py": {
+      "name": "upstream_inputs.py",
+      "type": "file",
+      "summary": "Table mapping each gate_id to the substantive upstream source artifacts whose change invalidates its result. Generated derivatives such as call slices and directory paths are deliberately excluded so freshness tracking never fires on a deterministic regeneration."
+    },
+    "file:runner/versions.py": {
+      "name": "versions.py",
+      "type": "file",
+      "summary": "Manifest, library and constitution version constants stamped into every gate result, so a result produced under a prior compilation is detected as stale rather than accepted."
+    },
+    "file:tools/backfill_gate_result_schema_id.py": {
+      "name": "backfill_gate_result_schema_id.py",
+      "type": "file",
+      "summary": "One-time idempotent migration that adds the required schema_id to legacy gate result files, discovering them from the runtime's own path registry. A file already declaring a different schema_id is reported as a conflict and never rewritten, since silent repair is the auto-correction the constitution forbids."
+    },
+    "file:runner/__main__.py": {
+      "name": "__main__.py",
+      "type": "file",
+      "summary": "CLI entry point for the DAG scheduler, invoked as `python -m runner`. Parses run scoping flags (--run-id, --phase, --node, --dry-run), loads the manifest graph and run context, optionally bootstraps phase prerequisites, dispatches the scheduler, and maps the run outcome onto four distinct process exit codes."
+    },
+    "file:runner/agent_runtime.py": {
+      "name": "agent_runtime.py",
+      "type": "file",
+      "summary": "The middle layer of the three-tier runtime stack: an orchestration adapter that loads agent and prompt specifications, resolves canonical tier inputs, sequences skill invocations through `run_skill()`, invokes Claude-free deterministic components, propagates failures, and determines `can_evaluate_exit_gate` by inspecting artifacts on disk. It never evaluates gates and never calls the scheduler."
+    },
+    "file:runner/call_slicer.py": {
+      "name": "call_slicer.py",
+      "type": "file",
+      "summary": "The deterministic Step-0 input bounding pass: before any Claude invocation, it extracts the single target call entry from a large grouped work-programme JSON (338-794 KB) into a bounded ~5-10 KB call slice so downstream skills read only call-specific data. Pure Python with no Claude dependency and no domain reasoning."
+    },
+    "file:runner/checkpoint_publisher.py": {
+      "name": "checkpoint_publisher.py",
+      "type": "file",
+      "summary": "Deterministic node-body component that publishes the immutable Phase-8 `phase8_checkpoint.json` to Tier 4 after confirming the six Phase-8 gate results. Cross-run gate results are authorized by deterministic set membership against `accepted_upstream_gates` and recorded verbatim as a provenance quad, so the checkpoint stays auditable against durable evidence without re-stamping."
+    },
+    "file:runner/dag_scheduler.py": {
+      "name": "dag_scheduler.py",
+      "type": "file",
+      "summary": "The top layer of the runtime stack and the largest module in the repository: it builds a read-only ManifestGraph from the compiled manifest, runs a synchronous dispatch loop over the DAG, and owns gate evaluation exclusively. Each dispatch follows the five-step contract (set running, entry gate, node body via run_agent, exit gate, NodeExecutionResult), propagates HARD_BLOCK to Phase 8 on budget-gate failure, and writes a durable RunSummary on every exit path."
+    },
+    "file:runner/deterministic_components.py": {
+      "name": "deterministic_components.py",
+      "type": "file",
+      "summary": "The generic binding substrate for deterministic components — Claude-free, pure-Python node-body passes that read declared artifacts and write canonical ones under a determinism guarantee. A node declares component IDs in the manifest, the node resolver returns them, and this module resolves each ID in its registry, invokes it, and hands back a ComponentInvocationRecord for `AgentResult.invoked_components`."
+    },
+    "file:runner/manifest_reader.py": {
+      "name": "manifest_reader.py",
+      "type": "file",
+      "summary": "Read-only loader for `manifest.compile.yaml` that indexes the gate registry by gate ID and exposes each gate's `predicate_refs`. Under Approach B the manifest is the predicate composition source and the gate rules library is only the implementation registry, so a predicate runs only if the manifest names it."
+    },
+    "file:runner/node_resolver.py": {
+      "name": "node_resolver.py",
+      "type": "file",
+      "summary": "Read-only resolution layer that maps a canonical manifest node ID to its agent, sub-agent and pre-gate agent identifiers, its deterministic component bindings, its skill IDs, its phase ID, and the on-disk paths of the agent definition and prompt spec. It contains no business logic, executes nothing, and evaluates no gates."
+    },
+    "file:runner/phase8_preseed.py": {
+      "name": "phase8_preseed.py",
+      "type": "file",
+      "summary": "Phase-8 manual preseed: copies an operator-prepared section artifact from the Tier 4 preseed directory into its canonical Tier 5 path before agent dispatch and suppresses only the primary drafting skill. Unlike reuse it needs no `.reuse.json` metadata, no input fingerprint and no prior run ID; audit skills, exit gate evaluation and downstream assembly still run normally."
+    },
+    "file:runner/phase8_reuse.py": {
+      "name": "phase8_reuse.py",
+      "type": "file",
+      "summary": "Minimal, fail-closed reuse layer that avoids rerunning the expensive Phase-8 section drafting for n08a/n08b/n08c when a previously produced section artifact is still input-equivalent and gate-approved. Provides pure functions for input fingerprinting, SHA-256 artifact hashing, reuse metadata I/O, eligibility validation and cross-run ownership checks; it evaluates no gates and invokes no agents."
+    },
+    "file:runner/phase8_skip_binding.py": {
+      "name": "phase8_skip_binding.py",
+      "type": "file",
+      "summary": "The single authoritative `node_id -> drafting-skill-id` map for Phase-8 section nodes, plus the import-time assertions and dispatch-time validation that keep every derived table in agreement with it. It exists because the skip binding was once named independently in four places with none checked against the manifest, which made a stale skip id a silent no-op that let the drafter overwrite a preseeded or reused section."
+    },
+    "file:runner/run_context.py": {
+      "name": "run_context.py",
+      "type": "file",
+      "summary": "Owns the per-run state directory `.claude/runs/<run_id>/`, holding `run_manifest.json` (run identity, versions, node state map, HARD_BLOCK metadata, accepted upstream gates, reuse decisions) and `reuse_policy.json`. The RunContext is the single point of truth for node state during a run and is read back and updated after every gate evaluation."
+    },
+    "file:runner/runtime_models.py": {
+      "name": "runtime_models.py",
+      "type": "file",
+      "summary": "Defines the frozen-dataclass data contracts exchanged between the three runtime layers — SkillResult, AgentResult and NodeExecutionResult plus the two invocation records — together with the closed vocabularies of valid failure origins and failure categories. Contains no business logic: it evaluates no gates, invokes nothing, and modifies no scheduler state."
+    },
+    "file:runner/claude_transport.py": {
+      "name": "claude_transport.py",
+      "type": "file",
+      "summary": "Sole runtime transport boundary for Claude invocations: subprocesses the local `claude` CLI in print mode, reassembles the response from multi-turn stream-json output, and enforces timeouts with a full process-tree kill. Authenticated by the user's Claude Code Max subscription, so no Anthropic API key is involved."
+    },
+    "file:runner/json_extract.py": {
+      "name": "json_extract.py",
+      "type": "file",
+      "summary": "Pure string-to-JSON helper that recovers the first JSON object from a model response - bare, fenced, or wrapped in prose - shared by the semantic dispatcher and the out-of-band harness judge. It never repairs: an unparseable response yields None and the caller decides what that means."
+    },
+    "file:runner/semantic_dispatch.py": {
+      "name": "semantic_dispatch.py",
+      "type": "file",
+      "summary": "Dispatches each semantic gate predicate to its designated agent through the runtime transport: reads the artifacts under evaluation, builds a system prompt stating the constitutional rule and the mandatory result schema, and returns the agent's structured verdict. Dispatch failures become schema-valid fail results flagged `_dispatch_error`, never fabricated passes."
+    },
+    "file:runner/skill_runtime.py": {
+      "name": "skill_runtime.py",
+      "type": "file",
+      "summary": "Claude runtime transport adapter for skills: loads a skill `.md` specification, resolves canonical inputs from disk, assembles the prompt in TAPM or cli-prompt mode, invokes Claude, parses and validates the structured response against the artifact schema, writes canonical artifacts atomically, and returns a SkillResult. It holds no domain knowledge."
+    },
+    "file:runner/transport/__init__.py": {
+      "name": "__init__.py",
+      "type": "file",
+      "summary": "Barrel for the backend-agnostic transport package, re-exporting only the dependency-free surface - provider capabilities, provider config and presets, the error taxonomy, the tool executor and the tool loop - so importing the package never pulls in the optional httpx or boto3 clients."
+    },
+    "file:runner/transport/bedrock_converse.py": {
+      "name": "bedrock_converse.py",
+      "type": "file",
+      "summary": "Native AWS Bedrock Converse backend implementing the ToolLoopBackend protocol through boto3, bypassing the OpenAI-compatible proxy and using the standard AWS credential chain plus inference profiles for on-demand throughput."
+    },
+    "file:runner/transport/capabilities.py": {
+      "name": "capabilities.py",
+      "type": "file",
+      "summary": "Static per-provider capability metadata - streaming, tool calling, structured-output level, usage reporting, auth type and OpenAI compatibility - declared as a frozen dataclass registry with no dynamic detection or extra API calls."
+    },
+    "file:runner/transport/config.py": {
+      "name": "config.py",
+      "type": "file",
+      "summary": "Resolves the ORCHESTRATOR_TRANSPORT_* environment (and named presets) into a ProviderConfig, selecting among the claude_cli, bedrock, bedrock_converse, together_ai, ollama and generic OpenAI-compatible backends, and constructs the chosen backend with optional imports deferred."
+    },
+    "file:runner/transport/errors.py": {
+      "name": "errors.py",
+      "type": "file",
+      "summary": "Transport-layer error taxonomy for the OpenAI-compatible backends: an ErrorCategory enum aligned with the SkillResult failure categories, typed exceptions carrying retryability metadata, and an HTTP status-to-exception normalizer."
+    },
+    "file:runner/transport/openai_compatible.py": {
+      "name": "openai_compatible.py",
+      "type": "file",
+      "summary": "HTTP backend implementing the ToolLoopBackend protocol by POSTing to any OpenAI Chat Completions endpoint - used for Bedrock via bedrock-mantle, Together AI and Ollama. Requires httpx, which the config factory imports lazily."
+    },
+    "file:runner/transport/tool_executor.py": {
+      "name": "tool_executor.py",
+      "type": "file",
+      "summary": "Local Read/Glob tool executor that emulates the file access Claude Code provides natively, for non-Claude backends whose tool loop Python must drive. Read-only by construction, with path authorisation applied after symlink resolution and every denial returned as a structured tool error."
+    },
+    "file:runner/transport/tool_loop.py": {
+      "name": "tool_loop.py",
+      "type": "file",
+      "summary": "Drives the iterative request to tool_calls to execute to re-send cycle for backends without native Read/Glob support, bounded by a max-round limit and deliberately decoupled from any particular HTTP client."
+    },
+    "file:runner/graph_canonical_pack.py": {
+      "name": "graph_canonical_pack.py",
+      "type": "file",
+      "summary": "Deterministic, Claude-free deriver that builds the Phase-8 canonical reference pack (objectives, outcomes, work packages, deliverables, partners) from graph vault nodes instead of docs/** JSON, so the pack and the compiled prose share one source and cannot drift. Operator-declared assumptions are read from a separate substrate and quarantined into their own array rather than merged into confirmed facts."
+    },
+    "file:runner/graph_claim_verifier.py": {
+      "name": "graph_claim_verifier.py",
+      "type": "file",
+      "summary": "Independent claim-to-node traceability auditor: reads the committed Tier 5 section artifacts from disk (never a fresh compile) plus the vault, and asserts that every published claim_id is a bound vault node whose status equals the schema's evidence mapping. Distinguishes audit findings from fail-closed preconditions, and refuses to pass vacuously when there is nothing to verify."
+    },
+    "file:runner/graph_compiler.py": {
+      "name": "graph_compiler.py",
+      "type": "file",
+      "summary": "The graph-to-docs compiler: reads a config-bound vault and deterministically extracts both the Tier 3 architecture_inputs JSON and the Part B proposal_section deliverables, writing them into a Tier 4 staging tree and diffing against the existing hand-lift rather than overwriting it. Record validation status is always computed from the node's evidence_strength, never read from the node, so an unconfirmed node can never land as a confirmed fact."
+    },
+    "file:runner/graph_config.py": {
+      "name": "graph_config.py",
+      "type": "file",
+      "summary": "Defines and validates the per-project graph.config.yaml binding contract — which vault folders and node types map to which target tier and canonical docs/** artifact path. This is the only place project specifics enter the graph substrate, which is what keeps the generic layer free of project nouns."
+    },
+    "file:runner/graph_determinism_check.py": {
+      "name": "graph_determinism_check.py",
+      "type": "file",
+      "summary": "Replay auditor that proves the compiler is a pure function of the vault: it compiles the same vault twice into two separate staging roots with deliberately different compiled_at stamps and shows the outputs are byte-identical apart from that one documented exclusion. Byte-exact on the fast path, falling back to order-preserving canonical JSON so a reordered key or array element is flagged rather than masked."
+    },
+    "file:runner/graph_projector.py": {
+      "name": "graph_projector.py",
+      "type": "file",
+      "summary": "The docs-to-graph projector: scans durable Tier 4 phase and gate state and mirrors it into the vault as derived, read-only phase_gate_state nodes so the Obsidian dashboards reflect run state. It is deterministic and idempotent, writes only its own owned vault folder, and enforces that the two sync directions never write the same docs path or vault folder."
+    },
+    "file:runner/graph_schema.py": {
+      "name": "graph_schema.py",
+      "type": "file",
+      "summary": "The project-agnostic schema half of the graph substrate: the controlled node_type and evidence_strength vocabularies, the pure lookup from evidence strength to a validation status, the required-core versus additive-optional front-matter split, and fail-closed validation that names the offending node. Carries no folder names, call, or partner nouns."
+    },
+    "file:runner/vault_reader.py": {
+      "name": "vault_reader.py",
+      "type": "file",
+      "summary": "Deterministic pure-Python parse layer of the graph substrate: reads every vault note's YAML front-matter, body prose, and wikilinks, validates each against the generic schema, and returns an indexed Vault. This is the single substrate the compiler, projector, pack deriver, and auditors all build on."
+    },
+    "file:runner/vault_scaffold.py": {
+      "name": "vault_scaffold.py",
+      "type": "file",
+      "summary": "Instantiates a fresh per-project graph vault by copying the generic template — schema superset, folder skeleton, and a noun-free config — and rewriting a single project_id line, then validates the result by reading it back through the reader. Pure and Claude-free: a scaffolded vault holds no project facts until a human authors nodes into it."
+    },
+    "file:runner/agnosticism_lint.py": {
+      "name": "agnosticism_lint.py",
+      "type": "file",
+      "summary": "Static \"no project nouns\" lint that proves the generic graph layer stays project-agnostic: it scans the enumerated generic-layer sources (runner/graph_*.py, runner/vault_*.py, runner/dev_graph/**, the vault template, the obsidian-graph skill) for a denylist of reference-instance proper nouns and domain terms and reports every file:line:noun hit. Pure, deterministic and Claude-free — it reads and reports, writes nothing and evaluates no gate."
+    },
+    "file:runner/consortium_composition.py": {
+      "name": "consortium_composition.py",
+      "type": "file",
+      "summary": "Deterministic evaluator for the Horizon Europe consortium-composition condition: it reads the four thresholds and their verbatim citations out of the Tier 1 participation rules and the partner records out of the Tier 3 registry, then reports whether the consortium is met and which of the four limbs fails. No threshold is supplied from programme knowledge and no partner fact is inferred — it reads, evaluates and reports, writing nothing."
+    },
+    "file:runner/leakage_scan.py": {
+      "name": "leakage_scan.py",
+      "type": "file",
+      "summary": "The anonymity scan guarding the blind-assessment lane: it checks that no reference-instance organisation name, person, place, web address or project identifier appears in Tier 3, Tier 4, Tier 5 or the vault. Two mechanisms do the work — a word scan over a denylist derived from the agnosticism lint's PROJECT_NOUNS (partitioned into identity, re-identifying and deliberately scoped-out nouns), and a structural pseudonymity check that reads the real country lists out of Tier 1 and fails on any country name, URL or email in a Tier 3 self-description."
+    },
+    "config:.claude/workflows/system_orchestration/manifest.compile.yaml": {
+      "name": "manifest.compile.yaml",
+      "type": "config",
+      "summary": "The compiled workflow manifest and executable spine of the engine: it declares the DAG execution model, a node_registry of 13 phase nodes binding each to its agent, skills, deterministic components and entry/exit gates, a 17-entry edge_registry of gate-guarded transitions, a 14-entry gate_registry and a 31-entry artifact registry. Its gate_registry predicate_refs are authoritative over which gate predicates actually execute."
+    },
+    "config:.claude/workflows/system_orchestration/agent_catalog.yaml": {
+      "name": "agent_catalog.yaml",
+      "type": "config",
+      "summary": "Declares the 20 workflow agents with their role, constitutional scope, declared tier reads and writes, explicit must_not prohibitions and phase alignment. Named by the constitution as an authoritative source of agent scope; three agents are cross-phase and proposal_writer is marked deprecated by the Phase 8 refactor."
+    },
+    "config:.claude/workflows/system_orchestration/skill_catalog.yaml": {
+      "name": "skill_catalog.yaml",
+      "type": "config",
+      "summary": "Declares the 27 skills, each an atomic single-Claude-invocation unit, with its execution mode (predominantly TAPM), output contract, purpose, consuming agents, declared tier reads and writes and constitutional constraints. A skill may never invoke another skill."
+    },
+    "config:.claude/workflows/system_orchestration/gate_rules_library.yaml": {
+      "name": "gate_rules_library.yaml",
+      "type": "config",
+      "summary": "The machine-evaluable predicate library behind all 14 gates: 149 declared predicates, each carrying a predicate_id, type, evaluation function, args, prose condition and operator-facing fail message. The manifest's predicate_refs select which of these actually run."
+    },
+    "config:.claude/workflows/system_orchestration/quality_gates.yaml": {
+      "name": "quality_gates.yaml",
+      "type": "config",
+      "summary": "The prose-level definition of the 15 quality gates: name, description, evaluation point, fail action and the human-readable conditions each gate enforces. Budget Consistency is the only gate flagged bypass_prohibited, matching the constitution's categorical Phase 8 block."
+    },
+    "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml": {
+      "name": "artifact_schema_specification.yaml",
+      "type": "config",
+      "summary": "The canonical artifact schema specification: field-level schemas for Tier 4 phase outputs, Tier 5 deliverables, proposal sections, gate results, operational and dev-graph artifacts, Tier 3 sources, Tier 2A/2B extracts and integration validation, plus a 22-entry schema_id_registry mapping each schema_id to its artifact and section. Agent output that diverges from these schemas is a failure, not an alternative valid reading."
+    },
+    "config:.claude/workflows/system_orchestration/tier_bindings.yaml": {
+      "name": "tier_bindings.yaml",
+      "type": "config",
+      "summary": "Maps the workflow onto the repository document model: for Tier 1 through Tier 5 plus integrations and runtime it declares the root path, role, subpaths, extracted artifacts, read authority and write constraint, including the Tier 2A constraint against treating grant agreement annexes as a proposal schema."
+    },
+    "config:.claude/workflows/system_orchestration/global_rules.yaml": {
+      "name": "global_rules.yaml",
+      "type": "config",
+      "summary": "Cross-cutting invariants binding every phase: determinism, failure on missing required inputs, mandatory tier traceability, durable Tier 4 writes, prohibitions on fabricating project facts, call constraints and budget estimates, the budget-gate-before-finalization rule and the evaluation-success optimisation target."
+    },
+    "config:.claude/workflows/system_orchestration/state_rules.yaml": {
+      "name": "state_rules.yaml",
+      "type": "config",
+      "summary": "Rules governing orchestration state: Tier 4 durability, checkpoint preservation, decision logging, deterministic rerun behaviour, conflict logging, the agent-memory boundary, the four-value validation status vocabulary (Confirmed, Inferred, Assumed, Unresolved) and index maintenance."
+    },
+    "config:.claude/workflows/system_orchestration/integration_rules.yaml": {
+      "name": "integration_rules.yaml",
+      "type": "config",
+      "summary": "Governs the Lump Sum Budget Planner exchange: interface contract location, request and response exchange directories, what the repository may and must not do, request preparation and response validation rules, failure modes and the prohibition on substituting internally generated budget figures."
+    },
+    "config:.claude/workflows/system_orchestration/meta.yaml": {
+      "name": "meta.yaml",
+      "type": "config",
+      "summary": "Workflow package metadata: name, version 1.1, a constitutional authority pointer to CLAUDE.md with its hierarchy position and amendment rule, repository scope (programme-agnostic, multi-instrument, project-specificity triggers), the 16-entry ordered package_sources load list and the compiled entry point manifest.compile.yaml."
+    },
+    "config:.claude/workflows/system_orchestration/design_notes.yaml": {
+      "name": "design_notes.yaml",
+      "type": "config",
+      "summary": "Records the design rationale behind the orchestration specification: why the workflow is universal and authoritative, evaluator orientation, Tier 3 as the project container, formalised dependency mapping, the Phase 8 substep split, the budget gate design, constitutional subordination and the package model."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1": {
+      "name": "orch.phase1.call_analysis_summary.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 1 call_analysis_summary.json Tier 4 phase output capturing extracted call analysis."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1": {
+      "name": "orch.phase2.concept_refinement_summary.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 2 concept_refinement_summary.json Tier 4 phase output recording call-aligned concept refinement."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1": {
+      "name": "orch.phase3.wp_structure.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 3 wp_structure.json artifact holding work packages, tasks, deliverables and dependencies."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1": {
+      "name": "orch.phase4.gantt.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 4 gantt.json artifact assigning every task to months across the project duration."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1": {
+      "name": "orch.phase4.scheduling_constraints.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 4 scheduling_constraints.json artifact produced by deterministic dependency normalization."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1": {
+      "name": "orch.phase5.impact_architecture.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 5 impact_architecture.json artifact holding output-to-outcome-to-impact pathways and KPIs."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1": {
+      "name": "orch.phase6.implementation_architecture.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 6 implementation_architecture.json artifact holding governance structure, risk register and ethics flags."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1": {
+      "name": "orch.phase7.budget_gate_assessment.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 7 budget_gate_assessment.json artifact recording budget presence and structural consistency."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1": {
+      "name": "orch.phase8.drafting_review_status.v1",
+      "type": "schema",
+      "summary": "Schema for the Phase 8 drafting_review_status.json artifact tracking section drafting and review disposition."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1": {
+      "name": "orch.checkpoints.phase8_checkpoint.v1",
+      "type": "schema",
+      "summary": "Schema for the durable phase8_checkpoint.json carrying the cross-run checkpoint provenance quad."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1": {
+      "name": "orch.tier5.assembled_draft.v1",
+      "type": "schema",
+      "summary": "Deprecated assembled_draft.json schema, superseded by orch.tier5.part_b_assembled_draft.v1."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1": {
+      "name": "orch.tier5.excellence_section.v1",
+      "type": "schema",
+      "summary": "Schema for the Tier 5 excellence_section.json deliverable drafted in Phase 8a."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1": {
+      "name": "orch.tier5.impact_section.v1",
+      "type": "schema",
+      "summary": "Schema for the Tier 5 impact_section.json deliverable drafted in Phase 8b."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.implementation_section.v1": {
+      "name": "orch.tier5.implementation_section.v1",
+      "type": "schema",
+      "summary": "Schema for the Tier 5 implementation_section.json deliverable drafted in Phase 8c."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1": {
+      "name": "orch.tier5.part_b_assembled_draft.v1",
+      "type": "schema",
+      "summary": "Schema for part_b_assembled_draft.json, the cross-section assembly product checked by gate_10d."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.review_packet.v1": {
+      "name": "orch.tier5.review_packet.v1",
+      "type": "schema",
+      "summary": "Schema for the Tier 5 review_packet.json produced by evaluator-style review in Phase 8e."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1": {
+      "name": "orch.tier5.final_export.v1",
+      "type": "schema",
+      "summary": "Schema for the Tier 5 final_export.json written by the deterministic final export component."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.proposal_section.v1": {
+      "name": "orch.tier5.proposal_section.v1",
+      "type": "schema",
+      "summary": "Generic proposal_section schema applied to each per-section JSON artifact under proposal_sections/."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1": {
+      "name": "orch.gate_result.v1",
+      "type": "schema",
+      "summary": "Schema for gate_result artifacts, which are written exclusively by the gate evaluator."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1": {
+      "name": "orch.operational.run_manifest.v1",
+      "type": "schema",
+      "summary": "Schema for per-run run_manifest artifacts recording run identity and node outcomes."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1": {
+      "name": "orch.dev_graph.snapshot.v1",
+      "type": "schema",
+      "summary": "Schema for the dev_graph snapshot.json capturing the projected graph state."
+    },
+    "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.document_snapshot.v1": {
+      "name": "orch.dev_graph.document_snapshot.v1",
+      "type": "schema",
+      "summary": "Schema for per-document dev_graph snapshots keyed by document id and content hash."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml": {
+      "name": "phase_01_call_analysis.yaml",
+      "type": "config",
+      "summary": "Node specification for Phase 1 (Call Analysis): binds the call_analyzer agent and five extraction skills to parse the work programme and call topic into the six Tier 2B extracted files plus the Tier 2A section and evaluator registries. Its gate requires all six extracted files non-empty with source section references and a resolved instrument type."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml": {
+      "name": "phase_02_concept_refinement.yaml",
+      "type": "config",
+      "summary": "Node specification for Phase 2 (Concept Refinement): binds the concept_refiner agent to align the Tier 3 concept note with the confirmed call scope and vocabulary, writing topic_mapping.json and compliance_profile.json back to Tier 3. Its gate requires a complete topic mapping with source references and no unresolved scope conflicts against Tier 2B."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml": {
+      "name": "phase_03_wp_design.yaml",
+      "type": "config",
+      "summary": "Node specification for Phase 3 (Work Package Design and Dependency Mapping): binds the wp_designer agent to build work packages, tasks, deliverables, milestones and an acyclic inter-WP dependency map from Tier 3 objectives and consortium data. Its gate requires every WP to carry objectives, tasks, at least one deliverable, a responsible lead and declared dependencies, with the WP count inside the Tier 2A instrument limit and no dependency cycles."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml": {
+      "name": "phase_04_gantt_milestones.yaml",
+      "type": "config",
+      "summary": "Node specification for Phase 4 (Gantt and Milestones): binds the gantt_designer agent plus the deterministic dependency_normalizer component to assign every task to months, define milestones with verifiable criteria and derive scheduling_constraints.json. Its gate requires all tasks scheduled within the call duration, every milestone verifiable, a critical path consistent with the dependency map, and the normalized constraints written to Tier 4."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml": {
+      "name": "phase_05_impact_architecture.yaml",
+      "type": "config",
+      "summary": "Node specification for Phase 5 (Impact Architecture): binds the impact_architect agent to build the output-to-outcome-to-impact pathway with KPIs, dissemination, exploitation, communication and sustainability logic. Its gate requires every Tier 2B expected impact to have at least one mapped project output and every KPI to trace to a named WP deliverable, with no impact claim asserted without a project mechanism."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml": {
+      "name": "phase_06_implementation_architecture.yaml",
+      "type": "config",
+      "summary": "Node specification for Phase 6 (Implementation Architecture): binds the implementation_architect agent to define the management structure, governance and decision-making matrix, quality assurance plan, populated risk register, ethics self-assessment and any instrument-mandated gender and diversity plan. Its gate requires ethics flags to be stated explicitly rather than omitted and all management roles to be assigned to named Tier 3 partners."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml": {
+      "name": "phase_07_budget_gate.yaml",
+      "type": "config",
+      "summary": "Node specification for Phase 7 (Budget Gate): binds the budget_gate_validator agent to confirm a validated external Lump Sum Budget Planner response exists and is structurally consistent with the Phase 3 WP structure, Phase 4 timeline and Phase 6 consortium roles, without computing any figure itself. The gate is marked mandatory with bypass_prohibited, and a pre_gate_action delegates request preparation to budget_interface_coordinator when no response is present."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml": {
+      "name": "phase_08_drafting_review.yaml",
+      "type": "config",
+      "summary": "Node specification for Phase 8 (Drafting and Review), the only phase decomposed into substeps: three parallel criterion-aligned drafting nodes (Excellence, Impact, Implementation), then sequential assembly, evaluator-style review and revision. It depends on all seven preceding phases and its gate aggregates gate_10a-d, gate_11, resolved critical revision actions, the final export and a published Phase 8 checkpoint."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting": {
+      "name": "phase_08a_excellence_drafting",
+      "type": "config",
+      "summary": "Substep 8a: binds the excellence_writer agent and the excellence-section-drafting skill to produce excellence_section.json covering objectives, relation to work programme, concept and methodology, ambition, interdisciplinarity and gender dimension. Runs in parallel with 8b and 8c and must verify the budget gate has passed before producing any content."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting": {
+      "name": "phase_08b_impact_drafting",
+      "type": "config",
+      "summary": "Substep 8b: binds the impact_writer agent and the impact-section-drafting skill to produce impact_section.json, mapping every Tier 2B expected impact to a Phase 5 pathway and populating impact_pathway_refs and dec_coverage. Runs in parallel with 8a and 8c and forbids fabricated coverage of an expected impact no project output addresses."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting": {
+      "name": "phase_08c_implementation_drafting",
+      "type": "config",
+      "summary": "Substep 8c: binds the implementation_writer agent and the implementation-section-drafting skill to produce implementation_section.json covering the work plan, Gantt, deliverables and milestones tables, management structure, risk management, consortium and resources. Populates wp_table_refs, gantt_ref, milestone_refs and risk_register_ref from the Phase 3, 4 and 6 artifacts without redesigning them."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly": {
+      "name": "phase_08d_assembly",
+      "type": "config",
+      "summary": "Substep 8d: binds the proposal_integrator agent and the cross-section-consistency-check skill to assemble the three criterion sections into part_b_assembled_draft.json in Part B order, recording cross-section findings in a consistency_log. It depends on substeps 8a, 8b and 8c and is forbidden from rewriting section content — inconsistencies are flagged, never silently normalised."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review": {
+      "name": "phase_08e_evaluator_review",
+      "type": "config",
+      "summary": "Substep 8e: binds the evaluator_reviewer agent and the evaluator-criteria-review skill to simulate evaluator assessment of the assembled draft against the Phase 1 evaluation matrix, producing review_packet.json with weaknesses categorised critical, major or minor and a prioritised revision action list. It depends on substep 8d and may not revise the draft itself."
+    },
+    "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision": {
+      "name": "phase_08f_revision",
+      "type": "config",
+      "summary": "Substep 8f: binds the revision_integrator agent plus the deterministic checkpoint_publisher component to apply critical then major revision actions, write the final export and publish phase8_checkpoint.json to Tier 4. It depends on substep 8e and must flag unresolvable gaps in the revision log rather than fabricate content."
+    },
+    "document:harness/HARNESS.md": {
+      "name": "HARNESS.md",
+      "type": "document",
+      "summary": "Specification document for the out-of-band evaluation and integrity harness, defining its substrate (E1/E1.5), the two headline signals E2 (status-aware faithfulness) and E3 (claim-ledger completeness plus status calibration), the E4 regression golden-set, the pre-evaluation profile layer and the blind-assessment lane. It is the authority for the harness's load-bearing invariant: no eval metric may wire into the runtime DAG as a fail-closed gate."
+    },
+    "config:harness/evaluator_scorecard_ria.json": {
+      "name": "evaluator_scorecard_ria.json",
+      "type": "config",
+      "summary": "Machine-readable RIA/IA evaluator scorecard transcribed from the EU Grants Evaluation form (HE RIA and IA) V4.0, pp.4-5: the 0-5 scoring scale with its level descriptions, the three criteria (Excellence, Impact, Implementation) each carrying a threshold score of 3, and the six verbatim aspect texts the harness grades against."
+    },
+    "config:harness/evaluator_scorecard_msca_pf.json": {
+      "name": "evaluator_scorecard_msca_pf.json",
+      "type": "config",
+      "summary": "Machine-readable MSCA Postdoctoral Fellowship evaluator scorecard transcribed from the HE MSCA Evaluation Form V2.2, pp.4-6: the 0-5 scale, the 50/30/20 criterion weighting against a 70/100 overall pass threshold, the nine PF-scoped aspects, and the COFUND-only recruiting-institution aspect explicitly excluded from grading."
+    },
+    "document:harness/evaluator_scorecard_msca_pf.md": {
+      "name": "evaluator_scorecard_msca_pf.md",
+      "type": "document",
+      "summary": "Human-readable mirror of the MSCA-PF evaluator scorecard, listing every criterion, weight and aspect text with its form page and option tag, plus the PF scoping rule that decides which registry aspects are graded and which are excluded."
+    },
+    "config:harness/rubrics_ria.json": {
+      "name": "rubrics_ria.json",
+      "type": "config",
+      "summary": "RIA rubric set (ria_ia_rubrics v1.0.0) binding each of the six scorecard aspects to an integrity-framed grading rubric with evaluation steps, a 0.6 pass threshold, selection terms and the Part B sub-section anchors (B.1.1 through B.3.2) that Phase 8 writes."
+    },
+    "config:harness/rubrics_msca_pf.json": {
+      "name": "rubrics_msca_pf.json",
+      "type": "config",
+      "summary": "MSCA-PF rubric set (msca_pf_rubrics v1.0.0) binding each of the nine PF-scoped scorecard aspects to an integrity-framed grading rubric with evaluation steps, a 0.6 pass threshold, selection terms and the sub-section anchors 1.1 through 3.2."
+    },
+    "config:harness/rubrics_ria.json:ria-exc-objectives": {
+      "name": "ria-exc-objectives",
+      "type": "config",
+      "summary": "Integrity rubric for the excellence aspect: Clarity and pertinence of the project’s objectives, and the extent to which the proposed work is ambitious, and goes beyond the state of the art. Graded against sub-section anchor B.1.1 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_ria.json:ria-exc-methodology": {
+      "name": "ria-exc-methodology",
+      "type": "config",
+      "summary": "Integrity rubric for the excellence aspect: Soundness of the proposed methodology, including the underlying concepts, models, assumptions, inter-disciplinary approaches, appropriate... Graded against sub-section anchor B.1.2 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_ria.json:ria-imp-pathways": {
+      "name": "ria-imp-pathways",
+      "type": "config",
+      "summary": "Integrity rubric for the impact aspect: Credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme. Graded against sub-section anchor B.2.1 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_ria.json:ria-imp-measures": {
+      "name": "ria-imp-measures",
+      "type": "config",
+      "summary": "Integrity rubric for the impact aspect: Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including... Graded against sub-section anchor B.2.2 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_ria.json:ria-impl-workplan": {
+      "name": "ria-impl-workplan",
+      "type": "config",
+      "summary": "Integrity rubric for the implementation aspect: Quality and effectiveness of the work plan, assessment of risks, and appropriateness of the effort assigned to work packages, and the resources... Graded against sub-section anchor B.3.1 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_ria.json:ria-impl-capacity": {
+      "name": "ria-impl-capacity",
+      "type": "config",
+      "summary": "Integrity rubric for the implementation aspect: Capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise. Graded against sub-section anchor B.3.2 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:exc-obj": {
+      "name": "exc-obj",
+      "type": "config",
+      "summary": "Integrity rubric for the excellence aspect: Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of... Graded against sub-section anchor 1.1 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:exc-method": {
+      "name": "exc-method",
+      "type": "config",
+      "summary": "Integrity rubric for the excellence aspect: Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if... Graded against sub-section anchor 1.2 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:exc-supervision": {
+      "name": "exc-supervision",
+      "type": "config",
+      "summary": "Integrity rubric for the excellence aspect: Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host. Graded against sub-section anchor 1.3 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:exc-researcher": {
+      "name": "exc-researcher",
+      "type": "config",
+      "summary": "Integrity rubric for the excellence aspect: Quality and appropriateness of the researcher's professional experience, competences and skills. Graded against sub-section anchor 1.4 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:imp-career": {
+      "name": "imp-career",
+      "type": "config",
+      "summary": "Integrity rubric for the impact aspect: Credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development. Graded against sub-section anchor 2.1 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:imp-dissemination": {
+      "name": "imp-dissemination",
+      "type": "config",
+      "summary": "Integrity rubric for the impact aspect: Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including... Graded against sub-section anchor 2.2 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:imp-magnitude": {
+      "name": "imp-magnitude",
+      "type": "config",
+      "summary": "Integrity rubric for the impact aspect: The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts. Graded against sub-section anchor 2.3 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:impl-workplan": {
+      "name": "impl-workplan",
+      "type": "config",
+      "summary": "Integrity rubric for the implementation aspect: Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages. Graded against sub-section anchor 3.1 with a pass threshold of 0.6."
+    },
+    "config:harness/rubrics_msca_pf.json:impl-host": {
+      "name": "impl-host",
+      "type": "config",
+      "summary": "Integrity rubric for the implementation aspect: Quality and capacity of the host institutions and participating organisations, including hosting arrangements. Graded against sub-section anchor 3.2 with a pass threshold of 0.6."
+    },
+    "config:harness/evaluator_scorecard_ria.json:excellence": {
+      "name": "excellence",
+      "type": "config",
+      "summary": "Scorecard criterion Excellence (Score 1, unweighted, weight_pct carrying the placeholder value 1, form page 4) covering the aspects ria-exc-objectives, ria-exc-methodology. Individual threshold score 3."
+    },
+    "config:harness/evaluator_scorecard_ria.json:impact": {
+      "name": "impact",
+      "type": "config",
+      "summary": "Scorecard criterion Impact (Score 2, unweighted, weight_pct carrying the placeholder value 1, form page 4-5) covering the aspects ria-imp-pathways, ria-imp-measures. Individual threshold score 3."
+    },
+    "config:harness/evaluator_scorecard_ria.json:implementation": {
+      "name": "implementation",
+      "type": "config",
+      "summary": "Scorecard criterion Quality and efficiency of the implementation (Score 3, unweighted, weight_pct carrying the placeholder value 1, form page 5) covering the aspects ria-impl-workplan, ria-impl-capacity. Individual threshold score 3."
+    },
+    "config:harness/evaluator_scorecard_msca_pf.json:excellence": {
+      "name": "excellence",
+      "type": "config",
+      "summary": "Scorecard criterion Excellence (Score 1, weight 50%, form page 4-5) covering the aspects exc-obj, exc-method, exc-supervision, exc-researcher."
+    },
+    "config:harness/evaluator_scorecard_msca_pf.json:impact": {
+      "name": "impact",
+      "type": "config",
+      "summary": "Scorecard criterion Impact (Score 2, weight 30%, form page 5-6) covering the aspects imp-career, imp-dissemination, imp-magnitude."
+    },
+    "config:harness/evaluator_scorecard_msca_pf.json:implementation": {
+      "name": "implementation",
+      "type": "config",
+      "summary": "Scorecard criterion Quality and efficiency of the implementation (Score 3, weight 20%, form page 6) covering the aspects impl-workplan, impl-host."
+    },
+    "document:CLAUDE.md": {
+      "name": "CLAUDE.md",
+      "type": "document",
+      "summary": "The repository constitution and highest interpretive authority: it defines the programme-agnostic proposal-orchestration mission, a ten-level authority hierarchy, the six-tier document model (Tier 1 normative framework through Tier 5 deliverables), the eight canonical gated phases, the budget-integration rules, twelve categories of forbidden action, the agent derivation and execution binding rules, and the three-layer runtime execution architecture. Every agent, skill and workflow in the repository is subordinate to it, and five formal amendment records track how it has changed."
+    },
+    "file:harness/commands/__init__.py": {
+      "name": "__init__.py",
+      "type": "file",
+      "summary": "Package marker for the out-of-band judge runners (E4 baseline freeze, E1.5 faithfulness calibration, E5f rubric grading, blind assessment), each invoked as a module from the repo root. The docstring records why they live inside the harness package: so the one-way harness-to-runner import boundary holds for the auxiliary runtime surfaces too."
+    },
+    "document:harness/gold_sets/README.md": {
+      "name": "README.md",
+      "type": "document",
+      "summary": "Explains the E1.5 faithfulness gold sets — human-labelled (claim, source_ref, supported?) triples used to calibrate the judge — and states the independence rule: the `supported` label is human ground truth, deliberately not the engine's own status, and an AI must never fill it."
+    },
+    "document:harness/labeling/LABELLING_GUIDE.md": {
+      "name": "LABELLING_GUIDE.md",
+      "type": "document",
+      "summary": "Hand-labelling rubric for the E3.1 materiality calibration: the single question a labeller asks of each text span, worked examples of material versus non-material prose, tie-breaks for edge cases, and the independence rule that a human — never an AI — writes the answer key."
+    },
+    "config:harness/labeling/e3.1-materiality-calibration_TEMPLATE.json": {
+      "name": "e3.1-materiality-calibration_TEMPLATE.json",
+      "type": "config",
+      "summary": "Skeleton decision record for the E3.1 materiality-classifier calibration: placeholders for the judge model and pin, gold-set counts, the precision and escape-recall metrics, the operator's threshold policy (0.85 / 0.80), and the advisory-versus-gating decision keyed to that exact judge version."
+    },
+    "file:harness/materiality_calibration.py": {
+      "name": "materiality_calibration.py",
+      "type": "file",
+      "summary": "Turnkey runner for the E3.1 materiality-classifier calibration: it reads a human-labelled spreadsheet, writes the canonical JSONL materiality set, scores the real classifier against the human labels with a genuine confusion matrix, computes the escape-recall slice that matters, applies the fail-safe graduation rule, and emits a pre-filled decision-log draft. Advisory only — it measures the classifier the pipeline runs but never blocks a run."
+    },
+    "document:harness/materiality_sets/README.md": {
+      "name": "README.md",
+      "type": "document",
+      "summary": "Documents the E3 materiality calibration data and its two-anchor rule: positives are the engine's own claim-ledger enumeration and may legitimately be auto-labelled, while negatives are a human's call and are shipped unlabelled. Also states what becomes measurable at each stage of labelling."
+    },
+    "config:harness/profiles/msca_pf_default.json": {
+      "name": "msca_pf_default.json",
+      "type": "config",
+      "summary": "Default pre-evaluation profile for MSCA Postdoctoral Fellowships, a single-researcher instrument: it binds the evaluator expectation registry, the option-tag grammar for the five MSCA variants, the three evaluation criteria and their section ids, and the MSCA-PF scorecard and rubric set."
+    },
+    "config:harness/profiles/ria_default.json": {
+      "name": "ria_default.json",
+      "type": "config",
+      "summary": "Default pre-evaluation profile for the Horizon Europe Research and Innovation Action, a collaborative multi-partner instrument: the parallel form of the MSCA-PF profile, binding the same registry and three criteria to the RIA/IA evaluation form, scorecard and rubric set."
+    },
+    "document:harness/regression_baselines/README.md": {
+      "name": "README.md",
+      "type": "document",
+      "summary": "Describes the E4 regression golden baselines — frozen per-section fingerprints covering the claim ledger, per-sub-section prose hashes and a formatting-invariant whole-artifact hash — what integrity drift the golden diff catches, and why the lane is merge-advisory and human-decided rather than run-blocking."
+    },
+    "config:pyproject.toml": {
+      "name": "pyproject.toml",
+      "type": "config",
+      "summary": "Minimal project file carrying pytest configuration only: the test path, repo-root import path, verbose output, and two custom markers registering the harness's advisory lanes — `harness_regression` for the E4 golden-set comparison and `harness_rubric` for the E5 rubric grid, both explicitly never run-blocking."
+    },
+    "file:runner/__init__.py": {
+      "name": "__init__.py",
+      "type": "file",
+      "summary": "Package marker for the DAG runner. Its docstring tracks the implementation status of the gate-predicate execution layer step by step and declares the package's constitutional subordination: it must not redefine gate logic, phase meanings, tier meanings or the authority hierarchy."
+    },
+    "file:runner/dependency_normalizer.py": {
+      "name": "dependency_normalizer.py",
+      "type": "file",
+      "summary": "Deterministic, Claude-free preprocessor for Phase 4 scheduling: it reads the Phase 3 dependency map, the work-package temporal bounds from the seed and the project duration from the call binding, then classifies every dependency edge as strict (temporally enforceable) or non-strict (informational data input) into a normalized scheduling-constraints artifact."
+    },
+    "file:runner/persistence_policy.py": {
+      "name": "persistence_policy.py",
+      "type": "file",
+      "summary": "Sole authority for what diagnostic data the runtime may write to disk, resolved from the deployment environment and a diagnostic-level variable. Development defaults to full prompt and response capture; production defaults to metadata only and rejects an explicit request for full content outright."
+    },
+    "file:tools/promote_graph_staging.py": {
+      "name": "promote_graph_staging.py",
+      "type": "file",
+      "summary": "Implements the explicit half of the parallel-plus-explicit-promote design: the graph-to-docs compiler writes non-destructively into a staging tree, and a human runs this script with `--apply` to copy that output onto the canonical docs paths the runner consumes. Dry-run by default, guarded by a project-id match, with pre-promote backups and a promote record for reversibility."
+    },
+    "file:tools/prose_detect.py": {
+      "name": "prose_detect.py",
+      "type": "file",
+      "summary": "Detection pass of the project's proposal prose profile: it measures human-facing text against the profile's mechanical rules — sentence length, em-dash count, clause-versus-list semicolons, paragraph length and a watch-word list — over every string value in a proposal-section JSON. It reports only and never edits; the edit pass is a separate, human-reviewed step."
+    }
+  },
+  "totalNodes": 208,
+  "totalEdges": 2191,
+  "realEdges": 639
+}

@@ -1,0 +1,1728 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/dev_graph/impact.py",
+   "type": "file",
+   "name": "impact.py",
+   "filePath": "runner/dev_graph/impact.py",
+   "summary": "Shadow impact planner: given the snapshots before and after an approved change plus the durable run records, it returns an advisory plan naming each affected record, passage, artifact or check with a reason path, a hit kind and one action from a closed set.",
+   "tags": [
+    "dev-graph",
+    "impact-analysis",
+    "graph-traversal",
+    "advisory",
+    "deterministic-component"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Breadth-first reach is bounded by a view policy applied before expansion; it refuses a broken index rather than returning a smaller plan."
+  },
+  {
+   "id": "class:runner/dev_graph/impact.py:ImpactPlan",
+   "type": "class",
+   "name": "ImpactPlan",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    113,
+    147
+   ],
+   "summary": "The advisory plan: its entries, the origins, newly relevant sources and the nothing-changed flag, with a dict projection for the writer.",
+   "tags": [
+    "data-model",
+    "impact-analysis",
+    "dev-graph"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:_id_list",
+   "type": "function",
+   "name": "_id_list",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    159,
+    164
+   ],
+   "summary": "Reads a declared list of identifiers from a run record, refusing a malformed shape.",
+   "tags": [
+    "validation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:normalise_run_records",
+   "type": "function",
+   "name": "normalise_run_records",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    167,
+    212
+   ],
+   "summary": "Validates and normalises the durable run records that declare each artifact's inputs and dependencies.",
+   "tags": [
+    "validation",
+    "normalization",
+    "run-records"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:read_run_records",
+   "type": "function",
+   "name": "read_run_records",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    215,
+    227
+   ],
+   "summary": "Reads the stored run records from Tier 4 and normalises them.",
+   "tags": [
+    "io",
+    "run-records"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:_adjacency",
+   "type": "function",
+   "name": "_adjacency",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    235,
+    258
+   ],
+   "summary": "Builds the traversal adjacency over the union of before and after edges, filtered by the view policy's permitted predicates.",
+   "tags": [
+    "graph-traversal",
+    "derivation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:_reach",
+   "type": "function",
+   "name": "_reach",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    261,
+    281
+   ],
+   "summary": "Breadth-first reach from the origins to the policy's depth, recording the edge labels traversed and stopping at non-expanding containers.",
+   "tags": [
+    "graph-traversal",
+    "bfs",
+    "bounded"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:plan_identity",
+   "type": "function",
+   "name": "plan_identity",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    301,
+    305
+   ],
+   "summary": "Returns the content-derived identity of an impact plan.",
+   "tags": [
+    "hashing",
+    "identity"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:plan_nothing_changed",
+   "type": "function",
+   "name": "plan_nothing_changed",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    308,
+    311
+   ],
+   "summary": "Builds the trivial plan for a change set that moved nothing.",
+   "tags": [
+    "factory",
+    "impact-analysis"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:plan_impact",
+   "type": "function",
+   "name": "plan_impact",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    327,
+    475
+   ],
+   "summary": "Core planner: derives the origins, walks the bounded reach, classifies each hit, assigns the action and flags newly relevant sources.",
+   "tags": [
+    "impact-analysis",
+    "graph-traversal",
+    "pure-function",
+    "advisory"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:read_impact_request",
+   "type": "function",
+   "name": "read_impact_request",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    483,
+    494
+   ],
+   "summary": "Reads the operator's impact-plan request from Tier 4.",
+   "tags": [
+    "io",
+    "request"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:write_impact_plan",
+   "type": "function",
+   "name": "write_impact_plan",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    497,
+    513
+   ],
+   "summary": "Writes the advisory plan atomically to its canonical Tier 4 path.",
+   "tags": [
+    "atomic-write",
+    "deterministic-component"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/impact.py:run_impact_plan_writer",
+   "type": "function",
+   "name": "run_impact_plan_writer",
+   "filePath": "runner/dev_graph/impact.py",
+   "lineRange": [
+    516,
+    520
+   ],
+   "summary": "Deterministic-component adapter `(run_id, repo_root) -> written`; the run id never enters the artifact.",
+   "tags": [
+    "deterministic-component",
+    "adapter",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/dev_graph/intake.py",
+   "type": "file",
+   "name": "intake.py",
+   "filePath": "runner/dev_graph/intake.py",
+   "summary": "Records what is known about an Evaluation Summary Report at intake, from a closed availability set and never by inference. One immutable record per intake id: identical content is a no-op, different content under the same id is refused.",
+   "tags": [
+    "dev-graph",
+    "intake",
+    "immutable",
+    "esr",
+    "validation"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "`available` requires a bound reference, and a reference without that declaration is refused rather than read as availability."
+  },
+  {
+   "id": "class:runner/dev_graph/intake.py:EsrIntake",
+   "type": "class",
+   "name": "EsrIntake",
+   "filePath": "runner/dev_graph/intake.py",
+   "lineRange": [
+    66,
+    89
+   ],
+   "summary": "The intake record: declared availability, bound submission and call ids, the document concerned, prior-submission flag and permitted purpose.",
+   "tags": [
+    "data-model",
+    "immutable",
+    "esr"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/intake.py:normalise_intake",
+   "type": "function",
+   "name": "normalise_intake",
+   "filePath": "runner/dev_graph/intake.py",
+   "lineRange": [
+    99,
+    155
+   ],
+   "summary": "Validates and normalises an intake payload, enforcing the closed availability set and the available-means-bound rule.",
+   "tags": [
+    "validation",
+    "normalization",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/intake.py:record_esr_intake",
+   "type": "function",
+   "name": "record_esr_intake",
+   "filePath": "runner/dev_graph/intake.py",
+   "lineRange": [
+    162,
+    205
+   ],
+   "summary": "Writes one immutable intake record, returning a no-op on identical content and refusing a conflicting rewrite of the same id.",
+   "tags": [
+    "entry-point",
+    "immutable",
+    "persistence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/intake.py:read_esr_intake",
+   "type": "function",
+   "name": "read_esr_intake",
+   "filePath": "runner/dev_graph/intake.py",
+   "lineRange": [
+    208,
+    223
+   ],
+   "summary": "Reads an intake record by id, validating its schema identity.",
+   "tags": [
+    "io",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/dev_graph/packages.py",
+   "type": "file",
+   "name": "packages.py",
+   "filePath": "runner/dev_graph/packages.py",
+   "summary": "Builds a bounded, task-scoped evidence package under one view policy and one budget, returning the included items plus a manifest saying what was included and why, what was excluded and why, what is unresolved, and whether the package is complete.",
+   "tags": [
+    "dev-graph",
+    "evidence-package",
+    "graph-traversal",
+    "policy",
+    "immutable"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Policy is applied before expansion, so a refused node is never a traversal step and nothing can enter through a side path; nothing is ever dropped silently."
+  },
+  {
+   "id": "class:runner/dev_graph/packages.py:Package",
+   "type": "class",
+   "name": "Package",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    144,
+    163
+   ],
+   "summary": "Immutable evidence package: its included items, manifest and content-derived package id, with dict and JSON projections.",
+   "tags": [
+    "data-model",
+    "immutable",
+    "evidence-package"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:_mandatory_step",
+   "type": "function",
+   "name": "_mandatory_step",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    114,
+    126
+   ],
+   "summary": "Decides whether one predicate traversal counts as a mandatory step for the given direction and endpoint type.",
+   "tags": [
+    "lookup",
+    "graph-traversal",
+    "policy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:estimate_cost",
+   "type": "function",
+   "name": "estimate_cost",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    132,
+    135
+   ],
+   "summary": "Returns the budget cost of one item's content — the single measure the budget fill spends against.",
+   "tags": [
+    "budgeting",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:_check_request",
+   "type": "function",
+   "name": "_check_request",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    175,
+    209
+   ],
+   "summary": "Refuses a stale snapshot id, a stale policy version, an unknown view, an absent task or a non-positive budget before any work is done.",
+   "tags": [
+    "validation",
+    "fail-closed",
+    "policy"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:_expand",
+   "type": "function",
+   "name": "_expand",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    217,
+    244
+   ],
+   "summary": "Breadth-first expansion from the seed over the permitted graph to the view's maximum depth, recording the edges traversed.",
+   "tags": [
+    "graph-traversal",
+    "bfs",
+    "bounded"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:_unresolved_items",
+   "type": "function",
+   "name": "_unresolved_items",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    261,
+    298
+   ],
+   "summary": "Lists unresolved items in both scopes: those included in the package and those the whole graph still owes.",
+   "tags": [
+    "validation",
+    "claim-status",
+    "reporting"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:_declared_status_items",
+   "type": "function",
+   "name": "_declared_status_items",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    301,
+    320
+   ],
+   "summary": "Rolls up each included item's declared status by node type rather than sniffing it from a value.",
+   "tags": [
+    "claim-status",
+    "lookup",
+    "reporting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:build_package",
+   "type": "function",
+   "name": "build_package",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    328,
+    506
+   ],
+   "summary": "The selection algorithm: refuse, apply policy, expand, mark mandatory, fill the budget in order, record exclusions and list unresolved items.",
+   "tags": [
+    "evidence-package",
+    "graph-traversal",
+    "budgeting",
+    "entry-point"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:read_package_request",
+   "type": "function",
+   "name": "read_package_request",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    516,
+    530
+   ],
+   "summary": "Reads the operator's package request from Tier 4.",
+   "tags": [
+    "io",
+    "request"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:package_dir",
+   "type": "function",
+   "name": "package_dir",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    533,
+    540
+   ],
+   "summary": "Returns the directory one package's artifacts land in.",
+   "tags": [
+    "path-resolution",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:write_package",
+   "type": "function",
+   "name": "write_package",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    543,
+    568
+   ],
+   "summary": "Writes the package items and manifest atomically under their content-derived package directory.",
+   "tags": [
+    "atomic-write",
+    "deterministic-component"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/packages.py:run_package_manifest_writer",
+   "type": "function",
+   "name": "run_package_manifest_writer",
+   "filePath": "runner/dev_graph/packages.py",
+   "lineRange": [
+    571,
+    575
+   ],
+   "summary": "Deterministic-component adapter `(run_id, repo_root) -> written`; the run id never enters the artifact.",
+   "tags": [
+    "deterministic-component",
+    "adapter",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/dev_graph/policies.py",
+   "type": "file",
+   "name": "policies.py",
+   "filePath": "runner/dev_graph/policies.py",
+   "summary": "Configuration data for the six dev-graph view policies — permitted node types and traversals, maximum depth, forbidden types and tags — plus a content-hash policy version so a policy edit can never silently reinterpret an existing package.",
+   "tags": [
+    "configuration",
+    "policy",
+    "dev-graph",
+    "data-model",
+    "pure-function"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "The blind pre-evaluation policy also hides superseded document versions; whether a snapshot is superseded is computed by the package builder, not tagged on a node."
+  },
+  {
+   "id": "class:runner/dev_graph/policies.py:ViewPolicy",
+   "type": "class",
+   "name": "ViewPolicy",
+   "filePath": "runner/dev_graph/policies.py",
+   "lineRange": [
+    71,
+    127
+   ],
+   "summary": "One view's policy: permitted types and traversals, depth, forbidden types and tags, with the per-node `refusal` lookup the builder applies before expansion.",
+   "tags": [
+    "policy",
+    "data-model",
+    "configuration",
+    "pure-function"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/dev_graph/revisions.py",
+   "type": "file",
+   "name": "revisions.py",
+   "filePath": "runner/dev_graph/revisions.py",
+   "summary": "Three closed operations over declared data: checking a proposed change set against a revision contract, creating a superseding candidate version with provenance, and deciding whether an existing assessment still applies. Also hosts the registered revision-record writer component.",
+   "tags": [
+    "dev-graph",
+    "revisions",
+    "contract-checking",
+    "versioning",
+    "deterministic-component"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Change classes come from a closed lookup table keyed by predicate, node type or changed field — never by inference; rejection outranks review."
+  },
+  {
+   "id": "class:runner/dev_graph/revisions.py:RevisionContract",
+   "type": "class",
+   "name": "RevisionContract",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    167,
+    183
+   ],
+   "summary": "The contract: the protected nodes, the permitted change classes and the unresolved items a change may bear on.",
+   "tags": [
+    "data-model",
+    "contract-checking",
+    "policy"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/dev_graph/revisions.py:ContractCheck",
+   "type": "class",
+   "name": "ContractCheck",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    264,
+    285
+   ],
+   "summary": "The verdict with its reasons: rejected protected nodes, unpermitted change classes and the unresolved items touched.",
+   "tags": [
+    "data-model",
+    "contract-checking",
+    "reporting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/dev_graph/revisions.py:Applicability",
+   "type": "class",
+   "name": "Applicability",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    498,
+    514
+   ],
+   "summary": "Whether an assessment still applies, with one reason per changed binding from the closed reason set.",
+   "tags": [
+    "data-model",
+    "applicability",
+    "assessment"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/dev_graph/revisions.py:RevisionRecord",
+   "type": "class",
+   "name": "RevisionRecord",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    572,
+    592
+   ],
+   "summary": "The immutable revision record: the contract check, the created candidate version and the change record it rests on.",
+   "tags": [
+    "data-model",
+    "immutable",
+    "revisions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:_id_list",
+   "type": "function",
+   "name": "_id_list",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    186,
+    195
+   ],
+   "summary": "Reads a declared list of identifiers from a contract payload.",
+   "tags": [
+    "validation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:_unresolved_item",
+   "type": "function",
+   "name": "_unresolved_item",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    198,
+    219
+   ],
+   "summary": "Normalises one declared unresolved item the contract names.",
+   "tags": [
+    "validation",
+    "normalization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:normalise_contract",
+   "type": "function",
+   "name": "normalise_contract",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    222,
+    255
+   ],
+   "summary": "Validates and normalises a revision contract payload into its typed form.",
+   "tags": [
+    "validation",
+    "normalization",
+    "contract-checking"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:_touches",
+   "type": "function",
+   "name": "_touches",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    288,
+    302
+   ],
+   "summary": "Collects every node id a change set touches, across added, removed and directly changed entries.",
+   "tags": [
+    "diff",
+    "derivation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:_validate_change_set",
+   "type": "function",
+   "name": "_validate_change_set",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    305,
+    320
+   ],
+   "summary": "Refuses a malformed change set before any classification is attempted.",
+   "tags": [
+    "validation",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:classify_change_set",
+   "type": "function",
+   "name": "classify_change_set",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    323,
+    340
+   ],
+   "summary": "Classifies a change set into change classes by closed lookup over predicates, node types and changed fields.",
+   "tags": [
+    "classification",
+    "lookup",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:check_revision",
+   "type": "function",
+   "name": "check_revision",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    343,
+    384
+   ],
+   "summary": "Pure contract check returning one verdict: rejected names every protected node touched, flagged carries unpermitted classes and unresolved items, accepted is the rest.",
+   "tags": [
+    "contract-checking",
+    "pure-function",
+    "policy"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:build_provenance",
+   "type": "function",
+   "name": "build_provenance",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    396,
+    420
+   ],
+   "summary": "Builds a candidate version's provenance: the snapshot it supersedes, the change record and the evidence nodes it rests on.",
+   "tags": [
+    "provenance",
+    "versioning",
+    "derivation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:create_candidate_version",
+   "type": "function",
+   "name": "create_candidate_version",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    423,
+    454
+   ],
+   "summary": "Imports a new candidate as a second immutable document snapshot whose provenance supersedes the old one, leaving the old record byte for byte as it was.",
+   "tags": [
+    "versioning",
+    "import",
+    "immutable"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:bind_assessment",
+   "type": "function",
+   "name": "bind_assessment",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    466,
+    494
+   ],
+   "summary": "Binds an assessment to the candidate id and version, the profile version and the policy version in force when it was made.",
+   "tags": [
+    "assessment",
+    "binding",
+    "derivation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:check_applicability",
+   "type": "function",
+   "name": "check_applicability",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    534,
+    563
+   ],
+   "summary": "Pure check of whether an assessment still applies to the current candidate, naming each changed binding as a reason.",
+   "tags": [
+    "applicability",
+    "pure-function",
+    "assessment"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:read_revision_request",
+   "type": "function",
+   "name": "read_revision_request",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    595,
+    621
+   ],
+   "summary": "Reads and validates the operator's revision request from Tier 4.",
+   "tags": [
+    "io",
+    "validation",
+    "request"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:write_revision_record",
+   "type": "function",
+   "name": "write_revision_record",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    624,
+    685
+   ],
+   "summary": "Component body: runs the contract check, creates the candidate version only on acceptance, and writes one immutable revision record.",
+   "tags": [
+    "deterministic-component",
+    "atomic-write",
+    "revisions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:read_revision_record",
+   "type": "function",
+   "name": "read_revision_record",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    688,
+    723
+   ],
+   "summary": "Reads a revision record by id, validating its schema identity and shape.",
+   "tags": [
+    "io",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/revisions.py:run_revision_record_writer",
+   "type": "function",
+   "name": "run_revision_record_writer",
+   "filePath": "runner/dev_graph/revisions.py",
+   "lineRange": [
+    726,
+    730
+   ],
+   "summary": "Deterministic-component adapter `(run_id, repo_root) -> written`; the run id never enters the artifact.",
+   "tags": [
+    "deterministic-component",
+    "adapter",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "class:runner/dev_graph/impact.py:ImpactPlan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "class:runner/dev_graph/impact.py:ImpactPlan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:_id_list",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:normalise_run_records",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:normalise_run_records",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:read_run_records",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:read_run_records",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:_adjacency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:_reach",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:plan_identity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:plan_identity",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:plan_nothing_changed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:plan_nothing_changed",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:plan_impact",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:plan_impact",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:read_impact_request",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:read_impact_request",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:write_impact_plan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:write_impact_plan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:run_impact_plan_writer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "function:runner/dev_graph/impact.py:run_impact_plan_writer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "class:runner/dev_graph/intake.py:EsrIntake",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "class:runner/dev_graph/intake.py:EsrIntake",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "function:runner/dev_graph/intake.py:normalise_intake",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "function:runner/dev_graph/intake.py:normalise_intake",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "function:runner/dev_graph/intake.py:record_esr_intake",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "function:runner/dev_graph/intake.py:record_esr_intake",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "function:runner/dev_graph/intake.py:read_esr_intake",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "function:runner/dev_graph/intake.py:read_esr_intake",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "class:runner/dev_graph/packages.py:Package",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "class:runner/dev_graph/packages.py:Package",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:_mandatory_step",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:estimate_cost",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:estimate_cost",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:_check_request",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:_expand",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:_unresolved_items",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:_declared_status_items",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:build_package",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:build_package",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:read_package_request",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:read_package_request",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:package_dir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:package_dir",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:write_package",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:write_package",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:run_package_manifest_writer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "function:runner/dev_graph/packages.py:run_package_manifest_writer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/policies.py",
+   "target": "class:runner/dev_graph/policies.py:ViewPolicy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/policies.py",
+   "target": "class:runner/dev_graph/policies.py:ViewPolicy",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "class:runner/dev_graph/revisions.py:RevisionContract",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "class:runner/dev_graph/revisions.py:RevisionContract",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "class:runner/dev_graph/revisions.py:ContractCheck",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "class:runner/dev_graph/revisions.py:ContractCheck",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "class:runner/dev_graph/revisions.py:Applicability",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "class:runner/dev_graph/revisions.py:Applicability",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "class:runner/dev_graph/revisions.py:RevisionRecord",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "class:runner/dev_graph/revisions.py:RevisionRecord",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:_id_list",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:_unresolved_item",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:normalise_contract",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:normalise_contract",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:_touches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:_validate_change_set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:classify_change_set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:classify_change_set",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:check_revision",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:check_revision",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:build_provenance",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:build_provenance",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:create_candidate_version",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:create_candidate_version",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:bind_assessment",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:bind_assessment",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:check_applicability",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:check_applicability",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:read_revision_request",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:read_revision_request",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:write_revision_record",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:write_revision_record",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:read_revision_record",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:read_revision_record",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:run_revision_record_writer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "function:runner/dev_graph/revisions.py:run_revision_record_writer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "file:runner/dev_graph/builder.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "file:runner/dev_graph/changes.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "file:runner/dev_graph/policies.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/impact.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/intake.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "file:runner/claim_status.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "file:runner/dev_graph/builder.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "file:runner/dev_graph/policies.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/packages.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/policies.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/policies.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "file:runner/dev_graph/builder.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "file:runner/dev_graph/changes.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "file:runner/dev_graph/documents.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "file:runner/dev_graph/policies.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/revisions.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/dev_graph/impact.py:plan_impact",
+   "target": "function:runner/dev_graph/changes.py:change_set",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/impact.py:write_impact_plan",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/impact.py:plan_identity",
+   "target": "function:runner/dev_graph/identity.py:content_hash",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/intake.py:record_esr_intake",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/packages.py:build_package",
+   "target": "function:runner/dev_graph/builder.py:superseded_versions",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/packages.py:_declared_status_items",
+   "target": "function:runner/dev_graph/schema.py:declared_status",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/packages.py:_unresolved_items",
+   "target": "function:runner/dev_graph/schema.py:declared_status",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/packages.py:write_package",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/revisions.py:create_candidate_version",
+   "target": "function:runner/dev_graph/documents.py:import_document",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/revisions.py:classify_change_set",
+   "target": "function:runner/dev_graph/changes.py:change_set",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/revisions.py:write_revision_record",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/revisions.py:build_provenance",
+   "target": "function:runner/dev_graph/identity.py:content_hash",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:runner/dev_graph/policies.py:ViewPolicy",
+   "target": "function:runner/dev_graph/identity.py:content_hash",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

@@ -1,0 +1,178 @@
+{
+  "schema_id": "orch.tier5.review_packet.v1",
+  "run_id": "import uuid; print(uuid.uuid4())",
+  "findings": [
+    {
+      "finding_id": "F-1",
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "description": "Twelve key performance indicators are named, but none carries a target value. The appropriateness and ambition of the objectives cannot be judged when every indicator is a placeholder.",
+      "severity": "major",
+      "evidence": "\"Twelve key performance indicators track progress, and each is measured on one deliverable that exists in the work plan. Target numbers are not yet fixed.\"",
+      "recommendation": "Add a target range for each indicator, or a dated baseline-and-method for setting it, so each KPI reads as a measured commitment rather than a deferred figure."
+    },
+    {
+      "finding_id": "F-2",
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "description": "The methodology states four design choices and three underpinning assumptions, but the beyond-state-of-the-art case rests on assertion. No prior result, pilot or quantified comparison backs the mechanism claims, and the section status is assumed throughout.",
+      "severity": "major",
+      "evidence": "\"The advance is a change in how biodiversity observation is reconciled, not a new sensor.\" No prior validation or quantified comparison is cited.",
+      "recommendation": "Cite the evidence behind each mechanism claim and give one quantified comparison against current per-project reconciliation practice, so soundness is evidenced rather than described."
+    },
+    {
+      "finding_id": "F-3",
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "description": "The gender dimension in research content is addressed, but only as disaggregation in the human-facing components, with no named analytical method or reporting point.",
+      "severity": "minor",
+      "evidence": "\"There the project disaggregates practitioner and decision-maker participation and response by sex and gender.\"",
+      "recommendation": "Name the analytical method and the deliverable where the disaggregated analysis is reported, so the gender dimension reads as a method rather than an intention."
+    },
+    {
+      "finding_id": "F-4",
+      "section_id": "impact",
+      "criterion": "Impact",
+      "description": "The valuation clause of the fourth destination impact is only partly addressed. The project improves the evidence base but runs no ecosystem-services valuation, leaving one expected-impact clause uncovered.",
+      "severity": "major",
+      "evidence": "\"One clause of the fourth destination impact is only partly addressed... It runs no valuation and claims none, because no partner carries environmental economics.\"",
+      "recommendation": "Add environmental-economics capability through a partner or advisory role to close the valuation clause, or state precisely which part of the impact the evidence base alone satisfies."
+    },
+    {
+      "finding_id": "F-5",
+      "section_id": "impact",
+      "criterion": "Impact",
+      "description": "All twelve impact indicators lack target numbers, so the magnitude of the quantified impact pathway cannot be assessed.",
+      "severity": "major",
+      "evidence": "\"No target numbers are fixed yet. A target is a consortium commitment, and partner participation is not yet confirmed.\"",
+      "recommendation": "Provide a target range or a baseline-and-method for each impact indicator, so the pathway magnitude is assessable rather than deferred to grant preparation."
+    },
+    {
+      "finding_id": "F-6",
+      "section_id": "impact",
+      "criterion": "Impact",
+      "description": "The central exploitation, transfer and standardisation measures each rest on a single partner whose participation is only assumed, so the measures to maximise impact depend on unconfirmed channels.",
+      "severity": "major",
+      "evidence": "\"The uptake channel is P05's multi-country user network, a partner whose participation is assumed.\"",
+      "recommendation": "Confirm the partners carrying the primary uptake, protocol-transfer and standards routes, or give a fallback channel for each, so no impact measure rests on one assumed partner."
+    },
+    {
+      "finding_id": "F-7",
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "description": "Person-months are absent from every work package, every task description and the staff-effort summary. The appropriateness of the effort assigned to work packages, an explicit evaluation element, cannot be assessed.",
+      "severity": "critical",
+      "evidence": "\"Person-months are not populated: the consortium has not agreed an effort split.\"",
+      "recommendation": "Populate indicative person-months per work package and per partner, marked provisional, so the evaluator can judge the effort distribution and the overall resources."
+    },
+    {
+      "finding_id": "F-8",
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "description": "Work-package start and end months and all milestone months are stated as not fixed, and the Gantt runs only at deliverable granularity. The timing and critical path of the work plan are not legible.",
+      "severity": "major",
+      "evidence": "\"Milestone months are not reproduced, because the canonical reference pack does not fix them.\"",
+      "recommendation": "Add work-package and milestone months against the assumed 48-month duration, marked assumed, so the timeline and critical path can be assessed."
+    },
+    {
+      "finding_id": "F-9",
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "description": "A gender equality plan is required, but no partner holds expertise in the gender dimension of research. The consortium's necessary expertise is incomplete against a mandated requirement.",
+      "severity": "major",
+      "evidence": "\"No partner records dedicated expertise in the gender dimension of research content. This is a gap.\"",
+      "recommendation": "Add gender-of-research expertise through a partner or an advisory role before submission, and name where it sits in the work plan."
+    },
+    {
+      "finding_id": "F-10",
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "description": "Consortium participation is wholly unconfirmed, the composition condition holds only under assumption, and six partners are fictional gap partners. Participant capacity cannot be evidenced, and the freshwater and marine realms each rest on one partner.",
+      "severity": "critical",
+      "evidence": "\"Every partner that adds a third country, P07 to P12, is a fictional gap partner carried as an operator declaration.\"",
+      "recommendation": "Confirm beneficiaries sufficient to meet the composition condition on evidence, and secure a second partner for the freshwater and marine realms, before the capacity case can score."
+    }
+  ],
+  "revision_actions": [
+    {
+      "action_id": "A-1",
+      "finding_id": "F-7",
+      "priority": 1,
+      "action_description": "Populate indicative per-work-package and per-partner person-months in Tables 3.1a, 3.1b and 3.1f, marked provisional, so effort appropriateness can be assessed.",
+      "target_section": "implementation",
+      "severity": "critical"
+    },
+    {
+      "action_id": "A-2",
+      "finding_id": "F-10",
+      "priority": 2,
+      "action_description": "Strengthen the capacity case by confirming beneficiaries that meet the composition condition on evidence and by securing a second partner for the freshwater and marine realms.",
+      "target_section": "implementation",
+      "severity": "critical"
+    },
+    {
+      "action_id": "A-3",
+      "finding_id": "F-1",
+      "priority": 3,
+      "action_description": "Add a target range or a dated baseline-and-method to each of the twelve KPIs in B.1.1 so the objectives are measurable.",
+      "target_section": "excellence",
+      "severity": "major"
+    },
+    {
+      "action_id": "A-4",
+      "finding_id": "F-2",
+      "priority": 4,
+      "action_description": "Back the four design choices and three assumptions in B.1.2 with cited prior results and one quantified comparison against current reconciliation practice.",
+      "target_section": "excellence",
+      "severity": "major"
+    },
+    {
+      "action_id": "A-5",
+      "finding_id": "F-4",
+      "priority": 5,
+      "action_description": "Close the fourth destination impact's valuation clause by adding environmental-economics capability, or state which part of the impact the evidence base alone satisfies.",
+      "target_section": "impact",
+      "severity": "major"
+    },
+    {
+      "action_id": "A-6",
+      "finding_id": "F-5",
+      "priority": 6,
+      "action_description": "Give a target range or baseline-and-method for each of the twelve impact indicators in B.2.1 so the pathway magnitude is assessable.",
+      "target_section": "impact",
+      "severity": "major"
+    },
+    {
+      "action_id": "A-7",
+      "finding_id": "F-6",
+      "priority": 7,
+      "action_description": "Confirm the partners carrying the uptake, protocol-transfer and standards routes in B.2.2, or add a fallback channel for each.",
+      "target_section": "impact",
+      "severity": "major"
+    },
+    {
+      "action_id": "A-8",
+      "finding_id": "F-8",
+      "priority": 8,
+      "action_description": "Add work-package and milestone months against the assumed 48-month duration in Tables 3.1a and 3.1d, marked assumed, so the timeline and critical path are legible.",
+      "target_section": "implementation",
+      "severity": "major"
+    },
+    {
+      "action_id": "A-9",
+      "finding_id": "F-9",
+      "priority": 9,
+      "action_description": "Add gender-of-research expertise to the consortium through a partner or advisory role and name its place in the work plan in B.3.2.",
+      "target_section": "implementation",
+      "severity": "major"
+    },
+    {
+      "action_id": "A-10",
+      "finding_id": "F-3",
+      "priority": 10,
+      "action_description": "Name the analytical method and reporting deliverable for the sex- and gender-disaggregated analysis in the gender-dimension paragraph of B.1.2.",
+      "target_section": "excellence",
+      "severity": "minor"
+    }
+  ]
+}

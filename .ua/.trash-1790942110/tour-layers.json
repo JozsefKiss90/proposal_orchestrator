@@ -1,0 +1,52 @@
+[
+ {
+  "id": "layer:constitution",
+  "name": "Constitution & Project Root",
+  "description": "The repository constitution (CLAUDE.md) — the highest interpretive authority above every prompt, skill, workflow and agent instruction — together with the project build and dependency metadata that defines the package."
+ },
+ {
+  "id": "layer:workflow-specification",
+  "name": "Workflow Specification Spine",
+  "description": "The declarative binding authority under .claude/workflows/system_orchestration: the compiled manifest that binds nodes to agents, skills, gate conditions and deterministic components, the agent and skill catalogues, the gate rules library, the eight per-phase node specs with their Phase-8 substeps, and the artifact schema specification with its 22 canonical artifact schemas."
+ },
+ {
+  "id": "layer:orchestration-runtime",
+  "name": "Orchestration Runtime Stack",
+  "description": "The three-layer execution stack with exactly one caller each — DAGScheduler dispatching nodes, run_agent() sequencing a node body, run_skill() invoking Claude — plus the CLI entry point, manifest and node resolution, run-context persistence, runtime result contracts, the Step-0 call slicer and the Phase-8 reuse, preseed and skip-binding resolvers."
+ },
+ {
+  "id": "layer:gate-evaluation",
+  "name": "Gate Evaluation",
+  "description": "Gate machinery owned exclusively by the scheduler: the gate evaluator (the single code-level caller of evaluate_gate), the gate rule library, the gate result registry, and the ten modules of atomic predicates that decide coverage, criteria, cycles, files, schemas, source refs, timelines and upstream gate passes."
+ },
+ {
+  "id": "layer:deterministic-components",
+  "name": "Deterministic Components",
+  "description": "Claude-free, node-body-scoped passes that read declared artifacts and write canonical ones under a byte-equal-replay or pure-lookup guarantee — distinct in kind from skills, which are defined by invoking a model: the component binding substrate plus the section assembler, assumption applier, canonical-pack deriver, unit-cost budget deriver, budget request builder, dependency normaliser, consortium-composition evaluator, instrument profile resolver, checkpoint publisher and the DOCX and final-export writers."
+ },
+ {
+  "id": "layer:model-transport",
+  "name": "Model Transport",
+  "description": "The transport boundary to the language model: the shared claude_transport adapter driving the local claude CLI in TAPM and cli-prompt modes, alternative Bedrock and OpenAI-compatible backends, transport configuration and capability negotiation, the tool-executor and tool loop, and the non-repairing JSON response extractor."
+ },
+ {
+  "id": "layer:graph-substrate",
+  "name": "Graph Substrate",
+  "description": "The deliberately programme-agnostic knowledge-graph layer: the bidirectional Obsidian-vault to docs/ compiler and projector pair, the claim verifier and determinism-check auditors, the graph schema and config, the vault reader and scaffold, the dev_graph package that builds revisions, impact, packages and shadow snapshots over the repository own artifacts, and the agnosticism lint that proves no project vocabulary leaks in."
+ },
+ {
+  "id": "layer:shared-foundation",
+  "name": "Shared Foundation",
+  "description": "Low-level primitives every other layer rests on, led by atomic_write (33 importers) and paths (17): atomic artifact writing, canonical path resolution, version and upstream-input resolution, the diagnostic persistence policy, the shared working-assumptions reader, the four-value Confirmed/Inferred/Assumed/Unresolved status vocabulary, content fingerprinting for gate staleness, the Tier 3 source-index verifier and the anonymity leakage scan."
+ },
+ {
+  "id": "layer:evaluation-harness",
+  "name": "Evaluation Harness",
+  "description": "The out-of-band QA track behind a strict one-way boundary — it reads engine artifacts and imports runner, and the engine never imports it, with zero runner-to-harness edges in the graph: verdict, provenance, routing and judge substrate, coverage, grounding, faithfulness and contradiction graders, the claim ledger, evidence packs, calibration and regression machinery, the blind pre-evaluation lane, CLI command drivers, and the per-instrument rubric, scorecard, profile and gold-set assets. Its results are advisory and never run-blocking."
+ },
+ {
+  "id": "layer:operator-tooling",
+  "name": "Operator Tooling",
+  "description": "Standalone operator scripts that import the engine but are never imported by it: dev-graph and Part B candidate builders, run phase-cost derivation, run-manifest preservation, a gate-result schema_id backfill, graph staging promotion and the prose detector."
+ }
+]

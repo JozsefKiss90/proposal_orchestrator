@@ -1,0 +1,1480 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/predicates/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "runner/predicates/__init__.py",
+   "summary": "Package barrel that re-exports every gate predicate implementation and the shared failure-category constants under one public namespace, grouped by the implementation step that introduced them.",
+   "tags": [
+    "barrel",
+    "entry-point",
+    "predicate-registry",
+    "re-exports"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/predicates/coverage_predicates.py",
+   "type": "file",
+   "name": "coverage_predicates.py",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "summary": "Cross-artifact join predicates checking coverage between work packages, partners, budget lines, expected impacts, KPIs, Gantt tasks and drafted sections. Mismatches between two present artifacts fail as CROSS_ARTIFACT_INCONSISTENCY rather than as a malformed input.",
+   "tags": [
+    "predicate",
+    "coverage-check",
+    "cross-artifact",
+    "validation"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Each public predicate pairs with bounded private extractors that tolerate several documented artifact shapes instead of assuming one schema."
+  },
+  {
+   "id": "file:runner/predicates/criterion_predicates.py",
+   "type": "file",
+   "name": "criterion_predicates.py",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "summary": "Phase 8 criterion-aligned predicates for gates 10a-10d: schema_id agreement, claim-status discipline (no unresolved material claims, assumed claims operator-declared, declared facts not silently inferred), impact and implementation coverage, and cross-section consistency against canonical Tier 3 data.",
+   "tags": [
+    "predicate",
+    "phase8",
+    "claim-validation",
+    "cross-section-consistency"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/predicates/cycle_predicates.py",
+   "type": "file",
+   "name": "cycle_predicates.py",
+   "filePath": "runner/predicates/cycle_predicates.py",
+   "summary": "Holds the single cycle-detection predicate: reads the dependency_map of the Phase 3 wp_structure.json and proves the work-package and task dependency graph is acyclic, reporting the offending cycle when it is not.",
+   "tags": [
+    "predicate",
+    "graph-algorithm",
+    "cycle-detection",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/predicates/file_predicates.py",
+   "type": "file",
+   "name": "file_predicates.py",
+   "filePath": "runner/predicates/file_predicates.py",
+   "summary": "Stateless filesystem predicates (exists, non_empty, non_empty_json, dir_non_empty) plus artifact_owned_by_run, the run-ownership check that separates an artifact written by the current run from one legitimately reused under the reuse policy.",
+   "tags": [
+    "predicate",
+    "filesystem",
+    "validation",
+    "run-ownership"
+   ],
+   "complexity": "complex",
+   "languageNotes": "JSON is read with utf-8-sig so a byte-order mark never masquerades as a malformed artifact."
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_read_json_object",
+   "type": "function",
+   "name": "_read_json_object",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    103,
+    159
+   ],
+   "summary": "Defensive JSON object reader returning either the parsed mapping or a failing PredicateResult categorised as missing or malformed.",
+   "tags": [
+    "json-parsing",
+    "error-handling",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_read_json_any",
+   "type": "function",
+   "name": "_read_json_any",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    162,
+    208
+   ],
+   "summary": "Variant of the JSON reader that accepts any top-level type, for artifacts legitimately shaped as arrays.",
+   "tags": [
+    "json-parsing",
+    "error-handling",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_partner_ids_from_array",
+   "type": "function",
+   "name": "_extract_partner_ids_from_array",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    216,
+    245
+   ],
+   "summary": "Extracts partner identifiers from an array-shaped consortium artifact, tolerating the documented key variants.",
+   "tags": [
+    "extraction",
+    "consortium",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_partner_ids",
+   "type": "function",
+   "name": "_extract_partner_ids",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    248,
+    299
+   ],
+   "summary": "Extracts the full set of partner identifiers from a Tier 3 consortium artifact regardless of which documented shape it uses.",
+   "tags": [
+    "extraction",
+    "consortium",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_expected_impact_ids",
+   "type": "function",
+   "name": "_extract_expected_impact_ids",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    309,
+    357
+   ],
+   "summary": "Extracts expected-impact identifiers from the Tier 2B expected_impacts artifact, including destination-level groupings.",
+   "tags": [
+    "extraction",
+    "impact",
+    "tier2b"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_required_section_ids",
+   "type": "function",
+   "name": "_extract_required_section_ids",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    365,
+    404
+   ],
+   "summary": "Extracts the set of section ids the active instrument's application-form schema requires.",
+   "tags": [
+    "extraction",
+    "instrument-schema",
+    "sections"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_required_impl_section_ids",
+   "type": "function",
+   "name": "_extract_required_impl_section_ids",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    407,
+    465
+   ],
+   "summary": "Extracts the implementation-section ids the instrument mandates, which gate_06 checks for coverage.",
+   "tags": [
+    "extraction",
+    "instrument-schema",
+    "implementation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_collect_field_values_deep",
+   "type": "function",
+   "name": "_collect_field_values_deep",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    473,
+    490
+   ],
+   "summary": "Recursively collects every value of a named field anywhere in a nested structure, used when a coverage key may appear at several depths.",
+   "tags": [
+    "recursion",
+    "extraction",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_scan_budget_dir",
+   "type": "function",
+   "name": "_scan_budget_dir",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    493,
+    530
+   ],
+   "summary": "Scans a budget response directory and gathers the values of one field across all budget files, so coverage works whether the budget arrives as one file or many.",
+   "tags": [
+    "budget",
+    "extraction",
+    "filesystem"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_wp_ids",
+   "type": "function",
+   "name": "_extract_wp_ids",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    538,
+    559
+   ],
+   "summary": "Extracts the work-package identifiers declared in the Phase 3 work-package structure.",
+   "tags": [
+    "extraction",
+    "work-package",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_all_deliverable_ids",
+   "type": "function",
+   "name": "_extract_all_deliverable_ids",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    562,
+    586
+   ],
+   "summary": "Collects every deliverable identifier across all work packages.",
+   "tags": [
+    "extraction",
+    "deliverables",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_all_task_ids",
+   "type": "function",
+   "name": "_extract_all_task_ids",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    589,
+    613
+   ],
+   "summary": "Collects every task identifier across all work packages.",
+   "tags": [
+    "extraction",
+    "tasks",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:_extract_all_wp_partners",
+   "type": "function",
+   "name": "_extract_all_wp_partners",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    616,
+    630
+   ],
+   "summary": "Collects the partner identifiers referenced as leads or participants across all work packages.",
+   "tags": [
+    "extraction",
+    "work-package",
+    "consortium"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:all_wps_have_deliverable_and_lead",
+   "type": "function",
+   "name": "all_wps_have_deliverable_and_lead",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    638,
+    717
+   ],
+   "summary": "Gate predicate: every work package must declare objectives, at least one deliverable and a responsible lead, which is the structural half of the Phase 3 gate condition.",
+   "tags": [
+    "predicate",
+    "work-package",
+    "coverage-check"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:all_partners_in_tier3",
+   "type": "function",
+   "name": "all_partners_in_tier3",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    720,
+    789
+   ],
+   "summary": "Gate predicate: every partner referenced by the work-package structure must exist in the Tier 3 consortium data, blocking fabricated partners.",
+   "tags": [
+    "predicate",
+    "consortium",
+    "anti-fabrication"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:all_management_roles_in_tier3",
+   "type": "function",
+   "name": "all_management_roles_in_tier3",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    792,
+    874
+   ],
+   "summary": "Gate predicate: every management role assigned in the implementation architecture must map to a partner present in Tier 3.",
+   "tags": [
+    "predicate",
+    "consortium",
+    "governance"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:all_tasks_have_months",
+   "type": "function",
+   "name": "all_tasks_have_months",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    877,
+    975
+   ],
+   "summary": "Gate predicate: every task in the work-package structure must be assigned start and end months in the Gantt, the Phase 4 scheduling completeness check.",
+   "tags": [
+    "predicate",
+    "scheduling",
+    "coverage-check"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:all_impacts_mapped",
+   "type": "function",
+   "name": "all_impacts_mapped",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    978,
+    1075
+   ],
+   "summary": "Gate predicate: every expected impact declared in Tier 2B must have at least one mapped project output in the impact architecture.",
+   "tags": [
+    "predicate",
+    "impact",
+    "coverage-check"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:kpis_traceable_to_wps",
+   "type": "function",
+   "name": "kpis_traceable_to_wps",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    1078,
+    1183
+   ],
+   "summary": "Gate predicate: every KPI in the impact architecture must trace to a work package, so no impact claim stands without a project mechanism.",
+   "tags": [
+    "predicate",
+    "impact",
+    "traceability"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:instrument_sections_addressed",
+   "type": "function",
+   "name": "instrument_sections_addressed",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    1186,
+    1295
+   ],
+   "summary": "Gate predicate: every implementation section the instrument mandates must be addressed in the Phase 6 output.",
+   "tags": [
+    "predicate",
+    "instrument-schema",
+    "coverage-check"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:all_sections_drafted",
+   "type": "function",
+   "name": "all_sections_drafted",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    1298,
+    1393
+   ],
+   "summary": "Gate predicate: every section required by the active application form must have a draft present, the Phase 8 completeness check.",
+   "tags": [
+    "predicate",
+    "phase8",
+    "coverage-check"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:all_sections_have_traceability_footer",
+   "type": "function",
+   "name": "all_sections_have_traceability_footer",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    1396,
+    1501
+   ],
+   "summary": "Gate predicate: every drafted section must carry its traceability footer, so each deliverable states the tiered sources it derives from.",
+   "tags": [
+    "predicate",
+    "traceability",
+    "phase8"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:wp_budget_coverage_match",
+   "type": "function",
+   "name": "wp_budget_coverage_match",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    1504,
+    1591
+   ],
+   "summary": "Gate predicate: the work-package ids in the budget response must match the designed work-package structure exactly, a structural consistency half of the budget gate.",
+   "tags": [
+    "predicate",
+    "budget-gate",
+    "cross-artifact"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/coverage_predicates.py:partner_budget_coverage_match",
+   "type": "function",
+   "name": "partner_budget_coverage_match",
+   "filePath": "runner/predicates/coverage_predicates.py",
+   "lineRange": [
+    1594,
+    1674
+   ],
+   "summary": "Gate predicate: the partners in the budget response must match the Tier 3 consortium, catching a budget computed for a different consortium.",
+   "tags": [
+    "predicate",
+    "budget-gate",
+    "consortium"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:_read_json_object",
+   "type": "function",
+   "name": "_read_json_object",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    75,
+    131
+   ],
+   "summary": "Defensive JSON object reader shared by the criterion predicates, returning a categorised failing result instead of raising.",
+   "tags": [
+    "json-parsing",
+    "error-handling",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:schema_id_matches",
+   "type": "function",
+   "name": "schema_id_matches",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    139,
+    182
+   ],
+   "summary": "Gate predicate: the artifact's schema_id must equal the expected value, so a draft written against a superseded schema cannot pass a gate.",
+   "tags": [
+    "predicate",
+    "schema-validation",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:no_unresolved_material_claims",
+   "type": "function",
+   "name": "no_unresolved_material_claims",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    190,
+    235
+   ],
+   "summary": "Gate predicate: the section's overall validation status must not be unresolved, enforcing that a gap is declared rather than drafted over.",
+   "tags": [
+    "predicate",
+    "claim-validation",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:assumed_claims_are_operator_declared",
+   "type": "function",
+   "name": "assumed_claims_are_operator_declared",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    243,
+    365
+   ],
+   "summary": "Gate predicate: every claim marked Assumed must cite a matching operator declaration in working_assumptions, so an assumption is never adopted by the drafter alone.",
+   "tags": [
+    "predicate",
+    "claim-validation",
+    "anti-fabrication"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:_cites_working_assumptions",
+   "type": "function",
+   "name": "_cites_working_assumptions",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    378,
+    390
+   ],
+   "summary": "Checks whether a claim's source reference actually cites the working-assumptions register.",
+   "tags": [
+    "claim-validation",
+    "utility",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:declared_facts_are_not_inferred",
+   "type": "function",
+   "name": "declared_facts_are_not_inferred",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    393,
+    492
+   ],
+   "summary": "Gate predicate: a fact traceable to a declared Tier 3 source must not be downgraded to Inferred, catching status drift in the drafted sections.",
+   "tags": [
+    "predicate",
+    "claim-validation",
+    "traceability"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:impact_pathways_covered",
+   "type": "function",
+   "name": "impact_pathways_covered",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    500,
+    594
+   ],
+   "summary": "Gate predicate: the Impact section's pathway references must cover every pathway in the Phase 5 impact architecture.",
+   "tags": [
+    "predicate",
+    "impact",
+    "coverage-check"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:implementation_coverage_complete",
+   "type": "function",
+   "name": "implementation_coverage_complete",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    602,
+    694
+   ],
+   "summary": "Gate predicate: the Implementation section must populate its work-package table, Gantt, milestone and risk-register references.",
+   "tags": [
+    "predicate",
+    "implementation",
+    "coverage-check"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:_check_objective_coverage",
+   "type": "function",
+   "name": "_check_objective_coverage",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    713,
+    765
+   ],
+   "summary": "Checks that every Tier 3 objective is addressed somewhere across the criterion-aligned sections.",
+   "tags": [
+    "consistency-check",
+    "objectives",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:_check_partner_naming",
+   "type": "function",
+   "name": "_check_partner_naming",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    768,
+    807
+   ],
+   "summary": "Checks that partner names used in the drafted sections match the canonical Tier 3 spellings.",
+   "tags": [
+    "consistency-check",
+    "consortium",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:_check_metric_completeness",
+   "type": "function",
+   "name": "_check_metric_completeness",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    810,
+    848
+   ],
+   "summary": "Checks that each objective's quantitative metric survives into the drafted prose.",
+   "tags": [
+    "consistency-check",
+    "metrics",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:_check_terminology_consistency",
+   "type": "function",
+   "name": "_check_terminology_consistency",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    851,
+    906
+   ],
+   "summary": "Checks that canonical terminology is used consistently across sections rather than paraphrased per section.",
+   "tags": [
+    "consistency-check",
+    "terminology",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:_check_deliverable_kpi_alignment",
+   "type": "function",
+   "name": "_check_deliverable_kpi_alignment",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    909,
+    973
+   ],
+   "summary": "Checks that deliverable and KPI references in the sections align with the canonical registers.",
+   "tags": [
+    "consistency-check",
+    "deliverables",
+    "phase8"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/criterion_predicates.py:cross_section_consistency",
+   "type": "function",
+   "name": "cross_section_consistency",
+   "filePath": "runner/predicates/criterion_predicates.py",
+   "lineRange": [
+    981,
+    1179
+   ],
+   "summary": "Gate predicate behind gate_10d: cross-checks objectives, work-package ids, partner names, deliverable ids, metrics and terminology across all criterion-aligned sections against canonical Tier 3 and Tier 4 artifacts.",
+   "tags": [
+    "predicate",
+    "cross-section-consistency",
+    "phase8",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/cycle_predicates.py:no_dependency_cycles",
+   "type": "function",
+   "name": "no_dependency_cycles",
+   "filePath": "runner/predicates/cycle_predicates.py",
+   "lineRange": [
+    106,
+    357
+   ],
+   "summary": "Gate predicate: parses the dependency_map of wp_structure.json, validates its node and edge contract, and proves the directed dependency graph is acyclic, naming the cycle when one exists.",
+   "tags": [
+    "predicate",
+    "cycle-detection",
+    "graph-algorithm",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/file_predicates.py:exists",
+   "type": "function",
+   "name": "exists",
+   "filePath": "runner/predicates/file_predicates.py",
+   "lineRange": [
+    66,
+    100
+   ],
+   "summary": "Gate predicate: the resolved path must exist, the most basic fail-closed input check.",
+   "tags": [
+    "predicate",
+    "filesystem",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/file_predicates.py:non_empty",
+   "type": "function",
+   "name": "non_empty",
+   "filePath": "runner/predicates/file_predicates.py",
+   "lineRange": [
+    108,
+    164
+   ],
+   "summary": "Gate predicate: the file must exist and contain non-whitespace content.",
+   "tags": [
+    "predicate",
+    "filesystem",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/file_predicates.py:non_empty_json",
+   "type": "function",
+   "name": "non_empty_json",
+   "filePath": "runner/predicates/file_predicates.py",
+   "lineRange": [
+    172,
+    302
+   ],
+   "summary": "Gate predicate: the file must parse as JSON and carry a non-empty top-level structure, distinguishing an absent input from a placeholder empty object.",
+   "tags": [
+    "predicate",
+    "json-parsing",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/file_predicates.py:dir_non_empty",
+   "type": "function",
+   "name": "dir_non_empty",
+   "filePath": "runner/predicates/file_predicates.py",
+   "lineRange": [
+    310,
+    416
+   ],
+   "summary": "Gate predicate: the directory must exist and have at least one direct child, scanned non-recursively.",
+   "tags": [
+    "predicate",
+    "filesystem",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/file_predicates.py:artifact_owned_by_run",
+   "type": "function",
+   "name": "artifact_owned_by_run",
+   "filePath": "runner/predicates/file_predicates.py",
+   "lineRange": [
+    424,
+    588
+   ],
+   "summary": "Gate predicate: the artifact must declare the current run_id, or qualify for reuse under the declared reuse policy, which is what keeps a gate from passing on a stale artifact from an earlier run.",
+   "tags": [
+    "predicate",
+    "run-ownership",
+    "reuse-policy",
+    "validation"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_read_json_object",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_read_json_any",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_partner_ids_from_array",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_partner_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_expected_impact_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_required_section_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_required_impl_section_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_collect_field_values_deep",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_scan_budget_dir",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_wp_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_all_deliverable_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_all_task_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:_extract_all_wp_partners",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_wps_have_deliverable_and_lead",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_partners_in_tier3",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_management_roles_in_tier3",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_tasks_have_months",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_impacts_mapped",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:kpis_traceable_to_wps",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:instrument_sections_addressed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_sections_drafted",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_sections_have_traceability_footer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:wp_budget_coverage_match",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:partner_budget_coverage_match",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:_read_json_object",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:schema_id_matches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:no_unresolved_material_claims",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:assumed_claims_are_operator_declared",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:_cites_working_assumptions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:declared_facts_are_not_inferred",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:impact_pathways_covered",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:implementation_coverage_complete",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:_check_objective_coverage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:_check_partner_naming",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:_check_metric_completeness",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:_check_terminology_consistency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:_check_deliverable_kpi_alignment",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:cross_section_consistency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/cycle_predicates.py",
+   "target": "function:runner/predicates/cycle_predicates.py:no_dependency_cycles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:exists",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:non_empty",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:non_empty_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:dir_non_empty",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:artifact_owned_by_run",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_wps_have_deliverable_and_lead",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_partners_in_tier3",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_management_roles_in_tier3",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_tasks_have_months",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_impacts_mapped",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:kpis_traceable_to_wps",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:instrument_sections_addressed",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_sections_drafted",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:all_sections_have_traceability_footer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:wp_budget_coverage_match",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "function:runner/predicates/coverage_predicates.py:partner_budget_coverage_match",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:schema_id_matches",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:no_unresolved_material_claims",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:assumed_claims_are_operator_declared",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:declared_facts_are_not_inferred",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:impact_pathways_covered",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:implementation_coverage_complete",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "function:runner/predicates/criterion_predicates.py:cross_section_consistency",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/cycle_predicates.py",
+   "target": "function:runner/predicates/cycle_predicates.py:no_dependency_cycles",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:exists",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:non_empty",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:non_empty_json",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:dir_non_empty",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "function:runner/predicates/file_predicates.py:artifact_owned_by_run",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/coverage_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/criterion_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/cycle_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/file_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/gate_pass_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/phase8_section_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/schema_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/scope_coverage_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/source_ref_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/timeline_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/__init__.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/coverage_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "file:runner/claim_status.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/criterion_predicates.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/cycle_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/predicates/file_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/predicates/coverage_predicates.py:all_wps_have_deliverable_and_lead",
+   "target": "function:runner/paths.py:resolve_repo_path",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/predicates/file_predicates.py:exists",
+   "target": "function:runner/paths.py:resolve_repo_path",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/predicates/criterion_predicates.py:no_unresolved_material_claims",
+   "target": "function:runner/claim_status.py:normalize_status",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/predicates/criterion_predicates.py:assumed_claims_are_operator_declared",
+   "target": "function:runner/working_assumptions.py:load_working_assumptions",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/predicates/criterion_predicates.py:assumed_claims_are_operator_declared",
+   "target": "function:runner/working_assumptions.py:declared_claim_summary",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

@@ -1,0 +1,1668 @@
+{
+  "nodes": [
+    {
+      "id": "file:runner/__main__.py",
+      "type": "file",
+      "name": "__main__.py",
+      "filePath": "runner/__main__.py",
+      "summary": "CLI entry point for the DAG scheduler, invoked as `python -m runner`. Parses run scoping flags (--run-id, --phase, --node, --dry-run), loads the manifest graph and run context, optionally bootstraps phase prerequisites, dispatches the scheduler, and maps the run outcome onto four distinct process exit codes.",
+      "tags": [
+        "entry-point",
+        "cli",
+        "orchestration",
+        "scheduler",
+        "argument-parsing"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Python `__main__.py` package-executable convention; `load_dotenv()` is called at import time before any other runner import so transport configuration is present."
+    },
+    {
+      "id": "function:runner/__main__.py:_parse_phase",
+      "type": "function",
+      "name": "_parse_phase",
+      "filePath": "runner/__main__.py",
+      "lineRange": [
+        66,
+        84
+      ],
+      "summary": "Normalizes the several accepted spellings of a --phase argument (`1`, `phase1`, `phase_01`) into a single integer phase number.",
+      "tags": [
+        "utility",
+        "argument-parsing",
+        "validation",
+        "cli"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/__main__.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "runner/__main__.py",
+      "lineRange": [
+        92,
+        538
+      ],
+      "summary": "The CLI driver: builds the argument parser, resolves repo root and manifest/library paths, enforces the mutual exclusion of --phase and --node, loads or initializes the RunContext, seeds phase prerequisites from durable Tier 4 gate evidence, runs the DAGScheduler, and translates RunSummary / RunAbortedError / DAGSchedulerError outcomes into exit codes 0-3.",
+      "tags": [
+        "entry-point",
+        "cli",
+        "orchestration",
+        "error-handling",
+        "exit-codes"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:runner/agent_runtime.py",
+      "type": "file",
+      "name": "agent_runtime.py",
+      "filePath": "runner/agent_runtime.py",
+      "summary": "The middle layer of the three-tier runtime stack: an orchestration adapter that loads agent and prompt specifications, resolves canonical tier inputs, sequences skill invocations through `run_skill()`, invokes Claude-free deterministic components, propagates failures, and determines `can_evaluate_exit_gate` by inspecting artifacts on disk. It never evaluates gates and never calls the scheduler.",
+      "tags": [
+        "orchestration",
+        "agent-runtime",
+        "service",
+        "node-body",
+        "failure-propagation"
+      ],
+      "complexity": "complex",
+      "languageNotes": "The agent/prompt `.md` files it loads are specifications, not executable code — all domain reasoning happens inside the Claude invocations made by `run_skill()`."
+    },
+    {
+      "id": "class:runner/agent_runtime.py:AgentRuntimeError",
+      "type": "class",
+      "name": "AgentRuntimeError",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        208,
+        215
+      ],
+      "summary": "Exception raised for agent-runtime-layer faults such as a missing agent catalog entry or an unloadable prompt specification.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "agent-runtime"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:drafting_skills_superseded_by",
+      "type": "function",
+      "name": "drafting_skills_superseded_by",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        178,
+        200
+      ],
+      "summary": "Returns the Phase-8 drafting skills that a given deterministic section assembler supersedes, so the monolithic drafter is not run when the assembler already composes the section from bounded sub-section drafts.",
+      "tags": [
+        "phase8",
+        "drafting",
+        "supersession",
+        "lookup"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_load_agent_catalog",
+      "type": "function",
+      "name": "_load_agent_catalog",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        225,
+        249
+      ],
+      "summary": "Loads and caches `agent_catalog.yaml`, the authoritative registry of agent declarations (reads_from, writes_to, must_not) used to resolve inputs and constrain agent behavior.",
+      "tags": [
+        "configuration",
+        "yaml",
+        "catalog",
+        "agent-runtime"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_load_artifact_registry",
+      "type": "function",
+      "name": "_load_artifact_registry",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        269,
+        313
+      ],
+      "summary": "Loads the artifact schema specification so the runtime can map node IDs to the canonical artifact paths they produce and consume.",
+      "tags": [
+        "configuration",
+        "artifact-schema",
+        "registry",
+        "agent-runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_load_prompt_spec",
+      "type": "function",
+      "name": "_load_prompt_spec",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        331,
+        341
+      ],
+      "summary": "Reads an agent's prompt specification Markdown file from disk, raising when the spec is absent.",
+      "tags": [
+        "utility",
+        "specification",
+        "file-io",
+        "agent-runtime"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_resolve_agent_inputs",
+      "type": "function",
+      "name": "_resolve_agent_inputs",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        349,
+        410
+      ],
+      "summary": "Resolves an agent's declared `reads_from` tier paths into concrete existing files on disk, expanding directory declarations and reporting which declared inputs are missing.",
+      "tags": [
+        "input-resolution",
+        "tier-inputs",
+        "agent-runtime",
+        "file-io"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_resolve_skill_sequence",
+      "type": "function",
+      "name": "_resolve_skill_sequence",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        418,
+        471
+      ],
+      "summary": "Determines the ordered skill sequence for a node body from the manifest-resolved skill IDs, honoring suppression of drafting skills under reuse, preseed, or assembler supersession.",
+      "tags": [
+        "skill-sequencing",
+        "agent-runtime",
+        "phase8",
+        "orchestration"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_resolve_budget_regime_safe",
+      "type": "function",
+      "name": "_resolve_budget_regime_safe",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        501,
+        517
+      ],
+      "summary": "Resolves the instrument's budget regime (lump-sum versus unit-cost) without raising, so skill applicability checks can degrade gracefully when the regime cannot be determined.",
+      "tags": [
+        "budget",
+        "instrument",
+        "resolution",
+        "defensive"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Reflects the instrument-conditional budget gate: lump-sum budgets come from the external planner, unit-cost budgets from a deterministic internal derivation."
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_get_artifacts_produced_by_node",
+      "type": "function",
+      "name": "_get_artifacts_produced_by_node",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        520,
+        588
+      ],
+      "summary": "Looks up every canonical artifact path a node is contractually expected to write, which is the basis for the on-disk gate-readiness check.",
+      "tags": [
+        "artifact-schema",
+        "lookup",
+        "agent-runtime",
+        "gate-readiness"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_determine_can_evaluate_exit_gate",
+      "type": "function",
+      "name": "_determine_can_evaluate_exit_gate",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        591,
+        674
+      ],
+      "summary": "Decides whether the scheduler may evaluate the node's exit gate by inspecting actual file-system state for the gate-relevant artifacts, never by assuming that successful skill invocations imply artifact presence.",
+      "tags": [
+        "gate-readiness",
+        "fail-closed",
+        "file-io",
+        "agent-runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Implements the constitutional rule that `can_evaluate_exit_gate` is derived from disk, not from optimistic assumption."
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_get_exit_gate_for_node",
+      "type": "function",
+      "name": "_get_exit_gate_for_node",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        684,
+        708
+      ],
+      "summary": "Reads the manifest to find which gate is bound as the given node's exit gate, so the runtime knows which artifacts are gate-relevant.",
+      "tags": [
+        "manifest",
+        "lookup",
+        "gate-binding",
+        "agent-runtime"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_resolve_instrument_type",
+      "type": "function",
+      "name": "_resolve_instrument_type",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        716,
+        762
+      ],
+      "summary": "Resolves the active Horizon Europe instrument type (RIA/IA, CSA, MSCA, ERC and so on) from the Tier 3 call binding, which drives instrument-conditional skill applicability.",
+      "tags": [
+        "instrument",
+        "tier3",
+        "resolution",
+        "agent-runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_context_sources_for",
+      "type": "function",
+      "name": "_context_sources_for",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        798,
+        833
+      ],
+      "summary": "Lists the upstream artifacts that must be passed as caller context into a given skill invocation.",
+      "tags": [
+        "context-passing",
+        "agent-runtime",
+        "lookup",
+        "skill-sequencing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_build_caller_context",
+      "type": "function",
+      "name": "_build_caller_context",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        836,
+        880
+      ],
+      "summary": "Assembles the caller-context payload handed to a skill invocation, reading the declared upstream artifacts from disk and threading prior-skill outputs through the sequence.",
+      "tags": [
+        "context-passing",
+        "agent-runtime",
+        "serialization",
+        "file-io"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_missing_context_sources",
+      "type": "function",
+      "name": "_missing_context_sources",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        883,
+        896
+      ],
+      "summary": "Returns the declared context sources that are absent from disk, so a skill is failed closed rather than invoked with incomplete context.",
+      "tags": [
+        "validation",
+        "fail-closed",
+        "agent-runtime",
+        "context-passing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_resolve_auditable_artifact",
+      "type": "function",
+      "name": "_resolve_auditable_artifact",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        955,
+        1003
+      ],
+      "summary": "Identifies the artifact that an audit skill (traceability-check, compliance-check) should examine, so audit passes always target the authoritative section on disk even when drafting was skipped.",
+      "tags": [
+        "audit",
+        "artifact-resolution",
+        "phase8",
+        "agent-runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_check_skill_applicability",
+      "type": "function",
+      "name": "_check_skill_applicability",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        1011,
+        1050
+      ],
+      "summary": "Evaluates a skill's `applies_when` condition against the resolved instrument type and budget regime, so instrument-inapplicable skills are skipped rather than run against absent inputs.",
+      "tags": [
+        "skill-sequencing",
+        "instrument",
+        "conditional-execution",
+        "agent-runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:run_agent",
+      "type": "function",
+      "name": "run_agent",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        1058,
+        2111
+      ],
+      "summary": "The single public entry point of the agent runtime and the node body of every scheduler dispatch: it resolves the node's agent, inputs and skill sequence, runs decomposed drafting and deterministic components where bound, invokes each applicable skill through `run_skill()`, coordinates sub-agents and pre-gate agents, halts immediately on CONSTITUTIONAL_HALT, and returns an AgentResult carrying the invocation records and the disk-derived `can_evaluate_exit_gate` flag.",
+      "tags": [
+        "agent-runtime",
+        "orchestration",
+        "node-body",
+        "failure-propagation",
+        "entry-point"
+      ],
+      "complexity": "complex",
+      "languageNotes": "The only caller is the scheduler's `_dispatch_node()`; the function itself never evaluates a gate nor calls back into the scheduler."
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_identify_agent_skills",
+      "type": "function",
+      "name": "_identify_agent_skills",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        2119,
+        2140
+      ],
+      "summary": "Resolves the skill IDs declared for an agent, used when the manifest node binding must be cross-checked against the agent catalog.",
+      "tags": [
+        "skill-sequencing",
+        "lookup",
+        "agent-runtime",
+        "catalog"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_refresh_inputs_from_outputs",
+      "type": "function",
+      "name": "_refresh_inputs_from_outputs",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        2143,
+        2161
+      ],
+      "summary": "Folds the artifacts a skill just wrote back into the resolved input set, so later skills in the same node body see the freshly produced files.",
+      "tags": [
+        "context-passing",
+        "agent-runtime",
+        "skill-sequencing",
+        "state"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/agent_runtime.py:_sub_agent_inputs_ready",
+      "type": "function",
+      "name": "_sub_agent_inputs_ready",
+      "filePath": "runner/agent_runtime.py",
+      "lineRange": [
+        2164,
+        2206
+      ],
+      "summary": "Checks on disk whether a sub-agent's or pre-gate agent's declared inputs are all present before that nested agent is coordinated within the same node body.",
+      "tags": [
+        "validation",
+        "sub-agent",
+        "fail-closed",
+        "agent-runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:runner/call_slicer.py",
+      "type": "file",
+      "name": "call_slicer.py",
+      "filePath": "runner/call_slicer.py",
+      "summary": "The deterministic Step-0 input bounding pass: before any Claude invocation, it extracts the single target call entry from a large grouped work-programme JSON (338-794 KB) into a bounded ~5-10 KB call slice so downstream skills read only call-specific data. Pure Python with no Claude dependency and no domain reasoning.",
+      "tags": [
+        "deterministic-component",
+        "preprocessing",
+        "input-bounding",
+        "tier2b",
+        "utility"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Called once by `DAGScheduler.run()` before the dispatch loop; failure is non-blocking because skills fall back to reading the full grouped JSON."
+    },
+    {
+      "id": "class:runner/call_slicer.py:CallSlicerError",
+      "type": "class",
+      "name": "CallSlicerError",
+      "filePath": "runner/call_slicer.py",
+      "lineRange": [
+        64,
+        69
+      ],
+      "summary": "Exception raised when the call slice cannot be produced — missing selected-call binding, unknown work programme, no topic match, or a slice exceeding the 20 KB hard limit.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "preprocessing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/call_slicer.py:generate_call_slice",
+      "type": "function",
+      "name": "generate_call_slice",
+      "filePath": "runner/call_slicer.py",
+      "lineRange": [
+        77,
+        201
+      ],
+      "summary": "Reads the Tier 3 selected call, locates its work programme in the grouped-JSON map, scans the destinations/calls structure for the matching topic code, and writes the bounded slice to `call_extracts/<topic_code>.slice.json`, failing closed when the result exceeds MAX_SLICE_BYTES.",
+      "tags": [
+        "deterministic-component",
+        "input-bounding",
+        "json",
+        "tier2b",
+        "fail-closed"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:runner/checkpoint_publisher.py",
+      "type": "file",
+      "name": "checkpoint_publisher.py",
+      "filePath": "runner/checkpoint_publisher.py",
+      "summary": "Deterministic node-body component that publishes the immutable Phase-8 `phase8_checkpoint.json` to Tier 4 after confirming the six Phase-8 gate results. Cross-run gate results are authorized by deterministic set membership against `accepted_upstream_gates` and recorded verbatim as a provenance quad, so the checkpoint stays auditable against durable evidence without re-stamping.",
+      "tags": [
+        "deterministic-component",
+        "phase8",
+        "checkpoint",
+        "provenance",
+        "fail-closed"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Replaces the retired `checkpoint-publish` skill once it was found to be entirely mechanical; the only non-deterministic field, `published_at`, is excluded from the byte-equal replay invariant."
+    },
+    {
+      "id": "class:runner/checkpoint_publisher.py:CheckpointPublishError",
+      "type": "class",
+      "name": "CheckpointPublishError",
+      "filePath": "runner/checkpoint_publisher.py",
+      "lineRange": [
+        99,
+        104
+      ],
+      "summary": "Exception raised on any structural fault — missing, malformed, non-pass or wrong-schema gate result, an unauthorized cross-run gate, or an attempt to overwrite an already-published checkpoint.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "fail-closed",
+        "phase8"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/checkpoint_publisher.py:_read_json_dict",
+      "type": "function",
+      "name": "_read_json_dict",
+      "filePath": "runner/checkpoint_publisher.py",
+      "lineRange": [
+        107,
+        125
+      ],
+      "summary": "Reads a required JSON object from disk, raising CheckpointPublishError when the file is missing, unreadable, or not a JSON object.",
+      "tags": [
+        "utility",
+        "file-io",
+        "json",
+        "fail-closed"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/checkpoint_publisher.py:_validate_gate_result",
+      "type": "function",
+      "name": "_validate_gate_result",
+      "filePath": "runner/checkpoint_publisher.py",
+      "lineRange": [
+        128,
+        146
+      ],
+      "summary": "Confirms that a durable gate result artifact carries the expected schema ID and a `status: pass` verdict before the checkpoint may assert the gate passed.",
+      "tags": [
+        "validation",
+        "gate-result",
+        "fail-closed",
+        "phase8"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/checkpoint_publisher.py:_authorize_and_build_quad",
+      "type": "function",
+      "name": "_authorize_and_build_quad",
+      "filePath": "runner/checkpoint_publisher.py",
+      "lineRange": [
+        157,
+        189
+      ],
+      "summary": "Authorizes a gate result whose durable run_id differs from the current run by deterministic set membership against `accepted_upstream_gates`, then copies the provenance quad (gate_id, original_run_id, evidence_path, input_fingerprint, versions) verbatim from the durable result.",
+      "tags": [
+        "provenance",
+        "cross-run",
+        "authorization",
+        "deterministic-component"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/checkpoint_publisher.py:_build_tier3_snapshot",
+      "type": "function",
+      "name": "_build_tier3_snapshot",
+      "filePath": "runner/checkpoint_publisher.py",
+      "lineRange": [
+        203,
+        236
+      ],
+      "summary": "Captures the Tier 3 project-instantiation state referenced by the checkpoint so the published record identifies exactly which project data the Phase-8 outcome was built on.",
+      "tags": [
+        "provenance",
+        "tier3",
+        "snapshot",
+        "checkpoint"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/checkpoint_publisher.py:publish_checkpoint",
+      "type": "function",
+      "name": "publish_checkpoint",
+      "filePath": "runner/checkpoint_publisher.py",
+      "lineRange": [
+        239,
+        305
+      ],
+      "summary": "The component entry point for node n08f: validates all six Phase-8 gate results, authorizes any cross-run evidence, assembles the checkpoint document with its optional `inherited_gate_provenance` array, and atomically writes the immutable artifact — refusing to overwrite a checkpoint already marked published.",
+      "tags": [
+        "deterministic-component",
+        "phase8",
+        "checkpoint",
+        "atomic-write",
+        "entry-point"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:runner/dag_scheduler.py",
+      "type": "file",
+      "name": "dag_scheduler.py",
+      "filePath": "runner/dag_scheduler.py",
+      "summary": "The top layer of the runtime stack and the largest module in the repository: it builds a read-only ManifestGraph from the compiled manifest, runs a synchronous dispatch loop over the DAG, and owns gate evaluation exclusively. Each dispatch follows the five-step contract (set running, entry gate, node body via run_agent, exit gate, NodeExecutionResult), propagates HARD_BLOCK to Phase 8 on budget-gate failure, and writes a durable RunSummary on every exit path.",
+      "tags": [
+        "scheduler",
+        "orchestration",
+        "dag",
+        "gate-evaluation",
+        "state-machine"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Explicitly forbidden from calling `run_skill()` directly; all skill execution flows through the agent runtime, and the exit gate is skipped if and only if the entry gate failed, the agent body failed, or `can_evaluate_exit_gate` is False."
+    },
+    {
+      "id": "function:runner/dag_scheduler.py:_gate_result_repo_path",
+      "type": "function",
+      "name": "_gate_result_repo_path",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        155,
+        165
+      ],
+      "summary": "Resolves a gate ID to its canonical repo-relative Tier 4 gate result path via the gate result registry.",
+      "tags": [
+        "utility",
+        "path-resolution",
+        "gate-result",
+        "registry"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/dag_scheduler.py:format_unsatisfied_condition",
+      "type": "function",
+      "name": "format_unsatisfied_condition",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        168,
+        178
+      ],
+      "summary": "Renders an unsatisfied DAG incoming condition as a human-readable line for CLI and summary output.",
+      "tags": [
+        "formatting",
+        "diagnostics",
+        "cli",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/dag_scheduler.py:format_evidence_violation",
+      "type": "function",
+      "name": "format_evidence_violation",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        181,
+        192
+      ],
+      "summary": "Renders a predecessor-evidence violation dict (node, gate, evidence path, reason code) as a readable diagnostic line.",
+      "tags": [
+        "formatting",
+        "diagnostics",
+        "cli",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/dag_scheduler.py:verify_released_predecessors",
+      "type": "function",
+      "name": "verify_released_predecessors",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        200,
+        377
+      ],
+      "summary": "Re-verifies every transitively upstream `released` predecessor against its durable Tier 4 exit-gate result — present, schema-valid, status pass, and content-fresh — because a persisted state string in `.claude/runs/` is runtime memory rather than source truth. Read-only and scheduler-side: it writes nothing and returns one violation dict per unproven claim so a scoped step fails closed.",
+      "tags": [
+        "validation",
+        "fail-closed",
+        "gate-result",
+        "scheduler",
+        "evidence"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:runner/dag_scheduler.py:_collect_upstream_nodes",
+      "type": "function",
+      "name": "_collect_upstream_nodes",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        385,
+        402
+      ],
+      "summary": "Recursively accumulates all transitive upstream node IDs for a target set by tracing incoming conditions, terminating on acyclic graphs via a visited set.",
+      "tags": [
+        "graph-traversal",
+        "recursion",
+        "utility",
+        "dag"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/dag_scheduler.py:bootstrap_phase_prerequisites",
+      "type": "function",
+      "name": "bootstrap_phase_prerequisites",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        405,
+        525
+      ],
+      "summary": "Seeds upstream prerequisite nodes as `released` in a fresh RunContext from durable Tier 4 gate evidence, so `--phase N` execution can proceed with a new run-id per invocation. This is a bootstrap step run before dispatch, not resume logic — readiness still derives from current RunContext state.",
+      "tags": [
+        "bootstrap",
+        "phase-scoped",
+        "evidence",
+        "scheduler",
+        "state"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:runner/dag_scheduler.py:DAGSchedulerError",
+      "type": "class",
+      "name": "DAGSchedulerError",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        533,
+        534
+      ],
+      "summary": "Base exception for scheduler configuration faults such as an empty phase scope, an unmatched node scope, or a dispatched node with no exit gate defined.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "scheduler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/dag_scheduler.py:RunSummary",
+      "type": "class",
+      "name": "RunSummary",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        543,
+        941
+      ],
+      "summary": "Typed dataclass capturing the full outcome of a run — overall status, node states in manifest order, terminal nodes reached, stalled and hard-blocked nodes, the gate results index, and per-node failure details. It computes scope-aware status for `--phase` and `--node` runs and writes `run_summary.json` before `run()` returns or raises.",
+      "tags": [
+        "data-model",
+        "run-summary",
+        "serialization",
+        "scheduler",
+        "reporting"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:runner/dag_scheduler.py:RunAbortedError",
+      "type": "class",
+      "name": "RunAbortedError",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        949,
+        971
+      ],
+      "summary": "Raised when in-scope nodes remain pending after the dispatch loop exits; carries the already-built RunSummary on `.summary` so the CLI can still report the run.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "scheduler",
+        "run-summary"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/dag_scheduler.py:IncomingCondition",
+      "type": "class",
+      "name": "IncomingCondition",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        980,
+        994
+      ],
+      "summary": "Immutable record of one DAG edge condition: the source node whose release unblocks the target, as declared in the manifest.",
+      "tags": [
+        "data-model",
+        "dag",
+        "graph",
+        "immutable"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/dag_scheduler.py:ManifestGraph",
+      "type": "class",
+      "name": "ManifestGraph",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        1002,
+        1409
+      ],
+      "summary": "Read-only in-memory graph built from `manifest.compile.yaml`: exposes canonical node IDs, entry and exit gate bindings, terminal flags, incoming conditions, readiness checks against current RunContext state, phase membership, and resolution of `--node` scope from canonical IDs or phase+substep shorthand.",
+      "tags": [
+        "data-model",
+        "dag",
+        "manifest",
+        "graph",
+        "readiness"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:runner/dag_scheduler.py:DAGScheduler",
+      "type": "class",
+      "name": "DAGScheduler",
+      "filePath": "runner/dag_scheduler.py",
+      "lineRange": [
+        1417,
+        2538
+      ],
+      "summary": "The synchronous dispatch loop and sole owner of gate evaluation. `run()` generates the Step-0 call slice, iterates ready nodes, and settles stalled ones; `_dispatch_node()` implements the five-step contract — set running, evaluate entry gate, execute the node body via `run_agent()`, evaluate the exit gate, return a NodeExecutionResult — applying Phase-8 preseed and reuse decisions, suppressing draft-consuming components, propagating HARD_BLOCK from the budget gate, and reloading RunContext after every gate evaluation.",
+      "tags": [
+        "scheduler",
+        "orchestration",
+        "gate-evaluation",
+        "state-machine",
+        "node-dispatch"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Failure origins form a closed set of three (`entry_gate`, `agent_body`, `exit_gate`) and are persisted alongside node state; node states are `pending`, `running`, `released`, `blocked_at_entry`, `blocked_at_exit`, `deterministic_pass_semantic_pending`, `hard_block_upstream`."
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:runner/__main__.py",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/__main__.py",
+      "target": "file:runner/gate_library.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/__main__.py",
+      "target": "file:runner/manifest_reader.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/__main__.py",
+      "target": "file:runner/paths.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/__main__.py",
+      "target": "file:runner/run_context.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "file:runner/decomposed_drafting.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "file:runner/deterministic_components.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "file:runner/node_resolver.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "file:runner/phase8_skip_binding.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "file:runner/runtime_models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "file:runner/section_assembler.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "file:runner/skill_runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "file:runner/atomic_write.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "file:runner/gate_result_registry.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "file:runner/run_context.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/agent_runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/call_slicer.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/deterministic_components.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/gate_result_registry.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/manifest_reader.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/node_resolver.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/paths.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/phase8_preseed.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/phase8_reuse.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/phase8_skip_binding.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/predicates/gate_pass_predicates.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/run_context.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/runtime_models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "file:runner/versions.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/__main__.py",
+      "target": "function:runner/__main__.py:_parse_phase",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/__main__.py",
+      "target": "function:runner/__main__.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/__main__.py",
+      "target": "function:runner/__main__.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "class:runner/agent_runtime.py:AgentRuntimeError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "class:runner/agent_runtime.py:AgentRuntimeError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:drafting_skills_superseded_by",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:drafting_skills_superseded_by",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_load_agent_catalog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_load_artifact_registry",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_load_prompt_spec",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_resolve_agent_inputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_resolve_skill_sequence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_resolve_budget_regime_safe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_get_artifacts_produced_by_node",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_determine_can_evaluate_exit_gate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_get_exit_gate_for_node",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_resolve_instrument_type",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_context_sources_for",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_build_caller_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_missing_context_sources",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_resolve_auditable_artifact",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_check_skill_applicability",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:run_agent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:run_agent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_identify_agent_skills",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_refresh_inputs_from_outputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/agent_runtime.py",
+      "target": "function:runner/agent_runtime.py:_sub_agent_inputs_ready",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/call_slicer.py",
+      "target": "class:runner/call_slicer.py:CallSlicerError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/call_slicer.py",
+      "target": "class:runner/call_slicer.py:CallSlicerError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/call_slicer.py",
+      "target": "function:runner/call_slicer.py:generate_call_slice",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/call_slicer.py",
+      "target": "function:runner/call_slicer.py:generate_call_slice",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "class:runner/checkpoint_publisher.py:CheckpointPublishError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "class:runner/checkpoint_publisher.py:CheckpointPublishError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "function:runner/checkpoint_publisher.py:_read_json_dict",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "function:runner/checkpoint_publisher.py:_validate_gate_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "function:runner/checkpoint_publisher.py:_authorize_and_build_quad",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "function:runner/checkpoint_publisher.py:_build_tier3_snapshot",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "function:runner/checkpoint_publisher.py:publish_checkpoint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/checkpoint_publisher.py",
+      "target": "function:runner/checkpoint_publisher.py:publish_checkpoint",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:_gate_result_repo_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:format_unsatisfied_condition",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:format_unsatisfied_condition",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:format_evidence_violation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:format_evidence_violation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:verify_released_predecessors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:verify_released_predecessors",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:_collect_upstream_nodes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:bootstrap_phase_prerequisites",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "function:runner/dag_scheduler.py:bootstrap_phase_prerequisites",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:DAGSchedulerError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:DAGSchedulerError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:RunSummary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:RunSummary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:RunAbortedError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:RunAbortedError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:RunAbortedError",
+      "target": "class:runner/dag_scheduler.py:DAGSchedulerError",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:IncomingCondition",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:IncomingCondition",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:ManifestGraph",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:ManifestGraph",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:DAGScheduler",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/dag_scheduler.py",
+      "target": "class:runner/dag_scheduler.py:DAGScheduler",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/__main__.py:main",
+      "target": "class:runner/dag_scheduler.py:DAGScheduler",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/__main__.py:main",
+      "target": "function:runner/dag_scheduler.py:bootstrap_phase_prerequisites",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/__main__.py:main",
+      "target": "class:runner/dag_scheduler.py:ManifestGraph",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/__main__.py:main",
+      "target": "class:runner/run_context.py:RunContext",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/__main__.py:main",
+      "target": "function:runner/paths.py:find_repo_root",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/__main__.py:main",
+      "target": "function:runner/dag_scheduler.py:format_evidence_violation",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/agent_runtime.py:run_agent",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/gate_evaluator.py:evaluate_gate",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/call_slicer.py:generate_call_slice",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/phase8_preseed.py:maybe_apply_phase8_preseed",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/phase8_reuse.py:validate_reuse_candidate",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/phase8_reuse.py:compute_input_fingerprint",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/phase8_reuse.py:write_reuse_metadata",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/phase8_skip_binding.py:validate_skip_binding",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "function:runner/deterministic_components.py:partition_draft_consuming",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/dag_scheduler.py:DAGScheduler",
+      "target": "class:runner/node_resolver.py:NodeResolver",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/dag_scheduler.py:verify_released_predecessors",
+      "target": "function:runner/predicates/gate_pass_predicates.py:is_gate_fresh",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/agent_runtime.py:run_agent",
+      "target": "function:runner/skill_runtime.py:run_skill",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/agent_runtime.py:run_agent",
+      "target": "function:runner/deterministic_components.py:invoke_component",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/agent_runtime.py:run_agent",
+      "target": "function:runner/phase8_skip_binding.py:validate_skip_binding",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/agent_runtime.py:run_agent",
+      "target": "function:runner/decomposed_drafting.py:draft_section_decomposed",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/checkpoint_publisher.py:publish_checkpoint",
+      "target": "function:runner/atomic_write.py:atomic_write_json",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

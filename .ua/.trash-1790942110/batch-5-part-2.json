@@ -1,0 +1,660 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/transport/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "runner/transport/__init__.py",
+   "summary": "Barrel for the backend-agnostic transport package, re-exporting only the dependency-free surface - provider capabilities, provider config and presets, the error taxonomy, the tool executor and the tool loop - so importing the package never pulls in the optional httpx or boto3 clients.",
+   "tags": [
+    "barrel",
+    "entry-point",
+    "re-exports",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/transport/bedrock_converse.py",
+   "type": "file",
+   "name": "bedrock_converse.py",
+   "filePath": "runner/transport/bedrock_converse.py",
+   "summary": "Native AWS Bedrock Converse backend implementing the ToolLoopBackend protocol through boto3, bypassing the OpenAI-compatible proxy and using the standard AWS credential chain plus inference profiles for on-demand throughput.",
+   "tags": [
+    "transport",
+    "backend",
+    "aws-bedrock",
+    "adapter",
+    "llm-invocation"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "boto3 is imported inside a try/except so the module stays importable when the optional dependency is absent."
+  },
+  {
+   "id": "class:runner/transport/bedrock_converse.py:BedrockConverseBackend",
+   "type": "class",
+   "name": "BedrockConverseBackend",
+   "filePath": "runner/transport/bedrock_converse.py",
+   "lineRange": [
+    47,
+    342
+   ],
+   "summary": "Callable backend that converts OpenAI-shaped messages and tool schemas into the Bedrock Converse format, invokes bedrock-runtime, extracts the response text and token usage, and classifies boto3 client errors into the shared transport taxonomy.",
+   "tags": [
+    "transport",
+    "aws-bedrock",
+    "adapter",
+    "error-handling"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/transport/capabilities.py",
+   "type": "file",
+   "name": "capabilities.py",
+   "filePath": "runner/transport/capabilities.py",
+   "summary": "Static per-provider capability metadata - streaming, tool calling, structured-output level, usage reporting, auth type and OpenAI compatibility - declared as a frozen dataclass registry with no dynamic detection or extra API calls.",
+   "tags": [
+    "configuration",
+    "metadata",
+    "data-model",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/capabilities.py:ProviderCapabilities",
+   "type": "class",
+   "name": "ProviderCapabilities",
+   "filePath": "runner/transport/capabilities.py",
+   "lineRange": [
+    23,
+    52
+   ],
+   "summary": "Frozen dataclass declaring one provider's static feature surface, consulted by the benchmark engine and the error-handling layer rather than negotiated at runtime.",
+   "tags": [
+    "data-model",
+    "configuration",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/transport/config.py",
+   "type": "file",
+   "name": "config.py",
+   "filePath": "runner/transport/config.py",
+   "summary": "Resolves the ORCHESTRATOR_TRANSPORT_* environment (and named presets) into a ProviderConfig, selecting among the claude_cli, bedrock, bedrock_converse, together_ai, ollama and generic OpenAI-compatible backends, and constructs the chosen backend with optional imports deferred.",
+   "tags": [
+    "configuration",
+    "transport",
+    "backend-selection",
+    "factory",
+    "environment"
+   ],
+   "complexity": "complex",
+   "languageNotes": "The httpx and boto3 imports live inside the builder functions, so the default Claude CLI path never requires either dependency."
+  },
+  {
+   "id": "class:runner/transport/config.py:TransportPreset",
+   "type": "class",
+   "name": "TransportPreset",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    102,
+    148
+   ],
+   "summary": "Frozen dataclass bundling a named preset's backend, endpoint, model, region and capability declarations.",
+   "tags": [
+    "data-model",
+    "configuration",
+    "presets"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/transport/config.py:ProviderConfig",
+   "type": "class",
+   "name": "ProviderConfig",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    300,
+    323
+   ],
+   "summary": "Resolved transport configuration - backend name, endpoint, model, credentials and capabilities - that the backend factories and callers consume.",
+   "tags": [
+    "data-model",
+    "configuration",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:validate_bedrock_model_id",
+   "type": "function",
+   "name": "validate_bedrock_model_id",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    331,
+    341
+   ],
+   "summary": "Checks a model identifier against the Bedrock `<provider>.<model>` format.",
+   "tags": [
+    "validation",
+    "aws-bedrock",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:is_production_mode",
+   "type": "function",
+   "name": "is_production_mode",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    349,
+    351
+   ],
+   "summary": "Reports whether production mode is active, which gates the set of admissible backends.",
+   "tags": [
+    "configuration",
+    "guard",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:_enforce_production_backend",
+   "type": "function",
+   "name": "_enforce_production_backend",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    354,
+    369
+   ],
+   "summary": "Rejects any non-production backend when production mode is active, raising ValueError rather than silently downgrading the transport.",
+   "tags": [
+    "validation",
+    "fail-closed",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:list_transport_presets",
+   "type": "function",
+   "name": "list_transport_presets",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    377,
+    379
+   ],
+   "summary": "Returns the names of all registered transport presets.",
+   "tags": [
+    "configuration",
+    "presets",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:get_transport_preset",
+   "type": "function",
+   "name": "get_transport_preset",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    382,
+    395
+   ],
+   "summary": "Looks up a named transport preset, raising ValueError for an unrecognised name.",
+   "tags": [
+    "configuration",
+    "presets",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:resolve_provider_config_from_preset",
+   "type": "function",
+   "name": "resolve_provider_config_from_preset",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    398,
+    488
+   ],
+   "summary": "Resolves a ProviderConfig from a named preset, letting explicit environment variables override preset defaults under a backend-safety rule that prevents a mismatched backend/endpoint pairing.",
+   "tags": [
+    "configuration",
+    "presets",
+    "transport"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/transport/config.py:resolve_provider_config",
+   "type": "function",
+   "name": "resolve_provider_config",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    496,
+    571
+   ],
+   "summary": "Reads the transport environment and returns the resolved ProviderConfig, delegating to the preset resolver when ORCHESTRATOR_TRANSPORT_PRESET is set.",
+   "tags": [
+    "configuration",
+    "transport",
+    "entry-point"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/transport/config.py:_resolve_bedrock",
+   "type": "function",
+   "name": "_resolve_bedrock",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    574,
+    605
+   ],
+   "summary": "Resolves Bedrock configuration for the bedrock-mantle OpenAI-compatible endpoint, constructing the regional URL and validating the model identifier.",
+   "tags": [
+    "configuration",
+    "aws-bedrock",
+    "transport"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/transport/config.py:_resolve_bedrock_converse",
+   "type": "function",
+   "name": "_resolve_bedrock_converse",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    608,
+    620
+   ],
+   "summary": "Resolves native Bedrock Converse configuration - region, model and inference profile - for the boto3 backend.",
+   "tags": [
+    "configuration",
+    "aws-bedrock",
+    "transport"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:_resolve_together_ai",
+   "type": "function",
+   "name": "_resolve_together_ai",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    623,
+    641
+   ],
+   "summary": "Resolves Together AI endpoint, model and API-key configuration.",
+   "tags": [
+    "configuration",
+    "transport",
+    "provider"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:_resolve_ollama",
+   "type": "function",
+   "name": "_resolve_ollama",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    644,
+    656
+   ],
+   "summary": "Resolves local Ollama endpoint and model configuration, which needs no API key.",
+   "tags": [
+    "configuration",
+    "transport",
+    "provider"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/transport/config.py:_resolve_generic",
+   "type": "function",
+   "name": "_resolve_generic",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    659,
+    678
+   ],
+   "summary": "Resolves a generic OpenAI-compatible endpoint configuration from explicit environment variables.",
+   "tags": [
+    "configuration",
+    "transport",
+    "provider"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/transport/config.py:build_openai_backend",
+   "type": "function",
+   "name": "build_openai_backend",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    686,
+    752
+   ],
+   "summary": "Constructs an OpenAICompatBackend from a resolved config, deferring the httpx import to the point a non-Claude backend is actually needed.",
+   "tags": [
+    "factory",
+    "transport",
+    "backend-selection"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/transport/config.py:build_converse_backend",
+   "type": "function",
+   "name": "build_converse_backend",
+   "filePath": "runner/transport/config.py",
+   "lineRange": [
+    755,
+    793
+   ],
+   "summary": "Constructs a BedrockConverseBackend from a resolved bedrock_converse config, converting any OpenAI-format tool schemas internally.",
+   "tags": [
+    "factory",
+    "transport",
+    "aws-bedrock"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/transport/bedrock_converse.py",
+   "target": "class:runner/transport/bedrock_converse.py:BedrockConverseBackend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/bedrock_converse.py",
+   "target": "class:runner/transport/bedrock_converse.py:BedrockConverseBackend",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/capabilities.py",
+   "target": "class:runner/transport/capabilities.py:ProviderCapabilities",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/capabilities.py",
+   "target": "class:runner/transport/capabilities.py:ProviderCapabilities",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "class:runner/transport/config.py:TransportPreset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "class:runner/transport/config.py:TransportPreset",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "class:runner/transport/config.py:ProviderConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "class:runner/transport/config.py:ProviderConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:validate_bedrock_model_id",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:validate_bedrock_model_id",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:is_production_mode",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:is_production_mode",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:_enforce_production_backend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:list_transport_presets",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:list_transport_presets",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:get_transport_preset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:get_transport_preset",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:resolve_provider_config_from_preset",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:resolve_provider_config_from_preset",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:resolve_provider_config",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:resolve_provider_config",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:_resolve_bedrock",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:_resolve_bedrock_converse",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:_resolve_together_ai",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:_resolve_ollama",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:_resolve_generic",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:build_openai_backend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:build_openai_backend",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:build_converse_backend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "function:runner/transport/config.py:build_converse_backend",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/transport/__init__.py",
+   "target": "file:runner/transport/capabilities.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/transport/__init__.py",
+   "target": "file:runner/transport/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/transport/__init__.py",
+   "target": "file:runner/transport/errors.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/transport/__init__.py",
+   "target": "file:runner/transport/tool_executor.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/transport/__init__.py",
+   "target": "file:runner/transport/tool_loop.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/transport/bedrock_converse.py",
+   "target": "file:runner/transport/errors.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/transport/config.py",
+   "target": "file:runner/transport/capabilities.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/transport/config.py:build_openai_backend",
+   "target": "class:runner/transport/openai_compatible.py:OpenAICompatBackend",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/transport/config.py:build_converse_backend",
+   "target": "class:runner/transport/bedrock_converse.py:BedrockConverseBackend",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "class:runner/transport/bedrock_converse.py:BedrockConverseBackend",
+   "target": "class:runner/transport/errors.py:ErrorCategory",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "function:runner/transport/config.py:resolve_provider_config",
+   "target": "class:runner/transport/capabilities.py:ProviderCapabilities",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

@@ -1,0 +1,95 @@
+[
+  {
+    "order": 1,
+    "title": "The Constitution",
+    "description": "Start here, and do not treat this file as a README. By its own Section 1, CLAUDE.md is the highest interpretive authority in the repository, ranking above every prompt, skill, workflow and agent instruction; it defines a ten-level authority hierarchy, a six-tier document model (Tier 1 normative framework through Tier 5 deliverables), the eight gated workflow phases, and twelve categories of constitutionally forbidden action. Its governing idea is that the system must prefer an explicit, honest gate failure over fabricated completion. Nothing else in the codebase makes sense before you have internalised that, because almost every design decision downstream exists to enforce a clause written here.",
+    "nodeIds": ["document:CLAUDE.md"],
+    "languageLesson": "Markdown as a governance artifact, not documentation: this file is the single highest-fan-out document in the graph (24 'documents' edges), meaning the analyzer found two dozen code and config files whose behaviour is directly traceable to clauses in it. When prose governs code, section numbers (§8.4, §17.5.3) become the stable identifiers that code comments and gate messages cite."
+  },
+  {
+    "order": 2,
+    "title": "The CLI Entry Point",
+    "description": "runner/__main__.py is where execution actually begins, invoked as `python -m runner`. It parses the run-scoping flags (--run-id, --phase, --node, --dry-run), loads the compiled manifest, and hands control to the scheduler — and that is deliberately all it does. Reading it tells you the engine's real interface is a scoped run over a declared graph of phases, not a script with a sequence of steps.",
+    "nodeIds": ["file:runner/__main__.py"]
+  },
+  {
+    "order": 3,
+    "title": "The Scheduler and Node Dispatch",
+    "description": "The DAGScheduler is the top layer of the runtime stack and the largest module in the repository. It builds a read-only ManifestGraph from the compiled manifest and dispatches each node through a fixed five-step contract: set state to running, evaluate the entry gate, execute the node body, evaluate the exit gate, return a composite result. Study the contract alongside runtime_models.py, which holds the frozen dataclasses passed between layers, and run_context.py, which persists node state and HARD_BLOCK metadata to disk under .claude/runs/<run_id>/ — because the constitution requires that durable state, not agent memory, be the record of what happened.",
+    "nodeIds": ["file:runner/dag_scheduler.py", "file:runner/runtime_models.py", "file:runner/run_context.py"],
+    "languageLesson": "Python frozen dataclasses as inter-layer contracts: making SkillResult, AgentResult and NodeExecutionResult immutable means a lower layer cannot mutate a result after a higher layer has read it. The closed `failure_origin` enum ('entry_gate', 'agent_body', 'exit_gate') is what lets failures be classified exactly once rather than interpreted twice."
+  },
+  {
+    "order": 4,
+    "title": "The Agent Runtime",
+    "description": "run_agent() is the middle layer, and the thing to notice is what it is forbidden to do. It loads agent and prompt specifications, resolves canonical tier inputs, sequences skill invocations, and determines can_evaluate_exit_gate by inspecting actual files on disk — but it never calls the gate evaluator and never calls the scheduler. Each layer in this stack has exactly one caller; that is enforced architecture, not a stylistic convention, and the node_resolver supplies the canonical node identity the agent runtime works against.",
+    "nodeIds": ["file:runner/agent_runtime.py", "file:runner/node_resolver.py", "file:runner/upstream_inputs.py"]
+  },
+  {
+    "order": 5,
+    "title": "The Skill Runtime",
+    "description": "run_skill() is the bottom orchestration layer and the only place a skill specification becomes an actual model invocation. It loads a skill .md file, resolves declared inputs, assembles a prompt in one of two modes — TAPM, where Claude reads inputs from disk itself, or cli-prompt, where inputs are serialized — parses and validates the JSON response, then writes the artifact. Pair it with call_slicer.py, the deterministic Step-0 pass that shrinks a 338-794 KB work-programme file to a bounded ~5-10 KB call slice before any model is invoked at all.",
+    "nodeIds": ["file:runner/skill_runtime.py", "file:runner/call_slicer.py", "file:runner/json_extract.py"],
+    "languageLesson": "A critical design rule lives here: the runtime must never silently repair a malformed model response. A missing run_id or an incorrect schema_id is a validation failure, not an auto-correctable condition. This is why json_extract.py competes candidate JSON spans rather than trusting the first fenced block it sees."
+  },
+  {
+    "order": 6,
+    "title": "The Model Transport Boundary",
+    "description": "Every Claude invocation in the system funnels through claude_transport.py, which subprocesses the local `claude` CLI in print mode and reassembles the reply from a multi-turn streaming format. Isolating the model behind one adapter is what made the migration from API-key billing to a subscription CLI a transport-layer change with no effect on workflow logic, gates or schemas. The runner/transport/ package generalises this further with a tool loop for backends lacking native Read/Glob support, plus typed transport errors so a timeout is distinguishable from an unavailable CLI.",
+    "nodeIds": ["file:runner/claude_transport.py", "file:runner/transport/tool_loop.py", "file:runner/transport/config.py", "file:runner/transport/errors.py"]
+  },
+  {
+    "order": 7,
+    "title": "Gates Are the Point",
+    "description": "This is the conceptual heart of the engine. gate_evaluator.py resolves a gate's predicates, runs each one deterministically, and writes the gate result — and it is called only by the scheduler, never by an agent or a skill. Note the inversion a newcomer always gets backwards: the manifest_reader exposes each gate's predicate_refs, and under 'Approach B' a predicate executes only if the manifest names it, so the predicate library is merely an implementation registry. A gate failure here is a correct and valuable output, not a bug to route around.",
+    "nodeIds": ["file:runner/gate_evaluator.py", "file:runner/manifest_reader.py", "file:runner/gate_result_registry.py", "file:runner/gate_library.py"]
+  },
+  {
+    "order": 8,
+    "title": "The Predicate Modules",
+    "description": "Gates decompose into atomic, deterministic predicates spread across ten modules in runner/predicates/, covering file existence, schema conformance, coverage, criterion binding, timelines, source references and DAG cycles. Every one of them returns the same PredicateResult type with one of five canonical failure categories — the uniform shape is what lets the evaluator aggregate 149 declared predicates without knowing what any individual check means. The YAML library declares each predicate's id, evaluation function, args, prose condition and the operator-facing message shown when it fails.",
+    "nodeIds": ["file:runner/predicates/__init__.py", "file:runner/predicates/types.py", "file:runner/predicates/schema_predicates.py", "config:.claude/workflows/system_orchestration/gate_rules_library.yaml"],
+    "languageLesson": "A barrel __init__.py re-exporting every predicate gives the evaluator one flat namespace to resolve names against, while keeping each predicate family in its own file. In Python this pattern trades a little import opacity for a stable public surface that a YAML registry can safely reference by bare name."
+  },
+  {
+    "order": 9,
+    "title": "The YAML Spine Governs the Python",
+    "description": "If you read only Python you will conclude the engine is self-describing. It is not. manifest.compile.yaml is the executable spine: a node_registry of 13 phase nodes binding each to its agents, skills, gate conditions and deterministic components, plus the gate_registry that decides which predicates run. It has zero import edges yet sources the largest cross-category relation in the whole graph (79 'configures' edges). The agent catalog declares each of the 20 agents' tier reads, writes and explicit must_not prohibitions; the artifact schema specification fixes the field-level shape of every Tier 4 and Tier 5 artifact the code is allowed to write.",
+    "nodeIds": ["config:.claude/workflows/system_orchestration/manifest.compile.yaml", "config:.claude/workflows/system_orchestration/agent_catalog.yaml", "config:.claude/workflows/system_orchestration/skill_catalog.yaml", "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml"],
+    "languageLesson": "YAML as a binding manifest rather than a settings file. The 'compile' in manifest.compile.yaml signals a derived artifact: per-phase node specs under workflow_phases/ are the authored sources, and the compiled manifest is the single file the runtime reads. Edit the source, recompile — never patch the compiled spine directly."
+  },
+  {
+    "order": 10,
+    "title": "Skills vs Deterministic Components",
+    "description": "This distinction unlocks the whole design. A skill invokes Claude and performs domain reasoning; a deterministic component invokes no model, makes no inference, and is closed by a byte-equal-replay or pure-lookup guarantee. deterministic_components.py is the generic binding substrate dispatching 17 of them, and section_assembler.py shows the flavour: it array-appends per-sub-section drafts in spine order, carrying claims verbatim and deriving exactly two things — word counts and a de-duplicated union of source refs. Components are bound in the manifest just like skills, but they are not skills, and keeping that line sharp is what preserves the guarantee that only reasoning steps can introduce new content.",
+    "nodeIds": ["file:runner/deterministic_components.py", "file:runner/section_assembler.py", "file:runner/decomposed_drafting.py", "file:runner/fingerprints.py"]
+  },
+  {
+    "order": 11,
+    "title": "The Budget Gate: Fail-Closed in Full",
+    "description": "Read these two phase specs as a pair — they are the sharpest illustration of the engine's philosophy. gate_09 categorically blocks every Phase 8 activity, including preparatory drafting, until a complete and structurally consistent budget exists; for lump-sum instruments that means a validated response from an external planner, because lump-sum figures carry judgment that cannot be replayed. unit_cost_budget.py is the instructive counter-case: it derives a unit-cost budget as fixed arithmetic on published constants (confirmed months x published rates x host coefficient), verified by byte-equal replay, which is precisely why determinism is permitted to substitute for the external-system guarantee. working_assumptions.py is the only sanctioned escape hatch — the mechanism by which a human operator, not an agent, converts an honest block into a declared assumption.",
+    "nodeIds": ["config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml", "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml", "file:runner/unit_cost_budget.py", "file:runner/working_assumptions.py"],
+    "languageLesson": "The anti-fabrication argument is worth following precisely: externalisation and determinism are alternative guarantees against the same risk. Where a number requires judgment, push it outside the system; where it is pure arithmetic on published constants, prove it by replaying the computation and comparing bytes. Either way, no layer is ever allowed to estimate."
+  },
+  {
+    "order": 12,
+    "title": "The Graph Substrate",
+    "description": "runner/dev_graph/ is a rebuildable operational index over the repository's authoritative records — it owns nothing, and rebuilding from the same records is byte-identical. schema.py holds the closed vocabularies as data: the node types and the relationship set, each relationship declaring its permitted endpoint pairs. Alongside it, graph_compiler.py extracts Tier 3 inputs and Part B deliverables from an Obsidian vault into a staging tree (diffing rather than overwriting the hand-lift), graph_projector.py mirrors durable run state back into the vault, and graph_determinism_check.py proves the compiler is a pure function by compiling twice and comparing bytes.",
+    "nodeIds": ["file:runner/dev_graph/schema.py", "file:runner/dev_graph/builder.py", "file:runner/graph_compiler.py", "file:runner/graph_determinism_check.py"],
+    "languageLesson": "Content-addressed snapshots make 'has anything really changed?' a byte comparison instead of a judgement call. The pattern's one concession is a documented exclusion — a timestamp field like compiled_at is explicitly exempted from the byte-equality check, because otherwise determinism could never be demonstrated at all."
+  },
+  {
+    "order": 13,
+    "title": "The Out-of-Band Harness",
+    "description": "harness/ is a quality-assurance track, not part of the engine, and the boundary runs one way only: the harness may read engine artifacts and import runner modules, while the engine never imports the harness — the dependency graph contains zero such edges. HARNESS.md is its own specification, defining the substrate and its headline signals (status-aware faithfulness, rubric grading), and its verdicts are advisory and never run-blocking. verdict.py and judge.py are its most-imported internals, mirroring atomic_write's role on the engine side.",
+    "nodeIds": ["document:harness/HARNESS.md", "file:harness/__init__.py", "file:harness/verdict.py", "file:harness/judge.py"],
+    "languageLesson": "A one-way import boundary is an architectural invariant you can actually test: assert that no module under runner/ imports harness/, and the rule stops depending on reviewer discipline. Declaring it in the package's __init__ docstring makes the intent discoverable at the point someone would be tempted to break it."
+  },
+  {
+    "order": 14,
+    "title": "The Shared Foundation",
+    "description": "Finish at the deepest sinks in the dependency graph, which are also the smallest modules. atomic_write.py has 33 importers: every deterministic component and exporter publishes canonical artifacts through its temp-file-plus-rename helpers, so a crashed run can never leave a half-written artifact that a gate would then read as complete. paths.py, with 17 importers, discovers the repository root by finding an ancestor holding both CLAUDE.md and .git/ — the constitution is literally the filesystem anchor. pyproject.toml closes the loop, carrying only pytest configuration plus the two markers that register the harness's lanes as explicitly non-blocking.",
+    "nodeIds": ["file:runner/atomic_write.py", "file:runner/paths.py", "config:pyproject.toml"],
+    "languageLesson": "Atomic writes via os.replace() on a same-filesystem temp file are the standard way to make a file update all-or-nothing on POSIX and Windows alike. In a gated system this is not a nicety: gate predicates decide pass or fail by inspecting files on disk, so a partially written artifact would be indistinguishable from a genuinely incomplete one."
+  }
+]

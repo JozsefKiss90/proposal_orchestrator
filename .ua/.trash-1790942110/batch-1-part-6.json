@@ -1,0 +1,1519 @@
+{
+ "nodes": [
+  {
+   "id": "file:harness/rubrics.py",
+   "type": "file",
+   "name": "rubrics.py",
+   "filePath": "harness/rubrics.py",
+   "summary": "Rubric set loader (E5b): parses the profile's versioned rubric file, cross-checks every rubric's expectation text byte-for-byte against the scorecard aspect and the E5a substrate, fails closed on divergence, and renders and hashes the pinned (system, user) rubric prompt pair.",
+   "tags": [
+    "data-loading",
+    "validation",
+    "prompt-building",
+    "versioning"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/status_calibration.py",
+   "type": "file",
+   "name": "status_calibration.py",
+   "filePath": "harness/status_calibration.py",
+   "summary": "Claim-status calibration (E3): detects label drift in both directions, reusing E2 verdicts to find overclaimed confirmed claims as hard findings and asking the confirmed-bar question counterfactually to flag underclaimed inferred claims as soft advisory drift.",
+   "tags": [
+    "calibration",
+    "status-drift",
+    "integrity",
+    "judge"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/status_faithfulness.py",
+   "type": "file",
+   "name": "status_faithfulness.py",
+   "filePath": "harness/status_faithfulness.py",
+   "summary": "Status-aware faithfulness (E2), the gap-masked-as-confirmed detector: partitions Tier-5 claims by status and judges each against the standard its status claims - confirmed strictly against its source_ref, assumed against the operator-declared value, inferred softly - and owns the baseline freeze and invariance comparison.",
+   "tags": [
+    "faithfulness",
+    "integrity",
+    "judge",
+    "baseline"
+   ],
+   "complexity": "complex",
+   "languageNotes": "The source_ref mini-grammar parser (segments, parentheticals, top-level splitting) is a hand-rolled recursive-descent reader over a free-text citation field."
+  },
+  {
+   "id": "file:harness/verdict.py",
+   "type": "file",
+   "name": "verdict.py",
+   "filePath": "harness/verdict.py",
+   "summary": "Judge verdict vocabulary: pure types that stamp every verdict with the section 12.2 status Inferred and make a Confirmed verdict impossible to construct, plus the N>=3 majority-vote scaffold required wherever a score will inform a decision.",
+   "tags": [
+    "data-model",
+    "verdict",
+    "majority-vote",
+    "type-definition"
+   ],
+   "complexity": "complex",
+   "languageNotes": "A deliberately pure module - no I/O, no network - so the verdict invariants are enforced in frozen dataclass __post_init__ validation."
+  },
+  {
+   "id": "file:runner/working_assumptions.py",
+   "type": "file",
+   "name": "working_assumptions.py",
+   "filePath": "runner/working_assumptions.py",
+   "summary": "Shared reader for the Tier 3 working_assumptions.json declaration file, the single mechanism by which a human operator turns an honest block into a conscious green; one parse serves both the unit-cost budget gate (by declared key) and the claim layer's W1 predicate (by checklist ref).",
+   "tags": [
+    "data-loading",
+    "tier3",
+    "shared-reader",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/rubrics.py:_parse_rubric",
+   "type": "function",
+   "name": "_parse_rubric",
+   "filePath": "harness/rubrics.py",
+   "lineRange": [
+    212,
+    258
+   ],
+   "summary": "Parses one rubric entry (text, steps, pass threshold, selection terms, anchor sub-sections) from the profile's rubric-set file.",
+   "tags": [
+    "parsing",
+    "rubric",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubrics.py:load_rubric_set",
+   "type": "function",
+   "name": "load_rubric_set",
+   "filePath": "harness/rubrics.py",
+   "lineRange": [
+    270,
+    386
+   ],
+   "summary": "Loads and cross-checks the rubric set against the E5a substrate and the scorecard, failing closed on a missing or extra rubric, a paraphrased expectation text, a criterion mismatch or a stale scorecard version.",
+   "tags": [
+    "data-loading",
+    "validation",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/rubrics.py:load_profile_bundle",
+   "type": "function",
+   "name": "load_profile_bundle",
+   "filePath": "harness/rubrics.py",
+   "lineRange": [
+    414,
+    476
+   ],
+   "summary": "Loads the full profile bundle - profile document, expectation substrate, rubric set and scoring - as one version-consistent unit.",
+   "tags": [
+    "data-loading",
+    "configuration",
+    "orchestration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubrics.py:build_pack_for",
+   "type": "function",
+   "name": "build_pack_for",
+   "filePath": "harness/rubrics.py",
+   "lineRange": [
+    484,
+    506
+   ],
+   "summary": "Builds the evidence pack for one rubric and section using the rubric's declared selection terms and anchor sub-sections.",
+   "tags": [
+    "orchestration",
+    "evidence-pack",
+    "rubric"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/rubrics.py:build_rubric_system_prompt",
+   "type": "function",
+   "name": "build_rubric_system_prompt",
+   "filePath": "harness/rubrics.py",
+   "lineRange": [
+    514,
+    544
+   ],
+   "summary": "Renders the system half of the integrity-framed rubric prompt, which asks whether the section addresses and grounds the expectation rather than whether the prose is good.",
+   "tags": [
+    "prompt-building",
+    "rubric",
+    "judge"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubrics.py:build_rubric_user_prompt",
+   "type": "function",
+   "name": "build_rubric_user_prompt",
+   "filePath": "harness/rubrics.py",
+   "lineRange": [
+    547,
+    564
+   ],
+   "summary": "Renders the user half of the rubric prompt over the evidence pack.",
+   "tags": [
+    "prompt-building",
+    "rubric",
+    "judge"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/rubrics.py:Rubric",
+   "type": "class",
+   "name": "Rubric",
+   "filePath": "harness/rubrics.py",
+   "lineRange": [
+    119,
+    155
+   ],
+   "summary": "One versioned rubric: expectation text traceable byte-for-byte to a scorecard aspect, evaluation steps, pass threshold and deterministic selection basis.",
+   "tags": [
+    "data-model",
+    "rubric",
+    "versioning"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/rubrics.py:RubricSet",
+   "type": "class",
+   "name": "RubricSet",
+   "filePath": "harness/rubrics.py",
+   "lineRange": [
+    177,
+    204
+   ],
+   "summary": "The loaded rubric set with lookup by expectation key and a content fingerprint that moves whenever a rubric changes.",
+   "tags": [
+    "data-model",
+    "rubric",
+    "versioning"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_calibration.py:_drift_from_e2_finding",
+   "type": "function",
+   "name": "_drift_from_e2_finding",
+   "filePath": "harness/status_calibration.py",
+   "lineRange": [
+    259,
+    280
+   ],
+   "summary": "Reinterprets an existing E2 integrity finding as an overclaimed status-drift finding, spending no additional judge calls on the confirmed direction.",
+   "tags": [
+    "reuse",
+    "status-drift",
+    "classification"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/status_calibration.py:evaluate_status_calibration",
+   "type": "function",
+   "name": "evaluate_status_calibration",
+   "filePath": "harness/status_calibration.py",
+   "lineRange": [
+    283,
+    446
+   ],
+   "summary": "Evaluates status drift in both directions: reuses E2 verdicts for overclaimed confirmed claims as hard findings and asks the confirmed-bar question counterfactually over inferred claims to flag soft underclaimed drift.",
+   "tags": [
+    "orchestration",
+    "status-drift",
+    "calibration"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/status_calibration.py:ClaimDrift",
+   "type": "class",
+   "name": "ClaimDrift",
+   "filePath": "harness/status_calibration.py",
+   "lineRange": [
+    115,
+    153
+   ],
+   "summary": "One claim's status-drift finding with its direction, hard/soft classification and flag.",
+   "tags": [
+    "data-model",
+    "status-drift",
+    "finding"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/status_calibration.py:StatusCalibrationResult",
+   "type": "class",
+   "name": "StatusCalibrationResult",
+   "filePath": "harness/status_calibration.py",
+   "lineRange": [
+    179,
+    251
+   ],
+   "summary": "The aggregate status-calibration result partitioning claims into overclaimed, underclaimed and unverifiable with drift counts and a report builder.",
+   "tags": [
+    "data-model",
+    "aggregation",
+    "report-generation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:load_section_claims",
+   "type": "function",
+   "name": "load_section_claims",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    277,
+    300
+   ],
+   "summary": "Loads a Tier-5 section's validation_status claim entries into the typed claim surface E2 judges.",
+   "tags": [
+    "data-loading",
+    "claim-ledger",
+    "tier5"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:build_faithfulness_prompt_for_status",
+   "type": "function",
+   "name": "build_faithfulness_prompt_for_status",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    426,
+    458
+   ],
+   "summary": "Renders the status-specific faithfulness prompt - strict against the source for confirmed, against the operator-declared value for assumed, softer for inferred.",
+   "tags": [
+    "prompt-building",
+    "faithfulness",
+    "status"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:_parse_segment",
+   "type": "function",
+   "name": "_parse_segment",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    513,
+    537
+   ],
+   "summary": "Parses one segment of a claim's source_ref citation string into its structured parts.",
+   "tags": [
+    "parsing",
+    "source-ref",
+    "grammar"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:_split_top_level",
+   "type": "function",
+   "name": "_split_top_level",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    557,
+    586
+   ],
+   "summary": "Splits a source_ref string on top-level separators while respecting nested parentheses and brackets.",
+   "tags": [
+    "parsing",
+    "source-ref",
+    "grammar"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:_parse_source_segments",
+   "type": "function",
+   "name": "_parse_source_segments",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    589,
+    610
+   ],
+   "summary": "Parses a full source_ref field into its ordered list of structured citation segments.",
+   "tags": [
+    "parsing",
+    "source-ref",
+    "grammar"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:_render_text",
+   "type": "function",
+   "name": "_render_text",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    635,
+    657
+   ],
+   "summary": "Renders a resolved source document region into the bounded text the judge is shown.",
+   "tags": [
+    "rendering",
+    "source-ref",
+    "bounded"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:resolve_claim_source_text",
+   "type": "function",
+   "name": "resolve_claim_source_text",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    660,
+    717
+   ],
+   "summary": "Resolves a claim's source_ref to the actual source text, walking the parsed segments and locating the cited region by id or hint tokens.",
+   "tags": [
+    "resolution",
+    "source-ref",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:_render_segment",
+   "type": "function",
+   "name": "_render_segment",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    720,
+    745
+   ],
+   "summary": "Renders one resolved citation segment into its judge-facing text form.",
+   "tags": [
+    "rendering",
+    "source-ref",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:resolve_assumed_declared_text",
+   "type": "function",
+   "name": "resolve_assumed_declared_text",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    748,
+    769
+   ],
+   "summary": "Resolves an assumed claim's operator-declared value from working_assumptions.json, the text an assumed claim is judged against instead of a source.",
+   "tags": [
+    "resolution",
+    "tier3",
+    "assumed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:meets_bar",
+   "type": "function",
+   "name": "meets_bar",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    777,
+    813
+   ],
+   "summary": "Decides whether a judge verdict clears the bar the claim's status promises, the single public owner of the status-specific threshold.",
+   "tags": [
+    "decision",
+    "status",
+    "threshold"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:_judge_claim",
+   "type": "function",
+   "name": "_judge_claim",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    935,
+    968
+   ],
+   "summary": "Runs one claim's status-specific faithfulness question through the judge and returns the typed verdict.",
+   "tags": [
+    "judge",
+    "faithfulness",
+    "orchestration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:evaluate_claim",
+   "type": "function",
+   "name": "evaluate_claim",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    973,
+    1004
+   ],
+   "summary": "Public per-claim E2 entry point: resolves the claim's comparison text, judges it against its status bar and returns the faithfulness verdict with severity.",
+   "tags": [
+    "faithfulness",
+    "judge",
+    "api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:_evaluate_claim_routed",
+   "type": "function",
+   "name": "_evaluate_claim_routed",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    1007,
+    1104
+   ],
+   "summary": "Routes one claim through the deterministic-first router before judging and records the routing decision on the verdict.",
+   "tags": [
+    "routing",
+    "faithfulness",
+    "guardrail"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:evaluate_status_aware_faithfulness",
+   "type": "function",
+   "name": "evaluate_status_aware_faithfulness",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    1209,
+    1255
+   ],
+   "summary": "Evaluates a whole section: partitions claims by status, judges each under its own bar and aggregates the verdicts into the E2 result with severity counts.",
+   "tags": [
+    "orchestration",
+    "faithfulness",
+    "aggregation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/status_faithfulness.py:compare_to_baseline",
+   "type": "function",
+   "name": "compare_to_baseline",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    1519,
+    1612
+   ],
+   "summary": "Compares current per-claim grounding verdicts against a frozen baseline and reports the invariance violations, classifying a lost grounding as breaking.",
+   "tags": [
+    "comparison",
+    "baseline",
+    "regression"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/status_faithfulness.py:SectionClaim",
+   "type": "class",
+   "name": "SectionClaim",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    212,
+    274
+   ],
+   "summary": "One Tier-5 claim with its status, summary and source_ref, validated on construction and keyed by meaning rather than claim_id.",
+   "tags": [
+    "data-model",
+    "claim-ledger",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/status_faithfulness.py:StatusPolicy",
+   "type": "class",
+   "name": "StatusPolicy",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    309,
+    344
+   ],
+   "summary": "The per-status faithfulness policy - what a claim of this status is judged against and at what bar.",
+   "tags": [
+    "data-model",
+    "configuration",
+    "status"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/status_faithfulness.py:ClaimFaithfulness",
+   "type": "class",
+   "name": "ClaimFaithfulness",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    836,
+    922
+   ],
+   "summary": "One claim's E2 verdict with its severity, pass bit, score and hard-finding classification.",
+   "tags": [
+    "data-model",
+    "faithfulness",
+    "finding"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/status_faithfulness.py:StatusFaithfulnessResult",
+   "type": "class",
+   "name": "StatusFaithfulnessResult",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    1113,
+    1206
+   ],
+   "summary": "The aggregate E2 result for a section: verdicts partitioned by status, flagged and integrity findings, severity counts and a report builder.",
+   "tags": [
+    "data-model",
+    "aggregation",
+    "report-generation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/status_faithfulness.py:ClaimGroundingSnapshot",
+   "type": "class",
+   "name": "ClaimGroundingSnapshot",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    1288,
+    1352
+   ],
+   "summary": "A frozen per-claim grounding verdict as stored in a baseline, with round-trip serialization.",
+   "tags": [
+    "data-model",
+    "baseline",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/status_faithfulness.py:FaithfulnessBaseline",
+   "type": "class",
+   "name": "FaithfulnessBaseline",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    1356,
+    1409
+   ],
+   "summary": "The frozen grounding baseline for a section, bound to the judge pin it was measured under, with lookups and serialization.",
+   "tags": [
+    "data-model",
+    "baseline",
+    "provenance"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/status_faithfulness.py:InvarianceViolation",
+   "type": "class",
+   "name": "InvarianceViolation",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    1445,
+    1475
+   ],
+   "summary": "One baseline invariance violation with its breaking classification.",
+   "tags": [
+    "data-model",
+    "regression",
+    "finding"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/status_faithfulness.py:InvarianceReport",
+   "type": "class",
+   "name": "InvarianceReport",
+   "filePath": "harness/status_faithfulness.py",
+   "lineRange": [
+    1479,
+    1516
+   ],
+   "summary": "The aggregate invariance report over a baseline comparison, exposing whether the invariant held.",
+   "tags": [
+    "data-model",
+    "regression",
+    "report-generation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/verdict.py:majority_vote",
+   "type": "function",
+   "name": "majority_vote",
+   "filePath": "harness/verdict.py",
+   "lineRange": [
+    210,
+    279
+   ],
+   "summary": "Combines N>=3 individual verdicts into a majority verdict, validating the sample count and synthesizing a combined rationale; the scaffold required wherever a score will inform a decision.",
+   "tags": [
+    "majority-vote",
+    "aggregation",
+    "verdict"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/verdict.py:_synthesize_rationale",
+   "type": "function",
+   "name": "_synthesize_rationale",
+   "filePath": "harness/verdict.py",
+   "lineRange": [
+    282,
+    301
+   ],
+   "summary": "Synthesizes the combined rationale of a majority verdict from its member rationales.",
+   "tags": [
+    "utility",
+    "verdict",
+    "rendering"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/verdict.py:Verdict",
+   "type": "class",
+   "name": "Verdict",
+   "filePath": "harness/verdict.py",
+   "lineRange": [
+    89,
+    146
+   ],
+   "summary": "One judge verdict, stamped Inferred on construction and impossible to build as Confirmed, so a judge score can never certify a fact.",
+   "tags": [
+    "data-model",
+    "verdict",
+    "type-definition"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/verdict.py:MajorityVerdict",
+   "type": "class",
+   "name": "MajorityVerdict",
+   "filePath": "harness/verdict.py",
+   "lineRange": [
+    150,
+    207
+   ],
+   "summary": "The combined N>=3 majority verdict carrying its members, the combined rationale and the same Inferred stamp.",
+   "tags": [
+    "data-model",
+    "verdict",
+    "majority-vote"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/working_assumptions.py:declared_claim_summary",
+   "type": "function",
+   "name": "declared_claim_summary",
+   "filePath": "runner/working_assumptions.py",
+   "lineRange": [
+    64,
+    83
+   ],
+   "summary": "Returns the operator-declared value a claim's summary must equal, the shared accessor the W1 predicate and the assumption applier both read.",
+   "tags": [
+    "accessor",
+    "tier3",
+    "shared-reader"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/working_assumptions.py:_parse_declaration",
+   "type": "function",
+   "name": "_parse_declaration",
+   "filePath": "runner/working_assumptions.py",
+   "lineRange": [
+    275,
+    328
+   ],
+   "summary": "Parses one working-assumption declaration fail-closed, requiring its declared value, placement and checklist reference.",
+   "tags": [
+    "parsing",
+    "validation",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/working_assumptions.py:load_working_assumptions",
+   "type": "function",
+   "name": "load_working_assumptions",
+   "filePath": "runner/working_assumptions.py",
+   "lineRange": [
+    331,
+    422
+   ],
+   "summary": "Loads and validates Tier 3 working_assumptions.json into the single reader both the unit-cost budget gate and the claim layer consume.",
+   "tags": [
+    "data-loading",
+    "tier3",
+    "shared-reader"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:runner/working_assumptions.py:Declaration",
+   "type": "class",
+   "name": "Declaration",
+   "filePath": "runner/working_assumptions.py",
+   "lineRange": [
+    126,
+    159
+   ],
+   "summary": "One operator-declared working assumption: declared value, placement, checklist reference and the claim ids it backs.",
+   "tags": [
+    "data-model",
+    "tier3",
+    "assumed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:runner/working_assumptions.py:WorkingAssumptions",
+   "type": "class",
+   "name": "WorkingAssumptions",
+   "filePath": "runner/working_assumptions.py",
+   "lineRange": [
+    163,
+    252
+   ],
+   "summary": "The parsed declaration set, resolving a declaration by key, by checklist ref, or as the surface and canonical-pack entries the budget and claim layers read.",
+   "tags": [
+    "data-model",
+    "tier3",
+    "shared-reader"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:_parse_rubric",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:load_rubric_set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:load_rubric_set",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:load_profile_bundle",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:load_profile_bundle",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:build_pack_for",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:build_pack_for",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:build_rubric_system_prompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:build_rubric_system_prompt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:build_rubric_user_prompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "function:harness/rubrics.py:build_rubric_user_prompt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "class:harness/rubrics.py:Rubric",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "class:harness/rubrics.py:Rubric",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "class:harness/rubrics.py:RubricSet",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "class:harness/rubrics.py:RubricSet",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "function:harness/status_calibration.py:_drift_from_e2_finding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "function:harness/status_calibration.py:evaluate_status_calibration",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "function:harness/status_calibration.py:evaluate_status_calibration",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "class:harness/status_calibration.py:ClaimDrift",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "class:harness/status_calibration.py:ClaimDrift",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "class:harness/status_calibration.py:StatusCalibrationResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "class:harness/status_calibration.py:StatusCalibrationResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:load_section_claims",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:load_section_claims",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:build_faithfulness_prompt_for_status",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:build_faithfulness_prompt_for_status",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:_parse_segment",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:_split_top_level",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:_parse_source_segments",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:_render_text",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:resolve_claim_source_text",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:resolve_claim_source_text",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:_render_segment",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:resolve_assumed_declared_text",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:resolve_assumed_declared_text",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:meets_bar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:meets_bar",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:_judge_claim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:evaluate_claim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:evaluate_claim",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:_evaluate_claim_routed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:evaluate_status_aware_faithfulness",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:evaluate_status_aware_faithfulness",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:compare_to_baseline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "function:harness/status_faithfulness.py:compare_to_baseline",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:SectionClaim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:SectionClaim",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:StatusPolicy",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:StatusPolicy",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:ClaimFaithfulness",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:ClaimFaithfulness",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:StatusFaithfulnessResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:StatusFaithfulnessResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:ClaimGroundingSnapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:ClaimGroundingSnapshot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:FaithfulnessBaseline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:FaithfulnessBaseline",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:InvarianceViolation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:InvarianceViolation",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:InvarianceReport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "class:harness/status_faithfulness.py:InvarianceReport",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/verdict.py",
+   "target": "function:harness/verdict.py:majority_vote",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/verdict.py",
+   "target": "function:harness/verdict.py:majority_vote",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/verdict.py",
+   "target": "function:harness/verdict.py:_synthesize_rationale",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/verdict.py",
+   "target": "class:harness/verdict.py:Verdict",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/verdict.py",
+   "target": "class:harness/verdict.py:Verdict",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/verdict.py",
+   "target": "class:harness/verdict.py:MajorityVerdict",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/verdict.py",
+   "target": "class:harness/verdict.py:MajorityVerdict",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "function:runner/working_assumptions.py:declared_claim_summary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "function:runner/working_assumptions.py:declared_claim_summary",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "function:runner/working_assumptions.py:_parse_declaration",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "function:runner/working_assumptions.py:load_working_assumptions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "function:runner/working_assumptions.py:load_working_assumptions",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "class:runner/working_assumptions.py:Declaration",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "class:runner/working_assumptions.py:Declaration",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "class:runner/working_assumptions.py:WorkingAssumptions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/working_assumptions.py",
+   "target": "class:runner/working_assumptions.py:WorkingAssumptions",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "file:harness/evidence_pack.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "file:harness/expectations.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "file:harness/profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubrics.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "file:harness/report.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "file:harness/routing.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "file:harness/status_faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_calibration.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "file:harness/faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "file:harness/report.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "file:harness/routing.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/status_faithfulness.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:harness/rubrics.py:build_pack_for",
+   "target": "function:harness/evidence_pack.py:build_evidence_pack",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/status_calibration.py:evaluate_status_calibration",
+   "target": "function:harness/status_faithfulness.py:meets_bar",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/status_faithfulness.py:resolve_assumed_declared_text",
+   "target": "function:runner/working_assumptions.py:load_working_assumptions",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/rubrics.py:load_profile_bundle",
+   "target": "function:harness/expectations.py:load_expectation_substrate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

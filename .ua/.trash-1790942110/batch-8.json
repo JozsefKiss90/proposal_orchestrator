@@ -1,0 +1,1072 @@
+{
+ "nodes": [
+  {
+   "id": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "type": "config",
+   "name": "manifest.compile.yaml",
+   "filePath": ".claude/workflows/system_orchestration/manifest.compile.yaml",
+   "summary": "The compiled workflow manifest and executable spine of the engine: it declares the DAG execution model, a node_registry of 13 phase nodes binding each to its agent, skills, deterministic components and entry/exit gates, a 17-entry edge_registry of gate-guarded transitions, a 14-entry gate_registry and a 31-entry artifact registry. Its gate_registry predicate_refs are authoritative over which gate predicates actually execute.",
+   "tags": [
+    "workflow-manifest",
+    "dag-definition",
+    "gate-registry",
+    "binding-authority",
+    "configuration"
+   ],
+   "complexity": "complex",
+   "languageNotes": "The gate_registry nests predicate_refs inside prose conditions, so a predicate defined in gate_rules_library.yaml but absent from a condition's predicate_refs is never evaluated."
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+   "type": "config",
+   "name": "agent_catalog.yaml",
+   "filePath": ".claude/workflows/system_orchestration/agent_catalog.yaml",
+   "summary": "Declares the 20 workflow agents with their role, constitutional scope, declared tier reads and writes, explicit must_not prohibitions and phase alignment. Named by the constitution as an authoritative source of agent scope; three agents are cross-phase and proposal_writer is marked deprecated by the Phase 8 refactor.",
+   "tags": [
+    "agent-catalog",
+    "binding-authority",
+    "phase-alignment",
+    "configuration",
+    "tier-bindings"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "type": "config",
+   "name": "skill_catalog.yaml",
+   "filePath": ".claude/workflows/system_orchestration/skill_catalog.yaml",
+   "summary": "Declares the 27 skills, each an atomic single-Claude-invocation unit, with its execution mode (predominantly TAPM), output contract, purpose, consuming agents, declared tier reads and writes and constitutional constraints. A skill may never invoke another skill.",
+   "tags": [
+    "skill-catalog",
+    "binding-authority",
+    "output-contract",
+    "tapm",
+    "configuration"
+   ],
+   "complexity": "complex",
+   "languageNotes": "execution_mode separates TAPM skills (Claude reads declared inputs from disk via tools) from the lightweight cli-prompt path; a few entries leave it unset."
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "type": "config",
+   "name": "gate_rules_library.yaml",
+   "filePath": ".claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "summary": "The machine-evaluable predicate library behind all 14 gates: 149 declared predicates, each carrying a predicate_id, type, evaluation function, args, prose condition and operator-facing fail message. The manifest's predicate_refs select which of these actually run.",
+   "tags": [
+    "gate-predicates",
+    "validation-rules",
+    "fail-closed",
+    "binding-authority",
+    "configuration"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Predicate ids follow a gNN_pNN scheme keyed to gate ordinal rather than gate_id, so the g02_* predicates belong to phase_01_gate."
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "type": "config",
+   "name": "quality_gates.yaml",
+   "filePath": ".claude/workflows/system_orchestration/quality_gates.yaml",
+   "summary": "The prose-level definition of the 15 quality gates: name, description, evaluation point, fail action and the human-readable conditions each gate enforces. Budget Consistency is the only gate flagged bypass_prohibited, matching the constitution's categorical Phase 8 block.",
+   "tags": [
+    "quality-gates",
+    "gate-conditions",
+    "fail-closed",
+    "configuration",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "type": "config",
+   "name": "artifact_schema_specification.yaml",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "The canonical artifact schema specification: field-level schemas for Tier 4 phase outputs, Tier 5 deliverables, proposal sections, gate results, operational and dev-graph artifacts, Tier 3 sources, Tier 2A/2B extracts and integration validation, plus a 22-entry schema_id_registry mapping each schema_id to its artifact and section. Agent output that diverges from these schemas is a failure, not an alternative valid reading.",
+   "tags": [
+    "artifact-schemas",
+    "schema-definition",
+    "binding-authority",
+    "validation",
+    "configuration"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Every canonical artifact carries a versioned schema_id of the form orch.<scope>.<artifact>.v1, which the runtime validates rather than repairs."
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "type": "config",
+   "name": "tier_bindings.yaml",
+   "filePath": ".claude/workflows/system_orchestration/tier_bindings.yaml",
+   "summary": "Maps the workflow onto the repository document model: for Tier 1 through Tier 5 plus integrations and runtime it declares the root path, role, subpaths, extracted artifacts, read authority and write constraint, including the Tier 2A constraint against treating grant agreement annexes as a proposal schema.",
+   "tags": [
+    "tier-model",
+    "path-bindings",
+    "read-write-authority",
+    "configuration",
+    "traceability"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "type": "config",
+   "name": "global_rules.yaml",
+   "filePath": ".claude/workflows/system_orchestration/global_rules.yaml",
+   "summary": "Cross-cutting invariants binding every phase: determinism, failure on missing required inputs, mandatory tier traceability, durable Tier 4 writes, prohibitions on fabricating project facts, call constraints and budget estimates, the budget-gate-before-finalization rule and the evaluation-success optimisation target.",
+   "tags": [
+    "global-rules",
+    "anti-fabrication",
+    "determinism",
+    "fail-closed",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "type": "config",
+   "name": "state_rules.yaml",
+   "filePath": ".claude/workflows/system_orchestration/state_rules.yaml",
+   "summary": "Rules governing orchestration state: Tier 4 durability, checkpoint preservation, decision logging, deterministic rerun behaviour, conflict logging, the agent-memory boundary, the four-value validation status vocabulary (Confirmed, Inferred, Assumed, Unresolved) and index maintenance.",
+   "tags": [
+    "state-rules",
+    "checkpointing",
+    "decision-log",
+    "validation-status",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "type": "config",
+   "name": "integration_rules.yaml",
+   "filePath": ".claude/workflows/system_orchestration/integration_rules.yaml",
+   "summary": "Governs the Lump Sum Budget Planner exchange: interface contract location, request and response exchange directories, what the repository may and must not do, request preparation and response validation rules, failure modes and the prohibition on substituting internally generated budget figures.",
+   "tags": [
+    "integration-rules",
+    "budget-exchange",
+    "interface-contract",
+    "anti-fabrication",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "type": "config",
+   "name": "meta.yaml",
+   "filePath": ".claude/workflows/system_orchestration/meta.yaml",
+   "summary": "Workflow package metadata: name, version 1.1, a constitutional authority pointer to CLAUDE.md with its hierarchy position and amendment rule, repository scope (programme-agnostic, multi-instrument, project-specificity triggers), the 16-entry ordered package_sources load list and the compiled entry point manifest.compile.yaml.",
+   "tags": [
+    "workflow-metadata",
+    "package-manifest",
+    "load-order",
+    "versioning",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "type": "config",
+   "name": "design_notes.yaml",
+   "filePath": ".claude/workflows/system_orchestration/design_notes.yaml",
+   "summary": "Records the design rationale behind the orchestration specification: why the workflow is universal and authoritative, evaluator orientation, Tier 3 as the project container, formalised dependency mapping, the Phase 8 substep split, the budget gate design, constitutional subordination and the package model.",
+   "tags": [
+    "design-rationale",
+    "documentation",
+    "architecture-notes",
+    "configuration",
+    "workflow-design"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1",
+   "type": "schema",
+   "name": "orch.phase1.call_analysis_summary.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 1 call_analysis_summary.json Tier 4 phase output capturing extracted call analysis.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1",
+   "type": "schema",
+   "name": "orch.phase2.concept_refinement_summary.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 2 concept_refinement_summary.json Tier 4 phase output recording call-aligned concept refinement.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1",
+   "type": "schema",
+   "name": "orch.phase3.wp_structure.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 3 wp_structure.json artifact holding work packages, tasks, deliverables and dependencies.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1",
+   "type": "schema",
+   "name": "orch.phase4.gantt.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 4 gantt.json artifact assigning every task to months across the project duration.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1",
+   "type": "schema",
+   "name": "orch.phase4.scheduling_constraints.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 4 scheduling_constraints.json artifact produced by deterministic dependency normalization.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1",
+   "type": "schema",
+   "name": "orch.phase5.impact_architecture.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 5 impact_architecture.json artifact holding output-to-outcome-to-impact pathways and KPIs.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1",
+   "type": "schema",
+   "name": "orch.phase6.implementation_architecture.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 6 implementation_architecture.json artifact holding governance structure, risk register and ethics flags.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1",
+   "type": "schema",
+   "name": "orch.phase7.budget_gate_assessment.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 7 budget_gate_assessment.json artifact recording budget presence and structural consistency.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1",
+   "type": "schema",
+   "name": "orch.phase8.drafting_review_status.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Phase 8 drafting_review_status.json artifact tracking section drafting and review disposition.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1",
+   "type": "schema",
+   "name": "orch.checkpoints.phase8_checkpoint.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the durable phase8_checkpoint.json carrying the cross-run checkpoint provenance quad.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier4-output"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1",
+   "type": "schema",
+   "name": "orch.tier5.assembled_draft.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Deprecated assembled_draft.json schema, superseded by orch.tier5.part_b_assembled_draft.v1.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier5-deliverable"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1",
+   "type": "schema",
+   "name": "orch.tier5.excellence_section.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Tier 5 excellence_section.json deliverable drafted in Phase 8a.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier5-deliverable"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1",
+   "type": "schema",
+   "name": "orch.tier5.impact_section.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Tier 5 impact_section.json deliverable drafted in Phase 8b.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier5-deliverable"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.implementation_section.v1",
+   "type": "schema",
+   "name": "orch.tier5.implementation_section.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Tier 5 implementation_section.json deliverable drafted in Phase 8c.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier5-deliverable"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1",
+   "type": "schema",
+   "name": "orch.tier5.part_b_assembled_draft.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for part_b_assembled_draft.json, the cross-section assembly product checked by gate_10d.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier5-deliverable"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.review_packet.v1",
+   "type": "schema",
+   "name": "orch.tier5.review_packet.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Tier 5 review_packet.json produced by evaluator-style review in Phase 8e.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier5-deliverable"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1",
+   "type": "schema",
+   "name": "orch.tier5.final_export.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the Tier 5 final_export.json written by the deterministic final export component.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier5-deliverable"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.proposal_section.v1",
+   "type": "schema",
+   "name": "orch.tier5.proposal_section.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Generic proposal_section schema applied to each per-section JSON artifact under proposal_sections/.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "tier5-deliverable"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1",
+   "type": "schema",
+   "name": "orch.gate_result.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for gate_result artifacts, which are written exclusively by the gate evaluator.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "operational-artifact"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1",
+   "type": "schema",
+   "name": "orch.operational.run_manifest.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for per-run run_manifest artifacts recording run identity and node outcomes.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "operational-artifact"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1",
+   "type": "schema",
+   "name": "orch.dev_graph.snapshot.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for the dev_graph snapshot.json capturing the projected graph state.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "dev-graph"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.document_snapshot.v1",
+   "type": "schema",
+   "name": "orch.dev_graph.document_snapshot.v1",
+   "filePath": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "summary": "Schema for per-document dev_graph snapshots keyed by document id and content hash.",
+   "tags": [
+    "artifact-schema",
+    "schema-definition",
+    "versioned-schema",
+    "dev-graph"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.implementation_section.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.review_packet.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.proposal_section.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.document_snapshot.v1",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "target": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "target": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "target": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "target": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "target": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "target": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "target": "config:.claude/workflows/system_orchestration/meta.yaml",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "file:runner/manifest_reader.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "file:runner/dag_scheduler.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "file:runner/node_resolver.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "file:runner/agent_runtime.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "file:runner/gate_evaluator.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "file:runner/deterministic_components.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "target": "file:runner/skill_runtime.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "target": "file:runner/gate_library.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "target": "file:runner/gate_evaluator.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "target": "file:runner/gate_evaluator.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "target": "file:runner/gate_library.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+   "target": "file:runner/agent_runtime.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+   "target": "file:runner/semantic_dispatch.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "target": "file:runner/skill_runtime.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "target": "file:runner/agent_runtime.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "target": "file:runner/dag_scheduler.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "target": "file:runner/gate_evaluator.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "target": "file:runner/run_context.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "target": "file:runner/checkpoint_publisher.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "target": "file:runner/paths.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "target": "file:runner/call_slicer.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "target": "file:runner/interface_contract.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "target": "file:runner/budget_request.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "file:runner/skill_runtime.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "file:runner/gate_evaluator.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "file:runner/gate_result_registry.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "file:runner/graph_schema.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "file:runner/final_export_writer.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "target": "file:runner/section_assembler.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1",
+   "target": "file:runner/gate_result_registry.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1",
+   "target": "file:runner/final_export_writer.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1",
+   "target": "file:runner/section_assembler.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1",
+   "target": "file:runner/unit_cost_budget.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1",
+   "target": "file:runner/checkpoint_publisher.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1",
+   "target": "file:runner/run_context.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1",
+   "target": "file:runner/graph_projector.py",
+   "type": "defines_schema",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

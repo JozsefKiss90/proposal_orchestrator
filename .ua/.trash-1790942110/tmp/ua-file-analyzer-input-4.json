@@ -1,0 +1,144 @@
+{
+ "projectRoot": "C:/Code/proposal_demo/proposal_orchestrator",
+ "batchFiles": [
+  {
+   "path": "runner/__main__.py",
+   "language": "python",
+   "sizeLines": 542,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/agent_runtime.py",
+   "language": "python",
+   "sizeLines": 2206,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/call_slicer.py",
+   "language": "python",
+   "sizeLines": 201,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/checkpoint_publisher.py",
+   "language": "python",
+   "sizeLines": 305,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/dag_scheduler.py",
+   "language": "python",
+   "sizeLines": 2538,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/deterministic_components.py",
+   "language": "python",
+   "sizeLines": 513,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/manifest_reader.py",
+   "language": "python",
+   "sizeLines": 200,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/node_resolver.py",
+   "language": "python",
+   "sizeLines": 237,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/phase8_preseed.py",
+   "language": "python",
+   "sizeLines": 326,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/phase8_reuse.py",
+   "language": "python",
+   "sizeLines": 745,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/phase8_skip_binding.py",
+   "language": "python",
+   "sizeLines": 170,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/run_context.py",
+   "language": "python",
+   "sizeLines": 438,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/runtime_models.py",
+   "language": "python",
+   "sizeLines": 274,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "runner/__main__.py": [
+   "runner/dag_scheduler.py",
+   "runner/gate_library.py",
+   "runner/manifest_reader.py",
+   "runner/paths.py",
+   "runner/run_context.py"
+  ],
+  "runner/agent_runtime.py": [
+   "runner/decomposed_drafting.py",
+   "runner/deterministic_components.py",
+   "runner/node_resolver.py",
+   "runner/phase8_skip_binding.py",
+   "runner/runtime_models.py",
+   "runner/section_assembler.py",
+   "runner/skill_runtime.py"
+  ],
+  "runner/call_slicer.py": [],
+  "runner/checkpoint_publisher.py": [
+   "runner/atomic_write.py",
+   "runner/gate_result_registry.py",
+   "runner/run_context.py"
+  ],
+  "runner/dag_scheduler.py": [
+   "runner/agent_runtime.py",
+   "runner/call_slicer.py",
+   "runner/deterministic_components.py",
+   "runner/gate_evaluator.py",
+   "runner/gate_result_registry.py",
+   "runner/manifest_reader.py",
+   "runner/node_resolver.py",
+   "runner/paths.py",
+   "runner/phase8_preseed.py",
+   "runner/phase8_reuse.py",
+   "runner/phase8_skip_binding.py",
+   "runner/predicates/gate_pass_predicates.py",
+   "runner/run_context.py",
+   "runner/runtime_models.py",
+   "runner/versions.py"
+  ],
+  "runner/deterministic_components.py": [
+   "runner/runtime_models.py"
+  ],
+  "runner/manifest_reader.py": [],
+  "runner/node_resolver.py": [
+   "runner/manifest_reader.py"
+  ],
+  "runner/phase8_preseed.py": [
+   "runner/claim_status.py",
+   "runner/phase8_skip_binding.py"
+  ],
+  "runner/phase8_reuse.py": [
+   "runner/claim_status.py",
+   "runner/phase8_skip_binding.py"
+  ],
+  "runner/phase8_skip_binding.py": [],
+  "runner/run_context.py": [
+   "runner/versions.py"
+  ],
+  "runner/runtime_models.py": []
+ }
+}

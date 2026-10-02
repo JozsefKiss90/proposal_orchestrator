@@ -1,0 +1,270 @@
+{
+ "batchIndex": 5,
+ "files": [
+  {
+   "path": "runner/claude_transport.py",
+   "language": "python",
+   "sizeLines": 1062,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/json_extract.py",
+   "language": "python",
+   "sizeLines": 74,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/semantic_dispatch.py",
+   "language": "python",
+   "sizeLines": 863,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/skill_runtime.py",
+   "language": "python",
+   "sizeLines": 2739,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/__init__.py",
+   "language": "python",
+   "sizeLines": 55,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/bedrock_converse.py",
+   "language": "python",
+   "sizeLines": 342,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/capabilities.py",
+   "language": "python",
+   "sizeLines": 122,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/config.py",
+   "language": "python",
+   "sizeLines": 793,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/errors.py",
+   "language": "python",
+   "sizeLines": 155,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/openai_compatible.py",
+   "language": "python",
+   "sizeLines": 253,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/tool_executor.py",
+   "language": "python",
+   "sizeLines": 393,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/tool_loop.py",
+   "language": "python",
+   "sizeLines": 284,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "runner/claude_transport.py": [],
+  "runner/json_extract.py": [],
+  "runner/semantic_dispatch.py": [
+   "runner/claude_transport.py",
+   "runner/json_extract.py",
+   "runner/paths.py",
+   "runner/transport/config.py"
+  ],
+  "runner/skill_runtime.py": [
+   "runner/claude_transport.py",
+   "runner/runtime_models.py",
+   "runner/transport/config.py",
+   "runner/transport/tool_executor.py",
+   "runner/transport/tool_loop.py"
+  ],
+  "runner/transport/__init__.py": [
+   "runner/transport/capabilities.py",
+   "runner/transport/config.py",
+   "runner/transport/errors.py",
+   "runner/transport/tool_executor.py",
+   "runner/transport/tool_loop.py"
+  ],
+  "runner/transport/bedrock_converse.py": [
+   "runner/transport/errors.py"
+  ],
+  "runner/transport/capabilities.py": [],
+  "runner/transport/config.py": [
+   "runner/transport/capabilities.py"
+  ],
+  "runner/transport/errors.py": [],
+  "runner/transport/openai_compatible.py": [
+   "runner/transport/errors.py"
+  ],
+  "runner/transport/tool_executor.py": [],
+  "runner/transport/tool_loop.py": [
+   "runner/transport/tool_executor.py"
+  ]
+ },
+ "neighborMap": {
+  "runner/json_extract.py": [
+   {
+    "path": "harness/claim_ledger.py",
+    "batchIndex": 1,
+    "symbols": [
+     "ClaimLedgerError",
+     "_default_clock",
+     "SubSectionProse",
+     "load_section_prose",
+     "ProseChunk",
+     "chunk_prose",
+     "build_decomposition_prompt",
+     "parse_assertions_payload",
+     "decompose_chunk",
+     "Assertion",
+     "dedup_assertions",
+     "LedgerRecord",
+     "dedup_ledger_claims",
+     "_tokens",
+     "lexical_shortlist",
+     "build_coverage_prompt",
+     "extract_covered_by",
+     "judge_assertion_covered_by",
+     "CoverageOutcome",
+     "_covered_by_from_result",
+     "match_assertion",
+     "AssertionFinding",
+     "ChunkFailure",
+     "LedgerCompletenessResult",
+     "evaluate_ledger_completeness"
+    ]
+   },
+   {
+    "path": "harness/judge.py",
+    "batchIndex": 1,
+    "symbols": [
+     "JudgeError",
+     "JudgeConfigError",
+     "JudgeIndependenceError",
+     "JudgeResponseError",
+     "drafter_models",
+     "_default_clock",
+     "JudgeConfig",
+     "resolve_judge_config",
+     "JudgeResult",
+     "MajorityJudgeResult",
+     "_verdict_from_payload",
+     "Judge"
+    ]
+   }
+  ],
+  "runner/semantic_dispatch.py": [
+   {
+    "path": "runner/paths.py",
+    "batchIndex": 3,
+    "symbols": [
+     "find_repo_root",
+     "resolve_repo_path"
+    ]
+   },
+   {
+    "path": "runner/gate_evaluator.py",
+    "batchIndex": 3,
+    "symbols": [
+     "_substitute_runtime_args",
+     "_extract_node_id",
+     "_gate_result_path",
+     "_call_predicate",
+     "_is_hard_block_failure",
+     "_resolve_budget_regime",
+     "_partition_predicates_by_instrument",
+     "evaluate_gate"
+    ]
+   }
+  ],
+  "runner/skill_runtime.py": [
+   {
+    "path": "runner/runtime_models.py",
+    "batchIndex": 4,
+    "symbols": [
+     "SkillResult",
+     "SkillInvocationRecord",
+     "ComponentInvocationRecord",
+     "AgentResult",
+     "NodeExecutionResult"
+    ]
+   },
+   {
+    "path": "runner/agent_runtime.py",
+    "batchIndex": 4,
+    "symbols": [
+     "drafting_skills_superseded_by",
+     "AgentRuntimeError",
+     "_load_agent_catalog",
+     "_get_agent_entry",
+     "_load_artifact_registry",
+     "_load_agent_spec",
+     "_load_prompt_spec",
+     "_resolve_agent_inputs",
+     "_resolve_skill_sequence",
+     "_resolve_budget_regime_safe",
+     "_get_artifacts_produced_by_node",
+     "_determine_can_evaluate_exit_gate",
+     "_get_exit_gate_for_node",
+     "_resolve_instrument_type",
+     "_context_sources_for",
+     "_build_caller_context",
+     "_missing_context_sources",
+     "_resolve_auditable_artifact",
+     "_check_skill_applicability",
+     "run_agent",
+     "_identify_agent_skills",
+     "_refresh_inputs_from_outputs",
+     "_sub_agent_inputs_ready"
+    ]
+   }
+  ],
+  "runner/transport/config.py": [
+   {
+    "path": "harness/commands/faithfulness_calibration.py",
+    "batchIndex": 1,
+    "symbols": [
+     "_paced_judge",
+     "_env_int",
+     "_load_ckpt",
+     "_run",
+     "main"
+    ]
+   },
+   {
+    "path": "harness/commands/freeze_grounding_baselines.py",
+    "batchIndex": 1,
+    "symbols": [
+     "PacedRetryingBackend",
+     "build_paced_judge",
+     "_env_int",
+     "main"
+    ]
+   }
+  ],
+  "runner/transport/errors.py": [
+   {
+    "path": "harness/commands/freeze_grounding_baselines.py",
+    "batchIndex": 1,
+    "symbols": [
+     "PacedRetryingBackend",
+     "build_paced_judge",
+     "_env_int",
+     "main"
+    ]
+   }
+  ]
+ }
+}

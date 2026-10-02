@@ -1,0 +1,181 @@
+{
+ "batchIndex": 6,
+ "files": [
+  {
+   "path": "runner/graph_canonical_pack.py",
+   "language": "python",
+   "sizeLines": 374,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/graph_claim_verifier.py",
+   "language": "python",
+   "sizeLines": 563,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/graph_compiler.py",
+   "language": "python",
+   "sizeLines": 1222,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/graph_config.py",
+   "language": "python",
+   "sizeLines": 290,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/graph_determinism_check.py",
+   "language": "python",
+   "sizeLines": 563,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/graph_projector.py",
+   "language": "python",
+   "sizeLines": 527,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/graph_schema.py",
+   "language": "python",
+   "sizeLines": 296,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/vault_reader.py",
+   "language": "python",
+   "sizeLines": 393,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/vault_scaffold.py",
+   "language": "python",
+   "sizeLines": 141,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "runner/graph_canonical_pack.py": [
+   "runner/atomic_write.py",
+   "runner/graph_config.py",
+   "runner/graph_schema.py",
+   "runner/vault_reader.py",
+   "runner/working_assumptions.py"
+  ],
+  "runner/graph_claim_verifier.py": [
+   "runner/graph_config.py",
+   "runner/graph_schema.py",
+   "runner/vault_reader.py"
+  ],
+  "runner/graph_compiler.py": [
+   "runner/atomic_write.py",
+   "runner/graph_config.py",
+   "runner/graph_schema.py",
+   "runner/vault_reader.py"
+  ],
+  "runner/graph_config.py": [
+   "runner/graph_schema.py"
+  ],
+  "runner/graph_determinism_check.py": [
+   "runner/graph_compiler.py",
+   "runner/graph_config.py",
+   "runner/vault_reader.py"
+  ],
+  "runner/graph_projector.py": [
+   "runner/atomic_write.py",
+   "runner/graph_config.py",
+   "runner/graph_schema.py"
+  ],
+  "runner/graph_schema.py": [],
+  "runner/vault_reader.py": [
+   "runner/graph_config.py",
+   "runner/graph_schema.py"
+  ],
+  "runner/vault_scaffold.py": [
+   "runner/graph_config.py",
+   "runner/vault_reader.py"
+  ]
+ },
+ "neighborMap": {
+  "runner/graph_canonical_pack.py": [
+   {
+    "path": "runner/atomic_write.py",
+    "batchIndex": 2,
+    "symbols": [
+     "canonical_json_bytes",
+     "_finalize",
+     "atomic_write_json",
+     "atomic_write_text",
+     "atomic_write_via"
+    ]
+   },
+   {
+    "path": "runner/working_assumptions.py",
+    "batchIndex": 1,
+    "symbols": [
+     "declared_claim_summary",
+     "WorkingAssumptionsError",
+     "Declaration",
+     "WorkingAssumptions",
+     "_require_str",
+     "_parse_declaration",
+     "load_working_assumptions"
+    ]
+   }
+  ],
+  "runner/graph_compiler.py": [
+   {
+    "path": "runner/atomic_write.py",
+    "batchIndex": 2,
+    "symbols": [
+     "canonical_json_bytes",
+     "_finalize",
+     "atomic_write_json",
+     "atomic_write_text",
+     "atomic_write_via"
+    ]
+   }
+  ],
+  "runner/graph_projector.py": [
+   {
+    "path": "runner/atomic_write.py",
+    "batchIndex": 2,
+    "symbols": [
+     "canonical_json_bytes",
+     "_finalize",
+     "atomic_write_json",
+     "atomic_write_text",
+     "atomic_write_via"
+    ]
+   }
+  ],
+  "runner/graph_schema.py": [
+   {
+    "path": "runner/dev_graph/documents.py",
+    "batchIndex": 2,
+    "symbols": [
+     "DocumentRef",
+     "_malformed",
+     "_str",
+     "_ids",
+     "_objects",
+     "_sub_sections",
+     "_section",
+     "_verified_span",
+     "_claim",
+     "_commitment",
+     "normalise_candidate",
+     "_tags",
+     "render_document",
+     "node_content",
+     "document_node_id",
+     "read_candidate",
+     "import_document",
+     "read_document_records"
+    ]
+   }
+  ]
+ }
+}

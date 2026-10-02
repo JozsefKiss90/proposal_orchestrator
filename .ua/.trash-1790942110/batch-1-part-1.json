@@ -1,0 +1,1431 @@
+{
+ "nodes": [
+  {
+   "id": "file:harness/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "harness/__init__.py",
+   "summary": "Package root for the out-of-band evaluation and integrity harness; re-exports the E1 substrate (verdict, provenance, routing, judge, report, calibration, gold set) and documents the enforced one-way dependency boundary in which harness may import runner but never the reverse.",
+   "tags": [
+    "entry-point",
+    "barrel",
+    "quality-assurance",
+    "test-harness"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Python package barrel using an explicit __all__ re-export surface; the module docstring is the architectural contract that keeps the harness out of the runtime DAG."
+  },
+  {
+   "id": "file:harness/blind_assessment.py",
+   "type": "file",
+   "name": "blind_assessment.py",
+   "filePath": "harness/blind_assessment.py",
+   "summary": "Candidate-bound blind pre-evaluation lane: materialises a candidate from section artifacts or a dev-graph document, enforces a leakage guard, grades each criterion cell with the pinned non-drafter assessor, and writes a report bound to the candidate hash, profile version and assessor pin.",
+   "tags": [
+    "blind-assessment",
+    "evaluation",
+    "integrity",
+    "report-generation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/calibration.py",
+   "type": "file",
+   "name": "calibration.py",
+   "filePath": "harness/calibration.py",
+   "summary": "Judge-reliability calibration (E1.5): measures the pinned judge's precision and recall against a human-labeled faithfulness gold set and turns the result into a graduation decision that keeps every harness metric advisory until a fresh, applicable, above-threshold calibration exists.",
+   "tags": [
+    "calibration",
+    "metrics",
+    "judge",
+    "fail-safe"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/claim_ledger.py",
+   "type": "file",
+   "name": "claim_ledger.py",
+   "filePath": "harness/claim_ledger.py",
+   "summary": "Escaped-claim detector (E3): decomposes section prose into atomic assertions with an independent judge, filters them through the materiality classifier, and matches the material remainder by meaning against the section's claim ledger to surface facts asserted without any claim_id.",
+   "tags": [
+    "claim-ledger",
+    "integrity",
+    "judge",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/commands/_common.py",
+   "type": "file",
+   "name": "_common.py",
+   "filePath": "harness/commands/_common.py",
+   "summary": "Shared bootstrap for the harness module commands: resolves the repo root anchored on this file and loads .env.harness from main() rather than at import, so importing a command never mutates os.environ.",
+   "tags": [
+    "utility",
+    "bootstrap",
+    "configuration",
+    "cli"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:resolve_document",
+   "type": "function",
+   "name": "resolve_document",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    240,
+    276
+   ],
+   "summary": "Resolves a user-supplied document reference to a dev-graph node id, accepting either a node id or a document id that has exactly one current version.",
+   "tags": [
+    "resolution",
+    "dev-graph",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:assert_no_leakage",
+   "type": "function",
+   "name": "assert_no_leakage",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    284,
+    309
+   ],
+   "summary": "Leakage guard over a built blind package: raises LeakageError naming the offending items when any evidence item carries a tag the blind view policy forbids.",
+   "tags": [
+    "guardrail",
+    "validation",
+    "blind-assessment"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:materialise_candidate",
+   "type": "function",
+   "name": "materialise_candidate",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    312,
+    381
+   ],
+   "summary": "Writes a blind evidence package out as a candidate directory of section artifacts under the output root, so the assessor is only ever constructed against materialised, leakage-checked content.",
+   "tags": [
+    "serialization",
+    "blind-assessment",
+    "io"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:build_blind_evidence",
+   "type": "function",
+   "name": "build_blind_evidence",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    384,
+    429
+   ],
+   "summary": "Builds the blind evidence for a dev-graph document under the blind pre-evaluation view policy and runs the leakage guard before anything is written.",
+   "tags": [
+    "dev-graph",
+    "evidence-pack",
+    "blind-assessment"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:load_candidate",
+   "type": "function",
+   "name": "load_candidate",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    479,
+    512
+   ],
+   "summary": "Loads a candidate directory into a Candidate object, parsing each section artifact and computing the formatting-invariant content hash that binds every downstream verdict.",
+   "tags": [
+    "data-loading",
+    "hashing",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:_check_intake",
+   "type": "function",
+   "name": "_check_intake",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    717,
+    734
+   ],
+   "summary": "Validates an ESR intake record's purpose and availability, refusing an intake declared for anything other than a blind assessment.",
+   "tags": [
+    "validation",
+    "blind-assessment",
+    "intake"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:assess_candidate",
+   "type": "function",
+   "name": "assess_candidate",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    737,
+    831
+   ],
+   "summary": "Core assessment loop: grades every criterion-to-section cell of the profile with the pinned assessor, labels the report SCOPE_PARTIAL when profile-required sections are missing, and refuses a candidate holding none of them.",
+   "tags": [
+    "orchestration",
+    "blind-assessment",
+    "grading"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:write_report",
+   "type": "function",
+   "name": "write_report",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    850,
+    868
+   ],
+   "summary": "Serializes a blind assessment report to the next free numbered path under the report directory.",
+   "tags": [
+    "serialization",
+    "io",
+    "report-generation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:load_report",
+   "type": "function",
+   "name": "load_report",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    871,
+    927
+   ],
+   "summary": "Rehydrates a persisted report and re-binds it to the candidate on disk, raising CandidateHashMismatch naming both hashes when the candidate has changed.",
+   "tags": [
+    "deserialization",
+    "validation",
+    "integrity"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/blind_assessment.py:render_report",
+   "type": "function",
+   "name": "render_report",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    947,
+    1008
+   ],
+   "summary": "Renders a blind assessment report as an ASCII-safe human-readable text block with the per-cell verdicts and scope labelling.",
+   "tags": [
+    "rendering",
+    "report-generation",
+    "cli"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/blind_assessment.py:ReviewTask",
+   "type": "class",
+   "name": "ReviewTask",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    198,
+    215
+   ],
+   "summary": "Describes one review task and whether it is blind, validating in __post_init__ that a blind task carries a coherent view policy.",
+   "tags": [
+    "data-model",
+    "blind-assessment",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/blind_assessment.py:BlindCell",
+   "type": "class",
+   "name": "BlindCell",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    531,
+    554
+   ],
+   "summary": "One graded (criterion, section) cell of a blind assessment, carrying the verdict plus the candidate hash, profile version and assessor pin that bind it.",
+   "tags": [
+    "data-model",
+    "grading",
+    "provenance"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/blind_assessment.py:BlindAssessmentReport",
+   "type": "class",
+   "name": "BlindAssessmentReport",
+   "filePath": "harness/blind_assessment.py",
+   "lineRange": [
+    567,
+    709
+   ],
+   "summary": "The bound blind assessment report: cells, scope label, missing sections and the binding triple, with a summary view and a serializable form.",
+   "tags": [
+    "data-model",
+    "report-generation",
+    "integrity"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/calibration.py:confusion_from_labels",
+   "type": "function",
+   "name": "confusion_from_labels",
+   "filePath": "harness/calibration.py",
+   "lineRange": [
+    148,
+    170
+   ],
+   "summary": "Builds a confusion matrix from paired human gold labels and judge predictions, taking supported as the positive class.",
+   "tags": [
+    "metrics",
+    "calibration",
+    "aggregation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/calibration.py:calibrate",
+   "type": "function",
+   "name": "calibrate",
+   "filePath": "harness/calibration.py",
+   "lineRange": [
+    276,
+    314
+   ],
+   "summary": "Computes a calibration report from already-collected judge predictions over a gold set, recording the judge pin alongside precision and recall.",
+   "tags": [
+    "calibration",
+    "metrics",
+    "report-generation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/calibration.py:calibrate_with_judge",
+   "type": "function",
+   "name": "calibrate_with_judge",
+   "filePath": "harness/calibration.py",
+   "lineRange": [
+    321,
+    361
+   ],
+   "summary": "Runs the pinned judge over every gold pair and calibrates on the results, pairing each prediction with its human label.",
+   "tags": [
+    "calibration",
+    "judge",
+    "orchestration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/calibration.py:graduation_for",
+   "type": "function",
+   "name": "graduation_for",
+   "filePath": "harness/calibration.py",
+   "lineRange": [
+    390,
+    441
+   ],
+   "summary": "Decides whether a metric may graduate from advisory to gating: returns advisory unless a fresh calibration exists for the exact judge pin and clears the threshold, treating an uncomputable score as a failure.",
+   "tags": [
+    "calibration",
+    "fail-safe",
+    "decision"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/calibration.py:ConfusionMatrix",
+   "type": "class",
+   "name": "ConfusionMatrix",
+   "filePath": "harness/calibration.py",
+   "lineRange": [
+    84,
+    145
+   ],
+   "summary": "Immutable confusion matrix with derived precision, recall, F1, accuracy and gap-detection recall, each returning None rather than a pass when undefined.",
+   "tags": [
+    "data-model",
+    "metrics",
+    "fail-safe"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/calibration.py:GraduationThreshold",
+   "type": "class",
+   "name": "GraduationThreshold",
+   "filePath": "harness/calibration.py",
+   "lineRange": [
+    179,
+    197
+   ],
+   "summary": "The precision/recall bar a calibration must clear before a metric may gate, validated on construction.",
+   "tags": [
+    "data-model",
+    "configuration",
+    "calibration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/calibration.py:CalibrationReport",
+   "type": "class",
+   "name": "CalibrationReport",
+   "filePath": "harness/calibration.py",
+   "lineRange": [
+    213,
+    268
+   ],
+   "summary": "A calibration result bound to the judge pin and gold-set hash it was measured on, with applies_to and meets predicates.",
+   "tags": [
+    "data-model",
+    "calibration",
+    "provenance"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/calibration.py:CalibrationLog",
+   "type": "class",
+   "name": "CalibrationLog",
+   "filePath": "harness/calibration.py",
+   "lineRange": [
+    449,
+    469
+   ],
+   "summary": "Append-only JSONL log of calibration runs with a latest_for lookup by judge pin.",
+   "tags": [
+    "logging",
+    "calibration",
+    "audit-trail"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:load_section_prose",
+   "type": "function",
+   "name": "load_section_prose",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    184,
+    212
+   ],
+   "summary": "Loads a Tier-5 section's sub-section prose from disk into the typed prose surface the decomposer consumes.",
+   "tags": [
+    "data-loading",
+    "prose",
+    "tier5"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:chunk_prose",
+   "type": "function",
+   "name": "chunk_prose",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    228,
+    257
+   ],
+   "summary": "Chunks section prose deterministically on whole-paragraph boundaries so the decomposition is reproducible and no sentence is split across chunks.",
+   "tags": [
+    "deterministic",
+    "chunking",
+    "prose"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:parse_assertions_payload",
+   "type": "function",
+   "name": "parse_assertions_payload",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    289,
+    317
+   ],
+   "summary": "Parses the judge's decomposition response into atomic assertions, failing rather than repairing a malformed payload.",
+   "tags": [
+    "parsing",
+    "validation",
+    "judge"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:decompose_chunk",
+   "type": "function",
+   "name": "decompose_chunk",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    320,
+    358
+   ],
+   "summary": "Asks the independent judge to decompose one prose chunk exhaustively into atomic assertions, with no importance filtering.",
+   "tags": [
+    "judge",
+    "decomposition",
+    "prose"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:dedup_assertions",
+   "type": "function",
+   "name": "dedup_assertions",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    397,
+    423
+   ],
+   "summary": "Deduplicates decomposed assertions by normalized text so repeated prose does not inflate the escaped-claim count.",
+   "tags": [
+    "deduplication",
+    "normalization",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:dedup_ledger_claims",
+   "type": "function",
+   "name": "dedup_ledger_claims",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    453,
+    479
+   ],
+   "summary": "Deduplicates ledger claim records by meaning rather than claim_id, because real ledgers repeat ids across drafting blocks.",
+   "tags": [
+    "deduplication",
+    "claim-ledger",
+    "normalization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:lexical_shortlist",
+   "type": "function",
+   "name": "lexical_shortlist",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    500,
+    528
+   ],
+   "summary": "Builds a token-overlap shortlist of candidate ledger claims for an assertion, bounding how many pairs reach the judge.",
+   "tags": [
+    "shortlisting",
+    "optimization",
+    "matching"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:build_coverage_prompt",
+   "type": "function",
+   "name": "build_coverage_prompt",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    564,
+    586
+   ],
+   "summary": "Renders the prompt asking the judge which shortlisted ledger claim, if any, covers an assertion by meaning.",
+   "tags": [
+    "prompt-building",
+    "judge",
+    "matching"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:extract_covered_by",
+   "type": "function",
+   "name": "extract_covered_by",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    589,
+    606
+   ],
+   "summary": "Extracts the covering claim reference from the judge's coverage response, treating an unparseable answer as unjudgeable.",
+   "tags": [
+    "parsing",
+    "judge",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:judge_assertion_covered_by",
+   "type": "function",
+   "name": "judge_assertion_covered_by",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    609,
+    641
+   ],
+   "summary": "Runs one assertion against its shortlist through the judge and returns the coverage outcome.",
+   "tags": [
+    "judge",
+    "matching",
+    "orchestration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:match_assertion",
+   "type": "function",
+   "name": "match_assertion",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    681,
+    759
+   ],
+   "summary": "Matches one material assertion against the section's ledger: shortlist, judge, and classify the result as covered, escaped or unjudgeable.",
+   "tags": [
+    "matching",
+    "orchestration",
+    "integrity"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/claim_ledger.py:evaluate_ledger_completeness",
+   "type": "function",
+   "name": "evaluate_ledger_completeness",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    997,
+    1168
+   ],
+   "summary": "End-to-end E3 evaluation: chunk and decompose the prose, classify materiality, match every material assertion against the ledger, and assemble the completeness result with escaped, covered, non-material and unjudgeable partitions.",
+   "tags": [
+    "orchestration",
+    "integrity",
+    "metrics"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/claim_ledger.py:AssertionFinding",
+   "type": "class",
+   "name": "AssertionFinding",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    768,
+    835
+   ],
+   "summary": "One assertion's outcome against the ledger, exposing whether it is a hard finding and the flag that surfaces it to a human.",
+   "tags": [
+    "data-model",
+    "integrity",
+    "finding"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/claim_ledger.py:LedgerCompletenessResult",
+   "type": "class",
+   "name": "LedgerCompletenessResult",
+   "filePath": "harness/claim_ledger.py",
+   "lineRange": [
+    850,
+    989
+   ],
+   "summary": "Aggregate E3 result partitioning assertions into escaped, covered, non-material and unjudgeable sets, with outcome counts, a materiality note and a report builder.",
+   "tags": [
+    "data-model",
+    "aggregation",
+    "report-generation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/commands/_common.py:load_harness_env",
+   "type": "function",
+   "name": "load_harness_env",
+   "filePath": "harness/commands/_common.py",
+   "lineRange": [
+    20,
+    44
+   ],
+   "summary": "Loads .env.harness into os.environ from a command's main(), anchored on the repo root so the commands work from any working directory.",
+   "tags": [
+    "configuration",
+    "bootstrap",
+    "utility"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:resolve_document",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:resolve_document",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:assert_no_leakage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:assert_no_leakage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:materialise_candidate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:materialise_candidate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:build_blind_evidence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:build_blind_evidence",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:load_candidate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:load_candidate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:_check_intake",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:assess_candidate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:assess_candidate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:write_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:write_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:load_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:load_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:render_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "function:harness/blind_assessment.py:render_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "class:harness/blind_assessment.py:ReviewTask",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "class:harness/blind_assessment.py:ReviewTask",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "class:harness/blind_assessment.py:BlindCell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "class:harness/blind_assessment.py:BlindCell",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "class:harness/blind_assessment.py:BlindAssessmentReport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "class:harness/blind_assessment.py:BlindAssessmentReport",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "function:harness/calibration.py:confusion_from_labels",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "function:harness/calibration.py:confusion_from_labels",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "function:harness/calibration.py:calibrate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "function:harness/calibration.py:calibrate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "function:harness/calibration.py:calibrate_with_judge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "function:harness/calibration.py:calibrate_with_judge",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "function:harness/calibration.py:graduation_for",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "function:harness/calibration.py:graduation_for",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "class:harness/calibration.py:ConfusionMatrix",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "class:harness/calibration.py:ConfusionMatrix",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "class:harness/calibration.py:GraduationThreshold",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "class:harness/calibration.py:GraduationThreshold",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "class:harness/calibration.py:CalibrationReport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "class:harness/calibration.py:CalibrationReport",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "class:harness/calibration.py:CalibrationLog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "class:harness/calibration.py:CalibrationLog",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:load_section_prose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:load_section_prose",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:chunk_prose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:chunk_prose",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:parse_assertions_payload",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:parse_assertions_payload",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:decompose_chunk",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:decompose_chunk",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:dedup_assertions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:dedup_assertions",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:dedup_ledger_claims",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:dedup_ledger_claims",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:lexical_shortlist",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:lexical_shortlist",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:build_coverage_prompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:build_coverage_prompt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:extract_covered_by",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:extract_covered_by",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:judge_assertion_covered_by",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:judge_assertion_covered_by",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:match_assertion",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:match_assertion",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:evaluate_ledger_completeness",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "function:harness/claim_ledger.py:evaluate_ledger_completeness",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "class:harness/claim_ledger.py:AssertionFinding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "class:harness/claim_ledger.py:AssertionFinding",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "class:harness/claim_ledger.py:LedgerCompletenessResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "class:harness/claim_ledger.py:LedgerCompletenessResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/_common.py",
+   "target": "function:harness/commands/_common.py:load_harness_env",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/_common.py",
+   "target": "function:harness/commands/_common.py:load_harness_env",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/calibration.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/gold_set.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/jsonl_log.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/report.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/routing.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/__init__.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:harness/evidence_pack.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:harness/expectation_coverage.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:harness/profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:harness/rubrics.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:runner/dev_graph/__init__.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/blind_assessment.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "file:harness/faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "file:harness/gold_set.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "file:harness/jsonl_log.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/calibration.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "file:harness/faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "file:harness/materiality.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "file:harness/report.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "file:harness/routing.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/claim_ledger.py",
+   "target": "file:runner/json_extract.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/_common.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:harness/calibration.py:calibrate_with_judge",
+   "target": "function:harness/faithfulness.py:judge_pair_supported",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/claim_ledger.py:evaluate_ledger_completeness",
+   "target": "function:harness/materiality.py:classify_materiality",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/blind_assessment.py:assess_candidate",
+   "target": "function:harness/expectation_coverage.py:grade_expectation",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

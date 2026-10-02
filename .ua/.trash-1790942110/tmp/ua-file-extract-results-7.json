@@ -1,0 +1,2464 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 3,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 3,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "results": [
+    {
+      "path": "runner/agnosticism_lint.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 355,
+      "nonEmptyLines": 298,
+      "functions": [
+        {
+          "name": "scan_text",
+          "startLine": 219,
+          "endLine": 231,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "_is_excluded",
+          "startLine": 239,
+          "endLine": 241,
+          "params": [
+            "rel_parts"
+          ]
+        },
+        {
+          "name": "iter_generic_layer_files",
+          "startLine": 244,
+          "endLine": 260,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "lint_generic_layer",
+          "startLine": 268,
+          "endLine": 287,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "format_report",
+          "startLine": 290,
+          "endLine": 308,
+          "params": [
+            "report"
+          ]
+        },
+        {
+          "name": "main",
+          "startLine": 316,
+          "endLine": 351,
+          "params": [
+            "argv"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "LintViolation",
+          "startLine": 186,
+          "endLine": 196,
+          "methods": [],
+          "properties": [
+            "path",
+            "line",
+            "noun",
+            "snippet"
+          ]
+        },
+        {
+          "name": "LintReport",
+          "startLine": 200,
+          "endLine": 211,
+          "methods": [
+            "ok"
+          ],
+          "properties": [
+            "scanned_files",
+            "violations"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "LintViolation",
+          "line": 185,
+          "isDefault": false
+        },
+        {
+          "name": "LintReport",
+          "line": 199,
+          "isDefault": false
+        },
+        {
+          "name": "scan_text",
+          "line": 219,
+          "isDefault": false
+        },
+        {
+          "name": "_is_excluded",
+          "line": 239,
+          "isDefault": false
+        },
+        {
+          "name": "iter_generic_layer_files",
+          "line": 244,
+          "isDefault": false
+        },
+        {
+          "name": "lint_generic_layer",
+          "line": 268,
+          "isDefault": false
+        },
+        {
+          "name": "format_report",
+          "line": 290,
+          "isDefault": false
+        },
+        {
+          "name": "main",
+          "line": 316,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "scan_text",
+          "callee": "enumerate",
+          "lineNumber": 228
+        },
+        {
+          "caller": "scan_text",
+          "callee": "text.splitlines",
+          "lineNumber": 228
+        },
+        {
+          "caller": "scan_text",
+          "callee": "_NOUN_RE.finditer",
+          "lineNumber": 229
+        },
+        {
+          "caller": "scan_text",
+          "callee": "out.append",
+          "lineNumber": 230
+        },
+        {
+          "caller": "scan_text",
+          "callee": "match.group",
+          "lineNumber": 230
+        },
+        {
+          "caller": "scan_text",
+          "callee": "line.strip",
+          "lineNumber": 230
+        },
+        {
+          "caller": "_is_excluded",
+          "callee": "any",
+          "lineNumber": 241
+        },
+        {
+          "caller": "iter_generic_layer_files",
+          "callee": "repo_root.glob",
+          "lineNumber": 253
+        },
+        {
+          "caller": "iter_generic_layer_files",
+          "callee": "path.is_file",
+          "lineNumber": 254
+        },
+        {
+          "caller": "iter_generic_layer_files",
+          "callee": "path.relative_to",
+          "lineNumber": 256
+        },
+        {
+          "caller": "iter_generic_layer_files",
+          "callee": "_is_excluded",
+          "lineNumber": 257
+        },
+        {
+          "caller": "iter_generic_layer_files",
+          "callee": "rel.as_posix",
+          "lineNumber": 259
+        },
+        {
+          "caller": "iter_generic_layer_files",
+          "callee": "sorted",
+          "lineNumber": 260
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "iter_generic_layer_files",
+          "lineNumber": 276
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "path.relative_to(repo_root).as_posix",
+          "lineNumber": 280
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "path.relative_to",
+          "lineNumber": 280
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "scanned.append",
+          "lineNumber": 281
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "path.read_text",
+          "lineNumber": 282
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "scan_text",
+          "lineNumber": 283
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "violations.append",
+          "lineNumber": 284
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "LintViolation",
+          "lineNumber": 285
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "LintReport",
+          "lineNumber": 287
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "tuple",
+          "lineNumber": 287
+        },
+        {
+          "caller": "lint_generic_layer",
+          "callee": "tuple",
+          "lineNumber": 287
+        },
+        {
+          "caller": "format_report",
+          "callee": "len",
+          "lineNumber": 294
+        },
+        {
+          "caller": "format_report",
+          "callee": "len",
+          "lineNumber": 298
+        },
+        {
+          "caller": "format_report",
+          "callee": "len",
+          "lineNumber": 299
+        },
+        {
+          "caller": "format_report",
+          "callee": "lines.append",
+          "lineNumber": 302
+        },
+        {
+          "caller": "format_report",
+          "callee": "lines.append",
+          "lineNumber": 303
+        },
+        {
+          "caller": "format_report",
+          "callee": "\"\\n\".join",
+          "lineNumber": 308
+        },
+        {
+          "caller": "main",
+          "callee": "argparse.ArgumentParser",
+          "lineNumber": 322
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 329
+        },
+        {
+          "caller": "main",
+          "callee": "parser.parse_args",
+          "lineNumber": 334
+        },
+        {
+          "caller": "main",
+          "callee": "Path(args.repo_root).resolve",
+          "lineNumber": 340
+        },
+        {
+          "caller": "main",
+          "callee": "Path",
+          "lineNumber": 340
+        },
+        {
+          "caller": "main",
+          "callee": "find_repo_root",
+          "lineNumber": 340
+        },
+        {
+          "caller": "main",
+          "callee": "lint_generic_layer",
+          "lineNumber": 342
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 344
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 348
+        },
+        {
+          "caller": "main",
+          "callee": "format_report",
+          "lineNumber": 348
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 350
+        },
+        {
+          "caller": "main",
+          "callee": "format_report",
+          "lineNumber": 350
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 8,
+        "functionCount": 6,
+        "classCount": 2
+      }
+    },
+    {
+      "path": "runner/consortium_composition.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 618,
+      "nonEmptyLines": 522,
+      "functions": [
+        {
+          "name": "_load_json",
+          "startLine": 196,
+          "endLine": 208,
+          "params": [
+            "path"
+          ]
+        },
+        {
+          "name": "_require_int",
+          "startLine": 211,
+          "endLine": 218,
+          "params": [
+            "block",
+            "key",
+            "where"
+          ]
+        },
+        {
+          "name": "_citation",
+          "startLine": 221,
+          "endLine": 239,
+          "params": [
+            "block",
+            "key",
+            "limb"
+          ]
+        },
+        {
+          "name": "load_composition_rule",
+          "startLine": 242,
+          "endLine": 293,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "load_partners",
+          "startLine": 301,
+          "endLine": 344,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "partners_by_capability_basis",
+          "startLine": 347,
+          "endLine": 367,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "_first_partner_per_slot",
+          "startLine": 375,
+          "endLine": 380,
+          "params": [
+            "counted"
+          ]
+        },
+        {
+          "name": "evaluate_composition",
+          "startLine": 383,
+          "endLine": 450,
+          "params": [
+            "partners",
+            "rule"
+          ]
+        },
+        {
+          "name": "evaluate_scenarios",
+          "startLine": 468,
+          "endLine": 515,
+          "params": [
+            "partners",
+            "rule",
+            "derived_ids",
+            "gap_ids"
+          ]
+        },
+        {
+          "name": "format_scenarios",
+          "startLine": 523,
+          "endLine": 537,
+          "params": [
+            "scenarios"
+          ]
+        },
+        {
+          "name": "main",
+          "startLine": 545,
+          "endLine": 614,
+          "params": [
+            "argv"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "CompositionError",
+          "startLine": 82,
+          "endLine": 89,
+          "methods": [],
+          "properties": []
+        },
+        {
+          "name": "Citation",
+          "startLine": 98,
+          "endLine": 106,
+          "methods": [],
+          "properties": [
+            "quote",
+            "source_document",
+            "source_page",
+            "source_section",
+            "limb"
+          ]
+        },
+        {
+          "name": "CompositionRule",
+          "startLine": 110,
+          "endLine": 120,
+          "methods": [],
+          "properties": [
+            "minimum_independent_beneficiaries",
+            "minimum_distinct_countries",
+            "minimum_in_a_member_state",
+            "minimum_others_in_member_or_associated_countries",
+            "affiliated_entities_count",
+            "rule_text",
+            "citations",
+            "source_path"
+          ]
+        },
+        {
+          "name": "Beneficiary",
+          "startLine": 124,
+          "endLine": 137,
+          "methods": [
+            "counts"
+          ],
+          "properties": [
+            "partner_id",
+            "country_slot",
+            "slot_class",
+            "independent",
+            "is_beneficiary"
+          ]
+        },
+        {
+          "name": "CompositionResult",
+          "startLine": 141,
+          "endLine": 188,
+          "methods": [
+            "status",
+            "reason"
+          ],
+          "properties": [
+            "met",
+            "counted",
+            "excluded",
+            "distinct_country_slots",
+            "member_state_slots",
+            "associated_country_slots",
+            "other_slots",
+            "failed_limbs",
+            "satisfying_selection",
+            "thresholds",
+            "citations"
+          ]
+        },
+        {
+          "name": "Scenario",
+          "startLine": 459,
+          "endLine": 465,
+          "methods": [],
+          "properties": [
+            "name",
+            "question",
+            "partner_ids",
+            "result"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "CompositionError",
+          "line": 82,
+          "isDefault": false
+        },
+        {
+          "name": "Citation",
+          "line": 97,
+          "isDefault": false
+        },
+        {
+          "name": "CompositionRule",
+          "line": 109,
+          "isDefault": false
+        },
+        {
+          "name": "Beneficiary",
+          "line": 123,
+          "isDefault": false
+        },
+        {
+          "name": "CompositionResult",
+          "line": 140,
+          "isDefault": false
+        },
+        {
+          "name": "_load_json",
+          "line": 196,
+          "isDefault": false
+        },
+        {
+          "name": "_require_int",
+          "line": 211,
+          "isDefault": false
+        },
+        {
+          "name": "_citation",
+          "line": 221,
+          "isDefault": false
+        },
+        {
+          "name": "load_composition_rule",
+          "line": 242,
+          "isDefault": false
+        },
+        {
+          "name": "load_partners",
+          "line": 301,
+          "isDefault": false
+        },
+        {
+          "name": "partners_by_capability_basis",
+          "line": 347,
+          "isDefault": false
+        },
+        {
+          "name": "_first_partner_per_slot",
+          "line": 375,
+          "isDefault": false
+        },
+        {
+          "name": "evaluate_composition",
+          "line": 383,
+          "isDefault": false
+        },
+        {
+          "name": "Scenario",
+          "line": 458,
+          "isDefault": false
+        },
+        {
+          "name": "evaluate_scenarios",
+          "line": 468,
+          "isDefault": false
+        },
+        {
+          "name": "format_scenarios",
+          "line": 523,
+          "isDefault": false
+        },
+        {
+          "name": "main",
+          "line": 545,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "reason",
+          "callee": "len",
+          "lineNumber": 175
+        },
+        {
+          "caller": "reason",
+          "callee": "len",
+          "lineNumber": 176
+        },
+        {
+          "caller": "reason",
+          "callee": "len",
+          "lineNumber": 177
+        },
+        {
+          "caller": "reason",
+          "callee": "len",
+          "lineNumber": 178
+        },
+        {
+          "caller": "reason",
+          "callee": "len",
+          "lineNumber": 181
+        },
+        {
+          "caller": "reason",
+          "callee": "\", \".join",
+          "lineNumber": 188
+        },
+        {
+          "caller": "_load_json",
+          "callee": "path.is_file",
+          "lineNumber": 198
+        },
+        {
+          "caller": "_load_json",
+          "callee": "CompositionError",
+          "lineNumber": 199
+        },
+        {
+          "caller": "_load_json",
+          "callee": "json.loads",
+          "lineNumber": 201
+        },
+        {
+          "caller": "_load_json",
+          "callee": "path.read_text",
+          "lineNumber": 201
+        },
+        {
+          "caller": "_load_json",
+          "callee": "CompositionError",
+          "lineNumber": 203
+        },
+        {
+          "caller": "_load_json",
+          "callee": "isinstance",
+          "lineNumber": 204
+        },
+        {
+          "caller": "_load_json",
+          "callee": "CompositionError",
+          "lineNumber": 205
+        },
+        {
+          "caller": "_load_json",
+          "callee": "type",
+          "lineNumber": 206
+        },
+        {
+          "caller": "_require_int",
+          "callee": "block.get",
+          "lineNumber": 212
+        },
+        {
+          "caller": "_require_int",
+          "callee": "isinstance",
+          "lineNumber": 213
+        },
+        {
+          "caller": "_require_int",
+          "callee": "isinstance",
+          "lineNumber": 213
+        },
+        {
+          "caller": "_require_int",
+          "callee": "CompositionError",
+          "lineNumber": 214
+        },
+        {
+          "caller": "_citation",
+          "callee": "block.get",
+          "lineNumber": 223
+        },
+        {
+          "caller": "_citation",
+          "callee": "isinstance",
+          "lineNumber": 224
+        },
+        {
+          "caller": "_citation",
+          "callee": "span.get",
+          "lineNumber": 226
+        },
+        {
+          "caller": "_citation",
+          "callee": "span.get",
+          "lineNumber": 227
+        },
+        {
+          "caller": "_citation",
+          "callee": "span.get",
+          "lineNumber": 228
+        },
+        {
+          "caller": "_citation",
+          "callee": "isinstance",
+          "lineNumber": 229
+        },
+        {
+          "caller": "_citation",
+          "callee": "isinstance",
+          "lineNumber": 229
+        },
+        {
+          "caller": "_citation",
+          "callee": "isinstance",
+          "lineNumber": 231
+        },
+        {
+          "caller": "_citation",
+          "callee": "isinstance",
+          "lineNumber": 231
+        },
+        {
+          "caller": "_citation",
+          "callee": "Citation",
+          "lineNumber": 233
+        },
+        {
+          "caller": "_citation",
+          "callee": "str",
+          "lineNumber": 237
+        },
+        {
+          "caller": "_citation",
+          "callee": "span.get",
+          "lineNumber": 237
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_load_json(path).get",
+          "lineNumber": 245
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_load_json",
+          "lineNumber": 245
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "isinstance",
+          "lineNumber": 246
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "CompositionError",
+          "lineNumber": 247
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_citation",
+          "lineNumber": 254
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_citation",
+          "lineNumber": 255
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_citation",
+          "lineNumber": 256
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_citation",
+          "lineNumber": 257
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "tuple",
+          "lineNumber": 259
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "CompositionError",
+          "lineNumber": 261
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "block.get",
+          "lineNumber": 266
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "isinstance",
+          "lineNumber": 267
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "CompositionError",
+          "lineNumber": 268
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "block.get",
+          "lineNumber": 273
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "isinstance",
+          "lineNumber": 274
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "rule_text.strip",
+          "lineNumber": 274
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "CompositionError",
+          "lineNumber": 275
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "CompositionRule",
+          "lineNumber": 277
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_require_int",
+          "lineNumber": 278
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_require_int",
+          "lineNumber": 281
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_require_int",
+          "lineNumber": 284
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "_require_int",
+          "lineNumber": 287
+        },
+        {
+          "caller": "load_composition_rule",
+          "callee": "rule_text.strip",
+          "lineNumber": 291
+        },
+        {
+          "caller": "load_partners",
+          "callee": "_load_json(path).get",
+          "lineNumber": 308
+        },
+        {
+          "caller": "load_partners",
+          "callee": "_load_json",
+          "lineNumber": 308
+        },
+        {
+          "caller": "load_partners",
+          "callee": "isinstance",
+          "lineNumber": 309
+        },
+        {
+          "caller": "load_partners",
+          "callee": "CompositionError",
+          "lineNumber": 310
+        },
+        {
+          "caller": "load_partners",
+          "callee": "enumerate",
+          "lineNumber": 313
+        },
+        {
+          "caller": "load_partners",
+          "callee": "isinstance",
+          "lineNumber": 314
+        },
+        {
+          "caller": "load_partners",
+          "callee": "CompositionError",
+          "lineNumber": 315
+        },
+        {
+          "caller": "load_partners",
+          "callee": "entry.get",
+          "lineNumber": 318
+        },
+        {
+          "caller": "load_partners",
+          "callee": "isinstance",
+          "lineNumber": 319
+        },
+        {
+          "caller": "load_partners",
+          "callee": "partner_id.strip",
+          "lineNumber": 319
+        },
+        {
+          "caller": "load_partners",
+          "callee": "CompositionError",
+          "lineNumber": 320
+        },
+        {
+          "caller": "load_partners",
+          "callee": "entry.get",
+          "lineNumber": 323
+        },
+        {
+          "caller": "load_partners",
+          "callee": "entry.get",
+          "lineNumber": 324
+        },
+        {
+          "caller": "load_partners",
+          "callee": "isinstance",
+          "lineNumber": 325
+        },
+        {
+          "caller": "load_partners",
+          "callee": "slot.strip",
+          "lineNumber": 325
+        },
+        {
+          "caller": "load_partners",
+          "callee": "CompositionError",
+          "lineNumber": 326
+        },
+        {
+          "caller": "load_partners",
+          "callee": "isinstance",
+          "lineNumber": 329
+        },
+        {
+          "caller": "load_partners",
+          "callee": "slot_class.strip",
+          "lineNumber": 329
+        },
+        {
+          "caller": "load_partners",
+          "callee": "CompositionError",
+          "lineNumber": 330
+        },
+        {
+          "caller": "load_partners",
+          "callee": "out.append",
+          "lineNumber": 335
+        },
+        {
+          "caller": "load_partners",
+          "callee": "Beneficiary",
+          "lineNumber": 336
+        },
+        {
+          "caller": "load_partners",
+          "callee": "partner_id.strip",
+          "lineNumber": 337
+        },
+        {
+          "caller": "load_partners",
+          "callee": "slot.strip",
+          "lineNumber": 338
+        },
+        {
+          "caller": "load_partners",
+          "callee": "slot_class.strip",
+          "lineNumber": 339
+        },
+        {
+          "caller": "load_partners",
+          "callee": "bool",
+          "lineNumber": 340
+        },
+        {
+          "caller": "load_partners",
+          "callee": "entry.get",
+          "lineNumber": 340
+        },
+        {
+          "caller": "load_partners",
+          "callee": "entry.get",
+          "lineNumber": 341
+        },
+        {
+          "caller": "load_partners",
+          "callee": "tuple",
+          "lineNumber": 344
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "_load_json(repo_root / PARTNERS_REL).get",
+          "lineNumber": 354
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "_load_json",
+          "lineNumber": 354
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "isinstance",
+          "lineNumber": 355
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "CompositionError",
+          "lineNumber": 356
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "isinstance",
+          "lineNumber": 359
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "entry.get",
+          "lineNumber": 361
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "entry.get",
+          "lineNumber": 362
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "isinstance",
+          "lineNumber": 363
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "isinstance",
+          "lineNumber": 363
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "grouped.setdefault(basis, []).append",
+          "lineNumber": 364
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "grouped.setdefault",
+          "lineNumber": 364
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "grouped.setdefault",
+          "lineNumber": 366
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "sorted",
+          "lineNumber": 367
+        },
+        {
+          "caller": "partners_by_capability_basis",
+          "callee": "grouped.items",
+          "lineNumber": 367
+        },
+        {
+          "caller": "_first_partner_per_slot",
+          "callee": "sorted",
+          "lineNumber": 378
+        },
+        {
+          "caller": "_first_partner_per_slot",
+          "callee": "per_slot.setdefault",
+          "lineNumber": 379
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "list",
+          "lineNumber": 391
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "tuple",
+          "lineNumber": 393
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "sorted",
+          "lineNumber": 393
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "_first_partner_per_slot",
+          "lineNumber": 395
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "tuple",
+          "lineNumber": 396
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "sorted",
+          "lineNumber": 396
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "sorted",
+          "lineNumber": 403
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "classes.setdefault",
+          "lineNumber": 404
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "tuple",
+          "lineNumber": 405
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "tuple",
+          "lineNumber": 406
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "tuple",
+          "lineNumber": 407
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "len",
+          "lineNumber": 410
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "failed.append",
+          "lineNumber": 411
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "len",
+          "lineNumber": 412
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "failed.append",
+          "lineNumber": 413
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "len",
+          "lineNumber": 414
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "failed.append",
+          "lineNumber": 415
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "len",
+          "lineNumber": 419
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "len",
+          "lineNumber": 419
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "min",
+          "lineNumber": 420
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "len",
+          "lineNumber": 420
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "failed.append",
+          "lineNumber": 422
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "sorted",
+          "lineNumber": 428
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "tuple",
+          "lineNumber": 431
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "sorted",
+          "lineNumber": 431
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "CompositionResult",
+          "lineNumber": 433
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "tuple",
+          "lineNumber": 435
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "sorted",
+          "lineNumber": 435
+        },
+        {
+          "caller": "evaluate_composition",
+          "callee": "tuple",
+          "lineNumber": 441
+        },
+        {
+          "caller": "scenario",
+          "callee": "Scenario",
+          "lineNumber": 485
+        },
+        {
+          "caller": "scenario",
+          "callee": "tuple",
+          "lineNumber": 488
+        },
+        {
+          "caller": "scenario",
+          "callee": "evaluate_composition",
+          "lineNumber": 489
+        },
+        {
+          "caller": "evaluate_scenarios",
+          "callee": "scenario",
+          "lineNumber": 494
+        },
+        {
+          "caller": "evaluate_scenarios",
+          "callee": "scenario",
+          "lineNumber": 499
+        },
+        {
+          "caller": "evaluate_scenarios",
+          "callee": "set",
+          "lineNumber": 503
+        },
+        {
+          "caller": "evaluate_scenarios",
+          "callee": "out.append",
+          "lineNumber": 507
+        },
+        {
+          "caller": "evaluate_scenarios",
+          "callee": "scenario",
+          "lineNumber": 508
+        },
+        {
+          "caller": "evaluate_scenarios",
+          "callee": "tuple",
+          "lineNumber": 515
+        },
+        {
+          "caller": "format_scenarios",
+          "callee": "lines.append",
+          "lineNumber": 527
+        },
+        {
+          "caller": "format_scenarios",
+          "callee": "len",
+          "lineNumber": 529
+        },
+        {
+          "caller": "format_scenarios",
+          "callee": "lines.append",
+          "lineNumber": 533
+        },
+        {
+          "caller": "format_scenarios",
+          "callee": "\"\\n\".join",
+          "lineNumber": 537
+        },
+        {
+          "caller": "main",
+          "callee": "argparse.ArgumentParser",
+          "lineNumber": 551
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 558
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 563
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 571
+        },
+        {
+          "caller": "main",
+          "callee": "parser.parse_args",
+          "lineNumber": 579
+        },
+        {
+          "caller": "main",
+          "callee": "Path(args.repo_root).resolve",
+          "lineNumber": 585
+        },
+        {
+          "caller": "main",
+          "callee": "Path",
+          "lineNumber": 585
+        },
+        {
+          "caller": "main",
+          "callee": "find_repo_root",
+          "lineNumber": 585
+        },
+        {
+          "caller": "main",
+          "callee": "load_composition_rule",
+          "lineNumber": 587
+        },
+        {
+          "caller": "main",
+          "callee": "load_partners",
+          "lineNumber": 588
+        },
+        {
+          "caller": "main",
+          "callee": "partners_by_capability_basis",
+          "lineNumber": 589
+        },
+        {
+          "caller": "main",
+          "callee": "evaluate_scenarios",
+          "lineNumber": 590
+        },
+        {
+          "caller": "main",
+          "callee": "args.derived.split",
+          "lineNumber": 594
+        },
+        {
+          "caller": "main",
+          "callee": "args.gap.split",
+          "lineNumber": 599
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 605
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 608
+        },
+        {
+          "caller": "main",
+          "callee": "format_scenarios",
+          "lineNumber": 611
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 613
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 17,
+        "functionCount": 11,
+        "classCount": 6
+      }
+    },
+    {
+      "path": "runner/leakage_scan.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 781,
+      "nonEmptyLines": 676,
+      "functions": [
+        {
+          "name": "leakage_denylist",
+          "startLine": 420,
+          "endLine": 432,
+          "params": [
+            "extra_nouns"
+          ]
+        },
+        {
+          "name": "scan_text",
+          "startLine": 435,
+          "endLine": 445,
+          "params": [
+            "text",
+            "pattern"
+          ]
+        },
+        {
+          "name": "iter_vault_roots",
+          "startLine": 453,
+          "endLine": 486,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "iter_scanned_files",
+          "startLine": 489,
+          "endLine": 508,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "scan_tree",
+          "startLine": 511,
+          "endLine": 533,
+          "params": [
+            "repo_root",
+            "extra_nouns"
+          ]
+        },
+        {
+          "name": "_read_json_object",
+          "startLine": 541,
+          "endLine": 548,
+          "params": [
+            "path"
+          ]
+        },
+        {
+          "name": "real_country_names",
+          "startLine": 551,
+          "endLine": 593,
+          "params": [
+            "rules_root"
+          ]
+        },
+        {
+          "name": "_iter_strings",
+          "startLine": 596,
+          "endLine": 605,
+          "params": [
+            "node",
+            "where"
+          ]
+        },
+        {
+          "name": "_iter_globbed",
+          "startLine": 608,
+          "endLine": 624,
+          "params": [
+            "repo_root",
+            "globs"
+          ]
+        },
+        {
+          "name": "iter_pseudonymity_files",
+          "startLine": 627,
+          "endLine": 629,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "iter_pseudonymity_text_files",
+          "startLine": 632,
+          "endLine": 634,
+          "params": [
+            "repo_root"
+          ]
+        },
+        {
+          "name": "scan_partner_records",
+          "startLine": 637,
+          "endLine": 704,
+          "params": [
+            "repo_root",
+            "rules_root"
+          ]
+        },
+        {
+          "name": "_read_extra_nouns",
+          "startLine": 712,
+          "endLine": 723,
+          "params": [
+            "path_text"
+          ]
+        },
+        {
+          "name": "main",
+          "startLine": 726,
+          "endLine": 777,
+          "params": [
+            "argv"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "LeakageError",
+          "startLine": 317,
+          "endLine": 322,
+          "methods": [],
+          "properties": []
+        },
+        {
+          "name": "LeakageViolation",
+          "startLine": 331,
+          "endLine": 345,
+          "methods": [],
+          "properties": [
+            "path",
+            "line",
+            "noun",
+            "snippet",
+            "kind",
+            "pre_existing"
+          ]
+        },
+        {
+          "name": "LeakageReport",
+          "startLine": 349,
+          "endLine": 412,
+          "methods": [
+            "new_violations",
+            "pre_existing_violations",
+            "ok",
+            "clean",
+            "format"
+          ],
+          "properties": [
+            "scanned_files",
+            "violations"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "LeakageError",
+          "line": 317,
+          "isDefault": false
+        },
+        {
+          "name": "LeakageViolation",
+          "line": 330,
+          "isDefault": false
+        },
+        {
+          "name": "LeakageReport",
+          "line": 348,
+          "isDefault": false
+        },
+        {
+          "name": "leakage_denylist",
+          "line": 420,
+          "isDefault": false
+        },
+        {
+          "name": "scan_text",
+          "line": 435,
+          "isDefault": false
+        },
+        {
+          "name": "iter_vault_roots",
+          "line": 453,
+          "isDefault": false
+        },
+        {
+          "name": "iter_scanned_files",
+          "line": 489,
+          "isDefault": false
+        },
+        {
+          "name": "scan_tree",
+          "line": 511,
+          "isDefault": false
+        },
+        {
+          "name": "_read_json_object",
+          "line": 541,
+          "isDefault": false
+        },
+        {
+          "name": "real_country_names",
+          "line": 551,
+          "isDefault": false
+        },
+        {
+          "name": "_iter_strings",
+          "line": 596,
+          "isDefault": false
+        },
+        {
+          "name": "_iter_globbed",
+          "line": 608,
+          "isDefault": false
+        },
+        {
+          "name": "iter_pseudonymity_files",
+          "line": 627,
+          "isDefault": false
+        },
+        {
+          "name": "iter_pseudonymity_text_files",
+          "line": 632,
+          "isDefault": false
+        },
+        {
+          "name": "scan_partner_records",
+          "line": 637,
+          "isDefault": false
+        },
+        {
+          "name": "_read_extra_nouns",
+          "line": 712,
+          "isDefault": false
+        },
+        {
+          "name": "main",
+          "line": 726,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "new_violations",
+          "callee": "tuple",
+          "lineNumber": 364
+        },
+        {
+          "caller": "pre_existing_violations",
+          "callee": "tuple",
+          "lineNumber": 369
+        },
+        {
+          "caller": "format",
+          "callee": "len",
+          "lineNumber": 383
+        },
+        {
+          "caller": "format",
+          "callee": "lines.append",
+          "lineNumber": 388
+        },
+        {
+          "caller": "format",
+          "callee": "len",
+          "lineNumber": 390
+        },
+        {
+          "caller": "format",
+          "callee": "lines.append",
+          "lineNumber": 394
+        },
+        {
+          "caller": "format",
+          "callee": "len",
+          "lineNumber": 395
+        },
+        {
+          "caller": "format",
+          "callee": "lines.append",
+          "lineNumber": 401
+        },
+        {
+          "caller": "format",
+          "callee": "sorted",
+          "lineNumber": 403
+        },
+        {
+          "caller": "format",
+          "callee": "KNOWN_PRE_EXISTING_LEAKS.items",
+          "lineNumber": 403
+        },
+        {
+          "caller": "format",
+          "callee": "lines.append",
+          "lineNumber": 404
+        },
+        {
+          "caller": "format",
+          "callee": "lines.append",
+          "lineNumber": 406
+        },
+        {
+          "caller": "format",
+          "callee": "\"\\n\".join",
+          "lineNumber": 412
+        },
+        {
+          "caller": "leakage_denylist",
+          "callee": "set",
+          "lineNumber": 426
+        },
+        {
+          "caller": "leakage_denylist",
+          "callee": "n.strip",
+          "lineNumber": 426
+        },
+        {
+          "caller": "leakage_denylist",
+          "callee": "n.strip",
+          "lineNumber": 426
+        },
+        {
+          "caller": "leakage_denylist",
+          "callee": "re.compile",
+          "lineNumber": 427
+        },
+        {
+          "caller": "leakage_denylist",
+          "callee": "\"|\".join",
+          "lineNumber": 429
+        },
+        {
+          "caller": "leakage_denylist",
+          "callee": "re.escape",
+          "lineNumber": 429
+        },
+        {
+          "caller": "leakage_denylist",
+          "callee": "sorted",
+          "lineNumber": 429
+        },
+        {
+          "caller": "scan_text",
+          "callee": "enumerate",
+          "lineNumber": 442
+        },
+        {
+          "caller": "scan_text",
+          "callee": "text.splitlines",
+          "lineNumber": 442
+        },
+        {
+          "caller": "scan_text",
+          "callee": "pattern.finditer",
+          "lineNumber": 443
+        },
+        {
+          "caller": "scan_text",
+          "callee": "out.append",
+          "lineNumber": 444
+        },
+        {
+          "caller": "scan_text",
+          "callee": "match.group",
+          "lineNumber": 444
+        },
+        {
+          "caller": "scan_text",
+          "callee": "line.strip",
+          "lineNumber": 444
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "repo_root.glob",
+          "lineNumber": 466
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "config.relative_to(repo_root).as_posix",
+          "lineNumber": 467
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "config.relative_to",
+          "lineNumber": 467
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "rel.startswith",
+          "lineNumber": 468
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "yaml.safe_load",
+          "lineNumber": 477
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "config.read_text",
+          "lineNumber": 477
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "declared.get",
+          "lineNumber": 478
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "isinstance",
+          "lineNumber": 479
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "vault_path.strip",
+          "lineNumber": 479
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "(config.parent / vault_path.strip()).resolve",
+          "lineNumber": 480
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "vault_path.strip",
+          "lineNumber": 480
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "candidate.is_dir",
+          "lineNumber": 481
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "repo_root.resolve",
+          "lineNumber": 481
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "target.resolve().as_posix",
+          "lineNumber": 485
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "target.resolve",
+          "lineNumber": 485
+        },
+        {
+          "caller": "iter_vault_roots",
+          "callee": "sorted",
+          "lineNumber": 486
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "list",
+          "lineNumber": 495
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "iter_vault_roots",
+          "lineNumber": 496
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "patterns.append",
+          "lineNumber": 497
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "vault.relative_to(repo_root.resolve()).as_posix",
+          "lineNumber": 498
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "vault.relative_to",
+          "lineNumber": 498
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "repo_root.resolve",
+          "lineNumber": 498
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "repo_root.glob",
+          "lineNumber": 501
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "path.is_file",
+          "lineNumber": 502
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "path.suffix.lower",
+          "lineNumber": 502
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "path.relative_to",
+          "lineNumber": 504
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "any",
+          "lineNumber": 505
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "rel.as_posix",
+          "lineNumber": 507
+        },
+        {
+          "caller": "iter_scanned_files",
+          "callee": "sorted",
+          "lineNumber": 508
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "leakage_denylist",
+          "lineNumber": 515
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "iter_scanned_files",
+          "lineNumber": 518
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "path.relative_to(repo_root).as_posix",
+          "lineNumber": 519
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "path.relative_to",
+          "lineNumber": 519
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "scanned.append",
+          "lineNumber": 520
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "path.read_text",
+          "lineNumber": 521
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "scan_text",
+          "lineNumber": 523
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "violations.append",
+          "lineNumber": 524
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "LeakageViolation",
+          "lineNumber": 525
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "LeakageReport",
+          "lineNumber": 533
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "tuple",
+          "lineNumber": 533
+        },
+        {
+          "caller": "scan_tree",
+          "callee": "tuple",
+          "lineNumber": 533
+        },
+        {
+          "caller": "_read_json_object",
+          "callee": "json.loads",
+          "lineNumber": 543
+        },
+        {
+          "caller": "_read_json_object",
+          "callee": "path.read_text",
+          "lineNumber": 543
+        },
+        {
+          "caller": "_read_json_object",
+          "callee": "LeakageError",
+          "lineNumber": 545
+        },
+        {
+          "caller": "_read_json_object",
+          "callee": "isinstance",
+          "lineNumber": 546
+        },
+        {
+          "caller": "_read_json_object",
+          "callee": "LeakageError",
+          "lineNumber": 547
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "path.is_file",
+          "lineNumber": 559
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "LeakageError",
+          "lineNumber": 560
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "_read_json_object(path).get",
+          "lineNumber": 564
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "_read_json_object",
+          "lineNumber": 564
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "isinstance",
+          "lineNumber": 565
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "LeakageError",
+          "lineNumber": 566
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "set",
+          "lineNumber": 570
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "funding.get",
+          "lineNumber": 576
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "isinstance",
+          "lineNumber": 577
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "LeakageError",
+          "lineNumber": 578
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "block.get",
+          "lineNumber": 581
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "isinstance",
+          "lineNumber": 582
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "entry.split(\"(\")[0].strip",
+          "lineNumber": 585
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "entry.split",
+          "lineNumber": 585
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "len",
+          "lineNumber": 586
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "names.add",
+          "lineNumber": 587
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "LeakageError",
+          "lineNumber": 589
+        },
+        {
+          "caller": "real_country_names",
+          "callee": "frozenset",
+          "lineNumber": 593
+        },
+        {
+          "caller": "_iter_strings",
+          "callee": "isinstance",
+          "lineNumber": 598
+        },
+        {
+          "caller": "_iter_strings",
+          "callee": "node.items",
+          "lineNumber": 599
+        },
+        {
+          "caller": "_iter_strings",
+          "callee": "_iter_strings",
+          "lineNumber": 600
+        },
+        {
+          "caller": "_iter_strings",
+          "callee": "isinstance",
+          "lineNumber": 601
+        },
+        {
+          "caller": "_iter_strings",
+          "callee": "enumerate",
+          "lineNumber": 602
+        },
+        {
+          "caller": "_iter_strings",
+          "callee": "_iter_strings",
+          "lineNumber": 603
+        },
+        {
+          "caller": "_iter_strings",
+          "callee": "isinstance",
+          "lineNumber": 604
+        },
+        {
+          "caller": "_iter_globbed",
+          "callee": "repo_root.glob",
+          "lineNumber": 617
+        },
+        {
+          "caller": "_iter_globbed",
+          "callee": "path.is_file",
+          "lineNumber": 618
+        },
+        {
+          "caller": "_iter_globbed",
+          "callee": "path.relative_to(repo_root).as_posix",
+          "lineNumber": 620
+        },
+        {
+          "caller": "_iter_globbed",
+          "callee": "path.relative_to",
+          "lineNumber": 620
+        },
+        {
+          "caller": "_iter_globbed",
+          "callee": "sorted",
+          "lineNumber": 624
+        },
+        {
+          "caller": "iter_pseudonymity_files",
+          "callee": "_iter_globbed",
+          "lineNumber": 629
+        },
+        {
+          "caller": "iter_pseudonymity_text_files",
+          "callee": "_iter_globbed",
+          "lineNumber": 634
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "iter_pseudonymity_files",
+          "lineNumber": 658
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "iter_pseudonymity_text_files",
+          "lineNumber": 659
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "real_country_names",
+          "lineNumber": 663
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "re.compile",
+          "lineNumber": 664
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "\"|\".join",
+          "lineNumber": 666
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "re.escape",
+          "lineNumber": 666
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "sorted",
+          "lineNumber": 666
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "path.relative_to(repo_root).as_posix",
+          "lineNumber": 677
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "path.relative_to",
+          "lineNumber": 677
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "_iter_strings",
+          "lineNumber": 678
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "_read_json_object",
+          "lineNumber": 678
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "pattern.finditer",
+          "lineNumber": 680
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "violations.append",
+          "lineNumber": 681
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "LeakageViolation",
+          "lineNumber": 682
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "match.group",
+          "lineNumber": 685
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "path.relative_to(repo_root).as_posix",
+          "lineNumber": 691
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "path.relative_to",
+          "lineNumber": 691
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "path.read_text",
+          "lineNumber": 692
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "scan_text",
+          "lineNumber": 694
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "violations.append",
+          "lineNumber": 695
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "LeakageViolation",
+          "lineNumber": 696
+        },
+        {
+          "caller": "scan_partner_records",
+          "callee": "tuple",
+          "lineNumber": 704
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "Path(path_text).expanduser",
+          "lineNumber": 716
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "Path",
+          "lineNumber": 716
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "path.is_file",
+          "lineNumber": 717
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "LeakageError",
+          "lineNumber": 718
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "tuple",
+          "lineNumber": 719
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "line.strip",
+          "lineNumber": 720
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "path.read_text(encoding=\"utf-8-sig\").splitlines",
+          "lineNumber": 721
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "path.read_text",
+          "lineNumber": 721
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "line.strip",
+          "lineNumber": 722
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "line.lstrip().startswith",
+          "lineNumber": 722
+        },
+        {
+          "caller": "_read_extra_nouns",
+          "callee": "line.lstrip",
+          "lineNumber": 722
+        },
+        {
+          "caller": "main",
+          "callee": "argparse.ArgumentParser",
+          "lineNumber": 732
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 739
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 740
+        },
+        {
+          "caller": "main",
+          "callee": "parser.parse_args",
+          "lineNumber": 749
+        },
+        {
+          "caller": "main",
+          "callee": "Path(args.repo_root).resolve",
+          "lineNumber": 755
+        },
+        {
+          "caller": "main",
+          "callee": "Path",
+          "lineNumber": 755
+        },
+        {
+          "caller": "main",
+          "callee": "find_repo_root",
+          "lineNumber": 755
+        },
+        {
+          "caller": "main",
+          "callee": "scan_tree",
+          "lineNumber": 757
+        },
+        {
+          "caller": "main",
+          "callee": "_read_extra_nouns",
+          "lineNumber": 757
+        },
+        {
+          "caller": "main",
+          "callee": "scan_partner_records",
+          "lineNumber": 758
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 760
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 763
+        },
+        {
+          "caller": "main",
+          "callee": "LeakageReport",
+          "lineNumber": 766
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 774
+        },
+        {
+          "caller": "main",
+          "callee": "combined.format",
+          "lineNumber": 774
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 776
+        },
+        {
+          "caller": "main",
+          "callee": "combined.format",
+          "lineNumber": 776
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 17,
+        "functionCount": 14,
+        "classCount": 3
+      }
+    }
+  ]
+}

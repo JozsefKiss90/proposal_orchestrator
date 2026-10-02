@@ -1,0 +1,652 @@
+{
+  "nodes": [
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "type": "config",
+      "name": "phase_01_call_analysis.yaml",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "summary": "Node specification for Phase 1 (Call Analysis): binds the call_analyzer agent and five extraction skills to parse the work programme and call topic into the six Tier 2B extracted files plus the Tier 2A section and evaluator registries. Its gate requires all six extracted files non-empty with source section references and a resolved instrument type.",
+      "tags": ["workflow-phase", "configuration", "gate-condition", "entry-point", "call-analysis"],
+      "complexity": "moderate",
+      "languageNotes": "YAML phase spec with a fixed key shape (id/phase/name/purpose/agent/skills/depends_on/required_inputs/outputs/instructions/validation/gate_condition); required_inputs splits into mandatory and conditional path entries each carrying role and validation prose."
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "type": "config",
+      "name": "phase_02_concept_refinement.yaml",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "summary": "Node specification for Phase 2 (Concept Refinement): binds the concept_refiner agent to align the Tier 3 concept note with the confirmed call scope and vocabulary, writing topic_mapping.json and compliance_profile.json back to Tier 3. Its gate requires a complete topic mapping with source references and no unresolved scope conflicts against Tier 2B.",
+      "tags": ["workflow-phase", "configuration", "gate-condition", "concept-alignment", "traceability"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "type": "config",
+      "name": "phase_03_wp_design.yaml",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "summary": "Node specification for Phase 3 (Work Package Design and Dependency Mapping): binds the wp_designer agent to build work packages, tasks, deliverables, milestones and an acyclic inter-WP dependency map from Tier 3 objectives and consortium data. Its gate requires every WP to carry objectives, tasks, at least one deliverable, a responsible lead and declared dependencies, with the WP count inside the Tier 2A instrument limit and no dependency cycles.",
+      "tags": ["workflow-phase", "configuration", "gate-condition", "work-package-design", "dependency-graph"],
+      "complexity": "moderate",
+      "languageNotes": "Declares dependency mapping as a required sub-task rather than a separate phase, so the dependency map is the Tier 4 artifact that Phase 4 and Phase 6 consume."
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "type": "config",
+      "name": "phase_04_gantt_milestones.yaml",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "summary": "Node specification for Phase 4 (Gantt and Milestones): binds the gantt_designer agent plus the deterministic dependency_normalizer component to assign every task to months, define milestones with verifiable criteria and derive scheduling_constraints.json. Its gate requires all tasks scheduled within the call duration, every milestone verifiable, a critical path consistent with the dependency map, and the normalized constraints written to Tier 4.",
+      "tags": ["workflow-phase", "configuration", "gate-condition", "scheduling", "deterministic-component"],
+      "complexity": "moderate",
+      "languageNotes": "One of only two phase specs carrying a deterministic_components key — the Claude-free node-body pass sanctioned by CLAUDE.md §16.5/§17.5.3, bound in the spec rather than hardcoded in the agent runtime."
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "type": "config",
+      "name": "phase_05_impact_architecture.yaml",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "summary": "Node specification for Phase 5 (Impact Architecture): binds the impact_architect agent to build the output-to-outcome-to-impact pathway with KPIs, dissemination, exploitation, communication and sustainability logic. Its gate requires every Tier 2B expected impact to have at least one mapped project output and every KPI to trace to a named WP deliverable, with no impact claim asserted without a project mechanism.",
+      "tags": ["workflow-phase", "configuration", "gate-condition", "impact-pathway", "kpi-traceability"],
+      "complexity": "moderate",
+      "languageNotes": "Depends on Phases 2 and 3 only, so it can run in parallel with Phase 4 — the one fork in the otherwise linear phase chain."
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "type": "config",
+      "name": "phase_06_implementation_architecture.yaml",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "summary": "Node specification for Phase 6 (Implementation Architecture): binds the implementation_architect agent to define the management structure, governance and decision-making matrix, quality assurance plan, populated risk register, ethics self-assessment and any instrument-mandated gender and diversity plan. Its gate requires ethics flags to be stated explicitly rather than omitted and all management roles to be assigned to named Tier 3 partners.",
+      "tags": ["workflow-phase", "configuration", "gate-condition", "governance", "risk-register"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "type": "config",
+      "name": "phase_07_budget_gate.yaml",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "summary": "Node specification for Phase 7 (Budget Gate): binds the budget_gate_validator agent to confirm a validated external Lump Sum Budget Planner response exists and is structurally consistent with the Phase 3 WP structure, Phase 4 timeline and Phase 6 consortium roles, without computing any figure itself. The gate is marked mandatory with bypass_prohibited, and a pre_gate_action delegates request preparation to budget_interface_coordinator when no response is present.",
+      "tags": ["workflow-phase", "configuration", "gate-condition", "budget-validation", "blocking-gate"],
+      "complexity": "moderate",
+      "languageNotes": "Carries the unique pre_gate_action block and the mandatory/bypass_prohibited gate flags, plus a trailing v1.1 semantic-correction note recording that the earlier non-failing hold_behavior key was removed as a CLAUDE.md §8.4 conflict — absent budget artifacts now compile unconditionally as a blocking failure."
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "type": "config",
+      "name": "phase_08_drafting_review.yaml",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "summary": "Node specification for Phase 8 (Drafting and Review), the only phase decomposed into substeps: three parallel criterion-aligned drafting nodes (Excellence, Impact, Implementation), then sequential assembly, evaluator-style review and revision. It depends on all seven preceding phases and its gate aggregates gate_10a-d, gate_11, resolved critical revision actions, the final export and a published Phase 8 checkpoint.",
+      "tags": ["workflow-phase", "configuration", "gate-condition", "drafting", "substep-decomposition"],
+      "complexity": "complex",
+      "languageNotes": "Unlike the other seven specs, the phase-level keys carry no agent or skills binding; those move into each entry of the substeps list, which also introduces depends_on_substep for the intra-phase DAG."
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting",
+      "type": "config",
+      "name": "phase_08a_excellence_drafting",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "lineRange": [25, 69],
+      "summary": "Substep 8a: binds the excellence_writer agent and the excellence-section-drafting skill to produce excellence_section.json covering objectives, relation to work programme, concept and methodology, ambition, interdisciplinarity and gender dimension. Runs in parallel with 8b and 8c and must verify the budget gate has passed before producing any content.",
+      "tags": ["workflow-substep", "drafting", "excellence-criterion", "traceability", "gate-condition"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting",
+      "type": "config",
+      "name": "phase_08b_impact_drafting",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "lineRange": [74, 116],
+      "summary": "Substep 8b: binds the impact_writer agent and the impact-section-drafting skill to produce impact_section.json, mapping every Tier 2B expected impact to a Phase 5 pathway and populating impact_pathway_refs and dec_coverage. Runs in parallel with 8a and 8c and forbids fabricated coverage of an expected impact no project output addresses.",
+      "tags": ["workflow-substep", "drafting", "impact-criterion", "pathway-mapping", "gate-condition"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting",
+      "type": "config",
+      "name": "phase_08c_implementation_drafting",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "lineRange": [121, 163],
+      "summary": "Substep 8c: binds the implementation_writer agent and the implementation-section-drafting skill to produce implementation_section.json covering the work plan, Gantt, deliverables and milestones tables, management structure, risk management, consortium and resources. Populates wp_table_refs, gantt_ref, milestone_refs and risk_register_ref from the Phase 3, 4 and 6 artifacts without redesigning them.",
+      "tags": ["workflow-substep", "drafting", "implementation-criterion", "artifact-references", "gate-condition"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+      "type": "config",
+      "name": "phase_08d_assembly",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "lineRange": [168, 205],
+      "summary": "Substep 8d: binds the proposal_integrator agent and the cross-section-consistency-check skill to assemble the three criterion sections into part_b_assembled_draft.json in Part B order, recording cross-section findings in a consistency_log. It depends on substeps 8a, 8b and 8c and is forbidden from rewriting section content — inconsistencies are flagged, never silently normalised.",
+      "tags": ["workflow-substep", "assembly", "consistency-check", "cross-section", "gate-condition"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review",
+      "type": "config",
+      "name": "phase_08e_evaluator_review",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "lineRange": [210, 244],
+      "summary": "Substep 8e: binds the evaluator_reviewer agent and the evaluator-criteria-review skill to simulate evaluator assessment of the assembled draft against the Phase 1 evaluation matrix, producing review_packet.json with weaknesses categorised critical, major or minor and a prioritised revision action list. It depends on substep 8d and may not revise the draft itself.",
+      "tags": ["workflow-substep", "evaluator-review", "severity-triage", "quality-assurance", "gate-condition"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision",
+      "type": "config",
+      "name": "phase_08f_revision",
+      "filePath": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "lineRange": [249, 293],
+      "summary": "Substep 8f: binds the revision_integrator agent plus the deterministic checkpoint_publisher component to apply critical then major revision actions, write the final export and publish phase8_checkpoint.json to Tier 4. It depends on substep 8e and must flag unresolvable gaps in the revision log rather than fabricate content.",
+      "tags": ["workflow-substep", "revision", "deterministic-component", "final-export", "checkpoint"],
+      "complexity": "moderate",
+      "languageNotes": "Its inline comment records that checkpoint_publisher replaced the retired checkpoint-publish skill and writes the cross-run provenance quad that gate_12's checkpoint_published predicate re-validates."
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision",
+      "target": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "target": "file:runner/manifest_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "target": "file:runner/node_resolver.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "target": "file:runner/manifest_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "target": "file:runner/node_resolver.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "target": "file:runner/manifest_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "target": "file:runner/node_resolver.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "target": "file:runner/manifest_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "target": "file:runner/node_resolver.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "target": "file:runner/dependency_normalizer.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "target": "file:runner/manifest_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "target": "file:runner/node_resolver.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "target": "file:runner/manifest_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "target": "file:runner/node_resolver.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "file:runner/manifest_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "file:runner/node_resolver.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "file:runner/budget_request.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "file:runner/unit_cost_budget.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "target": "file:runner/interface_contract.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "file:runner/manifest_reader.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "file:runner/dag_scheduler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "file:runner/node_resolver.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "file:runner/gate_evaluator.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "file:runner/phase8_reuse.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "file:runner/phase8_preseed.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "file:runner/phase8_skip_binding.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "target": "file:runner/decomposed_drafting.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+      "target": "file:runner/section_assembler.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision",
+      "target": "file:runner/final_export_writer.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision",
+      "target": "file:runner/checkpoint_publisher.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

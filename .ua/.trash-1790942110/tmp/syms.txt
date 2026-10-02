@@ -1,0 +1,214 @@
+=== harness/__init__.py
+=== harness/blind_assessment.py
+F|resolve_document|240|276
+F|assert_no_leakage|284|309
+F|materialise_candidate|312|381
+F|build_blind_evidence|384|429
+F|load_candidate|479|512
+F|_check_intake|717|734
+F|assess_candidate|737|831
+F|write_report|850|868
+F|load_report|871|927
+F|render_report|947|1008
+C|ReviewTask|198|215|m:__post_init__,is_blind
+C|BlindCell|531|554|m:to_dict
+C|BlindAssessmentReport|567|709|m:__post_init__,summary,to_dict
+=== harness/calibration.py
+F|confusion_from_labels|148|170
+F|calibrate|276|314
+F|calibrate_with_judge|321|361
+F|graduation_for|390|441
+C|ConfusionMatrix|84|145|m:total,precision,recall,f1,accuracy,gap_detection_recall,to_dict
+C|GraduationThreshold|179|197|m:__post_init__,to_dict
+C|CalibrationReport|213|268|m:meets,applies_to,to_dict
+C|CalibrationLog|449|469|m:__init__,append,latest_for
+=== harness/claim_ledger.py
+F|load_section_prose|184|212
+F|chunk_prose|228|257
+F|parse_assertions_payload|289|317
+F|decompose_chunk|320|358
+F|dedup_assertions|397|423
+F|dedup_ledger_claims|453|479
+F|lexical_shortlist|500|528
+F|build_coverage_prompt|564|586
+F|extract_covered_by|589|606
+F|judge_assertion_covered_by|609|641
+F|match_assertion|681|759
+F|evaluate_ledger_completeness|997|1168
+C|AssertionFinding|768|835|m:is_hard_finding,flagged,to_dict
+C|LedgerCompletenessResult|850|989|m:escaped,covered,non_material,unjudgeable,outcome_counts,_materiality_note,_outcome_verdict,build_report
+=== harness/commands/_common.py
+F|load_harness_env|20|44
+=== harness/commands/blind_assessment.py
+F|_parser|107|150
+F|main|153|209
+=== harness/commands/faithfulness_calibration.py
+F|_run|92|134
+F|main|137|242
+=== harness/commands/freeze_grounding_baselines.py
+F|build_paced_judge|210|233
+F|main|241|355
+C|PacedRetryingBackend|95|207|m:__init__,_evict,_tokens_in_window,_estimate_next,_pace,__call__,_retry_after
+=== harness/commands/rubric_grading_run.py
+F|compute_budget_plan|155|299
+F|run_meta|307|324
+F|load_checkpoint|336|366
+F|run_grading|374|468
+F|main|488|689
+=== harness/evidence_pack.py
+F|_load_sub_sections|420|438
+F|_fill_budget|450|484
+F|build_evidence_pack|487|639
+C|ProseSpan|196|223|m:key,render,token_estimate
+C|PackClaim|227|249|m:key,render,token_estimate
+C|ExcludedItem|253|280|m:to_dict
+C|EvidencePack|309|388|m:is_empty,render,token_estimate,to_dict
+=== harness/expectation_coverage.py
+F|grade_coverage|164|229
+F|grade_expectation|232|253
+C|CoverageGrade|111|161|m:to_dict
+=== harness/expectation_grounding.py
+F|_check_reused_finding|383|415
+F|derive_grounding|418|576
+F|derive_expectation_grounding|579|618
+C|ClaimGroundingRow|166|199|m:severity,grounded,to_dict
+C|GroundingGrade|203|375|m:rows_for,confirmed_rows,assumed_rows,inferred_rows,confirmed_total,confirmed_grounded,grounding_rate,integrity_failures
+=== harness/expectations.py
+F|parse_option_tag|128|160
+F|_scorecard_text_matches|178|204
+F|_registry_rows|291|318
+F|_scorecard_entries|343|394
+F|_resolve_tag|397|422
+F|load_expectation_substrate|425|560
+C|ExpectationSubstrate|251|274|m:by_key,for_criterion
+=== harness/faithfulness.py
+F|build_claim_user_prompt|73|94
+F|build_faithfulness_prompt|97|116
+F|resolve_source_text|119|141
+F|judge_pair_supported|144|165
+=== harness/gold_set.py
+F|_iter_raw_pairs|191|212
+F|load_gold_set|215|259
+F|gold_set_hash|262|279
+F|seed_pairs_from_claim_statuses|301|361
+F|_allocate|364|393
+C|GoldPair|64|152|m:__post_init__,is_labeled,to_dict,from_dict
+C|GoldSet|156|188|m:__len__,__iter__,labeled,unlabeled,require_fully_labeled
+=== harness/jsonl_log.py
+C|JsonlLog|32|80|m:__init__,path,_load_existing,append_dict,records,__len__
+=== harness/judge.py
+F|resolve_judge_config|172|193
+F|_verdict_from_payload|225|254
+C|JudgeConfig|126|169|m:__post_init__
+C|Judge|262|435|m:__init__,provenance_log,_get_backend,raw_invoke,evaluate,evaluate_majority
+=== harness/ledger_granularity.py
+F|measure_section|100|190
+F|run_e4_regression|193|223
+F|build_report|226|286
+F|_print_summary|289|332
+F|main|335|369
+=== harness/materiality.py
+F|seed_materiality_positives|211|247
+F|seed_negative_candidates|267|313
+F|load_materiality_set|331|368
+F|classify_materiality|431|462
+F|calibrate_materiality|522|577
+C|MaterialityExample|125|203|m:__post_init__,is_labeled,to_dict,from_dict
+C|MaterialityCalibration|475|519|m:applies_to,has_negatives,to_dict
+=== harness/profile.py
+F|_parse_grammar|207|231
+F|_parse_criteria|234|257
+F|parse_profile|260|290
+F|parse_scoring|322|364
+C|PreEvaluationProfile|139|177|m:criterion_ids,criterion,section_ids_for,criterion_id_for_registry,resolve
+=== harness/provenance.py
+C|ProvenanceRecord|72|181|m:__post_init__,from_verdict,to_dict
+C|ProvenanceLog|184|196|m:__init__,append
+=== harness/regression.py
+F|freeze_section_fingerprint|419|448
+F|load_golden_set|486|504
+F|_diff_ledger|573|647
+F|_diff_prose|650|693
+F|compare_section|696|758
+F|compare_to_golden_set|833|887
+F|_judge_section|895|917
+F|freeze_section_grounding|920|947
+F|compare_section_grounding|950|977
+F|_require_report|997|1020
+F|freeze_rubric_baseline|1023|1052
+F|compare_rubric_baseline|1109|1238
+F|main|1253|1346
+C|LedgerEntry|239|299|m:entry_key,identity,summary_key,from_claim,to_dict,from_dict
+C|SubSectionFingerprint|303|340|m:from_prose,to_dict,from_dict
+C|SectionFingerprint|344|408|m:status_counts,confirmed_share,identity_entries,to_dict,from_dict
+C|RegressionFinding|513|535|m:breaking,to_dict
+C|SectionRegressionResult|539|560|m:regressed,breaking_findings,to_dict
+C|RegressionReport|767|823|m:__post_init__,regressed,summary,to_dict
+=== harness/report.py
+F|build_report|122|139
+C|HarnessReport|40|119|m:__post_init__,summary,to_dict
+=== harness/routing.py
+F|route|141|178
+C|RoutingDecision|78|110|m:to_dict
+=== harness/rubric.py
+F|load_spine_registry|299|373
+F|_weak_grounding_explanation|418|464
+F|combine_axes|512|663
+F|build_rubric_report|764|788
+F|render_report|825|896
+F|grade_all|904|961
+F|main|990|1080
+C|SpineFact|191|231|m:effective_status,unconfirmed,to_dict
+C|SpineRegistry|243|279|m:by_id,unconfirmed,facts_for_claim
+C|Contradiction|382|405|m:to_dict
+C|ExpectationCell|468|509|m:covered,grounded,to_dict
+C|RubricReport|672|753|m:__post_init__,contradictions,summary,to_dict
+=== harness/rubrics.py
+F|_parse_rubric|212|258
+F|load_rubric_set|270|386
+F|load_profile_bundle|414|476
+F|build_pack_for|484|506
+F|build_rubric_system_prompt|514|544
+F|build_rubric_user_prompt|547|564
+C|Rubric|119|155|m:to_dict
+C|RubricSet|177|204|m:by_key,fingerprint
+=== harness/status_calibration.py
+F|_drift_from_e2_finding|259|280
+F|evaluate_status_calibration|283|446
+C|ClaimDrift|115|153|m:entry_key,is_hard_finding,flagged,to_dict
+C|StatusCalibrationResult|179|251|m:overclaimed,underclaimed,unverifiable,drifted,drift_counts,build_report,to_dict
+=== harness/status_faithfulness.py
+F|load_section_claims|277|300
+F|build_faithfulness_prompt_for_status|426|458
+F|_parse_segment|513|537
+F|_split_top_level|557|586
+F|_parse_source_segments|589|610
+F|_render_text|635|657
+F|resolve_claim_source_text|660|717
+F|_render_segment|720|745
+F|resolve_assumed_declared_text|748|769
+F|meets_bar|777|813
+F|_judge_claim|935|968
+F|evaluate_claim|973|1004
+F|_evaluate_claim_routed|1007|1104
+F|evaluate_status_aware_faithfulness|1209|1255
+F|compare_to_baseline|1519|1612
+C|SectionClaim|212|274|m:__post_init__,entry_key,from_dict
+C|StatusPolicy|309|344|m:__post_init__
+C|ClaimFaithfulness|836|922|m:entry_key,flagged,is_hard_finding,passed,score,to_dict
+C|StatusFaithfulnessResult|1113|1206|m:by_status,flagged,integrity_findings,severity_counts,build_report,to_dict
+C|ClaimGroundingSnapshot|1288|1352|m:entry_key,from_finding,to_dict,from_dict
+C|FaithfulnessBaseline|1356|1409|m:by_id,applies_to,to_dict,from_dict
+C|InvarianceViolation|1445|1475|m:breaking,to_dict
+C|InvarianceReport|1479|1516|m:invariant,breaking_violations,to_dict
+=== harness/verdict.py
+F|majority_vote|210|279
+F|_synthesize_rationale|282|301
+C|Verdict|89|146|m:__post_init__,to_dict
+C|MajorityVerdict|150|207|m:__post_init__,to_dict
+=== runner/working_assumptions.py
+F|declared_claim_summary|64|83
+F|_parse_declaration|275|328
+F|load_working_assumptions|331|422
+C|Declaration|126|159|m:
+C|WorkingAssumptions|163|252|m:is_empty,declaration,declared_value,by_checklist_ref,as_surface,as_canonical_pack_entries

@@ -1,0 +1,843 @@
+{
+ "nodes": [
+  {
+   "id": "file:harness/jsonl_log.py",
+   "type": "file",
+   "name": "jsonl_log.py",
+   "filePath": "harness/jsonl_log.py",
+   "summary": "Shared append-only JSONL log base: seeds from any pre-existing file, mirrors records in memory, and atomically re-serializes the whole file on every append so a reader never sees a torn line.",
+   "tags": [
+    "utility",
+    "logging",
+    "atomic-write",
+    "base-class"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:harness/judge.py",
+   "type": "file",
+   "name": "judge.py",
+   "filePath": "harness/judge.py",
+   "summary": "The independent judge: a pinned, temperature-zero, non-drafter model over the OpenAI-compatible transport that enforces grader/generator independence, refuses to silently repair a malformed response, and logs provenance for every verdict before returning it.",
+   "tags": [
+    "judge",
+    "llm-integration",
+    "provenance",
+    "service"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Dependency injection by backend callable keeps the judge testable with no network; the drafter-model blocklist and transport check are enforced in JudgeConfig construction rather than at call time."
+  },
+  {
+   "id": "file:harness/ledger_granularity.py",
+   "type": "file",
+   "name": "ledger_granularity.py",
+   "filePath": "harness/ledger_granularity.py",
+   "summary": "Offline, judge-free measurement of the claim-ledger granularity gap between the graph-sourced sections and the drafter-era ledgers preserved in the E4 golden baselines, verifying the prose is byte-identical so the cardinality deficit is exact rather than confounded by content drift.",
+   "tags": [
+    "measurement",
+    "cli",
+    "regression",
+    "offline"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/materiality.py",
+   "type": "file",
+   "name": "materiality.py",
+   "filePath": "harness/materiality.py",
+   "summary": "The CLAUDE.md section 10.5 materiality classifier and its ledger-anchored calibration: separates a material, attributable claim from framing and definitional prose, seeding positives from the engine's own claim ledger and leaving negative candidates unlabeled for a human.",
+   "tags": [
+    "classifier",
+    "materiality",
+    "calibration",
+    "judge"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/profile.py",
+   "type": "file",
+   "name": "profile.py",
+   "filePath": "harness/profile.py",
+   "summary": "Pre-evaluation profile parser: turns the versioned configuration bundle (instrument type, option-tag grammar, criterion-to-section map, scorecard and rubric-set pins) into typed objects fail-closed, and owns the version arithmetic that hashes the profile over its bundled component pins.",
+   "tags": [
+    "configuration",
+    "data-model",
+    "versioning",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/jsonl_log.py:JsonlLog",
+   "type": "class",
+   "name": "JsonlLog",
+   "filePath": "harness/jsonl_log.py",
+   "lineRange": [
+    32,
+    80
+   ],
+   "summary": "Append-only JSONL log base that seeds from an existing file, mirrors records in memory, and atomically rewrites the file on every append so a reader never sees a torn line.",
+   "tags": [
+    "base-class",
+    "logging",
+    "atomic-write"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/judge.py:resolve_judge_config",
+   "type": "function",
+   "name": "resolve_judge_config",
+   "filePath": "harness/judge.py",
+   "lineRange": [
+    172,
+    193
+   ],
+   "summary": "Resolves the judge configuration from the environment, rejecting any drafter model and the claude_cli transport so grader/generator independence holds structurally.",
+   "tags": [
+    "configuration",
+    "validation",
+    "judge"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/judge.py:_verdict_from_payload",
+   "type": "function",
+   "name": "_verdict_from_payload",
+   "filePath": "harness/judge.py",
+   "lineRange": [
+    225,
+    254
+   ],
+   "summary": "Turns a parsed judge response into a typed Inferred verdict, raising a JudgeResponseError rather than repairing a malformed payload.",
+   "tags": [
+    "parsing",
+    "validation",
+    "verdict"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/judge.py:JudgeConfig",
+   "type": "class",
+   "name": "JudgeConfig",
+   "filePath": "harness/judge.py",
+   "lineRange": [
+    126,
+    169
+   ],
+   "summary": "The pinned judge configuration (model, version, transport, temperature) validated on construction to exclude drafter models.",
+   "tags": [
+    "data-model",
+    "configuration",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/judge.py:Judge",
+   "type": "class",
+   "name": "Judge",
+   "filePath": "harness/judge.py",
+   "lineRange": [
+    262,
+    435
+   ],
+   "summary": "The injectable judge: invokes the pinned non-drafter model over the configured backend, returns typed Inferred verdicts, runs N>=3 majority panels, and logs provenance before returning.",
+   "tags": [
+    "service",
+    "judge",
+    "llm-integration"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/ledger_granularity.py:measure_section",
+   "type": "function",
+   "name": "measure_section",
+   "filePath": "harness/ledger_granularity.py",
+   "lineRange": [
+    100,
+    190
+   ],
+   "summary": "Measures one section's ledger granularity against its drafter-era baseline, verifying the prose is byte-identical per sub-section before reporting the claim-cardinality deficit.",
+   "tags": [
+    "measurement",
+    "comparison",
+    "deterministic"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/ledger_granularity.py:run_e4_regression",
+   "type": "function",
+   "name": "run_e4_regression",
+   "filePath": "harness/ledger_granularity.py",
+   "lineRange": [
+    193,
+    223
+   ],
+   "summary": "Runs the deterministic E4 golden-set comparison over the measured sections to supply the baseline side of the granularity measurement.",
+   "tags": [
+    "regression",
+    "comparison",
+    "orchestration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/ledger_granularity.py:build_report",
+   "type": "function",
+   "name": "build_report",
+   "filePath": "harness/ledger_granularity.py",
+   "lineRange": [
+    226,
+    286
+   ],
+   "summary": "Assembles the LG-1 measurement report from the per-section measurements and the regression comparison.",
+   "tags": [
+    "report-generation",
+    "aggregation",
+    "measurement"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/ledger_granularity.py:_print_summary",
+   "type": "function",
+   "name": "_print_summary",
+   "filePath": "harness/ledger_granularity.py",
+   "lineRange": [
+    289,
+    332
+   ],
+   "summary": "Prints the LG-1 measurement summary to the console for the human reading the result.",
+   "tags": [
+    "rendering",
+    "cli",
+    "report-generation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/ledger_granularity.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "harness/ledger_granularity.py",
+   "lineRange": [
+    335,
+    369
+   ],
+   "summary": "Entry point for the offline, judge-free LG-1 measurement run.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "offline"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/materiality.py:seed_materiality_positives",
+   "type": "function",
+   "name": "seed_materiality_positives",
+   "filePath": "harness/materiality.py",
+   "lineRange": [
+    211,
+    247
+   ],
+   "summary": "Turns real claim_summary values from the engine's own ledger into auto-labeled positive materiality examples, using the engine's enumeration rather than a fabricated gold label.",
+   "tags": [
+    "seeding",
+    "materiality",
+    "gold-set"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/materiality.py:seed_negative_candidates",
+   "type": "function",
+   "name": "seed_negative_candidates",
+   "filePath": "harness/materiality.py",
+   "lineRange": [
+    267,
+    313
+   ],
+   "summary": "Seeds framing, transition and definitional prose spans as unlabeled negative candidates for a human to label.",
+   "tags": [
+    "seeding",
+    "materiality",
+    "gold-set"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/materiality.py:load_materiality_set",
+   "type": "function",
+   "name": "load_materiality_set",
+   "filePath": "harness/materiality.py",
+   "lineRange": [
+    331,
+    368
+   ],
+   "summary": "Fail-closed loader for the materiality example set used to calibrate the classifier.",
+   "tags": [
+    "data-loading",
+    "fail-closed",
+    "materiality"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/materiality.py:classify_materiality",
+   "type": "function",
+   "name": "classify_materiality",
+   "filePath": "harness/materiality.py",
+   "lineRange": [
+    431,
+    462
+   ],
+   "summary": "Runs the section 10.5 materiality classifier over one assertion, quoting the constitutional text verbatim in the prompt and returning an Inferred verdict.",
+   "tags": [
+    "classifier",
+    "judge",
+    "materiality"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/materiality.py:calibrate_materiality",
+   "type": "function",
+   "name": "calibrate_materiality",
+   "filePath": "harness/materiality.py",
+   "lineRange": [
+    522,
+    577
+   ],
+   "summary": "Measures the materiality classifier's precision and recall against the labeled example set and records the result bound to the judge pin.",
+   "tags": [
+    "calibration",
+    "metrics",
+    "materiality"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/materiality.py:MaterialityExample",
+   "type": "class",
+   "name": "MaterialityExample",
+   "filePath": "harness/materiality.py",
+   "lineRange": [
+    125,
+    203
+   ],
+   "summary": "One materiality example (text plus optional human label) with labeled predicate and round-trip serialization.",
+   "tags": [
+    "data-model",
+    "materiality",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/materiality.py:MaterialityCalibration",
+   "type": "class",
+   "name": "MaterialityCalibration",
+   "filePath": "harness/materiality.py",
+   "lineRange": [
+    475,
+    519
+   ],
+   "summary": "A materiality calibration result bound to the judge pin and example set, exposing whether it had negatives to measure against.",
+   "tags": [
+    "data-model",
+    "calibration",
+    "provenance"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/profile.py:_parse_grammar",
+   "type": "function",
+   "name": "_parse_grammar",
+   "filePath": "harness/profile.py",
+   "lineRange": [
+    207,
+    231
+   ],
+   "summary": "Parses the profile's option-tag grammar (applicable variant, known variants, prefix vocabulary) fail-closed.",
+   "tags": [
+    "parsing",
+    "configuration",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/profile.py:_parse_criteria",
+   "type": "function",
+   "name": "_parse_criteria",
+   "filePath": "harness/profile.py",
+   "lineRange": [
+    234,
+    257
+   ],
+   "summary": "Parses the profile's criterion specs and their criterion-to-section mapping.",
+   "tags": [
+    "parsing",
+    "configuration",
+    "mapping"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/profile.py:parse_profile",
+   "type": "function",
+   "name": "parse_profile",
+   "filePath": "harness/profile.py",
+   "lineRange": [
+    260,
+    290
+   ],
+   "summary": "Parses a pre-evaluation profile document into typed objects, cross-checking that the declared scorecard and rubric-set IDs and versions match the files actually loaded.",
+   "tags": [
+    "parsing",
+    "validation",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/profile.py:parse_scoring",
+   "type": "function",
+   "name": "parse_scoring",
+   "filePath": "harness/profile.py",
+   "lineRange": [
+    322,
+    364
+   ],
+   "summary": "Parses the profile's scoring block (scale, weights, thresholds) with numeric validation.",
+   "tags": [
+    "parsing",
+    "configuration",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/profile.py:PreEvaluationProfile",
+   "type": "class",
+   "name": "PreEvaluationProfile",
+   "filePath": "harness/profile.py",
+   "lineRange": [
+    139,
+    177
+   ],
+   "summary": "The versioned configuration bundle the harness grades under: instrument spec, tag grammar, criterion-to-section map, scorecard and rubric-set pins, with criterion and section lookups.",
+   "tags": [
+    "data-model",
+    "configuration",
+    "versioning"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:harness/jsonl_log.py",
+   "target": "class:harness/jsonl_log.py:JsonlLog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/jsonl_log.py",
+   "target": "class:harness/jsonl_log.py:JsonlLog",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "function:harness/judge.py:resolve_judge_config",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "function:harness/judge.py:resolve_judge_config",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "function:harness/judge.py:_verdict_from_payload",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "class:harness/judge.py:JudgeConfig",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "class:harness/judge.py:JudgeConfig",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "class:harness/judge.py:Judge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "class:harness/judge.py:Judge",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:measure_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:measure_section",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:run_e4_regression",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:run_e4_regression",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:build_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:build_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:_print_summary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "function:harness/ledger_granularity.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:seed_materiality_positives",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:seed_materiality_positives",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:seed_negative_candidates",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:seed_negative_candidates",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:load_materiality_set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:load_materiality_set",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:classify_materiality",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:classify_materiality",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:calibrate_materiality",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "function:harness/materiality.py:calibrate_materiality",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "class:harness/materiality.py:MaterialityExample",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "class:harness/materiality.py:MaterialityExample",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "class:harness/materiality.py:MaterialityCalibration",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "class:harness/materiality.py:MaterialityCalibration",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/profile.py",
+   "target": "function:harness/profile.py:_parse_grammar",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/profile.py",
+   "target": "function:harness/profile.py:_parse_criteria",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/profile.py",
+   "target": "function:harness/profile.py:parse_profile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/profile.py",
+   "target": "function:harness/profile.py:parse_profile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/profile.py",
+   "target": "function:harness/profile.py:parse_scoring",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/profile.py",
+   "target": "function:harness/profile.py:parse_scoring",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/profile.py",
+   "target": "class:harness/profile.py:PreEvaluationProfile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/profile.py",
+   "target": "class:harness/profile.py:PreEvaluationProfile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/jsonl_log.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/judge.py",
+   "target": "file:runner/json_extract.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "file:harness/claim_ledger.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "file:harness/regression.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "file:harness/status_faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/ledger_granularity.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "file:harness/calibration.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "file:harness/faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "file:harness/gold_set.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/materiality.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:harness/ledger_granularity.py:run_e4_regression",
+   "target": "function:harness/regression.py:compare_to_golden_set",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/ledger_granularity.py:measure_section",
+   "target": "function:harness/status_faithfulness.py:load_section_claims",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

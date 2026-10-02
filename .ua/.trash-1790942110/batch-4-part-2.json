@@ -1,0 +1,1386 @@
+{
+  "nodes": [
+    {
+      "id": "file:runner/deterministic_components.py",
+      "type": "file",
+      "name": "deterministic_components.py",
+      "filePath": "runner/deterministic_components.py",
+      "summary": "The generic binding substrate for deterministic components — Claude-free, pure-Python node-body passes that read declared artifacts and write canonical ones under a determinism guarantee. A node declares component IDs in the manifest, the node resolver returns them, and this module resolves each ID in its registry, invokes it, and hands back a ComponentInvocationRecord for `AgentResult.invoked_components`.",
+      "tags": [
+        "deterministic-component",
+        "registry",
+        "dispatch",
+        "factory",
+        "node-body"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Each registered component is lazily imported inside its thin `_run_*` adapter, so a broken or optional component module cannot break the registry at import time."
+    },
+    {
+      "id": "function:runner/deterministic_components.py:_run_dependency_normalizer",
+      "type": "function",
+      "name": "_run_dependency_normalizer",
+      "filePath": "runner/deterministic_components.py",
+      "lineRange": [
+        64,
+        73
+      ],
+      "summary": "Adapter for the Phase-4 dependency normalizer — the one pre-existing hardcoded deterministic pass, now registered so it runs through the same generic component path as the rest.",
+      "tags": [
+        "deterministic-component",
+        "adapter",
+        "phase4",
+        "dependencies"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/deterministic_components.py:_run_unit_cost_budget_deriver",
+      "type": "function",
+      "name": "_run_unit_cost_budget_deriver",
+      "filePath": "runner/deterministic_components.py",
+      "lineRange": [
+        122,
+        136
+      ],
+      "summary": "Adapter for the unit-cost budget deriver, the sanctioned internal budget source for unit-cost instruments: a byte-equal-checked computation of confirmed months by published rates by host-country coefficient, which is a derivation rather than an estimate.",
+      "tags": [
+        "deterministic-component",
+        "budget",
+        "unit-cost",
+        "adapter"
+      ],
+      "complexity": "simple",
+      "languageNotes": "For lump-sum instruments budget computation stays external; only unit-cost instruments are derived internally, and determinism is the anti-fabrication guarantee."
+    },
+    {
+      "id": "function:runner/deterministic_components.py:_run_checkpoint_publisher",
+      "type": "function",
+      "name": "_run_checkpoint_publisher",
+      "filePath": "runner/deterministic_components.py",
+      "lineRange": [
+        197,
+        212
+      ],
+      "summary": "Adapter that invokes `publish_checkpoint` to write the immutable Phase-8 checkpoint, returning the written artifact path to the invocation record.",
+      "tags": [
+        "deterministic-component",
+        "adapter",
+        "phase8",
+        "checkpoint"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/deterministic_components.py:partition_draft_consuming",
+      "type": "function",
+      "name": "partition_draft_consuming",
+      "filePath": "runner/deterministic_components.py",
+      "lineRange": [
+        411,
+        429
+      ],
+      "summary": "Splits a list of component IDs into kept and suppressed by draft consumption, preserving order and deliberately keeping unknown IDs so they still reach `invoke_component` and fail closed there rather than being silently dropped.",
+      "tags": [
+        "deterministic-component",
+        "partitioning",
+        "fail-closed",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/deterministic_components.py:invoke_component",
+      "type": "function",
+      "name": "invoke_component",
+      "filePath": "runner/deterministic_components.py",
+      "lineRange": [
+        448,
+        513
+      ],
+      "summary": "Resolves a component ID against the registry, invokes it with the run ID and repo root, and captures the artifact paths it wrote. It never raises for a component fault: an unknown ID or raised exception comes back as a failure ComponentInvocationRecord, which the agent runtime maps to AGENT_EXECUTION_ERROR with `can_evaluate_exit_gate=False`.",
+      "tags": [
+        "deterministic-component",
+        "dispatch",
+        "error-handling",
+        "entry-point",
+        "registry"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:runner/manifest_reader.py",
+      "type": "file",
+      "name": "manifest_reader.py",
+      "filePath": "runner/manifest_reader.py",
+      "summary": "Read-only loader for `manifest.compile.yaml` that indexes the gate registry by gate ID and exposes each gate's `predicate_refs`. Under Approach B the manifest is the predicate composition source and the gate rules library is only the implementation registry, so a predicate runs only if the manifest names it.",
+      "tags": [
+        "configuration",
+        "manifest",
+        "yaml",
+        "gate-composition",
+        "reader"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Deliberately does not validate manifest/library version coupling — that remains the responsibility of `GateLibrary`."
+    },
+    {
+      "id": "class:runner/manifest_reader.py:ManifestReaderError",
+      "type": "class",
+      "name": "ManifestReaderError",
+      "filePath": "runner/manifest_reader.py",
+      "lineRange": [
+        41,
+        42
+      ],
+      "summary": "Base exception for manifest loading and structural errors.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "manifest"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/manifest_reader.py:ManifestGateNotFoundError",
+      "type": "class",
+      "name": "ManifestGateNotFoundError",
+      "filePath": "runner/manifest_reader.py",
+      "lineRange": [
+        45,
+        46
+      ],
+      "summary": "Raised when a requested gate ID is not present in the manifest gate registry.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "manifest",
+        "gate-composition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/manifest_reader.py:ManifestReader",
+      "type": "class",
+      "name": "ManifestReader",
+      "filePath": "runner/manifest_reader.py",
+      "lineRange": [
+        54,
+        200
+      ],
+      "summary": "In-memory representation of the loaded compiled manifest, constructed via `load()`. Indexes the gate registry by gate ID and answers `get_predicate_refs`, `gate_ids`, and `has_predicate_refs` for the gate evaluator.",
+      "tags": [
+        "data-model",
+        "manifest",
+        "gate-composition",
+        "reader",
+        "yaml"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:runner/node_resolver.py",
+      "type": "file",
+      "name": "node_resolver.py",
+      "filePath": "runner/node_resolver.py",
+      "summary": "Read-only resolution layer that maps a canonical manifest node ID to its agent, sub-agent and pre-gate agent identifiers, its deterministic component bindings, its skill IDs, its phase ID, and the on-disk paths of the agent definition and prompt spec. It contains no business logic, executes nothing, and evaluates no gates.",
+      "tags": [
+        "resolver",
+        "manifest",
+        "node-binding",
+        "read-only",
+        "utility"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "The manifest `node_registry` is the sole authoritative source for node-to-agent binding; this module only reads it and queries the file system."
+    },
+    {
+      "id": "class:runner/node_resolver.py:NodeResolverError",
+      "type": "class",
+      "name": "NodeResolverError",
+      "filePath": "runner/node_resolver.py",
+      "lineRange": [
+        35,
+        36
+      ],
+      "summary": "Exception raised for an unknown node ID or a missing agent definition / prompt spec file.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "resolver"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/node_resolver.py:NodeResolver",
+      "type": "class",
+      "name": "NodeResolver",
+      "filePath": "runner/node_resolver.py",
+      "lineRange": [
+        44,
+        237
+      ],
+      "summary": "Loads the compiled manifest and answers every node-binding question the runtime needs: `resolve_agent_id`, `resolve_sub_agent_id`, `resolve_pre_gate_agent_id`, `resolve_deterministic_components`, `resolve_skill_ids`, `resolve_phase_id`, plus the agent definition and prompt spec paths. All methods are side-effect free.",
+      "tags": [
+        "resolver",
+        "manifest",
+        "node-binding",
+        "read-only",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:runner/phase8_preseed.py",
+      "type": "file",
+      "name": "phase8_preseed.py",
+      "filePath": "runner/phase8_preseed.py",
+      "summary": "Phase-8 manual preseed: copies an operator-prepared section artifact from the Tier 4 preseed directory into its canonical Tier 5 path before agent dispatch and suppresses only the primary drafting skill. Unlike reuse it needs no `.reuse.json` metadata, no input fingerprint and no prior run ID; audit skills, exit gate evaluation and downstream assembly still run normally.",
+      "tags": [
+        "phase8",
+        "preseed",
+        "artifact-copy",
+        "fail-closed",
+        "drafting"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Fail-closed by design: an existing but invalid preseed file (bad JSON, wrong schema_id, missing required fields) blocks the node before dispatch rather than silently falling back to LLM drafting."
+    },
+    {
+      "id": "function:runner/phase8_preseed.py:_validation_status_inconsistency",
+      "type": "function",
+      "name": "_validation_status_inconsistency",
+      "filePath": "runner/phase8_preseed.py",
+      "lineRange": [
+        106,
+        121
+      ],
+      "summary": "Checks that a preseeded section's declared validation status is consistent with the rolled-up status of its claims, so an artifact cannot overstate how well evidenced it is.",
+      "tags": [
+        "validation",
+        "claim-status",
+        "consistency",
+        "phase8"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/phase8_preseed.py:Phase8PreseedResult",
+      "type": "class",
+      "name": "Phase8PreseedResult",
+      "filePath": "runner/phase8_preseed.py",
+      "lineRange": [
+        130,
+        149
+      ],
+      "summary": "Immutable three-way result of a preseed attempt: applied (artifact copied, audit written, skill to skip), not applied without error (no preseed file, proceed normally), or not applied with error (invalid preseed, block the node).",
+      "tags": [
+        "data-model",
+        "phase8",
+        "preseed",
+        "immutable"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_preseed.py:maybe_apply_phase8_preseed",
+      "type": "function",
+      "name": "maybe_apply_phase8_preseed",
+      "filePath": "runner/phase8_preseed.py",
+      "lineRange": [
+        157,
+        285
+      ],
+      "summary": "The entry point the scheduler calls before dispatching a Phase-8 drafting node: looks for a preseed file for the node, validates its JSON, schema ID, required fields and claim-status consistency, copies it to the canonical Tier 5 path, writes the preseed audit record, and returns which drafting skill to suppress.",
+      "tags": [
+        "phase8",
+        "preseed",
+        "entry-point",
+        "validation",
+        "fail-closed"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:runner/phase8_preseed.py:_write_preseed_audit",
+      "type": "function",
+      "name": "_write_preseed_audit",
+      "filePath": "runner/phase8_preseed.py",
+      "lineRange": [
+        293,
+        326
+      ],
+      "summary": "Writes the durable Tier 4 audit record for an applied preseed, naming the source file, the canonical destination, the suppressed drafting skill and the current run ID.",
+      "tags": [
+        "phase8",
+        "preseed",
+        "audit",
+        "tier4",
+        "file-io"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:runner/phase8_reuse.py",
+      "type": "file",
+      "name": "phase8_reuse.py",
+      "filePath": "runner/phase8_reuse.py",
+      "summary": "Minimal, fail-closed reuse layer that avoids rerunning the expensive Phase-8 section drafting for n08a/n08b/n08c when a previously produced section artifact is still input-equivalent and gate-approved. Provides pure functions for input fingerprinting, SHA-256 artifact hashing, reuse metadata I/O, eligibility validation and cross-run ownership checks; it evaluates no gates and invokes no agents.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "fingerprinting",
+        "fail-closed",
+        "caching"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Any parse error, missing field, hash mismatch or missing gate result falls back to normal execution — no artifact is ever reused without passing every eligibility check."
+    },
+    {
+      "id": "class:runner/phase8_reuse.py:ReuseDecision",
+      "type": "class",
+      "name": "ReuseDecision",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        163,
+        182
+      ],
+      "summary": "Immutable record of a reuse verdict for one node: whether the artifact is reused, the reuse mode, the artifact path and run ID it came from, and the reason the decision was reached.",
+      "tags": [
+        "data-model",
+        "phase8",
+        "reuse",
+        "immutable"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:_collect_fingerprint_files",
+      "type": "function",
+      "name": "_collect_fingerprint_files",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        190,
+        224
+      ],
+      "summary": "Enumerates, in a stable order, the upstream input files whose contents define a Phase-8 node's input fingerprint.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "fingerprinting",
+        "file-io",
+        "deterministic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:compute_input_fingerprint",
+      "type": "function",
+      "name": "compute_input_fingerprint",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        227,
+        248
+      ],
+      "summary": "Computes a content-based hash over a node's collected input files, the value against which a candidate reuse artifact's recorded fingerprint must match exactly.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "fingerprinting",
+        "hashing",
+        "deterministic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:artifact_sha256",
+      "type": "function",
+      "name": "artifact_sha256",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        256,
+        261
+      ],
+      "summary": "Returns the SHA-256 digest of an artifact file, used to prove the on-disk section has not changed since the reuse metadata was written.",
+      "tags": [
+        "hashing",
+        "utility",
+        "phase8",
+        "reuse"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:read_artifact_run_id",
+      "type": "function",
+      "name": "read_artifact_run_id",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        264,
+        278
+      ],
+      "summary": "Reads the `run_id` stamped inside a section artifact so the runtime can tell current-run output from a prior-run candidate.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "json",
+        "file-io",
+        "provenance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:load_reuse_metadata",
+      "type": "function",
+      "name": "load_reuse_metadata",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        291,
+        302
+      ],
+      "summary": "Loads a node's reuse metadata sidecar from the Tier 4 reuse directory, returning None when it is absent or unreadable.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "metadata",
+        "file-io",
+        "defensive"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:write_reuse_metadata",
+      "type": "function",
+      "name": "write_reuse_metadata",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        305,
+        357
+      ],
+      "summary": "Writes the reuse metadata sidecar after a Phase-8 node passes its exit gate, recording the policy version, artifact SHA-256, input fingerprint and owning run ID so a later run can validate reuse.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "metadata",
+        "serialization",
+        "tier4"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:_load_gate_result",
+      "type": "function",
+      "name": "_load_gate_result",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        365,
+        379
+      ],
+      "summary": "Reads a durable gate result artifact so reuse eligibility can require that the candidate artifact was actually gate-approved.",
+      "tags": [
+        "gate-result",
+        "file-io",
+        "phase8",
+        "reuse"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:validate_reuse_candidate",
+      "type": "function",
+      "name": "validate_reuse_candidate",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        382,
+        569
+      ],
+      "summary": "The central eligibility check: confirms the node is reuse-eligible, the artifact and its metadata exist, the recorded SHA-256 and input fingerprint still match, the owning gate result passed, and the claim statuses roll up consistently — returning a ReuseDecision that falls back to normal execution on any doubt.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "validation",
+        "fail-closed",
+        "eligibility"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:_audit_report_exists",
+      "type": "function",
+      "name": "_audit_report_exists",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        596,
+        606
+      ],
+      "summary": "Confirms a current-run audit report exists for a required audit skill, since reuse suppresses only drafting and the traceability and compliance checks must still have run this run.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "audit",
+        "validation",
+        "file-io"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_reuse.py:is_reuse_owned_artifact_valid",
+      "type": "function",
+      "name": "is_reuse_owned_artifact_valid",
+      "filePath": "runner/phase8_reuse.py",
+      "lineRange": [
+        609,
+        745
+      ],
+      "summary": "Validates ownership of a reused section artifact whose run_id differs from the current run, enforcing ten conjunctive fail-closed conditions: node eligibility, a persisted reuse decision in drafting-skipped mode matching the artifact run ID and canonical path, metadata on disk with matching hash and fingerprint, current-run audit reports for both audit skills, and structural validation of schema ID, validation status and traceability footer.",
+      "tags": [
+        "phase8",
+        "reuse",
+        "ownership",
+        "validation",
+        "fail-closed"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Called by the `artifact_owned_by_run` gate predicate — it is the single sanctioned exception to the rule that a gate-relevant artifact must carry the current run's ID."
+    },
+    {
+      "id": "file:runner/phase8_skip_binding.py",
+      "type": "file",
+      "name": "phase8_skip_binding.py",
+      "filePath": "runner/phase8_skip_binding.py",
+      "summary": "The single authoritative `node_id -> drafting-skill-id` map for Phase-8 section nodes, plus the import-time assertions and dispatch-time validation that keep every derived table in agreement with it. It exists because the skip binding was once named independently in four places with none checked against the manifest, which made a stale skip id a silent no-op that let the drafter overwrite a preseeded or reused section.",
+      "tags": [
+        "phase8",
+        "single-source-of-truth",
+        "validation",
+        "configuration",
+        "fail-closed"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "A pure data-and-validation leaf module: it imports nothing from `runner`, names no project facts, evaluates no gates and invokes no agents."
+    },
+    {
+      "id": "class:runner/phase8_skip_binding.py:SkipBindingError",
+      "type": "class",
+      "name": "SkipBindingError",
+      "filePath": "runner/phase8_skip_binding.py",
+      "lineRange": [
+        54,
+        59
+      ],
+      "summary": "Raised at import time when a derived skip-binding table has drifted from the single authoritative map, and at dispatch when the chosen skip ID does not resolve against the node's manifest skill IDs.",
+      "tags": [
+        "error-handling",
+        "exception",
+        "phase8",
+        "fail-closed"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_skip_binding.py:drafting_skill_for",
+      "type": "function",
+      "name": "drafting_skill_for",
+      "filePath": "runner/phase8_skip_binding.py",
+      "lineRange": [
+        67,
+        73
+      ],
+      "summary": "Returns the drafting skill ID bound to a Phase-8 section node, the one place that answers which skill a node drafts with.",
+      "tags": [
+        "phase8",
+        "lookup",
+        "single-source-of-truth",
+        "drafting"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/phase8_skip_binding.py:validate_skip_binding",
+      "type": "function",
+      "name": "validate_skip_binding",
+      "filePath": "runner/phase8_skip_binding.py",
+      "lineRange": [
+        81,
+        118
+      ],
+      "summary": "Resolves the chosen skip ID against the node's manifest-resolved `skill_ids` at dispatch time, failing closed on any drift between this map and the manifest rather than recording a skip that silently matches nothing.",
+      "tags": [
+        "phase8",
+        "validation",
+        "manifest",
+        "fail-closed",
+        "dispatch"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/phase8_skip_binding.py:assert_agrees_with_source",
+      "type": "function",
+      "name": "assert_agrees_with_source",
+      "filePath": "runner/phase8_skip_binding.py",
+      "lineRange": [
+        126,
+        154
+      ],
+      "summary": "Import-time guard asserting that a derived table maps the same skill for every node as the authoritative binding, so the copies in the reuse, preseed and agent-runtime tables can never drift apart.",
+      "tags": [
+        "phase8",
+        "validation",
+        "invariant",
+        "import-time",
+        "single-source-of-truth"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/phase8_skip_binding.py:assert_nodes_match_source",
+      "type": "function",
+      "name": "assert_nodes_match_source",
+      "filePath": "runner/phase8_skip_binding.py",
+      "lineRange": [
+        157,
+        170
+      ],
+      "summary": "Import-time guard asserting that a derived table covers exactly the same node set as the authoritative binding, closing the eligible-but-unbound defect where a node recorded a skipped drafting skill and still recomposed over stale drafts.",
+      "tags": [
+        "phase8",
+        "validation",
+        "invariant",
+        "import-time",
+        "fail-closed"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:runner/run_context.py",
+      "type": "file",
+      "name": "run_context.py",
+      "filePath": "runner/run_context.py",
+      "summary": "Owns the per-run state directory `.claude/runs/<run_id>/`, holding `run_manifest.json` (run identity, versions, node state map, HARD_BLOCK metadata, accepted upstream gates, reuse decisions) and `reuse_policy.json`. The RunContext is the single point of truth for node state during a run and is read back and updated after every gate evaluation.",
+      "tags": [
+        "state",
+        "run-context",
+        "persistence",
+        "node-state",
+        "runtime-memory"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Constitutionally this is runtime execution memory, not source truth — a persisted `released` state must still be provable against durable Tier 4 gate evidence."
+    },
+    {
+      "id": "class:runner/run_context.py:RunContext",
+      "type": "class",
+      "name": "RunContext",
+      "filePath": "runner/run_context.py",
+      "lineRange": [
+        96,
+        438
+      ],
+      "summary": "Creates or loads the run directory and manages all per-run state: node state get/set across the seven-state machine, per-node failure details (origin, reason, category), accepted upstream gate records for phase-scoped continuation, reuse decisions, artifact reuse approvals, HARD_BLOCK propagation to downstream nodes, and atomic persistence of the run manifest.",
+      "tags": [
+        "state",
+        "run-context",
+        "persistence",
+        "state-machine",
+        "data-model"
+      ],
+      "complexity": "complex",
+      "languageNotes": "States: `pending`, `running`, `released`, `blocked_at_entry`, `blocked_at_exit`, `deterministic_pass_semantic_pending`, and `hard_block_upstream` for Phase-8 nodes frozen by a failed budget gate."
+    },
+    {
+      "id": "file:runner/runtime_models.py",
+      "type": "file",
+      "name": "runtime_models.py",
+      "filePath": "runner/runtime_models.py",
+      "summary": "Defines the frozen-dataclass data contracts exchanged between the three runtime layers — SkillResult, AgentResult and NodeExecutionResult plus the two invocation records — together with the closed vocabularies of valid failure origins and failure categories. Contains no business logic: it evaluates no gates, invokes nothing, and modifies no scheduler state.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "runtime-contract",
+        "immutable",
+        "validation"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "All types are frozen dataclasses, and the valid value sets are `frozenset` constants, so a contract violation is a construction-time failure rather than a silently tolerated string."
+    },
+    {
+      "id": "class:runner/runtime_models.py:SkillResult",
+      "type": "class",
+      "name": "SkillResult",
+      "filePath": "runner/runtime_models.py",
+      "lineRange": [
+        66,
+        98
+      ],
+      "summary": "The contract returned by `run_skill()` to the agent runtime: success or failure status, the repo-relative paths of artifacts written, and on failure a human-readable reason plus one of the five skill failure categories.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "runtime-contract",
+        "skill-runtime",
+        "immutable"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/runtime_models.py:SkillInvocationRecord",
+      "type": "class",
+      "name": "SkillInvocationRecord",
+      "filePath": "runner/runtime_models.py",
+      "lineRange": [
+        107,
+        127
+      ],
+      "summary": "One entry in the agent runtime's ordered record of skill invocations, pairing the skill ID with its SkillResult so the node body's execution is fully auditable.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "audit",
+        "runtime-contract",
+        "immutable"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/runtime_models.py:ComponentInvocationRecord",
+      "type": "class",
+      "name": "ComponentInvocationRecord",
+      "filePath": "runner/runtime_models.py",
+      "lineRange": [
+        136,
+        168
+      ],
+      "summary": "One entry in `AgentResult.invoked_components`, recording a deterministic Claude-free component invocation: its ID, status, the artifacts it wrote, and the failure reason when it faulted.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "deterministic-component",
+        "audit",
+        "immutable"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/runtime_models.py:AgentResult",
+      "type": "class",
+      "name": "AgentResult",
+      "filePath": "runner/runtime_models.py",
+      "lineRange": [
+        177,
+        228
+      ],
+      "summary": "The contract returned by `run_agent()` to the scheduler: status, the disk-derived `can_evaluate_exit_gate` flag, a failure origin that is always `agent_body`, a failure category drawn from the skill categories plus SKILL_FAILURE and AGENT_EXECUTION_ERROR, and the ordered `invoked_skills` and `invoked_components` records.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "runtime-contract",
+        "agent-runtime",
+        "immutable"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:runner/runtime_models.py:NodeExecutionResult",
+      "type": "class",
+      "name": "NodeExecutionResult",
+      "filePath": "runner/runtime_models.py",
+      "lineRange": [
+        237,
+        274
+      ],
+      "summary": "The contract returned by `_dispatch_node()` to the scheduler's run loop: the canonical node ID, the terminal state, the failure origin from the closed set of three, whether the exit gate was actually evaluated, and the AgentResult (None when the entry gate failed before the body ran).",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "runtime-contract",
+        "scheduler",
+        "immutable"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "file:runner/runtime_models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "function:runner/deterministic_components.py:_run_dependency_normalizer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "function:runner/deterministic_components.py:_run_unit_cost_budget_deriver",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "function:runner/deterministic_components.py:_run_checkpoint_publisher",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "function:runner/deterministic_components.py:partition_draft_consuming",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "function:runner/deterministic_components.py:partition_draft_consuming",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "function:runner/deterministic_components.py:invoke_component",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "function:runner/deterministic_components.py:invoke_component",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "file:runner/checkpoint_publisher.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "file:runner/section_assembler.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:runner/deterministic_components.py",
+      "target": "file:runner/dev_graph/shadow.py",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:runner/manifest_reader.py",
+      "target": "class:runner/manifest_reader.py:ManifestReaderError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/manifest_reader.py",
+      "target": "class:runner/manifest_reader.py:ManifestReaderError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/manifest_reader.py",
+      "target": "class:runner/manifest_reader.py:ManifestGateNotFoundError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/manifest_reader.py",
+      "target": "class:runner/manifest_reader.py:ManifestGateNotFoundError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/manifest_reader.py:ManifestGateNotFoundError",
+      "target": "class:runner/manifest_reader.py:ManifestReaderError",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "file:runner/manifest_reader.py",
+      "target": "class:runner/manifest_reader.py:ManifestReader",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/manifest_reader.py",
+      "target": "class:runner/manifest_reader.py:ManifestReader",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/deterministic_components.py:_run_checkpoint_publisher",
+      "target": "function:runner/checkpoint_publisher.py:publish_checkpoint",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/node_resolver.py",
+      "target": "file:runner/manifest_reader.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/phase8_preseed.py",
+      "target": "file:runner/claim_status.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/phase8_preseed.py",
+      "target": "file:runner/phase8_skip_binding.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "file:runner/claim_status.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "file:runner/phase8_skip_binding.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/run_context.py",
+      "target": "file:runner/versions.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:runner/node_resolver.py",
+      "target": "class:runner/node_resolver.py:NodeResolverError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/node_resolver.py",
+      "target": "class:runner/node_resolver.py:NodeResolverError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/node_resolver.py",
+      "target": "class:runner/node_resolver.py:NodeResolver",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/node_resolver.py",
+      "target": "class:runner/node_resolver.py:NodeResolver",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_preseed.py",
+      "target": "function:runner/phase8_preseed.py:_validation_status_inconsistency",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_preseed.py",
+      "target": "class:runner/phase8_preseed.py:Phase8PreseedResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_preseed.py",
+      "target": "class:runner/phase8_preseed.py:Phase8PreseedResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_preseed.py",
+      "target": "function:runner/phase8_preseed.py:maybe_apply_phase8_preseed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_preseed.py",
+      "target": "function:runner/phase8_preseed.py:maybe_apply_phase8_preseed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_preseed.py",
+      "target": "function:runner/phase8_preseed.py:_write_preseed_audit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "class:runner/phase8_reuse.py:ReuseDecision",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "class:runner/phase8_reuse.py:ReuseDecision",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:_collect_fingerprint_files",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:compute_input_fingerprint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:compute_input_fingerprint",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:artifact_sha256",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:artifact_sha256",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:read_artifact_run_id",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:read_artifact_run_id",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:load_reuse_metadata",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:load_reuse_metadata",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:write_reuse_metadata",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:write_reuse_metadata",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:_load_gate_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:validate_reuse_candidate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:validate_reuse_candidate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:_audit_report_exists",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:is_reuse_owned_artifact_valid",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_reuse.py:is_reuse_owned_artifact_valid",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "class:runner/phase8_skip_binding.py:SkipBindingError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "class:runner/phase8_skip_binding.py:SkipBindingError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "function:runner/phase8_skip_binding.py:drafting_skill_for",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "function:runner/phase8_skip_binding.py:drafting_skill_for",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "function:runner/phase8_skip_binding.py:validate_skip_binding",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "function:runner/phase8_skip_binding.py:validate_skip_binding",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "function:runner/phase8_skip_binding.py:assert_agrees_with_source",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "function:runner/phase8_skip_binding.py:assert_agrees_with_source",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "function:runner/phase8_skip_binding.py:assert_nodes_match_source",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/phase8_skip_binding.py",
+      "target": "function:runner/phase8_skip_binding.py:assert_nodes_match_source",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/run_context.py",
+      "target": "class:runner/run_context.py:RunContext",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/run_context.py",
+      "target": "class:runner/run_context.py:RunContext",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:SkillResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:SkillResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:SkillInvocationRecord",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:SkillInvocationRecord",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:ComponentInvocationRecord",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:ComponentInvocationRecord",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:AgentResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:AgentResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:NodeExecutionResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:runner/runtime_models.py",
+      "target": "class:runner/runtime_models.py:NodeExecutionResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:runner/node_resolver.py:NodeResolver",
+      "target": "class:runner/manifest_reader.py:ManifestReader",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "function:runner/phase8_preseed.py:maybe_apply_phase8_preseed",
+      "target": "function:runner/phase8_skip_binding.py:drafting_skill_for",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/phase8_preseed.py:_validation_status_inconsistency",
+      "target": "function:runner/claim_status.py:rollup_inconsistency",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/phase8_reuse.py:validate_reuse_candidate",
+      "target": "function:runner/claim_status.py:normalize_status",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/phase8_reuse.py:validate_reuse_candidate",
+      "target": "function:runner/phase8_reuse.py:compute_input_fingerprint",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:runner/phase8_reuse.py:is_reuse_owned_artifact_valid",
+      "target": "function:runner/phase8_reuse.py:artifact_sha256",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:runner/phase8_reuse.py",
+      "target": "function:runner/phase8_skip_binding.py:assert_nodes_match_source",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

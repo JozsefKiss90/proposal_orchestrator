@@ -1,0 +1,969 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/dev_graph/schema.py",
+   "type": "file",
+   "name": "schema.py",
+   "filePath": "runner/dev_graph/schema.py",
+   "summary": "The dev graph's closed vocabularies as data: the node-type set and the relationship set, each relationship declaring its permitted endpoint pairs, direction, cardinality and whether it is a domain link or an execution dependency. Also owns the fail-closed graph validator.",
+   "tags": [
+    "schema-definition",
+    "type-definition",
+    "validation",
+    "dev-graph",
+    "configuration"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Carries no project noun, reads no file and evaluates no gate — adding a node type or predicate is a schema change that needs a test."
+  },
+  {
+   "id": "class:runner/dev_graph/schema.py:RelationshipSpec",
+   "type": "class",
+   "name": "RelationshipSpec",
+   "filePath": "runner/dev_graph/schema.py",
+   "lineRange": [
+    67,
+    85
+   ],
+   "summary": "One relationship's declaration: permitted endpoint type pairs, direction, cardinality and operational effect, with `permits` and `single_target` checks.",
+   "tags": [
+    "schema-definition",
+    "data-model",
+    "type-definition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/dev_graph/schema.py:DevGraphError",
+   "type": "class",
+   "name": "DevGraphError",
+   "filePath": "runner/dev_graph/schema.py",
+   "lineRange": [
+    271,
+    284
+   ],
+   "summary": "The package's fail-closed error, naming the first invalid node, edge or record and where it came from.",
+   "tags": [
+    "error-handling",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/schema.py:declared_status",
+   "type": "function",
+   "name": "declared_status",
+   "filePath": "runner/dev_graph/schema.py",
+   "lineRange": [
+    227,
+    240
+   ],
+   "summary": "Pure read of a node's declared validation status from the field its node type declares it in — never sniffed from a value.",
+   "tags": [
+    "claim-status",
+    "lookup",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/schema.py:validate_graph",
+   "type": "function",
+   "name": "validate_graph",
+   "filePath": "runner/dev_graph/schema.py",
+   "lineRange": [
+    296,
+    352
+   ],
+   "summary": "Fail-closed validation of nodes and edges against the closed vocabularies, endpoint pairs and cardinality, naming the first offender.",
+   "tags": [
+    "validation",
+    "fail-closed",
+    "schema-definition"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/dev_graph/shadow.py",
+   "type": "file",
+   "name": "shadow.py",
+   "filePath": "runner/dev_graph/shadow.py",
+   "summary": "Compares the impact planner's advisory against the reuse decision the scheduler actually recorded, emitting one diagnostic from a closed set (agreed, planner narrower, planner broader). Pure shadow mode: nothing consumes the diagnostic at runtime.",
+   "tags": [
+    "dev-graph",
+    "shadow-mode",
+    "comparison",
+    "reuse",
+    "diagnostics"
+   ],
+   "complexity": "complex",
+   "languageNotes": "A node with no artifact-path binding is a refusal rather than a silent skip, and `planner_broader` outranks `planner_narrower` because it is the safety-relevant finding."
+  },
+  {
+   "id": "class:runner/dev_graph/shadow.py:ShadowComparison",
+   "type": "class",
+   "name": "ShadowComparison",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    88,
+    108
+   ],
+   "summary": "The comparison result: the diagnostic, the per-node rows and the plan and run it compared.",
+   "tags": [
+    "data-model",
+    "diagnostics",
+    "comparison"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:_plan_dict",
+   "type": "function",
+   "name": "_plan_dict",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    120,
+    135
+   ],
+   "summary": "Indexes a plan's entries by the artifact path each one concerns.",
+   "tags": [
+    "derivation",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:_decisions",
+   "type": "function",
+   "name": "_decisions",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    138,
+    153
+   ],
+   "summary": "Normalises the scheduler's recorded reuse decisions into reuse/rerun verdicts.",
+   "tags": [
+    "normalization",
+    "reuse"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:_planner_verdict",
+   "type": "function",
+   "name": "_planner_verdict",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    170,
+    181
+   ],
+   "summary": "Derives the planner's reuse/rerun verdict for one artifact path by lookup over the plan's entries, defaulting to rerun when no run record vouches for it.",
+   "tags": [
+    "lookup",
+    "reuse",
+    "advisory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:compare_shadow",
+   "type": "function",
+   "name": "compare_shadow",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    184,
+    241
+   ],
+   "summary": "Core comparison: binds each node through its artifact path, compares the two verdicts and emits the ranked diagnostic with every row kept.",
+   "tags": [
+    "comparison",
+    "diagnostics",
+    "pure-function"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:read_shadow_request",
+   "type": "function",
+   "name": "read_shadow_request",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    258,
+    263
+   ],
+   "summary": "Reads the operator's shadow-comparison request from Tier 4.",
+   "tags": [
+    "io",
+    "request"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:read_plan",
+   "type": "function",
+   "name": "read_plan",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    266,
+    280
+   ],
+   "summary": "Reads a stored advisory impact plan by id.",
+   "tags": [
+    "io",
+    "impact-analysis"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:read_reuse_decisions",
+   "type": "function",
+   "name": "read_reuse_decisions",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    283,
+    295
+   ],
+   "summary": "Reads a run manifest's recorded reuse decisions from runtime state.",
+   "tags": [
+    "io",
+    "reuse",
+    "run-records"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:write_shadow_comparison",
+   "type": "function",
+   "name": "write_shadow_comparison",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    298,
+    313
+   ],
+   "summary": "Writes the comparison atomically to its canonical Tier 4 path.",
+   "tags": [
+    "atomic-write",
+    "deterministic-component"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/shadow.py:run_shadow_comparison_writer",
+   "type": "function",
+   "name": "run_shadow_comparison_writer",
+   "filePath": "runner/dev_graph/shadow.py",
+   "lineRange": [
+    316,
+    321
+   ],
+   "summary": "Deterministic-component adapter `(run_id, repo_root) -> written`.",
+   "tags": [
+    "deterministic-component",
+    "adapter",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/dev_graph/writer.py",
+   "type": "file",
+   "name": "writer.py",
+   "filePath": "runner/dev_graph/writer.py",
+   "summary": "The registered deterministic component behind the dev-graph index: builds the snapshot and writes it atomically to its canonical Tier 4 path. The snapshot carries no run id and no clock, so a replay from the same records is byte-equal.",
+   "tags": [
+    "deterministic-component",
+    "dev-graph",
+    "atomic-write",
+    "entry-point",
+    "determinism"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/writer.py:write_snapshot",
+   "type": "function",
+   "name": "write_snapshot",
+   "filePath": "runner/dev_graph/writer.py",
+   "lineRange": [
+    24,
+    30
+   ],
+   "summary": "Builds the snapshot and writes it atomically, returning the absolute path.",
+   "tags": [
+    "deterministic-component",
+    "atomic-write",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/writer.py:run_snapshot_writer",
+   "type": "function",
+   "name": "run_snapshot_writer",
+   "filePath": "runner/dev_graph/writer.py",
+   "lineRange": [
+    33,
+    37
+   ],
+   "summary": "Component adapter `(run_id, repo_root) -> written`; the run id is accepted for the contract and never enters the artifact.",
+   "tags": [
+    "deterministic-component",
+    "adapter"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/docx_exporter.py",
+   "type": "file",
+   "name": "docx_exporter.py",
+   "filePath": "runner/docx_exporter.py",
+   "summary": "Renders the assembled Part B (or whatever individual section artifacts exist) into a Microsoft Word `.docx` under Tier 5 final exports. Invents no content: every heading and paragraph is copied verbatim from the section JSON.",
+   "tags": [
+    "exporter",
+    "docx",
+    "tier5",
+    "rendering",
+    "deterministic-component"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Fails soft — with no section content it returns `None` rather than writing an empty document."
+  },
+  {
+   "id": "function:runner/docx_exporter.py:_synthetic_override_active",
+   "type": "function",
+   "name": "_synthetic_override_active",
+   "filePath": "runner/docx_exporter.py",
+   "lineRange": [
+    83,
+    96
+   ],
+   "summary": "Detects whether the fictional-budget operator override is in force, which the export must disclose.",
+   "tags": [
+    "lookup",
+    "override",
+    "governance"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/docx_exporter.py:_read_optional_json",
+   "type": "function",
+   "name": "_read_optional_json",
+   "filePath": "runner/docx_exporter.py",
+   "lineRange": [
+    104,
+    119
+   ],
+   "summary": "Reads a JSON artifact if it exists, returning `None` rather than raising when absent.",
+   "tags": [
+    "io",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/docx_exporter.py:_resolve_section_paths",
+   "type": "function",
+   "name": "_resolve_section_paths",
+   "filePath": "runner/docx_exporter.py",
+   "lineRange": [
+    122,
+    155
+   ],
+   "summary": "Resolves which section artifacts to render: the assembled Part B when present, otherwise whatever individual sections are on disk.",
+   "tags": [
+    "path-resolution",
+    "tier5",
+    "derivation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/docx_exporter.py:split_content_blocks",
+   "type": "function",
+   "name": "split_content_blocks",
+   "filePath": "runner/docx_exporter.py",
+   "lineRange": [
+    158,
+    165
+   ],
+   "summary": "Splits a sub-section's prose into the paragraph blocks the renderer emits.",
+   "tags": [
+    "text-processing",
+    "rendering",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/docx_exporter.py:_add_content_paragraphs",
+   "type": "function",
+   "name": "_add_content_paragraphs",
+   "filePath": "runner/docx_exporter.py",
+   "lineRange": [
+    168,
+    180
+   ],
+   "summary": "Appends each content block to the document as a paragraph, verbatim.",
+   "tags": [
+    "rendering",
+    "docx"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/docx_exporter.py:_render_section",
+   "type": "function",
+   "name": "_render_section",
+   "filePath": "runner/docx_exporter.py",
+   "lineRange": [
+    183,
+    211
+   ],
+   "summary": "Renders one section: its criterion heading and each sub-section's title and content, all copied from the artifact.",
+   "tags": [
+    "rendering",
+    "docx",
+    "tier5"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/docx_exporter.py:export_part_b_docx",
+   "type": "function",
+   "name": "export_part_b_docx",
+   "filePath": "runner/docx_exporter.py",
+   "lineRange": [
+    219,
+    297
+   ],
+   "summary": "Entry point: resolves the sections, renders the whole document and writes the `.docx` atomically, returning `None` when there is nothing to render.",
+   "tags": [
+    "entry-point",
+    "exporter",
+    "docx",
+    "atomic-write"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/docx_exporter.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "runner/docx_exporter.py",
+   "lineRange": [
+    305,
+    342
+   ],
+   "summary": "CLI entry point for running the exporter from the repository root.",
+   "tags": [
+    "cli",
+    "entry-point"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/final_export_writer.py",
+   "type": "file",
+   "name": "final_export_writer.py",
+   "filePath": "runner/final_export_writer.py",
+   "summary": "Deterministic node-body component for the revision phase that writes the terminal Tier 5 export artifacts: a self-contained JSON bundle embedding the assembled draft and every referenced section verbatim, plus the schema-bound export manifest.",
+   "tags": [
+    "deterministic-component",
+    "tier5",
+    "exporter",
+    "phase8",
+    "atomic-write"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "The manifest is written after the bundle, so a partial failure can never leave a manifest pointing at a missing export; only `exported_at` is excluded from the replay invariant."
+  },
+  {
+   "id": "function:runner/final_export_writer.py:_read_json_dict",
+   "type": "function",
+   "name": "_read_json_dict",
+   "filePath": "runner/final_export_writer.py",
+   "lineRange": [
+    97,
+    113
+   ],
+   "summary": "Reads a required JSON object, raising `FinalExportError` when absent or malformed.",
+   "tags": [
+    "io",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/final_export_writer.py:_validate_sections",
+   "type": "function",
+   "name": "_validate_sections",
+   "filePath": "runner/final_export_writer.py",
+   "lineRange": [
+    116,
+    166
+   ],
+   "summary": "Validates the assembled draft's section list and the referenced section artifacts before anything is bundled.",
+   "tags": [
+    "validation",
+    "fail-closed",
+    "tier5"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/final_export_writer.py:write_final_export",
+   "type": "function",
+   "name": "write_final_export",
+   "filePath": "runner/final_export_writer.py",
+   "lineRange": [
+    169,
+    251
+   ],
+   "summary": "Component entry point: bundles the assembled draft and sections verbatim, then writes the schema-bound export manifest with its derived section index.",
+   "tags": [
+    "entry-point",
+    "deterministic-component",
+    "exporter",
+    "atomic-write"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/dev_graph/schema.py",
+   "target": "class:runner/dev_graph/schema.py:RelationshipSpec",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/schema.py",
+   "target": "class:runner/dev_graph/schema.py:RelationshipSpec",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/schema.py",
+   "target": "class:runner/dev_graph/schema.py:DevGraphError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/schema.py",
+   "target": "class:runner/dev_graph/schema.py:DevGraphError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/schema.py",
+   "target": "function:runner/dev_graph/schema.py:declared_status",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/schema.py",
+   "target": "function:runner/dev_graph/schema.py:declared_status",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/schema.py",
+   "target": "function:runner/dev_graph/schema.py:validate_graph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/schema.py",
+   "target": "function:runner/dev_graph/schema.py:validate_graph",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "class:runner/dev_graph/shadow.py:ShadowComparison",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "class:runner/dev_graph/shadow.py:ShadowComparison",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:_plan_dict",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:_decisions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:_planner_verdict",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:compare_shadow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:compare_shadow",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:read_shadow_request",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:read_shadow_request",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:read_plan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:read_plan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:read_reuse_decisions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:read_reuse_decisions",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:write_shadow_comparison",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:write_shadow_comparison",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:run_shadow_comparison_writer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "function:runner/dev_graph/shadow.py:run_shadow_comparison_writer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/writer.py",
+   "target": "function:runner/dev_graph/writer.py:write_snapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/writer.py",
+   "target": "function:runner/dev_graph/writer.py:write_snapshot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/writer.py",
+   "target": "function:runner/dev_graph/writer.py:run_snapshot_writer",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/writer.py",
+   "target": "function:runner/dev_graph/writer.py:run_snapshot_writer",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:_synthetic_override_active",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:_read_optional_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:_resolve_section_paths",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:split_content_blocks",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:split_content_blocks",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:_add_content_paragraphs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:_render_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:export_part_b_docx",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:export_part_b_docx",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "function:runner/docx_exporter.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/final_export_writer.py",
+   "target": "function:runner/final_export_writer.py:_read_json_dict",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/final_export_writer.py",
+   "target": "function:runner/final_export_writer.py:_validate_sections",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/final_export_writer.py",
+   "target": "function:runner/final_export_writer.py:write_final_export",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/final_export_writer.py",
+   "target": "function:runner/final_export_writer.py:write_final_export",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "file:runner/dev_graph/impact.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "file:runner/run_context.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/writer.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/writer.py",
+   "target": "file:runner/dev_graph/builder.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/final_export_writer.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/dev_graph/shadow.py:compare_shadow",
+   "target": "function:runner/dev_graph/impact.py:plan_nothing_changed",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/shadow.py:write_shadow_comparison",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/writer.py:write_snapshot",
+   "target": "function:runner/dev_graph/builder.py:build_snapshot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/writer.py:write_snapshot",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/docx_exporter.py:export_part_b_docx",
+   "target": "function:runner/atomic_write.py:atomic_write_via",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/final_export_writer.py:write_final_export",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/shadow.py",
+   "target": "file:runner/phase8_reuse.py",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:runner/docx_exporter.py",
+   "target": "file:runner/section_assembler.py",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "file:runner/final_export_writer.py",
+   "target": "file:runner/section_assembler.py",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

@@ -1,0 +1,4801 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "louvain",
+  "totalFiles": 159,
+  "totalBatches": 11,
+  "exportsByPath": {
+    "harness/__init__.py": [],
+    "harness/blind_assessment.py": [
+      "_utc_now",
+      "BlindAssessmentError",
+      "CandidateHashMismatch",
+      "LeakageError",
+      "ReviewTask",
+      "BlindEvidence",
+      "resolve_document",
+      "_item_tags",
+      "assert_no_leakage",
+      "materialise_candidate",
+      "build_blind_evidence",
+      "MissingSection",
+      "Candidate",
+      "required_sections",
+      "load_candidate",
+      "candidate_hash",
+      "assessor_pin",
+      "BlindCell",
+      "BlindAssessmentReport",
+      "_check_intake",
+      "assess_candidate",
+      "_next_report_path",
+      "write_report",
+      "load_report",
+      "_ascii",
+      "_fmt_bool",
+      "render_report"
+    ],
+    "harness/calibration.py": [
+      "CalibrationError",
+      "_default_clock",
+      "ConfusionMatrix",
+      "confusion_from_labels",
+      "GraduationThreshold",
+      "CalibrationReport",
+      "calibrate",
+      "_with_graduated",
+      "calibrate_with_judge",
+      "GraduationDecision",
+      "graduation_for",
+      "CalibrationLog"
+    ],
+    "harness/claim_ledger.py": [
+      "ClaimLedgerError",
+      "_default_clock",
+      "SubSectionProse",
+      "load_section_prose",
+      "ProseChunk",
+      "chunk_prose",
+      "build_decomposition_prompt",
+      "parse_assertions_payload",
+      "decompose_chunk",
+      "Assertion",
+      "dedup_assertions",
+      "LedgerRecord",
+      "dedup_ledger_claims",
+      "_tokens",
+      "lexical_shortlist",
+      "build_coverage_prompt",
+      "extract_covered_by",
+      "judge_assertion_covered_by",
+      "CoverageOutcome",
+      "_covered_by_from_result",
+      "match_assertion",
+      "AssertionFinding",
+      "ChunkFailure",
+      "LedgerCompletenessResult",
+      "evaluate_ledger_completeness"
+    ],
+    "harness/commands/__init__.py": [],
+    "harness/commands/_common.py": [
+      "load_harness_env"
+    ],
+    "harness/commands/blind_assessment.py": [
+      "_env_int",
+      "_live_judge",
+      "_parser",
+      "main"
+    ],
+    "harness/commands/faithfulness_calibration.py": [
+      "_paced_judge",
+      "_env_int",
+      "_load_ckpt",
+      "_run",
+      "main"
+    ],
+    "harness/commands/freeze_grounding_baselines.py": [
+      "PacedRetryingBackend",
+      "build_paced_judge",
+      "_env_int",
+      "main"
+    ],
+    "harness/commands/rubric_grading_run.py": [
+      "BudgetStop",
+      "_utc_now",
+      "_cell_key",
+      "_gate_10b_note",
+      "compute_budget_plan",
+      "run_meta",
+      "save_checkpoint",
+      "load_checkpoint",
+      "run_grading",
+      "_env_int",
+      "_spent_line",
+      "main"
+    ],
+    "harness/evidence_pack.py": [
+      "EvidencePackError",
+      "estimate_tokens",
+      "normalize_terms",
+      "_term_patterns",
+      "_matched_terms",
+      "ProseSpan",
+      "PackClaim",
+      "ExcludedItem",
+      "_render_header",
+      "_render_frame",
+      "EvidencePack",
+      "pack_forbids_clean_pass",
+      "clean_pass",
+      "_load_sub_sections",
+      "_split_paragraphs",
+      "_fill_budget",
+      "build_evidence_pack"
+    ],
+    "harness/expectation_coverage.py": [
+      "CoverageError",
+      "coverage_property_key",
+      "CoverageGrade",
+      "grade_coverage",
+      "grade_expectation"
+    ],
+    "harness/expectation_grounding.py": [
+      "GroundingError",
+      "grounding_property_key",
+      "claim_content_key",
+      "ClaimGroundingRow",
+      "GroundingGrade",
+      "_check_reused_finding",
+      "derive_grounding",
+      "derive_expectation_grounding"
+    ],
+    "harness/expectations.py": [
+      "ExpectationError",
+      "_resolve_profile",
+      "OptionTag",
+      "_split_variants",
+      "parse_option_tag",
+      "_match_key",
+      "_scorecard_text_matches",
+      "Expectation",
+      "ExcludedExpectation",
+      "ExpectationSubstrate",
+      "_load_json",
+      "_registry_rows",
+      "_ScorecardEntry",
+      "_require_known_criterion",
+      "_scorecard_entries",
+      "_resolve_tag",
+      "load_expectation_substrate",
+      "section_ids_for",
+      "_resolve_paths",
+      "section_paths_for",
+      "golden_paths_for"
+    ],
+    "harness/faithfulness.py": [
+      "build_claim_user_prompt",
+      "build_faithfulness_prompt",
+      "resolve_source_text",
+      "judge_pair_supported"
+    ],
+    "harness/gold_set.py": [
+      "GoldSetError",
+      "GoldPair",
+      "GoldSet",
+      "_iter_raw_pairs",
+      "load_gold_set",
+      "gold_set_hash",
+      "_even_spaced_indices",
+      "seed_pairs_from_claim_statuses",
+      "_allocate",
+      "write_gold_set_template"
+    ],
+    "harness/jsonl_log.py": [
+      "JsonlLog"
+    ],
+    "harness/judge.py": [
+      "JudgeError",
+      "JudgeConfigError",
+      "JudgeIndependenceError",
+      "JudgeResponseError",
+      "drafter_models",
+      "_default_clock",
+      "JudgeConfig",
+      "resolve_judge_config",
+      "JudgeResult",
+      "MajorityJudgeResult",
+      "_verdict_from_payload",
+      "Judge"
+    ],
+    "harness/ledger_granularity.py": [
+      "_sha256",
+      "_count_sentences",
+      "_status_partition",
+      "measure_section",
+      "run_e4_regression",
+      "build_report",
+      "_print_summary",
+      "main"
+    ],
+    "harness/materiality.py": [
+      "MaterialityError",
+      "normalize_text",
+      "MaterialityExample",
+      "seed_materiality_positives",
+      "_sentences",
+      "seed_negative_candidates",
+      "write_materiality_template",
+      "load_materiality_set",
+      "materiality_set_hash",
+      "build_materiality_prompt",
+      "classify_materiality",
+      "_default_clock",
+      "MaterialityCalibration",
+      "calibrate_materiality"
+    ],
+    "harness/materiality_calibration.py": [
+      "Row",
+      "find_gold",
+      "_coerce_bool",
+      "_rows_from_xlsx",
+      "_rows_from_csv",
+      "read_sheet",
+      "escape_recall",
+      "disagreements",
+      "decide",
+      "_build_judge",
+      "_to_examples",
+      "_out_dir",
+      "main"
+    ],
+    "harness/profile.py": [
+      "ProfileError",
+      "canonical_hash",
+      "OptionTagGrammar",
+      "CriterionSpec",
+      "InstrumentSpec",
+      "ComponentPin",
+      "Scoring",
+      "PreEvaluationProfile",
+      "_require_str",
+      "_require_obj",
+      "_parse_pin",
+      "_parse_grammar",
+      "_parse_criteria",
+      "parse_profile",
+      "load_profile",
+      "default_profile",
+      "_number",
+      "parse_scoring",
+      "profile_version"
+    ],
+    "harness/provenance.py": [
+      "prompt_hash",
+      "ProvenanceRecord",
+      "ProvenanceLog"
+    ],
+    "harness/regression.py": [
+      "RegressionError",
+      "_default_clock",
+      "_norm",
+      "LedgerEntry",
+      "SubSectionFingerprint",
+      "SectionFingerprint",
+      "_canonical_artifact_sha256",
+      "freeze_section_fingerprint",
+      "write_fingerprint",
+      "load_fingerprint",
+      "freeze_golden_set",
+      "load_golden_set",
+      "RegressionFinding",
+      "SectionRegressionResult",
+      "_diff_ledger",
+      "_diff_prose",
+      "compare_section",
+      "RegressionReport",
+      "compare_to_golden_set",
+      "_judge_section",
+      "freeze_section_grounding",
+      "compare_section_grounding",
+      "_require_report",
+      "freeze_rubric_baseline",
+      "_read_json",
+      "load_rubric_baseline",
+      "_cell_index",
+      "_axis_value",
+      "_contradiction_kinds",
+      "compare_rubric_baseline",
+      "_section_files",
+      "main"
+    ],
+    "harness/report.py": [
+      "HarnessReport",
+      "build_report"
+    ],
+    "harness/routing.py": [
+      "DeterministicCoverageError",
+      "RoutingAuthority",
+      "RoutingDecision",
+      "deterministic_predicate_names",
+      "semantic_inrun_predicate_names",
+      "route",
+      "assert_judgeable"
+    ],
+    "harness/rubric.py": [
+      "RubricReportError",
+      "_ascii",
+      "SpineFact",
+      "_token_pattern",
+      "SpineRegistry",
+      "_spine_fact",
+      "load_spine_registry",
+      "Contradiction",
+      "_claim_ref",
+      "_weak_grounding_explanation",
+      "ExpectationCell",
+      "combine_axes",
+      "RubricReport",
+      "build_rubric_report",
+      "_fmt_bool",
+      "_coverage_summary",
+      "_grounding_summary",
+      "render_report",
+      "grade_all",
+      "_build_judge",
+      "main"
+    ],
+    "harness/rubrics.py": [
+      "RubricError",
+      "Rubric",
+      "rubric_fingerprint",
+      "RubricSet",
+      "_parse_rubric",
+      "_resolve_profile",
+      "load_rubric_set",
+      "ProfileBundle",
+      "load_profile_bundle",
+      "build_pack_for",
+      "build_rubric_system_prompt",
+      "build_rubric_user_prompt",
+      "build_rubric_prompts",
+      "rubric_prompt_hash"
+    ],
+    "harness/status_calibration.py": [
+      "StatusCalibrationError",
+      "ClaimDrift",
+      "classify_underclaimed",
+      "StatusCalibrationResult",
+      "_drift_from_e2_finding",
+      "evaluate_status_calibration"
+    ],
+    "harness/status_faithfulness.py": [
+      "StatusFaithfulnessError",
+      "SourceResolutionError",
+      "entry_key_for",
+      "SectionClaim",
+      "load_section_claims",
+      "StatusPolicy",
+      "build_faithfulness_prompt_for_status",
+      "_bounded",
+      "_leading_parenthetical",
+      "_parse_segment",
+      "_split_source_ref",
+      "_split_top_level",
+      "_parse_source_segments",
+      "_hint_tokens",
+      "_find_by_id",
+      "_render_text",
+      "resolve_claim_source_text",
+      "_render_segment",
+      "resolve_assumed_declared_text",
+      "meets_bar",
+      "classify_severity",
+      "ClaimFaithfulness",
+      "_judge_claim",
+      "evaluate_claim",
+      "_evaluate_claim_routed",
+      "StatusFaithfulnessResult",
+      "evaluate_status_aware_faithfulness",
+      "ClaimGroundingSnapshot",
+      "FaithfulnessBaseline",
+      "freeze_baseline",
+      "write_baseline",
+      "load_baseline",
+      "InvarianceViolation",
+      "InvarianceReport",
+      "compare_to_baseline"
+    ],
+    "harness/verdict.py": [
+      "validate_sample_count",
+      "_validate_inferred",
+      "Verdict",
+      "MajorityVerdict",
+      "majority_vote",
+      "_synthesize_rationale"
+    ],
+    "runner/__init__.py": [],
+    "runner/__main__.py": [
+      "_ts",
+      "_parse_phase",
+      "main"
+    ],
+    "runner/agent_runtime.py": [
+      "drafting_skills_superseded_by",
+      "AgentRuntimeError",
+      "_load_agent_catalog",
+      "_get_agent_entry",
+      "_load_artifact_registry",
+      "_load_agent_spec",
+      "_load_prompt_spec",
+      "_resolve_agent_inputs",
+      "_resolve_skill_sequence",
+      "_resolve_budget_regime_safe",
+      "_get_artifacts_produced_by_node",
+      "_determine_can_evaluate_exit_gate",
+      "_get_exit_gate_for_node",
+      "_resolve_instrument_type",
+      "_context_sources_for",
+      "_build_caller_context",
+      "_missing_context_sources",
+      "_resolve_auditable_artifact",
+      "_check_skill_applicability",
+      "run_agent",
+      "_identify_agent_skills",
+      "_refresh_inputs_from_outputs",
+      "_sub_agent_inputs_ready"
+    ],
+    "runner/agnosticism_lint.py": [
+      "LintViolation",
+      "LintReport",
+      "scan_text",
+      "_is_excluded",
+      "iter_generic_layer_files",
+      "lint_generic_layer",
+      "format_report",
+      "main"
+    ],
+    "runner/assumption_applier.py": [
+      "AssumptionApplierError",
+      "_resolve_declaration",
+      "_read_json_object",
+      "_flip_declared_claims",
+      "apply_assumptions"
+    ],
+    "runner/atomic_write.py": [
+      "canonical_json_bytes",
+      "_finalize",
+      "atomic_write_json",
+      "atomic_write_text",
+      "atomic_write_via"
+    ],
+    "runner/budget_request.py": [
+      "BudgetRequestError",
+      "_wp_month_windows",
+      "_management_roles",
+      "_entry_ids",
+      "_partner_identity",
+      "compose_budget_request",
+      "_read_json",
+      "derive_budget_request"
+    ],
+    "runner/call_slicer.py": [
+      "CallSlicerError",
+      "generate_call_slice"
+    ],
+    "runner/checkpoint_publisher.py": [
+      "CheckpointPublishError",
+      "_read_json_dict",
+      "_validate_gate_result",
+      "_load_run_context",
+      "_authorize_and_build_quad",
+      "_read_optional_json",
+      "_build_tier3_snapshot",
+      "publish_checkpoint"
+    ],
+    "runner/claim_status.py": [
+      "normalize_status",
+      "worst_status",
+      "rollup_inconsistency"
+    ],
+    "runner/claude_transport.py": [
+      "ClaudeTransportError",
+      "ClaudeCLIUnavailableError",
+      "ClaudeCLIRateLimitError",
+      "ClaudeCLITimeoutError",
+      "_effective_max_output_tokens",
+      "_rate_limit_notice",
+      "ClaudeCLIResolution",
+      "resolve_claude_cli",
+      "_announce_cli_resolution",
+      "AssistantTurn",
+      "_splice_continuation",
+      "_join_assistant_turns",
+      "_reassemble_stream_json",
+      "_tree_killable_popen_kwargs",
+      "_kill_process_tree",
+      "_child_tree_snapshot",
+      "_drain_after_kill",
+      "invoke_claude_text"
+    ],
+    "runner/consortium_composition.py": [
+      "CompositionError",
+      "Citation",
+      "CompositionRule",
+      "Beneficiary",
+      "CompositionResult",
+      "_load_json",
+      "_require_int",
+      "_citation",
+      "load_composition_rule",
+      "load_partners",
+      "partners_by_capability_basis",
+      "_first_partner_per_slot",
+      "evaluate_composition",
+      "Scenario",
+      "evaluate_scenarios",
+      "format_scenarios",
+      "main"
+    ],
+    "runner/dag_scheduler.py": [
+      "_gate_result_repo_path",
+      "format_unsatisfied_condition",
+      "format_evidence_violation",
+      "verify_released_predecessors",
+      "_collect_upstream_nodes",
+      "bootstrap_phase_prerequisites",
+      "DAGSchedulerError",
+      "RunSummary",
+      "RunAbortedError",
+      "IncomingCondition",
+      "ManifestGraph",
+      "DAGScheduler"
+    ],
+    "runner/decomposed_drafting.py": [
+      "DecomposedDraftingError",
+      "_section_id",
+      "_resolve_drafting_sub_sections",
+      "_build_draft",
+      "_derive_overall_status",
+      "_capture_raw_response",
+      "_snippet",
+      "_default_claude_drafter",
+      "_parse_drafter_response",
+      "_read_upstream_json",
+      "source_section_extra_fields",
+      "draft_section_decomposed"
+    ],
+    "runner/dependency_normalizer.py": [
+      "DependencyNormalizerError",
+      "_read_json",
+      "_build_wp_bounds",
+      "_build_task_to_wp",
+      "_get_project_duration",
+      "_is_wp_node",
+      "_classify_edge",
+      "normalize_dependencies"
+    ],
+    "runner/deterministic_components.py": [
+      "_run_dependency_normalizer",
+      "_run_excellence_section_assembler",
+      "_run_impact_section_assembler",
+      "_run_implementation_section_assembler",
+      "_run_excellence_assumption_applier",
+      "_run_impact_assumption_applier",
+      "_run_implementation_assumption_applier",
+      "_run_unit_cost_budget_deriver",
+      "_run_budget_request_composer",
+      "_run_canonical_pack_deriver",
+      "_run_final_export_writer",
+      "_run_checkpoint_publisher",
+      "_run_dev_graph_snapshot_writer",
+      "_run_dev_graph_package_manifest_writer",
+      "_run_dev_graph_impact_plan_writer",
+      "_run_dev_graph_shadow_comparison_writer",
+      "_run_dev_graph_revision_record_writer",
+      "partition_draft_consuming",
+      "_to_repo_relative",
+      "invoke_component"
+    ],
+    "runner/dev_graph/__init__.py": [],
+    "runner/dev_graph/builder.py": [
+      "Snapshot",
+      "canonical_graph",
+      "_malformed",
+      "_read_records",
+      "_objects",
+      "_key",
+      "_ids",
+      "_optional_id",
+      "_Assembler",
+      "_add_partner",
+      "_add_objective",
+      "_add_work_package",
+      "_add_milestone",
+      "_add_source",
+      "_source_span_id",
+      "_add_verified_span",
+      "_add_document",
+      "_assemble",
+      "build_snapshot",
+      "current_commitments",
+      "superseded_versions",
+      "derived_from_version"
+    ],
+    "runner/dev_graph/changes.py": [
+      "ChangeRecord",
+      "_hex",
+      "snapshot_path",
+      "store_snapshot",
+      "load_snapshot",
+      "_record_version_path",
+      "_archive_record",
+      "read_record_version",
+      "_own_content",
+      "label_of",
+      "_edge_entry",
+      "change_set",
+      "_refuse",
+      "record_change",
+      "read_change_record"
+    ],
+    "runner/dev_graph/documents.py": [
+      "DocumentRef",
+      "_malformed",
+      "_str",
+      "_ids",
+      "_objects",
+      "_sub_sections",
+      "_section",
+      "_verified_span",
+      "_claim",
+      "_commitment",
+      "normalise_candidate",
+      "_tags",
+      "render_document",
+      "node_content",
+      "document_node_id",
+      "read_candidate",
+      "import_document",
+      "read_document_records"
+    ],
+    "runner/dev_graph/identity.py": [
+      "canonical_json",
+      "content_hash",
+      "snapshot_id"
+    ],
+    "runner/dev_graph/impact.py": [
+      "ImpactPlan",
+      "_refuse",
+      "_id_list",
+      "normalise_run_records",
+      "read_run_records",
+      "_adjacency",
+      "_reach",
+      "plan_identity",
+      "plan_nothing_changed",
+      "_check_snapshot",
+      "plan_impact",
+      "read_impact_request",
+      "write_impact_plan",
+      "run_impact_plan_writer"
+    ],
+    "runner/dev_graph/intake.py": [
+      "_refuse",
+      "EsrIntake",
+      "_identifier",
+      "normalise_intake",
+      "intake_path",
+      "record_esr_intake",
+      "read_esr_intake"
+    ],
+    "runner/dev_graph/packages.py": [
+      "_mandatory_step",
+      "estimate_cost",
+      "Package",
+      "_refuse",
+      "_check_request",
+      "_expand",
+      "_item_span",
+      "_unresolved_items",
+      "_declared_status_items",
+      "build_package",
+      "read_package_request",
+      "package_dir",
+      "write_package",
+      "run_package_manifest_writer"
+    ],
+    "runner/dev_graph/policies.py": [
+      "ViewPolicy"
+    ],
+    "runner/dev_graph/revisions.py": [
+      "_refuse",
+      "RevisionContract",
+      "_id_list",
+      "_unresolved_item",
+      "normalise_contract",
+      "ContractCheck",
+      "_touches",
+      "_validate_change_set",
+      "classify_change_set",
+      "check_revision",
+      "_node_index",
+      "build_provenance",
+      "create_candidate_version",
+      "_ref",
+      "bind_assessment",
+      "Applicability",
+      "_binding_of",
+      "check_applicability",
+      "RevisionRecord",
+      "read_revision_request",
+      "write_revision_record",
+      "read_revision_record",
+      "run_revision_record_writer"
+    ],
+    "runner/dev_graph/schema.py": [
+      "RelationshipSpec",
+      "declared_status",
+      "DevGraphError",
+      "edge_label",
+      "validate_graph"
+    ],
+    "runner/dev_graph/shadow.py": [
+      "ShadowComparison",
+      "_refuse",
+      "_plan_dict",
+      "_decisions",
+      "_default_artifact_paths",
+      "_planner_verdict",
+      "compare_shadow",
+      "_read_json",
+      "read_shadow_request",
+      "read_plan",
+      "read_reuse_decisions",
+      "write_shadow_comparison",
+      "run_shadow_comparison_writer"
+    ],
+    "runner/dev_graph/writer.py": [
+      "write_snapshot",
+      "run_snapshot_writer"
+    ],
+    "runner/docx_exporter.py": [
+      "DocxExportError",
+      "_synthetic_override_active",
+      "_read_optional_json",
+      "_resolve_section_paths",
+      "split_content_blocks",
+      "_add_content_paragraphs",
+      "_render_section",
+      "export_part_b_docx",
+      "main"
+    ],
+    "runner/final_export_writer.py": [
+      "FinalExportError",
+      "_read_json_dict",
+      "_validate_sections",
+      "write_final_export"
+    ],
+    "runner/fingerprints.py": [
+      "fingerprint_path",
+      "compute_fingerprints"
+    ],
+    "runner/gate_evaluator.py": [
+      "_substitute_runtime_args",
+      "_extract_node_id",
+      "_gate_result_path",
+      "_call_predicate",
+      "_is_hard_block_failure",
+      "_resolve_budget_regime",
+      "_partition_predicates_by_instrument",
+      "evaluate_gate"
+    ],
+    "runner/gate_library.py": [
+      "GateLibraryError",
+      "ManifestVersionMismatchError",
+      "GateNotFoundError",
+      "GateLibrary"
+    ],
+    "runner/gate_result_registry.py": [],
+    "runner/graph_canonical_pack.py": [
+      "_provenance",
+      "_copy_fields",
+      "_tag",
+      "_bound_extraction_nodes",
+      "_extract_objectives",
+      "_extract_outcomes",
+      "_extract_wps_and_deliverables",
+      "_extract_partners",
+      "build_canonical_pack_from_graph",
+      "main"
+    ],
+    "runner/graph_claim_verifier.py": [
+      "GraphClaimVerificationError",
+      "ClaimFinding",
+      "ClaimVerificationResult",
+      "_as_dir",
+      "_rel",
+      "_tier5_sections_dir",
+      "_bound_section_nodes",
+      "_section_slug",
+      "_check_claim",
+      "verify_claim_traceability",
+      "format_report",
+      "main"
+    ],
+    "runner/graph_compiler.py": [
+      "GraphCompileError",
+      "CompiledArtifact",
+      "Tier3CompileResult",
+      "CompiledSection",
+      "PartBCompileResult",
+      "extract_record",
+      "_collection_key_for",
+      "_check_node_self_binding",
+      "_now_iso",
+      "_build_artifact_obj",
+      "compile_tier3",
+      "_record_identity",
+      "_diff_one",
+      "diff_against_hand_lift",
+      "compile_and_diff",
+      "_require_section_str",
+      "extract_sub_section",
+      "_section_claim",
+      "_derive_overall_status",
+      "_partb_out_dir",
+      "_union_section_source_refs",
+      "_merge_section_extra_fields",
+      "_load_required_section_fields",
+      "_validate_compiled_section",
+      "compile_part_b",
+      "part_b_report",
+      "compile_part_b_and_report",
+      "main"
+    ],
+    "runner/graph_config.py": [
+      "GraphConfigError",
+      "Binding",
+      "GraphConfig",
+      "_require_mapping",
+      "_optional_stripped_str",
+      "_parse_binding",
+      "load_graph_config"
+    ],
+    "runner/graph_determinism_check.py": [
+      "DeterminismCheckError",
+      "DeterminismFinding",
+      "StagingComparison",
+      "DeterminismResult",
+      "_strip_exclusions",
+      "_canonical_json",
+      "_staged_rel_paths",
+      "_divergence_detail",
+      "compare_staging_trees",
+      "verify_compile_determinism",
+      "_remove_tree",
+      "format_report",
+      "main"
+    ],
+    "runner/graph_projector.py": [
+      "GraphProjectionError",
+      "SyncOverlapError",
+      "GateState",
+      "_phase_from_path",
+      "_predicate_counts",
+      "Tier4Scan",
+      "scan_tier4_gate_states",
+      "read_tier4_gate_states",
+      "_render_mirror_node",
+      "ProjectionResult",
+      "project",
+      "SyncPartition",
+      "compute_sync_partition",
+      "check_no_overlap",
+      "main"
+    ],
+    "runner/graph_schema.py": [
+      "GraphSchemaError",
+      "map_evidence_to_status",
+      "_is_blank",
+      "validate_front_matter"
+    ],
+    "runner/instrument_profile.py": [
+      "InstrumentProfileError",
+      "InstrumentProfile",
+      "_read_json",
+      "_find_instrument_entry",
+      "resolve_instrument_type",
+      "resolve_instrument_profile",
+      "resolve_budget_regime",
+      "owns_budget_regime"
+    ],
+    "runner/interface_contract.py": [
+      "carries_json_schema_keywords",
+      "ContractViolation",
+      "is_planner_contract",
+      "_is_missing",
+      "_required_fields",
+      "_check_required",
+      "_check_negatives",
+      "validate_payload"
+    ],
+    "runner/json_extract.py": [
+      "extract_first_json_object"
+    ],
+    "runner/leakage_scan.py": [
+      "LeakageError",
+      "LeakageViolation",
+      "LeakageReport",
+      "leakage_denylist",
+      "scan_text",
+      "iter_vault_roots",
+      "iter_scanned_files",
+      "scan_tree",
+      "_read_json_object",
+      "real_country_names",
+      "_iter_strings",
+      "_iter_globbed",
+      "iter_pseudonymity_files",
+      "iter_pseudonymity_text_files",
+      "scan_partner_records",
+      "_read_extra_nouns",
+      "main"
+    ],
+    "runner/manifest_reader.py": [
+      "ManifestReaderError",
+      "ManifestGateNotFoundError",
+      "ManifestReader"
+    ],
+    "runner/node_resolver.py": [
+      "NodeResolverError",
+      "NodeResolver"
+    ],
+    "runner/paths.py": [
+      "find_repo_root",
+      "resolve_repo_path"
+    ],
+    "runner/persistence_policy.py": [
+      "DiagnosticLevel",
+      "resolve_diagnostic_level",
+      "reset_diagnostic_level_cache",
+      "allows_content_persistence",
+      "allows_benchmark_persistence",
+      "sanitize_error_message"
+    ],
+    "runner/phase8_canonical_pack.py": [
+      "CanonicalPackError",
+      "_confirmed",
+      "_read_json",
+      "_lift",
+      "_extract_objectives",
+      "_extract_outcomes",
+      "_extract_wps_and_deliverables",
+      "_extract_partners",
+      "_extract_declared_assumptions",
+      "build_phase8_canonical_reference_pack"
+    ],
+    "runner/phase8_preseed.py": [
+      "_validation_status_inconsistency",
+      "Phase8PreseedResult",
+      "maybe_apply_phase8_preseed",
+      "_write_preseed_audit"
+    ],
+    "runner/phase8_reuse.py": [
+      "ReuseDecision",
+      "_collect_fingerprint_files",
+      "compute_input_fingerprint",
+      "artifact_sha256",
+      "read_artifact_run_id",
+      "_reuse_metadata_path",
+      "load_reuse_metadata",
+      "write_reuse_metadata",
+      "_load_gate_result",
+      "validate_reuse_candidate",
+      "_run_id_prefix",
+      "_audit_report_exists",
+      "is_reuse_owned_artifact_valid"
+    ],
+    "runner/phase8_skip_binding.py": [
+      "SkipBindingError",
+      "drafting_skill_for",
+      "validate_skip_binding",
+      "assert_agrees_with_source",
+      "assert_nodes_match_source"
+    ],
+    "runner/predicates/__init__.py": [],
+    "runner/predicates/coverage_predicates.py": [
+      "_read_json_object",
+      "_read_json_any",
+      "_extract_partner_ids_from_array",
+      "_extract_partner_ids",
+      "_extract_expected_impact_ids",
+      "_extract_required_section_ids",
+      "_extract_required_impl_section_ids",
+      "_collect_field_values_deep",
+      "_scan_budget_dir",
+      "_extract_wp_ids",
+      "_extract_all_deliverable_ids",
+      "_extract_all_task_ids",
+      "_extract_all_wp_partners",
+      "all_wps_have_deliverable_and_lead",
+      "all_partners_in_tier3",
+      "all_management_roles_in_tier3",
+      "all_tasks_have_months",
+      "all_impacts_mapped",
+      "kpis_traceable_to_wps",
+      "instrument_sections_addressed",
+      "all_sections_drafted",
+      "all_sections_have_traceability_footer",
+      "wp_budget_coverage_match",
+      "partner_budget_coverage_match"
+    ],
+    "runner/predicates/criterion_predicates.py": [
+      "_read_json_object",
+      "schema_id_matches",
+      "no_unresolved_material_claims",
+      "assumed_claims_are_operator_declared",
+      "_cites_working_assumptions",
+      "declared_facts_are_not_inferred",
+      "impact_pathways_covered",
+      "implementation_coverage_complete",
+      "_extract_all_content",
+      "_check_objective_coverage",
+      "_check_partner_naming",
+      "_check_metric_completeness",
+      "_check_terminology_consistency",
+      "_check_deliverable_kpi_alignment",
+      "cross_section_consistency"
+    ],
+    "runner/predicates/cycle_predicates.py": [
+      "no_dependency_cycles"
+    ],
+    "runner/predicates/file_predicates.py": [
+      "exists",
+      "non_empty",
+      "non_empty_json",
+      "dir_non_empty",
+      "artifact_owned_by_run"
+    ],
+    "runner/predicates/gate_pass_predicates.py": [
+      "_parse_iso8601",
+      "_mtime_suspect_inputs",
+      "_check_continuation_acceptance",
+      "is_gate_fresh",
+      "gate_pass_recorded"
+    ],
+    "runner/predicates/phase8_section_predicates.py": [
+      "_read_json",
+      "_extract_all_content",
+      "_content_words",
+      "_is_title_attempt",
+      "_title_matches",
+      "_find_appositives",
+      "_appositive_is_other_entity",
+      "_find_truncated_legal_name",
+      "_check_partner_conflation",
+      "_extract_attached_wps",
+      "_extract_attached_months",
+      "no_stale_run_id",
+      "partner_names_preserved",
+      "deliverable_identity_preserved",
+      "canonical_terms_preserved",
+      "_extract_quantitative_components",
+      "_detect_section_type",
+      "_check_quantitative_components",
+      "measurable_targets_preserved"
+    ],
+    "runner/predicates/schema_predicates.py": [
+      "_read_json_object",
+      "json_field_present",
+      "json_fields_present",
+      "instrument_type_matches_schema",
+      "interface_contract_conforms",
+      "risk_register_populated",
+      "ethics_assessment_explicit",
+      "governance_matrix_present",
+      "no_blocking_inconsistencies",
+      "unit_cost_budget_resolved",
+      "budget_gate_confirmation_present",
+      "findings_categorised_by_severity",
+      "revision_action_list_present",
+      "all_critical_revisions_resolved",
+      "_read_gate_result_json",
+      "_validate_checkpoint_provenance",
+      "checkpoint_published"
+    ],
+    "runner/predicates/scope_coverage_predicates.py": [
+      "_read_json",
+      "all_mandatory_scope_covered"
+    ],
+    "runner/predicates/source_ref_predicates.py": [
+      "_read_json",
+      "_ref_value_is_present",
+      "_has_any_source_ref",
+      "_extract_entries_for_source_ref",
+      "_extract_mapping_entries",
+      "source_refs_present",
+      "all_mappings_have_source_refs"
+    ],
+    "runner/predicates/timeline_predicates.py": [
+      "_read_json_object",
+      "_extract_max_wp_values",
+      "timeline_within_duration",
+      "all_milestones_have_criteria",
+      "wp_count_within_limit",
+      "critical_path_present",
+      "dependency_schedule_consistency",
+      "_resolve_max_end_month",
+      "_resolve_min_start_month"
+    ],
+    "runner/predicates/types.py": [
+      "PredicateResult"
+    ],
+    "runner/run_context.py": [
+      "RunContext"
+    ],
+    "runner/runtime_models.py": [
+      "SkillResult",
+      "SkillInvocationRecord",
+      "ComponentInvocationRecord",
+      "AgentResult",
+      "NodeExecutionResult"
+    ],
+    "runner/section_assembler.py": [
+      "SectionAssemblerError",
+      "_read_json_object",
+      "_word_count",
+      "_build_sub_section",
+      "_coerce_tier",
+      "_source_ref_key",
+      "_union_source_refs",
+      "_load_drafts_in_order",
+      "_carry_claim_statuses",
+      "assemble_section"
+    ],
+    "runner/semantic_dispatch.py": [
+      "SemanticPredicateConfig",
+      "validate_semantic_result",
+      "_dispatch_error_result",
+      "_write_semantic_diagnostics",
+      "_read_artifacts",
+      "_build_system_prompt",
+      "_build_user_prompt",
+      "_extract_json",
+      "_resolve_semantic_backend",
+      "_invoke_via_backend",
+      "invoke_agent",
+      "dispatch_semantic_predicate"
+    ],
+    "runner/skill_runtime.py": [
+      "_run_id_echo_directive",
+      "_resolve_transport_backend",
+      "_reset_transport_backend_cache",
+      "SkillRuntimeError",
+      "_load_skill_catalog",
+      "_get_skill_entry",
+      "_load_artifact_schemas",
+      "_find_schema_for_path",
+      "_extract_schema_requirements",
+      "_sanitize_filename",
+      "_is_contextual_descriptor",
+      "_load_skill_spec",
+      "_resolve_inputs",
+      "_validate_skill_inputs",
+      "_anchor_field",
+      "_artifacts_under_directory",
+      "_resolve_output_artifacts",
+      "_collect_schema_hints",
+      "_multi_artifact_directive",
+      "_assemble_skill_prompt",
+      "_assemble_tapm_prompt",
+      "_invoke_claude",
+      "_classify_transport_failure",
+      "_write_transport_failure_diagnostics",
+      "_json_break_point",
+      "_extract_json_response",
+      "_validate_skill_output",
+      "_atomic_write",
+      "run_skill"
+    ],
+    "runner/source_index.py": [
+      "SourceIndexError",
+      "normalise_whitespace",
+      "read_page_text",
+      "SourceProblem",
+      "SourceIndexReport",
+      "_read_json",
+      "SourceIndex",
+      "load_index",
+      "candidate_names",
+      "_check_shape",
+      "_check_resolution",
+      "_check_transcription",
+      "span_id",
+      "_check_spans",
+      "_has_anchor",
+      "_check_anchor",
+      "_check_no_overclaim",
+      "_swept_texts",
+      "_check_names",
+      "_registered_document_ids",
+      "_concept_claim_ids",
+      "_check_coverage",
+      "verify",
+      "main"
+    ],
+    "runner/transport/__init__.py": [],
+    "runner/transport/bedrock_converse.py": [
+      "BedrockConverseBackend"
+    ],
+    "runner/transport/capabilities.py": [
+      "ProviderCapabilities"
+    ],
+    "runner/transport/config.py": [
+      "TransportPreset",
+      "ProviderConfig",
+      "validate_bedrock_model_id",
+      "is_production_mode",
+      "_enforce_production_backend",
+      "list_transport_presets",
+      "get_transport_preset",
+      "resolve_provider_config_from_preset",
+      "resolve_provider_config",
+      "_resolve_bedrock",
+      "_resolve_bedrock_converse",
+      "_resolve_together_ai",
+      "_resolve_ollama",
+      "_resolve_generic",
+      "build_openai_backend",
+      "build_converse_backend"
+    ],
+    "runner/transport/errors.py": [
+      "ErrorCategory",
+      "OpenAICompatTransportError",
+      "OpenAICompatAuthError",
+      "OpenAICompatRateLimitError",
+      "OpenAICompatProviderError",
+      "OpenAICompatTimeoutError",
+      "OpenAICompatModelNotFoundError",
+      "normalize_http_error"
+    ],
+    "runner/transport/openai_compatible.py": [
+      "OpenAICompatBackend"
+    ],
+    "runner/transport/tool_executor.py": [
+      "is_within",
+      "_make_error",
+      "ToolExecutor"
+    ],
+    "runner/transport/tool_loop.py": [
+      "ToolLoopResponse",
+      "ToolLoopBackend",
+      "FakeBackend",
+      "run_tool_loop"
+    ],
+    "runner/unit_cost_budget.py": [
+      "UnitCostBudgetError",
+      "_round2",
+      "_monthly_rate",
+      "compute_unit_cost_budget",
+      "_read_json",
+      "_resolve_confirmed_months",
+      "_lookup_coefficient",
+      "_resolve_host_country",
+      "derive_unit_cost_budget"
+    ],
+    "runner/upstream_inputs.py": [],
+    "runner/vault_reader.py": [
+      "VaultReadError",
+      "WikiLink",
+      "_parse_wikilink",
+      "_extract_wikilinks",
+      "_split_front_matter",
+      "GraphNode",
+      "Vault",
+      "_parse_node",
+      "read_vault"
+    ],
+    "runner/vault_scaffold.py": [
+      "VaultScaffoldError",
+      "ScaffoldResult",
+      "scaffold_vault",
+      "validate_scaffold"
+    ],
+    "runner/versions.py": [],
+    "runner/working_assumptions.py": [
+      "declared_claim_summary",
+      "WorkingAssumptionsError",
+      "Declaration",
+      "WorkingAssumptions",
+      "_require_str",
+      "_parse_declaration",
+      "load_working_assumptions"
+    ],
+    "tools/backfill_gate_result_schema_id.py": [
+      "_is_gate_result",
+      "_discover",
+      "backfill",
+      "main"
+    ],
+    "tools/build_demo_dev_graph.py": [
+      "_requests",
+      "_package",
+      "count_by",
+      "_minimum_budget",
+      "_mandatory_fits",
+      "_complete",
+      "_package_row",
+      "_totals",
+      "build",
+      "main"
+    ],
+    "tools/build_part_b_candidate.py": [
+      "BuilderError",
+      "SectionSpec",
+      "_section_specs",
+      "_read_section",
+      "_sub_sections",
+      "_claims",
+      "build_candidate",
+      "output_path",
+      "write_candidate",
+      "main"
+    ],
+    "tools/derive_run_phase_costs.py": [
+      "DerivationError",
+      "_read_json",
+      "_parse_ts",
+      "collect_phase_gates",
+      "resolve_run_id",
+      "read_ledger",
+      "read_monetary_cost",
+      "partition",
+      "_measure",
+      "build_record",
+      "output_path",
+      "main"
+    ],
+    "tools/preserve_run_manifests.py": [
+      "PreservationError",
+      "slug",
+      "_read",
+      "collect",
+      "main"
+    ],
+    "tools/promote_graph_staging.py": [
+      "PromoteError",
+      "_read_json",
+      "_config_project_id",
+      "_staging_project_id",
+      "promote",
+      "main"
+    ],
+    "tools/prose_detect.py": [
+      "split_sentences",
+      "iter_json_strings",
+      "main"
+    ]
+  },
+  "batches": [
+    {
+      "batchIndex": 1,
+      "files": [
+        {
+          "path": "harness/__init__.py",
+          "language": "python",
+          "sizeLines": 180,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/blind_assessment.py",
+          "language": "python",
+          "sizeLines": 1008,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/calibration.py",
+          "language": "python",
+          "sizeLines": 469,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/claim_ledger.py",
+          "language": "python",
+          "sizeLines": 1168,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/commands/_common.py",
+          "language": "python",
+          "sizeLines": 44,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/commands/blind_assessment.py",
+          "language": "python",
+          "sizeLines": 213,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/commands/faithfulness_calibration.py",
+          "language": "python",
+          "sizeLines": 246,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/commands/freeze_grounding_baselines.py",
+          "language": "python",
+          "sizeLines": 358,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/commands/rubric_grading_run.py",
+          "language": "python",
+          "sizeLines": 693,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/evidence_pack.py",
+          "language": "python",
+          "sizeLines": 639,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/expectation_coverage.py",
+          "language": "python",
+          "sizeLines": 253,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/expectation_grounding.py",
+          "language": "python",
+          "sizeLines": 618,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/expectations.py",
+          "language": "python",
+          "sizeLines": 616,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/faithfulness.py",
+          "language": "python",
+          "sizeLines": 165,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/gold_set.py",
+          "language": "python",
+          "sizeLines": 403,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/jsonl_log.py",
+          "language": "python",
+          "sizeLines": 80,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/judge.py",
+          "language": "python",
+          "sizeLines": 435,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/ledger_granularity.py",
+          "language": "python",
+          "sizeLines": 373,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/materiality.py",
+          "language": "python",
+          "sizeLines": 577,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/profile.py",
+          "language": "python",
+          "sizeLines": 388,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/provenance.py",
+          "language": "python",
+          "sizeLines": 196,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/regression.py",
+          "language": "python",
+          "sizeLines": 1350,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/report.py",
+          "language": "python",
+          "sizeLines": 139,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/routing.py",
+          "language": "python",
+          "sizeLines": 197,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/rubric.py",
+          "language": "python",
+          "sizeLines": 1084,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/rubrics.py",
+          "language": "python",
+          "sizeLines": 578,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/status_calibration.py",
+          "language": "python",
+          "sizeLines": 446,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/status_faithfulness.py",
+          "language": "python",
+          "sizeLines": 1612,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/verdict.py",
+          "language": "python",
+          "sizeLines": 301,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/working_assumptions.py",
+          "language": "python",
+          "sizeLines": 422,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "harness/__init__.py": [
+          "harness/calibration.py",
+          "harness/faithfulness.py",
+          "harness/gold_set.py",
+          "harness/jsonl_log.py",
+          "harness/judge.py",
+          "harness/provenance.py",
+          "harness/report.py",
+          "harness/routing.py",
+          "harness/verdict.py"
+        ],
+        "harness/blind_assessment.py": [
+          "harness/evidence_pack.py",
+          "harness/expectation_coverage.py",
+          "harness/judge.py",
+          "harness/profile.py",
+          "harness/rubrics.py",
+          "harness/verdict.py",
+          "runner/atomic_write.py",
+          "runner/dev_graph/__init__.py",
+          "runner/dev_graph/schema.py"
+        ],
+        "harness/calibration.py": [
+          "harness/faithfulness.py",
+          "harness/gold_set.py",
+          "harness/jsonl_log.py",
+          "harness/judge.py",
+          "harness/provenance.py"
+        ],
+        "harness/claim_ledger.py": [
+          "harness/faithfulness.py",
+          "harness/judge.py",
+          "harness/materiality.py",
+          "harness/provenance.py",
+          "harness/report.py",
+          "harness/routing.py",
+          "harness/verdict.py",
+          "runner/json_extract.py"
+        ],
+        "harness/commands/_common.py": [
+          "runner/paths.py"
+        ],
+        "harness/commands/blind_assessment.py": [
+          "harness/blind_assessment.py",
+          "harness/evidence_pack.py",
+          "harness/expectation_coverage.py",
+          "harness/expectations.py",
+          "harness/judge.py",
+          "harness/profile.py",
+          "harness/routing.py",
+          "harness/rubrics.py",
+          "harness/verdict.py",
+          "runner/dev_graph/__init__.py"
+        ],
+        "harness/commands/faithfulness_calibration.py": [
+          "harness/calibration.py",
+          "harness/commands/_common.py",
+          "harness/commands/freeze_grounding_baselines.py",
+          "harness/faithfulness.py",
+          "harness/gold_set.py",
+          "harness/judge.py",
+          "harness/provenance.py",
+          "runner/transport/config.py"
+        ],
+        "harness/commands/freeze_grounding_baselines.py": [
+          "harness/commands/_common.py",
+          "harness/judge.py",
+          "harness/provenance.py",
+          "harness/regression.py",
+          "harness/status_faithfulness.py",
+          "runner/transport/config.py",
+          "runner/transport/errors.py",
+          "runner/working_assumptions.py"
+        ],
+        "harness/commands/rubric_grading_run.py": [
+          "harness/evidence_pack.py",
+          "harness/expectation_coverage.py",
+          "harness/expectation_grounding.py",
+          "harness/expectations.py",
+          "harness/judge.py",
+          "harness/profile.py",
+          "harness/regression.py",
+          "harness/rubric.py",
+          "harness/rubrics.py",
+          "harness/verdict.py",
+          "runner/atomic_write.py",
+          "runner/working_assumptions.py"
+        ],
+        "harness/evidence_pack.py": [
+          "harness/judge.py",
+          "harness/status_faithfulness.py"
+        ],
+        "harness/expectation_coverage.py": [
+          "harness/evidence_pack.py",
+          "harness/judge.py",
+          "harness/provenance.py",
+          "harness/routing.py",
+          "harness/rubrics.py",
+          "harness/verdict.py"
+        ],
+        "harness/expectation_grounding.py": [
+          "harness/evidence_pack.py",
+          "harness/judge.py",
+          "harness/rubrics.py",
+          "harness/status_faithfulness.py",
+          "harness/verdict.py",
+          "runner/working_assumptions.py"
+        ],
+        "harness/expectations.py": [
+          "harness/profile.py",
+          "harness/regression.py"
+        ],
+        "harness/faithfulness.py": [
+          "harness/gold_set.py",
+          "harness/judge.py",
+          "runner/paths.py"
+        ],
+        "harness/gold_set.py": [
+          "runner/atomic_write.py"
+        ],
+        "harness/jsonl_log.py": [
+          "runner/atomic_write.py"
+        ],
+        "harness/judge.py": [
+          "harness/provenance.py",
+          "harness/verdict.py",
+          "runner/json_extract.py"
+        ],
+        "harness/ledger_granularity.py": [
+          "harness/claim_ledger.py",
+          "harness/regression.py",
+          "harness/status_faithfulness.py",
+          "runner/atomic_write.py"
+        ],
+        "harness/materiality.py": [
+          "harness/calibration.py",
+          "harness/faithfulness.py",
+          "harness/gold_set.py",
+          "harness/judge.py",
+          "harness/verdict.py",
+          "runner/atomic_write.py"
+        ],
+        "harness/profile.py": [],
+        "harness/provenance.py": [
+          "harness/jsonl_log.py",
+          "harness/verdict.py"
+        ],
+        "harness/regression.py": [
+          "harness/claim_ledger.py",
+          "harness/judge.py",
+          "harness/status_faithfulness.py",
+          "runner/atomic_write.py",
+          "runner/working_assumptions.py"
+        ],
+        "harness/report.py": [
+          "harness/routing.py",
+          "harness/verdict.py"
+        ],
+        "harness/routing.py": [],
+        "harness/rubric.py": [
+          "harness/evidence_pack.py",
+          "harness/expectation_coverage.py",
+          "harness/expectation_grounding.py",
+          "harness/expectations.py",
+          "harness/judge.py",
+          "harness/profile.py",
+          "harness/provenance.py",
+          "harness/rubrics.py",
+          "harness/status_faithfulness.py",
+          "harness/verdict.py",
+          "runner/atomic_write.py",
+          "runner/working_assumptions.py"
+        ],
+        "harness/rubrics.py": [
+          "harness/evidence_pack.py",
+          "harness/expectations.py",
+          "harness/profile.py",
+          "harness/provenance.py"
+        ],
+        "harness/status_calibration.py": [
+          "harness/judge.py",
+          "harness/report.py",
+          "harness/routing.py",
+          "harness/status_faithfulness.py",
+          "harness/verdict.py",
+          "runner/working_assumptions.py"
+        ],
+        "harness/status_faithfulness.py": [
+          "harness/faithfulness.py",
+          "harness/judge.py",
+          "harness/report.py",
+          "harness/routing.py",
+          "harness/verdict.py",
+          "runner/atomic_write.py",
+          "runner/paths.py",
+          "runner/working_assumptions.py"
+        ],
+        "harness/verdict.py": [],
+        "runner/working_assumptions.py": []
+      },
+      "neighborMap": {
+        "harness/blind_assessment.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          },
+          {
+            "path": "runner/dev_graph/__init__.py",
+            "batchIndex": 2,
+            "symbols": []
+          },
+          {
+            "path": "runner/dev_graph/schema.py",
+            "batchIndex": 2,
+            "symbols": [
+              "RelationshipSpec",
+              "declared_status",
+              "DevGraphError",
+              "edge_label",
+              "validate_graph"
+            ]
+          }
+        ],
+        "harness/claim_ledger.py": [
+          {
+            "path": "runner/json_extract.py",
+            "batchIndex": 5,
+            "symbols": [
+              "extract_first_json_object"
+            ]
+          }
+        ],
+        "harness/commands/_common.py": [
+          {
+            "path": "runner/paths.py",
+            "batchIndex": 3,
+            "symbols": [
+              "find_repo_root",
+              "resolve_repo_path"
+            ]
+          }
+        ],
+        "harness/commands/blind_assessment.py": [
+          {
+            "path": "runner/dev_graph/__init__.py",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "harness/commands/faithfulness_calibration.py": [
+          {
+            "path": "runner/transport/config.py",
+            "batchIndex": 5,
+            "symbols": [
+              "TransportPreset",
+              "ProviderConfig",
+              "validate_bedrock_model_id",
+              "is_production_mode",
+              "_enforce_production_backend",
+              "list_transport_presets",
+              "get_transport_preset",
+              "resolve_provider_config_from_preset",
+              "resolve_provider_config",
+              "_resolve_bedrock",
+              "_resolve_bedrock_converse",
+              "_resolve_together_ai",
+              "_resolve_ollama",
+              "_resolve_generic",
+              "build_openai_backend",
+              "build_converse_backend"
+            ]
+          }
+        ],
+        "harness/commands/freeze_grounding_baselines.py": [
+          {
+            "path": "runner/transport/config.py",
+            "batchIndex": 5,
+            "symbols": [
+              "TransportPreset",
+              "ProviderConfig",
+              "validate_bedrock_model_id",
+              "is_production_mode",
+              "_enforce_production_backend",
+              "list_transport_presets",
+              "get_transport_preset",
+              "resolve_provider_config_from_preset",
+              "resolve_provider_config",
+              "_resolve_bedrock",
+              "_resolve_bedrock_converse",
+              "_resolve_together_ai",
+              "_resolve_ollama",
+              "_resolve_generic",
+              "build_openai_backend",
+              "build_converse_backend"
+            ]
+          },
+          {
+            "path": "runner/transport/errors.py",
+            "batchIndex": 5,
+            "symbols": [
+              "ErrorCategory",
+              "OpenAICompatTransportError",
+              "OpenAICompatAuthError",
+              "OpenAICompatRateLimitError",
+              "OpenAICompatProviderError",
+              "OpenAICompatTimeoutError",
+              "OpenAICompatModelNotFoundError",
+              "normalize_http_error"
+            ]
+          }
+        ],
+        "harness/commands/rubric_grading_run.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "harness/faithfulness.py": [
+          {
+            "path": "runner/paths.py",
+            "batchIndex": 3,
+            "symbols": [
+              "find_repo_root",
+              "resolve_repo_path"
+            ]
+          }
+        ],
+        "harness/gold_set.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "harness/jsonl_log.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "harness/judge.py": [
+          {
+            "path": "runner/json_extract.py",
+            "batchIndex": 5,
+            "symbols": [
+              "extract_first_json_object"
+            ]
+          }
+        ],
+        "harness/ledger_granularity.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "harness/materiality.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "harness/regression.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "harness/rubric.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "harness/status_faithfulness.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          },
+          {
+            "path": "runner/paths.py",
+            "batchIndex": 3,
+            "symbols": [
+              "find_repo_root",
+              "resolve_repo_path"
+            ]
+          }
+        ],
+        "runner/working_assumptions.py": [
+          {
+            "path": "runner/assumption_applier.py",
+            "batchIndex": 2,
+            "symbols": [
+              "AssumptionApplierError",
+              "_resolve_declaration",
+              "_read_json_object",
+              "_flip_declared_claims",
+              "apply_assumptions"
+            ]
+          },
+          {
+            "path": "runner/graph_canonical_pack.py",
+            "batchIndex": 6,
+            "symbols": [
+              "_provenance",
+              "_copy_fields",
+              "_tag",
+              "_bound_extraction_nodes",
+              "_extract_objectives",
+              "_extract_outcomes",
+              "_extract_wps_and_deliverables",
+              "_extract_partners",
+              "build_canonical_pack_from_graph",
+              "main"
+            ]
+          },
+          {
+            "path": "runner/phase8_canonical_pack.py",
+            "batchIndex": 2,
+            "symbols": [
+              "CanonicalPackError",
+              "_confirmed",
+              "_read_json",
+              "_lift",
+              "_extract_objectives",
+              "_extract_outcomes",
+              "_extract_wps_and_deliverables",
+              "_extract_partners",
+              "_extract_declared_assumptions",
+              "build_phase8_canonical_reference_pack"
+            ]
+          },
+          {
+            "path": "runner/predicates/criterion_predicates.py",
+            "batchIndex": 3,
+            "symbols": [
+              "_read_json_object",
+              "schema_id_matches",
+              "no_unresolved_material_claims",
+              "assumed_claims_are_operator_declared",
+              "_cites_working_assumptions",
+              "declared_facts_are_not_inferred",
+              "impact_pathways_covered",
+              "implementation_coverage_complete",
+              "_extract_all_content",
+              "_check_objective_coverage",
+              "_check_partner_naming",
+              "_check_metric_completeness",
+              "_check_terminology_consistency",
+              "_check_deliverable_kpi_alignment",
+              "cross_section_consistency"
+            ]
+          },
+          {
+            "path": "runner/unit_cost_budget.py",
+            "batchIndex": 2,
+            "symbols": [
+              "UnitCostBudgetError",
+              "_round2",
+              "_monthly_rate",
+              "compute_unit_cost_budget",
+              "_read_json",
+              "_resolve_confirmed_months",
+              "_lookup_coefficient",
+              "_resolve_host_country",
+              "derive_unit_cost_budget"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 2,
+      "files": [
+        {
+          "path": "runner/assumption_applier.py",
+          "language": "python",
+          "sizeLines": 285,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/atomic_write.py",
+          "language": "python",
+          "sizeLines": 138,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/budget_request.py",
+          "language": "python",
+          "sizeLines": 446,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/claim_status.py",
+          "language": "python",
+          "sizeLines": 133,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/decomposed_drafting.py",
+          "language": "python",
+          "sizeLines": 767,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/__init__.py",
+          "language": "python",
+          "sizeLines": 287,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/builder.py",
+          "language": "python",
+          "sizeLines": 575,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/changes.py",
+          "language": "python",
+          "sizeLines": 364,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/documents.py",
+          "language": "python",
+          "sizeLines": 468,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/identity.py",
+          "language": "python",
+          "sizeLines": 36,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/impact.py",
+          "language": "python",
+          "sizeLines": 520,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/intake.py",
+          "language": "python",
+          "sizeLines": 223,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/packages.py",
+          "language": "python",
+          "sizeLines": 575,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/policies.py",
+          "language": "python",
+          "sizeLines": 179,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/revisions.py",
+          "language": "python",
+          "sizeLines": 730,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/schema.py",
+          "language": "python",
+          "sizeLines": 352,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/shadow.py",
+          "language": "python",
+          "sizeLines": 321,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dev_graph/writer.py",
+          "language": "python",
+          "sizeLines": 37,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/docx_exporter.py",
+          "language": "python",
+          "sizeLines": 348,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/final_export_writer.py",
+          "language": "python",
+          "sizeLines": 251,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/instrument_profile.py",
+          "language": "python",
+          "sizeLines": 362,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/interface_contract.py",
+          "language": "python",
+          "sizeLines": 296,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/phase8_canonical_pack.py",
+          "language": "python",
+          "sizeLines": 367,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/section_assembler.py",
+          "language": "python",
+          "sizeLines": 480,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/source_index.py",
+          "language": "python",
+          "sizeLines": 924,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/unit_cost_budget.py",
+          "language": "python",
+          "sizeLines": 583,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/build_demo_dev_graph.py",
+          "language": "python",
+          "sizeLines": 257,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/build_part_b_candidate.py",
+          "language": "python",
+          "sizeLines": 448,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/derive_run_phase_costs.py",
+          "language": "python",
+          "sizeLines": 480,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/preserve_run_manifests.py",
+          "language": "python",
+          "sizeLines": 213,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "runner/assumption_applier.py": [
+          "runner/atomic_write.py",
+          "runner/claim_status.py",
+          "runner/section_assembler.py",
+          "runner/working_assumptions.py"
+        ],
+        "runner/atomic_write.py": [],
+        "runner/budget_request.py": [
+          "runner/atomic_write.py",
+          "runner/instrument_profile.py",
+          "runner/interface_contract.py"
+        ],
+        "runner/claim_status.py": [],
+        "runner/decomposed_drafting.py": [
+          "runner/atomic_write.py",
+          "runner/claim_status.py",
+          "runner/instrument_profile.py",
+          "runner/section_assembler.py"
+        ],
+        "runner/dev_graph/__init__.py": [
+          "runner/dev_graph/builder.py",
+          "runner/dev_graph/changes.py",
+          "runner/dev_graph/documents.py",
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/impact.py",
+          "runner/dev_graph/intake.py",
+          "runner/dev_graph/packages.py",
+          "runner/dev_graph/policies.py",
+          "runner/dev_graph/revisions.py",
+          "runner/dev_graph/schema.py",
+          "runner/dev_graph/shadow.py",
+          "runner/dev_graph/writer.py"
+        ],
+        "runner/dev_graph/builder.py": [
+          "runner/dev_graph/documents.py",
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/schema.py"
+        ],
+        "runner/dev_graph/changes.py": [
+          "runner/atomic_write.py",
+          "runner/dev_graph/builder.py",
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/schema.py"
+        ],
+        "runner/dev_graph/documents.py": [
+          "runner/atomic_write.py",
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/schema.py",
+          "runner/graph_schema.py"
+        ],
+        "runner/dev_graph/identity.py": [],
+        "runner/dev_graph/impact.py": [
+          "runner/atomic_write.py",
+          "runner/dev_graph/builder.py",
+          "runner/dev_graph/changes.py",
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/policies.py",
+          "runner/dev_graph/schema.py"
+        ],
+        "runner/dev_graph/intake.py": [
+          "runner/atomic_write.py",
+          "runner/dev_graph/schema.py"
+        ],
+        "runner/dev_graph/packages.py": [
+          "runner/atomic_write.py",
+          "runner/claim_status.py",
+          "runner/dev_graph/builder.py",
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/policies.py",
+          "runner/dev_graph/schema.py"
+        ],
+        "runner/dev_graph/policies.py": [
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/schema.py"
+        ],
+        "runner/dev_graph/revisions.py": [
+          "runner/atomic_write.py",
+          "runner/dev_graph/builder.py",
+          "runner/dev_graph/changes.py",
+          "runner/dev_graph/documents.py",
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/policies.py",
+          "runner/dev_graph/schema.py"
+        ],
+        "runner/dev_graph/schema.py": [],
+        "runner/dev_graph/shadow.py": [
+          "runner/atomic_write.py",
+          "runner/dev_graph/identity.py",
+          "runner/dev_graph/impact.py",
+          "runner/dev_graph/schema.py",
+          "runner/run_context.py"
+        ],
+        "runner/dev_graph/writer.py": [
+          "runner/atomic_write.py",
+          "runner/dev_graph/builder.py"
+        ],
+        "runner/docx_exporter.py": [
+          "runner/atomic_write.py"
+        ],
+        "runner/final_export_writer.py": [
+          "runner/atomic_write.py"
+        ],
+        "runner/instrument_profile.py": [],
+        "runner/interface_contract.py": [],
+        "runner/phase8_canonical_pack.py": [
+          "runner/atomic_write.py",
+          "runner/working_assumptions.py"
+        ],
+        "runner/section_assembler.py": [
+          "runner/atomic_write.py"
+        ],
+        "runner/source_index.py": [
+          "runner/dev_graph/builder.py"
+        ],
+        "runner/unit_cost_budget.py": [
+          "runner/atomic_write.py",
+          "runner/instrument_profile.py",
+          "runner/working_assumptions.py"
+        ],
+        "tools/build_demo_dev_graph.py": [
+          "runner/atomic_write.py",
+          "runner/dev_graph/__init__.py",
+          "runner/paths.py"
+        ],
+        "tools/build_part_b_candidate.py": [
+          "runner/atomic_write.py",
+          "runner/decomposed_drafting.py",
+          "runner/dev_graph/documents.py",
+          "runner/dev_graph/schema.py",
+          "runner/phase8_preseed.py"
+        ],
+        "tools/derive_run_phase_costs.py": [
+          "runner/atomic_write.py"
+        ],
+        "tools/preserve_run_manifests.py": [
+          "runner/atomic_write.py"
+        ]
+      },
+      "neighborMap": {
+        "runner/assumption_applier.py": [
+          {
+            "path": "runner/working_assumptions.py",
+            "batchIndex": 1,
+            "symbols": [
+              "declared_claim_summary",
+              "WorkingAssumptionsError",
+              "Declaration",
+              "WorkingAssumptions",
+              "_require_str",
+              "_parse_declaration",
+              "load_working_assumptions"
+            ]
+          }
+        ],
+        "runner/atomic_write.py": [
+          {
+            "path": "harness/blind_assessment.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_utc_now",
+              "BlindAssessmentError",
+              "CandidateHashMismatch",
+              "LeakageError",
+              "ReviewTask",
+              "BlindEvidence",
+              "resolve_document",
+              "_item_tags",
+              "assert_no_leakage",
+              "materialise_candidate",
+              "build_blind_evidence",
+              "MissingSection",
+              "Candidate",
+              "required_sections",
+              "load_candidate",
+              "candidate_hash",
+              "assessor_pin",
+              "BlindCell",
+              "BlindAssessmentReport",
+              "_check_intake",
+              "assess_candidate",
+              "_next_report_path",
+              "write_report",
+              "load_report",
+              "_ascii",
+              "_fmt_bool",
+              "render_report"
+            ]
+          },
+          {
+            "path": "harness/commands/rubric_grading_run.py",
+            "batchIndex": 1,
+            "symbols": [
+              "BudgetStop",
+              "_utc_now",
+              "_cell_key",
+              "_gate_10b_note",
+              "compute_budget_plan",
+              "run_meta",
+              "save_checkpoint",
+              "load_checkpoint",
+              "run_grading",
+              "_env_int",
+              "_spent_line",
+              "main"
+            ]
+          },
+          {
+            "path": "harness/gold_set.py",
+            "batchIndex": 1,
+            "symbols": [
+              "GoldSetError",
+              "GoldPair",
+              "GoldSet",
+              "_iter_raw_pairs",
+              "load_gold_set",
+              "gold_set_hash",
+              "_even_spaced_indices",
+              "seed_pairs_from_claim_statuses",
+              "_allocate",
+              "write_gold_set_template"
+            ]
+          },
+          {
+            "path": "harness/jsonl_log.py",
+            "batchIndex": 1,
+            "symbols": [
+              "JsonlLog"
+            ]
+          },
+          {
+            "path": "harness/ledger_granularity.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_sha256",
+              "_count_sentences",
+              "_status_partition",
+              "measure_section",
+              "run_e4_regression",
+              "build_report",
+              "_print_summary",
+              "main"
+            ]
+          },
+          {
+            "path": "harness/materiality.py",
+            "batchIndex": 1,
+            "symbols": [
+              "MaterialityError",
+              "normalize_text",
+              "MaterialityExample",
+              "seed_materiality_positives",
+              "_sentences",
+              "seed_negative_candidates",
+              "write_materiality_template",
+              "load_materiality_set",
+              "materiality_set_hash",
+              "build_materiality_prompt",
+              "classify_materiality",
+              "_default_clock",
+              "MaterialityCalibration",
+              "calibrate_materiality"
+            ]
+          },
+          {
+            "path": "harness/regression.py",
+            "batchIndex": 1,
+            "symbols": [
+              "RegressionError",
+              "_default_clock",
+              "_norm",
+              "LedgerEntry",
+              "SubSectionFingerprint",
+              "SectionFingerprint",
+              "_canonical_artifact_sha256",
+              "freeze_section_fingerprint",
+              "write_fingerprint",
+              "load_fingerprint",
+              "freeze_golden_set",
+              "load_golden_set",
+              "RegressionFinding",
+              "SectionRegressionResult",
+              "_diff_ledger",
+              "_diff_prose",
+              "compare_section",
+              "RegressionReport",
+              "compare_to_golden_set",
+              "_judge_section",
+              "freeze_section_grounding",
+              "compare_section_grounding",
+              "_require_report",
+              "freeze_rubric_baseline",
+              "_read_json",
+              "load_rubric_baseline",
+              "_cell_index",
+              "_axis_value",
+              "_contradiction_kinds",
+              "compare_rubric_baseline",
+              "_section_files",
+              "main"
+            ]
+          },
+          {
+            "path": "harness/rubric.py",
+            "batchIndex": 1,
+            "symbols": [
+              "RubricReportError",
+              "_ascii",
+              "SpineFact",
+              "_token_pattern",
+              "SpineRegistry",
+              "_spine_fact",
+              "load_spine_registry",
+              "Contradiction",
+              "_claim_ref",
+              "_weak_grounding_explanation",
+              "ExpectationCell",
+              "combine_axes",
+              "RubricReport",
+              "build_rubric_report",
+              "_fmt_bool",
+              "_coverage_summary",
+              "_grounding_summary",
+              "render_report",
+              "grade_all",
+              "_build_judge",
+              "main"
+            ]
+          },
+          {
+            "path": "harness/status_faithfulness.py",
+            "batchIndex": 1,
+            "symbols": [
+              "StatusFaithfulnessError",
+              "SourceResolutionError",
+              "entry_key_for",
+              "SectionClaim",
+              "load_section_claims",
+              "StatusPolicy",
+              "build_faithfulness_prompt_for_status",
+              "_bounded",
+              "_leading_parenthetical",
+              "_parse_segment",
+              "_split_source_ref",
+              "_split_top_level",
+              "_parse_source_segments",
+              "_hint_tokens",
+              "_find_by_id",
+              "_render_text",
+              "resolve_claim_source_text",
+              "_render_segment",
+              "resolve_assumed_declared_text",
+              "meets_bar",
+              "classify_severity",
+              "ClaimFaithfulness",
+              "_judge_claim",
+              "evaluate_claim",
+              "_evaluate_claim_routed",
+              "StatusFaithfulnessResult",
+              "evaluate_status_aware_faithfulness",
+              "ClaimGroundingSnapshot",
+              "FaithfulnessBaseline",
+              "freeze_baseline",
+              "write_baseline",
+              "load_baseline",
+              "InvarianceViolation",
+              "InvarianceReport",
+              "compare_to_baseline"
+            ]
+          },
+          {
+            "path": "runner/checkpoint_publisher.py",
+            "batchIndex": 4,
+            "symbols": [
+              "CheckpointPublishError",
+              "_read_json_dict",
+              "_validate_gate_result",
+              "_load_run_context",
+              "_authorize_and_build_quad",
+              "_read_optional_json",
+              "_build_tier3_snapshot",
+              "publish_checkpoint"
+            ]
+          },
+          {
+            "path": "runner/graph_canonical_pack.py",
+            "batchIndex": 6,
+            "symbols": [
+              "_provenance",
+              "_copy_fields",
+              "_tag",
+              "_bound_extraction_nodes",
+              "_extract_objectives",
+              "_extract_outcomes",
+              "_extract_wps_and_deliverables",
+              "_extract_partners",
+              "build_canonical_pack_from_graph",
+              "main"
+            ]
+          },
+          {
+            "path": "runner/graph_compiler.py",
+            "batchIndex": 6,
+            "symbols": [
+              "GraphCompileError",
+              "CompiledArtifact",
+              "Tier3CompileResult",
+              "CompiledSection",
+              "PartBCompileResult",
+              "extract_record",
+              "_collection_key_for",
+              "_check_node_self_binding",
+              "_now_iso",
+              "_build_artifact_obj",
+              "compile_tier3",
+              "_record_identity",
+              "_diff_one",
+              "diff_against_hand_lift",
+              "compile_and_diff",
+              "_require_section_str",
+              "extract_sub_section",
+              "_section_claim",
+              "_derive_overall_status",
+              "_partb_out_dir",
+              "_union_section_source_refs",
+              "_merge_section_extra_fields",
+              "_load_required_section_fields",
+              "_validate_compiled_section",
+              "compile_part_b",
+              "part_b_report",
+              "compile_part_b_and_report",
+              "main"
+            ]
+          },
+          {
+            "path": "runner/graph_projector.py",
+            "batchIndex": 6,
+            "symbols": [
+              "GraphProjectionError",
+              "SyncOverlapError",
+              "GateState",
+              "_phase_from_path",
+              "_predicate_counts",
+              "Tier4Scan",
+              "scan_tier4_gate_states",
+              "read_tier4_gate_states",
+              "_render_mirror_node",
+              "ProjectionResult",
+              "project",
+              "SyncPartition",
+              "compute_sync_partition",
+              "check_no_overlap",
+              "main"
+            ]
+          }
+        ],
+        "runner/claim_status.py": [
+          {
+            "path": "runner/phase8_preseed.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_validation_status_inconsistency",
+              "Phase8PreseedResult",
+              "maybe_apply_phase8_preseed",
+              "_write_preseed_audit"
+            ]
+          },
+          {
+            "path": "runner/phase8_reuse.py",
+            "batchIndex": 4,
+            "symbols": [
+              "ReuseDecision",
+              "_collect_fingerprint_files",
+              "compute_input_fingerprint",
+              "artifact_sha256",
+              "read_artifact_run_id",
+              "_reuse_metadata_path",
+              "load_reuse_metadata",
+              "write_reuse_metadata",
+              "_load_gate_result",
+              "validate_reuse_candidate",
+              "_run_id_prefix",
+              "_audit_report_exists",
+              "is_reuse_owned_artifact_valid"
+            ]
+          },
+          {
+            "path": "runner/predicates/criterion_predicates.py",
+            "batchIndex": 3,
+            "symbols": [
+              "_read_json_object",
+              "schema_id_matches",
+              "no_unresolved_material_claims",
+              "assumed_claims_are_operator_declared",
+              "_cites_working_assumptions",
+              "declared_facts_are_not_inferred",
+              "impact_pathways_covered",
+              "implementation_coverage_complete",
+              "_extract_all_content",
+              "_check_objective_coverage",
+              "_check_partner_naming",
+              "_check_metric_completeness",
+              "_check_terminology_consistency",
+              "_check_deliverable_kpi_alignment",
+              "cross_section_consistency"
+            ]
+          }
+        ],
+        "runner/decomposed_drafting.py": [
+          {
+            "path": "runner/agent_runtime.py",
+            "batchIndex": 4,
+            "symbols": [
+              "drafting_skills_superseded_by",
+              "AgentRuntimeError",
+              "_load_agent_catalog",
+              "_get_agent_entry",
+              "_load_artifact_registry",
+              "_load_agent_spec",
+              "_load_prompt_spec",
+              "_resolve_agent_inputs",
+              "_resolve_skill_sequence",
+              "_resolve_budget_regime_safe",
+              "_get_artifacts_produced_by_node",
+              "_determine_can_evaluate_exit_gate",
+              "_get_exit_gate_for_node",
+              "_resolve_instrument_type",
+              "_context_sources_for",
+              "_build_caller_context",
+              "_missing_context_sources",
+              "_resolve_auditable_artifact",
+              "_check_skill_applicability",
+              "run_agent",
+              "_identify_agent_skills",
+              "_refresh_inputs_from_outputs",
+              "_sub_agent_inputs_ready"
+            ]
+          }
+        ],
+        "runner/dev_graph/__init__.py": [
+          {
+            "path": "harness/blind_assessment.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_utc_now",
+              "BlindAssessmentError",
+              "CandidateHashMismatch",
+              "LeakageError",
+              "ReviewTask",
+              "BlindEvidence",
+              "resolve_document",
+              "_item_tags",
+              "assert_no_leakage",
+              "materialise_candidate",
+              "build_blind_evidence",
+              "MissingSection",
+              "Candidate",
+              "required_sections",
+              "load_candidate",
+              "candidate_hash",
+              "assessor_pin",
+              "BlindCell",
+              "BlindAssessmentReport",
+              "_check_intake",
+              "assess_candidate",
+              "_next_report_path",
+              "write_report",
+              "load_report",
+              "_ascii",
+              "_fmt_bool",
+              "render_report"
+            ]
+          },
+          {
+            "path": "harness/commands/blind_assessment.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_env_int",
+              "_live_judge",
+              "_parser",
+              "main"
+            ]
+          }
+        ],
+        "runner/dev_graph/documents.py": [
+          {
+            "path": "runner/graph_schema.py",
+            "batchIndex": 6,
+            "symbols": [
+              "GraphSchemaError",
+              "map_evidence_to_status",
+              "_is_blank",
+              "validate_front_matter"
+            ]
+          }
+        ],
+        "runner/dev_graph/schema.py": [
+          {
+            "path": "harness/blind_assessment.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_utc_now",
+              "BlindAssessmentError",
+              "CandidateHashMismatch",
+              "LeakageError",
+              "ReviewTask",
+              "BlindEvidence",
+              "resolve_document",
+              "_item_tags",
+              "assert_no_leakage",
+              "materialise_candidate",
+              "build_blind_evidence",
+              "MissingSection",
+              "Candidate",
+              "required_sections",
+              "load_candidate",
+              "candidate_hash",
+              "assessor_pin",
+              "BlindCell",
+              "BlindAssessmentReport",
+              "_check_intake",
+              "assess_candidate",
+              "_next_report_path",
+              "write_report",
+              "load_report",
+              "_ascii",
+              "_fmt_bool",
+              "render_report"
+            ]
+          }
+        ],
+        "runner/dev_graph/shadow.py": [
+          {
+            "path": "runner/run_context.py",
+            "batchIndex": 4,
+            "symbols": [
+              "RunContext"
+            ]
+          }
+        ],
+        "runner/interface_contract.py": [
+          {
+            "path": "runner/predicates/schema_predicates.py",
+            "batchIndex": 3,
+            "symbols": [
+              "_read_json_object",
+              "json_field_present",
+              "json_fields_present",
+              "instrument_type_matches_schema",
+              "interface_contract_conforms",
+              "risk_register_populated",
+              "ethics_assessment_explicit",
+              "governance_matrix_present",
+              "no_blocking_inconsistencies",
+              "unit_cost_budget_resolved",
+              "budget_gate_confirmation_present",
+              "findings_categorised_by_severity",
+              "revision_action_list_present",
+              "all_critical_revisions_resolved",
+              "_read_gate_result_json",
+              "_validate_checkpoint_provenance",
+              "checkpoint_published"
+            ]
+          }
+        ],
+        "runner/phase8_canonical_pack.py": [
+          {
+            "path": "runner/working_assumptions.py",
+            "batchIndex": 1,
+            "symbols": [
+              "declared_claim_summary",
+              "WorkingAssumptionsError",
+              "Declaration",
+              "WorkingAssumptions",
+              "_require_str",
+              "_parse_declaration",
+              "load_working_assumptions"
+            ]
+          }
+        ],
+        "runner/section_assembler.py": [
+          {
+            "path": "runner/agent_runtime.py",
+            "batchIndex": 4,
+            "symbols": [
+              "drafting_skills_superseded_by",
+              "AgentRuntimeError",
+              "_load_agent_catalog",
+              "_get_agent_entry",
+              "_load_artifact_registry",
+              "_load_agent_spec",
+              "_load_prompt_spec",
+              "_resolve_agent_inputs",
+              "_resolve_skill_sequence",
+              "_resolve_budget_regime_safe",
+              "_get_artifacts_produced_by_node",
+              "_determine_can_evaluate_exit_gate",
+              "_get_exit_gate_for_node",
+              "_resolve_instrument_type",
+              "_context_sources_for",
+              "_build_caller_context",
+              "_missing_context_sources",
+              "_resolve_auditable_artifact",
+              "_check_skill_applicability",
+              "run_agent",
+              "_identify_agent_skills",
+              "_refresh_inputs_from_outputs",
+              "_sub_agent_inputs_ready"
+            ]
+          }
+        ],
+        "runner/unit_cost_budget.py": [
+          {
+            "path": "runner/working_assumptions.py",
+            "batchIndex": 1,
+            "symbols": [
+              "declared_claim_summary",
+              "WorkingAssumptionsError",
+              "Declaration",
+              "WorkingAssumptions",
+              "_require_str",
+              "_parse_declaration",
+              "load_working_assumptions"
+            ]
+          }
+        ],
+        "tools/build_demo_dev_graph.py": [
+          {
+            "path": "runner/paths.py",
+            "batchIndex": 3,
+            "symbols": [
+              "find_repo_root",
+              "resolve_repo_path"
+            ]
+          }
+        ],
+        "tools/build_part_b_candidate.py": [
+          {
+            "path": "runner/phase8_preseed.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_validation_status_inconsistency",
+              "Phase8PreseedResult",
+              "maybe_apply_phase8_preseed",
+              "_write_preseed_audit"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 3,
+      "files": [
+        {
+          "path": "runner/fingerprints.py",
+          "language": "python",
+          "sizeLines": 89,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/gate_evaluator.py",
+          "language": "python",
+          "sizeLines": 853,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/gate_library.py",
+          "language": "python",
+          "sizeLines": 265,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/gate_result_registry.py",
+          "language": "python",
+          "sizeLines": 115,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/paths.py",
+          "language": "python",
+          "sizeLines": 82,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/__init__.py",
+          "language": "python",
+          "sizeLines": 189,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/coverage_predicates.py",
+          "language": "python",
+          "sizeLines": 1674,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/criterion_predicates.py",
+          "language": "python",
+          "sizeLines": 1179,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/cycle_predicates.py",
+          "language": "python",
+          "sizeLines": 357,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/file_predicates.py",
+          "language": "python",
+          "sizeLines": 588,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/gate_pass_predicates.py",
+          "language": "python",
+          "sizeLines": 543,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/phase8_section_predicates.py",
+          "language": "python",
+          "sizeLines": 964,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/schema_predicates.py",
+          "language": "python",
+          "sizeLines": 2033,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/scope_coverage_predicates.py",
+          "language": "python",
+          "sizeLines": 330,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/source_ref_predicates.py",
+          "language": "python",
+          "sizeLines": 621,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/timeline_predicates.py",
+          "language": "python",
+          "sizeLines": 1063,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/predicates/types.py",
+          "language": "python",
+          "sizeLines": 162,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/upstream_inputs.py",
+          "language": "python",
+          "sizeLines": 169,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/versions.py",
+          "language": "python",
+          "sizeLines": 15,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/backfill_gate_result_schema_id.py",
+          "language": "python",
+          "sizeLines": 251,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "runner/fingerprints.py": [
+          "runner/paths.py"
+        ],
+        "runner/gate_evaluator.py": [
+          "runner/fingerprints.py",
+          "runner/gate_library.py",
+          "runner/gate_result_registry.py",
+          "runner/manifest_reader.py",
+          "runner/paths.py",
+          "runner/predicates/coverage_predicates.py",
+          "runner/predicates/criterion_predicates.py",
+          "runner/predicates/cycle_predicates.py",
+          "runner/predicates/file_predicates.py",
+          "runner/predicates/gate_pass_predicates.py",
+          "runner/predicates/phase8_section_predicates.py",
+          "runner/predicates/schema_predicates.py",
+          "runner/predicates/scope_coverage_predicates.py",
+          "runner/predicates/source_ref_predicates.py",
+          "runner/predicates/timeline_predicates.py",
+          "runner/predicates/types.py",
+          "runner/run_context.py",
+          "runner/semantic_dispatch.py",
+          "runner/upstream_inputs.py",
+          "runner/versions.py"
+        ],
+        "runner/gate_library.py": [
+          "runner/versions.py"
+        ],
+        "runner/gate_result_registry.py": [],
+        "runner/paths.py": [],
+        "runner/predicates/__init__.py": [
+          "runner/predicates/coverage_predicates.py",
+          "runner/predicates/criterion_predicates.py",
+          "runner/predicates/cycle_predicates.py",
+          "runner/predicates/file_predicates.py",
+          "runner/predicates/gate_pass_predicates.py",
+          "runner/predicates/phase8_section_predicates.py",
+          "runner/predicates/schema_predicates.py",
+          "runner/predicates/scope_coverage_predicates.py",
+          "runner/predicates/source_ref_predicates.py",
+          "runner/predicates/timeline_predicates.py",
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/coverage_predicates.py": [
+          "runner/paths.py",
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/criterion_predicates.py": [
+          "runner/claim_status.py",
+          "runner/paths.py",
+          "runner/predicates/types.py",
+          "runner/working_assumptions.py"
+        ],
+        "runner/predicates/cycle_predicates.py": [
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/file_predicates.py": [
+          "runner/paths.py",
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/gate_pass_predicates.py": [
+          "runner/fingerprints.py",
+          "runner/gate_result_registry.py",
+          "runner/paths.py",
+          "runner/predicates/types.py",
+          "runner/upstream_inputs.py",
+          "runner/versions.py"
+        ],
+        "runner/predicates/phase8_section_predicates.py": [
+          "runner/paths.py",
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/schema_predicates.py": [
+          "runner/interface_contract.py",
+          "runner/paths.py",
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/scope_coverage_predicates.py": [
+          "runner/paths.py",
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/source_ref_predicates.py": [
+          "runner/paths.py",
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/timeline_predicates.py": [
+          "runner/predicates/types.py"
+        ],
+        "runner/predicates/types.py": [],
+        "runner/upstream_inputs.py": [],
+        "runner/versions.py": [],
+        "tools/backfill_gate_result_schema_id.py": [
+          "runner/gate_result_registry.py"
+        ]
+      },
+      "neighborMap": {
+        "runner/gate_evaluator.py": [
+          {
+            "path": "runner/manifest_reader.py",
+            "batchIndex": 4,
+            "symbols": [
+              "ManifestReaderError",
+              "ManifestGateNotFoundError",
+              "ManifestReader"
+            ]
+          },
+          {
+            "path": "runner/run_context.py",
+            "batchIndex": 4,
+            "symbols": [
+              "RunContext"
+            ]
+          },
+          {
+            "path": "runner/semantic_dispatch.py",
+            "batchIndex": 5,
+            "symbols": [
+              "SemanticPredicateConfig",
+              "validate_semantic_result",
+              "_dispatch_error_result",
+              "_write_semantic_diagnostics",
+              "_read_artifacts",
+              "_build_system_prompt",
+              "_build_user_prompt",
+              "_extract_json",
+              "_resolve_semantic_backend",
+              "_invoke_via_backend",
+              "invoke_agent",
+              "dispatch_semantic_predicate"
+            ]
+          },
+          {
+            "path": "runner/dag_scheduler.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_gate_result_repo_path",
+              "format_unsatisfied_condition",
+              "format_evidence_violation",
+              "verify_released_predecessors",
+              "_collect_upstream_nodes",
+              "bootstrap_phase_prerequisites",
+              "DAGSchedulerError",
+              "RunSummary",
+              "RunAbortedError",
+              "IncomingCondition",
+              "ManifestGraph",
+              "DAGScheduler"
+            ]
+          }
+        ],
+        "runner/gate_library.py": [
+          {
+            "path": "runner/__main__.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_ts",
+              "_parse_phase",
+              "main"
+            ]
+          }
+        ],
+        "runner/gate_result_registry.py": [
+          {
+            "path": "runner/checkpoint_publisher.py",
+            "batchIndex": 4,
+            "symbols": [
+              "CheckpointPublishError",
+              "_read_json_dict",
+              "_validate_gate_result",
+              "_load_run_context",
+              "_authorize_and_build_quad",
+              "_read_optional_json",
+              "_build_tier3_snapshot",
+              "publish_checkpoint"
+            ]
+          },
+          {
+            "path": "runner/dag_scheduler.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_gate_result_repo_path",
+              "format_unsatisfied_condition",
+              "format_evidence_violation",
+              "verify_released_predecessors",
+              "_collect_upstream_nodes",
+              "bootstrap_phase_prerequisites",
+              "DAGSchedulerError",
+              "RunSummary",
+              "RunAbortedError",
+              "IncomingCondition",
+              "ManifestGraph",
+              "DAGScheduler"
+            ]
+          }
+        ],
+        "runner/paths.py": [
+          {
+            "path": "harness/commands/_common.py",
+            "batchIndex": 1,
+            "symbols": [
+              "load_harness_env"
+            ]
+          },
+          {
+            "path": "harness/faithfulness.py",
+            "batchIndex": 1,
+            "symbols": [
+              "build_claim_user_prompt",
+              "build_faithfulness_prompt",
+              "resolve_source_text",
+              "judge_pair_supported"
+            ]
+          },
+          {
+            "path": "harness/status_faithfulness.py",
+            "batchIndex": 1,
+            "symbols": [
+              "StatusFaithfulnessError",
+              "SourceResolutionError",
+              "entry_key_for",
+              "SectionClaim",
+              "load_section_claims",
+              "StatusPolicy",
+              "build_faithfulness_prompt_for_status",
+              "_bounded",
+              "_leading_parenthetical",
+              "_parse_segment",
+              "_split_source_ref",
+              "_split_top_level",
+              "_parse_source_segments",
+              "_hint_tokens",
+              "_find_by_id",
+              "_render_text",
+              "resolve_claim_source_text",
+              "_render_segment",
+              "resolve_assumed_declared_text",
+              "meets_bar",
+              "classify_severity",
+              "ClaimFaithfulness",
+              "_judge_claim",
+              "evaluate_claim",
+              "_evaluate_claim_routed",
+              "StatusFaithfulnessResult",
+              "evaluate_status_aware_faithfulness",
+              "ClaimGroundingSnapshot",
+              "FaithfulnessBaseline",
+              "freeze_baseline",
+              "write_baseline",
+              "load_baseline",
+              "InvarianceViolation",
+              "InvarianceReport",
+              "compare_to_baseline"
+            ]
+          },
+          {
+            "path": "runner/__main__.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_ts",
+              "_parse_phase",
+              "main"
+            ]
+          },
+          {
+            "path": "runner/dag_scheduler.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_gate_result_repo_path",
+              "format_unsatisfied_condition",
+              "format_evidence_violation",
+              "verify_released_predecessors",
+              "_collect_upstream_nodes",
+              "bootstrap_phase_prerequisites",
+              "DAGSchedulerError",
+              "RunSummary",
+              "RunAbortedError",
+              "IncomingCondition",
+              "ManifestGraph",
+              "DAGScheduler"
+            ]
+          },
+          {
+            "path": "runner/semantic_dispatch.py",
+            "batchIndex": 5,
+            "symbols": [
+              "SemanticPredicateConfig",
+              "validate_semantic_result",
+              "_dispatch_error_result",
+              "_write_semantic_diagnostics",
+              "_read_artifacts",
+              "_build_system_prompt",
+              "_build_user_prompt",
+              "_extract_json",
+              "_resolve_semantic_backend",
+              "_invoke_via_backend",
+              "invoke_agent",
+              "dispatch_semantic_predicate"
+            ]
+          },
+          {
+            "path": "tools/build_demo_dev_graph.py",
+            "batchIndex": 2,
+            "symbols": [
+              "_requests",
+              "_package",
+              "count_by",
+              "_minimum_budget",
+              "_mandatory_fits",
+              "_complete",
+              "_package_row",
+              "_totals",
+              "build",
+              "main"
+            ]
+          }
+        ],
+        "runner/predicates/criterion_predicates.py": [
+          {
+            "path": "runner/claim_status.py",
+            "batchIndex": 2,
+            "symbols": [
+              "normalize_status",
+              "worst_status",
+              "rollup_inconsistency"
+            ]
+          },
+          {
+            "path": "runner/working_assumptions.py",
+            "batchIndex": 1,
+            "symbols": [
+              "declared_claim_summary",
+              "WorkingAssumptionsError",
+              "Declaration",
+              "WorkingAssumptions",
+              "_require_str",
+              "_parse_declaration",
+              "load_working_assumptions"
+            ]
+          }
+        ],
+        "runner/predicates/gate_pass_predicates.py": [
+          {
+            "path": "runner/dag_scheduler.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_gate_result_repo_path",
+              "format_unsatisfied_condition",
+              "format_evidence_violation",
+              "verify_released_predecessors",
+              "_collect_upstream_nodes",
+              "bootstrap_phase_prerequisites",
+              "DAGSchedulerError",
+              "RunSummary",
+              "RunAbortedError",
+              "IncomingCondition",
+              "ManifestGraph",
+              "DAGScheduler"
+            ]
+          }
+        ],
+        "runner/predicates/schema_predicates.py": [
+          {
+            "path": "runner/interface_contract.py",
+            "batchIndex": 2,
+            "symbols": [
+              "carries_json_schema_keywords",
+              "ContractViolation",
+              "is_planner_contract",
+              "_is_missing",
+              "_required_fields",
+              "_check_required",
+              "_check_negatives",
+              "validate_payload"
+            ]
+          }
+        ],
+        "runner/versions.py": [
+          {
+            "path": "runner/dag_scheduler.py",
+            "batchIndex": 4,
+            "symbols": [
+              "_gate_result_repo_path",
+              "format_unsatisfied_condition",
+              "format_evidence_violation",
+              "verify_released_predecessors",
+              "_collect_upstream_nodes",
+              "bootstrap_phase_prerequisites",
+              "DAGSchedulerError",
+              "RunSummary",
+              "RunAbortedError",
+              "IncomingCondition",
+              "ManifestGraph",
+              "DAGScheduler"
+            ]
+          },
+          {
+            "path": "runner/run_context.py",
+            "batchIndex": 4,
+            "symbols": [
+              "RunContext"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 4,
+      "files": [
+        {
+          "path": "runner/__main__.py",
+          "language": "python",
+          "sizeLines": 542,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/agent_runtime.py",
+          "language": "python",
+          "sizeLines": 2206,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/call_slicer.py",
+          "language": "python",
+          "sizeLines": 201,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/checkpoint_publisher.py",
+          "language": "python",
+          "sizeLines": 305,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dag_scheduler.py",
+          "language": "python",
+          "sizeLines": 2538,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/deterministic_components.py",
+          "language": "python",
+          "sizeLines": 513,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/manifest_reader.py",
+          "language": "python",
+          "sizeLines": 200,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/node_resolver.py",
+          "language": "python",
+          "sizeLines": 237,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/phase8_preseed.py",
+          "language": "python",
+          "sizeLines": 326,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/phase8_reuse.py",
+          "language": "python",
+          "sizeLines": 745,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/phase8_skip_binding.py",
+          "language": "python",
+          "sizeLines": 170,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/run_context.py",
+          "language": "python",
+          "sizeLines": 438,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/runtime_models.py",
+          "language": "python",
+          "sizeLines": 274,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "runner/__main__.py": [
+          "runner/dag_scheduler.py",
+          "runner/gate_library.py",
+          "runner/manifest_reader.py",
+          "runner/paths.py",
+          "runner/run_context.py"
+        ],
+        "runner/agent_runtime.py": [
+          "runner/decomposed_drafting.py",
+          "runner/deterministic_components.py",
+          "runner/node_resolver.py",
+          "runner/phase8_skip_binding.py",
+          "runner/runtime_models.py",
+          "runner/section_assembler.py",
+          "runner/skill_runtime.py"
+        ],
+        "runner/call_slicer.py": [],
+        "runner/checkpoint_publisher.py": [
+          "runner/atomic_write.py",
+          "runner/gate_result_registry.py",
+          "runner/run_context.py"
+        ],
+        "runner/dag_scheduler.py": [
+          "runner/agent_runtime.py",
+          "runner/call_slicer.py",
+          "runner/deterministic_components.py",
+          "runner/gate_evaluator.py",
+          "runner/gate_result_registry.py",
+          "runner/manifest_reader.py",
+          "runner/node_resolver.py",
+          "runner/paths.py",
+          "runner/phase8_preseed.py",
+          "runner/phase8_reuse.py",
+          "runner/phase8_skip_binding.py",
+          "runner/predicates/gate_pass_predicates.py",
+          "runner/run_context.py",
+          "runner/runtime_models.py",
+          "runner/versions.py"
+        ],
+        "runner/deterministic_components.py": [
+          "runner/runtime_models.py"
+        ],
+        "runner/manifest_reader.py": [],
+        "runner/node_resolver.py": [
+          "runner/manifest_reader.py"
+        ],
+        "runner/phase8_preseed.py": [
+          "runner/claim_status.py",
+          "runner/phase8_skip_binding.py"
+        ],
+        "runner/phase8_reuse.py": [
+          "runner/claim_status.py",
+          "runner/phase8_skip_binding.py"
+        ],
+        "runner/phase8_skip_binding.py": [],
+        "runner/run_context.py": [
+          "runner/versions.py"
+        ],
+        "runner/runtime_models.py": []
+      },
+      "neighborMap": {
+        "runner/__main__.py": [
+          {
+            "path": "runner/gate_library.py",
+            "batchIndex": 3,
+            "symbols": [
+              "GateLibraryError",
+              "ManifestVersionMismatchError",
+              "GateNotFoundError",
+              "GateLibrary"
+            ]
+          },
+          {
+            "path": "runner/paths.py",
+            "batchIndex": 3,
+            "symbols": [
+              "find_repo_root",
+              "resolve_repo_path"
+            ]
+          }
+        ],
+        "runner/agent_runtime.py": [
+          {
+            "path": "runner/decomposed_drafting.py",
+            "batchIndex": 2,
+            "symbols": [
+              "DecomposedDraftingError",
+              "_section_id",
+              "_resolve_drafting_sub_sections",
+              "_build_draft",
+              "_derive_overall_status",
+              "_capture_raw_response",
+              "_snippet",
+              "_default_claude_drafter",
+              "_parse_drafter_response",
+              "_read_upstream_json",
+              "source_section_extra_fields",
+              "draft_section_decomposed"
+            ]
+          },
+          {
+            "path": "runner/section_assembler.py",
+            "batchIndex": 2,
+            "symbols": [
+              "SectionAssemblerError",
+              "_read_json_object",
+              "_word_count",
+              "_build_sub_section",
+              "_coerce_tier",
+              "_source_ref_key",
+              "_union_source_refs",
+              "_load_drafts_in_order",
+              "_carry_claim_statuses",
+              "assemble_section"
+            ]
+          },
+          {
+            "path": "runner/skill_runtime.py",
+            "batchIndex": 5,
+            "symbols": [
+              "_run_id_echo_directive",
+              "_resolve_transport_backend",
+              "_reset_transport_backend_cache",
+              "SkillRuntimeError",
+              "_load_skill_catalog",
+              "_get_skill_entry",
+              "_load_artifact_schemas",
+              "_find_schema_for_path",
+              "_extract_schema_requirements",
+              "_sanitize_filename",
+              "_is_contextual_descriptor",
+              "_load_skill_spec",
+              "_resolve_inputs",
+              "_validate_skill_inputs",
+              "_anchor_field",
+              "_artifacts_under_directory",
+              "_resolve_output_artifacts",
+              "_collect_schema_hints",
+              "_multi_artifact_directive",
+              "_assemble_skill_prompt",
+              "_assemble_tapm_prompt",
+              "_invoke_claude",
+              "_classify_transport_failure",
+              "_write_transport_failure_diagnostics",
+              "_json_break_point",
+              "_extract_json_response",
+              "_validate_skill_output",
+              "_atomic_write",
+              "run_skill"
+            ]
+          }
+        ],
+        "runner/checkpoint_publisher.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          },
+          {
+            "path": "runner/gate_result_registry.py",
+            "batchIndex": 3,
+            "symbols": []
+          }
+        ],
+        "runner/dag_scheduler.py": [
+          {
+            "path": "runner/gate_evaluator.py",
+            "batchIndex": 3,
+            "symbols": [
+              "_substitute_runtime_args",
+              "_extract_node_id",
+              "_gate_result_path",
+              "_call_predicate",
+              "_is_hard_block_failure",
+              "_resolve_budget_regime",
+              "_partition_predicates_by_instrument",
+              "evaluate_gate"
+            ]
+          },
+          {
+            "path": "runner/gate_result_registry.py",
+            "batchIndex": 3,
+            "symbols": []
+          },
+          {
+            "path": "runner/paths.py",
+            "batchIndex": 3,
+            "symbols": [
+              "find_repo_root",
+              "resolve_repo_path"
+            ]
+          },
+          {
+            "path": "runner/predicates/gate_pass_predicates.py",
+            "batchIndex": 3,
+            "symbols": [
+              "_parse_iso8601",
+              "_mtime_suspect_inputs",
+              "_check_continuation_acceptance",
+              "is_gate_fresh",
+              "gate_pass_recorded"
+            ]
+          },
+          {
+            "path": "runner/versions.py",
+            "batchIndex": 3,
+            "symbols": []
+          }
+        ],
+        "runner/manifest_reader.py": [
+          {
+            "path": "runner/gate_evaluator.py",
+            "batchIndex": 3,
+            "symbols": [
+              "_substitute_runtime_args",
+              "_extract_node_id",
+              "_gate_result_path",
+              "_call_predicate",
+              "_is_hard_block_failure",
+              "_resolve_budget_regime",
+              "_partition_predicates_by_instrument",
+              "evaluate_gate"
+            ]
+          }
+        ],
+        "runner/phase8_preseed.py": [
+          {
+            "path": "runner/claim_status.py",
+            "batchIndex": 2,
+            "symbols": [
+              "normalize_status",
+              "worst_status",
+              "rollup_inconsistency"
+            ]
+          },
+          {
+            "path": "tools/build_part_b_candidate.py",
+            "batchIndex": 2,
+            "symbols": [
+              "BuilderError",
+              "SectionSpec",
+              "_section_specs",
+              "_read_section",
+              "_sub_sections",
+              "_claims",
+              "build_candidate",
+              "output_path",
+              "write_candidate",
+              "main"
+            ]
+          }
+        ],
+        "runner/phase8_reuse.py": [
+          {
+            "path": "runner/claim_status.py",
+            "batchIndex": 2,
+            "symbols": [
+              "normalize_status",
+              "worst_status",
+              "rollup_inconsistency"
+            ]
+          }
+        ],
+        "runner/run_context.py": [
+          {
+            "path": "runner/versions.py",
+            "batchIndex": 3,
+            "symbols": []
+          },
+          {
+            "path": "runner/dev_graph/shadow.py",
+            "batchIndex": 2,
+            "symbols": [
+              "ShadowComparison",
+              "_refuse",
+              "_plan_dict",
+              "_decisions",
+              "_default_artifact_paths",
+              "_planner_verdict",
+              "compare_shadow",
+              "_read_json",
+              "read_shadow_request",
+              "read_plan",
+              "read_reuse_decisions",
+              "write_shadow_comparison",
+              "run_shadow_comparison_writer"
+            ]
+          },
+          {
+            "path": "runner/gate_evaluator.py",
+            "batchIndex": 3,
+            "symbols": [
+              "_substitute_runtime_args",
+              "_extract_node_id",
+              "_gate_result_path",
+              "_call_predicate",
+              "_is_hard_block_failure",
+              "_resolve_budget_regime",
+              "_partition_predicates_by_instrument",
+              "evaluate_gate"
+            ]
+          }
+        ],
+        "runner/runtime_models.py": [
+          {
+            "path": "runner/skill_runtime.py",
+            "batchIndex": 5,
+            "symbols": [
+              "_run_id_echo_directive",
+              "_resolve_transport_backend",
+              "_reset_transport_backend_cache",
+              "SkillRuntimeError",
+              "_load_skill_catalog",
+              "_get_skill_entry",
+              "_load_artifact_schemas",
+              "_find_schema_for_path",
+              "_extract_schema_requirements",
+              "_sanitize_filename",
+              "_is_contextual_descriptor",
+              "_load_skill_spec",
+              "_resolve_inputs",
+              "_validate_skill_inputs",
+              "_anchor_field",
+              "_artifacts_under_directory",
+              "_resolve_output_artifacts",
+              "_collect_schema_hints",
+              "_multi_artifact_directive",
+              "_assemble_skill_prompt",
+              "_assemble_tapm_prompt",
+              "_invoke_claude",
+              "_classify_transport_failure",
+              "_write_transport_failure_diagnostics",
+              "_json_break_point",
+              "_extract_json_response",
+              "_validate_skill_output",
+              "_atomic_write",
+              "run_skill"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 5,
+      "files": [
+        {
+          "path": "runner/claude_transport.py",
+          "language": "python",
+          "sizeLines": 1062,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/json_extract.py",
+          "language": "python",
+          "sizeLines": 74,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/semantic_dispatch.py",
+          "language": "python",
+          "sizeLines": 863,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/skill_runtime.py",
+          "language": "python",
+          "sizeLines": 2739,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/transport/__init__.py",
+          "language": "python",
+          "sizeLines": 55,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/transport/bedrock_converse.py",
+          "language": "python",
+          "sizeLines": 342,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/transport/capabilities.py",
+          "language": "python",
+          "sizeLines": 122,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/transport/config.py",
+          "language": "python",
+          "sizeLines": 793,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/transport/errors.py",
+          "language": "python",
+          "sizeLines": 155,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/transport/openai_compatible.py",
+          "language": "python",
+          "sizeLines": 253,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/transport/tool_executor.py",
+          "language": "python",
+          "sizeLines": 393,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/transport/tool_loop.py",
+          "language": "python",
+          "sizeLines": 284,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "runner/claude_transport.py": [],
+        "runner/json_extract.py": [],
+        "runner/semantic_dispatch.py": [
+          "runner/claude_transport.py",
+          "runner/json_extract.py",
+          "runner/paths.py",
+          "runner/transport/config.py"
+        ],
+        "runner/skill_runtime.py": [
+          "runner/claude_transport.py",
+          "runner/runtime_models.py",
+          "runner/transport/config.py",
+          "runner/transport/tool_executor.py",
+          "runner/transport/tool_loop.py"
+        ],
+        "runner/transport/__init__.py": [
+          "runner/transport/capabilities.py",
+          "runner/transport/config.py",
+          "runner/transport/errors.py",
+          "runner/transport/tool_executor.py",
+          "runner/transport/tool_loop.py"
+        ],
+        "runner/transport/bedrock_converse.py": [
+          "runner/transport/errors.py"
+        ],
+        "runner/transport/capabilities.py": [],
+        "runner/transport/config.py": [
+          "runner/transport/capabilities.py"
+        ],
+        "runner/transport/errors.py": [],
+        "runner/transport/openai_compatible.py": [
+          "runner/transport/errors.py"
+        ],
+        "runner/transport/tool_executor.py": [],
+        "runner/transport/tool_loop.py": [
+          "runner/transport/tool_executor.py"
+        ]
+      },
+      "neighborMap": {
+        "runner/json_extract.py": [
+          {
+            "path": "harness/claim_ledger.py",
+            "batchIndex": 1,
+            "symbols": [
+              "ClaimLedgerError",
+              "_default_clock",
+              "SubSectionProse",
+              "load_section_prose",
+              "ProseChunk",
+              "chunk_prose",
+              "build_decomposition_prompt",
+              "parse_assertions_payload",
+              "decompose_chunk",
+              "Assertion",
+              "dedup_assertions",
+              "LedgerRecord",
+              "dedup_ledger_claims",
+              "_tokens",
+              "lexical_shortlist",
+              "build_coverage_prompt",
+              "extract_covered_by",
+              "judge_assertion_covered_by",
+              "CoverageOutcome",
+              "_covered_by_from_result",
+              "match_assertion",
+              "AssertionFinding",
+              "ChunkFailure",
+              "LedgerCompletenessResult",
+              "evaluate_ledger_completeness"
+            ]
+          },
+          {
+            "path": "harness/judge.py",
+            "batchIndex": 1,
+            "symbols": [
+              "JudgeError",
+              "JudgeConfigError",
+              "JudgeIndependenceError",
+              "JudgeResponseError",
+              "drafter_models",
+              "_default_clock",
+              "JudgeConfig",
+              "resolve_judge_config",
+              "JudgeResult",
+              "MajorityJudgeResult",
+              "_verdict_from_payload",
+              "Judge"
+            ]
+          }
+        ],
+        "runner/semantic_dispatch.py": [
+          {
+            "path": "runner/paths.py",
+            "batchIndex": 3,
+            "symbols": [
+              "find_repo_root",
+              "resolve_repo_path"
+            ]
+          },
+          {
+            "path": "runner/gate_evaluator.py",
+            "batchIndex": 3,
+            "symbols": [
+              "_substitute_runtime_args",
+              "_extract_node_id",
+              "_gate_result_path",
+              "_call_predicate",
+              "_is_hard_block_failure",
+              "_resolve_budget_regime",
+              "_partition_predicates_by_instrument",
+              "evaluate_gate"
+            ]
+          }
+        ],
+        "runner/skill_runtime.py": [
+          {
+            "path": "runner/runtime_models.py",
+            "batchIndex": 4,
+            "symbols": [
+              "SkillResult",
+              "SkillInvocationRecord",
+              "ComponentInvocationRecord",
+              "AgentResult",
+              "NodeExecutionResult"
+            ]
+          },
+          {
+            "path": "runner/agent_runtime.py",
+            "batchIndex": 4,
+            "symbols": [
+              "drafting_skills_superseded_by",
+              "AgentRuntimeError",
+              "_load_agent_catalog",
+              "_get_agent_entry",
+              "_load_artifact_registry",
+              "_load_agent_spec",
+              "_load_prompt_spec",
+              "_resolve_agent_inputs",
+              "_resolve_skill_sequence",
+              "_resolve_budget_regime_safe",
+              "_get_artifacts_produced_by_node",
+              "_determine_can_evaluate_exit_gate",
+              "_get_exit_gate_for_node",
+              "_resolve_instrument_type",
+              "_context_sources_for",
+              "_build_caller_context",
+              "_missing_context_sources",
+              "_resolve_auditable_artifact",
+              "_check_skill_applicability",
+              "run_agent",
+              "_identify_agent_skills",
+              "_refresh_inputs_from_outputs",
+              "_sub_agent_inputs_ready"
+            ]
+          }
+        ],
+        "runner/transport/config.py": [
+          {
+            "path": "harness/commands/faithfulness_calibration.py",
+            "batchIndex": 1,
+            "symbols": [
+              "_paced_judge",
+              "_env_int",
+              "_load_ckpt",
+              "_run",
+              "main"
+            ]
+          },
+          {
+            "path": "harness/commands/freeze_grounding_baselines.py",
+            "batchIndex": 1,
+            "symbols": [
+              "PacedRetryingBackend",
+              "build_paced_judge",
+              "_env_int",
+              "main"
+            ]
+          }
+        ],
+        "runner/transport/errors.py": [
+          {
+            "path": "harness/commands/freeze_grounding_baselines.py",
+            "batchIndex": 1,
+            "symbols": [
+              "PacedRetryingBackend",
+              "build_paced_judge",
+              "_env_int",
+              "main"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 6,
+      "files": [
+        {
+          "path": "runner/graph_canonical_pack.py",
+          "language": "python",
+          "sizeLines": 374,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/graph_claim_verifier.py",
+          "language": "python",
+          "sizeLines": 563,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/graph_compiler.py",
+          "language": "python",
+          "sizeLines": 1222,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/graph_config.py",
+          "language": "python",
+          "sizeLines": 290,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/graph_determinism_check.py",
+          "language": "python",
+          "sizeLines": 563,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/graph_projector.py",
+          "language": "python",
+          "sizeLines": 527,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/graph_schema.py",
+          "language": "python",
+          "sizeLines": 296,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/vault_reader.py",
+          "language": "python",
+          "sizeLines": 393,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/vault_scaffold.py",
+          "language": "python",
+          "sizeLines": 141,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "runner/graph_canonical_pack.py": [
+          "runner/atomic_write.py",
+          "runner/graph_config.py",
+          "runner/graph_schema.py",
+          "runner/vault_reader.py",
+          "runner/working_assumptions.py"
+        ],
+        "runner/graph_claim_verifier.py": [
+          "runner/graph_config.py",
+          "runner/graph_schema.py",
+          "runner/vault_reader.py"
+        ],
+        "runner/graph_compiler.py": [
+          "runner/atomic_write.py",
+          "runner/graph_config.py",
+          "runner/graph_schema.py",
+          "runner/vault_reader.py"
+        ],
+        "runner/graph_config.py": [
+          "runner/graph_schema.py"
+        ],
+        "runner/graph_determinism_check.py": [
+          "runner/graph_compiler.py",
+          "runner/graph_config.py",
+          "runner/vault_reader.py"
+        ],
+        "runner/graph_projector.py": [
+          "runner/atomic_write.py",
+          "runner/graph_config.py",
+          "runner/graph_schema.py"
+        ],
+        "runner/graph_schema.py": [],
+        "runner/vault_reader.py": [
+          "runner/graph_config.py",
+          "runner/graph_schema.py"
+        ],
+        "runner/vault_scaffold.py": [
+          "runner/graph_config.py",
+          "runner/vault_reader.py"
+        ]
+      },
+      "neighborMap": {
+        "runner/graph_canonical_pack.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          },
+          {
+            "path": "runner/working_assumptions.py",
+            "batchIndex": 1,
+            "symbols": [
+              "declared_claim_summary",
+              "WorkingAssumptionsError",
+              "Declaration",
+              "WorkingAssumptions",
+              "_require_str",
+              "_parse_declaration",
+              "load_working_assumptions"
+            ]
+          }
+        ],
+        "runner/graph_compiler.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "runner/graph_projector.py": [
+          {
+            "path": "runner/atomic_write.py",
+            "batchIndex": 2,
+            "symbols": [
+              "canonical_json_bytes",
+              "_finalize",
+              "atomic_write_json",
+              "atomic_write_text",
+              "atomic_write_via"
+            ]
+          }
+        ],
+        "runner/graph_schema.py": [
+          {
+            "path": "runner/dev_graph/documents.py",
+            "batchIndex": 2,
+            "symbols": [
+              "DocumentRef",
+              "_malformed",
+              "_str",
+              "_ids",
+              "_objects",
+              "_sub_sections",
+              "_section",
+              "_verified_span",
+              "_claim",
+              "_commitment",
+              "normalise_candidate",
+              "_tags",
+              "render_document",
+              "node_content",
+              "document_node_id",
+              "read_candidate",
+              "import_document",
+              "read_document_records"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 7,
+      "files": [
+        {
+          "path": "runner/agnosticism_lint.py",
+          "language": "python",
+          "sizeLines": 355,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/consortium_composition.py",
+          "language": "python",
+          "sizeLines": 618,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/leakage_scan.py",
+          "language": "python",
+          "sizeLines": 781,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "runner/agnosticism_lint.py": [],
+        "runner/consortium_composition.py": [],
+        "runner/leakage_scan.py": [
+          "runner/agnosticism_lint.py",
+          "runner/consortium_composition.py"
+        ]
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 8,
+      "files": [
+        {
+          "path": ".claude/workflows/system_orchestration/agent_catalog.yaml",
+          "language": "yaml",
+          "sizeLines": 440,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+          "language": "yaml",
+          "sizeLines": 4099,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/design_notes.yaml",
+          "language": "yaml",
+          "sizeLines": 103,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/gate_rules_library.yaml",
+          "language": "yaml",
+          "sizeLines": 2113,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/global_rules.yaml",
+          "language": "yaml",
+          "sizeLines": 32,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/integration_rules.yaml",
+          "language": "yaml",
+          "sizeLines": 77,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/manifest.compile.yaml",
+          "language": "yaml",
+          "sizeLines": 1044,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/meta.yaml",
+          "language": "yaml",
+          "sizeLines": 130,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/quality_gates.yaml",
+          "language": "yaml",
+          "sizeLines": 335,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/skill_catalog.yaml",
+          "language": "yaml",
+          "sizeLines": 712,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/state_rules.yaml",
+          "language": "yaml",
+          "sizeLines": 66,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/tier_bindings.yaml",
+          "language": "yaml",
+          "sizeLines": 137,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".claude/workflows/system_orchestration/agent_catalog.yaml": [],
+        ".claude/workflows/system_orchestration/artifact_schema_specification.yaml": [],
+        ".claude/workflows/system_orchestration/design_notes.yaml": [],
+        ".claude/workflows/system_orchestration/gate_rules_library.yaml": [],
+        ".claude/workflows/system_orchestration/global_rules.yaml": [],
+        ".claude/workflows/system_orchestration/integration_rules.yaml": [],
+        ".claude/workflows/system_orchestration/manifest.compile.yaml": [],
+        ".claude/workflows/system_orchestration/meta.yaml": [],
+        ".claude/workflows/system_orchestration/quality_gates.yaml": [],
+        ".claude/workflows/system_orchestration/skill_catalog.yaml": [],
+        ".claude/workflows/system_orchestration/state_rules.yaml": [],
+        ".claude/workflows/system_orchestration/tier_bindings.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 9,
+      "files": [
+        {
+          "path": ".claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+          "language": "yaml",
+          "sizeLines": 102,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+          "language": "yaml",
+          "sizeLines": 79,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+          "language": "yaml",
+          "sizeLines": 84,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+          "language": "yaml",
+          "sizeLines": 83,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+          "language": "yaml",
+          "sizeLines": 78,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+          "language": "yaml",
+          "sizeLines": 85,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+          "language": "yaml",
+          "sizeLines": 106,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+          "language": "yaml",
+          "sizeLines": 311,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml": [],
+        ".claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml": [],
+        ".claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml": [],
+        ".claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml": [],
+        ".claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml": [],
+        ".claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml": [],
+        ".claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml": [],
+        ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 10,
+      "files": [
+        {
+          "path": "harness/HARNESS.md",
+          "language": "markdown",
+          "sizeLines": 422,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "harness/evaluator_scorecard_msca_pf.json",
+          "language": "json",
+          "sizeLines": 122,
+          "fileCategory": "config"
+        },
+        {
+          "path": "harness/evaluator_scorecard_msca_pf.md",
+          "language": "markdown",
+          "sizeLines": 43,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "harness/evaluator_scorecard_ria.json",
+          "language": "json",
+          "sizeLines": 105,
+          "fileCategory": "config"
+        },
+        {
+          "path": "harness/rubrics_msca_pf.json",
+          "language": "json",
+          "sizeLines": 181,
+          "fileCategory": "config"
+        },
+        {
+          "path": "harness/rubrics_ria.json",
+          "language": "json",
+          "sizeLines": 220,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "harness/HARNESS.md": [],
+        "harness/evaluator_scorecard_msca_pf.json": [],
+        "harness/evaluator_scorecard_msca_pf.md": [],
+        "harness/evaluator_scorecard_ria.json": [],
+        "harness/rubrics_msca_pf.json": [],
+        "harness/rubrics_ria.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 11,
+      "files": [
+        {
+          "path": "CLAUDE.md",
+          "language": "markdown",
+          "sizeLines": 595,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "harness/commands/__init__.py",
+          "language": "python",
+          "sizeLines": 24,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/gold_sets/README.md",
+          "language": "markdown",
+          "sizeLines": 49,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "harness/labeling/LABELLING_GUIDE.md",
+          "language": "markdown",
+          "sizeLines": 49,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "harness/labeling/e3.1-materiality-calibration_TEMPLATE.json",
+          "language": "json",
+          "sizeLines": 34,
+          "fileCategory": "config"
+        },
+        {
+          "path": "harness/materiality_calibration.py",
+          "language": "python",
+          "sizeLines": 454,
+          "fileCategory": "code"
+        },
+        {
+          "path": "harness/materiality_sets/README.md",
+          "language": "markdown",
+          "sizeLines": 59,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "harness/profiles/msca_pf_default.json",
+          "language": "json",
+          "sizeLines": 49,
+          "fileCategory": "config"
+        },
+        {
+          "path": "harness/profiles/ria_default.json",
+          "language": "json",
+          "sizeLines": 53,
+          "fileCategory": "config"
+        },
+        {
+          "path": "harness/regression_baselines/README.md",
+          "language": "markdown",
+          "sizeLines": 45,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "pyproject.toml",
+          "language": "toml",
+          "sizeLines": 8,
+          "fileCategory": "config"
+        },
+        {
+          "path": "runner/__init__.py",
+          "language": "python",
+          "sizeLines": 21,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/dependency_normalizer.py",
+          "language": "python",
+          "sizeLines": 368,
+          "fileCategory": "code"
+        },
+        {
+          "path": "runner/persistence_policy.py",
+          "language": "python",
+          "sizeLines": 213,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/promote_graph_staging.py",
+          "language": "python",
+          "sizeLines": 166,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/prose_detect.py",
+          "language": "python",
+          "sizeLines": 104,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "CLAUDE.md": [],
+        "harness/commands/__init__.py": [],
+        "harness/gold_sets/README.md": [],
+        "harness/labeling/LABELLING_GUIDE.md": [],
+        "harness/labeling/e3.1-materiality-calibration_TEMPLATE.json": [],
+        "harness/materiality_calibration.py": [],
+        "harness/materiality_sets/README.md": [],
+        "harness/profiles/msca_pf_default.json": [],
+        "harness/profiles/ria_default.json": [],
+        "harness/regression_baselines/README.md": [],
+        "pyproject.toml": [],
+        "runner/__init__.py": [],
+        "runner/dependency_normalizer.py": [],
+        "runner/persistence_policy.py": [],
+        "tools/promote_graph_staging.py": [],
+        "tools/prose_detect.py": []
+      },
+      "neighborMap": {}
+    }
+  ]
+}

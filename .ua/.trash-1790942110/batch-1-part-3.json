@@ -1,0 +1,973 @@
+{
+ "nodes": [
+  {
+   "id": "file:harness/expectation_coverage.py",
+   "type": "file",
+   "name": "expectation_coverage.py",
+   "filePath": "harness/expectation_coverage.py",
+   "summary": "Coverage-axis grader (E5c): asks the judge, over one evidence pack, whether the section substantively addresses a profile evaluator expectation, routing the property through the deterministic-first router and requiring an N>=3 majority panel with mandatory provenance.",
+   "tags": [
+    "grading",
+    "coverage",
+    "judge",
+    "majority-vote"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/expectation_grounding.py",
+   "type": "file",
+   "name": "expectation_grounding.py",
+   "filePath": "harness/expectation_grounding.py",
+   "summary": "Grounding-axis grader (E5d): aggregates the status-aware faithfulness verdicts for the claims in an evidence pack into a per-expectation grounding rate and weakest-link claim, contributing no faithfulness judgment of its own and reusing existing verdicts under a fail-closed consistency check.",
+   "tags": [
+    "grading",
+    "grounding",
+    "aggregation",
+    "integrity"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/expectations.py",
+   "type": "file",
+   "name": "expectations.py",
+   "filePath": "harness/expectations.py",
+   "summary": "Expectation substrate loader (E5a): derives the applicable evaluator expectation set from the Tier-2A registry by parsing [OPTION for ...] applicability tags under the profile's grammar, then requires the result to reproduce the profile scorecard exactly and fails closed on any divergence.",
+   "tags": [
+    "data-loading",
+    "validation",
+    "fail-closed",
+    "registry"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/faithfulness.py",
+   "type": "file",
+   "name": "faithfulness.py",
+   "filePath": "harness/faithfulness.py",
+   "summary": "The atomic faithfulness primitive: renders the bounded prompt asking whether a cited source supports one claim and reads back a boolean verdict, so calibration and the E2 metric ask the judge exactly the question the gold set is labeled against.",
+   "tags": [
+    "prompt-building",
+    "judge",
+    "faithfulness",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:harness/gold_set.py",
+   "type": "file",
+   "name": "gold_set.py",
+   "filePath": "harness/gold_set.py",
+   "summary": "Human-labeled faithfulness gold set: the (claim, source_ref, supported?) data model, a fail-closed loader that refuses unlabeled pairs, a content hash, and a deterministic seeder that emits unlabeled templates from a Phase-8 section's claim statuses without ever fabricating the human label.",
+   "tags": [
+    "data-model",
+    "gold-set",
+    "fail-closed",
+    "calibration"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/expectation_coverage.py:grade_coverage",
+   "type": "function",
+   "name": "grade_coverage",
+   "filePath": "harness/expectation_coverage.py",
+   "lineRange": [
+    164,
+    229
+   ],
+   "summary": "Grades the coverage axis for one expectation and pack: routes the property through the deterministic-first router, runs an N>=3 majority panel, and refuses a judge without an attached provenance log.",
+   "tags": [
+    "grading",
+    "coverage",
+    "judge"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/expectation_coverage.py:grade_expectation",
+   "type": "function",
+   "name": "grade_expectation",
+   "filePath": "harness/expectation_coverage.py",
+   "lineRange": [
+    232,
+    253
+   ],
+   "summary": "Thin orchestration that builds the expectation's evidence pack and grades coverage over it, the single call every grid cell goes through.",
+   "tags": [
+    "orchestration",
+    "grading",
+    "coverage"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/expectation_coverage.py:CoverageGrade",
+   "type": "class",
+   "name": "CoverageGrade",
+   "filePath": "harness/expectation_coverage.py",
+   "lineRange": [
+    111,
+    161
+   ],
+   "summary": "The coverage-axis result for one (expectation, section) cell, keeping the judge's raw majority alongside the clean pass bit and the routing decision.",
+   "tags": [
+    "data-model",
+    "coverage",
+    "grading"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/expectation_grounding.py:_check_reused_finding",
+   "type": "function",
+   "name": "_check_reused_finding",
+   "filePath": "harness/expectation_grounding.py",
+   "lineRange": [
+    383,
+    415
+   ],
+   "summary": "Fail-closed consistency check on a reused faithfulness verdict, refusing a stale result that would silently re-attribute a verdict to a different claim.",
+   "tags": [
+    "validation",
+    "fail-closed",
+    "integrity"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/expectation_grounding.py:derive_grounding",
+   "type": "function",
+   "name": "derive_grounding",
+   "filePath": "harness/expectation_grounding.py",
+   "lineRange": [
+    418,
+    576
+   ],
+   "summary": "Derives the grounding grade for one expectation by aggregating per-claim faithfulness verdicts over the pack's claims, reusing supplied verdicts where valid and delegating any remaining claim to the E2 evaluator.",
+   "tags": [
+    "aggregation",
+    "grounding",
+    "integrity"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/expectation_grounding.py:derive_expectation_grounding",
+   "type": "function",
+   "name": "derive_expectation_grounding",
+   "filePath": "harness/expectation_grounding.py",
+   "lineRange": [
+    579,
+    618
+   ],
+   "summary": "Builds the expectation's evidence pack and derives its grounding grade, the grounding-axis counterpart of grade_expectation.",
+   "tags": [
+    "orchestration",
+    "grounding",
+    "aggregation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/expectation_grounding.py:ClaimGroundingRow",
+   "type": "class",
+   "name": "ClaimGroundingRow",
+   "filePath": "harness/expectation_grounding.py",
+   "lineRange": [
+    166,
+    199
+   ],
+   "summary": "One claim's contribution to an expectation's grounding grade, carrying its status, severity and whether it is grounded.",
+   "tags": [
+    "data-model",
+    "grounding",
+    "claim-ledger"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/expectation_grounding.py:GroundingGrade",
+   "type": "class",
+   "name": "GroundingGrade",
+   "filePath": "harness/expectation_grounding.py",
+   "lineRange": [
+    203,
+    375
+   ],
+   "summary": "The grounding-axis result for one cell: per-status row partitions, the confirmed grounding rate, the weakest-link claim and the integrity failures.",
+   "tags": [
+    "data-model",
+    "grounding",
+    "aggregation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/expectations.py:parse_option_tag",
+   "type": "function",
+   "name": "parse_option_tag",
+   "filePath": "harness/expectations.py",
+   "lineRange": [
+    128,
+    160
+   ],
+   "summary": "Parses an [OPTION for ...] applicability tag under the profile's tag grammar into a structured option tag, rejecting an unrecognised prefix or variant.",
+   "tags": [
+    "parsing",
+    "validation",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/expectations.py:_scorecard_text_matches",
+   "type": "function",
+   "name": "_scorecard_text_matches",
+   "filePath": "harness/expectations.py",
+   "lineRange": [
+    178,
+    204
+   ],
+   "summary": "Compares a registry row's expectation text against a scorecard aspect's verbatim text under the normalization the reproduction check allows.",
+   "tags": [
+    "comparison",
+    "normalization",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/expectations.py:_registry_rows",
+   "type": "function",
+   "name": "_registry_rows",
+   "filePath": "harness/expectations.py",
+   "lineRange": [
+    291,
+    318
+   ],
+   "summary": "Reads the Tier-2A evaluator expectation registry rows for the profile's instrument type.",
+   "tags": [
+    "data-loading",
+    "registry",
+    "tier2a"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/expectations.py:_scorecard_entries",
+   "type": "function",
+   "name": "_scorecard_entries",
+   "filePath": "harness/expectations.py",
+   "lineRange": [
+    343,
+    394
+   ],
+   "summary": "Parses the profile's scorecard file into the binding, human-verified aspect entries that the applicability filter must reproduce.",
+   "tags": [
+    "data-loading",
+    "parsing",
+    "scorecard"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/expectations.py:_resolve_tag",
+   "type": "function",
+   "name": "_resolve_tag",
+   "filePath": "harness/expectations.py",
+   "lineRange": [
+    397,
+    422
+   ],
+   "summary": "Resolves a registry row's applicability tag to applicable, excluded or absent for the profile's instrument variant.",
+   "tags": [
+    "resolution",
+    "applicability",
+    "filtering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/expectations.py:load_expectation_substrate",
+   "type": "function",
+   "name": "load_expectation_substrate",
+   "filePath": "harness/expectations.py",
+   "lineRange": [
+    425,
+    560
+   ],
+   "summary": "Loads the E5a substrate: filters the registry by applicability tag, requires the result to reproduce the scorecard exactly, maps every expectation to its criterion and sections, and raises rather than grading a silent subset.",
+   "tags": [
+    "data-loading",
+    "fail-closed",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/expectations.py:ExpectationSubstrate",
+   "type": "class",
+   "name": "ExpectationSubstrate",
+   "filePath": "harness/expectations.py",
+   "lineRange": [
+    251,
+    274
+   ],
+   "summary": "The loaded expectation set with lookups by stable expectation key and by criterion.",
+   "tags": [
+    "data-model",
+    "registry",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/faithfulness.py:build_claim_user_prompt",
+   "type": "function",
+   "name": "build_claim_user_prompt",
+   "filePath": "harness/faithfulness.py",
+   "lineRange": [
+    73,
+    94
+   ],
+   "summary": "Renders the user half of the faithfulness prompt for one (claim, source) pair.",
+   "tags": [
+    "prompt-building",
+    "faithfulness",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/faithfulness.py:build_faithfulness_prompt",
+   "type": "function",
+   "name": "build_faithfulness_prompt",
+   "filePath": "harness/faithfulness.py",
+   "lineRange": [
+    97,
+    116
+   ],
+   "summary": "Renders the full (system, user) faithfulness prompt pair that asks the single bounded question whether the source supports the claim.",
+   "tags": [
+    "prompt-building",
+    "faithfulness",
+    "judge"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/faithfulness.py:resolve_source_text",
+   "type": "function",
+   "name": "resolve_source_text",
+   "filePath": "harness/faithfulness.py",
+   "lineRange": [
+    119,
+    141
+   ],
+   "summary": "Resolves a pair's source_ref to the source text the judge is shown, failing when the reference cannot be resolved.",
+   "tags": [
+    "resolution",
+    "source-ref",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/faithfulness.py:judge_pair_supported",
+   "type": "function",
+   "name": "judge_pair_supported",
+   "filePath": "harness/faithfulness.py",
+   "lineRange": [
+    144,
+    165
+   ],
+   "summary": "Asks the judge the atomic faithfulness question about one pair and returns the boolean verdict plus its provenance.",
+   "tags": [
+    "judge",
+    "faithfulness",
+    "primitive"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/gold_set.py:_iter_raw_pairs",
+   "type": "function",
+   "name": "_iter_raw_pairs",
+   "filePath": "harness/gold_set.py",
+   "lineRange": [
+    191,
+    212
+   ],
+   "summary": "Iterates the raw pair objects out of a gold-set file, tolerating both the list and keyed container shapes.",
+   "tags": [
+    "parsing",
+    "data-loading",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/gold_set.py:load_gold_set",
+   "type": "function",
+   "name": "load_gold_set",
+   "filePath": "harness/gold_set.py",
+   "lineRange": [
+    215,
+    259
+   ],
+   "summary": "Fail-closed gold-set loader that refuses an unlabeled pair, because a judge cannot be characterized against labels that do not exist.",
+   "tags": [
+    "data-loading",
+    "fail-closed",
+    "gold-set"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/gold_set.py:gold_set_hash",
+   "type": "function",
+   "name": "gold_set_hash",
+   "filePath": "harness/gold_set.py",
+   "lineRange": [
+    262,
+    279
+   ],
+   "summary": "Content hash over the gold set, so a calibration is provably bound to the exact label set it was measured on.",
+   "tags": [
+    "hashing",
+    "provenance",
+    "gold-set"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/gold_set.py:seed_pairs_from_claim_statuses",
+   "type": "function",
+   "name": "seed_pairs_from_claim_statuses",
+   "filePath": "harness/gold_set.py",
+   "lineRange": [
+    301,
+    361
+   ],
+   "summary": "Deterministically draws candidate pairs from a Phase-8 section's claim statuses and emits unlabeled templates, never fabricating the human label.",
+   "tags": [
+    "seeding",
+    "deterministic",
+    "gold-set"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/gold_set.py:_allocate",
+   "type": "function",
+   "name": "_allocate",
+   "filePath": "harness/gold_set.py",
+   "lineRange": [
+    364,
+    393
+   ],
+   "summary": "Allocates the seed quota across status classes with even spacing so the template is not skewed toward one status.",
+   "tags": [
+    "allocation",
+    "deterministic",
+    "sampling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/gold_set.py:GoldPair",
+   "type": "class",
+   "name": "GoldPair",
+   "filePath": "harness/gold_set.py",
+   "lineRange": [
+    64,
+    152
+   ],
+   "summary": "One (claim, source_ref, human label) gold triple, validated on construction, with labeled/unlabeled predicates and round-trip serialization.",
+   "tags": [
+    "data-model",
+    "gold-set",
+    "serialization"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/gold_set.py:GoldSet",
+   "type": "class",
+   "name": "GoldSet",
+   "filePath": "harness/gold_set.py",
+   "lineRange": [
+    156,
+    188
+   ],
+   "summary": "An iterable collection of gold pairs with labeled/unlabeled partitions and a require_fully_labeled guard for calibration use.",
+   "tags": [
+    "data-model",
+    "gold-set",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "function:harness/expectation_coverage.py:grade_coverage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "function:harness/expectation_coverage.py:grade_coverage",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "function:harness/expectation_coverage.py:grade_expectation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "function:harness/expectation_coverage.py:grade_expectation",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "class:harness/expectation_coverage.py:CoverageGrade",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "class:harness/expectation_coverage.py:CoverageGrade",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "function:harness/expectation_grounding.py:_check_reused_finding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "function:harness/expectation_grounding.py:derive_grounding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "function:harness/expectation_grounding.py:derive_grounding",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "function:harness/expectation_grounding.py:derive_expectation_grounding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "function:harness/expectation_grounding.py:derive_expectation_grounding",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "class:harness/expectation_grounding.py:ClaimGroundingRow",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "class:harness/expectation_grounding.py:ClaimGroundingRow",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "class:harness/expectation_grounding.py:GroundingGrade",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "class:harness/expectation_grounding.py:GroundingGrade",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "function:harness/expectations.py:parse_option_tag",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "function:harness/expectations.py:parse_option_tag",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "function:harness/expectations.py:_scorecard_text_matches",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "function:harness/expectations.py:_registry_rows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "function:harness/expectations.py:_scorecard_entries",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "function:harness/expectations.py:_resolve_tag",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "function:harness/expectations.py:load_expectation_substrate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "function:harness/expectations.py:load_expectation_substrate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "class:harness/expectations.py:ExpectationSubstrate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "class:harness/expectations.py:ExpectationSubstrate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "function:harness/faithfulness.py:build_claim_user_prompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "function:harness/faithfulness.py:build_claim_user_prompt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "function:harness/faithfulness.py:build_faithfulness_prompt",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "function:harness/faithfulness.py:build_faithfulness_prompt",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "function:harness/faithfulness.py:resolve_source_text",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "function:harness/faithfulness.py:resolve_source_text",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "function:harness/faithfulness.py:judge_pair_supported",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "function:harness/faithfulness.py:judge_pair_supported",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "function:harness/gold_set.py:_iter_raw_pairs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "function:harness/gold_set.py:load_gold_set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "function:harness/gold_set.py:load_gold_set",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "function:harness/gold_set.py:gold_set_hash",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "function:harness/gold_set.py:gold_set_hash",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "function:harness/gold_set.py:seed_pairs_from_claim_statuses",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "function:harness/gold_set.py:seed_pairs_from_claim_statuses",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "function:harness/gold_set.py:_allocate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "class:harness/gold_set.py:GoldPair",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "class:harness/gold_set.py:GoldPair",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "class:harness/gold_set.py:GoldSet",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "class:harness/gold_set.py:GoldSet",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "file:harness/evidence_pack.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "file:harness/routing.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "file:harness/rubrics.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_coverage.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "file:harness/evidence_pack.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "file:harness/rubrics.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "file:harness/status_faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectation_grounding.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "file:harness/profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/expectations.py",
+   "target": "file:harness/regression.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "file:harness/gold_set.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/faithfulness.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/gold_set.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:harness/expectation_grounding.py:derive_grounding",
+   "target": "function:harness/status_faithfulness.py:evaluate_claim",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/expectations.py:load_expectation_substrate",
+   "target": "function:harness/profile.py:parse_profile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

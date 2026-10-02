@@ -1,0 +1,952 @@
+{
+ "nodes": [
+  {
+   "id": "file:harness/commands/blind_assessment.py",
+   "type": "file",
+   "name": "blind_assessment.py",
+   "filePath": "harness/commands/blind_assessment.py",
+   "summary": "Command-line entry point for the blind assessment lane: assesses one candidate directory or dev-graph document against a pre-evaluation profile, or re-binds a persisted report to the candidate on disk and rejects it when the candidate changed.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "blind-assessment",
+    "argparse"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:harness/commands/faithfulness_calibration.py",
+   "type": "file",
+   "name": "faithfulness_calibration.py",
+   "filePath": "harness/commands/faithfulness_calibration.py",
+   "summary": "Turnkey, resumable runner for the E1.5 faithfulness calibration: judges every gold-set pair through a paced/retrying backend, checkpoints predictions per pair, salvages verdicts from malformed judge JSON, and writes a decision-log draft with the graduation outcome.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "calibration",
+    "resumable"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/commands/freeze_grounding_baselines.py",
+   "type": "file",
+   "name": "freeze_grounding_baselines.py",
+   "filePath": "harness/commands/freeze_grounding_baselines.py",
+   "summary": "Freezes the judge half of the E4 regression golden set section by section, injecting a single paced and retrying backend choke point so a rate-limited judge (TPM/RPM caps, 429s) cannot abort the run; already frozen sections are skipped on re-run.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "rate-limiting",
+    "regression"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/commands/rubric_grading_run.py",
+   "type": "file",
+   "name": "rubric_grading_run.py",
+   "filePath": "harness/commands/rubric_grading_run.py",
+   "summary": "Drives the E5 rubric grid over the committed Part B sections under an explicit judge budget: computes and records the full call/token plan before the first judge call, checkpoints every grid cell for multi-day resume, and freezes both the grid report and the E4 rubric-lane baseline.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "budget-planning",
+    "resumable"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/evidence_pack.py",
+   "type": "file",
+   "name": "evidence_pack.py",
+   "filePath": "harness/evidence_pack.py",
+   "summary": "Deterministic evidence-pack builder that keeps each rubric judge call inside the token budget: selects the prose spans and claim-ledger entries bearing on an expectation by versioned term matching and anchor sub-section bonuses, then records every excluded item and the reason it was dropped.",
+   "tags": [
+    "evidence-pack",
+    "deterministic",
+    "token-budget",
+    "serialization"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/commands/blind_assessment.py:_parser",
+   "type": "function",
+   "name": "_parser",
+   "filePath": "harness/commands/blind_assessment.py",
+   "lineRange": [
+    107,
+    150
+   ],
+   "summary": "Builds the argparse parser for the assess and verify sub-commands and their candidate, document, profile and output options.",
+   "tags": [
+    "cli",
+    "argparse",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/commands/blind_assessment.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "harness/commands/blind_assessment.py",
+   "lineRange": [
+    153,
+    209
+   ],
+   "summary": "Command entry point: resolves the candidate (directory or dev-graph document), constructs the pinned assessor, writes or verifies a bound report, and maps the outcome onto distinct exit codes.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "orchestration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/commands/faithfulness_calibration.py:_run",
+   "type": "function",
+   "name": "_run",
+   "filePath": "harness/commands/faithfulness_calibration.py",
+   "lineRange": [
+    92,
+    134
+   ],
+   "summary": "Judges the outstanding gold pairs with per-pair checkpointing, salvaging a verdict from malformed judge JSON and excluding an unrecoverable pair rather than aborting the run.",
+   "tags": [
+    "resumable",
+    "judge",
+    "error-handling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/commands/faithfulness_calibration.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "harness/commands/faithfulness_calibration.py",
+   "lineRange": [
+    137,
+    242
+   ],
+   "summary": "Calibration run entry point: loads the gold set and checkpoint, paces the judge calls, computes precision and recall, applies the graduation threshold and writes the decision-log draft.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "calibration"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/commands/freeze_grounding_baselines.py:build_paced_judge",
+   "type": "function",
+   "name": "build_paced_judge",
+   "filePath": "harness/commands/freeze_grounding_baselines.py",
+   "lineRange": [
+    210,
+    233
+   ],
+   "summary": "Constructs the pinned judge wrapped in the paced, retrying backend so every judge call in the freeze passes through one rate-limiting choke point.",
+   "tags": [
+    "factory",
+    "rate-limiting",
+    "judge"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/commands/freeze_grounding_baselines.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "harness/commands/freeze_grounding_baselines.py",
+   "lineRange": [
+    241,
+    355
+   ],
+   "summary": "Freeze entry point: iterates the committed sections, skips any already frozen under the current judge pin, and writes one grounding baseline per section with resume on interruption.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "resumable"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/commands/freeze_grounding_baselines.py:PacedRetryingBackend",
+   "type": "class",
+   "name": "PacedRetryingBackend",
+   "filePath": "harness/commands/freeze_grounding_baselines.py",
+   "lineRange": [
+    95,
+    207
+   ],
+   "summary": "Backend wrapper that paces every judge call under a TPM/RPM budget using the backend's real token usage and retries the provider's own retryable errors with exponential backoff, honouring a try-again hint.",
+   "tags": [
+    "rate-limiting",
+    "retry",
+    "decorator"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/commands/rubric_grading_run.py:compute_budget_plan",
+   "type": "function",
+   "name": "compute_budget_plan",
+   "filePath": "harness/commands/rubric_grading_run.py",
+   "lineRange": [
+    155,
+    299
+   ],
+   "summary": "Computes the full offline call and token plan for the grid (expectations by mapped sections by N>=3, coverage plus grounding, cross-pack claim dedup) and records it before the first judge call, making a multi-day resume explicit rather than silently shrinking the panel.",
+   "tags": [
+    "budget-planning",
+    "deterministic",
+    "planning"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/commands/rubric_grading_run.py:run_meta",
+   "type": "function",
+   "name": "run_meta",
+   "filePath": "harness/commands/rubric_grading_run.py",
+   "lineRange": [
+    307,
+    324
+   ],
+   "summary": "Assembles the run metadata block (judge pin, profile version, rubric fingerprint, timestamps) stamped onto every artifact the run writes.",
+   "tags": [
+    "provenance",
+    "metadata",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/commands/rubric_grading_run.py:load_checkpoint",
+   "type": "function",
+   "name": "load_checkpoint",
+   "filePath": "harness/commands/rubric_grading_run.py",
+   "lineRange": [
+    336,
+    366
+   ],
+   "summary": "Loads the per-cell checkpoint and verdict cache, validating it against the current run plan so a stale checkpoint cannot be silently resumed.",
+   "tags": [
+    "resumable",
+    "validation",
+    "deserialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/commands/rubric_grading_run.py:run_grading",
+   "type": "function",
+   "name": "run_grading",
+   "filePath": "harness/commands/rubric_grading_run.py",
+   "lineRange": [
+    374,
+    468
+   ],
+   "summary": "Grades the grid cell by cell within the recorded budget, persisting the checkpoint after each cell and stopping cleanly with BudgetStop when the plan's allowance is exhausted.",
+   "tags": [
+    "orchestration",
+    "resumable",
+    "budget-planning"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/commands/rubric_grading_run.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "harness/commands/rubric_grading_run.py",
+   "lineRange": [
+    488,
+    689
+   ],
+   "summary": "Run entry point: loads the profile bundle, writes the budget plan, optionally stops at plan-only, grades with resume, then freezes the grid report and the E4 rubric-lane baseline.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "orchestration"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/evidence_pack.py:_load_sub_sections",
+   "type": "function",
+   "name": "_load_sub_sections",
+   "filePath": "harness/evidence_pack.py",
+   "lineRange": [
+    420,
+    438
+   ],
+   "summary": "Reads a Tier-5 section artifact's sub-sections into the ordered prose surface the pack builder selects spans from.",
+   "tags": [
+    "data-loading",
+    "prose",
+    "tier5"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/evidence_pack.py:_fill_budget",
+   "type": "function",
+   "name": "_fill_budget",
+   "filePath": "harness/evidence_pack.py",
+   "lineRange": [
+    450,
+    484
+   ],
+   "summary": "Greedily fills the pack to the token ceiling in score order and records every item it had to leave out together with the reason.",
+   "tags": [
+    "token-budget",
+    "selection",
+    "deterministic"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/evidence_pack.py:build_evidence_pack",
+   "type": "function",
+   "name": "build_evidence_pack",
+   "filePath": "harness/evidence_pack.py",
+   "lineRange": [
+    487,
+    639
+   ],
+   "summary": "Builds the deterministic evidence pack for one (expectation, section) pair: term-matches and anchor-bonuses candidate prose spans and claims, fills the token budget, and attaches the full exclusion record.",
+   "tags": [
+    "deterministic",
+    "evidence-pack",
+    "token-budget"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/evidence_pack.py:ProseSpan",
+   "type": "class",
+   "name": "ProseSpan",
+   "filePath": "harness/evidence_pack.py",
+   "lineRange": [
+    196,
+    223
+   ],
+   "summary": "One selectable paragraph of section prose with its matched terms, render form and token estimate.",
+   "tags": [
+    "data-model",
+    "prose",
+    "evidence-pack"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/evidence_pack.py:PackClaim",
+   "type": "class",
+   "name": "PackClaim",
+   "filePath": "harness/evidence_pack.py",
+   "lineRange": [
+    227,
+    249
+   ],
+   "summary": "One selectable claim-ledger entry with its matched terms, render form and token estimate.",
+   "tags": [
+    "data-model",
+    "claim-ledger",
+    "evidence-pack"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/evidence_pack.py:ExcludedItem",
+   "type": "class",
+   "name": "ExcludedItem",
+   "filePath": "harness/evidence_pack.py",
+   "lineRange": [
+    253,
+    280
+   ],
+   "summary": "A record of one item the budget fill dropped and why, so a capped pack never reads as an empty section.",
+   "tags": [
+    "data-model",
+    "transparency",
+    "token-budget"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/evidence_pack.py:EvidencePack",
+   "type": "class",
+   "name": "EvidencePack",
+   "filePath": "harness/evidence_pack.py",
+   "lineRange": [
+    309,
+    388
+   ],
+   "summary": "The assembled, budget-bounded evidence pack handed to one judge call, with its render, token estimate and serializable form.",
+   "tags": [
+    "data-model",
+    "evidence-pack",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "function:harness/commands/blind_assessment.py:_parser",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "function:harness/commands/blind_assessment.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "function:harness/commands/blind_assessment.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "function:harness/commands/faithfulness_calibration.py:_run",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "function:harness/commands/faithfulness_calibration.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "function:harness/commands/faithfulness_calibration.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "function:harness/commands/freeze_grounding_baselines.py:build_paced_judge",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "function:harness/commands/freeze_grounding_baselines.py:build_paced_judge",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "function:harness/commands/freeze_grounding_baselines.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "function:harness/commands/freeze_grounding_baselines.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "class:harness/commands/freeze_grounding_baselines.py:PacedRetryingBackend",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "class:harness/commands/freeze_grounding_baselines.py:PacedRetryingBackend",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:compute_budget_plan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:compute_budget_plan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:run_meta",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:run_meta",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:load_checkpoint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:load_checkpoint",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:run_grading",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:run_grading",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "function:harness/commands/rubric_grading_run.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "function:harness/evidence_pack.py:_load_sub_sections",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "function:harness/evidence_pack.py:_fill_budget",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "function:harness/evidence_pack.py:build_evidence_pack",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "function:harness/evidence_pack.py:build_evidence_pack",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "class:harness/evidence_pack.py:ProseSpan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "class:harness/evidence_pack.py:ProseSpan",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "class:harness/evidence_pack.py:PackClaim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "class:harness/evidence_pack.py:PackClaim",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "class:harness/evidence_pack.py:ExcludedItem",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "class:harness/evidence_pack.py:ExcludedItem",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "class:harness/evidence_pack.py:EvidencePack",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "class:harness/evidence_pack.py:EvidencePack",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/blind_assessment.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/evidence_pack.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/expectation_coverage.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/expectations.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/routing.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/rubrics.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/blind_assessment.py",
+   "target": "file:runner/dev_graph/__init__.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "file:harness/calibration.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "file:harness/commands/_common.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "file:harness/commands/freeze_grounding_baselines.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "file:harness/faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "file:harness/gold_set.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/faithfulness_calibration.py",
+   "target": "file:runner/transport/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "file:harness/commands/_common.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "file:harness/regression.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "file:harness/status_faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "file:runner/transport/config.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "file:runner/transport/errors.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/freeze_grounding_baselines.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/evidence_pack.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/expectation_coverage.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/expectation_grounding.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/expectations.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/regression.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/rubric.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/rubrics.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/commands/rubric_grading_run.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/evidence_pack.py",
+   "target": "file:harness/status_faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:harness/commands/rubric_grading_run.py:main",
+   "target": "function:harness/regression.py:freeze_rubric_baseline",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/commands/freeze_grounding_baselines.py:main",
+   "target": "function:harness/regression.py:freeze_section_grounding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/commands/blind_assessment.py:main",
+   "target": "function:harness/blind_assessment.py:assess_candidate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/commands/faithfulness_calibration.py:main",
+   "target": "function:harness/calibration.py:graduation_for",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/commands/rubric_grading_run.py:run_grading",
+   "target": "function:harness/rubric.py:combine_axes",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

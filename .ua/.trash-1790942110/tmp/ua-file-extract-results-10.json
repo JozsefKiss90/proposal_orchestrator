@@ -1,0 +1,340 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 6,
+  "filesSkipped": [],
+  "filesUnreadable": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 6,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 6
+    }
+  },
+  "results": [
+    {
+      "path": "harness/HARNESS.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 422,
+      "nonEmptyLines": 364,
+      "sections": [
+        {
+          "heading": "Evaluation & Integrity Harness — substrate (E1/E1.5), the two headline signals (E2, E3) + the regression golden-set (E4)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "The one load-bearing invariant",
+          "level": 2,
+          "line": 19
+        },
+        {
+          "heading": "Three tiers (this harness is tier 3)",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "The enforced boundary (structural, not just prose)",
+          "level": 2,
+          "line": 45
+        },
+        {
+          "heading": "Deterministic-first routing",
+          "level": 2,
+          "line": 58
+        },
+        {
+          "heading": "Judge configuration",
+          "level": 2,
+          "line": 78
+        },
+        {
+          "heading": "N≥3 majority scaffold",
+          "level": 2,
+          "line": 92
+        },
+        {
+          "heading": "Provenance",
+          "level": 2,
+          "line": 100
+        },
+        {
+          "heading": "E1.5 — Judge-reliability calibration (the advisory → gating mechanism)",
+          "level": 2,
+          "line": 109
+        },
+        {
+          "heading": "E2 — Status-aware faithfulness (headline signal #1)",
+          "level": 2,
+          "line": 143
+        },
+        {
+          "heading": "Claim identity — `entry_key`, because `claim_id` is not a key",
+          "level": 2,
+          "line": 194
+        },
+        {
+          "heading": "E3 — Claim-ledger completeness + status calibration (headline signal #2)",
+          "level": 2,
+          "line": 208
+        },
+        {
+          "heading": "E4 — Regression golden-set (`regression.py` + `regression_baselines/`)",
+          "level": 2,
+          "line": 251
+        },
+        {
+          "heading": "Pre-evaluation profile (`profile.py` + `profiles/`)",
+          "level": 2,
+          "line": 290
+        },
+        {
+          "heading": "Blind assessment (`blind_assessment.py` + `commands/blind_assessment.py`)",
+          "level": 2,
+          "line": 340
+        },
+        {
+          "heading": "What the harness does *not* do (through E4)",
+          "level": 2,
+          "line": 401
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 16
+      }
+    },
+    {
+      "path": "harness/evaluator_scorecard_msca_pf.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 123,
+      "nonEmptyLines": 123,
+      "sections": [
+        {
+          "heading": "scorecard_id",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "instrument",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "provenance",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "scoring",
+          "level": 1,
+          "line": 17
+        },
+        {
+          "heading": "criteria",
+          "level": 1,
+          "line": 31
+        },
+        {
+          "heading": "excluded_aspects",
+          "level": 1,
+          "line": 114
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "harness/evaluator_scorecard_msca_pf.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 43,
+      "nonEmptyLines": 30,
+      "sections": [
+        {
+          "heading": "MSCA-PF evaluation scorecard — the yardstick E5 grades against",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Excellence — weight 50%  (Score 1, form p.4-5)",
+          "level": 2,
+          "line": 10
+        },
+        {
+          "heading": "Impact — weight 30%  (Score 2, form p.5-6)",
+          "level": 2,
+          "line": 21
+        },
+        {
+          "heading": "Quality and efficiency of the implementation — weight 20%  (Score 3, form p.6)",
+          "level": 2,
+          "line": 30
+        },
+        {
+          "heading": "Excluded for PF (present in the raw registry — do NOT grade)",
+          "level": 2,
+          "line": 37
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 5
+      }
+    },
+    {
+      "path": "harness/evaluator_scorecard_ria.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 105,
+      "nonEmptyLines": 105,
+      "sections": [
+        {
+          "heading": "scorecard_id",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "instrument",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "provenance",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "scoring",
+          "level": 1,
+          "line": 18
+        },
+        {
+          "heading": "criteria",
+          "level": 1,
+          "line": 36
+        },
+        {
+          "heading": "excluded_aspects",
+          "level": 1,
+          "line": 104
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "harness/rubrics_msca_pf.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 181,
+      "nonEmptyLines": 181,
+      "sections": [
+        {
+          "heading": "rubric_set_id",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "scorecard_id",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "scorecard_version",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "framing",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "rubrics",
+          "level": 1,
+          "line": 7
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "harness/rubrics_ria.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 220,
+      "nonEmptyLines": 220,
+      "sections": [
+        {
+          "heading": "rubric_set_id",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "scorecard_id",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "scorecard_version",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "framing",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "rubrics",
+          "level": 1,
+          "line": 7
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    }
+  ]
+}

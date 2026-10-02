@@ -1,0 +1,206 @@
+{
+  "scriptCompleted": true,
+  "issues": [],
+  "warnings": [
+    "1 orphan node(s) with zero edges (by type: {\"file\":1}): file:harness/commands/__init__.py",
+    "17 schema node(s) have no 'defines_schema' edge: schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1, schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1 ..."
+  ],
+  "stats": {
+    "totalNodes": 1056,
+    "totalEdges": 2191,
+    "totalLayers": 10,
+    "tourSteps": 14,
+    "nodeTypes": {
+      "file": 124,
+      "function": 677,
+      "class": 171,
+      "config": 55,
+      "schema": 22,
+      "document": 7
+    },
+    "edgeTypes": {
+      "contains": 897,
+      "exports": 540,
+      "imports": 365,
+      "calls": 159,
+      "depends_on": 68,
+      "inherits": 2,
+      "related": 7,
+      "documents": 64,
+      "configures": 79,
+      "defines_schema": 10
+    }
+  },
+  "extra": {
+    "scanFileCount": 159,
+    "scannedFilesWithoutNode": 0,
+    "fileLevelNodesWithUnknownPath": 0,
+    "fileIdentityNodes": 159,
+    "fileLevelChildNodes": 49,
+    "fileIdentityNodeTypes": {
+      "file": 124,
+      "config": 28,
+      "document": 7
+    },
+    "fileLevelChildNodeTypes": {
+      "schema": 22,
+      "config": 27
+    },
+    "childNodesWithoutContainsParent": 0,
+    "childNodesWithUnexpectedParent": 0,
+    "importMapEntries": 365,
+    "importMapUniquePairs": 365,
+    "importEdges": 365,
+    "importEdgesWithoutMapBacking": 0,
+    "importMapPairsWithoutEdge": 0,
+    "nonAsciiCodepoints": {
+      "U+2014": 89,
+      "U+2019": 1
+    },
+    "dubiousRegionEdges": [
+      "config:.claude/workflows/system_orchestration/manifest.compile.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/manifest.compile.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/global_rules.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml --configures--> file:runner/manifest_reader.py (weight 0.6)",
+      "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml --configures--> file:runner/dag_scheduler.py (weight 0.6)",
+      "document:CLAUDE.md --documents--> file:runner/dag_scheduler.py (weight 0.5)"
+    ],
+    "fileLevelNodeCount": 208,
+    "layerAssignedFileLevelNodes": 208,
+    "tourNodeRefs": 46,
+    "tourUniqueNodeRefs": 46,
+    "isDomainGraph": false,
+    "orphanCount": 1,
+    "orphansByType": {
+      "file": 1
+    },
+    "layerSizes": [
+      {
+        "name": "Constitution & Project Root",
+        "count": 2
+      },
+      {
+        "name": "Workflow Specification Spine",
+        "count": 48
+      },
+      {
+        "name": "Orchestration Runtime Stack",
+        "count": 14
+      },
+      {
+        "name": "Gate Evaluation",
+        "count": 15
+      },
+      {
+        "name": "Deterministic Components",
+        "count": 14
+      },
+      {
+        "name": "Model Transport",
+        "count": 10
+      },
+      {
+        "name": "Graph Substrate",
+        "count": 23
+      },
+      {
+        "name": "Shared Foundation",
+        "count": 10
+      },
+      {
+        "name": "Evaluation Harness",
+        "count": 65
+      },
+      {
+        "name": "Operator Tooling",
+        "count": 7
+      }
+    ],
+    "tourStepSizes": [
+      {
+        "order": 1,
+        "title": "The Constitution",
+        "count": 1
+      },
+      {
+        "order": 2,
+        "title": "The CLI Entry Point",
+        "count": 1
+      },
+      {
+        "order": 3,
+        "title": "The Scheduler and Node Dispatch",
+        "count": 3
+      },
+      {
+        "order": 4,
+        "title": "The Agent Runtime",
+        "count": 3
+      },
+      {
+        "order": 5,
+        "title": "The Skill Runtime",
+        "count": 3
+      },
+      {
+        "order": 6,
+        "title": "The Model Transport Boundary",
+        "count": 4
+      },
+      {
+        "order": 7,
+        "title": "Gates Are the Point",
+        "count": 4
+      },
+      {
+        "order": 8,
+        "title": "The Predicate Modules",
+        "count": 4
+      },
+      {
+        "order": 9,
+        "title": "The YAML Spine Governs the Python",
+        "count": 4
+      },
+      {
+        "order": 10,
+        "title": "Skills vs Deterministic Components",
+        "count": 4
+      },
+      {
+        "order": 11,
+        "title": "The Budget Gate: Fail-Closed in Full",
+        "count": 4
+      },
+      {
+        "order": 12,
+        "title": "The Graph Substrate",
+        "count": 4
+      },
+      {
+        "order": 13,
+        "title": "The Out-of-Band Harness",
+        "count": 4
+      },
+      {
+        "order": 14,
+        "title": "The Shared Foundation",
+        "count": 3
+      }
+    ]
+  }
+}

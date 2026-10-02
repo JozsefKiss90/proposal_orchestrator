@@ -1,0 +1,221 @@
+{
+ "projectRoot": "C:/Code/proposal_demo/proposal_orchestrator",
+ "batchFiles": [
+  {
+   "path": "runner/fingerprints.py",
+   "language": "python",
+   "sizeLines": 89,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/gate_evaluator.py",
+   "language": "python",
+   "sizeLines": 853,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/gate_library.py",
+   "language": "python",
+   "sizeLines": 265,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/gate_result_registry.py",
+   "language": "python",
+   "sizeLines": 115,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/paths.py",
+   "language": "python",
+   "sizeLines": 82,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/__init__.py",
+   "language": "python",
+   "sizeLines": 189,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/coverage_predicates.py",
+   "language": "python",
+   "sizeLines": 1674,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/criterion_predicates.py",
+   "language": "python",
+   "sizeLines": 1179,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/cycle_predicates.py",
+   "language": "python",
+   "sizeLines": 357,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/file_predicates.py",
+   "language": "python",
+   "sizeLines": 588,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/gate_pass_predicates.py",
+   "language": "python",
+   "sizeLines": 543,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/phase8_section_predicates.py",
+   "language": "python",
+   "sizeLines": 964,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/schema_predicates.py",
+   "language": "python",
+   "sizeLines": 2033,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/scope_coverage_predicates.py",
+   "language": "python",
+   "sizeLines": 330,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/source_ref_predicates.py",
+   "language": "python",
+   "sizeLines": 621,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/timeline_predicates.py",
+   "language": "python",
+   "sizeLines": 1063,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/predicates/types.py",
+   "language": "python",
+   "sizeLines": 162,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/upstream_inputs.py",
+   "language": "python",
+   "sizeLines": 169,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/versions.py",
+   "language": "python",
+   "sizeLines": 15,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/backfill_gate_result_schema_id.py",
+   "language": "python",
+   "sizeLines": 251,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "runner/fingerprints.py": [
+   "runner/paths.py"
+  ],
+  "runner/gate_evaluator.py": [
+   "runner/fingerprints.py",
+   "runner/gate_library.py",
+   "runner/gate_result_registry.py",
+   "runner/manifest_reader.py",
+   "runner/paths.py",
+   "runner/predicates/coverage_predicates.py",
+   "runner/predicates/criterion_predicates.py",
+   "runner/predicates/cycle_predicates.py",
+   "runner/predicates/file_predicates.py",
+   "runner/predicates/gate_pass_predicates.py",
+   "runner/predicates/phase8_section_predicates.py",
+   "runner/predicates/schema_predicates.py",
+   "runner/predicates/scope_coverage_predicates.py",
+   "runner/predicates/source_ref_predicates.py",
+   "runner/predicates/timeline_predicates.py",
+   "runner/predicates/types.py",
+   "runner/run_context.py",
+   "runner/semantic_dispatch.py",
+   "runner/upstream_inputs.py",
+   "runner/versions.py"
+  ],
+  "runner/gate_library.py": [
+   "runner/versions.py"
+  ],
+  "runner/gate_result_registry.py": [],
+  "runner/paths.py": [],
+  "runner/predicates/__init__.py": [
+   "runner/predicates/coverage_predicates.py",
+   "runner/predicates/criterion_predicates.py",
+   "runner/predicates/cycle_predicates.py",
+   "runner/predicates/file_predicates.py",
+   "runner/predicates/gate_pass_predicates.py",
+   "runner/predicates/phase8_section_predicates.py",
+   "runner/predicates/schema_predicates.py",
+   "runner/predicates/scope_coverage_predicates.py",
+   "runner/predicates/source_ref_predicates.py",
+   "runner/predicates/timeline_predicates.py",
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/coverage_predicates.py": [
+   "runner/paths.py",
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/criterion_predicates.py": [
+   "runner/claim_status.py",
+   "runner/paths.py",
+   "runner/predicates/types.py",
+   "runner/working_assumptions.py"
+  ],
+  "runner/predicates/cycle_predicates.py": [
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/file_predicates.py": [
+   "runner/paths.py",
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/gate_pass_predicates.py": [
+   "runner/fingerprints.py",
+   "runner/gate_result_registry.py",
+   "runner/paths.py",
+   "runner/predicates/types.py",
+   "runner/upstream_inputs.py",
+   "runner/versions.py"
+  ],
+  "runner/predicates/phase8_section_predicates.py": [
+   "runner/paths.py",
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/schema_predicates.py": [
+   "runner/interface_contract.py",
+   "runner/paths.py",
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/scope_coverage_predicates.py": [
+   "runner/paths.py",
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/source_ref_predicates.py": [
+   "runner/paths.py",
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/timeline_predicates.py": [
+   "runner/predicates/types.py"
+  ],
+  "runner/predicates/types.py": [],
+  "runner/upstream_inputs.py": [],
+  "runner/versions.py": [],
+  "tools/backfill_gate_result_schema_id.py": [
+   "runner/gate_result_registry.py"
+  ]
+ }
+}

@@ -1,0 +1,1349 @@
+{
+ "nodes": [
+  {
+   "id": "file:harness/provenance.py",
+   "type": "file",
+   "name": "provenance.py",
+   "filePath": "harness/provenance.py",
+   "summary": "Judge-verdict provenance: a stable content hash over the (system, user) prompt pair, an immutable record carrying judge model, version, prompt hash, score and rationale that cannot be built with a non-Inferred evidence type, and an append-only JSONL sink.",
+   "tags": [
+    "provenance",
+    "audit-trail",
+    "data-model",
+    "logging"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:harness/regression.py",
+   "type": "file",
+   "name": "regression.py",
+   "filePath": "harness/regression.py",
+   "summary": "Regression golden set (E4): freezes each Tier-5 section's claim ledger, per-sub-section prose hashes and canonical artifact hash as a baseline, then diffs a current artifact against it and classifies lost claims, status weakenings and source-ref swaps as breaking regressions; also owns the grounding and rubric baselines.",
+   "tags": [
+    "regression",
+    "fingerprinting",
+    "baseline",
+    "cli"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:harness/report.py",
+   "type": "file",
+   "name": "report.py",
+   "filePath": "harness/report.py",
+   "summary": "The harness's terminal artifact: aggregates a metric's verdicts and routing decisions into one serializable report that is advisory by construction, with no method that could yield a gate pass/fail for the scheduler.",
+   "tags": [
+    "report-generation",
+    "advisory",
+    "serialization",
+    "data-model"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:harness/routing.py",
+   "type": "file",
+   "name": "routing.py",
+   "filePath": "harness/routing.py",
+   "summary": "Deterministic-first routing authority: refuses to judge any property whose key names a deterministic predicate the runtime actually dispatches, while deliberately treating the in-run semantic registry as non-deterministic so the independent judge may legitimately re-check it.",
+   "tags": [
+    "routing",
+    "authority",
+    "validation",
+    "guardrail"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:harness/rubric.py",
+   "type": "file",
+   "name": "rubric.py",
+   "filePath": "harness/rubric.py",
+   "summary": "Contradiction detector and rubric grid report (E5e): deterministically combines the coverage and grounding axes into a 2x2 grid whose headline cell is high coverage with weak grounding, carrying no blended score anywhere so that cell can never be averaged away; also renders the report and owns the grading CLI.",
+   "tags": [
+    "report-generation",
+    "deterministic",
+    "contradiction-detection",
+    "cli"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/provenance.py:ProvenanceRecord",
+   "type": "class",
+   "name": "ProvenanceRecord",
+   "filePath": "harness/provenance.py",
+   "lineRange": [
+    72,
+    181
+   ],
+   "summary": "The immutable five-field provenance record for a judge verdict, which cannot be constructed with a non-Inferred evidence type, plus construction from a verdict.",
+   "tags": [
+    "data-model",
+    "provenance",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/provenance.py:ProvenanceLog",
+   "type": "class",
+   "name": "ProvenanceLog",
+   "filePath": "harness/provenance.py",
+   "lineRange": [
+    184,
+    196
+   ],
+   "summary": "Append-only JSONL sink for provenance records, written atomically so Python owns every write.",
+   "tags": [
+    "logging",
+    "provenance",
+    "atomic-write"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/regression.py:freeze_section_fingerprint",
+   "type": "function",
+   "name": "freeze_section_fingerprint",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    419,
+    448
+   ],
+   "summary": "Snapshots a section's claim ledger matched by meaning, its per-sub-section prose hashes and a canonical whole-artifact hash as the deterministic E4 baseline.",
+   "tags": [
+    "fingerprinting",
+    "baseline",
+    "deterministic"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/regression.py:load_golden_set",
+   "type": "function",
+   "name": "load_golden_set",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    486,
+    504
+   ],
+   "summary": "Loads the frozen golden-set fingerprints for every baselined section.",
+   "tags": [
+    "data-loading",
+    "baseline",
+    "deserialization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/regression.py:_diff_ledger",
+   "type": "function",
+   "name": "_diff_ledger",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    573,
+    647
+   ],
+   "summary": "Diffs a current claim ledger against a frozen one by meaning, classifying removed claims, status weakenings and source-ref swaps as breaking and additions as advisory.",
+   "tags": [
+    "diffing",
+    "regression",
+    "classification"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/regression.py:_diff_prose",
+   "type": "function",
+   "name": "_diff_prose",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    650,
+    693
+   ],
+   "summary": "Diffs per-sub-section prose hashes and calls out prose that changed while the ledger did not, the escaped-claim risk zone.",
+   "tags": [
+    "diffing",
+    "regression",
+    "prose"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/regression.py:compare_section",
+   "type": "function",
+   "name": "compare_section",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    696,
+    758
+   ],
+   "summary": "Compares one current section artifact against its frozen fingerprint and returns the classified regression result.",
+   "tags": [
+    "comparison",
+    "regression",
+    "orchestration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/regression.py:compare_to_golden_set",
+   "type": "function",
+   "name": "compare_to_golden_set",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    833,
+    887
+   ],
+   "summary": "Compares every section in the golden set against the current artifacts and aggregates the per-section results into one regression report.",
+   "tags": [
+    "comparison",
+    "regression",
+    "aggregation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/regression.py:_judge_section",
+   "type": "function",
+   "name": "_judge_section",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    895,
+    917
+   ],
+   "summary": "Runs the status-aware faithfulness evaluation over one section to produce the judge-lane input for a grounding baseline.",
+   "tags": [
+    "judge",
+    "orchestration",
+    "grounding"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/regression.py:freeze_section_grounding",
+   "type": "function",
+   "name": "freeze_section_grounding",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    920,
+    947
+   ],
+   "summary": "Freezes a section's judge-lane grounding baseline under the current judge pin.",
+   "tags": [
+    "baseline",
+    "grounding",
+    "judge"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/regression.py:compare_section_grounding",
+   "type": "function",
+   "name": "compare_section_grounding",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    950,
+    977
+   ],
+   "summary": "Compares a section's current grounding verdicts against its frozen baseline and reports the invariance violations.",
+   "tags": [
+    "comparison",
+    "grounding",
+    "regression"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/regression.py:_require_report",
+   "type": "function",
+   "name": "_require_report",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    997,
+    1020
+   ],
+   "summary": "Validates that a rubric report has the shape the baseline freeze requires, failing rather than freezing a partial grid.",
+   "tags": [
+    "validation",
+    "fail-closed",
+    "rubric"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:harness/regression.py:freeze_rubric_baseline",
+   "type": "function",
+   "name": "freeze_rubric_baseline",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    1023,
+    1052
+   ],
+   "summary": "Freezes an E5 rubric grid report as the E4 rubric-lane baseline, embedding the run's budget accounting.",
+   "tags": [
+    "baseline",
+    "rubric",
+    "provenance"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/regression.py:compare_rubric_baseline",
+   "type": "function",
+   "name": "compare_rubric_baseline",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    1109,
+    1238
+   ],
+   "summary": "Diffs a current rubric grid against the frozen baseline cell by cell, classifying axis-value and contradiction-kind changes.",
+   "tags": [
+    "comparison",
+    "rubric",
+    "regression"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/regression.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    1253,
+    1346
+   ],
+   "summary": "Regression CLI entry point for the deterministic lane: freeze or check the section golden set and the rubric baseline.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "regression"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/regression.py:LedgerEntry",
+   "type": "class",
+   "name": "LedgerEntry",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    239,
+    299
+   ],
+   "summary": "One frozen ledger claim identified by meaning - summary, status and source_ref - never by bare claim_id, with round-trip serialization.",
+   "tags": [
+    "data-model",
+    "claim-ledger",
+    "fingerprinting"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/regression.py:SubSectionFingerprint",
+   "type": "class",
+   "name": "SubSectionFingerprint",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    303,
+    340
+   ],
+   "summary": "The frozen prose hash for one sub-section, built from its prose and serializable both ways.",
+   "tags": [
+    "data-model",
+    "fingerprinting",
+    "prose"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/regression.py:SectionFingerprint",
+   "type": "class",
+   "name": "SectionFingerprint",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    344,
+    408
+   ],
+   "summary": "A section's complete frozen baseline: ledger entries, sub-section prose hashes, status counts, confirmed share and canonical artifact hash.",
+   "tags": [
+    "data-model",
+    "fingerprinting",
+    "baseline"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/regression.py:RegressionFinding",
+   "type": "class",
+   "name": "RegressionFinding",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    513,
+    535
+   ],
+   "summary": "One classified regression finding with its breaking flag.",
+   "tags": [
+    "data-model",
+    "regression",
+    "finding"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/regression.py:SectionRegressionResult",
+   "type": "class",
+   "name": "SectionRegressionResult",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    539,
+    560
+   ],
+   "summary": "Per-section regression outcome exposing whether the section regressed and which findings are breaking.",
+   "tags": [
+    "data-model",
+    "regression",
+    "aggregation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/regression.py:RegressionReport",
+   "type": "class",
+   "name": "RegressionReport",
+   "filePath": "harness/regression.py",
+   "lineRange": [
+    767,
+    823
+   ],
+   "summary": "The aggregate E4 regression report across sections, with a regressed predicate and a human summary.",
+   "tags": [
+    "data-model",
+    "regression",
+    "report-generation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/report.py:build_report",
+   "type": "function",
+   "name": "build_report",
+   "filePath": "harness/report.py",
+   "lineRange": [
+    122,
+    139
+   ],
+   "summary": "Builds the advisory harness report from a metric's verdicts and routing decisions.",
+   "tags": [
+    "factory",
+    "report-generation",
+    "advisory"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/report.py:HarnessReport",
+   "type": "class",
+   "name": "HarnessReport",
+   "filePath": "harness/report.py",
+   "lineRange": [
+    40,
+    119
+   ],
+   "summary": "The harness's terminal report object, advisory by construction - always advisory, never blocking, with no gate pass/fail accessor the scheduler could consume.",
+   "tags": [
+    "data-model",
+    "advisory",
+    "report-generation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/routing.py:route",
+   "type": "function",
+   "name": "route",
+   "filePath": "harness/routing.py",
+   "lineRange": [
+    141,
+    178
+   ],
+   "summary": "Routes a named property: refuses to judge it when the key names a deterministic predicate the runtime dispatches, otherwise returns a decision permitting the judge in the semantic gap.",
+   "tags": [
+    "routing",
+    "authority",
+    "guardrail"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/routing.py:RoutingDecision",
+   "type": "class",
+   "name": "RoutingDecision",
+   "filePath": "harness/routing.py",
+   "lineRange": [
+    78,
+    110
+   ],
+   "summary": "The recorded routing decision for one property, attached to every grade so the deterministic-first rule is auditable.",
+   "tags": [
+    "data-model",
+    "routing",
+    "provenance"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubric.py:load_spine_registry",
+   "type": "function",
+   "name": "load_spine_registry",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    299,
+    373
+   ],
+   "summary": "Loads the spine-fact registry (researcher, host, call and related facts) used to annotate a grid cell with the unconfirmed facts its claims rest on.",
+   "tags": [
+    "data-loading",
+    "spine",
+    "registry"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubric.py:_weak_grounding_explanation",
+   "type": "function",
+   "name": "_weak_grounding_explanation",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    418,
+    464
+   ],
+   "summary": "Builds the human-readable explanation of why a cell's grounding is weak, naming the weakest-link claim and any unconfirmed spine facts behind it.",
+   "tags": [
+    "rendering",
+    "grounding",
+    "explanation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubric.py:combine_axes",
+   "type": "function",
+   "name": "combine_axes",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    512,
+    663
+   ],
+   "summary": "Deterministic arithmetic combining one coverage grade and one grounding grade into a grid cell, using the judge's raw majority for the covered axis so a truncated pack cannot hide the headline contradiction.",
+   "tags": [
+    "deterministic",
+    "combination",
+    "contradiction-detection"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:harness/rubric.py:build_rubric_report",
+   "type": "function",
+   "name": "build_rubric_report",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    764,
+    788
+   ],
+   "summary": "Assembles the rubric grid report from the combined cells and the run metadata.",
+   "tags": [
+    "factory",
+    "report-generation",
+    "rubric"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubric.py:render_report",
+   "type": "function",
+   "name": "render_report",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    825,
+    896
+   ],
+   "summary": "Renders the rubric grid as text with the two axes printed side by side and no blended score anywhere.",
+   "tags": [
+    "rendering",
+    "report-generation",
+    "cli"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubric.py:grade_all",
+   "type": "function",
+   "name": "grade_all",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    904,
+    961
+   ],
+   "summary": "Grades the full grid: for every applicable expectation and mapped section, derives both axes and combines them into a cell.",
+   "tags": [
+    "orchestration",
+    "grading",
+    "rubric"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:harness/rubric.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    990,
+    1080
+   ],
+   "summary": "Rubric CLI entry point that re-renders or regrades the E5 grid report.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "rubric"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:harness/rubric.py:SpineFact",
+   "type": "class",
+   "name": "SpineFact",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    191,
+    231
+   ],
+   "summary": "One spine fact with its effective status and an unconfirmed predicate, used to explain weak grounding.",
+   "tags": [
+    "data-model",
+    "spine",
+    "status"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/rubric.py:SpineRegistry",
+   "type": "class",
+   "name": "SpineRegistry",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    243,
+    279
+   ],
+   "summary": "The loaded spine-fact registry with lookups by id, by claim and over the unconfirmed subset.",
+   "tags": [
+    "data-model",
+    "registry",
+    "lookup"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/rubric.py:Contradiction",
+   "type": "class",
+   "name": "Contradiction",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    382,
+    405
+   ],
+   "summary": "A recorded high-coverage / weak-grounding contradiction - the grid's headline cell.",
+   "tags": [
+    "data-model",
+    "contradiction-detection",
+    "finding"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:harness/rubric.py:ExpectationCell",
+   "type": "class",
+   "name": "ExpectationCell",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    468,
+    509
+   ],
+   "summary": "One grid cell carrying both axes separately, their covered and grounded bits, and the clean-pass override state.",
+   "tags": [
+    "data-model",
+    "rubric",
+    "grading"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:harness/rubric.py:RubricReport",
+   "type": "class",
+   "name": "RubricReport",
+   "filePath": "harness/rubric.py",
+   "lineRange": [
+    672,
+    753
+   ],
+   "summary": "The E5 grid report, structurally carrying no blended field so the contradiction cell can never be averaged away.",
+   "tags": [
+    "data-model",
+    "report-generation",
+    "rubric"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:harness/provenance.py",
+   "target": "class:harness/provenance.py:ProvenanceRecord",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/provenance.py",
+   "target": "class:harness/provenance.py:ProvenanceRecord",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/provenance.py",
+   "target": "class:harness/provenance.py:ProvenanceLog",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/provenance.py",
+   "target": "class:harness/provenance.py:ProvenanceLog",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:freeze_section_fingerprint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:freeze_section_fingerprint",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:load_golden_set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:load_golden_set",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:_diff_ledger",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:_diff_prose",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:compare_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:compare_section",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:compare_to_golden_set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:compare_to_golden_set",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:_judge_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:freeze_section_grounding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:freeze_section_grounding",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:compare_section_grounding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:compare_section_grounding",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:_require_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:freeze_rubric_baseline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:freeze_rubric_baseline",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:compare_rubric_baseline",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:compare_rubric_baseline",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "function:harness/regression.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:LedgerEntry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:LedgerEntry",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:SubSectionFingerprint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:SubSectionFingerprint",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:SectionFingerprint",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:SectionFingerprint",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:RegressionFinding",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:RegressionFinding",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:SectionRegressionResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:SectionRegressionResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:RegressionReport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "class:harness/regression.py:RegressionReport",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/report.py",
+   "target": "function:harness/report.py:build_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/report.py",
+   "target": "function:harness/report.py:build_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/report.py",
+   "target": "class:harness/report.py:HarnessReport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/report.py",
+   "target": "class:harness/report.py:HarnessReport",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/routing.py",
+   "target": "function:harness/routing.py:route",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/routing.py",
+   "target": "function:harness/routing.py:route",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/routing.py",
+   "target": "class:harness/routing.py:RoutingDecision",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/routing.py",
+   "target": "class:harness/routing.py:RoutingDecision",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:load_spine_registry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:load_spine_registry",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:_weak_grounding_explanation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:combine_axes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:combine_axes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:build_rubric_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:build_rubric_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:render_report",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:render_report",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:grade_all",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:grade_all",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "function:harness/rubric.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:SpineFact",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:SpineFact",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:SpineRegistry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:SpineRegistry",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:Contradiction",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:Contradiction",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:ExpectationCell",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:ExpectationCell",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:RubricReport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "class:harness/rubric.py:RubricReport",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:harness/provenance.py",
+   "target": "file:harness/jsonl_log.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/provenance.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "file:harness/claim_ledger.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "file:harness/status_faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/regression.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/report.py",
+   "target": "file:harness/routing.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/report.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/evidence_pack.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/expectation_coverage.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/expectation_grounding.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/expectations.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/judge.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/provenance.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/rubrics.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/status_faithfulness.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:harness/verdict.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:harness/rubric.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:harness/rubric.py:grade_all",
+   "target": "function:harness/expectation_grounding.py:derive_expectation_grounding",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:harness/regression.py:_judge_section",
+   "target": "function:harness/status_faithfulness.py:evaluate_status_aware_faithfulness",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

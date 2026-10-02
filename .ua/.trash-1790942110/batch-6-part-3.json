@@ -1,0 +1,239 @@
+{
+  "nodes": [
+    {
+      "id": "file:runner/graph_schema.py",
+      "type": "file",
+      "name": "graph_schema.py",
+      "filePath": "runner/graph_schema.py",
+      "summary": "The project-agnostic schema half of the graph substrate: the controlled node_type and evidence_strength vocabularies, the pure lookup from evidence strength to a validation status, the required-core versus additive-optional front-matter split, and fail-closed validation that names the offending node. Carries no folder names, call, or partner nouns.",
+      "tags": ["schema-definition", "validation", "vocabulary", "graph-substrate", "provenance"],
+      "complexity": "moderate",
+      "languageNotes": "Vocabularies are frozensets and the evidence-to-status map is a plain dict lookup, never a judgement — that purity is what lets provenance be carried end to end. The newer tier/phase/artifact_path/sub_section_id keys are additive-optional so existing nodes still validate unchanged."
+    },
+    {
+      "id": "class:runner/graph_schema.py:GraphSchemaError",
+      "type": "class",
+      "name": "GraphSchemaError",
+      "filePath": "runner/graph_schema.py",
+      "lineRange": [173, 178],
+      "summary": "Raised on a front-matter violation, always naming the offending node reference.",
+      "tags": ["exception", "fail-closed", "error-handling"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/graph_schema.py:map_evidence_to_status",
+      "type": "function",
+      "name": "map_evidence_to_status",
+      "filePath": "runner/graph_schema.py",
+      "lineRange": [186, 209],
+      "summary": "Maps an evidence_strength value to its constitutional validation status by pure dict lookup — source-grounded to confirmed, synthesis and inference to inferred, unconfirmed to unresolved — and is the single authority every graph tool reads that mapping from.",
+      "tags": ["lookup", "provenance", "validation-status", "deterministic"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/graph_schema.py:validate_front_matter",
+      "type": "function",
+      "name": "validate_front_matter",
+      "filePath": "runner/graph_schema.py",
+      "lineRange": [221, 296],
+      "summary": "Validates a node's front-matter against the schema: the required identity and provenance core must be present and non-blank, every controlled-vocabulary value must be in range, and any violation raises a named error rather than a silent default.",
+      "tags": ["validation", "fail-closed", "schema-check", "entry-point"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "file:runner/vault_reader.py",
+      "type": "file",
+      "name": "vault_reader.py",
+      "filePath": "runner/vault_reader.py",
+      "summary": "Deterministic pure-Python parse layer of the graph substrate: reads every vault note's YAML front-matter, body prose, and wikilinks, validates each against the generic schema, and returns an indexed Vault. This is the single substrate the compiler, projector, pack deriver, and auditors all build on.",
+      "tags": ["parser", "graph-substrate", "frontmatter", "deterministic", "wikilinks"],
+      "complexity": "complex",
+      "languageNotes": "Wikilink resolution mirrors Obsidian's basename semantics, so [[Target]], [[Target|Display]] and [[folder/Target#Heading]] all land on the same node. A dangling link is recorded as a graph-quality signal rather than raised, while a duplicate id or basename fails closed."
+    },
+    {
+      "id": "class:runner/vault_reader.py:VaultReadError",
+      "type": "class",
+      "name": "VaultReadError",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [55, 62],
+      "summary": "Raised when a node has missing or malformed front-matter, an unparseable YAML block, a duplicate id or basename, or a schema violation — always naming the node.",
+      "tags": ["exception", "fail-closed", "error-handling"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/vault_reader.py:WikiLink",
+      "type": "class",
+      "name": "WikiLink",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [76, 83],
+      "summary": "One parsed wikilink: its target basename plus the optional display text and heading anchor.",
+      "tags": ["data-model", "dataclass", "wikilinks"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/vault_reader.py:GraphNode",
+      "type": "class",
+      "name": "GraphNode",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [156, 196],
+      "summary": "One parsed vault node: its id, path, validated front-matter, body prose, outbound wikilinks, and mapped status, with accessors for the additive-optional tier, phase, artifact_path, and sub_section_id keys.",
+      "tags": ["data-model", "dataclass", "graph-substrate", "node"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:runner/vault_reader.py:Vault",
+      "type": "class",
+      "name": "Vault",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [205, 247],
+      "summary": "The indexed parse result: path-ordered nodes plus id and basename indices, with methods to resolve a wikilink, find the config binding for a node, and enumerate dangling links.",
+      "tags": ["data-model", "dataclass", "index", "graph-substrate"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/vault_reader.py:_parse_wikilink",
+      "type": "function",
+      "name": "_parse_wikilink",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [86, 104],
+      "summary": "Parses the inside of a wikilink into target, display text, and heading, handling the folder-prefixed and aliased forms.",
+      "tags": ["parsing", "wikilinks", "helper"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/vault_reader.py:_extract_wikilinks",
+      "type": "function",
+      "name": "_extract_wikilinks",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [107, 118],
+      "summary": "Scans a node body for wikilinks and returns them de-duplicated in first-seen order, keeping the parse deterministic.",
+      "tags": ["parsing", "wikilinks", "deterministic"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/vault_reader.py:_split_front_matter",
+      "type": "function",
+      "name": "_split_front_matter",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [126, 147],
+      "summary": "Splits a note into its YAML front-matter block and body, failing closed with the node reference when the block is missing or unparseable.",
+      "tags": ["parsing", "frontmatter", "fail-closed"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/vault_reader.py:_parse_node",
+      "type": "function",
+      "name": "_parse_node",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [255, 305],
+      "summary": "Parses one note file into a GraphNode: splits the front-matter, validates it against the schema, extracts wikilinks, and computes the node's status from its evidence_strength.",
+      "tags": ["parsing", "validation", "graph-substrate", "provenance"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/vault_reader.py:read_vault",
+      "type": "function",
+      "name": "read_vault",
+      "filePath": "runner/vault_reader.py",
+      "lineRange": [308, 393],
+      "summary": "Reads a whole vault directory into an indexed Vault: parses every note in sorted path order, builds the id and basename indices, and rejects duplicate ids or basenames.",
+      "tags": ["entry-point", "parser", "deterministic", "graph-substrate"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "file:runner/vault_scaffold.py",
+      "type": "file",
+      "name": "vault_scaffold.py",
+      "filePath": "runner/vault_scaffold.py",
+      "summary": "Instantiates a fresh per-project graph vault by copying the generic template — schema superset, folder skeleton, and a noun-free config — and rewriting a single project_id line, then validates the result by reading it back through the reader. Pure and Claude-free: a scaffolded vault holds no project facts until a human authors nodes into it.",
+      "tags": ["scaffolding", "graph-substrate", "template", "deterministic", "programme-agnostic"],
+      "complexity": "moderate",
+      "languageNotes": "The project_id swap is a single targeted regex substitution so the template config's explanatory comments survive the copy."
+    },
+    {
+      "id": "class:runner/vault_scaffold.py:VaultScaffoldError",
+      "type": "class",
+      "name": "VaultScaffoldError",
+      "filePath": "runner/vault_scaffold.py",
+      "lineRange": [41, 43],
+      "summary": "Raised when a vault cannot be scaffolded — a bad template, a target collision, or a config with no project_id line to rewrite.",
+      "tags": ["exception", "fail-closed", "error-handling"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:runner/vault_scaffold.py:ScaffoldResult",
+      "type": "class",
+      "name": "ScaffoldResult",
+      "filePath": "runner/vault_scaffold.py",
+      "lineRange": [47, 56],
+      "summary": "The outcome of scaffolding: the written vault root, the written config path, and the node root the reader and compiler will read.",
+      "tags": ["data-model", "dataclass", "result-contract"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:runner/vault_scaffold.py:scaffold_vault",
+      "type": "function",
+      "name": "scaffold_vault",
+      "filePath": "runner/vault_scaffold.py",
+      "lineRange": [59, 126],
+      "summary": "Copies the generic template to the target directory, rewrites the config's project_id, and returns the resolved vault, config, and node roots — refusing an existing target unless forced.",
+      "tags": ["scaffolding", "entry-point", "template", "deterministic"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:runner/vault_scaffold.py:validate_scaffold",
+      "type": "function",
+      "name": "validate_scaffold",
+      "filePath": "runner/vault_scaffold.py",
+      "lineRange": [129, 141],
+      "summary": "Validates a scaffold by loading its config and reading the vault back through the reader, proving the new vault is one the compiler will accept.",
+      "tags": ["validation", "scaffolding", "round-trip"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {"source": "file:runner/vault_reader.py", "target": "file:runner/graph_config.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:runner/vault_reader.py", "target": "file:runner/graph_schema.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:runner/vault_scaffold.py", "target": "file:runner/graph_config.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:runner/vault_scaffold.py", "target": "file:runner/vault_reader.py", "type": "imports", "direction": "forward", "weight": 0.7},
+
+    {"source": "file:runner/graph_schema.py", "target": "class:runner/graph_schema.py:GraphSchemaError", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/graph_schema.py", "target": "function:runner/graph_schema.py:map_evidence_to_status", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/graph_schema.py", "target": "function:runner/graph_schema.py:validate_front_matter", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/graph_schema.py", "target": "class:runner/graph_schema.py:GraphSchemaError", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/graph_schema.py", "target": "function:runner/graph_schema.py:map_evidence_to_status", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/graph_schema.py", "target": "function:runner/graph_schema.py:validate_front_matter", "type": "exports", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:runner/vault_reader.py", "target": "class:runner/vault_reader.py:VaultReadError", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "class:runner/vault_reader.py:WikiLink", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "class:runner/vault_reader.py:GraphNode", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "class:runner/vault_reader.py:Vault", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "function:runner/vault_reader.py:_parse_wikilink", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "function:runner/vault_reader.py:_extract_wikilinks", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "function:runner/vault_reader.py:_split_front_matter", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "function:runner/vault_reader.py:_parse_node", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "function:runner/vault_reader.py:read_vault", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_reader.py", "target": "class:runner/vault_reader.py:VaultReadError", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/vault_reader.py", "target": "class:runner/vault_reader.py:WikiLink", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/vault_reader.py", "target": "class:runner/vault_reader.py:GraphNode", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/vault_reader.py", "target": "class:runner/vault_reader.py:Vault", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/vault_reader.py", "target": "function:runner/vault_reader.py:read_vault", "type": "exports", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:runner/vault_scaffold.py", "target": "class:runner/vault_scaffold.py:VaultScaffoldError", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_scaffold.py", "target": "class:runner/vault_scaffold.py:ScaffoldResult", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_scaffold.py", "target": "function:runner/vault_scaffold.py:scaffold_vault", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_scaffold.py", "target": "function:runner/vault_scaffold.py:validate_scaffold", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:runner/vault_scaffold.py", "target": "class:runner/vault_scaffold.py:VaultScaffoldError", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/vault_scaffold.py", "target": "class:runner/vault_scaffold.py:ScaffoldResult", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/vault_scaffold.py", "target": "function:runner/vault_scaffold.py:scaffold_vault", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:runner/vault_scaffold.py", "target": "function:runner/vault_scaffold.py:validate_scaffold", "type": "exports", "direction": "forward", "weight": 0.8},
+
+    {"source": "function:runner/vault_reader.py:_parse_node", "target": "function:runner/graph_schema.py:validate_front_matter", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:runner/vault_reader.py:_parse_node", "target": "function:runner/graph_schema.py:map_evidence_to_status", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:runner/vault_scaffold.py:scaffold_vault", "target": "function:runner/graph_config.py:load_graph_config", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:runner/vault_scaffold.py:validate_scaffold", "target": "function:runner/graph_config.py:load_graph_config", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:runner/vault_scaffold.py:validate_scaffold", "target": "function:runner/vault_reader.py:read_vault", "type": "calls", "direction": "forward", "weight": 0.8}
+  ]
+}

@@ -1,0 +1,979 @@
+{
+  "scriptCompleted": true,
+  "contentDigest": "be9a02f21f70574cfb29d13d7d74640a53f8dc8d4f3e5ec487a65b8c41ac1e10",
+  "files": [
+    {
+      "path": ".claude/workflows/system_orchestration/agent_catalog.yaml",
+      "language": "yaml",
+      "sizeLines": 440,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+      "language": "yaml",
+      "sizeLines": 4099,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/design_notes.yaml",
+      "language": "yaml",
+      "sizeLines": 103,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/gate_rules_library.yaml",
+      "language": "yaml",
+      "sizeLines": 2113,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/global_rules.yaml",
+      "language": "yaml",
+      "sizeLines": 32,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/integration_rules.yaml",
+      "language": "yaml",
+      "sizeLines": 77,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/manifest.compile.yaml",
+      "language": "yaml",
+      "sizeLines": 1044,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/meta.yaml",
+      "language": "yaml",
+      "sizeLines": 130,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/quality_gates.yaml",
+      "language": "yaml",
+      "sizeLines": 335,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/skill_catalog.yaml",
+      "language": "yaml",
+      "sizeLines": 712,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/state_rules.yaml",
+      "language": "yaml",
+      "sizeLines": 66,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/tier_bindings.yaml",
+      "language": "yaml",
+      "sizeLines": 137,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+      "language": "yaml",
+      "sizeLines": 102,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+      "language": "yaml",
+      "sizeLines": 79,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+      "language": "yaml",
+      "sizeLines": 84,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+      "language": "yaml",
+      "sizeLines": 83,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+      "language": "yaml",
+      "sizeLines": 78,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+      "language": "yaml",
+      "sizeLines": 85,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+      "language": "yaml",
+      "sizeLines": 106,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+      "language": "yaml",
+      "sizeLines": 311,
+      "fileCategory": "config"
+    },
+    {
+      "path": "CLAUDE.md",
+      "language": "markdown",
+      "sizeLines": 595,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "harness/HARNESS.md",
+      "language": "markdown",
+      "sizeLines": 422,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "harness/__init__.py",
+      "language": "python",
+      "sizeLines": 180,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/blind_assessment.py",
+      "language": "python",
+      "sizeLines": 1008,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/calibration.py",
+      "language": "python",
+      "sizeLines": 469,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/claim_ledger.py",
+      "language": "python",
+      "sizeLines": 1168,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/commands/__init__.py",
+      "language": "python",
+      "sizeLines": 24,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/commands/_common.py",
+      "language": "python",
+      "sizeLines": 44,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/commands/blind_assessment.py",
+      "language": "python",
+      "sizeLines": 213,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/commands/faithfulness_calibration.py",
+      "language": "python",
+      "sizeLines": 246,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/commands/freeze_grounding_baselines.py",
+      "language": "python",
+      "sizeLines": 358,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/commands/rubric_grading_run.py",
+      "language": "python",
+      "sizeLines": 693,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/evaluator_scorecard_msca_pf.json",
+      "language": "json",
+      "sizeLines": 122,
+      "fileCategory": "config"
+    },
+    {
+      "path": "harness/evaluator_scorecard_msca_pf.md",
+      "language": "markdown",
+      "sizeLines": 43,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "harness/evaluator_scorecard_ria.json",
+      "language": "json",
+      "sizeLines": 105,
+      "fileCategory": "config"
+    },
+    {
+      "path": "harness/evidence_pack.py",
+      "language": "python",
+      "sizeLines": 639,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/expectation_coverage.py",
+      "language": "python",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/expectation_grounding.py",
+      "language": "python",
+      "sizeLines": 618,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/expectations.py",
+      "language": "python",
+      "sizeLines": 616,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/faithfulness.py",
+      "language": "python",
+      "sizeLines": 165,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/gold_set.py",
+      "language": "python",
+      "sizeLines": 403,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/gold_sets/README.md",
+      "language": "markdown",
+      "sizeLines": 49,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "harness/jsonl_log.py",
+      "language": "python",
+      "sizeLines": 80,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/judge.py",
+      "language": "python",
+      "sizeLines": 435,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/labeling/LABELLING_GUIDE.md",
+      "language": "markdown",
+      "sizeLines": 49,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "harness/labeling/e3.1-materiality-calibration_TEMPLATE.json",
+      "language": "json",
+      "sizeLines": 34,
+      "fileCategory": "config"
+    },
+    {
+      "path": "harness/ledger_granularity.py",
+      "language": "python",
+      "sizeLines": 373,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/materiality.py",
+      "language": "python",
+      "sizeLines": 577,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/materiality_calibration.py",
+      "language": "python",
+      "sizeLines": 454,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/materiality_sets/README.md",
+      "language": "markdown",
+      "sizeLines": 59,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "harness/profile.py",
+      "language": "python",
+      "sizeLines": 388,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/profiles/msca_pf_default.json",
+      "language": "json",
+      "sizeLines": 49,
+      "fileCategory": "config"
+    },
+    {
+      "path": "harness/profiles/ria_default.json",
+      "language": "json",
+      "sizeLines": 53,
+      "fileCategory": "config"
+    },
+    {
+      "path": "harness/provenance.py",
+      "language": "python",
+      "sizeLines": 196,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/regression.py",
+      "language": "python",
+      "sizeLines": 1350,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/regression_baselines/README.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "harness/report.py",
+      "language": "python",
+      "sizeLines": 139,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/routing.py",
+      "language": "python",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/rubric.py",
+      "language": "python",
+      "sizeLines": 1084,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/rubrics.py",
+      "language": "python",
+      "sizeLines": 578,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/rubrics_msca_pf.json",
+      "language": "json",
+      "sizeLines": 181,
+      "fileCategory": "config"
+    },
+    {
+      "path": "harness/rubrics_ria.json",
+      "language": "json",
+      "sizeLines": 220,
+      "fileCategory": "config"
+    },
+    {
+      "path": "harness/status_calibration.py",
+      "language": "python",
+      "sizeLines": 446,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/status_faithfulness.py",
+      "language": "python",
+      "sizeLines": 1612,
+      "fileCategory": "code"
+    },
+    {
+      "path": "harness/verdict.py",
+      "language": "python",
+      "sizeLines": 301,
+      "fileCategory": "code"
+    },
+    {
+      "path": "pyproject.toml",
+      "language": "toml",
+      "sizeLines": 8,
+      "fileCategory": "config"
+    },
+    {
+      "path": "runner/__init__.py",
+      "language": "python",
+      "sizeLines": 21,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/__main__.py",
+      "language": "python",
+      "sizeLines": 542,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/agent_runtime.py",
+      "language": "python",
+      "sizeLines": 2206,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/agnosticism_lint.py",
+      "language": "python",
+      "sizeLines": 355,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/assumption_applier.py",
+      "language": "python",
+      "sizeLines": 285,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/atomic_write.py",
+      "language": "python",
+      "sizeLines": 138,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/budget_request.py",
+      "language": "python",
+      "sizeLines": 446,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/call_slicer.py",
+      "language": "python",
+      "sizeLines": 201,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/checkpoint_publisher.py",
+      "language": "python",
+      "sizeLines": 305,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/claim_status.py",
+      "language": "python",
+      "sizeLines": 133,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/claude_transport.py",
+      "language": "python",
+      "sizeLines": 1062,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/consortium_composition.py",
+      "language": "python",
+      "sizeLines": 618,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dag_scheduler.py",
+      "language": "python",
+      "sizeLines": 2538,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/decomposed_drafting.py",
+      "language": "python",
+      "sizeLines": 767,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dependency_normalizer.py",
+      "language": "python",
+      "sizeLines": 368,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/deterministic_components.py",
+      "language": "python",
+      "sizeLines": 513,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/__init__.py",
+      "language": "python",
+      "sizeLines": 287,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/builder.py",
+      "language": "python",
+      "sizeLines": 575,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/changes.py",
+      "language": "python",
+      "sizeLines": 364,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/documents.py",
+      "language": "python",
+      "sizeLines": 468,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/identity.py",
+      "language": "python",
+      "sizeLines": 36,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/impact.py",
+      "language": "python",
+      "sizeLines": 520,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/intake.py",
+      "language": "python",
+      "sizeLines": 223,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/packages.py",
+      "language": "python",
+      "sizeLines": 575,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/policies.py",
+      "language": "python",
+      "sizeLines": 179,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/revisions.py",
+      "language": "python",
+      "sizeLines": 730,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/schema.py",
+      "language": "python",
+      "sizeLines": 352,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/shadow.py",
+      "language": "python",
+      "sizeLines": 321,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/dev_graph/writer.py",
+      "language": "python",
+      "sizeLines": 37,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/docx_exporter.py",
+      "language": "python",
+      "sizeLines": 348,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/final_export_writer.py",
+      "language": "python",
+      "sizeLines": 251,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/fingerprints.py",
+      "language": "python",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/gate_evaluator.py",
+      "language": "python",
+      "sizeLines": 853,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/gate_library.py",
+      "language": "python",
+      "sizeLines": 265,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/gate_result_registry.py",
+      "language": "python",
+      "sizeLines": 115,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/graph_canonical_pack.py",
+      "language": "python",
+      "sizeLines": 374,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/graph_claim_verifier.py",
+      "language": "python",
+      "sizeLines": 563,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/graph_compiler.py",
+      "language": "python",
+      "sizeLines": 1222,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/graph_config.py",
+      "language": "python",
+      "sizeLines": 290,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/graph_determinism_check.py",
+      "language": "python",
+      "sizeLines": 563,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/graph_projector.py",
+      "language": "python",
+      "sizeLines": 527,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/graph_schema.py",
+      "language": "python",
+      "sizeLines": 296,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/instrument_profile.py",
+      "language": "python",
+      "sizeLines": 362,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/interface_contract.py",
+      "language": "python",
+      "sizeLines": 296,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/json_extract.py",
+      "language": "python",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/leakage_scan.py",
+      "language": "python",
+      "sizeLines": 781,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/manifest_reader.py",
+      "language": "python",
+      "sizeLines": 200,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/node_resolver.py",
+      "language": "python",
+      "sizeLines": 237,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/paths.py",
+      "language": "python",
+      "sizeLines": 82,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/persistence_policy.py",
+      "language": "python",
+      "sizeLines": 213,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/phase8_canonical_pack.py",
+      "language": "python",
+      "sizeLines": 367,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/phase8_preseed.py",
+      "language": "python",
+      "sizeLines": 326,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/phase8_reuse.py",
+      "language": "python",
+      "sizeLines": 745,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/phase8_skip_binding.py",
+      "language": "python",
+      "sizeLines": 170,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/__init__.py",
+      "language": "python",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/coverage_predicates.py",
+      "language": "python",
+      "sizeLines": 1674,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/criterion_predicates.py",
+      "language": "python",
+      "sizeLines": 1179,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/cycle_predicates.py",
+      "language": "python",
+      "sizeLines": 357,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/file_predicates.py",
+      "language": "python",
+      "sizeLines": 588,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/gate_pass_predicates.py",
+      "language": "python",
+      "sizeLines": 543,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/phase8_section_predicates.py",
+      "language": "python",
+      "sizeLines": 964,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/schema_predicates.py",
+      "language": "python",
+      "sizeLines": 2033,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/scope_coverage_predicates.py",
+      "language": "python",
+      "sizeLines": 330,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/source_ref_predicates.py",
+      "language": "python",
+      "sizeLines": 621,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/timeline_predicates.py",
+      "language": "python",
+      "sizeLines": 1063,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/predicates/types.py",
+      "language": "python",
+      "sizeLines": 162,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/run_context.py",
+      "language": "python",
+      "sizeLines": 438,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/runtime_models.py",
+      "language": "python",
+      "sizeLines": 274,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/section_assembler.py",
+      "language": "python",
+      "sizeLines": 480,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/semantic_dispatch.py",
+      "language": "python",
+      "sizeLines": 863,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/skill_runtime.py",
+      "language": "python",
+      "sizeLines": 2739,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/source_index.py",
+      "language": "python",
+      "sizeLines": 924,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/transport/__init__.py",
+      "language": "python",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/transport/bedrock_converse.py",
+      "language": "python",
+      "sizeLines": 342,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/transport/capabilities.py",
+      "language": "python",
+      "sizeLines": 122,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/transport/config.py",
+      "language": "python",
+      "sizeLines": 793,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/transport/errors.py",
+      "language": "python",
+      "sizeLines": 155,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/transport/openai_compatible.py",
+      "language": "python",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/transport/tool_executor.py",
+      "language": "python",
+      "sizeLines": 393,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/transport/tool_loop.py",
+      "language": "python",
+      "sizeLines": 284,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/unit_cost_budget.py",
+      "language": "python",
+      "sizeLines": 583,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/upstream_inputs.py",
+      "language": "python",
+      "sizeLines": 169,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/vault_reader.py",
+      "language": "python",
+      "sizeLines": 393,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/vault_scaffold.py",
+      "language": "python",
+      "sizeLines": 141,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/versions.py",
+      "language": "python",
+      "sizeLines": 15,
+      "fileCategory": "code"
+    },
+    {
+      "path": "runner/working_assumptions.py",
+      "language": "python",
+      "sizeLines": 422,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/backfill_gate_result_schema_id.py",
+      "language": "python",
+      "sizeLines": 251,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/build_demo_dev_graph.py",
+      "language": "python",
+      "sizeLines": 257,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/build_part_b_candidate.py",
+      "language": "python",
+      "sizeLines": 448,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/derive_run_phase_costs.py",
+      "language": "python",
+      "sizeLines": 480,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/preserve_run_manifests.py",
+      "language": "python",
+      "sizeLines": 213,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/promote_graph_staging.py",
+      "language": "python",
+      "sizeLines": 166,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/prose_detect.py",
+      "language": "python",
+      "sizeLines": 104,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 159,
+  "filteredByIgnore": 1025,
+  "estimatedComplexity": "large",
+  "failures": [],
+  "stats": {
+    "filesScanned": 159,
+    "byCategory": {
+      "config": 28,
+      "docs": 7,
+      "code": 124
+    },
+    "byLanguage": {
+      "yaml": 20,
+      "markdown": 7,
+      "python": 124,
+      "json": 7,
+      "toml": 1
+    }
+  }
+}

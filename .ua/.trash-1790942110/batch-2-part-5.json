@@ -1,0 +1,1464 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/instrument_profile.py",
+   "type": "file",
+   "name": "instrument_profile.py",
+   "filePath": "runner/instrument_profile.py",
+   "summary": "Resolves a per-instrument profile — mandatory sub-sections, hard page limit, budget regime and phases in scope — from the two Tier 2A extracted registries keyed on the selected call's instrument type, so no instrument literal is baked into the drafting path.",
+   "tags": [
+    "resolver",
+    "instrument-profile",
+    "configuration",
+    "tier2a",
+    "fail-closed"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Never defaults silently: an absent or unknown instrument type, or any missing profile field, raises rather than guessing."
+  },
+  {
+   "id": "class:runner/instrument_profile.py:InstrumentProfile",
+   "type": "class",
+   "name": "InstrumentProfile",
+   "filePath": "runner/instrument_profile.py",
+   "lineRange": [
+    78,
+    122
+   ],
+   "summary": "The consolidated profile: instrument type, sub-section set, page limit, budget regime and phases in scope, with the mandatory and drafting sub-section views.",
+   "tags": [
+    "data-model",
+    "instrument-profile",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/instrument_profile.py:_read_json",
+   "type": "function",
+   "name": "_read_json",
+   "filePath": "runner/instrument_profile.py",
+   "lineRange": [
+    130,
+    145
+   ],
+   "summary": "Reads one Tier 2A registry, raising `InstrumentProfileError` when absent or malformed.",
+   "tags": [
+    "io",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/instrument_profile.py:_find_instrument_entry",
+   "type": "function",
+   "name": "_find_instrument_entry",
+   "filePath": "runner/instrument_profile.py",
+   "lineRange": [
+    148,
+    179
+   ],
+   "summary": "Finds the registry entry for an instrument type, refusing an unknown or ambiguous key.",
+   "tags": [
+    "lookup",
+    "validation",
+    "tier2a"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/instrument_profile.py:resolve_instrument_type",
+   "type": "function",
+   "name": "resolve_instrument_type",
+   "filePath": "runner/instrument_profile.py",
+   "lineRange": [
+    182,
+    197
+   ],
+   "summary": "Reads the selected call's declared instrument type from Tier 3.",
+   "tags": [
+    "resolver",
+    "tier3",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/instrument_profile.py:resolve_instrument_profile",
+   "type": "function",
+   "name": "resolve_instrument_profile",
+   "filePath": "runner/instrument_profile.py",
+   "lineRange": [
+    205,
+    300
+   ],
+   "summary": "Consolidates the section-schema and instrument registries into one profile, failing closed on any missing required field.",
+   "tags": [
+    "resolver",
+    "instrument-profile",
+    "consolidation",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/instrument_profile.py:resolve_budget_regime",
+   "type": "function",
+   "name": "resolve_budget_regime",
+   "filePath": "runner/instrument_profile.py",
+   "lineRange": [
+    308,
+    336
+   ],
+   "summary": "Resolves the instrument's budget regime — lump sum or unit cost — the value the budget gate branches on.",
+   "tags": [
+    "resolver",
+    "budget",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/instrument_profile.py:owns_budget_regime",
+   "type": "function",
+   "name": "owns_budget_regime",
+   "filePath": "runner/instrument_profile.py",
+   "lineRange": [
+    339,
+    362
+   ],
+   "summary": "Guard answering whether the active instrument owns a given budget regime, so each budget component writes only under its own regime.",
+   "tags": [
+    "guard",
+    "budget",
+    "resolver"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/interface_contract.py",
+   "type": "file",
+   "name": "interface_contract.py",
+   "filePath": "runner/interface_contract.py",
+   "summary": "Validator for the Lump Sum Budget Planner interface contract, interpreting that document on its own terms rather than as a JSON Schema (which would accept every payload). Pure, with no I/O or run state, and used by both the request composer and the response-side gate predicate.",
+   "tags": [
+    "validation",
+    "interface-contract",
+    "budget",
+    "integration",
+    "pure-function"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Walks every number for the no-negative-values rule rather than guessing which field is a budget field, because that judgment is deliberately out of scope."
+  },
+  {
+   "id": "class:runner/interface_contract.py:ContractViolation",
+   "type": "class",
+   "name": "ContractViolation",
+   "filePath": "runner/interface_contract.py",
+   "lineRange": [
+    110,
+    124
+   ],
+   "summary": "One located contract violation, with a human-readable rendering for the gate's finding list.",
+   "tags": [
+    "error-handling",
+    "validation",
+    "reporting"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/interface_contract.py:carries_json_schema_keywords",
+   "type": "function",
+   "name": "carries_json_schema_keywords",
+   "filePath": "runner/interface_contract.py",
+   "lineRange": [
+    103,
+    107
+   ],
+   "summary": "Reports whether a contract document carries any recognised JSON Schema keyword — the check that proves it must not be read as a schema.",
+   "tags": [
+    "validation",
+    "guard",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/interface_contract.py:is_planner_contract",
+   "type": "function",
+   "name": "is_planner_contract",
+   "filePath": "runner/interface_contract.py",
+   "lineRange": [
+    127,
+    136
+   ],
+   "summary": "Recognises a payload as the planner's contract document by its own declared blocks.",
+   "tags": [
+    "validation",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/interface_contract.py:_check_required",
+   "type": "function",
+   "name": "_check_required",
+   "filePath": "runner/interface_contract.py",
+   "lineRange": [
+    160,
+    181
+   ],
+   "summary": "Checks each named required field is present and non-empty, treating `None`, `\"\"`, `[]` and `{}` as missing but `0` and `False` as values.",
+   "tags": [
+    "validation",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/interface_contract.py:_check_negatives",
+   "type": "function",
+   "name": "_check_negatives",
+   "filePath": "runner/interface_contract.py",
+   "lineRange": [
+    184,
+    208
+   ],
+   "summary": "Walks the whole payload refusing any negative number, excluding booleans since a flag is not a value.",
+   "tags": [
+    "validation",
+    "traversal",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/interface_contract.py:validate_payload",
+   "type": "function",
+   "name": "validate_payload",
+   "filePath": "runner/interface_contract.py",
+   "lineRange": [
+    211,
+    296
+   ],
+   "summary": "Validates a request or response payload against the contract's required fields, entry shapes and validation rules, returning every located violation.",
+   "tags": [
+    "validation",
+    "entry-point",
+    "interface-contract",
+    "pure-function"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/phase8_canonical_pack.py",
+   "type": "file",
+   "name": "phase8_canonical_pack.py",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "summary": "Deterministic builder of the canonical reference pack that Phase 8 drafting skills use for objective, work-package, deliverable, partner and outcome identities. Confirmed Tier 3/4 values are lifted verbatim; operator declarations are quarantined in a separate provenance-tagged array.",
+   "tags": [
+    "deterministic-component",
+    "phase8",
+    "canonical-pack",
+    "provenance",
+    "tier3"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "An assumed value is structurally incapable of being emitted as confirmed: the deriver does no inference about which typed entity a declaration backs."
+  },
+  {
+   "id": "function:runner/phase8_canonical_pack.py:_read_json",
+   "type": "function",
+   "name": "_read_json",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "lineRange": [
+    153,
+    162
+   ],
+   "summary": "Reads one source artifact, returning an empty mapping when it is absent.",
+   "tags": [
+    "io",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/phase8_canonical_pack.py:_lift",
+   "type": "function",
+   "name": "_lift",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "lineRange": [
+    165,
+    190
+   ],
+   "summary": "Lifts named keys (with aliases) verbatim from a source record into a pack entry, preserving source values exactly.",
+   "tags": [
+    "derivation",
+    "verbatim-copy",
+    "canonical-pack"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/phase8_canonical_pack.py:_extract_objectives",
+   "type": "function",
+   "name": "_extract_objectives",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "lineRange": [
+    193,
+    206
+   ],
+   "summary": "Extracts the confirmed objective identities and titles from Tier 3.",
+   "tags": [
+    "extraction",
+    "tier3",
+    "canonical-pack"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/phase8_canonical_pack.py:_extract_outcomes",
+   "type": "function",
+   "name": "_extract_outcomes",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "lineRange": [
+    209,
+    222
+   ],
+   "summary": "Extracts the confirmed outcome identities and titles from Tier 3.",
+   "tags": [
+    "extraction",
+    "tier3",
+    "canonical-pack"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/phase8_canonical_pack.py:_extract_wps_and_deliverables",
+   "type": "function",
+   "name": "_extract_wps_and_deliverables",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "lineRange": [
+    225,
+    250
+   ],
+   "summary": "Extracts the confirmed work-package and deliverable identities from the Phase 3 structure.",
+   "tags": [
+    "extraction",
+    "work-package",
+    "canonical-pack"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/phase8_canonical_pack.py:_extract_partners",
+   "type": "function",
+   "name": "_extract_partners",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "lineRange": [
+    253,
+    265
+   ],
+   "summary": "Extracts the confirmed partner identities from the Tier 3 consortium record.",
+   "tags": [
+    "extraction",
+    "consortium",
+    "canonical-pack"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/phase8_canonical_pack.py:_extract_declared_assumptions",
+   "type": "function",
+   "name": "_extract_declared_assumptions",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "lineRange": [
+    268,
+    286
+   ],
+   "summary": "Passes the operator's declarations through verbatim into the quarantined assumed array, failing closed on a malformed declarations file.",
+   "tags": [
+    "extraction",
+    "provenance",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/phase8_canonical_pack.py:build_phase8_canonical_reference_pack",
+   "type": "function",
+   "name": "build_phase8_canonical_reference_pack",
+   "filePath": "runner/phase8_canonical_pack.py",
+   "lineRange": [
+    289,
+    367
+   ],
+   "summary": "Component entry point: assembles every typed array with its provenance tag and writes the pack atomically.",
+   "tags": [
+    "entry-point",
+    "deterministic-component",
+    "canonical-pack",
+    "atomic-write"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/section_assembler.py",
+   "type": "file",
+   "name": "section_assembler.py",
+   "filePath": "runner/section_assembler.py",
+   "summary": "Deterministic section assembler: array-appends the per-sub-section drafts into the Tier 5 section artifact in spine order, carrying claim statuses and declarations verbatim and deriving exactly two things — each sub-section's word count and the de-duplicated union of source refs.",
+   "tags": [
+    "deterministic-component",
+    "phase8",
+    "composition",
+    "tier5",
+    "determinism"
+   ],
+   "complexity": "complex",
+   "languageNotes": "\"No synthesis\" holds by construction and is enforced by a byte-equal replay check: the assembler never authors prose and never sets a claim's status."
+  },
+  {
+   "id": "function:runner/section_assembler.py:_read_json_object",
+   "type": "function",
+   "name": "_read_json_object",
+   "filePath": "runner/section_assembler.py",
+   "lineRange": [
+    126,
+    144
+   ],
+   "summary": "Reads a required JSON object, raising `SectionAssemblerError` when absent or malformed.",
+   "tags": [
+    "io",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/section_assembler.py:_build_sub_section",
+   "type": "function",
+   "name": "_build_sub_section",
+   "filePath": "runner/section_assembler.py",
+   "lineRange": [
+    152,
+    180
+   ],
+   "summary": "Builds one assembled sub-section, carrying the draft verbatim and deriving only its word count.",
+   "tags": [
+    "composition",
+    "derivation",
+    "phase8"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/section_assembler.py:_coerce_tier",
+   "type": "function",
+   "name": "_coerce_tier",
+   "filePath": "runner/section_assembler.py",
+   "lineRange": [
+    183,
+    201
+   ],
+   "summary": "Normalises a source ref's tier label so refs from different drafts de-duplicate correctly.",
+   "tags": [
+    "normalization",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/section_assembler.py:_source_ref_key",
+   "type": "function",
+   "name": "_source_ref_key",
+   "filePath": "runner/section_assembler.py",
+   "lineRange": [
+    204,
+    218
+   ],
+   "summary": "Builds the de-duplication key for one source ref.",
+   "tags": [
+    "derivation",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/section_assembler.py:_union_source_refs",
+   "type": "function",
+   "name": "_union_source_refs",
+   "filePath": "runner/section_assembler.py",
+   "lineRange": [
+    221,
+    246
+   ],
+   "summary": "Computes the de-duplicated union of every draft's source refs — one of the assembler's two derived values.",
+   "tags": [
+    "derivation",
+    "traceability",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/section_assembler.py:_load_drafts_in_order",
+   "type": "function",
+   "name": "_load_drafts_in_order",
+   "filePath": "runner/section_assembler.py",
+   "lineRange": [
+    249,
+    303
+   ],
+   "summary": "Loads the per-sub-section drafts in the spine-declared order, refusing a missing, extra or duplicate draft.",
+   "tags": [
+    "io",
+    "validation",
+    "sequencing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/section_assembler.py:_carry_claim_statuses",
+   "type": "function",
+   "name": "_carry_claim_statuses",
+   "filePath": "runner/section_assembler.py",
+   "lineRange": [
+    306,
+    323
+   ],
+   "summary": "Concatenates each draft's claim statuses verbatim, without re-judging any of them.",
+   "tags": [
+    "claim-status",
+    "verbatim-copy",
+    "composition"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/section_assembler.py:assemble_section",
+   "type": "function",
+   "name": "assemble_section",
+   "filePath": "runner/section_assembler.py",
+   "lineRange": [
+    331,
+    480
+   ],
+   "summary": "Component entry point: loads the spine and drafts, array-appends the sub-sections, carries the validation block verbatim and writes the section artifact atomically.",
+   "tags": [
+    "entry-point",
+    "deterministic-component",
+    "composition",
+    "atomic-write"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/source_index.py",
+   "type": "file",
+   "name": "source_index.py",
+   "filePath": "runner/source_index.py",
+   "summary": "Verifier for the Tier 3 source index, enforcing the one rule the snapshot builder cannot: a source carries verbatim text only when that text can be re-derived byte for byte from a file stored in this repository. Everything else is a reference, which carries no text and therefore no verifiable span.",
+   "tags": [
+    "validation",
+    "traceability",
+    "tier3",
+    "source-index",
+    "fail-closed"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Deliberately has only two transcription states with no third \"paraphrased\" option, closing the one place in Tier 3 where a claim could be laundered."
+  },
+  {
+   "id": "class:runner/source_index.py:SourceProblem",
+   "type": "class",
+   "name": "SourceProblem",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    228,
+    236
+   ],
+   "summary": "One located finding about a source record: its kind, the record it concerns and the detail.",
+   "tags": [
+    "data-model",
+    "reporting",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/source_index.py:SourceIndexReport",
+   "type": "class",
+   "name": "SourceIndexReport",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    240,
+    265
+   ],
+   "summary": "The verification report: every problem found, with an `ok` verdict and a human-readable rendering.",
+   "tags": [
+    "data-model",
+    "reporting",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/source_index.py:SourceIndex",
+   "type": "class",
+   "name": "SourceIndex",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    283,
+    291
+   ],
+   "summary": "The loaded index with its records and an id lookup.",
+   "tags": [
+    "data-model",
+    "source-index",
+    "lookup"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/source_index.py:normalise_whitespace",
+   "type": "function",
+   "name": "normalise_whitespace",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    185,
+    194
+   ],
+   "summary": "Normalises whitespace the way the byte-equal transcription check requires.",
+   "tags": [
+    "text-processing",
+    "normalization",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/source_index.py:read_page_text",
+   "type": "function",
+   "name": "read_page_text",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    197,
+    219
+   ],
+   "summary": "Transcribes one page of a stored PDF to text — the only mechanism by which a source may carry verbatim text.",
+   "tags": [
+    "transcription",
+    "pdf",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/source_index.py:load_index",
+   "type": "function",
+   "name": "load_index",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    294,
+    325
+   ],
+   "summary": "Loads and shape-checks the source index from Tier 3 source materials.",
+   "tags": [
+    "io",
+    "validation",
+    "source-index"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:candidate_names",
+   "type": "function",
+   "name": "candidate_names",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    333,
+    352
+   ],
+   "summary": "Collects the candidate names an external reference's anchor may be checked against.",
+   "tags": [
+    "derivation",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/source_index.py:_check_shape",
+   "type": "function",
+   "name": "_check_shape",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    365,
+    405
+   ],
+   "summary": "Checks one record's declared shape against its source kind, refusing text on a reference.",
+   "tags": [
+    "validation",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:_check_resolution",
+   "type": "function",
+   "name": "_check_resolution",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    408,
+    466
+   ],
+   "summary": "Checks that a record resolves: a page source to a stored file and page, a reference to a registered identifier.",
+   "tags": [
+    "validation",
+    "resolution",
+    "traceability"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:_check_transcription",
+   "type": "function",
+   "name": "_check_transcription",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    469,
+    536
+   ],
+   "summary": "Re-derives a page source's text from the stored document and refuses any byte-level divergence.",
+   "tags": [
+    "validation",
+    "transcription",
+    "determinism"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:span_id",
+   "type": "function",
+   "name": "span_id",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    539,
+    548
+   ],
+   "summary": "Builds the canonical span identifier from a source id and its byte offsets.",
+   "tags": [
+    "identity",
+    "traceability",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/source_index.py:_check_spans",
+   "type": "function",
+   "name": "_check_spans",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    551,
+    614
+   ],
+   "summary": "Checks every claim span resolves inside the source's stored text at its declared byte offsets.",
+   "tags": [
+    "validation",
+    "traceability",
+    "evidence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:_check_anchor",
+   "type": "function",
+   "name": "_check_anchor",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    627,
+    699
+   ],
+   "summary": "Checks an external reference's anchor string actually occurs in the stored artifact that names it.",
+   "tags": [
+    "validation",
+    "traceability",
+    "evidence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:_check_no_overclaim",
+   "type": "function",
+   "name": "_check_no_overclaim",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    702,
+    747
+   ],
+   "summary": "Refuses a record that claims more verification than its kind and evidence support.",
+   "tags": [
+    "validation",
+    "fail-closed",
+    "claim-status"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:_check_names",
+   "type": "function",
+   "name": "_check_names",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    756,
+    770
+   ],
+   "summary": "Checks a reference's recorded name occurs in the swept project texts.",
+   "tags": [
+    "validation",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/source_index.py:_registered_document_ids",
+   "type": "function",
+   "name": "_registered_document_ids",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    778,
+    787
+   ],
+   "summary": "Collects the registered document ids a page source may resolve against.",
+   "tags": [
+    "lookup",
+    "registry"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/source_index.py:_concept_claim_ids",
+   "type": "function",
+   "name": "_concept_claim_ids",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    790,
+    799
+   ],
+   "summary": "Collects the concept claim ids whose spans the index must cover.",
+   "tags": [
+    "lookup",
+    "derivation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/source_index.py:_check_coverage",
+   "type": "function",
+   "name": "_check_coverage",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    802,
+    837
+   ],
+   "summary": "Checks every claim that needs a source has one, and flags sources nothing cites.",
+   "tags": [
+    "validation",
+    "coverage",
+    "reporting"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:verify",
+   "type": "function",
+   "name": "verify",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    840,
+    886
+   ],
+   "summary": "Entry point: runs every per-record and index-wide check and returns the full report.",
+   "tags": [
+    "entry-point",
+    "validation",
+    "source-index"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/source_index.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "runner/source_index.py",
+   "lineRange": [
+    894,
+    920
+   ],
+   "summary": "CLI entry point that renders the report and exits non-zero on any finding.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "class:runner/instrument_profile.py:InstrumentProfile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "class:runner/instrument_profile.py:InstrumentProfile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:_read_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:_find_instrument_entry",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:resolve_instrument_type",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:resolve_instrument_type",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:resolve_instrument_profile",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:resolve_instrument_profile",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:resolve_budget_regime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:resolve_budget_regime",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:owns_budget_regime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/instrument_profile.py",
+   "target": "function:runner/instrument_profile.py:owns_budget_regime",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "class:runner/interface_contract.py:ContractViolation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "class:runner/interface_contract.py:ContractViolation",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "function:runner/interface_contract.py:carries_json_schema_keywords",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "function:runner/interface_contract.py:carries_json_schema_keywords",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "function:runner/interface_contract.py:is_planner_contract",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "function:runner/interface_contract.py:is_planner_contract",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "function:runner/interface_contract.py:_check_required",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "function:runner/interface_contract.py:_check_negatives",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "function:runner/interface_contract.py:validate_payload",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/interface_contract.py",
+   "target": "function:runner/interface_contract.py:validate_payload",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:_read_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:_lift",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:_extract_objectives",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:_extract_outcomes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:_extract_wps_and_deliverables",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:_extract_partners",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:_extract_declared_assumptions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:build_phase8_canonical_reference_pack",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "function:runner/phase8_canonical_pack.py:build_phase8_canonical_reference_pack",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:_read_json_object",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:_build_sub_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:_coerce_tier",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:_source_ref_key",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:_union_source_refs",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:_load_drafts_in_order",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:_carry_claim_statuses",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:assemble_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "function:runner/section_assembler.py:assemble_section",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "class:runner/source_index.py:SourceProblem",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "class:runner/source_index.py:SourceProblem",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "class:runner/source_index.py:SourceIndexReport",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "class:runner/source_index.py:SourceIndexReport",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "class:runner/source_index.py:SourceIndex",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "class:runner/source_index.py:SourceIndex",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:normalise_whitespace",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:normalise_whitespace",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:read_page_text",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:read_page_text",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:load_index",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:load_index",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:candidate_names",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:candidate_names",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_check_shape",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_check_resolution",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_check_transcription",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:span_id",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:span_id",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_check_spans",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_check_anchor",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_check_no_overclaim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_check_names",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_registered_document_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_concept_claim_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:_check_coverage",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:verify",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:verify",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "function:runner/source_index.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/phase8_canonical_pack.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/section_assembler.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "file:runner/dev_graph/builder.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/phase8_canonical_pack.py:_extract_declared_assumptions",
+   "target": "function:runner/working_assumptions.py:load_working_assumptions",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/phase8_canonical_pack.py:build_phase8_canonical_reference_pack",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/section_assembler.py:assemble_section",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/source_index.py:verify",
+   "target": "function:runner/dev_graph/builder.py:build_snapshot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/source_index.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "depends_on",
+   "direction": "forward",
+   "weight": 0.6
+  }
+ ]
+}

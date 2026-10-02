@@ -1,0 +1,76 @@
+{
+  "approved": true,
+  "issues": [],
+  "warnings": [
+    "Orphan node: 'file:harness/commands/__init__.py' has zero edges. This is an empty package-marker module, so the isolation is faithful to the code rather than a modelling gap; no action required.",
+    "17 of 22 'schema' nodes have no 'defines_schema' edge (only 10 such edges exist graph-wide). The unlinked entries are the orch.phase1-phase8 and orch.tier5 artifact schemas inside '.claude/workflows/system_orchestration/artifact_schema_specification.yaml'. They are reachable only via their parent 'contains' edge, so the schema-to-consumer relationship (which runner module validates against which schema id) is under-modelled. This is the largest completeness gap in the graph.",
+    "Weakest region of the graph: 16 cross-batch 'configures' edges left in place deliberately by the Phase 3 reviewer rest on an indirect compiled-source binding rather than a direct load. Specifically the 8 'phase_XX_*.yaml --configures--> file:runner/manifest_reader.py' edges plus 'global_rules.yaml --configures--> file:runner/dag_scheduler.py': no runner module opens those YAMLs directly; they are compiled into manifest.compile.yaml, which manifest_reader.py does read. Assessment: keeping them is defensible because the dependency is real at the specification level (editing phase_07_budget_gate.yaml does change scheduler behaviour after recompilation) and all 16 carry weight 0.6 rather than a confident 1.0, which correctly signals inference. They should not be deleted, but the relationship is transitive-through-compilation, so a future pass should either retarget them at 'config:manifest.compile.yaml' (the artifact that is actually read) or introduce a distinct lower-weight edge semantic. Readers navigating this region will see a direct binding where only an indirect one exists.",
+    "Batches 7-11 were analyzed with an empty 'neighborMap', so their cross-batch 'configures' / 'documents' / 'defines_schema' edges were grounded by on-disk path existence rather than symbol matching. The Phase 3 reviewer removed 11 disprovable edges and retargeted 1, but edges in this region carry systematically weaker evidence than the import/export/contains backbone, which is deterministically derived.",
+    "Lazy imports are modelled inconsistently across batches: batch 5 expresses them as function-level 'calls' edges while batch 4 expresses them as file-level 'depends_on' edges. No uniform convention was imposed. This is a readability and queryability defect rather than a correctness one -- a reader filtering for deferred-import coupling will miss roughly half of it depending on which edge type they query. Worth normalising in a future pass.",
+    "'document:CLAUDE.md --documents--> file:runner/dag_scheduler.py' (weight 0.5) sits in the same weakly-grounded group. The constitution does govern the scheduler, so the edge is semantically true, but it was not symbol-verified.",
+    "One non-ASCII codepoint beyond the expected em dash: the graph's text fields contain 89 occurrences of U+2014 (em dash) and 1 of U+2019 (right single quotation mark). Both are legitimate typography, not mojibake. The cp1252 corruption reported during batch 4 analysis did not survive into the assembled graph -- no replacement characters, no 'A-circumflex' or 'a-euro' sequences anywhere in node names, summaries, tags, or edge descriptions.",
+    "Zero 'tested_by' edges. This is correct and expected, not a defect: 'tests/' and 'docs/' are excluded by the '.understandignore' allowlist, so no test files were scanned and no test-coverage relationship could be modelled.",
+    "Batch planning merged 13 small batches (16 files) into a single misc batch, consolidating singletons and orphans. Informational -- it did not degrade node or edge quality in those files."
+  ],
+  "stats": {
+    "totalNodes": 1056,
+    "totalEdges": 2191,
+    "totalLayers": 10,
+    "tourSteps": 14,
+    "nodeTypes": {
+      "file": 124,
+      "function": 677,
+      "class": 171,
+      "config": 55,
+      "schema": 22,
+      "document": 7
+    },
+    "edgeTypes": {
+      "contains": 897,
+      "exports": 540,
+      "imports": 365,
+      "calls": 159,
+      "configures": 79,
+      "depends_on": 68,
+      "documents": 64,
+      "defines_schema": 10,
+      "related": 7,
+      "inherits": 2
+    },
+    "confirmedStructuralFacts": {
+      "scannedFiles": 159,
+      "fileIdentityNodes": 159,
+      "fileIdentityNodeTypes": {
+        "file": 124,
+        "config": 28,
+        "document": 7
+      },
+      "scannedFilesWithoutNode": 0,
+      "fileLevelNodesWithPathOutsideInventory": 0,
+      "fileLevelChildNodes": 49,
+      "fileLevelChildNodeTypes": {
+        "schema": 22,
+        "config": 27
+      },
+      "childNodesMissingContainsParent": 0,
+      "childNodesWithUnexpectedParent": 0,
+      "fileLevelNodesTotal": 208,
+      "fileLevelNodesInExactlyOneLayer": 208,
+      "tourNodeRefs": 46,
+      "tourNodeRefsResolving": 46,
+      "tourNodeRefsNotFileLevel": 0,
+      "importEdges": 365,
+      "importMapPairs": 365,
+      "importEdgesWithoutMapBacking": 0,
+      "importMapPairsWithoutEdge": 0,
+      "duplicateNodeIds": 0,
+      "danglingEdgeReferences": 0,
+      "danglingLayerReferences": 0,
+      "danglingTourReferences": 0,
+      "selfReferencingEdges": 0,
+      "emptyLayers": 0,
+      "nodeTypeIdPrefixMismatches": 0,
+      "orphanNodes": 1
+    }
+  }
+}

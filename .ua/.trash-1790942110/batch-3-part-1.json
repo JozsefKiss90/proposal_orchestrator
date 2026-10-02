@@ -1,0 +1,718 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/fingerprints.py",
+   "type": "file",
+   "name": "fingerprints.py",
+   "filePath": "runner/fingerprints.py",
+   "summary": "Single source of truth for reducing a gate input artifact to a deterministic SHA-256 content fingerprint. Imported by both the writer side (gate_evaluator, which stamps input_artifact_fingerprints into every gate result) and the reader side (is_gate_fresh), so content-based staleness cannot diverge.",
+   "tags": [
+    "utility",
+    "content-fingerprint",
+    "gate-freshness",
+    "determinism"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Kept as a leaf module depending only on runner.paths and the standard library, because importing the helper back from gate_evaluator would form an import cycle."
+  },
+  {
+   "id": "file:runner/gate_evaluator.py",
+   "type": "file",
+   "name": "gate_evaluator.py",
+   "filePath": "runner/gate_evaluator.py",
+   "summary": "The sole entry point for evaluating one gate: resolves predicates from the compiled manifest's predicate_refs, runs every deterministic predicate without fast-fail, dispatches semantic predicates only when all deterministic ones pass, writes the canonical Tier 4 GateResult, updates node state and propagates HARD_BLOCK from the budget gate.",
+   "tags": [
+    "gate-evaluation",
+    "entry-point",
+    "orchestration",
+    "fail-closed",
+    "service"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Approach B predicate resolution: the compiled manifest is the composition source (predicate_refs) and the gate library is the implementation registry, with Approach A (library predicate list) as fallback when the manifest is absent."
+  },
+  {
+   "id": "file:runner/gate_library.py",
+   "type": "file",
+   "name": "gate_library.py",
+   "filePath": "runner/gate_library.py",
+   "summary": "Loader and validator for gate_rules_library.yaml, the implementation registry that maps each gate_id to its executable predicates, and refuses to load when the library's manifest_version disagrees with the runner's.",
+   "tags": [
+    "gate-registry",
+    "configuration-loader",
+    "validation",
+    "yaml"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/gate_result_registry.py",
+   "type": "file",
+   "name": "gate_result_registry.py",
+   "filePath": "runner/gate_result_registry.py",
+   "summary": "Authoritative table of canonical Tier 4 gate result paths, plus the shared gate-result schema_id, Tier 4 root and version-field constants that the evaluator, the gate_pass_recorded predicate and the backfill tool all read instead of re-hardcoding.",
+   "tags": [
+    "constants",
+    "registry",
+    "gate-results",
+    "single-source-of-truth"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/paths.py",
+   "type": "file",
+   "name": "paths.py",
+   "filePath": "runner/paths.py",
+   "summary": "Deterministic repository-root discovery (an ancestor holding both CLAUDE.md and .git/) and repo-relative artifact path resolution. Every predicate resolves paths through it rather than inlining path logic.",
+   "tags": [
+    "utility",
+    "path-resolution",
+    "filesystem",
+    "determinism"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/fingerprints.py:fingerprint_path",
+   "type": "function",
+   "name": "fingerprint_path",
+   "filePath": "runner/fingerprints.py",
+   "lineRange": [
+    39,
+    57
+   ],
+   "summary": "Computes the deterministic SHA-256 fingerprint of one path, returning a MISSING sentinel when the file is absent so an input appearing or disappearing counts as a real content change.",
+   "tags": [
+    "hashing",
+    "utility",
+    "gate-freshness"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/fingerprints.py:compute_fingerprints",
+   "type": "function",
+   "name": "compute_fingerprints",
+   "filePath": "runner/fingerprints.py",
+   "lineRange": [
+    60,
+    89
+   ],
+   "summary": "Fingerprints a list of repo-relative artifact paths, returning the per-artifact map plus the combined fingerprint the gate evaluator records in every gate result.",
+   "tags": [
+    "hashing",
+    "aggregation",
+    "gate-freshness"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/gate_evaluator.py:_substitute_runtime_args",
+   "type": "function",
+   "name": "_substitute_runtime_args",
+   "filePath": "runner/gate_evaluator.py",
+   "lineRange": [
+    250,
+    270
+   ],
+   "summary": "Substitutes runtime placeholders such as the current run_id into a predicate's declared argument map before invocation.",
+   "tags": [
+    "argument-binding",
+    "utility",
+    "gate-evaluation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/gate_evaluator.py:_gate_result_path",
+   "type": "function",
+   "name": "_gate_result_path",
+   "filePath": "runner/gate_evaluator.py",
+   "lineRange": [
+    283,
+    295
+   ],
+   "summary": "Resolves the canonical Tier 4 write path for a gate result from the registry, falling back to the gate_results subdirectory for gate_ids absent from the table.",
+   "tags": [
+    "path-resolution",
+    "gate-results",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/gate_evaluator.py:_call_predicate",
+   "type": "function",
+   "name": "_call_predicate",
+   "filePath": "runner/gate_evaluator.py",
+   "lineRange": [
+    298,
+    345
+   ],
+   "summary": "Dispatches one deterministic predicate by registered function name with its resolved arguments, converting an unknown name or raised exception into a failing PredicateResult rather than an abort.",
+   "tags": [
+    "dispatch",
+    "predicate",
+    "error-handling"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/gate_evaluator.py:_is_hard_block_failure",
+   "type": "function",
+   "name": "_is_hard_block_failure",
+   "filePath": "runner/gate_evaluator.py",
+   "lineRange": [
+    348,
+    381
+   ],
+   "summary": "Decides whether a gate's failed predicates constitute a HARD_BLOCK, the propagation that freezes every Phase 8 node behind the budget gate.",
+   "tags": [
+    "gate-evaluation",
+    "hard-block",
+    "budget-gate"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/gate_evaluator.py:_resolve_budget_regime",
+   "type": "function",
+   "name": "_resolve_budget_regime",
+   "filePath": "runner/gate_evaluator.py",
+   "lineRange": [
+    392,
+    405
+   ],
+   "summary": "Reads the active instrument's budget regime (lump-sum versus unit-cost) so the budget gate evaluates the predicate set that matches the instrument.",
+   "tags": [
+    "budget-gate",
+    "instrument-resolution",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/gate_evaluator.py:_partition_predicates_by_instrument",
+   "type": "function",
+   "name": "_partition_predicates_by_instrument",
+   "filePath": "runner/gate_evaluator.py",
+   "lineRange": [
+    408,
+    470
+   ],
+   "summary": "Splits a gate's predicate list into the ones applicable to the resolved instrument and the ones skipped by applies_when, so an instrument-conditional gate neither over- nor under-checks.",
+   "tags": [
+    "gate-evaluation",
+    "instrument-resolution",
+    "predicate-filtering"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/gate_evaluator.py:evaluate_gate",
+   "type": "function",
+   "name": "evaluate_gate",
+   "filePath": "runner/gate_evaluator.py",
+   "lineRange": [
+    478,
+    853
+   ],
+   "summary": "The gate evaluation entry point: loads the library and run context, resolves predicate_refs from the compiled manifest, computes input fingerprints, runs all deterministic predicates collecting every failure, dispatches semantic predicates only when the deterministic set passes, writes the GateResult and updates node state.",
+   "tags": [
+    "gate-evaluation",
+    "entry-point",
+    "orchestration",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:runner/gate_library.py:GateLibraryError",
+   "type": "class",
+   "name": "GateLibraryError",
+   "filePath": "runner/gate_library.py",
+   "lineRange": [
+    43,
+    44
+   ],
+   "summary": "Base exception for every gate rules library load or validation failure.",
+   "tags": [
+    "exception",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/gate_library.py:ManifestVersionMismatchError",
+   "type": "class",
+   "name": "ManifestVersionMismatchError",
+   "filePath": "runner/gate_library.py",
+   "lineRange": [
+    47,
+    54
+   ],
+   "summary": "Raised when the library's declared manifest_version disagrees with the runner's constant, which means the compiled manifest and the gate rules have drifted apart.",
+   "tags": [
+    "exception",
+    "versioning",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/gate_library.py:GateNotFoundError",
+   "type": "class",
+   "name": "GateNotFoundError",
+   "filePath": "runner/gate_library.py",
+   "lineRange": [
+    57,
+    58
+   ],
+   "summary": "Raised when a requested gate_id has no entry in the loaded gate rules library.",
+   "tags": [
+    "exception",
+    "error-handling"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/gate_library.py:GateLibrary",
+   "type": "class",
+   "name": "GateLibrary",
+   "filePath": "runner/gate_library.py",
+   "lineRange": [
+    66,
+    265
+   ],
+   "summary": "Loads and validates gate_rules_library.yaml once per evaluation and serves gate entries and individual predicate definitions by id, exposing the library, manifest and constitution versions the gate result records.",
+   "tags": [
+    "gate-registry",
+    "configuration-loader",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/paths.py:find_repo_root",
+   "type": "function",
+   "name": "find_repo_root",
+   "filePath": "runner/paths.py",
+   "lineRange": [
+    21,
+    57
+   ],
+   "summary": "Walks up from a starting directory to the first ancestor containing both CLAUDE.md and .git/, requiring both markers to avoid false positives in nested checkouts.",
+   "tags": [
+    "path-resolution",
+    "utility",
+    "filesystem"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/paths.py:resolve_repo_path",
+   "type": "function",
+   "name": "resolve_repo_path",
+   "filePath": "runner/paths.py",
+   "lineRange": [
+    60,
+    82
+   ],
+   "summary": "Resolves a repo-relative artifact path against an explicit repository root, passing absolute paths through unchanged; the single resolution point every predicate uses.",
+   "tags": [
+    "path-resolution",
+    "utility",
+    "determinism"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/fingerprints.py",
+   "target": "function:runner/fingerprints.py:fingerprint_path",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/fingerprints.py",
+   "target": "function:runner/fingerprints.py:compute_fingerprints",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "function:runner/gate_evaluator.py:_substitute_runtime_args",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "function:runner/gate_evaluator.py:_gate_result_path",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "function:runner/gate_evaluator.py:_call_predicate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "function:runner/gate_evaluator.py:_is_hard_block_failure",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "function:runner/gate_evaluator.py:_resolve_budget_regime",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "function:runner/gate_evaluator.py:_partition_predicates_by_instrument",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "function:runner/gate_evaluator.py:evaluate_gate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "class:runner/gate_library.py:GateLibraryError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "class:runner/gate_library.py:ManifestVersionMismatchError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "class:runner/gate_library.py:GateNotFoundError",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "class:runner/gate_library.py:GateLibrary",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/paths.py",
+   "target": "function:runner/paths.py:find_repo_root",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/paths.py",
+   "target": "function:runner/paths.py:resolve_repo_path",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/fingerprints.py",
+   "target": "function:runner/fingerprints.py:fingerprint_path",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/fingerprints.py",
+   "target": "function:runner/fingerprints.py:compute_fingerprints",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "function:runner/gate_evaluator.py:evaluate_gate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "class:runner/gate_library.py:GateLibraryError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "class:runner/gate_library.py:ManifestVersionMismatchError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "class:runner/gate_library.py:GateNotFoundError",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "class:runner/gate_library.py:GateLibrary",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/paths.py",
+   "target": "function:runner/paths.py:find_repo_root",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/paths.py",
+   "target": "function:runner/paths.py:resolve_repo_path",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/fingerprints.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/fingerprints.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/gate_library.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/gate_result_registry.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/manifest_reader.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/paths.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/coverage_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/criterion_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/cycle_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/file_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/gate_pass_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/phase8_section_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/schema_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/scope_coverage_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/source_ref_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/timeline_predicates.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/run_context.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/semantic_dispatch.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/upstream_inputs.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_evaluator.py",
+   "target": "file:runner/versions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/gate_library.py",
+   "target": "file:runner/versions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/gate_evaluator.py:evaluate_gate",
+   "target": "function:runner/fingerprints.py:compute_fingerprints",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/gate_evaluator.py:evaluate_gate",
+   "target": "class:runner/gate_library.py:GateLibrary",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/gate_evaluator.py:evaluate_gate",
+   "target": "class:runner/run_context.py:RunContext",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/gate_evaluator.py:evaluate_gate",
+   "target": "class:runner/manifest_reader.py:ManifestReader",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/gate_evaluator.py:evaluate_gate",
+   "target": "function:runner/semantic_dispatch.py:dispatch_semantic_predicate",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/gate_evaluator.py:evaluate_gate",
+   "target": "function:runner/semantic_dispatch.py:validate_semantic_result",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/gate_evaluator.py:_call_predicate",
+   "target": "function:runner/predicates/gate_pass_predicates.py:gate_pass_recorded",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/fingerprints.py:compute_fingerprints",
+   "target": "function:runner/paths.py:resolve_repo_path",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/fingerprints.py:compute_fingerprints",
+   "target": "function:runner/fingerprints.py:fingerprint_path",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

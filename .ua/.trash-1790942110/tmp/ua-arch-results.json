@@ -1,0 +1,1705 @@
+{
+ "scriptCompleted": true,
+ "commonPrefix": "",
+ "directoryGroups": {
+  "harness": [
+   "file:harness/__init__.py",
+   "file:harness/blind_assessment.py",
+   "file:harness/calibration.py",
+   "file:harness/claim_ledger.py",
+   "file:harness/evidence_pack.py",
+   "file:harness/expectation_coverage.py",
+   "file:harness/expectation_grounding.py",
+   "file:harness/expectations.py",
+   "file:harness/faithfulness.py",
+   "file:harness/gold_set.py",
+   "file:harness/jsonl_log.py",
+   "file:harness/judge.py",
+   "file:harness/ledger_granularity.py",
+   "file:harness/materiality.py",
+   "file:harness/profile.py",
+   "file:harness/provenance.py",
+   "file:harness/regression.py",
+   "file:harness/report.py",
+   "file:harness/routing.py",
+   "file:harness/rubric.py",
+   "file:harness/rubrics.py",
+   "file:harness/status_calibration.py",
+   "file:harness/status_faithfulness.py",
+   "file:harness/verdict.py",
+   "document:harness/HARNESS.md",
+   "config:harness/evaluator_scorecard_ria.json",
+   "config:harness/evaluator_scorecard_msca_pf.json",
+   "document:harness/evaluator_scorecard_msca_pf.md",
+   "config:harness/rubrics_ria.json",
+   "config:harness/rubrics_msca_pf.json",
+   "config:harness/rubrics_ria.json:ria-exc-objectives",
+   "config:harness/rubrics_ria.json:ria-exc-methodology",
+   "config:harness/rubrics_ria.json:ria-imp-pathways",
+   "config:harness/rubrics_ria.json:ria-imp-measures",
+   "config:harness/rubrics_ria.json:ria-impl-workplan",
+   "config:harness/rubrics_ria.json:ria-impl-capacity",
+   "config:harness/rubrics_msca_pf.json:exc-obj",
+   "config:harness/rubrics_msca_pf.json:exc-method",
+   "config:harness/rubrics_msca_pf.json:exc-supervision",
+   "config:harness/rubrics_msca_pf.json:exc-researcher",
+   "config:harness/rubrics_msca_pf.json:imp-career",
+   "config:harness/rubrics_msca_pf.json:imp-dissemination",
+   "config:harness/rubrics_msca_pf.json:imp-magnitude",
+   "config:harness/rubrics_msca_pf.json:impl-workplan",
+   "config:harness/rubrics_msca_pf.json:impl-host",
+   "config:harness/evaluator_scorecard_ria.json:excellence",
+   "config:harness/evaluator_scorecard_ria.json:impact",
+   "config:harness/evaluator_scorecard_ria.json:implementation",
+   "config:harness/evaluator_scorecard_msca_pf.json:excellence",
+   "config:harness/evaluator_scorecard_msca_pf.json:impact",
+   "config:harness/evaluator_scorecard_msca_pf.json:implementation",
+   "file:harness/materiality_calibration.py"
+  ],
+  "harness/commands": [
+   "file:harness/commands/_common.py",
+   "file:harness/commands/blind_assessment.py",
+   "file:harness/commands/faithfulness_calibration.py",
+   "file:harness/commands/freeze_grounding_baselines.py",
+   "file:harness/commands/rubric_grading_run.py",
+   "file:harness/commands/__init__.py"
+  ],
+  "runner": [
+   "file:runner/working_assumptions.py",
+   "file:runner/assumption_applier.py",
+   "file:runner/atomic_write.py",
+   "file:runner/budget_request.py",
+   "file:runner/claim_status.py",
+   "file:runner/decomposed_drafting.py",
+   "file:runner/docx_exporter.py",
+   "file:runner/final_export_writer.py",
+   "file:runner/instrument_profile.py",
+   "file:runner/interface_contract.py",
+   "file:runner/phase8_canonical_pack.py",
+   "file:runner/section_assembler.py",
+   "file:runner/source_index.py",
+   "file:runner/unit_cost_budget.py",
+   "file:runner/fingerprints.py",
+   "file:runner/gate_evaluator.py",
+   "file:runner/gate_library.py",
+   "file:runner/gate_result_registry.py",
+   "file:runner/paths.py",
+   "file:runner/upstream_inputs.py",
+   "file:runner/versions.py",
+   "file:runner/__main__.py",
+   "file:runner/agent_runtime.py",
+   "file:runner/call_slicer.py",
+   "file:runner/checkpoint_publisher.py",
+   "file:runner/dag_scheduler.py",
+   "file:runner/deterministic_components.py",
+   "file:runner/manifest_reader.py",
+   "file:runner/node_resolver.py",
+   "file:runner/phase8_preseed.py",
+   "file:runner/phase8_reuse.py",
+   "file:runner/phase8_skip_binding.py",
+   "file:runner/run_context.py",
+   "file:runner/runtime_models.py",
+   "file:runner/claude_transport.py",
+   "file:runner/json_extract.py",
+   "file:runner/semantic_dispatch.py",
+   "file:runner/skill_runtime.py",
+   "file:runner/graph_canonical_pack.py",
+   "file:runner/graph_claim_verifier.py",
+   "file:runner/graph_compiler.py",
+   "file:runner/graph_config.py",
+   "file:runner/graph_determinism_check.py",
+   "file:runner/graph_projector.py",
+   "file:runner/graph_schema.py",
+   "file:runner/vault_reader.py",
+   "file:runner/vault_scaffold.py",
+   "file:runner/agnosticism_lint.py",
+   "file:runner/consortium_composition.py",
+   "file:runner/leakage_scan.py",
+   "file:runner/__init__.py",
+   "file:runner/dependency_normalizer.py",
+   "file:runner/persistence_policy.py"
+  ],
+  "runner/dev_graph": [
+   "file:runner/dev_graph/__init__.py",
+   "file:runner/dev_graph/builder.py",
+   "file:runner/dev_graph/changes.py",
+   "file:runner/dev_graph/documents.py",
+   "file:runner/dev_graph/identity.py",
+   "file:runner/dev_graph/impact.py",
+   "file:runner/dev_graph/intake.py",
+   "file:runner/dev_graph/packages.py",
+   "file:runner/dev_graph/policies.py",
+   "file:runner/dev_graph/revisions.py",
+   "file:runner/dev_graph/schema.py",
+   "file:runner/dev_graph/shadow.py",
+   "file:runner/dev_graph/writer.py"
+  ],
+  "tools": [
+   "file:tools/build_demo_dev_graph.py",
+   "file:tools/build_part_b_candidate.py",
+   "file:tools/derive_run_phase_costs.py",
+   "file:tools/preserve_run_manifests.py",
+   "file:tools/backfill_gate_result_schema_id.py",
+   "file:tools/promote_graph_staging.py",
+   "file:tools/prose_detect.py"
+  ],
+  "runner/predicates": [
+   "file:runner/predicates/__init__.py",
+   "file:runner/predicates/coverage_predicates.py",
+   "file:runner/predicates/criterion_predicates.py",
+   "file:runner/predicates/cycle_predicates.py",
+   "file:runner/predicates/file_predicates.py",
+   "file:runner/predicates/gate_pass_predicates.py",
+   "file:runner/predicates/phase8_section_predicates.py",
+   "file:runner/predicates/schema_predicates.py",
+   "file:runner/predicates/scope_coverage_predicates.py",
+   "file:runner/predicates/source_ref_predicates.py",
+   "file:runner/predicates/timeline_predicates.py",
+   "file:runner/predicates/types.py"
+  ],
+  "runner/transport": [
+   "file:runner/transport/__init__.py",
+   "file:runner/transport/bedrock_converse.py",
+   "file:runner/transport/capabilities.py",
+   "file:runner/transport/config.py",
+   "file:runner/transport/errors.py",
+   "file:runner/transport/openai_compatible.py",
+   "file:runner/transport/tool_executor.py",
+   "file:runner/transport/tool_loop.py"
+  ],
+  ".claude/workflows": [
+   "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+   "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "config:.claude/workflows/system_orchestration/meta.yaml",
+   "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.implementation_section.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.review_packet.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.proposal_section.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.document_snapshot.v1",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision"
+  ],
+  "(root)": [
+   "document:CLAUDE.md",
+   "config:pyproject.toml"
+  ],
+  "harness/gold_sets": [
+   "document:harness/gold_sets/README.md"
+  ],
+  "harness/labeling": [
+   "document:harness/labeling/LABELLING_GUIDE.md",
+   "config:harness/labeling/e3.1-materiality-calibration_TEMPLATE.json"
+  ],
+  "harness/materiality_sets": [
+   "document:harness/materiality_sets/README.md"
+  ],
+  "harness/profiles": [
+   "config:harness/profiles/msca_pf_default.json",
+   "config:harness/profiles/ria_default.json"
+  ],
+  "harness/regression_baselines": [
+   "document:harness/regression_baselines/README.md"
+  ]
+ },
+ "nodeTypeGroups": {
+  "file": [
+   "file:harness/__init__.py",
+   "file:harness/blind_assessment.py",
+   "file:harness/calibration.py",
+   "file:harness/claim_ledger.py",
+   "file:harness/commands/_common.py",
+   "file:harness/commands/blind_assessment.py",
+   "file:harness/commands/faithfulness_calibration.py",
+   "file:harness/commands/freeze_grounding_baselines.py",
+   "file:harness/commands/rubric_grading_run.py",
+   "file:harness/evidence_pack.py",
+   "file:harness/expectation_coverage.py",
+   "file:harness/expectation_grounding.py",
+   "file:harness/expectations.py",
+   "file:harness/faithfulness.py",
+   "file:harness/gold_set.py",
+   "file:harness/jsonl_log.py",
+   "file:harness/judge.py",
+   "file:harness/ledger_granularity.py",
+   "file:harness/materiality.py",
+   "file:harness/profile.py",
+   "file:harness/provenance.py",
+   "file:harness/regression.py",
+   "file:harness/report.py",
+   "file:harness/routing.py",
+   "file:harness/rubric.py",
+   "file:harness/rubrics.py",
+   "file:harness/status_calibration.py",
+   "file:harness/status_faithfulness.py",
+   "file:harness/verdict.py",
+   "file:runner/working_assumptions.py",
+   "file:runner/assumption_applier.py",
+   "file:runner/atomic_write.py",
+   "file:runner/budget_request.py",
+   "file:runner/claim_status.py",
+   "file:runner/decomposed_drafting.py",
+   "file:runner/dev_graph/__init__.py",
+   "file:runner/dev_graph/builder.py",
+   "file:runner/dev_graph/changes.py",
+   "file:runner/dev_graph/documents.py",
+   "file:runner/dev_graph/identity.py",
+   "file:runner/dev_graph/impact.py",
+   "file:runner/dev_graph/intake.py",
+   "file:runner/dev_graph/packages.py",
+   "file:runner/dev_graph/policies.py",
+   "file:runner/dev_graph/revisions.py",
+   "file:runner/dev_graph/schema.py",
+   "file:runner/dev_graph/shadow.py",
+   "file:runner/dev_graph/writer.py",
+   "file:runner/docx_exporter.py",
+   "file:runner/final_export_writer.py",
+   "file:runner/instrument_profile.py",
+   "file:runner/interface_contract.py",
+   "file:runner/phase8_canonical_pack.py",
+   "file:runner/section_assembler.py",
+   "file:runner/source_index.py",
+   "file:runner/unit_cost_budget.py",
+   "file:tools/build_demo_dev_graph.py",
+   "file:tools/build_part_b_candidate.py",
+   "file:tools/derive_run_phase_costs.py",
+   "file:tools/preserve_run_manifests.py",
+   "file:runner/fingerprints.py",
+   "file:runner/gate_evaluator.py",
+   "file:runner/gate_library.py",
+   "file:runner/gate_result_registry.py",
+   "file:runner/paths.py",
+   "file:runner/predicates/__init__.py",
+   "file:runner/predicates/coverage_predicates.py",
+   "file:runner/predicates/criterion_predicates.py",
+   "file:runner/predicates/cycle_predicates.py",
+   "file:runner/predicates/file_predicates.py",
+   "file:runner/predicates/gate_pass_predicates.py",
+   "file:runner/predicates/phase8_section_predicates.py",
+   "file:runner/predicates/schema_predicates.py",
+   "file:runner/predicates/scope_coverage_predicates.py",
+   "file:runner/predicates/source_ref_predicates.py",
+   "file:runner/predicates/timeline_predicates.py",
+   "file:runner/predicates/types.py",
+   "file:runner/upstream_inputs.py",
+   "file:runner/versions.py",
+   "file:tools/backfill_gate_result_schema_id.py",
+   "file:runner/__main__.py",
+   "file:runner/agent_runtime.py",
+   "file:runner/call_slicer.py",
+   "file:runner/checkpoint_publisher.py",
+   "file:runner/dag_scheduler.py",
+   "file:runner/deterministic_components.py",
+   "file:runner/manifest_reader.py",
+   "file:runner/node_resolver.py",
+   "file:runner/phase8_preseed.py",
+   "file:runner/phase8_reuse.py",
+   "file:runner/phase8_skip_binding.py",
+   "file:runner/run_context.py",
+   "file:runner/runtime_models.py",
+   "file:runner/claude_transport.py",
+   "file:runner/json_extract.py",
+   "file:runner/semantic_dispatch.py",
+   "file:runner/skill_runtime.py",
+   "file:runner/transport/__init__.py",
+   "file:runner/transport/bedrock_converse.py",
+   "file:runner/transport/capabilities.py",
+   "file:runner/transport/config.py",
+   "file:runner/transport/errors.py",
+   "file:runner/transport/openai_compatible.py",
+   "file:runner/transport/tool_executor.py",
+   "file:runner/transport/tool_loop.py",
+   "file:runner/graph_canonical_pack.py",
+   "file:runner/graph_claim_verifier.py",
+   "file:runner/graph_compiler.py",
+   "file:runner/graph_config.py",
+   "file:runner/graph_determinism_check.py",
+   "file:runner/graph_projector.py",
+   "file:runner/graph_schema.py",
+   "file:runner/vault_reader.py",
+   "file:runner/vault_scaffold.py",
+   "file:runner/agnosticism_lint.py",
+   "file:runner/consortium_composition.py",
+   "file:runner/leakage_scan.py",
+   "file:harness/commands/__init__.py",
+   "file:harness/materiality_calibration.py",
+   "file:runner/__init__.py",
+   "file:runner/dependency_normalizer.py",
+   "file:runner/persistence_policy.py",
+   "file:tools/promote_graph_staging.py",
+   "file:tools/prose_detect.py"
+  ],
+  "config": [
+   "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+   "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "config:.claude/workflows/system_orchestration/meta.yaml",
+   "config:.claude/workflows/system_orchestration/design_notes.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review",
+   "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision",
+   "config:harness/evaluator_scorecard_ria.json",
+   "config:harness/evaluator_scorecard_msca_pf.json",
+   "config:harness/rubrics_ria.json",
+   "config:harness/rubrics_msca_pf.json",
+   "config:harness/rubrics_ria.json:ria-exc-objectives",
+   "config:harness/rubrics_ria.json:ria-exc-methodology",
+   "config:harness/rubrics_ria.json:ria-imp-pathways",
+   "config:harness/rubrics_ria.json:ria-imp-measures",
+   "config:harness/rubrics_ria.json:ria-impl-workplan",
+   "config:harness/rubrics_ria.json:ria-impl-capacity",
+   "config:harness/rubrics_msca_pf.json:exc-obj",
+   "config:harness/rubrics_msca_pf.json:exc-method",
+   "config:harness/rubrics_msca_pf.json:exc-supervision",
+   "config:harness/rubrics_msca_pf.json:exc-researcher",
+   "config:harness/rubrics_msca_pf.json:imp-career",
+   "config:harness/rubrics_msca_pf.json:imp-dissemination",
+   "config:harness/rubrics_msca_pf.json:imp-magnitude",
+   "config:harness/rubrics_msca_pf.json:impl-workplan",
+   "config:harness/rubrics_msca_pf.json:impl-host",
+   "config:harness/evaluator_scorecard_ria.json:excellence",
+   "config:harness/evaluator_scorecard_ria.json:impact",
+   "config:harness/evaluator_scorecard_ria.json:implementation",
+   "config:harness/evaluator_scorecard_msca_pf.json:excellence",
+   "config:harness/evaluator_scorecard_msca_pf.json:impact",
+   "config:harness/evaluator_scorecard_msca_pf.json:implementation",
+   "config:harness/labeling/e3.1-materiality-calibration_TEMPLATE.json",
+   "config:harness/profiles/msca_pf_default.json",
+   "config:harness/profiles/ria_default.json",
+   "config:pyproject.toml"
+  ],
+  "schema": [
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.implementation_section.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.review_packet.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.proposal_section.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1",
+   "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.document_snapshot.v1"
+  ],
+  "document": [
+   "document:harness/HARNESS.md",
+   "document:harness/evaluator_scorecard_msca_pf.md",
+   "document:CLAUDE.md",
+   "document:harness/gold_sets/README.md",
+   "document:harness/labeling/LABELLING_GUIDE.md",
+   "document:harness/materiality_sets/README.md",
+   "document:harness/regression_baselines/README.md"
+  ]
+ },
+ "crossCategoryEdges": [
+  {
+   "fromType": "config",
+   "toType": "file",
+   "edgeType": "configures",
+   "count": 79
+  },
+  {
+   "fromType": "document",
+   "toType": "file",
+   "edgeType": "documents",
+   "count": 49
+  },
+  {
+   "fromType": "config",
+   "toType": "config",
+   "edgeType": "depends_on",
+   "count": 41
+  },
+  {
+   "fromType": "config",
+   "toType": "config",
+   "edgeType": "contains",
+   "count": 27
+  },
+  {
+   "fromType": "config",
+   "toType": "schema",
+   "edgeType": "contains",
+   "count": 22
+  },
+  {
+   "fromType": "document",
+   "toType": "config",
+   "edgeType": "documents",
+   "count": 10
+  },
+  {
+   "fromType": "config",
+   "toType": "config",
+   "edgeType": "documents",
+   "count": 5
+  },
+  {
+   "fromType": "config",
+   "toType": "file",
+   "edgeType": "defines_schema",
+   "count": 5
+  },
+  {
+   "fromType": "schema",
+   "toType": "file",
+   "edgeType": "defines_schema",
+   "count": 5
+  },
+  {
+   "fromType": "config",
+   "toType": "config",
+   "edgeType": "related",
+   "count": 3
+  },
+  {
+   "fromType": "config",
+   "toType": "file",
+   "edgeType": "related",
+   "count": 1
+  },
+  {
+   "fromType": "config",
+   "toType": "document",
+   "edgeType": "related",
+   "count": 1
+  },
+  {
+   "fromType": "document",
+   "toType": "document",
+   "edgeType": "depends_on",
+   "count": 1
+  }
+ ],
+ "nonCodeToCodeSample": [
+  {
+   "from": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "to": "file:runner/manifest_reader.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "to": "file:runner/node_resolver.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "to": "file:runner/agent_runtime.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "to": "file:runner/deterministic_components.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/manifest.compile.yaml",
+   "to": "file:runner/skill_runtime.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "to": "file:runner/gate_library.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/gate_rules_library.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/quality_gates.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/agent_catalog.yaml",
+   "to": "file:runner/agent_runtime.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "to": "file:runner/skill_runtime.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/skill_catalog.yaml",
+   "to": "file:runner/agent_runtime.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/global_rules.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "to": "file:runner/run_context.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/state_rules.yaml",
+   "to": "file:runner/checkpoint_publisher.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/tier_bindings.yaml",
+   "to": "file:runner/call_slicer.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "to": "file:runner/interface_contract.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/integration_rules.yaml",
+   "to": "file:runner/budget_request.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "to": "file:runner/skill_runtime.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "to": "file:runner/gate_result_registry.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "to": "file:runner/final_export_writer.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml",
+   "to": "file:runner/section_assembler.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1",
+   "to": "file:runner/gate_result_registry.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1",
+   "to": "file:runner/final_export_writer.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1",
+   "to": "file:runner/checkpoint_publisher.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1",
+   "to": "file:runner/run_context.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1",
+   "to": "file:runner/dev_graph/writer.py",
+   "edgeType": "defines_schema"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+   "to": "file:runner/manifest_reader.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+   "to": "file:runner/node_resolver.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+   "to": "file:runner/manifest_reader.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+   "to": "file:runner/node_resolver.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+   "to": "file:runner/manifest_reader.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+   "to": "file:runner/node_resolver.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+   "to": "file:runner/manifest_reader.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+   "to": "file:runner/node_resolver.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml",
+   "to": "file:runner/dependency_normalizer.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+   "to": "file:runner/manifest_reader.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+   "to": "file:runner/node_resolver.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+   "to": "file:runner/manifest_reader.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+   "to": "file:runner/node_resolver.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+   "to": "file:runner/manifest_reader.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+   "to": "file:runner/dag_scheduler.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+   "to": "file:runner/node_resolver.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+   "to": "file:runner/gate_evaluator.py",
+   "edgeType": "configures"
+  },
+  {
+   "from": "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml",
+   "to": "file:runner/budget_request.py",
+   "edgeType": "configures"
+  }
+ ],
+ "interGroupImports": [
+  {
+   "from": "harness/commands",
+   "to": "harness",
+   "count": 28
+  },
+  {
+   "from": "harness",
+   "to": "runner",
+   "count": 17
+  },
+  {
+   "from": "runner/predicates",
+   "to": "runner",
+   "count": 15
+  },
+  {
+   "from": "runner",
+   "to": "runner/predicates",
+   "count": 12
+  },
+  {
+   "from": "runner/dev_graph",
+   "to": "runner",
+   "count": 11
+  },
+  {
+   "from": "tools",
+   "to": "runner",
+   "count": 8
+  },
+  {
+   "from": "harness/commands",
+   "to": "runner",
+   "count": 4
+  },
+  {
+   "from": "runner",
+   "to": "runner/transport",
+   "count": 4
+  },
+  {
+   "from": "harness/commands",
+   "to": "runner/transport",
+   "count": 3
+  },
+  {
+   "from": "tools",
+   "to": "runner/dev_graph",
+   "count": 3
+  },
+  {
+   "from": "harness",
+   "to": "runner/dev_graph",
+   "count": 2
+  },
+  {
+   "from": "harness/commands",
+   "to": "runner/dev_graph",
+   "count": 1
+  },
+  {
+   "from": "runner",
+   "to": "runner/dev_graph",
+   "count": 1
+  }
+ ],
+ "intraGroupDensity": {
+  "harness": {
+   "internalEdges": 85,
+   "totalEdges": 132,
+   "density": 0.644
+  },
+  "harness/commands": {
+   "internalEdges": 3,
+   "totalEdges": 39,
+   "density": 0.077
+  },
+  "runner": {
+   "internalEdges": 96,
+   "totalEdges": 168,
+   "density": 0.571
+  },
+  "runner/dev_graph": {
+   "internalEdges": 42,
+   "totalEdges": 60,
+   "density": 0.7
+  },
+  "tools": {
+   "internalEdges": 0,
+   "totalEdges": 11,
+   "density": 0
+  },
+  "runner/predicates": {
+   "internalEdges": 21,
+   "totalEdges": 48,
+   "density": 0.438
+  },
+  "runner/transport": {
+   "internalEdges": 9,
+   "totalEdges": 16,
+   "density": 0.563
+  },
+  ".claude/workflows": {
+   "internalEdges": 0,
+   "totalEdges": 0,
+   "density": 0
+  },
+  "(root)": {
+   "internalEdges": 0,
+   "totalEdges": 0,
+   "density": 0
+  },
+  "harness/gold_sets": {
+   "internalEdges": 0,
+   "totalEdges": 0,
+   "density": 0
+  },
+  "harness/labeling": {
+   "internalEdges": 0,
+   "totalEdges": 0,
+   "density": 0
+  },
+  "harness/materiality_sets": {
+   "internalEdges": 0,
+   "totalEdges": 0,
+   "density": 0
+  },
+  "harness/profiles": {
+   "internalEdges": 0,
+   "totalEdges": 0,
+   "density": 0
+  },
+  "harness/regression_baselines": {
+   "internalEdges": 0,
+   "totalEdges": 0,
+   "density": 0
+  }
+ },
+ "patternMatches": {
+  "harness": null,
+  "harness/commands": "config",
+  "runner": null,
+  "runner/dev_graph": null,
+  "tools": "utility",
+  "runner/predicates": null,
+  "runner/transport": null,
+  ".claude/workflows": null,
+  "(root)": null,
+  "harness/gold_sets": null,
+  "harness/labeling": null,
+  "harness/materiality_sets": null,
+  "harness/profiles": null,
+  "harness/regression_baselines": null
+ },
+ "filePatterns": {
+  "file:harness/__init__.py": "entry",
+  "file:runner/dev_graph/__init__.py": "entry",
+  "file:runner/predicates/__init__.py": "entry",
+  "file:runner/__main__.py": "entry",
+  "file:runner/transport/__init__.py": "entry",
+  "config:.claude/workflows/system_orchestration/manifest.compile.yaml": "config",
+  "config:.claude/workflows/system_orchestration/agent_catalog.yaml": "config",
+  "config:.claude/workflows/system_orchestration/skill_catalog.yaml": "config",
+  "config:.claude/workflows/system_orchestration/gate_rules_library.yaml": "config",
+  "config:.claude/workflows/system_orchestration/quality_gates.yaml": "config",
+  "config:.claude/workflows/system_orchestration/artifact_schema_specification.yaml": "config",
+  "config:.claude/workflows/system_orchestration/tier_bindings.yaml": "config",
+  "config:.claude/workflows/system_orchestration/global_rules.yaml": "config",
+  "config:.claude/workflows/system_orchestration/state_rules.yaml": "config",
+  "config:.claude/workflows/system_orchestration/integration_rules.yaml": "config",
+  "config:.claude/workflows/system_orchestration/meta.yaml": "config",
+  "config:.claude/workflows/system_orchestration/design_notes.yaml": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase1.call_analysis_summary.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase2.concept_refinement_summary.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase3.wp_structure.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.gantt.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase4.scheduling_constraints.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase5.impact_architecture.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase6.implementation_architecture.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase7.budget_gate_assessment.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.phase8.drafting_review_status.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.checkpoints.phase8_checkpoint.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.assembled_draft.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.excellence_section.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.impact_section.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.implementation_section.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.part_b_assembled_draft.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.review_packet.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.final_export.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.tier5.proposal_section.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.gate_result.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.operational.run_manifest.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.snapshot.v1": "config",
+  "schema:.claude/workflows/system_orchestration/artifact_schema_specification.yaml:orch.dev_graph.document_snapshot.v1": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_02_concept_refinement.yaml": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_03_wp_design.yaml": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_04_gantt_milestones.yaml": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_05_impact_architecture.yaml": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_06_implementation_architecture.yaml": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_07_budget_gate.yaml": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08a_excellence_drafting": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08b_impact_drafting": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08c_implementation_drafting": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08d_assembly": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08e_evaluator_review": "config",
+  "config:.claude/workflows/system_orchestration/workflow_phases/phase_08_drafting_review.yaml:phase_08f_revision": "config",
+  "document:harness/HARNESS.md": "documentation",
+  "config:harness/evaluator_scorecard_ria.json": "config",
+  "config:harness/evaluator_scorecard_msca_pf.json": "config",
+  "document:harness/evaluator_scorecard_msca_pf.md": "documentation",
+  "config:harness/rubrics_ria.json": "config",
+  "config:harness/rubrics_msca_pf.json": "config",
+  "config:harness/rubrics_ria.json:ria-exc-objectives": "config",
+  "config:harness/rubrics_ria.json:ria-exc-methodology": "config",
+  "config:harness/rubrics_ria.json:ria-imp-pathways": "config",
+  "config:harness/rubrics_ria.json:ria-imp-measures": "config",
+  "config:harness/rubrics_ria.json:ria-impl-workplan": "config",
+  "config:harness/rubrics_ria.json:ria-impl-capacity": "config",
+  "config:harness/rubrics_msca_pf.json:exc-obj": "config",
+  "config:harness/rubrics_msca_pf.json:exc-method": "config",
+  "config:harness/rubrics_msca_pf.json:exc-supervision": "config",
+  "config:harness/rubrics_msca_pf.json:exc-researcher": "config",
+  "config:harness/rubrics_msca_pf.json:imp-career": "config",
+  "config:harness/rubrics_msca_pf.json:imp-dissemination": "config",
+  "config:harness/rubrics_msca_pf.json:imp-magnitude": "config",
+  "config:harness/rubrics_msca_pf.json:impl-workplan": "config",
+  "config:harness/rubrics_msca_pf.json:impl-host": "config",
+  "config:harness/evaluator_scorecard_ria.json:excellence": "config",
+  "config:harness/evaluator_scorecard_ria.json:impact": "config",
+  "config:harness/evaluator_scorecard_ria.json:implementation": "config",
+  "config:harness/evaluator_scorecard_msca_pf.json:excellence": "config",
+  "config:harness/evaluator_scorecard_msca_pf.json:impact": "config",
+  "config:harness/evaluator_scorecard_msca_pf.json:implementation": "config",
+  "document:CLAUDE.md": "documentation",
+  "file:harness/commands/__init__.py": "entry",
+  "document:harness/gold_sets/README.md": "documentation",
+  "document:harness/labeling/LABELLING_GUIDE.md": "documentation",
+  "config:harness/labeling/e3.1-materiality-calibration_TEMPLATE.json": "config",
+  "document:harness/materiality_sets/README.md": "documentation",
+  "config:harness/profiles/msca_pf_default.json": "config",
+  "config:harness/profiles/ria_default.json": "config",
+  "document:harness/regression_baselines/README.md": "documentation",
+  "config:pyproject.toml": "config",
+  "file:runner/__init__.py": "entry"
+ },
+ "deploymentTopology": {
+  "hasDockerfile": false,
+  "hasCompose": false,
+  "hasK8s": false,
+  "hasTerraform": false,
+  "hasCI": false,
+  "infraFiles": []
+ },
+ "dataPipeline": {
+  "schemaFiles": [
+   "runner/dev_graph/schema.py",
+   "runner/predicates/schema_predicates.py",
+   "tools/backfill_gate_result_schema_id.py",
+   "runner/graph_schema.py",
+   ".claude/workflows/system_orchestration/artifact_schema_specification.yaml"
+  ],
+  "migrationFiles": [],
+  "dataModelFiles": [
+   "harness/gold_set.py",
+   "harness/profile.py",
+   "harness/provenance.py",
+   "harness/report.py",
+   "harness/verdict.py",
+   "runner/dev_graph/builder.py",
+   "runner/dev_graph/policies.py",
+   "runner/predicates/types.py",
+   "runner/runtime_models.py",
+   "runner/transport/capabilities.py",
+   "runner/consortium_composition.py"
+  ],
+  "apiHandlerFiles": [
+   "harness/__init__.py",
+   "harness/commands/_common.py",
+   "harness/commands/blind_assessment.py",
+   "harness/commands/faithfulness_calibration.py",
+   "harness/commands/freeze_grounding_baselines.py",
+   "harness/commands/rubric_grading_run.py",
+   "harness/ledger_granularity.py",
+   "harness/regression.py",
+   "harness/rubric.py",
+   "runner/decomposed_drafting.py",
+   "runner/dev_graph/__init__.py",
+   "runner/dev_graph/writer.py",
+   "tools/build_demo_dev_graph.py",
+   "tools/build_part_b_candidate.py",
+   "tools/derive_run_phase_costs.py",
+   "tools/preserve_run_manifests.py",
+   "runner/gate_evaluator.py",
+   "runner/predicates/__init__.py",
+   "tools/backfill_gate_result_schema_id.py",
+   "runner/__main__.py",
+   "runner/claude_transport.py",
+   "runner/transport/__init__.py",
+   "runner/graph_canonical_pack.py",
+   "runner/graph_compiler.py",
+   "runner/graph_determinism_check.py",
+   "runner/graph_projector.py",
+   "runner/agnosticism_lint.py",
+   "runner/consortium_composition.py",
+   "runner/leakage_scan.py",
+   ".claude/workflows/system_orchestration/workflow_phases/phase_01_call_analysis.yaml",
+   "harness/HARNESS.md",
+   "CLAUDE.md",
+   "harness/commands/__init__.py",
+   "harness/materiality_calibration.py",
+   "runner/__init__.py",
+   "tools/promote_graph_staging.py",
+   "tools/prose_detect.py"
+  ]
+ },
+ "docCoverage": {
+  "groupsWithDocs": 6,
+  "totalGroups": 14,
+  "coverageRatio": 0.43,
+  "undocumentedGroups": [
+   "harness/commands",
+   "runner",
+   "runner/dev_graph",
+   "tools",
+   "runner/predicates",
+   "runner/transport",
+   ".claude/workflows",
+   "harness/profiles"
+  ]
+ },
+ "dependencyDirection": [
+  {
+   "dependent": "harness/commands",
+   "dependsOn": "harness",
+   "forward": 28,
+   "reverse": 0
+  },
+  {
+   "dependent": "harness",
+   "dependsOn": "runner",
+   "forward": 17,
+   "reverse": 0
+  },
+  {
+   "dependent": "runner/predicates",
+   "dependsOn": "runner",
+   "forward": 15,
+   "reverse": 12
+  },
+  {
+   "dependent": "runner/dev_graph",
+   "dependsOn": "runner",
+   "forward": 11,
+   "reverse": 1
+  },
+  {
+   "dependent": "tools",
+   "dependsOn": "runner",
+   "forward": 8,
+   "reverse": 0
+  },
+  {
+   "dependent": "harness/commands",
+   "dependsOn": "runner",
+   "forward": 4,
+   "reverse": 0
+  },
+  {
+   "dependent": "runner",
+   "dependsOn": "runner/transport",
+   "forward": 4,
+   "reverse": 0
+  },
+  {
+   "dependent": "harness/commands",
+   "dependsOn": "runner/transport",
+   "forward": 3,
+   "reverse": 0
+  },
+  {
+   "dependent": "tools",
+   "dependsOn": "runner/dev_graph",
+   "forward": 3,
+   "reverse": 0
+  },
+  {
+   "dependent": "harness",
+   "dependsOn": "runner/dev_graph",
+   "forward": 2,
+   "reverse": 0
+  },
+  {
+   "dependent": "harness/commands",
+   "dependsOn": "runner/dev_graph",
+   "forward": 1,
+   "reverse": 0
+  }
+ ],
+ "groupImportsFrom": {
+  "harness/commands": [
+   "harness",
+   "runner",
+   "runner/transport",
+   "runner/dev_graph"
+  ],
+  "harness": [
+   "runner",
+   "runner/dev_graph"
+  ],
+  "runner/predicates": [
+   "runner"
+  ],
+  "runner": [
+   "runner/predicates",
+   "runner/transport",
+   "runner/dev_graph"
+  ],
+  "runner/dev_graph": [
+   "runner"
+  ],
+  "tools": [
+   "runner",
+   "runner/dev_graph"
+  ]
+ },
+ "groupImportedBy": {
+  "harness": [
+   "harness/commands"
+  ],
+  "runner": [
+   "harness",
+   "runner/predicates",
+   "runner/dev_graph",
+   "tools",
+   "harness/commands"
+  ],
+  "runner/predicates": [
+   "runner"
+  ],
+  "runner/transport": [
+   "runner",
+   "harness/commands"
+  ],
+  "runner/dev_graph": [
+   "tools",
+   "harness",
+   "harness/commands",
+   "runner"
+  ]
+ },
+ "fileStats": {
+  "totalFileNodes": 208,
+  "filesPerGroup": {
+   "harness": 52,
+   "harness/commands": 6,
+   "runner": 53,
+   "runner/dev_graph": 13,
+   "tools": 7,
+   "runner/predicates": 12,
+   "runner/transport": 8,
+   ".claude/workflows": 48,
+   "(root)": 2,
+   "harness/gold_sets": 1,
+   "harness/labeling": 2,
+   "harness/materiality_sets": 1,
+   "harness/profiles": 2,
+   "harness/regression_baselines": 1
+  },
+  "nodeTypeCounts": {
+   "file": 124,
+   "config": 55,
+   "schema": 22,
+   "document": 7
+  }
+ },
+ "fileFanIn": {
+  "file:harness/calibration.py": 3,
+  "file:harness/faithfulness.py": 6,
+  "file:harness/gold_set.py": 5,
+  "file:harness/jsonl_log.py": 3,
+  "file:harness/judge.py": 17,
+  "file:harness/provenance.py": 9,
+  "file:harness/report.py": 4,
+  "file:harness/routing.py": 7,
+  "file:harness/verdict.py": 14,
+  "file:harness/evidence_pack.py": 7,
+  "file:harness/expectation_coverage.py": 4,
+  "file:harness/profile.py": 6,
+  "file:harness/rubrics.py": 6,
+  "file:runner/atomic_write.py": 33,
+  "file:runner/dev_graph/__init__.py": 3,
+  "file:runner/dev_graph/schema.py": 12,
+  "file:harness/materiality.py": 1,
+  "file:runner/json_extract.py": 3,
+  "file:runner/paths.py": 17,
+  "file:harness/blind_assessment.py": 1,
+  "file:harness/expectations.py": 4,
+  "file:harness/commands/_common.py": 2,
+  "file:harness/commands/freeze_grounding_baselines.py": 1,
+  "file:runner/transport/config.py": 5,
+  "file:harness/regression.py": 4,
+  "file:harness/status_faithfulness.py": 7,
+  "file:runner/transport/errors.py": 4,
+  "file:runner/working_assumptions.py": 12,
+  "file:harness/expectation_grounding.py": 2,
+  "file:harness/rubric.py": 1,
+  "file:harness/claim_ledger.py": 2,
+  "file:runner/claim_status.py": 6,
+  "file:runner/section_assembler.py": 3,
+  "file:runner/instrument_profile.py": 3,
+  "file:runner/interface_contract.py": 2,
+  "file:runner/dev_graph/builder.py": 7,
+  "file:runner/dev_graph/changes.py": 3,
+  "file:runner/dev_graph/documents.py": 4,
+  "file:runner/dev_graph/identity.py": 9,
+  "file:runner/dev_graph/impact.py": 2,
+  "file:runner/dev_graph/intake.py": 1,
+  "file:runner/dev_graph/packages.py": 1,
+  "file:runner/dev_graph/policies.py": 4,
+  "file:runner/dev_graph/revisions.py": 1,
+  "file:runner/dev_graph/shadow.py": 1,
+  "file:runner/dev_graph/writer.py": 1,
+  "file:runner/graph_schema.py": 7,
+  "file:runner/run_context.py": 5,
+  "file:runner/decomposed_drafting.py": 2,
+  "file:runner/phase8_preseed.py": 2,
+  "file:runner/fingerprints.py": 2,
+  "file:runner/gate_library.py": 2,
+  "file:runner/gate_result_registry.py": 5,
+  "file:runner/manifest_reader.py": 4,
+  "file:runner/predicates/coverage_predicates.py": 2,
+  "file:runner/predicates/criterion_predicates.py": 2,
+  "file:runner/predicates/cycle_predicates.py": 2,
+  "file:runner/predicates/file_predicates.py": 2,
+  "file:runner/predicates/gate_pass_predicates.py": 3,
+  "file:runner/predicates/phase8_section_predicates.py": 2,
+  "file:runner/predicates/schema_predicates.py": 2,
+  "file:runner/predicates/scope_coverage_predicates.py": 2,
+  "file:runner/predicates/source_ref_predicates.py": 2,
+  "file:runner/predicates/timeline_predicates.py": 2,
+  "file:runner/predicates/types.py": 12,
+  "file:runner/semantic_dispatch.py": 1,
+  "file:runner/upstream_inputs.py": 2,
+  "file:runner/versions.py": 5,
+  "file:runner/dag_scheduler.py": 1,
+  "file:runner/deterministic_components.py": 2,
+  "file:runner/node_resolver.py": 2,
+  "file:runner/phase8_skip_binding.py": 4,
+  "file:runner/runtime_models.py": 4,
+  "file:runner/skill_runtime.py": 1,
+  "file:runner/agent_runtime.py": 1,
+  "file:runner/call_slicer.py": 1,
+  "file:runner/gate_evaluator.py": 1,
+  "file:runner/phase8_reuse.py": 1,
+  "file:runner/claude_transport.py": 2,
+  "file:runner/transport/tool_executor.py": 3,
+  "file:runner/transport/tool_loop.py": 2,
+  "file:runner/transport/capabilities.py": 2,
+  "file:runner/graph_config.py": 7,
+  "file:runner/vault_reader.py": 5,
+  "file:runner/graph_compiler.py": 1,
+  "file:runner/agnosticism_lint.py": 1,
+  "file:runner/consortium_composition.py": 1
+ },
+ "fileFanOut": {
+  "file:harness/__init__.py": 9,
+  "file:harness/blind_assessment.py": 9,
+  "file:harness/calibration.py": 5,
+  "file:harness/claim_ledger.py": 8,
+  "file:harness/commands/_common.py": 1,
+  "file:harness/commands/blind_assessment.py": 10,
+  "file:harness/commands/faithfulness_calibration.py": 8,
+  "file:harness/commands/freeze_grounding_baselines.py": 8,
+  "file:harness/commands/rubric_grading_run.py": 12,
+  "file:harness/evidence_pack.py": 2,
+  "file:harness/expectation_coverage.py": 6,
+  "file:harness/expectation_grounding.py": 6,
+  "file:harness/expectations.py": 2,
+  "file:harness/faithfulness.py": 3,
+  "file:harness/gold_set.py": 1,
+  "file:harness/jsonl_log.py": 1,
+  "file:harness/judge.py": 3,
+  "file:harness/ledger_granularity.py": 4,
+  "file:harness/materiality.py": 6,
+  "file:harness/provenance.py": 2,
+  "file:harness/regression.py": 5,
+  "file:harness/report.py": 2,
+  "file:harness/rubric.py": 12,
+  "file:harness/rubrics.py": 4,
+  "file:harness/status_calibration.py": 6,
+  "file:harness/status_faithfulness.py": 8,
+  "file:runner/assumption_applier.py": 4,
+  "file:runner/budget_request.py": 3,
+  "file:runner/decomposed_drafting.py": 4,
+  "file:runner/dev_graph/__init__.py": 12,
+  "file:runner/dev_graph/builder.py": 3,
+  "file:runner/dev_graph/changes.py": 4,
+  "file:runner/dev_graph/documents.py": 4,
+  "file:runner/dev_graph/impact.py": 6,
+  "file:runner/dev_graph/intake.py": 2,
+  "file:runner/dev_graph/packages.py": 6,
+  "file:runner/dev_graph/policies.py": 2,
+  "file:runner/dev_graph/revisions.py": 7,
+  "file:runner/dev_graph/shadow.py": 5,
+  "file:runner/dev_graph/writer.py": 2,
+  "file:runner/docx_exporter.py": 1,
+  "file:runner/final_export_writer.py": 1,
+  "file:runner/phase8_canonical_pack.py": 2,
+  "file:runner/section_assembler.py": 1,
+  "file:runner/source_index.py": 1,
+  "file:runner/unit_cost_budget.py": 3,
+  "file:tools/build_demo_dev_graph.py": 3,
+  "file:tools/build_part_b_candidate.py": 5,
+  "file:tools/derive_run_phase_costs.py": 1,
+  "file:tools/preserve_run_manifests.py": 1,
+  "file:runner/fingerprints.py": 1,
+  "file:runner/gate_evaluator.py": 20,
+  "file:runner/gate_library.py": 1,
+  "file:runner/predicates/__init__.py": 11,
+  "file:runner/predicates/coverage_predicates.py": 2,
+  "file:runner/predicates/criterion_predicates.py": 4,
+  "file:runner/predicates/cycle_predicates.py": 1,
+  "file:runner/predicates/file_predicates.py": 2,
+  "file:runner/predicates/gate_pass_predicates.py": 6,
+  "file:runner/predicates/phase8_section_predicates.py": 2,
+  "file:runner/predicates/schema_predicates.py": 3,
+  "file:runner/predicates/scope_coverage_predicates.py": 2,
+  "file:runner/predicates/source_ref_predicates.py": 2,
+  "file:runner/predicates/timeline_predicates.py": 1,
+  "file:tools/backfill_gate_result_schema_id.py": 1,
+  "file:runner/__main__.py": 5,
+  "file:runner/agent_runtime.py": 7,
+  "file:runner/checkpoint_publisher.py": 3,
+  "file:runner/dag_scheduler.py": 15,
+  "file:runner/deterministic_components.py": 1,
+  "file:runner/node_resolver.py": 1,
+  "file:runner/phase8_preseed.py": 2,
+  "file:runner/phase8_reuse.py": 2,
+  "file:runner/run_context.py": 1,
+  "file:runner/semantic_dispatch.py": 4,
+  "file:runner/skill_runtime.py": 5,
+  "file:runner/transport/__init__.py": 5,
+  "file:runner/transport/bedrock_converse.py": 1,
+  "file:runner/transport/config.py": 1,
+  "file:runner/transport/openai_compatible.py": 1,
+  "file:runner/transport/tool_loop.py": 1,
+  "file:runner/graph_canonical_pack.py": 5,
+  "file:runner/graph_claim_verifier.py": 3,
+  "file:runner/graph_compiler.py": 4,
+  "file:runner/graph_config.py": 1,
+  "file:runner/graph_determinism_check.py": 3,
+  "file:runner/graph_projector.py": 3,
+  "file:runner/vault_reader.py": 2,
+  "file:runner/vault_scaffold.py": 2,
+  "file:runner/leakage_scan.py": 2
+ },
+ "topFanIn": [
+  [
+   "file:runner/atomic_write.py",
+   33
+  ],
+  [
+   "file:harness/judge.py",
+   17
+  ],
+  [
+   "file:runner/paths.py",
+   17
+  ],
+  [
+   "file:harness/verdict.py",
+   14
+  ],
+  [
+   "file:runner/dev_graph/schema.py",
+   12
+  ],
+  [
+   "file:runner/working_assumptions.py",
+   12
+  ],
+  [
+   "file:runner/predicates/types.py",
+   12
+  ],
+  [
+   "file:harness/provenance.py",
+   9
+  ],
+  [
+   "file:runner/dev_graph/identity.py",
+   9
+  ],
+  [
+   "file:harness/routing.py",
+   7
+  ],
+  [
+   "file:harness/evidence_pack.py",
+   7
+  ],
+  [
+   "file:harness/status_faithfulness.py",
+   7
+  ],
+  [
+   "file:runner/dev_graph/builder.py",
+   7
+  ],
+  [
+   "file:runner/graph_schema.py",
+   7
+  ],
+  [
+   "file:runner/graph_config.py",
+   7
+  ],
+  [
+   "file:harness/faithfulness.py",
+   6
+  ],
+  [
+   "file:harness/profile.py",
+   6
+  ],
+  [
+   "file:harness/rubrics.py",
+   6
+  ],
+  [
+   "file:runner/claim_status.py",
+   6
+  ],
+  [
+   "file:harness/gold_set.py",
+   5
+  ],
+  [
+   "file:runner/transport/config.py",
+   5
+  ],
+  [
+   "file:runner/run_context.py",
+   5
+  ],
+  [
+   "file:runner/gate_result_registry.py",
+   5
+  ],
+  [
+   "file:runner/versions.py",
+   5
+  ],
+  [
+   "file:runner/vault_reader.py",
+   5
+  ]
+ ],
+ "topFanOut": [
+  [
+   "file:runner/gate_evaluator.py",
+   20
+  ],
+  [
+   "file:runner/dag_scheduler.py",
+   15
+  ],
+  [
+   "file:harness/commands/rubric_grading_run.py",
+   12
+  ],
+  [
+   "file:harness/rubric.py",
+   12
+  ],
+  [
+   "file:runner/dev_graph/__init__.py",
+   12
+  ],
+  [
+   "file:runner/predicates/__init__.py",
+   11
+  ],
+  [
+   "file:harness/commands/blind_assessment.py",
+   10
+  ],
+  [
+   "file:harness/__init__.py",
+   9
+  ],
+  [
+   "file:harness/blind_assessment.py",
+   9
+  ],
+  [
+   "file:harness/claim_ledger.py",
+   8
+  ],
+  [
+   "file:harness/commands/faithfulness_calibration.py",
+   8
+  ],
+  [
+   "file:harness/commands/freeze_grounding_baselines.py",
+   8
+  ],
+  [
+   "file:harness/status_faithfulness.py",
+   8
+  ],
+  [
+   "file:runner/dev_graph/revisions.py",
+   7
+  ],
+  [
+   "file:runner/agent_runtime.py",
+   7
+  ],
+  [
+   "file:harness/expectation_coverage.py",
+   6
+  ],
+  [
+   "file:harness/expectation_grounding.py",
+   6
+  ],
+  [
+   "file:harness/materiality.py",
+   6
+  ],
+  [
+   "file:harness/status_calibration.py",
+   6
+  ],
+  [
+   "file:runner/dev_graph/impact.py",
+   6
+  ],
+  [
+   "file:runner/dev_graph/packages.py",
+   6
+  ],
+  [
+   "file:runner/predicates/gate_pass_predicates.py",
+   6
+  ],
+  [
+   "file:harness/calibration.py",
+   5
+  ],
+  [
+   "file:harness/regression.py",
+   5
+  ],
+  [
+   "file:runner/dev_graph/shadow.py",
+   5
+  ]
+ ]
+}

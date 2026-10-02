@@ -1,0 +1,479 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/predicates/timeline_predicates.py",
+   "type": "file",
+   "name": "timeline_predicates.py",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "summary": "Scheduling-consistency predicates over the Phase 4 Gantt: timeline within the call-specified duration, every milestone carrying a verifiable criterion, work-package count within the instrument limit, a declared critical path, and dependency/schedule agreement.",
+   "tags": [
+    "predicate",
+    "scheduling",
+    "timeline",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/predicates/types.py",
+   "type": "file",
+   "name": "types.py",
+   "filePath": "runner/predicates/types.py",
+   "summary": "Defines PredicateResult, the uniform return type of every gate predicate, together with the five canonical failure-category constants that drive gate triage and the GateResult writer.",
+   "tags": [
+    "type-definition",
+    "data-model",
+    "failure-categories",
+    "shared-contract"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/upstream_inputs.py",
+   "type": "file",
+   "name": "upstream_inputs.py",
+   "filePath": "runner/upstream_inputs.py",
+   "summary": "Table mapping each gate_id to the substantive upstream source artifacts whose change invalidates its result. Generated derivatives such as call slices and directory paths are deliberately excluded so freshness tracking never fires on a deterministic regeneration.",
+   "tags": [
+    "constants",
+    "registry",
+    "gate-freshness",
+    "configuration"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/versions.py",
+   "type": "file",
+   "name": "versions.py",
+   "filePath": "runner/versions.py",
+   "summary": "Manifest, library and constitution version constants stamped into every gate result, so a result produced under a prior compilation is detected as stale rather than accepted.",
+   "tags": [
+    "constants",
+    "versioning",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/backfill_gate_result_schema_id.py",
+   "type": "file",
+   "name": "backfill_gate_result_schema_id.py",
+   "filePath": "tools/backfill_gate_result_schema_id.py",
+   "summary": "One-time idempotent migration that adds the required schema_id to legacy gate result files, discovering them from the runtime's own path registry. A file already declaring a different schema_id is reported as a conflict and never rewritten, since silent repair is the auto-correction the constitution forbids.",
+   "tags": [
+    "script",
+    "migration",
+    "cli",
+    "data-repair"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:_read_json_object",
+   "type": "function",
+   "name": "_read_json_object",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    176,
+    232
+   ],
+   "summary": "Defensive JSON object reader shared by the timeline predicates.",
+   "tags": [
+    "json-parsing",
+    "error-handling",
+    "utility"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:_extract_max_wp_values",
+   "type": "function",
+   "name": "_extract_max_wp_values",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    235,
+    283
+   ],
+   "summary": "Reads the instrument registry for the maximum work-package and deliverable counts the active instrument allows.",
+   "tags": [
+    "extraction",
+    "instrument-schema",
+    "limits"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:timeline_within_duration",
+   "type": "function",
+   "name": "timeline_within_duration",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    291,
+    467
+   ],
+   "summary": "Gate predicate: the latest Gantt month must fit inside the call-specified project duration, the arithmetic half of the Phase 4 gate condition.",
+   "tags": [
+    "predicate",
+    "scheduling",
+    "timeline",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:all_milestones_have_criteria",
+   "type": "function",
+   "name": "all_milestones_have_criteria",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    470,
+    586
+   ],
+   "summary": "Gate predicate: every milestone must declare a month, a verifiable achievement criterion and a responsible party.",
+   "tags": [
+    "predicate",
+    "milestones",
+    "scheduling"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:wp_count_within_limit",
+   "type": "function",
+   "name": "wp_count_within_limit",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    589,
+    739
+   ],
+   "summary": "Gate predicate: the designed work-package count must stay within the limit the active instrument's schema sets.",
+   "tags": [
+    "predicate",
+    "work-package",
+    "instrument-schema"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:critical_path_present",
+   "type": "function",
+   "name": "critical_path_present",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    742,
+    863
+   ],
+   "summary": "Gate predicate: the Gantt must declare a critical path, so no critical-path dependency is left unresolved at the Phase 4 gate.",
+   "tags": [
+    "predicate",
+    "scheduling",
+    "critical-path"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:dependency_schedule_consistency",
+   "type": "function",
+   "name": "dependency_schedule_consistency",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    871,
+    1025
+   ],
+   "summary": "Gate predicate: each declared dependency must be consistent with the scheduled months of the tasks and work packages it links.",
+   "tags": [
+    "predicate",
+    "scheduling",
+    "consistency-check"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:_resolve_max_end_month",
+   "type": "function",
+   "name": "_resolve_max_end_month",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    1028,
+    1045
+   ],
+   "summary": "Resolves the latest end month of a dependency node, expanding a work package to its tasks.",
+   "tags": [
+    "scheduling",
+    "utility",
+    "resolution"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/predicates/timeline_predicates.py:_resolve_min_start_month",
+   "type": "function",
+   "name": "_resolve_min_start_month",
+   "filePath": "runner/predicates/timeline_predicates.py",
+   "lineRange": [
+    1048,
+    1063
+   ],
+   "summary": "Resolves the earliest start month of a dependency node, expanding a work package to its tasks.",
+   "tags": [
+    "scheduling",
+    "utility",
+    "resolution"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:runner/predicates/types.py:PredicateResult",
+   "type": "class",
+   "name": "PredicateResult",
+   "filePath": "runner/predicates/types.py",
+   "lineRange": [
+    92,
+    162
+   ],
+   "summary": "The uniform result dataclass every predicate returns: passed, failure_category, reason and details, with a post-init rule that a failing result must carry a category.",
+   "tags": [
+    "data-model",
+    "type-definition",
+    "shared-contract"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/backfill_gate_result_schema_id.py:_discover",
+   "type": "function",
+   "name": "_discover",
+   "filePath": "tools/backfill_gate_result_schema_id.py",
+   "lineRange": [
+    97,
+    141
+   ],
+   "summary": "Discovers gate result files from three de-duplicated sources - the canonical path registry, the evaluator's fallback subdirectory and a shape-checked tier-4 sweep - instead of a glob that would miss sibling locations.",
+   "tags": [
+    "discovery",
+    "migration",
+    "gate-results"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/backfill_gate_result_schema_id.py:backfill",
+   "type": "function",
+   "name": "backfill",
+   "filePath": "tools/backfill_gate_result_schema_id.py",
+   "lineRange": [
+    144,
+    185
+   ],
+   "summary": "Adds the required schema_id to each discovered gate result that lacks it, reporting a file carrying a different schema_id as a conflict rather than rewriting it.",
+   "tags": [
+    "migration",
+    "data-repair",
+    "idempotent"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/backfill_gate_result_schema_id.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/backfill_gate_result_schema_id.py",
+   "lineRange": [
+    188,
+    247
+   ],
+   "summary": "CLI entry point: parses arguments, runs the dry-run or applied backfill, prints the report and exits non-zero when conflicts remain.",
+   "tags": [
+    "cli",
+    "entry-point",
+    "script"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:_read_json_object",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:_extract_max_wp_values",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:timeline_within_duration",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:all_milestones_have_criteria",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:wp_count_within_limit",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:critical_path_present",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:dependency_schedule_consistency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:_resolve_max_end_month",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:_resolve_min_start_month",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/types.py",
+   "target": "class:runner/predicates/types.py:PredicateResult",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/backfill_gate_result_schema_id.py",
+   "target": "function:tools/backfill_gate_result_schema_id.py:_discover",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/backfill_gate_result_schema_id.py",
+   "target": "function:tools/backfill_gate_result_schema_id.py:backfill",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:tools/backfill_gate_result_schema_id.py",
+   "target": "function:tools/backfill_gate_result_schema_id.py:main",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:timeline_within_duration",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:all_milestones_have_criteria",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:wp_count_within_limit",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:critical_path_present",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "function:runner/predicates/timeline_predicates.py:dependency_schedule_consistency",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/types.py",
+   "target": "class:runner/predicates/types.py:PredicateResult",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/backfill_gate_result_schema_id.py",
+   "target": "function:tools/backfill_gate_result_schema_id.py:backfill",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:tools/backfill_gate_result_schema_id.py",
+   "target": "function:tools/backfill_gate_result_schema_id.py:main",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/predicates/timeline_predicates.py",
+   "target": "file:runner/predicates/types.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:tools/backfill_gate_result_schema_id.py",
+   "target": "file:runner/gate_result_registry.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/predicates/timeline_predicates.py:wp_count_within_limit",
+   "target": "function:runner/predicates/timeline_predicates.py:_extract_max_wp_values",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/backfill_gate_result_schema_id.py:main",
+   "target": "function:tools/backfill_gate_result_schema_id.py:backfill",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:tools/backfill_gate_result_schema_id.py:backfill",
+   "target": "function:tools/backfill_gate_result_schema_id.py:_discover",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

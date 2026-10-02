@@ -1,0 +1,1445 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/dev_graph/__init__.py",
+   "type": "file",
+   "name": "__init__.py",
+   "filePath": "runner/dev_graph/__init__.py",
+   "summary": "Public API barrel for the dev graph — a rebuildable operational index over the repository's authoritative records. Re-exports the snapshot builder, closed vocabularies, document import, evidence packaging, change recording, impact planning, revisions, shadow comparison and ESR intake.",
+   "tags": [
+    "barrel",
+    "entry-point",
+    "dev-graph",
+    "public-api",
+    "re-exports"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Python package barrel: the docstring is the module's API contract, listing each re-exported entry point and the vocabulary it belongs to."
+  },
+  {
+   "id": "file:runner/dev_graph/builder.py",
+   "type": "file",
+   "name": "builder.py",
+   "filePath": "runner/dev_graph/builder.py",
+   "summary": "Builds the immutable dev-graph snapshot: reads the Tier 3 records that own project facts, derives typed nodes and edges from their declared keys, validates against the closed schema and returns a content-addressed `Snapshot`. The graph owns nothing and a rebuild from the same records is byte-identical.",
+   "tags": [
+    "dev-graph",
+    "graph-builder",
+    "data-model",
+    "determinism",
+    "tier3"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Identity model: node id is the record's own declared key, node version is the record's content hash, and every edge references both endpoints as `{id, version}`."
+  },
+  {
+   "id": "class:runner/dev_graph/builder.py:Snapshot",
+   "type": "class",
+   "name": "Snapshot",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    98,
+    177
+   ],
+   "summary": "Immutable snapshot value object holding the canonical nodes, edges and content-derived snapshot id, with JSON round-tripping and an empty constructor.",
+   "tags": [
+    "data-model",
+    "immutable",
+    "dev-graph",
+    "serialization"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:runner/dev_graph/builder.py:_Assembler",
+   "type": "class",
+   "name": "_Assembler",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    255,
+    314
+   ],
+   "summary": "Internal accumulator that collects nodes and edges with de-duplication and per-id version tracking, then finalises them into a canonical graph.",
+   "tags": [
+    "builder",
+    "internal",
+    "graph-builder"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:canonical_graph",
+   "type": "function",
+   "name": "canonical_graph",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    185,
+    192
+   ],
+   "summary": "Returns nodes and edges in their canonical sorted order, the form every snapshot id is hashed over.",
+   "tags": [
+    "determinism",
+    "canonicalization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:_read_records",
+   "type": "function",
+   "name": "_read_records",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    199,
+    213
+   ],
+   "summary": "Reads one Tier 3 record file and extracts its declared list, recording the path on every record it yields.",
+   "tags": [
+    "io",
+    "tier3",
+    "provenance"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:_objects",
+   "type": "function",
+   "name": "_objects",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    216,
+    226
+   ],
+   "summary": "Extracts a list of nested objects from a record, refusing a malformed shape with a located error.",
+   "tags": [
+    "validation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:_add_work_package",
+   "type": "function",
+   "name": "_add_work_package",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    327,
+    356
+   ],
+   "summary": "Derives the work-package node plus its lead, objective, constraint and deliverable edges from the record's declared keys.",
+   "tags": [
+    "graph-builder",
+    "derivation",
+    "work-package"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:_add_verified_span",
+   "type": "function",
+   "name": "_add_verified_span",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    378,
+    404
+   ],
+   "summary": "Adds a `source_span` node for a claim's verified span and links the claim to both the span and its source.",
+   "tags": [
+    "graph-builder",
+    "evidence",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:_add_document",
+   "type": "function",
+   "name": "_add_document",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    407,
+    461
+   ],
+   "summary": "Turns one immutable document snapshot record into its document, passage, claim and commitment nodes, stamping the document's declared tags on all of them.",
+   "tags": [
+    "graph-builder",
+    "documents",
+    "derivation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:_assemble",
+   "type": "function",
+   "name": "_assemble",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    464,
+    496
+   ],
+   "summary": "Drives the whole build: reads every record kind in order and feeds it to the per-type node/edge derivation.",
+   "tags": [
+    "orchestration",
+    "graph-builder"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:build_snapshot",
+   "type": "function",
+   "name": "build_snapshot",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    504,
+    517
+   ],
+   "summary": "Public entry point: assembles the graph from a repository root, validates it against the closed schema and returns the immutable snapshot.",
+   "tags": [
+    "entry-point",
+    "dev-graph",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:current_commitments",
+   "type": "function",
+   "name": "current_commitments",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    520,
+    541
+   ],
+   "summary": "Returns the commitments of current document snapshots only, skipping submitted and superseded versions.",
+   "tags": [
+    "query",
+    "dev-graph",
+    "commitments"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:superseded_versions",
+   "type": "function",
+   "name": "superseded_versions",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    544,
+    556
+   ],
+   "summary": "Computes which document snapshots a later version supersedes — a fact of the whole graph rather than a per-node tag.",
+   "tags": [
+    "query",
+    "dev-graph",
+    "versioning"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/builder.py:derived_from_version",
+   "type": "function",
+   "name": "derived_from_version",
+   "filePath": "runner/dev_graph/builder.py",
+   "lineRange": [
+    564,
+    575
+   ],
+   "summary": "Reports the document snapshot a derived node (passage, claim, commitment) came from.",
+   "tags": [
+    "query",
+    "provenance"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/dev_graph/changes.py",
+   "type": "file",
+   "name": "changes.py",
+   "filePath": "runner/dev_graph/changes.py",
+   "summary": "Records an operator-approved new version of one Tier 3 record while keeping the old one: archives the prior content, stores the before/after snapshots content-addressed, and writes one immutable change record carrying the pure snapshot diff.",
+   "tags": [
+    "dev-graph",
+    "versioning",
+    "change-record",
+    "audit-trail",
+    "fail-closed"
+   ],
+   "complexity": "complex",
+   "languageNotes": "On a failed after-build the record file is restored byte for byte and nothing is written — the diff distinguishes a directly changed node from one whose version only moved because a nested record changed."
+  },
+  {
+   "id": "class:runner/dev_graph/changes.py:ChangeRecord",
+   "type": "class",
+   "name": "ChangeRecord",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    82,
+    93
+   ],
+   "summary": "Immutable record of one approved change: both snapshot ids, both record versions and the computed change set.",
+   "tags": [
+    "data-model",
+    "immutable",
+    "change-record"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:snapshot_path",
+   "type": "function",
+   "name": "snapshot_path",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    105,
+    106
+   ],
+   "summary": "Returns the content-addressed path a stored snapshot lands at.",
+   "tags": [
+    "path-resolution",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:store_snapshot",
+   "type": "function",
+   "name": "store_snapshot",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    109,
+    114
+   ],
+   "summary": "Stores a snapshot content-addressed under the snapshots directory so the planner can read it later without rebuilding.",
+   "tags": [
+    "persistence",
+    "dev-graph"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:load_snapshot",
+   "type": "function",
+   "name": "load_snapshot",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    117,
+    139
+   ],
+   "summary": "Loads a stored snapshot by id, refusing a missing or malformed file.",
+   "tags": [
+    "io",
+    "dev-graph",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:_archive_record",
+   "type": "function",
+   "name": "_archive_record",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    151,
+    164
+   ],
+   "summary": "Archives the current record content by its content hash so the superseded version stays retrievable.",
+   "tags": [
+    "versioning",
+    "archive"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:read_record_version",
+   "type": "function",
+   "name": "read_record_version",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    167,
+    177
+   ],
+   "summary": "Reads an archived record version back by its content hash.",
+   "tags": [
+    "io",
+    "versioning"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:_own_content",
+   "type": "function",
+   "name": "_own_content",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    185,
+    195
+   ],
+   "summary": "Extracts a node's own content, excluding nested records, so a contained change is not mistaken for a direct one.",
+   "tags": [
+    "diff",
+    "derivation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:change_set",
+   "type": "function",
+   "name": "change_set",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    212,
+    253
+   ],
+   "summary": "Pure diff of two snapshots: classifies each node as added, removed, direct (with the changed fields) or contained, and compares edges by label.",
+   "tags": [
+    "diff",
+    "pure-function",
+    "dev-graph"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:record_change",
+   "type": "function",
+   "name": "record_change",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    265,
+    333
+   ],
+   "summary": "Builds the before snapshot, archives and replaces the record content, rebuilds after, and writes the immutable change record — restoring the file if the rebuild refuses.",
+   "tags": [
+    "entry-point",
+    "versioning",
+    "transactional",
+    "fail-closed"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/dev_graph/changes.py:read_change_record",
+   "type": "function",
+   "name": "read_change_record",
+   "filePath": "runner/dev_graph/changes.py",
+   "lineRange": [
+    336,
+    364
+   ],
+   "summary": "Reads one change record by id, validating its schema identity and shape.",
+   "tags": [
+    "io",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/dev_graph/documents.py",
+   "type": "file",
+   "name": "documents.py",
+   "filePath": "runner/dev_graph/documents.py",
+   "summary": "Imports a candidate proposal document as an immutable, content-versioned record — the snapshot builder's only source for document, passage, claim and commitment nodes. Re-importing identical content is a no-op; the same content under a different lifecycle state is refused.",
+   "tags": [
+    "dev-graph",
+    "documents",
+    "immutable",
+    "import",
+    "validation"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Carries no wall-clock field, so a replay produces the same bytes at the same `<document_id>/<version>.json` path."
+  },
+  {
+   "id": "class:runner/dev_graph/documents.py:DocumentRef",
+   "type": "class",
+   "name": "DocumentRef",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    80,
+    88
+   ],
+   "summary": "Reference to one imported document record: its id, content version and record path.",
+   "tags": [
+    "data-model",
+    "documents"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:_str",
+   "type": "function",
+   "name": "_str",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    100,
+    106
+   ],
+   "summary": "Reads a string field from a candidate record, refusing a blank or wrong-typed value with a located error.",
+   "tags": [
+    "validation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:_ids",
+   "type": "function",
+   "name": "_ids",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    109,
+    115
+   ],
+   "summary": "Reads a declared list of identifiers from a candidate record.",
+   "tags": [
+    "validation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:_objects",
+   "type": "function",
+   "name": "_objects",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    118,
+    127
+   ],
+   "summary": "Reads a declared list of nested objects from a candidate record.",
+   "tags": [
+    "validation",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:_sub_sections",
+   "type": "function",
+   "name": "_sub_sections",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    130,
+    162
+   ],
+   "summary": "Normalises a section's optional sub-sections, carrying each id, title and content verbatim.",
+   "tags": [
+    "normalization",
+    "documents",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:_section",
+   "type": "function",
+   "name": "_section",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    165,
+    178
+   ],
+   "summary": "Normalises one candidate section, including the ids it addresses and its sub-sections.",
+   "tags": [
+    "normalization",
+    "documents"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:_verified_span",
+   "type": "function",
+   "name": "_verified_span",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    181,
+    198
+   ],
+   "summary": "Normalises a claim's verified span (source id plus byte offsets), refusing a partial span.",
+   "tags": [
+    "evidence",
+    "validation",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:_claim",
+   "type": "function",
+   "name": "_claim",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    201,
+    241
+   ],
+   "summary": "Normalises one claim, keeping its declared status, verified span and approval as three separate fields and mapping evidence strength through the shared lookup.",
+   "tags": [
+    "claim-status",
+    "normalization",
+    "evidence"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:_commitment",
+   "type": "function",
+   "name": "_commitment",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    244,
+    257
+   ],
+   "summary": "Normalises one commitment and binds it to its section and the ids it addresses.",
+   "tags": [
+    "normalization",
+    "commitments"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:normalise_candidate",
+   "type": "function",
+   "name": "normalise_candidate",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    260,
+    300
+   ],
+   "summary": "Validates and normalises a whole candidate document — the single owner of candidate shape, also run by external converters before import.",
+   "tags": [
+    "validation",
+    "normalization",
+    "public-api"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:render_document",
+   "type": "function",
+   "name": "render_document",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    318,
+    341
+   ],
+   "summary": "Renders the sections into the plain text that every passage span's byte offsets resolve against.",
+   "tags": [
+    "rendering",
+    "traceability"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:node_content",
+   "type": "function",
+   "name": "node_content",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    344,
+    367
+   ],
+   "summary": "Builds the record content the document node carries, the input to its content-derived version.",
+   "tags": [
+    "derivation",
+    "versioning"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:read_candidate",
+   "type": "function",
+   "name": "read_candidate",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    379,
+    390
+   ],
+   "summary": "Reads a candidate JSON file from disk and normalises it.",
+   "tags": [
+    "io",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:import_document",
+   "type": "function",
+   "name": "import_document",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    393,
+    448
+   ],
+   "summary": "Imports a candidate as an immutable document snapshot record, returning a no-op on identical content and refusing a state change disguised as a re-import.",
+   "tags": [
+    "entry-point",
+    "import",
+    "immutable",
+    "documents"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/dev_graph/documents.py:read_document_records",
+   "type": "function",
+   "name": "read_document_records",
+   "filePath": "runner/dev_graph/documents.py",
+   "lineRange": [
+    451,
+    468
+   ],
+   "summary": "Reads every stored document snapshot record, the builder's document input.",
+   "tags": [
+    "io",
+    "documents"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/dev_graph/identity.py",
+   "type": "file",
+   "name": "identity.py",
+   "filePath": "runner/dev_graph/identity.py",
+   "summary": "Dev-graph identity primitives: canonical JSON serialisation, a record's content-hash version, and the content-derived snapshot id. Reads no clock, path or filesystem stamp, so two builds over the same content agree byte for byte.",
+   "tags": [
+    "utility",
+    "determinism",
+    "hashing",
+    "identity",
+    "pure-function"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Deliberately does not reuse the directory fingerprint helper, which hashes direct child names only."
+  },
+  {
+   "id": "function:runner/dev_graph/identity.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "runner/dev_graph/identity.py",
+   "lineRange": [
+    22,
+    26
+   ],
+   "summary": "Canonical serialisation — sorted keys, no whitespace, ASCII-escaped — the only form hashed here.",
+   "tags": [
+    "serialization",
+    "determinism",
+    "canonicalization"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/identity.py:content_hash",
+   "type": "function",
+   "name": "content_hash",
+   "filePath": "runner/dev_graph/identity.py",
+   "lineRange": [
+    29,
+    31
+   ],
+   "summary": "Returns `sha256:<hex>` over the canonical JSON of an object, recursively through nested values.",
+   "tags": [
+    "hashing",
+    "versioning",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/dev_graph/identity.py:snapshot_id",
+   "type": "function",
+   "name": "snapshot_id",
+   "filePath": "runner/dev_graph/identity.py",
+   "lineRange": [
+    34,
+    36
+   ],
+   "summary": "Content-derived snapshot identity over the sorted nodes and edges.",
+   "tags": [
+    "hashing",
+    "identity",
+    "dev-graph"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "class:runner/dev_graph/builder.py:Snapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "class:runner/dev_graph/builder.py:Snapshot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "class:runner/dev_graph/builder.py:_Assembler",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:canonical_graph",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:canonical_graph",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:_read_records",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:_objects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:_add_work_package",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:_add_verified_span",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:_add_document",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:_assemble",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:build_snapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:build_snapshot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:current_commitments",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:current_commitments",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:superseded_versions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:superseded_versions",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:derived_from_version",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "function:runner/dev_graph/builder.py:derived_from_version",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "class:runner/dev_graph/changes.py:ChangeRecord",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "class:runner/dev_graph/changes.py:ChangeRecord",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:snapshot_path",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:snapshot_path",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:store_snapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:store_snapshot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:load_snapshot",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:load_snapshot",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:_archive_record",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:read_record_version",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:read_record_version",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:_own_content",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:change_set",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:change_set",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:record_change",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:record_change",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:read_change_record",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "function:runner/dev_graph/changes.py:read_change_record",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "class:runner/dev_graph/documents.py:DocumentRef",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "class:runner/dev_graph/documents.py:DocumentRef",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:_str",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:_objects",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:_sub_sections",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:_section",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:_verified_span",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:_claim",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:_commitment",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:normalise_candidate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:normalise_candidate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:render_document",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:render_document",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:node_content",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:node_content",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:read_candidate",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:read_candidate",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:import_document",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:import_document",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:read_document_records",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "function:runner/dev_graph/documents.py:read_document_records",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/identity.py",
+   "target": "function:runner/dev_graph/identity.py:canonical_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/identity.py",
+   "target": "function:runner/dev_graph/identity.py:canonical_json",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/identity.py",
+   "target": "function:runner/dev_graph/identity.py:content_hash",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/identity.py",
+   "target": "function:runner/dev_graph/identity.py:content_hash",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/identity.py",
+   "target": "function:runner/dev_graph/identity.py:snapshot_id",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/dev_graph/identity.py",
+   "target": "function:runner/dev_graph/identity.py:snapshot_id",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/builder.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/changes.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/documents.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/impact.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/intake.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/packages.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/policies.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/revisions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/shadow.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/__init__.py",
+   "target": "file:runner/dev_graph/writer.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "file:runner/dev_graph/documents.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/builder.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "file:runner/dev_graph/builder.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/changes.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "file:runner/dev_graph/identity.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "file:runner/dev_graph/schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/dev_graph/documents.py",
+   "target": "file:runner/graph_schema.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/dev_graph/builder.py:build_snapshot",
+   "target": "function:runner/dev_graph/schema.py:validate_graph",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/builder.py:_add_document",
+   "target": "function:runner/dev_graph/documents.py:read_document_records",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/builder.py:canonical_graph",
+   "target": "function:runner/dev_graph/identity.py:snapshot_id",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/changes.py:change_set",
+   "target": "function:runner/dev_graph/identity.py:content_hash",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/changes.py:record_change",
+   "target": "function:runner/dev_graph/builder.py:build_snapshot",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/changes.py:store_snapshot",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/documents.py:node_content",
+   "target": "function:runner/dev_graph/identity.py:content_hash",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/documents.py:import_document",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/dev_graph/documents.py:_claim",
+   "target": "function:runner/graph_schema.py:map_evidence_to_status",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

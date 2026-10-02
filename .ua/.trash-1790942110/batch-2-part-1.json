@@ -1,0 +1,972 @@
+{
+ "nodes": [
+  {
+   "id": "file:runner/assumption_applier.py",
+   "type": "file",
+   "name": "assumption_applier.py",
+   "filePath": "runner/assumption_applier.py",
+   "summary": "Deterministic component that flips drafted claims from `unresolved` to `assumed` wherever a Tier 3 operator declaration backs them, then re-derives the section spine's overall status. Implements the constitution's mode-beta \"conscious green\" without inventing any claim.",
+   "tags": [
+    "deterministic-component",
+    "claim-status",
+    "phase8",
+    "validation",
+    "tier3"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Idempotent by construction: a second pass finds no unresolved claim left to flip and writes nothing."
+  },
+  {
+   "id": "function:runner/assumption_applier.py:_resolve_declaration",
+   "type": "function",
+   "name": "_resolve_declaration",
+   "filePath": "runner/assumption_applier.py",
+   "lineRange": [
+    92,
+    125
+   ],
+   "summary": "Resolves a claim id to an operator declaration, first by declaration key and then through the unique `checklist_ref` bridge.",
+   "tags": [
+    "lookup",
+    "claim-status",
+    "resolution"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/assumption_applier.py:_read_json_object",
+   "type": "function",
+   "name": "_read_json_object",
+   "filePath": "runner/assumption_applier.py",
+   "lineRange": [
+    128,
+    146
+   ],
+   "summary": "Reads a JSON object from disk, raising `AssumptionApplierError` on a missing or malformed artifact (fail-closed).",
+   "tags": [
+    "io",
+    "validation",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/assumption_applier.py:_flip_declared_claims",
+   "type": "function",
+   "name": "_flip_declared_claims",
+   "filePath": "runner/assumption_applier.py",
+   "lineRange": [
+    149,
+    196
+   ],
+   "summary": "Rewrites every `unresolved` claim backed by a declaration into an `assumed` claim carrying the declared summary and the `assumption_declared` flag.",
+   "tags": [
+    "claim-status",
+    "transformation",
+    "deterministic-component"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/assumption_applier.py:apply_assumptions",
+   "type": "function",
+   "name": "apply_assumptions",
+   "filePath": "runner/assumption_applier.py",
+   "lineRange": [
+    199,
+    285
+   ],
+   "summary": "Component entry point: loads the working assumptions, flips the per-sub-section drafts, re-derives the spine's `overall_status`, and atomically rewrites only the touched drafts.",
+   "tags": [
+    "entry-point",
+    "deterministic-component",
+    "phase8",
+    "atomic-write"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/atomic_write.py",
+   "type": "file",
+   "name": "atomic_write.py",
+   "filePath": "runner/atomic_write.py",
+   "summary": "Shared atomic-write helpers (temp file plus rename) that every deterministic component and exporter uses to publish canonical artifacts. Owns the canonical JSON serialisation that the byte-equal replay checks depend on.",
+   "tags": [
+    "utility",
+    "atomic-write",
+    "io",
+    "determinism",
+    "serialization"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Windows-safe finalisation: `os.rename` requires an absent target, so an existing file is unlinked first."
+  },
+  {
+   "id": "function:runner/atomic_write.py:canonical_json_bytes",
+   "type": "function",
+   "name": "canonical_json_bytes",
+   "filePath": "runner/atomic_write.py",
+   "lineRange": [
+    32,
+    40
+   ],
+   "summary": "Serialises an object to the canonical pretty UTF-8 JSON bytes (`indent=2, ensure_ascii=False`) that every byte-equal replay comparison uses.",
+   "tags": [
+    "serialization",
+    "determinism",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "function",
+   "name": "atomic_write_json",
+   "filePath": "runner/atomic_write.py",
+   "lineRange": [
+    50,
+    78
+   ],
+   "summary": "Writes an object as canonical JSON to a path atomically, creating parents and leaving no partial output on failure.",
+   "tags": [
+    "atomic-write",
+    "io",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/atomic_write.py:atomic_write_text",
+   "type": "function",
+   "name": "atomic_write_text",
+   "filePath": "runner/atomic_write.py",
+   "lineRange": [
+    81,
+    111
+   ],
+   "summary": "Writes UTF-8 text to a path atomically with the same temp-file-and-rename discipline as the JSON writer.",
+   "tags": [
+    "atomic-write",
+    "io",
+    "utility"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/atomic_write.py:atomic_write_via",
+   "type": "function",
+   "name": "atomic_write_via",
+   "filePath": "runner/atomic_write.py",
+   "lineRange": [
+    114,
+    138
+   ],
+   "summary": "Atomic-write adapter for third-party writers that need a file path of their own (used by the `.docx` exporter).",
+   "tags": [
+    "atomic-write",
+    "adapter",
+    "io"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:runner/budget_request.py",
+   "type": "file",
+   "name": "budget_request.py",
+   "filePath": "runner/budget_request.py",
+   "summary": "Deterministic composer of the lump-sum budget request sent to the external Lump Sum Budget Planner. Every effort and cost field carries an explicit \"requires external computation\" sentinel, so the repository prepares the request without computing any budget figure.",
+   "tags": [
+    "deterministic-component",
+    "budget",
+    "integration",
+    "lump-sum",
+    "phase7"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Fails closed: a missing or malformed upstream artifact raises and writes nothing, because a partial request would be priced by the planner."
+  },
+  {
+   "id": "function:runner/budget_request.py:_wp_month_windows",
+   "type": "function",
+   "name": "_wp_month_windows",
+   "filePath": "runner/budget_request.py",
+   "lineRange": [
+    112,
+    137
+   ],
+   "summary": "Derives each work package's start/end month window from the Phase 4 Gantt task spans, yielding `null` where no task exists.",
+   "tags": [
+    "derivation",
+    "gantt",
+    "phase4"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/budget_request.py:_management_roles",
+   "type": "function",
+   "name": "_management_roles",
+   "filePath": "runner/budget_request.py",
+   "lineRange": [
+    140,
+    155
+   ],
+   "summary": "Lifts each partner's management roles verbatim from the Phase 6 implementation architecture.",
+   "tags": [
+    "lookup",
+    "consortium",
+    "phase6"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/budget_request.py:_entry_ids",
+   "type": "function",
+   "name": "_entry_ids",
+   "filePath": "runner/budget_request.py",
+   "lineRange": [
+    158,
+    172
+   ],
+   "summary": "Collects the declared identifiers of a record collection, refusing a malformed container.",
+   "tags": [
+    "utility",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/budget_request.py:_partner_identity",
+   "type": "function",
+   "name": "_partner_identity",
+   "filePath": "runner/budget_request.py",
+   "lineRange": [
+    175,
+    201
+   ],
+   "summary": "Copies a partner's identity verbatim from Tier 3, halting when a country has escaped its anonymised slot.",
+   "tags": [
+    "consortium",
+    "validation",
+    "anonymisation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/budget_request.py:compose_budget_request",
+   "type": "function",
+   "name": "compose_budget_request",
+   "filePath": "runner/budget_request.py",
+   "lineRange": [
+    204,
+    353
+   ],
+   "summary": "Composes the full budget-request payload from the call binding, WP structure, Gantt, implementation architecture and partners, stamping the external-computation sentinel on every cost field.",
+   "tags": [
+    "composition",
+    "budget",
+    "deterministic-component",
+    "integration"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/budget_request.py:_read_json",
+   "type": "function",
+   "name": "_read_json",
+   "filePath": "runner/budget_request.py",
+   "lineRange": [
+    361,
+    371
+   ],
+   "summary": "Reads one repo-relative JSON artifact, raising `BudgetRequestError` when absent or malformed.",
+   "tags": [
+    "io",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/budget_request.py:derive_budget_request",
+   "type": "function",
+   "name": "derive_budget_request",
+   "filePath": "runner/budget_request.py",
+   "lineRange": [
+    374,
+    446
+   ],
+   "summary": "Component entry point: checks the instrument owns the lump-sum regime, composes the request, validates it against the interface contract, and writes it atomically.",
+   "tags": [
+    "entry-point",
+    "deterministic-component",
+    "budget",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:runner/claim_status.py",
+   "type": "file",
+   "name": "claim_status.py",
+   "filePath": "runner/claim_status.py",
+   "summary": "Single source of truth for the constitution's four-value validation vocabulary and its worst-wins ordering. Pure lookups with no I/O, so both the drafter and the assumption applier derive a section's overall status identically.",
+   "tags": [
+    "utility",
+    "claim-status",
+    "validation",
+    "type-definition",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/claim_status.py:normalize_status",
+   "type": "function",
+   "name": "normalize_status",
+   "filePath": "runner/claim_status.py",
+   "lineRange": [
+    37,
+    56
+   ],
+   "summary": "Maps any casing of a known status onto its canonical lowercase spelling and returns `None` for anything outside the vocabulary.",
+   "tags": [
+    "normalization",
+    "claim-status",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/claim_status.py:worst_status",
+   "type": "function",
+   "name": "worst_status",
+   "filePath": "runner/claim_status.py",
+   "lineRange": [
+    59,
+    72
+   ],
+   "summary": "Returns the least-resolved status among an iterable, ignoring unknown values; an empty iterable yields `confirmed`.",
+   "tags": [
+    "claim-status",
+    "derivation",
+    "pure-function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/claim_status.py:rollup_inconsistency",
+   "type": "function",
+   "name": "rollup_inconsistency",
+   "filePath": "runner/claim_status.py",
+   "lineRange": [
+    75,
+    133
+   ],
+   "summary": "Detects a section whose declared `overall_status` disagrees with the worst of its per-claim statuses, naming the inconsistency for the gate.",
+   "tags": [
+    "validation",
+    "claim-status",
+    "consistency-check"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:runner/decomposed_drafting.py",
+   "type": "file",
+   "name": "decomposed_drafting.py",
+   "filePath": "runner/decomposed_drafting.py",
+   "summary": "Drafting driver that replaces one monolithic Claude call per section with one bounded call per sub-section, passing prior drafts forward as sequential context. Writes the per-sub-section drafts and the section spine that the deterministic assembler then composes.",
+   "tags": [
+    "phase8",
+    "drafting",
+    "claude-transport",
+    "orchestration",
+    "entry-point"
+   ],
+   "complexity": "complex",
+   "languageNotes": "The per-sub-section call sits behind an injectable `drafter` callable, so the loop, spine derivation and atomic writes are unit-testable with a fake."
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:_resolve_drafting_sub_sections",
+   "type": "function",
+   "name": "_resolve_drafting_sub_sections",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    151,
+    172
+   ],
+   "summary": "Reads the section's drafting sub-sections from the instrument profile, so granularity never hardcodes an instrument literal.",
+   "tags": [
+    "instrument-profile",
+    "resolution",
+    "configuration"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:_build_draft",
+   "type": "function",
+   "name": "_build_draft",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    175,
+    216
+   ],
+   "summary": "Drafts one sub-section through the injected drafter, handing it the criterion and the prior sub-sections as sequential context.",
+   "tags": [
+    "drafting",
+    "phase8",
+    "sequencing"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:_derive_overall_status",
+   "type": "function",
+   "name": "_derive_overall_status",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    219,
+    233
+   ],
+   "summary": "Derives the spine's overall status as the worst status over all freshly drafted per-sub-section claims.",
+   "tags": [
+    "claim-status",
+    "derivation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:_capture_raw_response",
+   "type": "function",
+   "name": "_capture_raw_response",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    249,
+    268
+   ],
+   "summary": "Persists a drafter's raw response under the run's capture directory so a parse failure can be replayed offline.",
+   "tags": [
+    "debugging",
+    "capture",
+    "io"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:_default_claude_drafter",
+   "type": "function",
+   "name": "_default_claude_drafter",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    279,
+    471
+   ],
+   "summary": "Builds the production drafter closure: assembles the bounded per-sub-section prompt, invokes the Claude runtime transport, captures the raw response and returns the parsed draft.",
+   "tags": [
+    "claude-transport",
+    "drafting",
+    "prompt-assembly",
+    "factory"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:_parse_drafter_response",
+   "type": "function",
+   "name": "_parse_drafter_response",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    474,
+    521
+   ],
+   "summary": "Parses and validates a drafter response into a sub-section draft, refusing a malformed or incomplete payload rather than repairing it.",
+   "tags": [
+    "parsing",
+    "validation",
+    "fail-closed"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:_read_upstream_json",
+   "type": "function",
+   "name": "_read_upstream_json",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    547,
+    564
+   ],
+   "summary": "Reads a required upstream Tier 3/4 artifact, raising `DecomposedDraftingError` when absent.",
+   "tags": [
+    "io",
+    "fail-closed"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:source_section_extra_fields",
+   "type": "function",
+   "name": "source_section_extra_fields",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    567,
+    652
+   ],
+   "summary": "Sources the per-section extra fields (criterion, declarations, schema identity) that the assembled section artifact must carry.",
+   "tags": [
+    "phase8",
+    "derivation",
+    "schema"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:runner/decomposed_drafting.py:draft_section_decomposed",
+   "type": "function",
+   "name": "draft_section_decomposed",
+   "filePath": "runner/decomposed_drafting.py",
+   "lineRange": [
+    660,
+    767
+   ],
+   "summary": "Entry point: resolves the sub-section set, drafts each one in order, derives the spine and atomically writes the drafts plus `section_spine.json`.",
+   "tags": [
+    "entry-point",
+    "phase8",
+    "drafting",
+    "orchestration"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "function:runner/assumption_applier.py:_resolve_declaration",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "function:runner/assumption_applier.py:_read_json_object",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "function:runner/assumption_applier.py:_flip_declared_claims",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "function:runner/assumption_applier.py:apply_assumptions",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "function:runner/assumption_applier.py:apply_assumptions",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/atomic_write.py",
+   "target": "function:runner/atomic_write.py:canonical_json_bytes",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/atomic_write.py",
+   "target": "function:runner/atomic_write.py:canonical_json_bytes",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/atomic_write.py",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/atomic_write.py",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/atomic_write.py",
+   "target": "function:runner/atomic_write.py:atomic_write_text",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/atomic_write.py",
+   "target": "function:runner/atomic_write.py:atomic_write_text",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/atomic_write.py",
+   "target": "function:runner/atomic_write.py:atomic_write_via",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/atomic_write.py",
+   "target": "function:runner/atomic_write.py:atomic_write_via",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:_wp_month_windows",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:_management_roles",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:_entry_ids",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:_partner_identity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:compose_budget_request",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:compose_budget_request",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:_read_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:derive_budget_request",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "function:runner/budget_request.py:derive_budget_request",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/claim_status.py",
+   "target": "function:runner/claim_status.py:normalize_status",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/claim_status.py",
+   "target": "function:runner/claim_status.py:normalize_status",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/claim_status.py",
+   "target": "function:runner/claim_status.py:worst_status",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/claim_status.py",
+   "target": "function:runner/claim_status.py:worst_status",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/claim_status.py",
+   "target": "function:runner/claim_status.py:rollup_inconsistency",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/claim_status.py",
+   "target": "function:runner/claim_status.py:rollup_inconsistency",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:_resolve_drafting_sub_sections",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:_build_draft",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:_derive_overall_status",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:_capture_raw_response",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:_default_claude_drafter",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:_parse_drafter_response",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:_read_upstream_json",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:source_section_extra_fields",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:source_section_extra_fields",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:draft_section_decomposed",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "function:runner/decomposed_drafting.py:draft_section_decomposed",
+   "type": "exports",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "file:runner/claim_status.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "file:runner/section_assembler.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/assumption_applier.py",
+   "target": "file:runner/working_assumptions.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "file:runner/instrument_profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/budget_request.py",
+   "target": "file:runner/interface_contract.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "file:runner/atomic_write.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "file:runner/claim_status.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "file:runner/instrument_profile.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "file:runner/decomposed_drafting.py",
+   "target": "file:runner/section_assembler.py",
+   "type": "imports",
+   "direction": "forward",
+   "weight": 0.7
+  },
+  {
+   "source": "function:runner/assumption_applier.py:apply_assumptions",
+   "target": "function:runner/working_assumptions.py:load_working_assumptions",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/assumption_applier.py:_resolve_declaration",
+   "target": "function:runner/working_assumptions.py:declared_claim_summary",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/assumption_applier.py:_flip_declared_claims",
+   "target": "function:runner/claim_status.py:worst_status",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/assumption_applier.py:apply_assumptions",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/budget_request.py:derive_budget_request",
+   "target": "function:runner/interface_contract.py:validate_payload",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/budget_request.py:derive_budget_request",
+   "target": "function:runner/instrument_profile.py:owns_budget_regime",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/budget_request.py:derive_budget_request",
+   "target": "function:runner/instrument_profile.py:resolve_budget_regime",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/budget_request.py:derive_budget_request",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/decomposed_drafting.py:_resolve_drafting_sub_sections",
+   "target": "function:runner/instrument_profile.py:resolve_instrument_profile",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/decomposed_drafting.py:_derive_overall_status",
+   "target": "function:runner/claim_status.py:worst_status",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "function:runner/decomposed_drafting.py:draft_section_decomposed",
+   "target": "function:runner/atomic_write.py:atomic_write_json",
+   "type": "calls",
+   "direction": "forward",
+   "weight": 0.8
+  }
+ ]
+}

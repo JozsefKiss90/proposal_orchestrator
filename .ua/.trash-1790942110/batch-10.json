@@ -1,0 +1,856 @@
+{
+ "nodes": [
+  {
+   "id": "document:harness/HARNESS.md",
+   "type": "document",
+   "name": "HARNESS.md",
+   "filePath": "harness/HARNESS.md",
+   "summary": "Specification document for the out-of-band evaluation and integrity harness, defining its substrate (E1/E1.5), the two headline signals E2 (status-aware faithfulness) and E3 (claim-ledger completeness plus status calibration), the E4 regression golden-set, the pre-evaluation profile layer and the blind-assessment lane. It is the authority for the harness's load-bearing invariant: no eval metric may wire into the runtime DAG as a fail-closed gate.",
+   "tags": [
+    "documentation",
+    "specification",
+    "evaluation-harness",
+    "quality-assurance",
+    "entry-point"
+   ],
+   "complexity": "complex",
+   "languageNotes": "Documents a structurally enforced one-way import boundary (harness depends on runner, never the reverse), asserted by tests/harness/test_boundary.py rather than by prose alone."
+  },
+  {
+   "id": "config:harness/evaluator_scorecard_ria.json",
+   "type": "config",
+   "name": "evaluator_scorecard_ria.json",
+   "filePath": "harness/evaluator_scorecard_ria.json",
+   "summary": "Machine-readable RIA/IA evaluator scorecard transcribed from the EU Grants Evaluation form (HE RIA and IA) V4.0, pp.4-5: the 0-5 scoring scale with its level descriptions, the three criteria (Excellence, Impact, Implementation) each carrying a threshold score of 3, and the six verbatim aspect texts the harness grades against.",
+   "tags": [
+    "configuration",
+    "scorecard",
+    "ria",
+    "evaluation-criteria",
+    "schema-definition"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "An RIA form is single-type and unweighted, so option_tag and weight_pct are declared Inferred rather than transcribed, recorded as Milestone 1 defects F1 and F2."
+  },
+  {
+   "id": "config:harness/evaluator_scorecard_msca_pf.json",
+   "type": "config",
+   "name": "evaluator_scorecard_msca_pf.json",
+   "filePath": "harness/evaluator_scorecard_msca_pf.json",
+   "summary": "Machine-readable MSCA Postdoctoral Fellowship evaluator scorecard transcribed from the HE MSCA Evaluation Form V2.2, pp.4-6: the 0-5 scale, the 50/30/20 criterion weighting against a 70/100 overall pass threshold, the nine PF-scoped aspects, and the COFUND-only recruiting-institution aspect explicitly excluded from grading.",
+   "tags": [
+    "configuration",
+    "scorecard",
+    "msca-pf",
+    "evaluation-criteria",
+    "schema-definition"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:harness/evaluator_scorecard_msca_pf.md",
+   "type": "document",
+   "name": "evaluator_scorecard_msca_pf.md",
+   "filePath": "harness/evaluator_scorecard_msca_pf.md",
+   "summary": "Human-readable mirror of the MSCA-PF evaluator scorecard, listing every criterion, weight and aspect text with its form page and option tag, plus the PF scoping rule that decides which registry aspects are graded and which are excluded.",
+   "tags": [
+    "documentation",
+    "scorecard",
+    "msca-pf",
+    "evaluation-criteria",
+    "reference"
+   ],
+   "complexity": "simple",
+   "languageNotes": "Declared a mirror by design: the rubric lane loads the JSON, while this file exists for human verification against the official PDF form."
+  },
+  {
+   "id": "config:harness/rubrics_ria.json",
+   "type": "config",
+   "name": "rubrics_ria.json",
+   "filePath": "harness/rubrics_ria.json",
+   "summary": "RIA rubric set (ria_ia_rubrics v1.0.0) binding each of the six scorecard aspects to an integrity-framed grading rubric with evaluation steps, a 0.6 pass threshold, selection terms and the Part B sub-section anchors (B.1.1 through B.3.2) that Phase 8 writes.",
+   "tags": [
+    "configuration",
+    "rubric",
+    "ria",
+    "scoring",
+    "evaluation-harness"
+   ],
+   "complexity": "moderate",
+   "languageNotes": "Integrity-framed by design: a rubric asks whether a section addresses and grounds its expectation, never whether the prose reads well."
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json",
+   "type": "config",
+   "name": "rubrics_msca_pf.json",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "MSCA-PF rubric set (msca_pf_rubrics v1.0.0) binding each of the nine PF-scoped scorecard aspects to an integrity-framed grading rubric with evaluation steps, a 0.6 pass threshold, selection terms and the sub-section anchors 1.1 through 3.2.",
+   "tags": [
+    "configuration",
+    "rubric",
+    "msca-pf",
+    "scoring",
+    "evaluation-harness"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:harness/rubrics_ria.json:ria-exc-objectives",
+   "type": "config",
+   "name": "ria-exc-objectives",
+   "filePath": "harness/rubrics_ria.json",
+   "summary": "Integrity rubric for the excellence aspect: Clarity and pertinence of the project’s objectives, and the extent to which the proposed work is ambitious, and goes beyond the state of the art. Graded against sub-section anchor B.1.1 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "excellence",
+    "ria",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_ria.json:ria-exc-methodology",
+   "type": "config",
+   "name": "ria-exc-methodology",
+   "filePath": "harness/rubrics_ria.json",
+   "summary": "Integrity rubric for the excellence aspect: Soundness of the proposed methodology, including the underlying concepts, models, assumptions, inter-disciplinary approaches, appropriate... Graded against sub-section anchor B.1.2 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "excellence",
+    "ria",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_ria.json:ria-imp-pathways",
+   "type": "config",
+   "name": "ria-imp-pathways",
+   "filePath": "harness/rubrics_ria.json",
+   "summary": "Integrity rubric for the impact aspect: Credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme. Graded against sub-section anchor B.2.1 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "impact",
+    "ria",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_ria.json:ria-imp-measures",
+   "type": "config",
+   "name": "ria-imp-measures",
+   "filePath": "harness/rubrics_ria.json",
+   "summary": "Integrity rubric for the impact aspect: Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including... Graded against sub-section anchor B.2.2 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "impact",
+    "ria",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_ria.json:ria-impl-workplan",
+   "type": "config",
+   "name": "ria-impl-workplan",
+   "filePath": "harness/rubrics_ria.json",
+   "summary": "Integrity rubric for the implementation aspect: Quality and effectiveness of the work plan, assessment of risks, and appropriateness of the effort assigned to work packages, and the resources... Graded against sub-section anchor B.3.1 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "implementation",
+    "ria",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_ria.json:ria-impl-capacity",
+   "type": "config",
+   "name": "ria-impl-capacity",
+   "filePath": "harness/rubrics_ria.json",
+   "summary": "Integrity rubric for the implementation aspect: Capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise. Graded against sub-section anchor B.3.2 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "implementation",
+    "ria",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:exc-obj",
+   "type": "config",
+   "name": "exc-obj",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the excellence aspect: Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of... Graded against sub-section anchor 1.1 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "excellence",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:exc-method",
+   "type": "config",
+   "name": "exc-method",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the excellence aspect: Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if... Graded against sub-section anchor 1.2 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "excellence",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:exc-supervision",
+   "type": "config",
+   "name": "exc-supervision",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the excellence aspect: Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host. Graded against sub-section anchor 1.3 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "excellence",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:exc-researcher",
+   "type": "config",
+   "name": "exc-researcher",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the excellence aspect: Quality and appropriateness of the researcher's professional experience, competences and skills. Graded against sub-section anchor 1.4 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "excellence",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:imp-career",
+   "type": "config",
+   "name": "imp-career",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the impact aspect: Credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development. Graded against sub-section anchor 2.1 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "impact",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:imp-dissemination",
+   "type": "config",
+   "name": "imp-dissemination",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the impact aspect: Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including... Graded against sub-section anchor 2.2 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "impact",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:imp-magnitude",
+   "type": "config",
+   "name": "imp-magnitude",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the impact aspect: The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts. Graded against sub-section anchor 2.3 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "impact",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:impl-workplan",
+   "type": "config",
+   "name": "impl-workplan",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the implementation aspect: Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages. Graded against sub-section anchor 3.1 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "implementation",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/rubrics_msca_pf.json:impl-host",
+   "type": "config",
+   "name": "impl-host",
+   "filePath": "harness/rubrics_msca_pf.json",
+   "summary": "Integrity rubric for the implementation aspect: Quality and capacity of the host institutions and participating organisations, including hosting arrangements. Graded against sub-section anchor 3.2 with a pass threshold of 0.6.",
+   "tags": [
+    "rubric",
+    "implementation",
+    "msca-pf",
+    "scoring",
+    "expectation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/evaluator_scorecard_ria.json:excellence",
+   "type": "config",
+   "name": "excellence",
+   "filePath": "harness/evaluator_scorecard_ria.json",
+   "summary": "Scorecard criterion Excellence (Score 1, unweighted, weight_pct carrying the placeholder value 1, form page 4) covering the aspects ria-exc-objectives, ria-exc-methodology. Individual threshold score 3.",
+   "tags": [
+    "scorecard",
+    "criterion",
+    "excellence",
+    "ria",
+    "evaluation-criteria"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/evaluator_scorecard_ria.json:impact",
+   "type": "config",
+   "name": "impact",
+   "filePath": "harness/evaluator_scorecard_ria.json",
+   "summary": "Scorecard criterion Impact (Score 2, unweighted, weight_pct carrying the placeholder value 1, form page 4-5) covering the aspects ria-imp-pathways, ria-imp-measures. Individual threshold score 3.",
+   "tags": [
+    "scorecard",
+    "criterion",
+    "impact",
+    "ria",
+    "evaluation-criteria"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/evaluator_scorecard_ria.json:implementation",
+   "type": "config",
+   "name": "implementation",
+   "filePath": "harness/evaluator_scorecard_ria.json",
+   "summary": "Scorecard criterion Quality and efficiency of the implementation (Score 3, unweighted, weight_pct carrying the placeholder value 1, form page 5) covering the aspects ria-impl-workplan, ria-impl-capacity. Individual threshold score 3.",
+   "tags": [
+    "scorecard",
+    "criterion",
+    "implementation",
+    "ria",
+    "evaluation-criteria"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/evaluator_scorecard_msca_pf.json:excellence",
+   "type": "config",
+   "name": "excellence",
+   "filePath": "harness/evaluator_scorecard_msca_pf.json",
+   "summary": "Scorecard criterion Excellence (Score 1, weight 50%, form page 4-5) covering the aspects exc-obj, exc-method, exc-supervision, exc-researcher.",
+   "tags": [
+    "scorecard",
+    "criterion",
+    "excellence",
+    "msca-pf",
+    "evaluation-criteria"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/evaluator_scorecard_msca_pf.json:impact",
+   "type": "config",
+   "name": "impact",
+   "filePath": "harness/evaluator_scorecard_msca_pf.json",
+   "summary": "Scorecard criterion Impact (Score 2, weight 30%, form page 5-6) covering the aspects imp-career, imp-dissemination, imp-magnitude.",
+   "tags": [
+    "scorecard",
+    "criterion",
+    "impact",
+    "msca-pf",
+    "evaluation-criteria"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:harness/evaluator_scorecard_msca_pf.json:implementation",
+   "type": "config",
+   "name": "implementation",
+   "filePath": "harness/evaluator_scorecard_msca_pf.json",
+   "summary": "Scorecard criterion Quality and efficiency of the implementation (Score 3, weight 20%, form page 6) covering the aspects impl-workplan, impl-host.",
+   "tags": [
+    "scorecard",
+    "criterion",
+    "implementation",
+    "msca-pf",
+    "evaluation-criteria"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "config:harness/rubrics_ria.json:ria-exc-objectives",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "config:harness/rubrics_ria.json:ria-exc-methodology",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "config:harness/rubrics_ria.json:ria-imp-pathways",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "config:harness/rubrics_ria.json:ria-imp-measures",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "config:harness/rubrics_ria.json:ria-impl-workplan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "config:harness/rubrics_ria.json:ria-impl-capacity",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:exc-obj",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:exc-method",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:exc-supervision",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:exc-researcher",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:imp-career",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:imp-dissemination",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:imp-magnitude",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:impl-workplan",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "config:harness/rubrics_msca_pf.json:impl-host",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_ria.json",
+   "target": "config:harness/evaluator_scorecard_ria.json:excellence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_ria.json",
+   "target": "config:harness/evaluator_scorecard_ria.json:impact",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_ria.json",
+   "target": "config:harness/evaluator_scorecard_ria.json:implementation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_msca_pf.json",
+   "target": "config:harness/evaluator_scorecard_msca_pf.json:excellence",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_msca_pf.json",
+   "target": "config:harness/evaluator_scorecard_msca_pf.json:impact",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_msca_pf.json",
+   "target": "config:harness/evaluator_scorecard_msca_pf.json:implementation",
+   "type": "contains",
+   "direction": "forward",
+   "weight": 1.0
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/verdict.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/provenance.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/judge.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/routing.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/report.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/rubric.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/rubrics.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/expectations.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/profile.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/blind_assessment.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/calibration.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/claim_ledger.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/faithfulness.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/gold_set.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/materiality.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/regression.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/status_calibration.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/commands/blind_assessment.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "file:harness/commands/rubric_grading_run.py",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "config:harness/evaluator_scorecard_ria.json",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "config:harness/evaluator_scorecard_msca_pf.json",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "config:harness/rubrics_ria.json",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/HARNESS.md",
+   "target": "config:harness/rubrics_msca_pf.json",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "document:harness/evaluator_scorecard_msca_pf.md",
+   "target": "config:harness/evaluator_scorecard_msca_pf.json",
+   "type": "documents",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "file:harness/rubrics.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "file:harness/rubric.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "file:harness/commands/rubric_grading_run.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "file:harness/blind_assessment.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "file:harness/rubrics.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "file:harness/rubric.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "file:harness/commands/rubric_grading_run.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/rubrics_msca_pf.json",
+   "target": "file:harness/blind_assessment.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_ria.json",
+   "target": "file:harness/profile.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_ria.json",
+   "target": "file:harness/rubrics.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_ria.json",
+   "target": "file:harness/expectations.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_ria.json",
+   "target": "file:harness/rubric.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_msca_pf.json",
+   "target": "file:harness/profile.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_msca_pf.json",
+   "target": "file:harness/rubrics.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_msca_pf.json",
+   "target": "file:harness/expectations.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_msca_pf.json",
+   "target": "file:harness/rubric.py",
+   "type": "configures",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "config:harness/rubrics_ria.json",
+   "target": "config:harness/rubrics_msca_pf.json",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "config:harness/evaluator_scorecard_ria.json",
+   "target": "config:harness/evaluator_scorecard_msca_pf.json",
+   "type": "related",
+   "direction": "forward",
+   "weight": 0.5
+  }
+ ]
+}

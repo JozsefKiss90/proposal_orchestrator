@@ -1,0 +1,116 @@
+{
+ "projectRoot": "C:/Code/proposal_demo/proposal_orchestrator",
+ "batchFiles": [
+  {
+   "path": "runner/claude_transport.py",
+   "language": "python",
+   "sizeLines": 1062,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/json_extract.py",
+   "language": "python",
+   "sizeLines": 74,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/semantic_dispatch.py",
+   "language": "python",
+   "sizeLines": 863,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/skill_runtime.py",
+   "language": "python",
+   "sizeLines": 2739,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/__init__.py",
+   "language": "python",
+   "sizeLines": 55,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/bedrock_converse.py",
+   "language": "python",
+   "sizeLines": 342,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/capabilities.py",
+   "language": "python",
+   "sizeLines": 122,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/config.py",
+   "language": "python",
+   "sizeLines": 793,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/errors.py",
+   "language": "python",
+   "sizeLines": 155,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/openai_compatible.py",
+   "language": "python",
+   "sizeLines": 253,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/tool_executor.py",
+   "language": "python",
+   "sizeLines": 393,
+   "fileCategory": "code"
+  },
+  {
+   "path": "runner/transport/tool_loop.py",
+   "language": "python",
+   "sizeLines": 284,
+   "fileCategory": "code"
+  }
+ ],
+ "batchImportData": {
+  "runner/claude_transport.py": [],
+  "runner/json_extract.py": [],
+  "runner/semantic_dispatch.py": [
+   "runner/claude_transport.py",
+   "runner/json_extract.py",
+   "runner/paths.py",
+   "runner/transport/config.py"
+  ],
+  "runner/skill_runtime.py": [
+   "runner/claude_transport.py",
+   "runner/runtime_models.py",
+   "runner/transport/config.py",
+   "runner/transport/tool_executor.py",
+   "runner/transport/tool_loop.py"
+  ],
+  "runner/transport/__init__.py": [
+   "runner/transport/capabilities.py",
+   "runner/transport/config.py",
+   "runner/transport/errors.py",
+   "runner/transport/tool_executor.py",
+   "runner/transport/tool_loop.py"
+  ],
+  "runner/transport/bedrock_converse.py": [
+   "runner/transport/errors.py"
+  ],
+  "runner/transport/capabilities.py": [],
+  "runner/transport/config.py": [
+   "runner/transport/capabilities.py"
+  ],
+  "runner/transport/errors.py": [],
+  "runner/transport/openai_compatible.py": [
+   "runner/transport/errors.py"
+  ],
+  "runner/transport/tool_executor.py": [],
+  "runner/transport/tool_loop.py": [
+   "runner/transport/tool_executor.py"
+  ]
+ }
+}
