@@ -88,6 +88,13 @@ NOT_A_TIER3_ARTIFACT = frozenset(
     {".gitkeep", "working_assumptions.example.json"}
 )
 
+#: Tier 3 subtrees that belong to another instance. The MSCA-DN pre-evaluation
+#: case keeps its originals and fidelity register beside the demo's source
+#: materials (plans/msca_dn_pre_evaluation_spec.md, decision 2) but has its own
+#: graph root under workspaces/msca_dn/ and its own records; the demo's freeze
+#: rule does not govern it.
+OTHER_INSTANCE_TIER3_DIRS = ("docs/tier3_project_instantiation/source_materials/msca_dn/",)
+
 
 def _read(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8-sig"))
@@ -1017,6 +1024,7 @@ def _tier3_artifacts() -> set[str]:
         if path.is_file()
         and path.name not in NOT_A_TIER3_ARTIFACT
         and path.suffix.lower() not in {".pdf", ".docx"}
+        and not path.relative_to(REPO).as_posix().startswith(OTHER_INSTANCE_TIER3_DIRS)
     }
 
 

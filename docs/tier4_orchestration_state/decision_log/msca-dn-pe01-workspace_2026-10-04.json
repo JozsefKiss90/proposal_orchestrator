@@ -1,0 +1,58 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe01-workspace_2026-10-04",
+  "date": "2026-10-04",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-01 (Workspace, intake and provenance freeze) in plans/msca_dn_pre_evaluation_spec.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §12.2 (four status categories), §16.3 (no schema_id coined for an authored artifact). Spec decisions 1, 2, 12 and 18. Not a constitutional amendment.",
+  "decision": "The MSCA-DN pre-evaluation case gets its own graph root at workspaces/msca_dn/, separate from the demo instance whose records stay under docs/. Both PDFs move to docs/tier3_project_instantiation/source_materials/msca_dn/ beside a new fidelity register whose provenance header carries the five sanitisation declarations. The ESR intake is recorded under the workspace with the historical call as its call_id; the baseline's target call is owned by the profile, run label and report and never enters the intake. Everything is authored by tools/author_msca_dn_workspace.py and replays byte-equal.",
+  "declared_values": {
+    "historical_call_id": {
+      "value": "HORIZON-MSCA-2025-DN-01",
+      "declared_status": "Assumed",
+      "reason": "The sanitised ESR names no call and no proposal number. The 2025 work programme is not stored (spec §8). The value is the operator's declaration of the call the ESR evaluated and is recorded in the intake, which is immutable; a correction is a new intake id."
+    },
+    "submission_id": {
+      "value": "MSCA-DN-2025-PROPOSAL-NUMBER-WITHHELD",
+      "declared_status": "Assumed",
+      "reason": "The proposal number stays with the original inside the private network. The intake schema requires a plain identifier, so the withholding is stated in the identifier."
+    },
+    "baseline_target_call_id": {
+      "value": "HORIZON-MSCA-2026-DN-01",
+      "owner": "profile (PE-02), run label and report (PE-06); recorded in the register only to state that it is not the intake's call",
+      "check": "tests/test_msca_dn_workspace.py asserts the intake's call_id differs from it, because no engine path reads call_id."
+    },
+    "input_hashes_pages_and_esr_scores": {
+      "declared_status": "Confirmed",
+      "reason": "Derived from the stored bytes by the authoring tool and re-derived by the test."
+    }
+  },
+  "artifacts": {
+    "register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+    "workspace": "workspaces/msca_dn/",
+    "intake": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/intake/msca-dn-2025-sanitised-v1.json",
+    "tool": "tools/author_msca_dn_workspace.py",
+    "test": "tests/test_msca_dn_workspace.py"
+  },
+  "deferred": {
+    "register_derived_half": "PE-03 writes it (extraction losses, figure and dependency keyword counts, table render results).",
+    "register_declared_sub_sections": "The operator fills presence and transformation per sub-section beside PE-03's derived half; empty at PE-01.",
+    "esr_record": "docs/tier4_orchestration_state/msca_dn/esr/ is authored at PE-08 and never snapshotted (spec decision 12)."
+  },
+  "side_effect": "The demo report's leakage-scan file count moves from 322 to 324 (the register and this record). The three demo records that pin it now read 324 with a re-derivation note naming this date and the 2026-10-03 figure, because tests/test_demo_report.py checks the pin against the live scan.",
+  "demo_tests_touched": {
+    "freeze_sweep_scoped_by_path": "tests/test_demo_architecture_seeds.py sweeps all of docs/tier3_project_instantiation for the demo's freeze rule. The MSCA-DN subtree source_materials/msca_dn/ is another instance's Tier 3 and is now excluded by path there; the demo's freeze records are not edited.",
+    "blind_baseline_pin": "docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json carries its eighth amendment moving its pinned scan count to 324, per that record's own convention."
+  },
+  "known_gaps": {
+    "workspace_outside_the_leakage_scan": "runner/leakage_scan.py globs docs/tier3, tier4, tier5 and the vault. workspaces/msca_dn/ holds a Tier 4 intake record and is scanned by nothing. Isolation by path (spec decision 1) also puts the path outside the leakage control. Extending the scanner's roots is a scanner change, not a PE-01 change; recorded for the operator.",
+    "target_call_owner_not_yet_built": "Until PE-02 the baseline target call is a constant in tools/author_msca_dn_workspace.py. A tripwire test fails the moment a harness/profiles/msca_dn*.json exists, so the test is re-pointed at the profile then.",
+    "esr_content_kept_out_of_tier_3": "The register names the ESR by path and hash only. Its scores and text belong to the Tier 4 ESR record of PE-08 (spec decision 12)."
+  },
+  "acceptance_criteria": {
+    "1_every_input_has_a_declared_version_and_role": "MET. Six inputs in the register's provenance.inputs, each with role, version, version markers found in the PDF text, sha256 and page count re-derived by the test.",
+    "2_no_demo_record_is_reachable_from_the_real_graph_root": "MET. build_snapshot(workspaces/msca_dn) reads only the workspace's empty source index, yields zero nodes, and the demo intake id is unreadable from it.",
+    "3_the_candidate_is_nowhere_described_as_the_submitted_version": "MET. is_submitted_document is false in the register and the test scans every authored text for the phrases.",
+    "4_intake_call_id_is_the_historical_call_and_differs_from_the_target": "MET by test, since no engine path checks it."
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "record_type": "fidelity_register",
+  "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml carries no tier3 schema for a fidelity register, and no schema_id is coined for it (CLAUDE.md §16.3), as sources.json says of its own shape. The shape is fixed by tools/author_msca_dn_workspace.py and checked by tests/test_msca_dn_workspace.py.",
+  "artifact_purpose": "The fidelity register of the MSCA-DN pre-evaluation case: what the current assessment artifact is, how it differs from the historical submission, and how much of that difference is measured versus declared. Spec decisions 9 and 18. Its provenance header is referenced by the ESR intake under workspaces/msca_dn/.",
+  "spec": "plans/msca_dn_pre_evaluation_spec.md",
+  "ticket": "PE-01",
+  "provenance": {
+    "kind": "declared",
+    "declared_by": "operator",
+    "declared_on": "2026-10-04",
+    "declared_status": "Assumed",
+    "status_note": "Operator statements about an original that is not stored here carry Assumed status (CLAUDE.md §12.2). An item that the authoring tool checks against the stored files carries its own Confirmed status where it stands. The ESR's content, scores included, is not recorded here: it belongs to the Tier 4 ESR record of PE-08, which no snapshot reads (spec decision 12).",
+    "historical_submission": {
+      "instrument": "MSCA Doctoral Networks",
+      "dn_type": {
+        "value": "standard Doctoral Network, not an Industrial Doctorate and not a Joint Doctorate",
+        "basis": "the sanitised copy states it on p. 32; the tool checks the phrase on that page",
+        "declared_status": "Confirmed"
+      },
+      "call_id": {
+        "value": "HORIZON-MSCA-2025-DN-01",
+        "declared_status": "Assumed",
+        "basis": "operator declaration. The sanitised ESR names no call and no proposal number, and the 2025 work programme is not stored (spec §8).",
+        "owner": "the intake record; never the profile, run label or report"
+      },
+      "submission_id": {
+        "value": "MSCA-DN-2025-PROPOSAL-NUMBER-WITHHELD",
+        "declared_status": "Assumed",
+        "basis": "the proposal number stays with the original inside the private network"
+      }
+    },
+    "current_assessment_artifact": {
+      "path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_final.pdf",
+      "sha256": "5474569f33d20174bfd76f088c10002edf1e82cfdc4fc5a41849f67c0ec1e1ca",
+      "pages": 84,
+      "kind": "sanitised derivative of the historical submission",
+      "is_submitted_document": false,
+      "statement": "This file is not the text the ESR evaluated. It is a derivative produced by sanitisation after evaluation, and no result over it is a result over the submission."
+    },
+    "transformation": {
+      "declared_status": "Assumed",
+      "basis": "operator declaration at PE-01; the body size, table flattening, figure and citation counts are re-checked in the derived half at PE-03",
+      "identifiers": "generalised (project acronym, partner names, people, places)",
+      "prose": "some passages omitted or rephrased",
+      "figures": "all lost; the copy carries zero images on any page",
+      "citations": "all removed; no bracketed numbers, author-year, DOIs, URLs or reference list",
+      "reformatting": {
+        "body_point_size": 12,
+        "table_3_1a": "flattened to label-value lines (WP Number:, WP title:, Lead participant)",
+        "tables_3_1b_to_e": "survived as tables",
+        "bullets": "one bullet per line"
+      },
+      "reflow": {
+        "original_pages": 34,
+        "current_pages": 84,
+        "consequence": "no page-based judgment of length, density or page-limit compliance is admissible from this file (spec §2.11)"
+      }
+    },
+    "relationship_to_esr": {
+      "statement": "Same underlying project, different assessment text. The ESR scored the original; the baseline scores the derivative. A difference from the ESR total is not interpretable as model error: it may be changed wording, removed evidence or assessor variance (spec §1).",
+      "esr_path": "docs/tier3_project_instantiation/source_materials/msca_dn/MSCA DN ESR.pdf",
+      "esr_sha256": "40a885e8aa593367446d5890b040c20bb096bab1c64169c26da2d724225f60bc",
+      "esr_pages": 4
+    },
+    "authoritative_original": {
+      "location": "the private network only",
+      "stored_here": false,
+      "proposal_number": "withheld with the original",
+      "consequence": "fidelity against the original is checkable only at PE-09, inside that network"
+    },
+    "inputs": [
+      {
+        "role_key": "candidate",
+        "role": "Current assessment artifact: a sanitised derivative of the historical submission, reflowed from 34 to 84 pages. Not the submitted text.",
+        "path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_final.pdf",
+        "version": "sanitised derivative, 84 pages (reflow of a 34-page original)",
+        "version_markers": [
+          "standard Doctoral Network"
+        ],
+        "sha256": "5474569f33d20174bfd76f088c10002edf1e82cfdc4fc5a41849f67c0ec1e1ca",
+        "sha256_status": "Confirmed",
+        "sha256_basis": "derived from the stored bytes; re-derived by the test",
+        "pages": 84
+      },
+      {
+        "role_key": "esr",
+        "role": "Historical evaluation: the Evaluation Summary Report of the 2025 submission, project identifiers generalised.",
+        "path": "docs/tier3_project_instantiation/source_materials/msca_dn/MSCA DN ESR.pdf",
+        "version": "ESR, 4 pages",
+        "version_markers": [],
+        "sha256": "40a885e8aa593367446d5890b040c20bb096bab1c64169c26da2d724225f60bc",
+        "sha256_status": "Confirmed",
+        "sha256_basis": "derived from the stored bytes; re-derived by the test",
+        "pages": 4
+      },
+      {
+        "role_key": "evaluation_form",
+        "role": "Instrument schema, evaluation: scoring authority for the baseline.",
+        "path": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+        "version": "V2.2, 17.12.2025",
+        "version_markers": [
+          "Version 2.2",
+          "17.12.2025"
+        ],
+        "sha256": "f7478ef7f1eac4c327c62489b66f0c8531ee890917671442846027f329bfbd2c",
+        "sha256_status": "Confirmed",
+        "sha256_basis": "derived from the stored bytes; re-derived by the test",
+        "pages": 10
+      },
+      {
+        "role_key": "application_form_submission",
+        "role": "Instrument schema, application: the form the 2025 submission was written against. Recorded for the V5.0/V6.0 equivalence of spec §2.12; not the structural authority.",
+        "path": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+        "version": "V5.0, 29.04.2025 (2025 call)",
+        "version_markers": [
+          "V5.0",
+          "29.04.2025",
+          "For the 2025 call"
+        ],
+        "sha256": "b77f148e8875359a64594889c3c4580d10d4024aaf23d949ac67b2b6dcbf03f7",
+        "sha256_status": "Confirmed",
+        "sha256_basis": "derived from the stored bytes; re-derived by the test",
+        "pages": 56
+      },
+      {
+        "role_key": "application_form_baseline",
+        "role": "Instrument schema, application: structural authority for the 2026 baseline.",
+        "path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+        "version": "V6.0, 04.04.2026 (2026 call; footer date, see spec §2.12)",
+        "version_markers": [
+          "V6.0",
+          "04.04.2026",
+          "For the 2026 call"
+        ],
+        "sha256": "f19042696e492ce4a0686b8c20dc0633a12cf7eb2bb8461b3dfc41eb57d4d3bd",
+        "sha256_status": "Confirmed",
+        "sha256_basis": "derived from the stored bytes; re-derived by the test",
+        "pages": 34
+      },
+      {
+        "role_key": "application_form_baseline_rtf",
+        "role": "Same V6.0 template as RTF; recorded so a text-level reading has a pinned source.",
+        "path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).rtf",
+        "version": "V6.0, 04.04.2026 (RTF rendition)",
+        "version_markers": [],
+        "sha256": "00a48b993fe013ac79a09bcf3d2b6d9ac72da6840d355e9d7ff412009c636918",
+        "sha256_status": "Confirmed",
+        "sha256_basis": "derived from the stored bytes; re-derived by the test"
+      }
+    ]
+  },
+  "derived": {
+    "kind": "derived",
+    "status": "pending",
+    "written_by": "PE-03, tools/import_external_proposal.py",
+    "will_hold": [
+      "per-page extraction losses",
+      "figure count (expected zero)",
+      "dependency keyword counts (expected zero for dependenc, interdepend, Gantt, critical path)",
+      "table render results for the surviving tables, their count derived there",
+      "body point-size distribution"
+    ]
+  },
+  "declared": {
+    "kind": "declared",
+    "fields_per_sub_section": [
+      "presence",
+      "transformation"
+    ],
+    "note": "Two independent fields per sub-section: a present but heavily sanitised section is not an absent one (spec decision 9). Filled by the operator beside PE-03's derived half.",
+    "sub_sections": []
+  }
+}
