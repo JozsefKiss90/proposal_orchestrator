@@ -46,6 +46,7 @@ __all__ = [
     "load_profile",
     "default_profile",
     "parse_scoring",
+    "score_resolution_for_scale",
     "profile_version",
 ]
 
@@ -117,13 +118,25 @@ class ComponentPin:
 
 @dataclass(frozen=True)
 class Scoring:
-    """The scorecard's scale, levels, weights and thresholds."""
+    """The scorecard's scale, levels, weights and thresholds.
+
+    ``scale_max`` is the top level key (the per-criterion maximum score);
+    ``score_resolution`` the step a criterion score is awarded in when the
+    scale wording declares one (:func:`score_resolution_for_scale`), else
+    ``None`` — a criterion score is then bounded but not step-checked, and
+    the record says so; ``individual_threshold`` the per-criterion threshold
+    when the scorecard carries one, else ``None`` — a report then says the
+    per-criterion threshold was not checked, never that it was met.
+    """
 
     scale: str
     levels: Mapping[str, str]
     overall_threshold: float
     overall_max: float
     weights: Mapping[str, float]
+    scale_max: float = 5.0
+    score_resolution: float | None = None
+    individual_threshold: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -132,6 +145,9 @@ class Scoring:
             "overall_threshold": self.overall_threshold,
             "overall_max": self.overall_max,
             "weights": dict(self.weights),
+            "scale_max": self.scale_max,
+            "score_resolution": self.score_resolution,
+            "individual_threshold": self.individual_threshold,
         }
 
 
@@ -149,6 +165,11 @@ class PreEvaluationProfile:
     rubric_set: ComponentPin
     document_hash: str
     source_path: Path | None = None
+    #: The criterion appendix mapping file (repo-relative) when the profile
+    #: declares one; the criterion-scoring stage then appends its declared rows
+    #: to each criterion's own section.  ``None`` means every criterion is
+    #: scored over its own section alone.
+    criterion_appendix_mapping: Path | None = None
 
     @property
     def criterion_ids(self) -> tuple[str, ...]:
@@ -276,6 +297,12 @@ def parse_profile(data: Any, *, source_path: Path | None = None) -> PreEvaluatio
     registry_path = Path(_require_str(data, "registry_path", "profile"))
     scorecard = _parse_pin(_require_obj(data, "scorecard", "profile"), "profile scorecard", "scorecard_id")
     rubric_set = _parse_pin(_require_obj(data, "rubric_set", "profile"), "profile rubric_set", "rubric_set_id")
+    mapping_raw = data.get("criterion_appendix_mapping")
+    mapping_path: Path | None = None
+    if mapping_raw is not None:
+        if not isinstance(mapping_raw, Mapping):
+            raise ProfileError("profile criterion_appendix_mapping must be an object.")
+        mapping_path = Path(_require_str(mapping_raw, "path", "profile criterion_appendix_mapping"))
     return PreEvaluationProfile(
         profile_id=profile_id,
         label=label,
@@ -287,6 +314,7 @@ def parse_profile(data: Any, *, source_path: Path | None = None) -> PreEvaluatio
         rubric_set=rubric_set,
         document_hash=canonical_hash(data),
         source_path=source_path,
+        criterion_appendix_mapping=mapping_path,
     )
 
 
@@ -319,12 +347,34 @@ def _number(value: Any, what: str) -> float:
     return float(value)
 
 
+#: The closed rule from a scorecard's ``scale`` wording to the step a score is
+#: awarded in.  The stored forms say "one decimal place" (MSCA) or "half-marks"
+#: (RIA/IA); a synthetic scorecard may name integers.  Any other wording
+#: declares no resolution: the step is then ``None`` and never guessed.
+_SCALE_RESOLUTIONS: tuple[tuple[str, float], ...] = (
+    ("one decimal", 0.1),
+    ("half", 0.5),
+    ("integer", 1.0),
+)
+
+
+def score_resolution_for_scale(scale: str) -> float | None:
+    """The score step the scorecard's ``scale`` wording declares, or ``None``."""
+    lowered = scale.lower()
+    for marker, step in _SCALE_RESOLUTIONS:
+        if marker in lowered:
+            return step
+    return None
+
+
 def parse_scoring(scorecard: Mapping[str, Any], criterion_ids: tuple[str, ...]) -> Scoring:
     """Extract the scale, levels, weights and thresholds of a scorecard, fail-closed.
 
     Every profile criterion must carry a ``weight_pct`` in the scorecard; the
     overall threshold and maximum must be numbers with the threshold within
-    the maximum.
+    the maximum.  The level keys must be integers (the top one is the
+    per-criterion maximum), the scale wording may name a resolution, and an
+    ``individual_threshold``, when present, must lie within the scale.
     """
     scoring = scorecard.get("scoring")
     if not isinstance(scoring, Mapping):
@@ -355,12 +405,34 @@ def parse_scoring(scorecard: Mapping[str, Any], criterion_ids: tuple[str, ...]) 
     missing = [c for c in criterion_ids if c not in weights]
     if missing:
         raise ProfileError(f"scorecard carries no weight_pct for criteria {missing}.")
+    try:
+        level_keys = [int(str(k)) for k in levels_raw]
+    except ValueError as exc:
+        raise ProfileError(
+            f"scorecard scoring: level keys must be integers; got {sorted(levels_raw)}."
+        ) from exc
+    if not level_keys or max(level_keys) <= 0:
+        raise ProfileError("scorecard scoring: levels must name a positive top level.")
+    scale_max = float(max(level_keys))
+    resolution = score_resolution_for_scale(scale)
+    individual_raw = scoring.get("individual_threshold")
+    individual: float | None = None
+    if individual_raw is not None:
+        individual = _number(individual_raw, "individual_threshold")
+        if not 0 < individual <= scale_max:
+            raise ProfileError(
+                f"scorecard scoring: individual_threshold {individual} must lie in "
+                f"(0, {scale_max}]."
+            )
     return Scoring(
         scale=scale,
         levels={str(k): str(v) for k, v in levels_raw.items()},
         overall_threshold=threshold,
         overall_max=maximum,
         weights=weights,
+        scale_max=scale_max,
+        score_resolution=resolution,
+        individual_threshold=individual,
     )
 
 

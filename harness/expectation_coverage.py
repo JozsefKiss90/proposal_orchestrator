@@ -239,6 +239,7 @@ def grade_expectation(
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
     max_token_budget: int | None = MAX_PACK_TOKEN_BUDGET,
     n: int = MIN_MAJORITY_SAMPLES,
+    include_claims: bool = True,
 ) -> CoverageGrade:
     """Build the rubric's evidence pack over *section_path* and grade it.
 
@@ -252,5 +253,6 @@ def grade_expectation(
         token_budget=token_budget,
         span_budget_fraction=span_budget_fraction,
         max_token_budget=max_token_budget,
+        include_claims=include_claims,
     )
     return grade_coverage(judge, rubric, pack, n=n)

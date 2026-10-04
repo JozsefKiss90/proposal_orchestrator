@@ -126,8 +126,16 @@ def _graph_profile(root: Path) -> Path:
     return _write_json(root / "syn/profile.json", profile)
 
 
+CRITERION_JSON = json.dumps(
+    {"score": 4.0, "shortcomings": ["one named shortcoming"], "strengths": ["s"],
+     "rationale": "scripted criterion score"}
+)
+
+
 class RecordingBackend:
-    """Scripted pass; keeps every prompt it was shown and counts calls."""
+    """Scripted pass for cell prompts and a scripted criterion score for the
+    criterion-scoring stage; keeps every prompt it was shown and counts calls.
+    The ESR-text check therefore covers the criterion prompts too."""
 
     def __init__(self):
         self.calls = 0
@@ -136,6 +144,9 @@ class RecordingBackend:
     def __call__(self, messages):
         self.calls += 1
         self.prompts.extend(str(m.get("content", "")) for m in messages)
+        system = "\n".join(str(m.get("content", "")) for m in messages if m.get("role") == "system")
+        if "CRITERION UNDER ASSESSMENT" in system:
+            return {"content": CRITERION_JSON}
         return {"content": PASS_JSON}
 
 
@@ -196,7 +207,10 @@ class TestDocumentRoute:
         assert data["evidence_view"] == "blind_pre_evaluation"
         assert data["scope"] == "complete"
         assert {c["section_id"] for c in data["cells"]} == {"S1", "S2", "S3"}
-        assert backend.calls == 3 * 3
+        # nine cells (3 rubrics x 3 samples) plus the criterion stage the
+        # command runs by default (3 criteria x 5 samples)
+        assert backend.calls == 3 * 3 + 3 * 5
+        assert data["criterion_scoring"]["samples_per_criterion"] == 5
 
     def test_rendered_package_prompts_and_report_hold_no_esr_text(self, world, bundle):
         backend = RecordingBackend()

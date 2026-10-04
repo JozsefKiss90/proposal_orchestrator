@@ -50,6 +50,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
+from harness.appendix_mapping import (
+    AppendixMappingError,
+    CriterionAppendixMapping,
+    load_criterion_appendix_mapping,
+)
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     MAX_PACK_TOKEN_BUDGET,
@@ -183,6 +188,10 @@ class RubricSet:
     scorecard_id: str
     scorecard_version: str
     rubrics: tuple[Rubric, ...]
+    #: The rubric file's ``criterion_appendix_mapping`` pin (path + sha256) when
+    #: it carries one.  Read by :func:`load_profile_bundle`; not part of the
+    #: fingerprint, because the mapping rule bumps the set version on change.
+    appendix_mapping_pin: Mapping[str, Any] | None = None
 
     def by_key(self) -> dict[str, Rubric]:
         """The rubrics keyed by ``expectation_key`` (substrate order preserved)."""
@@ -378,12 +387,16 @@ def load_rubric_set(
             )
         )
 
+    pin_raw = data.get("criterion_appendix_mapping")
+    if pin_raw is not None and not isinstance(pin_raw, Mapping):
+        raise RubricError(f"rubric set {path}: criterion_appendix_mapping must be an object.")
     return RubricSet(
         rubric_set_id=set_id,
         version=version,
         scorecard_id=sc_id,
         scorecard_version=sc_version,
         rubrics=tuple(ordered),
+        appendix_mapping_pin=dict(pin_raw) if pin_raw is not None else None,
     )
 
 
@@ -406,6 +419,9 @@ class ProfileBundle:
     scoring: Scoring
     scorecard_hash: str
     version: str
+    #: The criterion appendix mapping when the profile declares one, loaded
+    #: against the rubric set's sha256 pin; ``None`` when the profile has none.
+    appendix_mapping: CriterionAppendixMapping | None = None
 
     @property
     def profile_id(self) -> str:
@@ -463,6 +479,18 @@ def load_profile_bundle(
     except ProfileError as exc:
         raise RubricError(str(exc)) from exc
     scorecard_hash = canonical_hash(scorecard_data)
+    mapping: CriterionAppendixMapping | None = None
+    if profile.criterion_appendix_mapping is not None:
+        mapping_pin = rubric_set.appendix_mapping_pin or {}
+        try:
+            mapping = load_criterion_appendix_mapping(
+                profile.resolve(profile.criterion_appendix_mapping, repo_root),
+                expected_sha256=mapping_pin.get("sha256"),
+                rubric_set_id=rubric_set.rubric_set_id,
+                rubric_set_version=rubric_set.version,
+            )
+        except AppendixMappingError as exc:
+            raise RubricError(str(exc)) from exc
     return ProfileBundle(
         profile=profile,
         substrate=substrate,
@@ -474,6 +502,7 @@ def load_profile_bundle(
             scorecard_hash=scorecard_hash,
             rubric_set_fingerprint=rubric_set.fingerprint,
         ),
+        appendix_mapping=mapping,
     )
 
 
@@ -489,6 +518,7 @@ def build_pack_for(
     token_budget: int = DEFAULT_PACK_TOKEN_BUDGET,
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
     max_token_budget: int | None = MAX_PACK_TOKEN_BUDGET,
+    include_claims: bool = True,
 ) -> EvidencePack:
     """Build the evidence pack for *rubric* over one section artifact.
 
@@ -506,6 +536,7 @@ def build_pack_for(
         token_budget=token_budget,
         max_token_budget=max_token_budget,
         span_budget_fraction=span_budget_fraction,
+        include_claims=include_claims,
     )
 
 

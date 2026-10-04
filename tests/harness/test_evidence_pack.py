@@ -376,3 +376,62 @@ class TestRealSections:
                 rubric.expectation_key,
                 overhead,
             )
+
+
+# --------------------------------------------------------------------------- #
+# include_claims — decision 6: the blind DN lane withholds the ledger
+# --------------------------------------------------------------------------- #
+
+
+class TestIncludeClaims:
+    def test_default_is_unchanged_and_recorded(self, section_path):
+        pack = _build(section_path)
+        assert pack.include_claims is True
+        assert pack.claims  # the fixture ledger has matching entries
+        assert pack.to_dict()["include_claims"] is True
+
+    def test_no_claim_is_loaded_rendered_or_charged(self, section_path, monkeypatch):
+        calls: list[Path] = []
+        real = ep.load_section_claims
+
+        def spy(path):
+            calls.append(Path(path))
+            return real(path)
+
+        monkeypatch.setattr(ep, "load_section_claims", spy)
+        pack = _build(section_path, include_claims=False)
+        assert calls == [], "the ledger must not be opened when claims are withheld"
+        assert pack.claims == ()
+        assert pack.include_claims is False
+        assert all(e.kind != ep.KIND_CLAIM for e in pack.excluded)
+        rendered = pack.render()
+        assert "C01" not in rendered and "C02" not in rendered
+        assert ep.CLAIMS_WITHHELD_DIVIDER in rendered
+        assert ep.CLAIM_DIVIDER not in rendered
+        assert pack.to_dict()["include_claims"] is False
+
+    def test_a_ledgerless_section_still_builds_when_claims_are_withheld(self, tmp_path):
+        data = _section_data()
+        del data["validation_status"]
+        p = tmp_path / "excellence_section.json"
+        p.write_text(json.dumps(data), encoding="utf-8")
+        with pytest.raises(Exception):
+            _build(p)  # the default path keeps failing closed on an absent ledger
+        pack = _build(p, include_claims=False)
+        assert pack.status == ep.PACK_COMPLETE
+        assert pack.spans
+
+    def test_prose_receives_the_whole_usable_budget(self, section_path):
+        # 140 tokens: the span fraction (0.6) truncates prose when claims
+        # share the budget, and loose enough that prose alone fits.
+        with_claims = _build(section_path, token_budget=140)
+        without = _build(section_path, token_budget=140, include_claims=False)
+        kept_with = {s.key for s in with_claims.spans}
+        kept_without = {s.key for s in without.spans}
+        assert kept_with < kept_without
+        assert any(
+            e.kind == ep.KIND_PROSE_SPAN and e.reason == ep.EXCLUDED_OVER_BUDGET
+            for e in with_claims.excluded
+        )
+        assert without.status == ep.PACK_COMPLETE
+        assert without.token_estimate <= 140

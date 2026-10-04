@@ -76,6 +76,7 @@ __all__ = [
     "KIND_CLAIM",
     "SPAN_DIVIDER",
     "CLAIM_DIVIDER",
+    "CLAIMS_WITHHELD_DIVIDER",
     "EvidencePackError",
     "estimate_tokens",
     "normalize_terms",
@@ -306,6 +307,14 @@ class ExcludedItem:
 SPAN_DIVIDER: str = "=== PROSE SPANS (verbatim from the section under assessment) ===\n\n"
 CLAIM_DIVIDER: str = "=== CLAIM-LEDGER ENTRIES (status and source_ref as recorded) ===\n\n"
 
+#: The divider that replaces :data:`CLAIM_DIVIDER` when the pack was built with
+#: ``include_claims=False``: the ledger was never opened, so grounding is
+#: unassessable from this pack and the rubric's substantiation step must say so.
+CLAIMS_WITHHELD_DIVIDER: str = (
+    "=== CLAIM-LEDGER ENTRIES: none - the ledger is withheld from this lane; "
+    "grounding is UNASSESSABLE from this pack ===\n\n"
+)
+
 
 def _render_header(expectation_key: str, section_id: str, status: str) -> str:
     return (
@@ -317,9 +326,19 @@ def _render_header(expectation_key: str, section_id: str, status: str) -> str:
     )
 
 
-def _render_frame(expectation_key: str, section_id: str, status: str) -> str:
+def _claim_divider(include_claims: bool) -> str:
+    return CLAIM_DIVIDER if include_claims else CLAIMS_WITHHELD_DIVIDER
+
+
+def _render_frame(
+    expectation_key: str, section_id: str, status: str, include_claims: bool = True
+) -> str:
     """The pack's fixed wrapper text (header + the two dividers)."""
-    return _render_header(expectation_key, section_id, status) + SPAN_DIVIDER + CLAIM_DIVIDER
+    return (
+        _render_header(expectation_key, section_id, status)
+        + SPAN_DIVIDER
+        + _claim_divider(include_claims)
+    )
 
 
 @dataclass(frozen=True)
@@ -344,6 +363,10 @@ class EvidencePack:
     excluded: tuple[ExcludedItem, ...]
     selection_terms: tuple[str, ...]
     anchor_sub_section_ids: tuple[str, ...]
+    #: Whether the claim ledger was loaded into this pack.  ``False`` means the
+    #: ledger was never opened (blind-lane spec decision 6): no claim was
+    #: rendered or charged, and grounding is unassessable from the pack.
+    include_claims: bool = True
 
     @property
     def is_empty(self) -> bool:
@@ -361,7 +384,7 @@ class EvidencePack:
             SPAN_DIVIDER,
         ]
         parts.extend(s.render() for s in self.spans)
-        parts.append(CLAIM_DIVIDER)
+        parts.append(_claim_divider(self.include_claims))
         parts.extend(c.render() for c in self.claims)
         return "".join(parts)
 
@@ -380,6 +403,7 @@ class EvidencePack:
             "status": self.status,
             "token_budget": self.token_budget,
             "token_estimate": self.token_estimate,
+            "include_claims": self.include_claims,
             "selection_terms": list(self.selection_terms),
             "anchor_sub_section_ids": list(self.anchor_sub_section_ids),
             "spans": [
@@ -510,6 +534,7 @@ def build_evidence_pack(
     token_budget: int = DEFAULT_PACK_TOKEN_BUDGET,
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
     max_token_budget: int | None = MAX_PACK_TOKEN_BUDGET,
+    include_claims: bool = True,
 ) -> EvidencePack:
     """Deterministically build the evidence pack for one ``(expectation, section)``.
 
@@ -532,6 +557,14 @@ def build_evidence_pack(
     with no per-minute token ceiling, where *token_budget* alone governs; the
     selection pipeline is unchanged either way, and a pack that does not fit
     still reports :data:`PACK_INSUFFICIENT_CONTEXT` rather than growing.
+
+    *include_claims* ``False`` withholds the claim ledger structurally (blind-lane
+    spec decision 6): ``load_section_claims`` is never called, so a section
+    without a ledger builds, no claim is rendered or charged to the budget, and
+    prose receives the whole usable budget instead of *span_budget_fraction*
+    of it.  The pack records the choice (``include_claims``) and renders
+    :data:`CLAIMS_WITHHELD_DIVIDER` in place of the ledger, so the rubric's
+    substantiation step reports grounding unassessable rather than failed.
 
     Raises :class:`EvidencePackError` on an unusable section artifact, a
     declared anchor absent from the section, an empty term list, or a budget
@@ -571,7 +604,7 @@ def build_evidence_pack(
             f"(has: {sorted(known_ids)}) — the anchor map must fail closed, not "
             "silently stop matching."
         )
-    claims = load_section_claims(path)
+    claims: Sequence[SectionClaim] = load_section_claims(path) if include_claims else ()
 
     # -- score every candidate ------------------------------------------- #
     span_candidates: list[tuple[int, int, ProseSpan]] = []  # (score, doc_order, span)
@@ -625,7 +658,7 @@ def build_evidence_pack(
 
     # -- budget fill ------------------------------------------------------ #
     frame_tokens = estimate_tokens(
-        _render_frame(expectation_key, section_id, PACK_INSUFFICIENT_CONTEXT)
+        _render_frame(expectation_key, section_id, PACK_INSUFFICIENT_CONTEXT, include_claims)
     )
     usable = token_budget - frame_tokens
     if usable <= 0:
@@ -641,7 +674,9 @@ def build_evidence_pack(
     # conservative: a span excluded here is over the *span* budget even if
     # claim budget goes unused — the split biases toward declaring
     # insufficient_context rather than quietly re-balancing the pack shape.
-    span_budget = int(usable * span_budget_fraction)
+    # With the ledger withheld there is nothing for the remainder to carry, so
+    # prose takes the whole usable budget (decision 6).
+    span_budget = int(usable * span_budget_fraction) if include_claims else usable
     included_spans, spans_used, spans_truncated = _fill_budget(
         span_candidates, span_budget, KIND_PROSE_SPAN, excluded
     )
@@ -665,4 +700,5 @@ def build_evidence_pack(
         excluded=tuple(excluded),
         selection_terms=terms,
         anchor_sub_section_ids=anchors,
+        include_claims=include_claims,
     )

@@ -59,6 +59,7 @@ from harness.evidence_pack import (
     UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
     EvidencePackError,
 )
+from harness.criterion_scoring import DEFAULT_CRITERION_SAMPLES, CriterionScoringError
 from harness.expectation_coverage import CoverageError
 from harness.expectations import ExpectationError
 from harness.judge import Judge, JudgeError
@@ -77,6 +78,7 @@ _CLI_ERRORS = (
     ExpectationError,
     EvidencePackError,
     CoverageError,
+    CriterionScoringError,
     DeterministicCoverageError,
     JudgeError,
     OSError,
@@ -187,6 +189,37 @@ def _parser() -> argparse.ArgumentParser:
     p_assess.add_argument("--span-fraction", type=float, default=DEFAULT_SPAN_BUDGET_FRACTION)
     p_assess.add_argument("--n", type=int, default=MIN_MAJORITY_SAMPLES,
                           help="assessor samples per verdict (majority; N>=3)")
+    p_assess.add_argument(
+        "--no-claims", action="store_true",
+        help=(
+            "withhold the claim ledger from every cell's evidence pack: no claim is "
+            "loaded, rendered or charged, prose gets the whole budget, and each "
+            "cell's grounding reads unassessable (spec decision 6; the blind lane "
+            "over an imported proposal passes this)"
+        ),
+    )
+    p_assess.add_argument(
+        "--criterion-n", type=int, default=DEFAULT_CRITERION_SAMPLES,
+        help=(
+            "assessor samples per criterion score (median and spread reported; "
+            f"default {DEFAULT_CRITERION_SAMPLES}, minimum {MIN_MAJORITY_SAMPLES}). "
+            "The criterion scorer reads each criterion's complete section verbatim "
+            "plus its declared appendix rows, never a pack"
+        ),
+    )
+    p_assess.add_argument(
+        "--skip-criterion-scores", action="store_true",
+        help="run the cells only; write no criterion scores and no total",
+    )
+    p_assess.add_argument(
+        "--criterion-budget", type=int, default=UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
+        help=(
+            "token budget for one criterion's complete input (section plus declared "
+            f"appendix). Default {UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET}, the uncapped "
+            "assessor budget; an input that does not fit is reported not scored, "
+            "never truncated. Lower it only on a transport with a per-minute ceiling"
+        ),
+    )
     p_assess.add_argument("--tpm", type=int, default=_env_int("HARNESS_TPM_BUDGET", 5500))
     p_assess.add_argument("--rpm", type=int, default=_env_int("HARNESS_RPM_BUDGET", 28))
     p_assess.add_argument("--max-retries", type=int, default=_env_int("HARNESS_MAX_RETRIES", 6))
@@ -313,6 +346,9 @@ def main(
             span_budget_fraction=args.span_fraction,
             n=args.n,
             clock=clock,
+            include_claims=not args.no_claims,
+            criterion_samples=None if args.skip_criterion_scores else args.criterion_n,
+            criterion_token_budget=args.criterion_budget,
         )
         path = write_report(report, out_dir)
         data = report.to_dict()

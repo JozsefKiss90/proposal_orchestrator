@@ -350,7 +350,19 @@ records Part B2 section 11 (RAISE DN), which is no evaluation-form aspect and
 belongs to another call. `criterion_appendix_mapping_msca_dn.json` names the
 table rows each criterion receives beyond its own section at the criterion-grading
 stage. The rubric set pins that file's sha256, so a change to the mapping is a
-rubric-set change and never a scoring-time assembly. The profile also owns the
+rubric-set change and never a scoring-time assembly. A profile declares the
+mapping under `criterion_appendix_mapping.path`; `load_profile_bundle` loads it
+against the rubric set's pin (`appendix_mapping.py`) and refuses a drifted or
+unpinned file. Resolution is by candidate sub-section: the import flattened
+Table 3.1 a to prose and section 8 carries no rows, so a finer locator would
+fail on the rows that matter.
+
+`Scoring` also carries `scale_max` (the top level key), `score_resolution`
+(from the scale wording: one decimal place, half-marks, or integers; any other
+wording declares none and the step is not checked, which the aggregate records)
+and `individual_threshold` when the scorecard states one. The criterion-scoring
+stage bounds every assessor score by the first, steps it by the second when
+declared, and checks the third. The profile also owns the
 baseline's target call (`target_call`), derived from the Tier 2B work-programme
 extract, which the ESR intake never carries. `tests/harness/test_msca_dn_profile.py`
 re-derives all of it and pins the RIA and MSCA-PF registry entries by hash, since
@@ -423,6 +435,40 @@ rubric's versioned pack, an N≥3 majority panel, provenance per sample. A
 malformed assessor response fails the run through the judge's no-repair rule
 and no report is written. Grounding (E5d) is not part of the blind lane: an
 evaluator sees the candidate, not the Tier-3 sources behind it.
+
+**Two values per cell.** A cell reports `addressal` (the coverage verdict)
+and `grounding` beside it: `in_verdict` when the pack carried claim-ledger
+entries, `unassessable` when it carried none. `--no-claims` withholds the
+ledger structurally (`include_claims=False` on `build_evidence_pack`): the
+ledger file is never opened, no claim is rendered or charged, prose receives
+the whole usable budget, and the pack renders a divider saying grounding is
+unassessable. The report records `include_claims`. An imported proposal whose
+ledger is not trustworthy for grounding is assessed this way; the integrity
+audit owns that axis.
+
+**Criterion scores (`criterion_scoring.py`).** A separate stage after the
+cells produces the holistic 0–5 score per criterion, because scores are
+awarded for criteria and not for aspects (General Annexes Part 15). The scorer
+reads the criterion's **complete section verbatim**, never a pack, plus the
+sub-sections the profile's criterion appendix mapping declares
+(`appendix_mapping.py`, sha256-pinned by the rubric set). Every score names
+its complete input by hash (`input_hash`, section and appendix together;
+`section_hash`, the section alone) and records the mapping version. An input
+with a missing section, an unresolved declared row or more tokens than the
+budget is reported incomplete and **not scored**. Nothing is truncated. The
+stage has its own budget (`--criterion-budget`, default the uncapped 32768),
+because whole sections are the point of the lane. The
+cells of the criterion accompany the section as advisory findings and can
+never replace it: an input without section text is refused. Five samples per
+criterion by default (`--criterion-n`); the median is the score and the spread
+is labelled **within-assessor repeatability**, which is all five samples of one
+pinned assessor can measure. The total follows the scorecard
+(`S = 10E + 6I + 4Q` on the MSCA form, a plain sum on an unweighted one) and
+both thresholds, per criterion and overall, are checked and reported. Every
+criterion score is bound to the report like a cell; `verify` checks the
+binding. `--skip-criterion-scores` runs the cells only. The library default
+(`assess_candidate(criterion_samples=None)`) skips the stage; the command runs
+it.
 
 **Immutability.** The writer never overwrites: a rerun writes the next
 sequence number for the same candidate hash and earlier reports stay

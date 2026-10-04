@@ -301,6 +301,17 @@ class Judge:
         self._clock = clock or _default_clock
 
     @property
+    def clock(self) -> Clock:
+        """The timestamp source provenance records carry (read-only).
+
+        Exposed for the same reason as :attr:`provenance_log`: a caller that
+        drives :meth:`raw_invoke` for a verdict the default schema cannot carry
+        (a 0-5 criterion score, say) hand-builds its provenance with the same
+        clock the judge would have used, so its trail stays comparable.
+        """
+        return self._clock
+
+    @property
     def provenance_log(self) -> ProvenanceLog | None:
         """The attached provenance log, if any (read-only).
 

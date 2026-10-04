@@ -412,7 +412,7 @@ class TestCommand:
             ["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
              "--profile", str(bundle.profile.source_path)],
-            judge=_judge(tmp_path, ScriptedBackend()),
+            judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
         assert code == 0
@@ -438,7 +438,7 @@ class TestCommand:
             ["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
              "--profile", str(bundle.profile.source_path)],
-            judge=_judge(tmp_path, ScriptedBackend()),
+            judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
         (path,) = list(out.iterdir())
@@ -460,7 +460,7 @@ class TestCommand:
             ["assess", "--candidate", str(candidate), "--out-dir", str(tmp_path / "r"),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
              "--profile", str(bundle.profile.source_path)],
-            judge=_judge(tmp_path, ScriptedBackend()),
+            judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
         assert code == 1
@@ -470,3 +470,176 @@ class TestCommand:
 
         assert "blind_assessment" in commands
         assert not (REPO_ROOT / "scripts" / "blind_assessment.py").exists()
+
+
+# --------------------------------------------------------------------------- #
+# PE-04: include_claims, the two-value cell, and the criterion-scoring stage
+# --------------------------------------------------------------------------- #
+
+CRITERION_JSON = json.dumps(
+    {"score": 4.0, "shortcomings": ["one named shortcoming"], "strengths": ["s"],
+     "rationale": "scripted criterion score"}
+)
+
+
+class DualBackend:
+    """Cell JSON for rubric prompts, criterion JSON for criterion prompts; counts both."""
+
+    def __init__(self, cell: str = PASS_JSON, criterion: str = CRITERION_JSON):
+        self.cell, self.criterion = cell, criterion
+        self.calls = self.cell_calls = self.criterion_calls = 0
+        self.prompts: list[tuple[str, str]] = []
+
+    def __call__(self, messages):
+        system = "\n".join(m["content"] for m in messages if m["role"] == "system")
+        user = "\n".join(m["content"] for m in messages if m["role"] == "user")
+        self.prompts.append((system, user))
+        self.calls += 1
+        if "CRITERION UNDER ASSESSMENT" in system:
+            self.criterion_calls += 1
+            return {"content": self.criterion}
+        self.cell_calls += 1
+        return {"content": self.cell}
+
+
+class TestCriterionScoringInReport:
+    def test_the_library_default_scores_no_criteria_and_includes_claims(self, tmp_path, bundle):
+        report = _assess(tmp_path, bundle, _candidate(tmp_path, bundle))
+        assert report.criterion_scoring is None
+        assert report.include_claims is True
+        data = report.to_dict()
+        assert data["criterion_scoring"] is None
+        assert data["include_claims"] is True
+        for cell in data["cells"]:
+            assert cell["addressal"] == cell["covered"]
+            assert cell["grounding"] == ba.GROUNDING_IN_VERDICT
+
+    def test_criterion_scores_are_bound_and_total_follows_the_scorecard(self, tmp_path, bundle):
+        backend = DualBackend()
+        candidate = _candidate(tmp_path, bundle)
+        report = ba.assess_candidate(
+            _judge(tmp_path, backend), bundle, candidate, clock=lambda: FROZEN, criterion_samples=5
+        )
+        assert backend.cell_calls == 3 * len(bundle.rubric_set.rubrics)
+        assert backend.criterion_calls == 5 * len(bundle.profile.criteria)
+        cs = report.criterion_scoring
+        assert cs is not None
+        assert cs.samples_per_criterion == 5
+        # weights 60/25/15 over 0-10 to 100 -> factors 6, 2.5, 1.5; every score 4.0
+        assert cs.total == pytest.approx(4.0 * (6 + 2.5 + 1.5))
+        assert cs.formula == "S = 6*novelty + 2.5*reach + 1.5*feasibility"
+        assert cs.overall_threshold_met is False  # 40 < 60
+        assert cs.individual_threshold is None and cs.individual_thresholds_met is None
+        for score in cs.scores:
+            assert score.candidate_hash == report.candidate_hash
+            assert score.profile_version == report.profile_version
+            assert score.assessor_pin == report.assessor_pin
+            assert score.aspect_findings_attached is True
+            assert score.input_hash.startswith("sha256:")
+        data = report.to_dict()
+        assert data["criterion_scoring"]["total"] == pytest.approx(40.0)
+        assert all(s["candidate_hash"] == report.candidate_hash for s in data["criterion_scoring"]["scores"])
+        rendered = ba.render_report(data)
+        assert "CRITERION SCORES" in rendered and "40.00" in rendered
+
+    def test_the_criterion_scorer_reads_the_section_and_the_findings_follow_it(self, tmp_path, bundle):
+        backend = DualBackend()
+        ba.assess_candidate(
+            _judge(tmp_path, backend), bundle, _candidate(tmp_path, bundle),
+            clock=lambda: FROZEN, criterion_samples=3,
+        )
+        criterion_prompts = [(s, u) for s, u in backend.prompts if "CRITERION UNDER ASSESSMENT" in s]
+        assert criterion_prompts
+        for _system, user in criterion_prompts:
+            assert TEXT.split("\n\n")[0] in user          # the section, verbatim
+            assert "EVIDENCE PACK" not in user            # never a pack
+            assert "HARNESS FINDINGS" in user             # the cells accompany it
+            assert user.index("CRITERION SECTION") < user.index("HARNESS FINDINGS")
+
+    def test_a_partial_candidate_leaves_the_total_undetermined(self, tmp_path, bundle):
+        report = ba.assess_candidate(
+            _judge(tmp_path, DualBackend()), bundle, _candidate(tmp_path, bundle, drop="reach_section"),
+            clock=lambda: FROZEN, criterion_samples=3,
+        )
+        cs = report.criterion_scoring
+        assert cs.total is None and cs.overall_threshold_met is None
+        assert cs.unscored_criteria == ("reach",)
+        reach = next(s for s in cs.scores if s.criterion_id == "reach")
+        assert reach.status == "not_scored" and reach.samples == ()
+
+    def test_report_refuses_a_criterion_score_bound_to_another_candidate(self, tmp_path, bundle):
+        import dataclasses
+
+        report = ba.assess_candidate(
+            _judge(tmp_path, DualBackend()), bundle, _candidate(tmp_path, bundle),
+            clock=lambda: FROZEN, criterion_samples=3,
+        )
+        cs = report.criterion_scoring
+        foreign = dataclasses.replace(cs.scores[0], candidate_hash="sha256:" + "0" * 64)
+        tampered = dataclasses.replace(cs, scores=(foreign,) + cs.scores[1:])
+        kwargs = {k: getattr(report, k) for k in report.__dataclass_fields__}
+        with pytest.raises(ValueError, match="criterion score"):
+            ba.BlindAssessmentReport(**{**kwargs, "criterion_scoring": tampered})
+
+    def test_loaded_report_rejects_a_criterion_score_with_a_foreign_pin(self, tmp_path, bundle):
+        candidate = _candidate(tmp_path, bundle)
+        report = ba.assess_candidate(
+            _judge(tmp_path, DualBackend()), bundle, candidate, clock=lambda: FROZEN, criterion_samples=3
+        )
+        path = ba.write_report(report, tmp_path / "reports")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["criterion_scoring"]["scores"][0]["assessor_pin"] = "other@pin"
+        tampered = _write_json(tmp_path / "tampered.json", data)
+        with pytest.raises(ba.BlindAssessmentError, match="assessor_pin"):
+            ba.load_report(tampered, candidate, bundle.profile)
+        assert ba.load_report(path, candidate, bundle.profile)["criterion_scoring"]["total"] is not None
+
+    def test_no_claims_withholds_the_ledger_and_marks_grounding_unassessable(self, tmp_path, bundle):
+        report = ba.assess_candidate(
+            _judge(tmp_path, ScriptedBackend()), bundle, _candidate(tmp_path, bundle),
+            clock=lambda: FROZEN, include_claims=False,
+        )
+        assert report.include_claims is False
+        for cell in report.cells:
+            assert cell.coverage.pack_record["include_claims"] is False
+            assert cell.coverage.pack_record["claims"] == []
+            assert cell.to_dict()["grounding"] == ba.GROUNDING_UNASSESSABLE
+        assert report.to_dict()["include_claims"] is False
+
+
+class TestCommandCriterionScoring:
+    def _args(self, bundle, candidate, out):
+        return ["assess", "--candidate", str(candidate), "--out-dir", str(out),
+                "--repo-root", str(bundle.profile.source_path.parents[1]),
+                "--profile", str(bundle.profile.source_path)]
+
+    def test_assess_scores_criteria_by_default_with_five_samples(self, tmp_path, bundle):
+        backend = DualBackend()
+        out = tmp_path / "reports"
+        code = cmd.main(self._args(bundle, _candidate(tmp_path, bundle), out),
+                        judge=_judge(tmp_path, backend), clock=lambda: FROZEN)
+        assert code == 0
+        (path,) = list(out.iterdir())
+        data = json.loads(path.read_text(encoding="utf-8"))
+        assert data["criterion_scoring"]["samples_per_criterion"] == 5
+        assert backend.criterion_calls == 5 * len(bundle.profile.criteria)
+        assert data["include_claims"] is True
+
+    def test_skip_and_no_claims_flags(self, tmp_path, bundle):
+        out = tmp_path / "reports"
+        code = cmd.main(
+            self._args(bundle, _candidate(tmp_path, bundle), out) + ["--skip-criterion-scores", "--no-claims"],
+            judge=_judge(tmp_path, ScriptedBackend()), clock=lambda: FROZEN,
+        )
+        assert code == 0
+        (path,) = list(out.iterdir())
+        data = json.loads(path.read_text(encoding="utf-8"))
+        assert data["criterion_scoring"] is None
+        assert data["include_claims"] is False
+
+    def test_criterion_n_below_the_minimum_exits_2(self, tmp_path, bundle):
+        out = tmp_path / "reports"
+        code = cmd.main(self._args(bundle, _candidate(tmp_path, bundle), out) + ["--criterion-n", "2"],
+                        judge=_judge(tmp_path, DualBackend()), clock=lambda: FROZEN)
+        assert code == 2
+        assert not out.exists() or not list(out.iterdir())

@@ -62,6 +62,7 @@ Constitutional authority:
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import re
 from dataclasses import dataclass
@@ -87,6 +88,13 @@ from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
     MAX_PACK_TOKEN_BUDGET,
+    UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
+)
+from harness.criterion_scoring import (
+    CriterionScoring,
+    build_criterion_input,
+    combine_criterion_scores,
+    grade_criterion,
 )
 from harness.expectation_coverage import CoverageGrade, grade_expectation
 from harness.judge import Judge
@@ -109,6 +117,8 @@ __all__ = [
     "DEFAULT_PACKAGE_BUDGET",
     "EVIDENCE_SOURCE_DEV_GRAPH",
     "EVIDENCE_SOURCE_DIRECTORY",
+    "GROUNDING_IN_VERDICT",
+    "GROUNDING_UNASSESSABLE",
     "BlindAssessmentError",
     "CandidateHashMismatch",
     "LeakageError",
@@ -177,6 +187,14 @@ DEFAULT_PACKAGE_BUDGET: int = 200_000
 
 #: Where the document route materialises candidates, under the reports dir.
 _CANDIDATES_SUBDIR: str = "candidates"
+
+#: The cell's second value (spec decision 4).  ``in_verdict``: the pack carried
+#: claim-ledger entries, so the coverage verdict judged addressal and grounding
+#: together.  ``unassessable``: the pack carried no ledger — withheld
+#: (``include_claims=False``) or empty — so grounding is neither passed nor
+#: failed, and the addressal value must not be read as a clean score of both.
+GROUNDING_IN_VERDICT: str = "in_verdict"
+GROUNDING_UNASSESSABLE: str = "unassessable"
 
 Clock = Callable[[], str]
 
@@ -543,7 +561,17 @@ class BlindCell:
     assessor_pin: str
     coverage: CoverageGrade
 
+    @property
+    def grounding(self) -> str:
+        """The cell's grounding value: :data:`GROUNDING_UNASSESSABLE` when the
+        pack carried no claim-ledger entry, else :data:`GROUNDING_IN_VERDICT`."""
+        record = self.coverage.pack_record
+        if not record.get("include_claims", True) or not record.get("claims"):
+            return GROUNDING_UNASSESSABLE
+        return GROUNDING_IN_VERDICT
+
     def to_dict(self) -> dict[str, Any]:
+        covered = self.coverage.judge_passed is True
         return {
             "criterion_id": self.criterion_id,
             "expectation_key": self.expectation_key,
@@ -551,11 +579,30 @@ class BlindCell:
             "candidate_hash": self.candidate_hash,
             "profile_version": self.profile_version,
             "assessor_pin": self.assessor_pin,
-            "covered": self.coverage.judge_passed is True,
+            "covered": covered,
+            "addressal": covered,
+            "grounding": self.grounding,
             "clean_pass": self.coverage.passed,
             "score": self.coverage.score,
             "coverage": self.coverage.to_dict(),
         }
+
+
+#: The three fields that tie a cell or a criterion score to its report.
+_BINDING_FIELDS: tuple[str, ...] = ("candidate_hash", "profile_version", "assessor_pin")
+
+
+def _check_binding(
+    item: Mapping[str, Any], report: Mapping[str, Any], label: str, error: type[Exception]
+) -> None:
+    """Raise *error* unless *item* carries the report's three binding fields."""
+    for attr in _BINDING_FIELDS:
+        if item.get(attr) != report.get(attr):
+            raise error(
+                f"{label} carries {attr} {item.get(attr)!r}, the report {report.get(attr)!r} — "
+                "every cell and criterion score must be bound to the report's candidate, "
+                "profile and assessor."
+            )
 
 
 #: The advisory boundary sentence stamped on every report.
@@ -601,6 +648,10 @@ class BlindAssessmentReport:
     policy_version: str = ""
     evidence_view: str = ""
     evidence_source: str = EVIDENCE_SOURCE_DIRECTORY
+    #: Whether the cells' packs carried the claim ledger (spec decision 6).
+    include_claims: bool = True
+    #: The criterion-scoring stage (spec PE-04), when it ran.
+    criterion_scoring: CriterionScoring | None = None
     notes: str = _ADVISORY_NOTE
     advisory: bool = True
     blocking: bool = False
@@ -639,14 +690,14 @@ class BlindAssessmentReport:
                 "scope must be 'partial' exactly when partial_coverage is non-empty."
             )
         for cell in self.cells:
-            for attr in ("candidate_hash", "profile_version", "assessor_pin"):
-                if getattr(cell, attr) != getattr(self, attr):
-                    raise ValueError(
-                        f"cell {cell.expectation_key}/{cell.section_id} carries "
-                        f"{attr} {getattr(cell, attr)!r}, the report "
-                        f"{getattr(self, attr)!r} — every cell must be bound to the "
-                        "report's candidate, profile and assessor."
-                    )
+            _check_binding(
+                cell.__dict__, self.__dict__, f"cell {cell.expectation_key}/{cell.section_id}", ValueError
+            )
+        if self.criterion_scoring is not None:
+            for score in self.criterion_scoring.scores:
+                _check_binding(
+                    score.__dict__, self.__dict__, f"criterion score {score.criterion_id}", ValueError
+                )
 
     @property
     def summary(self) -> dict[str, Any]:
@@ -707,9 +758,13 @@ class BlindAssessmentReport:
             "policy_version": self.policy_version,
             "evidence_view": self.evidence_view,
             "evidence_source": self.evidence_source,
+            "include_claims": self.include_claims,
             "notes": self.notes,
             "summary": self.summary,
             "cells": [c.to_dict() for c in self.cells],
+            "criterion_scoring": (
+                self.criterion_scoring.to_dict() if self.criterion_scoring is not None else None
+            ),
         }
 
 
@@ -750,6 +805,9 @@ def assess_candidate(
     max_token_budget: int | None = MAX_PACK_TOKEN_BUDGET,
     n: int = MIN_MAJORITY_SAMPLES,
     clock: Clock | None = None,
+    include_claims: bool = True,
+    criterion_samples: int | None = None,
+    criterion_token_budget: int = UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
 ) -> BlindAssessmentReport:
     """Assess one candidate against *bundle* with *judge*; return the bound report.
 
@@ -764,6 +822,20 @@ def assess_candidate(
 
     *intake*, when given, must permit a blind assessment and concern the
     assessed document; its ESR availability is stamped on the report.
+
+    *include_claims* ``False`` withholds the claim ledger from every cell's
+    pack (spec decision 6); the report records the choice and each cell's
+    grounding reads unassessable.  *criterion_samples*, when given, runs the
+    criterion-scoring stage (:mod:`harness.criterion_scoring`) after the
+    cells: each criterion's complete section plus its declared appendix,
+    that many samples, the cells of the criterion attached as advisory
+    findings, every score bound to this report.  ``None`` skips the stage;
+    the module command runs it by default with
+    :data:`~harness.criterion_scoring.DEFAULT_CRITERION_SAMPLES`.  The stage
+    has its own budget, *criterion_token_budget*: whole sections are the
+    point of the lane, so it defaults to the uncapped assessor budget rather
+    than the cells' pack budget, and an input that does not fit is reported
+    not scored rather than cut.
     """
     if n < MIN_MAJORITY_SAMPLES:
         raise BlindAssessmentError(
@@ -796,6 +868,7 @@ def assess_candidate(
                 span_budget_fraction=span_budget_fraction,
                 max_token_budget=max_token_budget,
                 n=n,
+                include_claims=include_claims,
             )
             cells.append(
                 BlindCell(
@@ -808,6 +881,28 @@ def assess_candidate(
                     coverage=coverage,
                 )
             )
+    criterion_scoring: CriterionScoring | None = None
+    if criterion_samples is not None:
+        scores = []
+        for criterion_id in bundle.profile.criterion_ids:
+            criterion_input = build_criterion_input(
+                bundle, candidate, criterion_id, token_budget=criterion_token_budget
+            )
+            findings = [
+                {
+                    "expectation_key": c.expectation_key,
+                    "covered": c.coverage.judge_passed,
+                    "score": c.coverage.score,
+                    "rationale": c.coverage.rationale,
+                }
+                for c in cells
+                if c.criterion_id == criterion_id
+            ]
+            score = grade_criterion(
+                judge, bundle, criterion_input, aspect_findings=findings, n=criterion_samples
+            )
+            scores.append(dataclasses.replace(score, candidate_hash=digest))
+        criterion_scoring = combine_criterion_scores(scores, bundle.scoring)
     rubric_set = bundle.rubric_set
     return BlindAssessmentReport(
         candidate_hash=digest,
@@ -834,6 +929,8 @@ def assess_candidate(
         policy_version=str(evidence.package.manifest["policy_version"]) if evidence is not None else "",
         evidence_view=str(evidence.package.manifest["view"]) if evidence is not None else "",
         evidence_source=EVIDENCE_SOURCE_DEV_GRAPH if evidence is not None else EVIDENCE_SOURCE_DIRECTORY,
+        include_claims=include_claims,
+        criterion_scoring=criterion_scoring,
     )
 
 
@@ -924,12 +1021,17 @@ def load_report(
     for i, cell in enumerate(data.get("cells", [])):
         if not isinstance(cell, Mapping):
             raise BlindAssessmentError(f"report {p}: cells[{i}] is not an object.")
-        for attr in ("candidate_hash", "profile_version", "assessor_pin"):
-            if cell.get(attr) != data.get(attr):
-                raise BlindAssessmentError(
-                    f"report {p}: cells[{i}] carries {attr} {cell.get(attr)!r}, the "
-                    f"report {data.get(attr)!r} — the cell is not bound to this report."
-                )
+        _check_binding(cell, data, f"report {p}: cells[{i}]", BlindAssessmentError)
+    scoring = data.get("criterion_scoring")
+    if scoring is not None:
+        if not isinstance(scoring, Mapping) or not isinstance(scoring.get("scores"), list):
+            raise BlindAssessmentError(f"report {p}: criterion_scoring must carry a scores array.")
+        for i, score in enumerate(scoring["scores"]):
+            if not isinstance(score, Mapping):
+                raise BlindAssessmentError(f"report {p}: criterion_scoring.scores[{i}] is not an object.")
+            _check_binding(
+                score, data, f"report {p}: criterion_scoring.scores[{i}]", BlindAssessmentError
+            )
     return dict(data)
 
 
@@ -948,6 +1050,17 @@ def _fmt_bool(value: Any) -> str:
     if value is False:
         return "no"
     return "-"
+
+
+def _render_table(rows: list[tuple[str, ...]]) -> list[str]:
+    """Column-aligned lines for *rows*, the first row a header under a dashed rule."""
+    widths = [max(len(r[i]) for r in rows) for i in range(len(rows[0]))]
+    lines = []
+    for i, row in enumerate(rows):
+        lines.append("  ".join(col.ljust(widths[j]) for j, col in enumerate(row)).rstrip())
+        if i == 0:
+            lines.append("  ".join("-" * w for w in widths))
+    return lines
 
 
 def render_report(report: Mapping[str, Any]) -> str:
@@ -999,11 +1112,50 @@ def render_report(report: Mapping[str, Any]) -> str:
                 f"{score:.2f}" if isinstance(score, (int, float)) else "-",
             )
         )
-    widths = [max(len(r[i]) for r in rows) for i in range(len(rows[0]))]
-    for i, row in enumerate(rows):
-        lines.append("  ".join(col.ljust(widths[j]) for j, col in enumerate(row)).rstrip())
-        if i == 0:
-            lines.append("  ".join("-" * w for w in widths))
+    lines.extend(_render_table(rows))
+    scoring = report.get("criterion_scoring")
+    if isinstance(scoring, Mapping):
+        lines.append("")
+        lines.append(
+            f"CRITERION SCORES - median of {scoring.get('samples_per_criterion') or '-'} sample(s) "
+            "per criterion; spread = within-assessor repeatability only"
+        )
+        crows: list[tuple[str, ...]] = [
+            ("criterion", "score", "spread", "threshold", "input", "complete")
+        ]
+        for s in scoring.get("scores", []):
+            score = s.get("score")
+            spread = s.get("spread")
+            met = s.get("threshold_met")
+            threshold = s.get("threshold")
+            if met is not None:
+                threshold_text = f"{'met' if met else 'NOT met'} (>= {threshold})"
+            else:
+                threshold_text = "not checked" if threshold is None else "-"
+            crows.append(
+                (
+                    str(s.get("criterion_id", "")),
+                    f"{score:.2f}" if isinstance(score, (int, float)) else "-",
+                    f"{spread:.2f}" if isinstance(spread, (int, float)) else "-",
+                    threshold_text,
+                    str(s.get("input_hash") or "")[:19],
+                    "yes" if (s.get("input") or {}).get("complete") else "no",
+                )
+            )
+        lines.extend(_render_table(crows))
+        total = scoring.get("total")
+        if isinstance(total, (int, float)):
+            lines.append(
+                f"total: {scoring.get('formula')} = {total:.2f} / {scoring.get('overall_max')}  "
+                f"(threshold {scoring.get('overall_threshold')}: "
+                f"{'met' if scoring.get('overall_threshold_met') else 'NOT met'})"
+            )
+        else:
+            unscored = ", ".join(scoring.get("unscored_criteria") or [])
+            lines.append(f"total: undetermined - not scored: {unscored}")
+        for s in scoring.get("scores", []):
+            for reason in s.get("incompleteness") or []:
+                lines.append(f"  - {s.get('criterion_id')}: {reason}")
     summary = report.get("summary")
     if summary:
         lines.append("")

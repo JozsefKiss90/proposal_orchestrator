@@ -386,13 +386,26 @@ class TestMscaDefaultIsUntouched:
 # --------------------------------------------------------------------------- #
 
 
+#: A criterion score the RIA form permits: half-marks, with named shortcomings.
+CRITERION_JSON = (
+    '{"score": 4.5, "shortcomings": ["one named shortcoming"], "strengths": ["s"], '
+    '"rationale": "scripted criterion score"}'
+)
+
+
 class ScriptedBackend:
-    """Returns one scripted response for every call."""
+    """Returns one scripted response for every cell call, and a half-mark
+    criterion score for the criterion-scoring stage the command runs by default."""
 
     def __init__(self, content: str = PASS_JSON):
         self.content = content
 
     def __call__(self, messages):
+        system = "\n".join(
+            str(m.get("content", "")) for m in messages if m.get("role") == "system"
+        )
+        if "CRITERION UNDER ASSESSMENT" in system:
+            return {"content": CRITERION_JSON}
         return {"content": self.content}
 
 

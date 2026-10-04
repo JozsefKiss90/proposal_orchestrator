@@ -1,0 +1,115 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe04-evaluator-scoring-contract_2026-10-04",
+  "date": "2026-10-04",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-04 (Evaluator scoring contract) in plans/msca_dn_pre_evaluation_spec.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §12.2 (a judge verdict is Inferred, never Confirmed), §13.3 (no project fact invented: the scorer reads the candidate's own text). Tier 1: General Annexes Part 15 p. 27, scores are awarded for criteria and not for aspects, per-criterion threshold 3. Tier 2A: HE MSCA Evaluation Form V2.2 p. 2, scale 0-5 at one decimal place, weights 50/30/20, overall threshold 70 of 100. Spec §3.3, decisions 4, 5, 6, 11, 14, ticket PE-04. Not a constitutional amendment.",
+  "decision": "A separate criterion-scoring stage produces the holistic 0-5 score per criterion in harness/criterion_scoring.py. The scorer reads each criterion's complete section verbatim plus the sub-sections the criterion appendix mapping declares, never an evidence pack and never the aspect findings alone. Five samples per criterion; the median is the score and the spread is labelled within-assessor repeatability. The total is S = 10E + 6I + 4Q with the per-criterion and overall thresholds both checked. The claim ledger can be withheld structurally from the cells (include_claims=False); each cell then reports grounding unassessable beside its addressal value.",
+  "declared_values": {
+    "appendix_resolution_granularity": {
+      "value": "candidate sub-section",
+      "declared_status": "Assumed",
+      "reason": "The mapping's rows field is prose an evaluator reads. The import renders labelled tables one pipe-delimited row per paragraph, but Table 3.1 a was flattened to label-value prose with no row boundary left, and section 8 carries no rows at all; a finer locator would fail on exactly the rows the mapping declares. The criterion input therefore appends the whole declared sub-section, which carries the declared rows and never less than them, and names every declared row beside it in the prompt. A row is resolved when its sub-section is present in some candidate section; a row whose sub-section lies in the criterion's own sections is recorded in_own_section and not duplicated."
+    },
+    "samples_per_criterion": {
+      "value": 5,
+      "declared_status": "Assumed",
+      "reason": "Adopted from spec decisions 5 and 11 and ticket PE-04, which all specify N=5; no Tier 1-3 source prescribes a sample count. The library default is 5; the module command runs the stage by default and the operator may skip it."
+    },
+    "spread_meaning": {
+      "value": "within-assessor repeatability",
+      "declared_status": "Assumed",
+      "reason": "Adopted from spec decision 11. Five samples from one pinned assessor over an identical prompt measure that assessor's run-to-run variability and nothing else. The label is stamped on every score and on the aggregate so a reader cannot take the spread for a decomposition of the distance from the ESR's 85.80."
+    },
+    "score_resolution_rule": {
+      "value": {
+        "one decimal": 0.1,
+        "half": 0.5,
+        "integer": 1.0
+      },
+      "declared_status": "Inferred",
+      "reason": "The scorecard scale strings on disk say 'one decimal place' (MSCA forms) or 'half-marks may be given' (RIA/IA); a synthetic scorecard may name integers. The parser maps those three wordings; any other wording declares no resolution, the step is then not checked, and the aggregate records score_resolution null so a reader knows it was not validated. A response off a declared step fails closed rather than being rounded. The scale maximum is the top level key of the scorecard's levels and always bounds the score."
+    },
+    "total_arithmetic": {
+      "value": "factor_c = weight_c * overall_max / (scale_max * sum(weights)); S = sum(score_c * factor_c)",
+      "declared_status": "Confirmed",
+      "reason": "Weights 50/30/20 and the overall threshold of 70 out of 100 are on the evaluation form p. 2 (Tier 2A); the per-criterion threshold of 3 and the no-aspect-scores rule are on General Annexes Part 15 p. 27 (Tier 1), both held in the scorecard with quotes. On the DN scorecard this is 10, 6 and 4 and reproduces the ESR's 4.20 / 4.50 / 4.20 -> 85.80 (tests/harness/test_criterion_scoring.py). On the unweighted RIA scorecard (weights 1, maximum 15) the factor is 1 and the total is the plain sum the form states."
+    },
+    "incomplete_input_is_not_scored": {
+      "declared_status": "Assumed",
+      "reason": "A missing section, an unresolved appendix row or an input over the budget leaves the criterion not_scored with the reasons recorded; the judge is not called and nothing is truncated. The total and both threshold verdicts are then undetermined and the unscored criteria are named. Mirrors §12.4: a declared gap over a fabricated completion."
+    },
+    "library_default_versus_command_default": {
+      "value": {
+        "assess_candidate": "criterion_samples=None (stage skipped)",
+        "command": "--criterion-n 5 (stage runs), --skip-criterion-scores to opt out"
+      },
+      "declared_status": "Assumed",
+      "reason": "The library caller chooses whether to spend fifteen assessor calls; the operator surface runs the stage the spec specifies unless told otherwise."
+    },
+    "dn_candidate_inputs_measured": {
+      "value": {
+        "excellence": {
+          "characters": 82286,
+          "tokens": 20572
+        },
+        "impact": {
+          "characters": 47917,
+          "tokens": 11980
+        },
+        "implementation": {
+          "characters": 57457,
+          "tokens": 14365
+        },
+        "budget": 32768,
+        "budget_owner": "assess_candidate criterion_token_budget / --criterion-budget, independent of the cells' pack budget"
+      },
+      "declared_status": "Inferred",
+      "reason": "Derived by measurement from the imported Tier 4 record (not a Tier 1-3 source) through build_blind_evidence and build_criterion_input on 2026-10-04 and re-derived by tests/harness/test_criterion_scoring.py::TestShippedDnCandidate. Larger than the spec's section-only table because the declared appendix travels with the section; every input is complete and every declared row resolves."
+    }
+  },
+  "artifacts": {
+    "modules": [
+      "harness/criterion_scoring.py (new): input assembly, appendix resolution, prompts, five-sample grader, weighted total, threshold checks",
+      "harness/appendix_mapping.py (new): the mapping model and its sha256-pinned loader",
+      "harness/evidence_pack.py: include_claims on build_evidence_pack and EvidencePack; CLAIMS_WITHHELD_DIVIDER",
+      "harness/profile.py: Scoring gains scale_max, score_resolution, individual_threshold; profiles may declare criterion_appendix_mapping",
+      "harness/rubrics.py: RubricSet carries the mapping pin; ProfileBundle carries the loaded mapping",
+      "harness/judge.py: the judge's clock is readable for hand-built provenance",
+      "harness/blind_assessment.py: two-value cells (addressal, grounding), report fields include_claims and criterion_scoring, one binding check for cells and scores, rendering; criterion_token_budget separate from the pack budget",
+      "harness/commands/blind_assessment.py: --no-claims, --criterion-n, --skip-criterion-scores, --criterion-budget"
+    ],
+    "tests": [
+      "tests/harness/test_criterion_scoring.py (new)",
+      "tests/harness/test_evidence_pack.py::TestIncludeClaims",
+      "tests/harness/test_blind_assessment.py::TestCriterionScoringInReport, ::TestCommandCriterionScoring"
+    ],
+    "documentation": "harness/HARNESS.md (blind assessment and profile sections)"
+  },
+  "design_notes": {
+    "provenance": "A 0-5 score cannot travel through Judge.evaluate, whose Verdict is bounded to [0, 1]. The grader drives Judge.raw_invoke, parses each response strictly, and hand-builds a ProvenanceRecord with the score normalised by the scale maximum, the same prompt hash and the judge's own clock, so the trail stays comparable with every other harness verdict. The raw 0-5 value and the named shortcomings live on the criterion sample.",
+    "no_cell_arithmetic": "harness/criterion_scoring.py imports neither grade_expectation nor CoverageGrade, and combine_criterion_scores takes criterion scores and the scoring only. A test reads the module source to pin this.",
+    "findings_accompany_never_replace": "The cells of a criterion are appended after the section text under a header naming them an advisory machine pre-check. An input that is complete yet carries no section text is refused with the words 'findings alone'.",
+    "two_value_cell": "BlindCell.to_dict carries addressal (the coverage verdict) and grounding: in_verdict when the pack carried claim-ledger entries, unassessable when it carried none. The coverage verdict itself is unchanged; the second value is what stops an unassessable half from reading as a clean score (spec decision 4).",
+    "criterion_budget": "The criterion stage does not inherit the cells' pack budget. The pack budget is 3000 on a TPM-capped transport, under which every DN criterion would be not_scored; the stage's own budget defaults to the uncapped 32768 the spec measured against, and a caller on a capped transport lowers it knowingly.",
+    "empty_section": "A present section artifact whose sub-sections carry no text is incomplete ('carries no sub-section text to score'), because its rendered header alone would otherwise count as section text and the criterion would be scored over the findings."
+  },
+  "side_effect": "A new Tier 4 file moves the branch leakage scan's file count from 328 to 329; the demo report and its decision record are updated to say so.",
+  "known_gaps": [
+    "The DN rubric file's framing still says the two-value cell contract is PE-04's; it now is, and the file is not rewritten because its sha256 is pinned by the profile version.",
+    "The criterion stage has not been run against the live assessor; the operator runs assessor calls (no quota is spent by this ticket).",
+    "phase_07_budget_gate and the other runtime phases are untouched; this is harness-only work."
+  ],
+  "acceptance_criteria": {
+    "scorer_reads_the_complete_section": "tests/harness/test_criterion_scoring.py::TestGrader::test_the_scorer_sees_the_complete_section_not_a_pack",
+    "complete_input_named_by_hash": "::TestCriterionInput::test_the_hash_covers_section_and_appendix_together",
+    "completeness_check_covers_rows_and_budget": "::TestCriterionInput::test_an_unresolved_appendix_row_makes_the_input_incomplete, ::test_an_input_over_budget_is_incomplete_not_truncated",
+    "mapping_version_on_every_score": "::TestCriterionInput::test_the_mapping_version_is_recorded_on_the_input, ::TestGrader::test_five_samples_median_and_spread",
+    "no_score_from_findings_alone": "::TestGrader::test_no_criterion_score_from_findings_alone",
+    "include_claims_false_loads_nothing": "tests/harness/test_evidence_pack.py::TestIncludeClaims::test_no_claim_is_loaded_rendered_or_charged, ::test_prose_receives_the_whole_usable_budget",
+    "pf_and_ria_unchanged": "tests/harness/test_profile.py, test_ria_profile.py, test_rubrics.py, test_expectation_coverage.py pass unchanged; include_claims defaults to True",
+    "no_cell_arithmetic": "::TestTotal::test_no_code_path_derives_a_criterion_score_from_cells",
+    "esr_arithmetic": "::TestTotal::test_the_esr_arithmetic_on_the_shipped_dn_scorecard (4.20 / 4.50 / 4.20 -> 85.80)"
+  }
+}
