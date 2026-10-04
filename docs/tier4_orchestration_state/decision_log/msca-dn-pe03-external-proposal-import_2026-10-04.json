@@ -1,0 +1,157 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe03-external-proposal-import_2026-10-04",
+  "date": "2026-10-04",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-03 (External proposal import) in plans/msca_dn_pre_evaluation_spec.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §9.6 (the schema registry lists the new schema id), §12.2 (four status categories), §13.3 (no project fact invented: every text is the copy's own), §16.3 (no schema_id coined for the manifest or the register). Spec §2.7, §2.8, §2.11, §4, §6, decisions 6, 8, 9, 15, 17. Not a constitutional amendment.",
+  "decision": "The sanitised MSCA-DN Part B is imported into the workspace graph root by tools/import_external_proposal.py on the Claude-free substrate runner/external_proposal.py: 84 page sources, one v2 document record with three sections and fifteen sub-sections, tables rendered one pipe-delimited row per paragraph, a claim ledger of rule-selected sentences frozen unconfirmed, an import manifest carrying the extractor versions, and the fidelity register's derived half. Everything replays byte-equal from the PDF; both tools' --check pass.",
+  "declared_values": {
+    "page_map_and_markers": {
+      "declared_status": "Assumed",
+      "reason": "The §4.1 page map, the heading markers (1.2. to 7.), the exact opening block of section 8 ('Beneficiary A') and the §4.2 grouping are declarations the tool carries. The heading texts, the start page of every sub-section and the one discrepancy are derived and recorded in the manifest."
+    },
+    "unlabelled_titles": {
+      "value": {
+        "1.1": "the AF V6.0 heading from the scorecard",
+        "8": "Participating Organisations"
+      },
+      "declared_status": "Assumed",
+      "reason": "The copy labels neither (spec §4.1); a title is cosmetic to the evidence pack, which reads sub_section_id and content."
+    },
+    "page_8_start": {
+      "value": {
+        "declared": 76,
+        "derived": 75
+      },
+      "declared_status": "Confirmed",
+      "reason": "The 'Beneficiary A' block is the last line of p. 75. Recorded as a discrepancy in the manifest and the derived half, not resolved by editing either."
+    },
+    "claim_rule": {
+      "declared_status": "Assumed",
+      "reason": "No source prescribes which sentences form the audit ledger. The rule is the closed regex set runner.external_proposal.CLAIM_RULES (quantity, evidential), versioned as claim_extraction 1.0.0. It selects 45 of 1348 sentences. The selection is a measurement under a declared rule; the rule itself is a choice."
+    },
+    "claim_fields": {
+      "value": {
+        "evidence_strength": "unconfirmed",
+        "declared_status": "Unresolved",
+        "approval": "not_applicable"
+      },
+      "declared_status": "Confirmed",
+      "reason": "Spec PE-03: no extracted claim may declare source_grounded; these are the proposal's own assertions with no external source after sanitisation (§2.8). The verified_span locates the assertion in its page source and is not evidence for it. Nobody here approves a proposal's assertions."
+    },
+    "texts_counts_offsets_hashes": {
+      "declared_status": "Confirmed",
+      "reason": "Derived from the stored PDF bytes by the tool and re-derived by tests/test_msca_dn_import.py, which also checks completeness: the record accounts for every non-whitespace character of the 84 pages."
+    }
+  },
+  "normalisation_declared": {
+    "whitespace": "runs of whitespace collapse to one space; nothing else is rewritten",
+    "paragraphs": "one paragraph per pymupdf text block; blank-line blocks dropped",
+    "page_crossing": "the last prose block of a page joins the first of the next when it ends without terminal punctuation and the next starts in lower case, or when it ends with a hyphen",
+    "headings": "the heading block of a numbered sub-section is its title (numbering stripped), not its content",
+    "criterion_heading": "the one criterion-level heading ('3.') is its section's own content",
+    "tables": "one pipe-delimited paragraph per table row, cells collapsed; a pipe inside a cell is refused",
+    "hyphenation": "line-end hyphens are kept as the source carries them"
+  },
+  "artifacts": {
+    "document_record": {
+      "path": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/documents/MSCA-DN-2025_sanitised_part_b/bdb8670f6987e4db012498c70abc2629c4186a83a18a8286cb8ffb4fdc8d3d84.json",
+      "schema_id": "orch.dev_graph.document_snapshot.v2",
+      "content_version": "sha256:bdb8670f6987e4db012498c70abc2629c4186a83a18a8286cb8ffb4fdc8d3d84",
+      "node_id": "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+      "sha256": "bab560c6f9b7e62600ca5faeb06cf8ec6de623ed7efa3d0695c1d76bfe0856e6"
+    },
+    "source_index": {
+      "path": "workspaces/msca_dn/docs/tier3_project_instantiation/source_materials/sources.json",
+      "sources": 84,
+      "sha256": "d9353447295c6a9eff15d9806d08fd0b75a8794445b08cd919d5e5b4830fbf04"
+    },
+    "import_manifest": {
+      "path": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json",
+      "sha256": "ab8958de94911a3de50fbc17fac1071a396bcb2a54a4ac79145eacee38308a27"
+    },
+    "fidelity_register": {
+      "path": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+      "sha256": "5c9ce4e34af8c120ce266effba7ee7719e92cff91671de1be1f3bcb3e205e4e9",
+      "derived_half": "written"
+    },
+    "schema_registry_entry": {
+      "path": "docs/index/schema_registry.json",
+      "schema_id": "orch.dev_graph.document_snapshot.v2"
+    },
+    "engine": [
+      "runner/dev_graph/documents.py (DOCUMENT_SCHEMA_ID_V2, DOCUMENT_SCHEMA_IDS, render_record, import_candidate; v1 default unchanged)",
+      "runner/dev_graph/builder.py (re-checks a record under its own schema id)",
+      "runner/external_proposal.py (new substrate)"
+    ],
+    "tools": [
+      "tools/import_external_proposal.py",
+      "tools/author_msca_dn_workspace.py (renders the derived half through the importer; no longer owns sources.json)"
+    ],
+    "tests": [
+      "tests/test_msca_dn_import.py",
+      "tests/runner/test_external_proposal.py",
+      "tests/runner/test_dev_graph_documents.py::TestSchemaV2",
+      "tests/test_msca_dn_workspace.py"
+    ]
+  },
+  "figures": {
+    "pages": 84,
+    "sub_sections": 15,
+    "tables": 17,
+    "rows_rendered": 88,
+    "rows_parsed": 88,
+    "claims": 45,
+    "claims_without_span": 1,
+    "sentences_considered": 1348,
+    "extraction_loss_pages": 0,
+    "non_whitespace_characters": 103913,
+    "images": 0,
+    "dependency_keyword_counts": {
+      "dependenc": 0,
+      "interdepend": 0,
+      "Gantt": 0,
+      "critical path": 0,
+      "in WP<n>": 4,
+      "build(s/ing) (up)on": 1
+    },
+    "citation_marker_counts": {
+      "bracketed_numbers": 0,
+      "doi": 0,
+      "url": 0,
+      "author_year": 0
+    },
+    "body_point_size_distribution": {
+      "12.0": 117953,
+      "10.0": 1040
+    }
+  },
+  "design_notes": {
+    "schema_v2_grandfathering": "import_document keeps v1 as its default so every committed record and the demo's byte-pinned reruns are unchanged; v2 is opt-in by schema_id. The builder re-normalises each record under the schema id it carries, so a v2 record edited by hand to drop a span is refused at build time, not only at import.",
+    "no_intermediate_candidate_file": "import_candidate takes the candidate object in memory; the importer never writes a candidate JSON beside the record, so there is one copy of the content and the engine's immutability rule governs it.",
+    "table_strategy": "pymupdf's default 'lines' strategy splits a wrapped header cell into one row per line ('Numbe' / 'r'); 'lines_strict' keeps the ruled cell whole. The 17 tables and their 88 rows are found under lines_strict.",
+    "cells_read_in_a_different_order": "Three of 610 cells (pp. 51, 57, 63) are not contiguous in the page's reading order and carry a glyph-order artifact ('tradeof.f', 'fni al', 'efofrts') the PDF itself produces. The characters are the same and the per-page accounting balances, so they are counted as character-order losses under per_page_extraction_losses and listed in full under tables.cells_not_contiguous_in_page_text; nothing is repaired, and the integrity audit must treat those cells as unordered text.",
+    "page_crossing_join": "Ten paragraphs cross a page break and are rejoined under the declared rule (no terminal punctuation, next page starts in lower case, or a trailing hyphen). One claim sentence straddles a break and so has no span; the manifest counts it.",
+    "register_ownership": "The register has one renderer: the workspace tool, which imports the importer's derive_register_half inside render_register. The importer's render_all includes the register through that same function, so both --check modes see identical bytes.",
+    "verbatim_test_is_two_sided": "Substring containment proves nothing was added; the completeness count (headings + criterion heading + prose + cells == non-whitespace characters of the 84 pages) proves nothing was dropped."
+  },
+  "side_effect": "The demo report's leakage-scan file count moves from 326 to 328 (this record and the PE-03 validation report). The three demo records that pin it now read 328 with a re-derivation note naming this date, and the blind-baseline report carries its tenth amendment, per the convention PE-01 and PE-02 followed. The fidelity register changes bytes (its derived half is filled) but is not a new file.",
+  "known_gaps": {
+    "workspace_outside_the_leakage_scan": "runner/leakage_scan.py globs docs/tier3, tier4, tier5 and the vault; workspaces/msca_dn/ now holds the copy's full text in 84 sources and a document record, and is scanned by nothing (PE-01 known gap, now with more at stake). A scan of the workspace tree was run by hand for this record; see the validation report.",
+    "claim_rule_is_a_choice": "The ledger's size depends on the regex set; a different rule yields a different ledger and a different content_version. PE-05 binds the import manifest for that reason. The rule is small on purpose and may be widened at a version bump.",
+    "sources_json_not_verifiable_by_runner_source_index": "runner.source_index.verify is bound to the demo's concept (document registry, concept claims, swept Tier 3 names) and resolves stored_path against its repo_root argument; the workspace is not the repository root (spec decision 2), so verify is not run over it. The import test replays every page text byte-equal instead.",
+    "declared_half_still_empty": "The register's declared half (presence and transformation per sub-section, decision 9) is the operator's and is empty after PE-03. Until it is filled, a reader of the register sees a derived half only; PE-08 must not read an empty declared half as 'nothing was transformed'.",
+    "include_claims_not_yet_built": "Decision 6's include_claims on build_evidence_pack is PE-04's work and does not exist yet. The ledger is frozen here so that PE-04 has something to exclude structurally and PE-07 something to enumerate; nothing reads it until then.",
+    "header_spellings_differ_per_physical_table": "The deliverables table repeats its header on each page and pymupdf reads the wrapped cells differently ('Numbe r', 'W P', 'Typ e' on pp. 51-56; 'Number', 'WP' on pp. 56-58). Each physical table's header is recorded under tables.per_table; the integrity audit must key on position, not on header text.",
+    "document_registry": "The sanitised PDF is not listed in docs/index/document_registry.json (§9.6); PE-01 did not list it either. The source records name it by path and sha256."
+  },
+  "acceptance_criteria": {
+    "1_sub_section_prose_matches_the_pdf_verbatim_under_a_declared_normalisation": "MET. The normalisation is declared in the manifest (whitespace collapse, one paragraph per block, the page-crossing join rule, heading and criterion-heading handling, table rows, hyphens kept). tests/test_msca_dn_import.py::TestVerbatim checks every prose paragraph is a substring of the page text, every heading and cell is on its page, no character outside the page text appears, and the record accounts for every non-whitespace character of the 84 pages.",
+    "2_rerunning_the_importer_produces_byte_identical_output": "MET. render_all is equal across runs and equal to the committed bytes; both --check modes exit 0; no wall-clock field anywhere. The record lands through import_candidate, whose immutability rule refuses a changed record under the same content.",
+    "3_all_17_tables_render_and_every_row_parses": "MET. 17 tables, 88 rows rendered, 88 parsed back to their table's column count; all 88 rows sit in sub-section 3.1 as paragraphs of their own, with the four captions.",
+    "4_extraction_losses_recorded_including_zero_figures_and_zero_dependency_strings": "MET. The derived half records per-page losses (none), 0 images, 0 for dependenc / interdepend / Gantt / critical path with the 4 informal 'in WP<n>' relations beside them, 0 citation markers, the point-size distribution with the 10 pt text identified as bullet glyphs, and the Table 3.1 a flattening (7 'WP Number:' blocks).",
+    "5_the_originals_are_untouched": "MET. Both PDFs still carry the spec's hashes; the importer writes nothing under source_materials/msca_dn/ except the register's derived half.",
+    "6_the_ledger_is_an_input_frozen_here": "MET. 45 claims in the record, none source_grounded, all unconfirmed/Unresolved/not_applicable, each a sentence of its sub-section, every span resolving to the claim text in its page source; the snapshot builds over the workspace with every span validated."
+  }
+}

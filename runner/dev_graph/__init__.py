@@ -76,9 +76,13 @@ from runner.dev_graph.changes import (
 )
 from runner.dev_graph.documents import (
     DOCUMENT_SCHEMA_ID,
+    DOCUMENT_SCHEMA_ID_V2,
+    DOCUMENT_SCHEMA_IDS,
     DOCUMENTS_REL,
     DocumentRef,
+    import_candidate,
     import_document,
+    render_record,
 )
 from runner.dev_graph.identity import canonical_json, content_hash
 from runner.dev_graph.impact import (
@@ -231,6 +235,8 @@ __all__ = [
     "DIAGNOSTICS",
     "DOCUMENTS_REL",
     "DOCUMENT_SCHEMA_ID",
+    "DOCUMENT_SCHEMA_ID_V2",
+    "DOCUMENT_SCHEMA_IDS",
     "DOCUMENT_STATES",
     "DOMAIN_LINK",
     "ENTRY_KINDS",
@@ -331,6 +337,7 @@ __all__ = [
     "current_commitments",
     "declared_status",
     "edge_label",
+    "import_candidate",
     "import_document",
     "load_snapshot",
     "normalise_contract",
@@ -343,6 +350,7 @@ __all__ = [
     "read_plan",
     "locate_run_manifest",
     "read_record_version",
+    "render_record",
     "read_reuse_decisions",
     "read_revision_record",
     "read_run_records",

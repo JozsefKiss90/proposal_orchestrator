@@ -1,0 +1,738 @@
+{
+  "record_type": "external_proposal_import_manifest",
+  "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml carries no schema for an import manifest, and no schema_id is coined for it (CLAUDE.md §16.3). The shape is fixed by tools/import_external_proposal.py and checked by tests/test_msca_dn_import.py.",
+  "spec": "plans/msca_dn_pre_evaluation_spec.md",
+  "ticket": "PE-03",
+  "tool": "tools/import_external_proposal.py",
+  "candidate": {
+    "path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_final.pdf",
+    "sha256": "5474569f33d20174bfd76f088c10002edf1e82cfdc4fc5a41849f67c0ec1e1ca",
+    "pages": 84,
+    "is_submitted_document": false,
+    "fidelity_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json"
+  },
+  "versions": {
+    "extractor": "1.0.0",
+    "normalisation": "1.0.0",
+    "table_rendering": "1.0.0",
+    "claim_extraction": "1.0.0",
+    "page_text_method": "pymupdf_page_text_whitespace_normalised",
+    "table_strategy": "lines_strict"
+  },
+  "document": {
+    "document_id": "MSCA-DN-2025_sanitised_part_b",
+    "title": "Sanitised derivative of the MSCA-DN 2025 Part B (PROJECT-X)",
+    "schema_id": "orch.dev_graph.document_snapshot.v2",
+    "state": "imported",
+    "record_path": "docs/tier4_orchestration_state/dev_graph/documents/MSCA-DN-2025_sanitised_part_b/bdb8670f6987e4db012498c70abc2629c4186a83a18a8286cb8ffb4fdc8d3d84.json",
+    "content_version": "sha256:bdb8670f6987e4db012498c70abc2629c4186a83a18a8286cb8ffb4fdc8d3d84",
+    "node_id": "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+    "sections": [
+      {
+        "section_id": "excellence_section",
+        "sub_sections": [
+          "1.1",
+          "1.2",
+          "1.3",
+          "1.4"
+        ]
+      },
+      {
+        "section_id": "impact_section",
+        "sub_sections": [
+          "2.1",
+          "2.2",
+          "2.3",
+          "2.4"
+        ]
+      },
+      {
+        "section_id": "implementation_section",
+        "sub_sections": [
+          "3.1",
+          "3.2",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8"
+        ]
+      }
+    ]
+  },
+  "sources": {
+    "path": "docs/tier3_project_instantiation/source_materials/sources.json",
+    "count": 84,
+    "source_id_format": "SRC-DN-P{page:02d}",
+    "sha256": "d9353447295c6a9eff15d9806d08fd0b75a8794445b08cd919d5e5b4830fbf04"
+  },
+  "page_map": {
+    "declared_from": "plans/msca_dn_pre_evaluation_spec.md §4.1",
+    "sub_sections": [
+      {
+        "sub_section_id": "1.1",
+        "section_id": "excellence_section",
+        "declared_pages": [
+          1,
+          13
+        ],
+        "derived_pages": [
+          1,
+          14
+        ],
+        "heading": null,
+        "title": "Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
+        "title_source": "declared",
+        "paragraphs": 302,
+        "table_rows": 0,
+        "characters": 19601,
+        "claims": 17
+      },
+      {
+        "sub_section_id": "1.2",
+        "section_id": "excellence_section",
+        "declared_pages": [
+          14,
+          21
+        ],
+        "derived_pages": [
+          14,
+          22
+        ],
+        "heading": "1.2. Soundness of the proposed methodology",
+        "title": "Soundness of the proposed methodology",
+        "title_source": "candidate heading",
+        "paragraphs": 150,
+        "table_rows": 0,
+        "characters": 7315,
+        "claims": 0
+      },
+      {
+        "sub_section_id": "1.3",
+        "section_id": "excellence_section",
+        "declared_pages": [
+          22,
+          26
+        ],
+        "derived_pages": [
+          22,
+          27
+        ],
+        "heading": "1.3. Quality and credibility of the training programme",
+        "title": "Quality and credibility of the training programme",
+        "title_source": "candidate heading",
+        "paragraphs": 66,
+        "table_rows": 0,
+        "characters": 10010,
+        "claims": 0
+      },
+      {
+        "sub_section_id": "1.4",
+        "section_id": "excellence_section",
+        "declared_pages": [
+          27,
+          31
+        ],
+        "derived_pages": [
+          27,
+          32
+        ],
+        "heading": "1.4. Quality of the supervision (including mandatory joint supervision for industrial and joint doctorate projects)",
+        "title": "Quality of the supervision (including mandatory joint supervision for industrial and joint doctorate projects)",
+        "title_source": "candidate heading",
+        "paragraphs": 79,
+        "table_rows": 0,
+        "characters": 7947,
+        "claims": 18
+      },
+      {
+        "sub_section_id": "2.1",
+        "section_id": "impact_section",
+        "declared_pages": [
+          32,
+          33
+        ],
+        "derived_pages": [
+          32,
+          34
+        ],
+        "heading": "2.1. Contribution to structuring doctoral training at the European level and to strengthening European innovation capacity, including the potential for: Meaningful contribution of the non-academic sector to the doctoral training, as appropriate to the implementation mode and research field",
+        "title": "Contribution to structuring doctoral training at the European level and to strengthening European innovation capacity, including the potential for: Meaningful contribution of the non-academic sector to the doctoral training, as appropriate to the implementation mode and research field",
+        "title_source": "candidate heading",
+        "paragraphs": 21,
+        "table_rows": 0,
+        "characters": 5294,
+        "claims": 2
+      },
+      {
+        "sub_section_id": "2.2",
+        "section_id": "impact_section",
+        "declared_pages": [
+          34,
+          35
+        ],
+        "derived_pages": [
+          34,
+          36
+        ],
+        "heading": "2.2. Credibility of the measures to enhance the career perspectives and employability of researchers and contribution to their skills development",
+        "title": "Credibility of the measures to enhance the career perspectives and employability of researchers and contribution to their skills development",
+        "title_source": "candidate heading",
+        "paragraphs": 20,
+        "table_rows": 0,
+        "characters": 3135,
+        "claims": 1
+      },
+      {
+        "sub_section_id": "2.3",
+        "section_id": "impact_section",
+        "declared_pages": [
+          36,
+          38
+        ],
+        "derived_pages": [
+          36,
+          39
+        ],
+        "heading": "2.3. Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities",
+        "title": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities",
+        "title_source": "candidate heading",
+        "paragraphs": 56,
+        "table_rows": 0,
+        "characters": 5240,
+        "claims": 1
+      },
+      {
+        "sub_section_id": "2.4",
+        "section_id": "impact_section",
+        "declared_pages": [
+          39,
+          40
+        ],
+        "derived_pages": [
+          39,
+          41
+        ],
+        "heading": "2.4. The magnitude and importance of the project’s contribution to the expected scientific, societal and economic impacts",
+        "title": "The magnitude and importance of the project’s contribution to the expected scientific, societal and economic impacts",
+        "title_source": "candidate heading",
+        "paragraphs": 20,
+        "table_rows": 0,
+        "characters": 4769,
+        "claims": 0
+      },
+      {
+        "sub_section_id": "3.1",
+        "section_id": "implementation_section",
+        "declared_pages": [
+          41,
+          64
+        ],
+        "derived_pages": [
+          41,
+          65
+        ],
+        "heading": "3.1. Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
+        "title": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
+        "title_source": "candidate heading",
+        "paragraphs": 145,
+        "table_rows": 88,
+        "characters": 27977,
+        "claims": 1
+      },
+      {
+        "sub_section_id": "3.2",
+        "section_id": "implementation_section",
+        "declared_pages": [
+          65,
+          66
+        ],
+        "derived_pages": [
+          65,
+          67
+        ],
+        "heading": "3.2. Quality, capacity and role of each participant, including hosting arrangements and extent to which the consortium as a whole brings together the necessary expertise (Sanitized)",
+        "title": "Quality, capacity and role of each participant, including hosting arrangements and extent to which the consortium as a whole brings together the necessary expertise (Sanitized)",
+        "title_source": "candidate heading",
+        "paragraphs": 25,
+        "table_rows": 0,
+        "characters": 4783,
+        "claims": 2
+      },
+      {
+        "sub_section_id": "4",
+        "section_id": "implementation_section",
+        "declared_pages": [
+          67,
+          67
+        ],
+        "derived_pages": [
+          67,
+          68
+        ],
+        "heading": "4. Recruitment strategy (including how the project will strive to adhere to the Code of Conduct for the Recruitment of Researchers) (Sanitized)",
+        "title": "Recruitment strategy (including how the project will strive to adhere to the Code of Conduct for the Recruitment of Researchers) (Sanitized)",
+        "title_source": "candidate heading",
+        "paragraphs": 5,
+        "table_rows": 0,
+        "characters": 3265,
+        "claims": 2
+      },
+      {
+        "sub_section_id": "5",
+        "section_id": "implementation_section",
+        "declared_pages": [
+          68,
+          72
+        ],
+        "derived_pages": [
+          68,
+          72
+        ],
+        "heading": "5. Network organisation (Fully Sanitized)",
+        "title": "Network organisation (Fully Sanitized)",
+        "title_source": "candidate heading",
+        "paragraphs": 64,
+        "table_rows": 0,
+        "characters": 7221,
+        "claims": 0
+      },
+      {
+        "sub_section_id": "6",
+        "section_id": "implementation_section",
+        "declared_pages": [
+          73,
+          74
+        ],
+        "derived_pages": [
+          73,
+          74
+        ],
+        "heading": "6. Ethics Self-Assessment (Sanitized)",
+        "title": "Ethics Self-Assessment (Sanitized)",
+        "title_source": "candidate heading",
+        "paragraphs": 26,
+        "table_rows": 0,
+        "characters": 2328,
+        "claims": 0
+      },
+      {
+        "sub_section_id": "7",
+        "section_id": "implementation_section",
+        "declared_pages": [
+          74,
+          75
+        ],
+        "derived_pages": [
+          74,
+          75
+        ],
+        "heading": "7. Environmental aspects in light of the MSCA Green Charter (Sanitized)",
+        "title": "Environmental aspects in light of the MSCA Green Charter (Sanitized)",
+        "title_source": "candidate heading",
+        "paragraphs": 27,
+        "table_rows": 0,
+        "characters": 2868,
+        "claims": 0
+      },
+      {
+        "sub_section_id": "8",
+        "section_id": "implementation_section",
+        "declared_pages": [
+          76,
+          84
+        ],
+        "derived_pages": [
+          75,
+          84
+        ],
+        "heading": null,
+        "title": "Participating Organisations",
+        "title_source": "declared",
+        "paragraphs": 209,
+        "table_rows": 0,
+        "characters": 8249,
+        "claims": 1
+      }
+    ],
+    "discrepancies": [
+      {
+        "sub_section_id": "8",
+        "declared_start_page": 76,
+        "derived_start_page": 75,
+        "note": "the opening block sits on the page before the declared one"
+      }
+    ]
+  },
+  "normalisation": {
+    "whitespace": "runs of whitespace collapse to one space; nothing else is rewritten",
+    "paragraphs": "one paragraph per pymupdf text block; blank-line blocks dropped",
+    "page_crossing": "the last prose block of a page joins the first of the next when it ends without terminal punctuation and the next starts in lower case, or when it ends with a hyphen",
+    "headings": "the heading block of a numbered sub-section is its title (numbering stripped), not its content",
+    "criterion_heading": "the one criterion-level heading ('3.') is its section's own content",
+    "tables": "one pipe-delimited paragraph per table row, cells collapsed; a pipe inside a cell is refused",
+    "hyphenation": "line-end hyphens are kept as the source carries them"
+  },
+  "tables": {
+    "strategy": "lines_strict",
+    "count": 17,
+    "rows_rendered": 88,
+    "rows_parsed": 88,
+    "every_row_parses": true,
+    "cells": 610,
+    "cells_not_contiguous_in_page_text": [
+      {
+        "page": 51,
+        "index": 0,
+        "row": 1,
+        "col": 2,
+        "cell": "Methodology and metrics for benchmarking state-of-the- art AI models in healthcare diagnosis, addressing the fairness- performance tradeof.f"
+      },
+      {
+        "page": 57,
+        "index": 0,
+        "row": 2,
+        "col": 2,
+        "cell": "Early, mid-term and fni al scientific reports."
+      },
+      {
+        "page": 63,
+        "index": 0,
+        "row": 1,
+        "col": 4,
+        "cell": "Early-on and targeted job advertisements, specific dissemination channels. Project manager monitors number and quality of incoming applications. If not deemed sufficient after 60% of the intended recruitment period, efofrts will be reinforced. Inclusive language used in position advertisements and partners follow equality principles in hiring."
+      }
+    ],
+    "cells_not_contiguous_note": "A wrapped cell whose lines the page's reading order interleaves with other cells, or whose glyphs pymupdf orders differently in the cell than on the page. The characters are the same; the per-page accounting balances. Recorded, not repaired.",
+    "per_table": [
+      {
+        "page": 51,
+        "index": 0,
+        "rows": 4,
+        "cols": 8,
+        "rows_parsed": 4,
+        "header": [
+          "Numbe r",
+          "Deliverable Title",
+          "Short Description",
+          "W P",
+          "Lead Beneficiary",
+          "Typ e",
+          "Disseminatio n",
+          "Due"
+        ]
+      },
+      {
+        "page": 52,
+        "index": 0,
+        "rows": 5,
+        "cols": 8,
+        "rows_parsed": 5,
+        "header": [
+          "Numbe r",
+          "Deliverable Title",
+          "Short Description",
+          "W P",
+          "Lead Beneficiary",
+          "Typ e",
+          "Disseminatio n",
+          "Due"
+        ]
+      },
+      {
+        "page": 53,
+        "index": 0,
+        "rows": 5,
+        "cols": 8,
+        "rows_parsed": 5,
+        "header": [
+          "Numbe r",
+          "Deliverable Title",
+          "Short Description",
+          "W P",
+          "Lead Beneficiary",
+          "Typ e",
+          "Disseminatio n",
+          "Due"
+        ]
+      },
+      {
+        "page": 54,
+        "index": 0,
+        "rows": 5,
+        "cols": 8,
+        "rows_parsed": 5,
+        "header": [
+          "Numbe r",
+          "Deliverable Title",
+          "Short Description",
+          "W P",
+          "Lead Beneficiary",
+          "Typ e",
+          "Disseminatio n",
+          "Due"
+        ]
+      },
+      {
+        "page": 55,
+        "index": 0,
+        "rows": 5,
+        "cols": 8,
+        "rows_parsed": 5,
+        "header": [
+          "Numbe r",
+          "Deliverable Title",
+          "Short Description",
+          "W P",
+          "Lead Beneficiary",
+          "Typ e",
+          "Disseminatio n",
+          "Due"
+        ]
+      },
+      {
+        "page": 56,
+        "index": 0,
+        "rows": 2,
+        "cols": 8,
+        "rows_parsed": 2,
+        "header": [
+          "Numbe r",
+          "Deliverable Title",
+          "Short Description",
+          "W P",
+          "Lead Beneficiary",
+          "Typ e",
+          "Disseminatio n",
+          "Due"
+        ]
+      },
+      {
+        "page": 56,
+        "index": 1,
+        "rows": 4,
+        "cols": 8,
+        "rows_parsed": 4,
+        "header": [
+          "Number",
+          "Deliverable Title",
+          "Short Description",
+          "WP",
+          "Lead Beneficiary",
+          "Type",
+          "Dissemination",
+          "Due"
+        ]
+      },
+      {
+        "page": 57,
+        "index": 0,
+        "rows": 8,
+        "cols": 8,
+        "rows_parsed": 8,
+        "header": [
+          "Number",
+          "Deliverable Title",
+          "Short Description",
+          "WP",
+          "Lead Beneficiary",
+          "Type",
+          "Dissemination",
+          "Due"
+        ]
+      },
+      {
+        "page": 58,
+        "index": 0,
+        "rows": 5,
+        "cols": 8,
+        "rows_parsed": 5,
+        "header": [
+          "Number",
+          "Deliverable Title",
+          "Short Description",
+          "WP",
+          "Lead Beneficiary",
+          "Type",
+          "Dissemination",
+          "Due"
+        ]
+      },
+      {
+        "page": 58,
+        "index": 1,
+        "rows": 2,
+        "cols": 6,
+        "rows_parsed": 2,
+        "header": [
+          "Number",
+          "Title",
+          "Related WP",
+          "Lead Beneficiary",
+          "Due Date",
+          "Means of Verification"
+        ]
+      },
+      {
+        "page": 59,
+        "index": 0,
+        "rows": 8,
+        "cols": 6,
+        "rows_parsed": 8,
+        "header": [
+          "Number",
+          "Title",
+          "Related WP",
+          "Lead Beneficiary",
+          "Due Date",
+          "Means of Verification"
+        ]
+      },
+      {
+        "page": 60,
+        "index": 0,
+        "rows": 9,
+        "cols": 6,
+        "rows_parsed": 9,
+        "header": [
+          "Number",
+          "Title",
+          "Related WP",
+          "Lead Beneficiary",
+          "Due Date",
+          "Means of Verification"
+        ]
+      },
+      {
+        "page": 61,
+        "index": 0,
+        "rows": 2,
+        "cols": 7,
+        "rows_parsed": 2,
+        "header": [
+          "DC No.",
+          "Recruiting Participant",
+          "PhD Awarding Entity",
+          "Planned Start Month",
+          "Duration (months)",
+          "Total Duration of Secondments (months)",
+          "Total Duration in Non- academic Sector (months)"
+        ]
+      },
+      {
+        "page": 62,
+        "index": 0,
+        "rows": 9,
+        "cols": 7,
+        "rows_parsed": 9,
+        "header": [
+          "DC No.",
+          "Recruiting Participant",
+          "PhD Awarding Entity",
+          "Planned Start Month",
+          "Duration (months)",
+          "Total Duration of Secondments (months)",
+          "Total Duration in Non- academic Sector (months)"
+        ]
+      },
+      {
+        "page": 63,
+        "index": 0,
+        "rows": 5,
+        "cols": 5,
+        "rows_parsed": 5,
+        "header": [
+          "Description of risk",
+          "Likelihood",
+          "Severity",
+          "WPs involved",
+          "Proposed risk-mitigation measures"
+        ]
+      },
+      {
+        "page": 64,
+        "index": 0,
+        "rows": 7,
+        "cols": 5,
+        "rows_parsed": 7,
+        "header": [
+          "Description of risk",
+          "Likelihood",
+          "Severity",
+          "WPs involved",
+          "Proposed risk-mitigation measures"
+        ]
+      },
+      {
+        "page": 65,
+        "index": 0,
+        "rows": 3,
+        "cols": 5,
+        "rows_parsed": 3,
+        "header": [
+          "Description of risk",
+          "Likelihood",
+          "Severity",
+          "WPs involved",
+          "Proposed risk-mitigation measures"
+        ]
+      }
+    ]
+  },
+  "claims": {
+    "count": 45,
+    "rule": "every sentence of the prose that matches a named pattern of runner.external_proposal.CLAIM_RULES; table rows and headings are not sentences",
+    "sentences": 1348,
+    "duplicates_removed": 0,
+    "without_span": 1,
+    "claims_without_span": [
+      {
+        "claim_id": "3.2-c001",
+        "pages": [
+          65,
+          66
+        ],
+        "reason": "the sentence straddles a page break and is in no single page source"
+      }
+    ],
+    "rules_matched": {
+      "evidential": 7,
+      "quantity": 39
+    },
+    "evidence_strength": "unconfirmed",
+    "declared_status": "Unresolved",
+    "approval": "not_applicable",
+    "why": "These are the proposal's own assertions. The sanitisation removed every citation (spec §2.8), so no claim has an external source and none declares source_grounded; the span locates the assertion in its page source and is not evidence for it. Nobody in this repository approves a proposal's assertions, so approval is not applicable. The integrity audit (PE-07) enumerates this ledger and reports each claim Unresolved."
+  },
+  "extraction_losses": {
+    "unit": "non-whitespace characters: the only thing the normalisation moves is whitespace",
+    "total_page_chars": 103913,
+    "total_accounted": 103913,
+    "pages_with_loss": [],
+    "character_order_losses": {
+      "cells": 3,
+      "where": [
+        {
+          "page": 51,
+          "index": 0,
+          "row": 1,
+          "col": 2
+        },
+        {
+          "page": 57,
+          "index": 0,
+          "row": 2,
+          "col": 2
+        },
+        {
+          "page": 63,
+          "index": 0,
+          "row": 1,
+          "col": 4
+        }
+      ],
+      "note": "Cells whose characters are all present but not in the page's reading order; the integrity audit reads these rows and must treat their text as unordered. Listed in full under tables."
+    }
+  },
+  "fidelity_register_derived_half": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived"
+}

@@ -10,9 +10,9 @@
     "The scope record decision_log/dev-graph-demo-scope_2026-09-29.json supplies the four questions."
   ],
   "question_asked": "Does the demo report answer every scope question from a Tier 4 artifact, list the defects as Milestone 2 candidates, and does the leakage test pass on the whole branch?",
-  "answer": "Three of three. Every one of the four scope questions is answered in the report's first table with the artifact it reads, and tests/test_demo_report.py re-derives the figures. Twenty-six defects are listed as candidates M1 to M26 with their source records. The leakage scan over 326 files (re-derived 2026-10-04 after PE-01 and PE-02 added four Tier 3/4 records; the 2026-10-03 scan saw 322) reports no new leak and 11 recorded pre-existing hits in the 22 September purge record, exit 0.",
+  "answer": "Three of three. Every one of the four scope questions is answered in the report's first table with the artifact it reads, and tests/test_demo_report.py re-derives the figures. Twenty-six defects are listed as candidates M1 to M26 with their source records. The leakage scan over 328 files (re-derived 2026-10-04 after PE-01, PE-02 and PE-03 added six Tier 3/4 records; the 2026-10-03 scan saw 322) reports no new leak and 11 recorded pre-existing hits in the 22 September purge record, exit 0.",
   "what_ran": {
-    "leakage_scan": "py -3.10 -m runner.leakage_scan: 326 files (re-derived 2026-10-04 after PE-01 and PE-02 added four Tier 3/4 records; the 2026-10-03 scan saw 322) in Tier 3, Tier 4, Tier 5 and the vault, this ticket's two records included; 0 new leaks; 11 pre-existing hits, all in decision_log/project-purge-clean-engine-base_2026-09-22.json; exit 0.",
+    "leakage_scan": "py -3.10 -m runner.leakage_scan: 328 files (re-derived 2026-10-04 after PE-01, PE-02 and PE-03 added six Tier 3/4 records; the 2026-10-03 scan saw 322) in Tier 3, Tier 4, Tier 5 and the vault, this ticket's two records included; 0 new leaks; 11 pre-existing hits, all in decision_log/project-purge-clean-engine-base_2026-09-22.json; exit 0.",
     "derivation_checks": "tools.build_demo_dev_graph --check (38 of 38 artifacts up to date); tools.run_demo_change_scenarios --check (7 scenarios OK); tools.derive_dev_graph_run_records --check (17 records unchanged); tools.preserve_run_manifests --check (2 records unchanged); tools.derive_run_phase_costs --check (unchanged). All run 2026-10-03.",
     "snapshot_build_time": "build_snapshot in process, three runs: 0.021 s, 0.016 s, 0.016 s. Full check mode 5.1 s wall-clock.",
     "test_suite": "py -3.10 -m pytest -q on 2026-10-03: 47 failed, 6060 passed, 77 skipped, 5 errors in 258 s, measured before this report's own placeholder check was filled, so the committed state is 46 failed. Before this ticket the suite showed 47 failed and 5 errors; the one failure this ticket removes is the blind-baseline scan count."
@@ -133,7 +133,7 @@
       ]
     },
     "leakage_scan": {
-      "files_scanned": 326,
+      "files_scanned": 328,
       "new_leaks": 0,
       "pre_existing_hits": 11
     }

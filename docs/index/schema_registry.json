@@ -71,6 +71,13 @@
       "description": "Immutable document snapshot record written once by import_document; lifecycle state imported, draft, submitted or superseded"
     },
     {
+      "schema_id": "orch.dev_graph.document_snapshot.v2",
+      "artifact": "<document_id>/<content version hex>.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/documents/",
+      "provenance_class": "derived",
+      "description": "Document snapshot record as v1, plus: a source_grounded claim must carry a verified_span (plans/msca_dn_pre_evaluation_spec.md decision 17). v1 records are grandfathered; written by import_candidate or import_document with schema_id=v2"
+    },
+    {
       "schema_id": "orch.dev_graph.package_manifest.v1",
       "artifact": "<package id hex>/manifest.json",
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/packages/",

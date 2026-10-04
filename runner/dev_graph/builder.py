@@ -408,7 +408,7 @@ def _add_document(
     g: _Assembler, rel_str: str, rec: dict[str, Any], sources: dict[str, str]
 ) -> None:
     rel = Path(rel_str)
-    content = normalise_candidate(rec, rel_str)
+    content = normalise_candidate(rec, rel_str, schema_id=rec["schema_id"])
     if content_hash(content) != rec.get("content_version"):
         raise _malformed(rel, "content_version does not match the record content")
     record = {**content, "state": rec["state"], "content_version": rec["content_version"]}

@@ -148,11 +148,13 @@ class TestRegisterProvenance:
         for token in (r"\b85\.80\b", r"\b4\.20\b", r"\b4\.50\b", "esr_scores", "baseline_target"):
             assert re.search(token, text) is None, token
 
-    def test_the_two_halves_are_marked_and_the_derived_half_is_pending(self) -> None:
+    def test_the_two_halves_are_marked_and_the_derived_half_is_written_by_pe03(self) -> None:
         reg = _register()
         assert reg["derived"]["kind"] == "derived"
-        assert reg["derived"]["status"] == "pending"
+        assert reg["derived"]["status"] == "written"
+        assert reg["derived"]["written_by"] == "PE-03, tools/import_external_proposal.py"
         assert reg["declared"]["kind"] == "declared"
+        # The operator fills the per-sub-section declarations; PE-03 leaves them empty.
         assert reg["declared"]["sub_sections"] == []
 
     def test_no_authored_text_calls_the_candidate_the_submitted_version(self) -> None:
@@ -208,11 +210,13 @@ class TestIntake:
 
 
 class TestIsolation:
-    def test_workspace_is_a_graph_root_with_nothing_in_it_yet(self) -> None:
+    def test_workspace_is_a_graph_root_reading_only_its_own_records(self) -> None:
         snap = build_snapshot(WORKSPACE)
         assert all(not Path(p).is_absolute() for p in snap.inputs)
-        assert tuple(snap.inputs) == (SOURCES_REL.as_posix(),)
-        assert len(snap.nodes) == 0
+        assert SOURCES_REL.as_posix() in snap.inputs
+        # PE-03 populated it: the page sources and the imported document and nothing of the demo's.
+        assert all(rel.startswith("docs/") and (WORKSPACE / rel).is_file() for rel in snap.inputs)
+        assert len(snap.nodes) > 0
 
     def test_no_demo_node_or_input_is_reachable_from_the_workspace(self) -> None:
         demo = build_snapshot(REPO)
@@ -229,9 +233,10 @@ class TestIsolation:
     def test_no_symlink_or_reference_out_of_the_workspace(self) -> None:
         for path in WORKSPACE.rglob("*"):
             assert not path.is_symlink(), path
-        demo_sources = REPO / SOURCES_REL
-        assert json.loads(demo_sources.read_text(encoding="utf-8-sig"))["sources"]
-        assert json.loads((WORKSPACE / SOURCES_REL).read_text(encoding="utf-8"))["sources"] == []
+        demo_ids = {s["source_id"] for s in json.loads((REPO / SOURCES_REL).read_text(encoding="utf-8-sig"))["sources"]}
+        real_ids = {s["source_id"] for s in json.loads((WORKSPACE / SOURCES_REL).read_text(encoding="utf-8"))["sources"]}
+        assert demo_ids and real_ids
+        assert demo_ids.isdisjoint(real_ids)
 
 
 # --------------------------------------------------------------------------- #

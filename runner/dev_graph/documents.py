@@ -66,6 +66,19 @@ from runner.graph_schema import EVIDENCE_TO_STATUS
 
 DOCUMENT_SCHEMA_ID = "orch.dev_graph.document_snapshot.v1"
 
+#: Schema v2 (``plans/msca_dn_pre_evaluation_spec.md`` decision 17): identical to
+#: v1 except that a ``source_grounded`` claim must carry a ``verified_span``.
+#: The demo's 147-claim record declares 90 claims source-grounded with no span
+#: and nothing in v1 forbids it; v1 records are grandfathered, so the default
+#: stays v1 and an importer opts into v2 explicitly.
+DOCUMENT_SCHEMA_ID_V2 = "orch.dev_graph.document_snapshot.v2"
+
+#: The closed set of document snapshot schema ids the builder reads.
+DOCUMENT_SCHEMA_IDS: frozenset[str] = frozenset({DOCUMENT_SCHEMA_ID, DOCUMENT_SCHEMA_ID_V2})
+
+#: Schema ids under which a ``source_grounded`` claim without a span is malformed.
+_STRICT_GROUNDING_SCHEMA_IDS: frozenset[str] = frozenset({DOCUMENT_SCHEMA_ID_V2})
+
 #: Repo-relative directory holding one immutable record per document version.
 DOCUMENTS_REL = "docs/tier4_orchestration_state/dev_graph/documents"
 
@@ -198,7 +211,9 @@ def _verified_span(raw: Any, where: str) -> dict[str, Any] | None:
     return span
 
 
-def _claim(c: dict[str, Any], sections: set[str], where_doc: str) -> dict[str, Any]:
+def _claim(
+    c: dict[str, Any], sections: set[str], where_doc: str, *, strict_grounding: bool = False
+) -> dict[str, Any]:
     cid = _str(c, "claim_id", where_doc)
     where = f"claim {cid}"
     if not _ID_RE.match(cid):
@@ -230,13 +245,20 @@ def _claim(c: dict[str, Any], sections: set[str], where_doc: str) -> dict[str, A
     approval = _str(c, "approval", where)
     if approval not in APPROVALS:
         raise _malformed(where, f"{where}: approval {approval!r} is not in {sorted(APPROVALS)}")
+    span = _verified_span(c.get("verified_span"), where)
+    if strict_grounding and strength == "source_grounded" and span is None:
+        raise _malformed(
+            where,
+            f"{where}: a source_grounded claim must carry a verified_span under "
+            f"{DOCUMENT_SCHEMA_ID_V2}; a grounding nobody can resolve is a declaration, not evidence",
+        )
     return {
         "claim_id": cid,
         "section_id": section_id,
         "text": _str(c, "text", where, required=False),
         "evidence_strength": strength,
         "declared_status": declared,
-        "verified_span": _verified_span(c.get("verified_span"), where),
+        "verified_span": span,
         "approval": approval,
     }
 
@@ -257,12 +279,22 @@ def _commitment(m: dict[str, Any], sections: set[str], where_doc: str) -> dict[s
     }
 
 
-def normalise_candidate(raw: Any, where: str) -> dict[str, Any]:
+def normalise_candidate(
+    raw: Any, where: str, *, schema_id: str = DOCUMENT_SCHEMA_ID
+) -> dict[str, Any]:
     """Validate a candidate's own shape and return its canonical content.
 
     Pure. Cross-record facts (does the source exist, do offsets fit its text,
     do the addressed ids exist) are the builder's job at snapshot time.
+
+    *schema_id* selects the rule set: under :data:`DOCUMENT_SCHEMA_ID_V2` a
+    ``source_grounded`` claim without a ``verified_span`` is malformed. The
+    canonical content is the same under both ids, so a candidate's
+    ``content_version`` does not depend on the schema it is imported under.
     """
+    if schema_id not in DOCUMENT_SCHEMA_IDS:
+        raise _malformed(where, f"{where}: schema_id {schema_id!r} is not in {sorted(DOCUMENT_SCHEMA_IDS)}")
+    strict = schema_id in _STRICT_GROUNDING_SCHEMA_IDS
     if not isinstance(raw, dict):
         raise _malformed(where, f"{where}: candidate must be a JSON object")
     document_id = _str(raw, "document_id", where)
@@ -276,7 +308,9 @@ def normalise_candidate(raw: Any, where: str) -> dict[str, Any]:
     if dup is not None:
         raise _malformed(where, f"{where}: section_id {dup!r} declared more than once")
     section_ids = set(ids)
-    claims = [_claim(c, section_ids, where) for c in _objects(raw, "claims", where)]
+    claims = [
+        _claim(c, section_ids, where, strict_grounding=strict) for c in _objects(raw, "claims", where)
+    ]
     for key, items in (("claim_id", claims),):
         seen = [i[key] for i in items]
         dup = next((i for i in seen if seen.count(i) > 1), None)
@@ -390,36 +424,27 @@ def read_candidate(repo_root: Path, candidate_rel: Path | str) -> dict[str, Any]
     return normalise_candidate(raw, where)
 
 
-def import_document(
-    repo_root: Path,
-    candidate_rel: Path | str,
+def render_record(
+    raw: Any,
+    where: str,
     *,
     state: str = "imported",
     provenance: dict[str, Any] | None = None,
-) -> DocumentRef:
-    """Import the candidate at *candidate_rel* as an immutable document record.
+    schema_id: str = DOCUMENT_SCHEMA_ID,
+) -> tuple[dict[str, Any], str]:
+    """The immutable record *raw* would become and its repo-relative path.
 
-    Returns the :class:`DocumentRef` of the record, writing it only when it
-    does not already exist. Raises :class:`DevGraphError` on an unreadable or
-    malformed candidate or an unknown *state* (``malformed_record``), and on
-    an existing record of the same content under another state or another
-    provenance (``immutable_record``): neither is a re-import.
-
-    *provenance* is stored as given and never derived here. The revision
-    module (``runner.dev_graph.revisions.create_candidate_version``)
-    validates it against the change record and the current snapshot before
-    calling this function; the builder turns its ``supersedes`` reference
-    into the edge.
+    Pure: the record an import writes is a function of the candidate content,
+    the state, the provenance and the schema id alone, so a check mode can
+    compare bytes without writing. Raises ``malformed_record`` as
+    :func:`normalise_candidate` does, and on an unknown *state*.
     """
-    root = Path(repo_root)
-    rel = Path(candidate_rel)
-    where = rel.as_posix()
     if state not in DOCUMENT_STATES:
         raise _malformed(where, f"state {state!r} is not in {sorted(DOCUMENT_STATES)}")
-    content = read_candidate(root, rel)
+    content = normalise_candidate(raw, where, schema_id=schema_id)
     content_version = content_hash(content)
     record: dict[str, Any] = {
-        "schema_id": DOCUMENT_SCHEMA_ID,
+        "schema_id": schema_id,
         "document_id": content["document_id"],
         "content_version": content_version,
         "state": state,
@@ -429,22 +454,87 @@ def import_document(
         record["tags"] = content["tags"]
     if provenance is not None:
         record["provenance"] = provenance
-    node_id = document_node_id(record["document_id"], content_version)
     target_rel = Path(DOCUMENTS_REL) / record["document_id"] / f"{content_version[len(HASH_PREFIX):]}.json"
+    return record, target_rel.as_posix()
+
+
+def import_candidate(
+    repo_root: Path,
+    raw: Any,
+    *,
+    where: str,
+    state: str = "imported",
+    provenance: dict[str, Any] | None = None,
+    schema_id: str = DOCUMENT_SCHEMA_ID,
+) -> DocumentRef:
+    """Import the candidate object *raw* as an immutable document record.
+
+    The in-memory entry point :func:`import_document` delegates to after
+    reading its file; an importer that derives a candidate from another
+    document (a PDF, say) calls this directly and never writes the candidate
+    as an intermediate file. *where* names the candidate in error messages.
+    Semantics are otherwise those of :func:`import_document`.
+    """
+    root = Path(repo_root)
+    record, target_rel = render_record(
+        raw, where, state=state, provenance=provenance, schema_id=schema_id
+    )
+    node_id = document_node_id(record["document_id"], record["content_version"])
     target = root / target_rel
     if target.is_file():
         existing = json.loads(target.read_text(encoding="utf-8-sig"))
         if existing != record:
             raise DevGraphError(
                 "immutable_record",
-                target_rel.as_posix(),
+                target_rel,
                 f"document snapshot {node_id} already exists with state "
-                f"{existing.get('state')!r}; a state or provenance change is not a re-import",
+                f"{existing.get('state')!r}; a state, provenance or schema change is not a re-import",
             )
     else:
         atomic_write_json(record, target)
     return DocumentRef(
-        id=node_id, version=content_hash(node_content(record)), path=target_rel.as_posix()
+        id=node_id, version=content_hash(node_content(record)), path=target_rel
+    )
+
+
+def import_document(
+    repo_root: Path,
+    candidate_rel: Path | str,
+    *,
+    state: str = "imported",
+    provenance: dict[str, Any] | None = None,
+    schema_id: str = DOCUMENT_SCHEMA_ID,
+) -> DocumentRef:
+    """Import the candidate at *candidate_rel* as an immutable document record.
+
+    Returns the :class:`DocumentRef` of the record, writing it only when it
+    does not already exist. Raises :class:`DevGraphError` on an unreadable or
+    malformed candidate, an unknown *state* or an unknown *schema_id*
+    (``malformed_record``), and on an existing record of the same content
+    under another state, provenance or schema (``immutable_record``): none of
+    these is a re-import.
+
+    *provenance* is stored as given and never derived here. The revision
+    module (``runner.dev_graph.revisions.create_candidate_version``)
+    validates it against the change record and the current snapshot before
+    calling this function; the builder turns its ``supersedes`` reference
+    into the edge.
+
+    *schema_id* defaults to v1 so every existing caller and every committed
+    record replays unchanged; :data:`DOCUMENT_SCHEMA_ID_V2` is opt-in.
+    """
+    root = Path(repo_root)
+    rel = Path(candidate_rel)
+    where = rel.as_posix()
+    path = root / rel
+    if not path.is_file():
+        raise _malformed(where, "candidate file not found")
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as exc:
+        raise _malformed(where, f"unreadable JSON: {exc}") from exc
+    return import_candidate(
+        root, raw, where=where, state=state, provenance=provenance, schema_id=schema_id
     )
 
 
@@ -460,8 +550,8 @@ def read_document_records(repo_root: Path) -> list[tuple[str, dict[str, Any]]]:
             rec = json.loads(p.read_text(encoding="utf-8-sig"))
         except (OSError, ValueError) as exc:
             raise _malformed(rel, f"unreadable JSON: {exc}") from exc
-        if not isinstance(rec, dict) or rec.get("schema_id") != DOCUMENT_SCHEMA_ID:
-            raise _malformed(rel, f"not a {DOCUMENT_SCHEMA_ID} record")
+        if not isinstance(rec, dict) or rec.get("schema_id") not in DOCUMENT_SCHEMA_IDS:
+            raise _malformed(rel, f"not a document snapshot record ({sorted(DOCUMENT_SCHEMA_IDS)})")
         if rec.get("state") not in DOCUMENT_STATES:
             raise _malformed(rel, f"state {rec.get('state')!r} is not in {sorted(DOCUMENT_STATES)}")
         out.append((rel, rec))

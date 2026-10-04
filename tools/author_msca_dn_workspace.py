@@ -12,15 +12,17 @@ What it writes
     operator declarations of PE-01 and the input table. Each input carries a
     role, a declared version, the version markers a reader can find in the
     file, and a sha256 and page count derived here from the stored bytes.
-    The ``derived`` half stays ``pending`` until PE-03 writes it; the
-    ``declared`` sub-section table stays empty until the operator fills it
-    beside PE-03's derived half.
+    The ``derived`` half is rendered through
+    ``tools.import_external_proposal.derive_register_half`` (PE-03), so the
+    register has one renderer; the ``declared`` sub-section table stays empty
+    until the operator fills it beside the derived half.
 
 ``workspaces/msca_dn/``
     The real project's graph root (spec §6). ``build_snapshot`` resolves its
     nine relative paths against it, so the demo's Tier 3 and Tier 4 records
-    are unreachable by construction. It holds an empty source index that PE-03
-    populates, the empty dev-graph directories, and the ESR intake record.
+    are unreachable by construction. It holds the dev-graph directories and the
+    ESR intake record; the source index, the document record and the import
+    manifest are PE-03's and are written by ``tools/import_external_proposal.py``.
 
 ``workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/intake/<id>.json``
     The intake, written through :func:`runner.dev_graph.record_esr_intake` so
@@ -67,7 +69,7 @@ from runner.atomic_write import atomic_write_text, canonical_json_bytes
 from runner.dev_graph.builder import SOURCES_REL
 from runner.dev_graph.intake import INTAKE_REL, normalise_intake, record_esr_intake
 from runner.paths import find_repo_root
-from runner.source_index import SOURCE_INDEX_RECORD_TYPE, read_page_text
+from runner.source_index import read_page_text
 
 # --------------------------------------------------------------------------- #
 # Constants: the spec's names
@@ -235,6 +237,10 @@ def _input_rows(repo_root: Path) -> list[dict[str, Any]]:
 
 
 def render_register(repo_root: Path) -> dict[str, Any]:
+    # PE-03 owns the derived half; imported here so the register has one renderer.
+    from tools.import_external_proposal import derive_register_half
+
+    derived = derive_register_half(repo_root)
     rows = _input_rows(repo_root)
     by_key = {r["role_key"]: r for r in rows}
     candidate = by_key["candidate"]
@@ -343,18 +349,7 @@ def render_register(repo_root: Path) -> dict[str, Any]:
             },
             "inputs": rows,
         },
-        "derived": {
-            "kind": "derived",
-            "status": "pending",
-            "written_by": "PE-03, tools/import_external_proposal.py",
-            "will_hold": [
-                "per-page extraction losses",
-                "figure count (expected zero)",
-                "dependency keyword counts (expected zero for dependenc, interdepend, Gantt, critical path)",
-                "table render results for the surviving tables, their count derived there",
-                "body point-size distribution",
-            ],
-        },
+        "derived": derived,
         "declared": {
             "kind": "declared",
             "fields_per_sub_section": ["presence", "transformation"],
@@ -364,25 +359,6 @@ def render_register(repo_root: Path) -> dict[str, Any]:
             ),
             "sub_sections": [],
         },
-    }
-
-
-def render_workspace_sources() -> dict[str, Any]:
-    return {
-        "record_type": SOURCE_INDEX_RECORD_TYPE,
-        "schema_ref": (
-            "No declared schema; see docs/tier3_project_instantiation/source_materials/sources.json "
-            "for the shape rationale. runner/dev_graph/builder.py asks only for a non-empty source_id "
-            "and, if present, a string text."
-        ),
-        "provenance_class": "pending",
-        "artifact_purpose": (
-            "The Tier 3 source index of the MSCA-DN pre-evaluation graph root. Empty at PE-01. "
-            "PE-03 writes one source per page of the sanitised copy, SRC-DN-P01 to SRC-DN-P84, "
-            "each holding that page's extracted text, so a verified_span resolves to a page and an offset."
-        ),
-        "spec": SPEC_REL,
-        "sources": [],
     }
 
 
@@ -427,11 +403,15 @@ def render_readme() -> str:
         "\n"
         "What lives here:\n"
         "\n"
-        f"- `{SOURCES_REL.as_posix()}`: the source index, empty until PE-03 writes one source per page.\n"
+        f"- `{SOURCES_REL.as_posix()}`: the source index, one source per page of the sanitised copy\n"
+        "  (`SRC-DN-P01` to `SRC-DN-P84`), each holding that page's text, written by PE-03.\n"
         f"- `{_DEV_GRAPH_REL.as_posix()}/intake/{INTAKE_ID}.json`: the ESR intake, whose `call_id` is the\n"
         "  call the ESR evaluated.\n"
         "- The baseline's target call belongs to the profile, the run label and the report, never to the intake.\n"
-        f"- `{_DEV_GRAPH_REL.as_posix()}/documents/`, `snapshots/`, `packages/`: empty until PE-03 and PE-06.\n"
+        f"- `{_DEV_GRAPH_REL.as_posix()}/documents/`: the imported document record (schema v2), written by PE-03.\n"
+        f"- `{_DEV_GRAPH_REL.as_posix()}/imports/`: the import manifest naming the extractor, normalisation,\n"
+        "  table-rendering and claim-extraction versions, written by PE-03.\n"
+        f"- `{_DEV_GRAPH_REL.as_posix()}/snapshots/`, `packages/`: empty until PE-06.\n"
         "\n"
         "What does not live here:\n"
         "\n"
@@ -441,7 +421,9 @@ def render_readme() -> str:
         "The assessment artifact under the register is a sanitised derivative of the historical submission.\n"
         "No result over it is a result over that submission.\n"
         "\n"
-        "Authored by `py -3.10 -m tools.author_msca_dn_workspace`; `--check` exits 1 if any file would change.\n"
+        "Authored by `py -3.10 -m tools.author_msca_dn_workspace` (skeleton, intake, register) and\n"
+        "`py -3.10 -m tools.import_external_proposal` (sources, document record, manifest, the register's\n"
+        "derived half). Each tool's `--check` exits 1 if any file it owns would change.\n"
     )
 
 
@@ -450,7 +432,6 @@ def render_all(repo_root: Path) -> dict[str, bytes]:
     files: dict[str, bytes] = {
         REGISTER_REL.as_posix(): canonical_json_bytes(render_register(repo_root)),
         (WORKSPACE_REL / "README.md").as_posix(): render_readme().encode("utf-8"),
-        (WORKSPACE_REL / SOURCES_REL).as_posix(): canonical_json_bytes(render_workspace_sources()),
         (WORKSPACE_REL / INTAKE_REL / f"{INTAKE_ID}.json").as_posix(): canonical_json_bytes(render_intake(repo_root)),
     }
     for name in _EMPTY_DEV_GRAPH_DIRS:

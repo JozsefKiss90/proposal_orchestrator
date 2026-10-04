@@ -1,0 +1,152 @@
+{
+  "report_id": "msca-dn-pe03-external-proposal-import",
+  "report_kind": "validation",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-03 (External proposal import) in plans/msca_dn_pre_evaluation_spec.md",
+  "target_call": "HORIZON-MSCA-2026-DN-01",
+  "instrument_type": "MSCA-DN",
+  "authority": "CLAUDE.md §9.5, §10.5, §12.1, §12.2, §13.3, §16.3. An authoring tool and an engine seam; no gate, no Claude. Not a constitutional amendment; §14.5 is not engaged.",
+  "question_asked": "Does the import carry the sanitised copy into the graph root verbatim, reproducibly, with every table row parseable, every loss recorded, the originals untouched, and a frozen ledger no claim of which is source_grounded?",
+  "answer": "Yes, with the statuses below. Every text, count, offset and hash is derived and re-derived. The page map, the markers, the two unlabelled titles and the claim rule are declared choices with Assumed status. One page-map discrepancy (section 8 opens on p. 75, not 76) is recorded. One claim has no span because it straddles a page break.",
+  "status_summary": {
+    "Confirmed": [
+      "page texts (byte-equal replay)",
+      "sub-section texts and completeness",
+      "table rows",
+      "losses, figures, keyword and citation counts",
+      "hashes",
+      "section-8 start page"
+    ],
+    "Inferred": [],
+    "Assumed": [
+      "§4.1 page map and markers",
+      "titles of 1.1 and 8",
+      "the claim rule"
+    ],
+    "Unresolved": [
+      "every one of the 45 claims, by the lookup (decision 15; PE-07 reports them)"
+    ]
+  },
+  "acceptance_criteria": [
+    {
+      "criterion": "Sub-section prose matches the PDF verbatim under a declared normalisation.",
+      "met": true,
+      "evidence": "MET. The normalisation is declared in the manifest (whitespace collapse, one paragraph per block, the page-crossing join rule, heading and criterion-heading handling, table rows, hyphens kept). tests/test_msca_dn_import.py::TestVerbatim checks every prose paragraph is a substring of the page text, every heading and cell is on its page, no character outside the page text appears, and the record accounts for every non-whitespace character of the 84 pages."
+    },
+    {
+      "criterion": "Re-running the importer produces byte-identical output.",
+      "met": true,
+      "evidence": "MET. render_all is equal across runs and equal to the committed bytes; both --check modes exit 0; no wall-clock field anywhere. The record lands through import_candidate, whose immutability rule refuses a changed record under the same content."
+    },
+    {
+      "criterion": "All 17 tables render and every row parses.",
+      "met": true,
+      "evidence": "MET. 17 tables, 88 rows rendered, 88 parsed back to their table's column count; all 88 rows sit in sub-section 3.1 as paragraphs of their own, with the four captions."
+    },
+    {
+      "criterion": "Extraction losses are recorded, including the zero figures and the zero dependency strings.",
+      "met": true,
+      "evidence": "MET. The derived half records per-page losses (none), 0 images, 0 for dependenc / interdepend / Gantt / critical path with the 4 informal 'in WP<n>' relations beside them, 0 citation markers, the point-size distribution with the 10 pt text identified as bullet glyphs, and the Table 3.1 a flattening (7 'WP Number:' blocks)."
+    },
+    {
+      "criterion": "The originals are untouched.",
+      "met": true,
+      "evidence": "MET. Both PDFs still carry the spec's hashes; the importer writes nothing under source_materials/msca_dn/ except the register's derived half."
+    },
+    {
+      "criterion": "The ledger is an input, frozen here; no extracted claim declares source_grounded; the record is v2.",
+      "met": true,
+      "evidence": "MET. 45 claims in the record, none source_grounded, all unconfirmed/Unresolved/not_applicable, each a sentence of its sub-section, every span resolving to the claim text in its page source; the snapshot builds over the workspace with every span validated."
+    }
+  ],
+  "figures": {
+    "pages": 84,
+    "sub_sections": 15,
+    "tables": 17,
+    "rows_rendered": 88,
+    "rows_parsed": 88,
+    "claims": 45,
+    "claims_without_span": 1,
+    "sentences_considered": 1348,
+    "extraction_loss_pages": 0,
+    "non_whitespace_characters": 103913,
+    "images": 0,
+    "dependency_keyword_counts": {
+      "dependenc": 0,
+      "interdepend": 0,
+      "Gantt": 0,
+      "critical path": 0,
+      "in WP<n>": 4,
+      "build(s/ing) (up)on": 1
+    },
+    "citation_marker_counts": {
+      "bracketed_numbers": 0,
+      "doi": 0,
+      "url": 0,
+      "author_year": 0
+    },
+    "body_point_size_distribution": {
+      "12.0": 117953,
+      "10.0": 1040
+    }
+  },
+  "artifacts": {
+    "document_record": {
+      "path": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/documents/MSCA-DN-2025_sanitised_part_b/bdb8670f6987e4db012498c70abc2629c4186a83a18a8286cb8ffb4fdc8d3d84.json",
+      "schema_id": "orch.dev_graph.document_snapshot.v2",
+      "content_version": "sha256:bdb8670f6987e4db012498c70abc2629c4186a83a18a8286cb8ffb4fdc8d3d84",
+      "node_id": "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+      "sha256": "bab560c6f9b7e62600ca5faeb06cf8ec6de623ed7efa3d0695c1d76bfe0856e6"
+    },
+    "source_index": {
+      "path": "workspaces/msca_dn/docs/tier3_project_instantiation/source_materials/sources.json",
+      "sources": 84,
+      "sha256": "d9353447295c6a9eff15d9806d08fd0b75a8794445b08cd919d5e5b4830fbf04"
+    },
+    "import_manifest": {
+      "path": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json",
+      "sha256": "ab8958de94911a3de50fbc17fac1071a396bcb2a54a4ac79145eacee38308a27"
+    },
+    "fidelity_register": {
+      "path": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+      "sha256": "5c9ce4e34af8c120ce266effba7ee7719e92cff91671de1be1f3bcb3e205e4e9",
+      "derived_half": "written"
+    },
+    "schema_registry_entry": {
+      "path": "docs/index/schema_registry.json",
+      "schema_id": "orch.dev_graph.document_snapshot.v2"
+    },
+    "engine": [
+      "runner/dev_graph/documents.py (DOCUMENT_SCHEMA_ID_V2, DOCUMENT_SCHEMA_IDS, render_record, import_candidate; v1 default unchanged)",
+      "runner/dev_graph/builder.py (re-checks a record under its own schema id)",
+      "runner/external_proposal.py (new substrate)"
+    ],
+    "tools": [
+      "tools/import_external_proposal.py",
+      "tools/author_msca_dn_workspace.py (renders the derived half through the importer; no longer owns sources.json)"
+    ],
+    "tests": [
+      "tests/test_msca_dn_import.py",
+      "tests/runner/test_external_proposal.py",
+      "tests/runner/test_dev_graph_documents.py::TestSchemaV2",
+      "tests/test_msca_dn_workspace.py"
+    ]
+  },
+  "what_ran": {
+    "import": "py -3.10 -m tools.import_external_proposal (4 files written), then --check: up to date.",
+    "workspace": "py -3.10 -m tools.author_msca_dn_workspace (README refreshed), then --check: up to date.",
+    "tests": "py -3.10 -m pytest -q tests on 2026-10-04 after this ticket: 46 failed, 6196 passed, 77 skipped, 5 errors in 269 s. The failures and errors are the branch baseline PE-02 recorded (transport_openai_compatible, purged golden sets, demo Tier 5 state); none is in a file this ticket adds or touches. Targeted: tests/test_msca_dn_import.py, tests/test_msca_dn_workspace.py, tests/runner/test_external_proposal.py, tests/runner/test_dev_graph_documents.py, tests/test_demo_report.py, tests/test_demo_candidate_blind_baseline.py and tests/harness/test_msca_dn_profile.py all green.",
+    "leakage_scan": "py -3.10 -m runner.leakage_scan: 328 files in Tier 3, Tier 4, Tier 5 and the vault, this ticket's two records included; 0 new leaks; 11 pre-existing hits, all in decision_log/project-purge-clean-engine-base_2026-09-22.json; exit 0. By hand, because the scanner's globs do not reach it: runner.leakage_scan.scan_text over every file under workspaces/msca_dn/ (8 files, the 84 page sources and the document record included): 0 hits.",
+    "demo_derivation": "tools.build_demo_dev_graph --check: 38 of 38 artifacts up to date after the schema change (v1 default unchanged)."
+  },
+  "known_gaps": {
+    "workspace_outside_the_leakage_scan": "runner/leakage_scan.py globs docs/tier3, tier4, tier5 and the vault; workspaces/msca_dn/ now holds the copy's full text in 84 sources and a document record, and is scanned by nothing (PE-01 known gap, now with more at stake). A scan of the workspace tree was run by hand for this record; see the validation report.",
+    "claim_rule_is_a_choice": "The ledger's size depends on the regex set; a different rule yields a different ledger and a different content_version. PE-05 binds the import manifest for that reason. The rule is small on purpose and may be widened at a version bump.",
+    "sources_json_not_verifiable_by_runner_source_index": "runner.source_index.verify is bound to the demo's concept (document registry, concept claims, swept Tier 3 names) and resolves stored_path against its repo_root argument; the workspace is not the repository root (spec decision 2), so verify is not run over it. The import test replays every page text byte-equal instead.",
+    "declared_half_still_empty": "The register's declared half (presence and transformation per sub-section, decision 9) is the operator's and is empty after PE-03. Until it is filled, a reader of the register sees a derived half only; PE-08 must not read an empty declared half as 'nothing was transformed'.",
+    "include_claims_not_yet_built": "Decision 6's include_claims on build_evidence_pack is PE-04's work and does not exist yet. The ledger is frozen here so that PE-04 has something to exclude structurally and PE-07 something to enumerate; nothing reads it until then.",
+    "header_spellings_differ_per_physical_table": "The deliverables table repeats its header on each page and pymupdf reads the wrapped cells differently ('Numbe r', 'W P', 'Typ e' on pp. 51-56; 'Number', 'WP' on pp. 56-58). Each physical table's header is recorded under tables.per_table; the integrity audit must key on position, not on header text.",
+    "document_registry": "The sanitised PDF is not listed in docs/index/document_registry.json (§9.6); PE-01 did not list it either. The source records name it by path and sha256."
+  },
+  "decision_record": "docs/tier4_orchestration_state/decision_log/msca-dn-pe03-external-proposal-import_2026-10-04.json"
+}

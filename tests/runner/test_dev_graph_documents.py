@@ -389,3 +389,99 @@ class TestExtendedFixtureStability:
         write_snapshot(world)
         assert (world / SNAPSHOT_REL).read_bytes() == first
         assert b'"document_snapshot"' in first
+
+
+# --------------------------------------------------------------------------- #
+# Schema v2 (spec decision 17): a source_grounded claim must carry a span
+# --------------------------------------------------------------------------- #
+
+
+class TestSchemaV2:
+    """``orch.dev_graph.document_snapshot.v2`` requires a ``verified_span`` on
+    every ``source_grounded`` claim. v1 is grandfathered: the fixture's CL-2
+    (source_grounded, no span) still imports under v1 and is refused under v2.
+    """
+
+    def test_schema_ids_are_closed_and_v1_is_the_default(self):
+        from runner.dev_graph.documents import (
+            DOCUMENT_SCHEMA_ID,
+            DOCUMENT_SCHEMA_ID_V2,
+            DOCUMENT_SCHEMA_IDS,
+        )
+
+        assert DOCUMENT_SCHEMA_ID == "orch.dev_graph.document_snapshot.v1"
+        assert DOCUMENT_SCHEMA_ID_V2 == "orch.dev_graph.document_snapshot.v2"
+        assert DOCUMENT_SCHEMA_IDS == frozenset({DOCUMENT_SCHEMA_ID, DOCUMENT_SCHEMA_ID_V2})
+
+    def test_v2_refuses_a_source_grounded_claim_without_a_span_naming_it(self, world: Path):
+        from runner.dev_graph.documents import DOCUMENT_SCHEMA_ID_V2
+
+        with pytest.raises(DevGraphError) as exc:
+            import_document(world, CANDIDATE, schema_id=DOCUMENT_SCHEMA_ID_V2)
+        assert exc.value.kind == "malformed_record"
+        assert "CL-2" in str(exc.value)
+        assert "verified_span" in str(exc.value)
+        assert not (world / DOCUMENTS_REL).exists()
+
+    def test_v1_still_imports_the_same_candidate(self, world: Path):
+        ref = import_document(world, CANDIDATE)
+        rec = _load(world, Path(ref.path))
+        assert rec["schema_id"] == "orch.dev_graph.document_snapshot.v1"
+
+    def test_v2_record_carries_the_v2_schema_id_and_builds(self, world: Path):
+        from runner.dev_graph.documents import DOCUMENT_SCHEMA_ID_V2
+
+        cand = _load(world, CANDIDATE)
+        cand["claims"][1]["verified_span"] = {"source_id": "SRC-2", "start": 0, "end": 13}
+        _dump(world, CANDIDATE, cand)
+        ref = import_document(world, CANDIDATE, schema_id=DOCUMENT_SCHEMA_ID_V2)
+        rec = _load(world, Path(ref.path))
+        assert rec["schema_id"] == DOCUMENT_SCHEMA_ID_V2
+        snap = build_snapshot(world)
+        docs = [n for n in snap.nodes if n["type"] == "artifact_version"]
+        assert [d["id"] for d in docs] == [ref.id]
+
+    def test_the_builder_re_checks_a_v2_record_on_disk(self, world: Path):
+        """A v2 record whose span was dropped by hand is refused at build time,
+        so the rule cannot be bypassed by editing the record."""
+        from runner.dev_graph.documents import DOCUMENT_SCHEMA_ID_V2
+
+        cand = _load(world, CANDIDATE)
+        cand["claims"][1]["verified_span"] = {"source_id": "SRC-2", "start": 0, "end": 13}
+        _dump(world, CANDIDATE, cand)
+        ref = import_document(world, CANDIDATE, schema_id=DOCUMENT_SCHEMA_ID_V2)
+        rec = _load(world, Path(ref.path))
+        rec["claims"][1]["verified_span"] = None
+        _dump(world, Path(ref.path), rec)
+        with pytest.raises(DevGraphError) as exc:
+            build_snapshot(world)
+        assert exc.value.kind == "malformed_record"
+
+    def test_an_unknown_schema_id_is_refused(self, world: Path):
+        with pytest.raises(DevGraphError) as exc:
+            import_document(world, CANDIDATE, schema_id="orch.dev_graph.document_snapshot.v9")
+        assert exc.value.kind == "malformed_record"
+
+    def test_import_candidate_from_a_dict_lands_the_same_record_as_the_file(self, tmp_path: Path):
+        from runner.dev_graph.documents import import_candidate
+
+        a = tmp_path / "a"
+        b = tmp_path / "b"
+        shutil.copytree(FIXTURE, a)
+        shutil.copytree(FIXTURE, b)
+        raw = _load(a, CANDIDATE)
+        ref_file = import_document(a, CANDIDATE)
+        ref_dict = import_candidate(b, raw, where="in-memory candidate")
+        assert ref_dict == ref_file
+        assert (a / ref_file.path).read_bytes() == (b / ref_dict.path).read_bytes()
+
+    def test_render_record_is_the_bytes_import_writes_without_writing(self, world: Path):
+        from runner.atomic_write import canonical_json_bytes
+        from runner.dev_graph.documents import render_record
+
+        raw = _load(world, CANDIDATE)
+        record, rel = render_record(raw, where="x")
+        assert not (world / rel).exists()
+        ref = import_document(world, CANDIDATE)
+        assert rel == ref.path
+        assert (world / ref.path).read_bytes() == canonical_json_bytes(record)

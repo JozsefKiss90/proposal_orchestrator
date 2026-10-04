@@ -356,6 +356,18 @@ extract, which the ESR intake never carries. `tests/harness/test_msca_dn_profile
 re-derives all of it and pins the RIA and MSCA-PF registry entries by hash, since
 Phase 1 has destroyed a registry entry before.
 
+The DN candidate is an external PDF, not a Phase-8 output. `tools/import_external_proposal.py`
+(spec PE-03) imports it into the workspace graph root `workspaces/msca_dn/` on the
+Claude-free substrate `runner/external_proposal.py`: one page source per PDF page,
+fifteen sub-sections anchored `1.1` to `3.2` and `4` to `8` in three section artifacts,
+tables rendered one pipe-delimited row per paragraph, a claim ledger of rule-selected
+sentences frozen `unconfirmed` with a span into their page, and a v2 document record
+(`orch.dev_graph.document_snapshot.v2`, which requires a span on every
+`source_grounded` claim). The import manifest under `dev_graph/imports/` carries the
+extractor, normalisation, table-rendering and claim-extraction versions that PE-05's
+preflight binds. `tests/test_msca_dn_import.py` re-derives the import and checks every
+sub-section verbatim against the PDF under the declared normalisation.
+
 ## Blind assessment (`blind_assessment.py` + `commands/blind_assessment.py`)
 
 The blind pre-evaluation lane assesses one specified candidate against a
