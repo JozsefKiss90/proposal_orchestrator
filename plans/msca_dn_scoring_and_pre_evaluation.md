@@ -290,4 +290,5 @@ Keep historical and resubmission profiles separate wherever their rules differ. 
 
 **You can proceed with the development tickets now.** Rename the current deliverable to **“MSCA-DN assessment framework tested on a sanitised historical case”**, and add the private-network validation as an explicit acceptance stage. That accurately captures the progress these documents can support without overstating the reliability of their scores.
 
-"Repeated placeholders have been removed and table Table 3.1 has been included"
+"Repeated placeholders have been removed and table Table 3.1 has been included.
+The ESR and the sanitized proposal are located at docs\tier3_project_instantiation\source_materials"
