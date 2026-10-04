@@ -1,0 +1,433 @@
+{
+  "scorecard_id": "msca_dn_evaluation_scorecard",
+  "instrument": "MSCA Doctoral Networks (standard DN)",
+  "provenance": {
+    "source_form": "Horizon Europe Evaluation Form (HE MSCA)",
+    "version": "2.2",
+    "version_date": "2025-12-17",
+    "source_path": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+    "criteria_pages": "4-6",
+    "weighting_pages": "5-7",
+    "scoring_page": 2,
+    "derivation": "Aspect texts, levels, weights and quotes are derived from the stored PDFs by tools/author_msca_dn_bundle.py through runner.source_index.read_page_text (whitespace normalised, every other character carried through) and are never typed. tests/harness/test_msca_dn_profile.py re-derives them.",
+    "scoring_authority": "The evaluation form (Tier 2A), with the per-criterion threshold and the no-aspect-scores rule from General Annexes Part 15 (Tier 1).",
+    "structural_authority": {
+      "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+      "version": "6.0",
+      "version_date": "2026-04-04",
+      "template_pages": "28-31",
+      "note": "The page footer dates V6.0 to 04.04.2026; the form's own history table says 26.03.2026. The footer is cited and the discrepancy recorded, not resolved (spec §2.12).",
+      "template_tag_rule": "Headings derived from either application form strip #@...@# and #§...§# tags before use (spec §2.12)."
+    },
+    "v5_equivalence": {
+      "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+      "version": "5.0",
+      "statement": "For HORIZON-MSCA-2026-DN-01 the V5.0 (2025 call) and V6.0 (2026 call) Part B templates are structurally identical: the same ten numbered aspect headings §1.1 to §3.2, the same Tables 3.1 a to 3.1 e, the same 34-page Part B1 cap with sections 1-3 at 30, the same Part B2 sections 4 to 10. V6.0 adds Part B2 section 11 (RAISE DN) for a different call. Measured in spec §2.12."
+    },
+    "dn_scope_rule": "Keep every aspect whose [OPTION for ...] tag names MSCA Doctoral networks, plus the 'all MSCA except ...' aspects whose exception list does not name it. Exclude every Postdoctoral fellowships, Staff exchanges, COFUND, COFUND Choose Europe and Special needs allowances variant.",
+    "untagged_bullet_resolution": {
+      "aspect_id": "imp-career",
+      "defect": "The bullet closes a bracket with ']' but no '[OPTION for ...' opens it. The DN bracket opened at imp-structuring and closed at 'developing sustainable elements of doctoral programmes. ]'.",
+      "resolved_to": "MSCA Doctoral networks",
+      "status": "Inferred",
+      "grounds": [
+        "The plural 'researchers ... their' matches the DN variants; the Postdoctoral fellowships bullet immediately below is singular ('the researcher ... his/her').",
+        "The ESR, assessing a DN proposal, lists it as one of the four Impact aspects considered (read once in session on 2026-10-04; the ESR's content is not copied here, spec decision 12).",
+        "No other variant's bracket is open at that point in the document: the walk in tools/author_msca_dn_bundle.py records the previous bullet as closing."
+      ]
+    },
+    "esr_cross_confirmation": "Read once in session on 2026-10-04: nine of the ten aspect texts occur verbatim in the ESR; exc-training differs only by a hyphenation line break ('inter- sectoral'). No ESR text is stored in this bundle.",
+    "verified_by": "tools/author_msca_dn_bundle.py (derived) and tests/harness/test_msca_dn_profile.py (re-derived)",
+    "verified_on": "2026-10-04"
+  },
+  "scoring": {
+    "scale": "0-5, one decimal place",
+    "scale_source_quote": "Scoring must be in the range from 0-5. Scores will be awarded with a resolution of one decimal place.",
+    "levels": {
+      "0": "The proposal fails to address the criterion or cannot be assessed due to missing or incomplete information.",
+      "1": "Poor. The criterion is inadequately addressed, or there are serious inherent weaknesses.",
+      "2": "Fair. The proposal broadly addresses the criterion, but there are significant weaknesses.",
+      "3": "Good. The proposal addresses the criterion well, but a number of shortcomings are present.",
+      "4": "Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.",
+      "5": "Excellent. The proposal successfully addresses all relevant aspects of the criterion. Any shortcomings are minor."
+    },
+    "levels_note": "Verbatim from the form p. 2, each level's full sentence.",
+    "individual_threshold": 3,
+    "individual_threshold_source": {
+      "source_path": "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "page": 27,
+      "quote": "The threshold for individual criteria will be 3."
+    },
+    "no_aspect_scores_rule": {
+      "source_path": "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "page": 27,
+      "quote": "Evaluation scores will be awarded for the criteria, and not for the different aspects listed in the table.",
+      "consequence": "Scores are awarded per criterion. The ten aspect cells inform a criterion score; they are never averaged into one (spec decisions 5 and 11)."
+    },
+    "overall_threshold": 70,
+    "overall_max": 100,
+    "threshold_source_quote": "The overall threshold, applying to the sum of the 3 individual scores, is 70 points.",
+    "weighting_source_quote": "Weighting is only for the ranking (not to determine if the proposal passed the thresholds).",
+    "total_formula": "S = 10·E + 6·I + 4·Q",
+    "total_formula_note": "Each 0-5 score times weight_pct/5: 50% -> 10, 30% -> 6, 20% -> 4; maximum 100 (form p. 7 'Total score Overall threshold /100').",
+    "annex_d_override": {
+      "annex_d_rule": "The overall threshold, applying to the sum of the three individual scores, will be 10.",
+      "form_rule": "The overall threshold, applying to the sum of the 3 individual scores, is 70 points.",
+      "resolution": "The MSCA evaluation form (Tier 2A) overrides the General Annexes' generic overall threshold of 10 on the unweighted sum with 70 on a weighted total out of 100; the General Annexes themselves allow it ('Specific calls or topics may have different rules'). The per-criterion threshold of 3 is unchanged. Tier interaction logged per CLAUDE.md §12.3 in docs/tier4_orchestration_state/decision_log/msca-dn-pe02-evaluation-bundle_2026-10-04.json."
+    },
+    "weighting_note": "Each of the 3 criteria is scored 0-5, then weighted into a total out of 100; overall pass threshold is 70/100. Weighting is used for ranking only (form p. 2)."
+  },
+  "criteria": [
+    {
+      "id": "excellence",
+      "name": "Excellence",
+      "weight_pct": 50,
+      "threshold_score": 3,
+      "score_field": "Score 1",
+      "weighting_page": 5,
+      "source_page": 4,
+      "aspects": [
+        {
+          "id": "exc-obj",
+          "anchor": "1.1",
+          "source_page": 4,
+          "option_tag": "MSCA Doctoral networks, Postdoctoral fellowships",
+          "option_tag_status": "Confirmed",
+          "text": "Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art).",
+          "af_v6_heading": "Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
+          "af_v6_heading_page": 28,
+          "af_v6_heading_glosses": []
+        },
+        {
+          "id": "exc-method",
+          "anchor": "1.2",
+          "source_page": 4,
+          "option_tag": "MSCA Doctoral networks, Postdoctoral fellowships",
+          "option_tag_status": "Confirmed",
+          "text": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality and appropriateness of open science practices).",
+          "af_v6_heading": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality and appropriateness of open science practices)",
+          "af_v6_heading_page": 28,
+          "af_v6_heading_glosses": []
+        },
+        {
+          "id": "exc-training",
+          "anchor": "1.3",
+          "source_page": 4,
+          "option_tag": "MSCA Doctoral networks",
+          "option_tag_status": "Confirmed",
+          "text": "Quality and credibility of the training programme (including transferable skills, inter/multidisciplinary, inter-sectoral and gender as well as other diversity aspects).",
+          "af_v6_heading": "Quality and credibility of the training programme (including transferable skills, inter/multidisciplinary, inter-sectoral and gender as well as other diversity aspects)",
+          "af_v6_heading_page": 28,
+          "af_v6_heading_glosses": []
+        },
+        {
+          "id": "exc-supervision",
+          "anchor": "1.4",
+          "source_page": 4,
+          "option_tag": "MSCA Doctoral networks",
+          "option_tag_status": "Confirmed",
+          "text": "Quality of the supervision (including mandatory joint supervision for industrial and joint doctorate projects).",
+          "af_v6_heading": "Quality of the supervision (including mandatory joint supervision for industrial and joint doctorate projects)",
+          "af_v6_heading_page": 29,
+          "af_v6_heading_glosses": []
+        }
+      ]
+    },
+    {
+      "id": "impact",
+      "name": "Impact",
+      "weight_pct": 30,
+      "threshold_score": 3,
+      "score_field": "Score 2",
+      "weighting_page": 6,
+      "source_page": "5-6",
+      "aspects": [
+        {
+          "id": "imp-structuring",
+          "anchor": "2.1",
+          "source_page": 5,
+          "option_tag": "MSCA Doctoral networks",
+          "option_tag_status": "Confirmed",
+          "text": "Contribution to structuring doctoral training at the European level and to strengthening European innovation capacity, including the potential for: a) meaningful contribution of the non-academic sector to the doctoral training, as appropriate to the implementation mode and research field b) developing sustainable elements of doctoral programmes.",
+          "af_v6_heading": "Contribution to structuring doctoral training at the European level and to strengthening European innovation capacity, including the potential for: a) Meaningful contribution of the non-academic sector to the doctoral training, as appropriate to the implementation mode and research field b) Developing sustainable (=lasting) elements of doctoral programmes after the end of the DN funding",
+          "af_v6_heading_page": 29,
+          "af_v6_heading_glosses": [
+            "(=lasting) ",
+            " after the end of the dn funding"
+          ]
+        },
+        {
+          "id": "imp-career",
+          "anchor": "2.2",
+          "source_page": 5,
+          "option_tag": "MSCA Doctoral networks",
+          "option_tag_status": "Inferred",
+          "text": "Credibility of the measures to enhance the career perspectives and employability of researchers and contribution to their skills development.",
+          "option_tag_resolution": "provenance.untagged_bullet_resolution",
+          "af_v6_heading": "Credibility of the measures to enhance the career perspectives and employability of researchers and contribution to their skills development",
+          "af_v6_heading_page": 29,
+          "af_v6_heading_glosses": []
+        },
+        {
+          "id": "imp-dissemination",
+          "anchor": "2.3",
+          "source_page": 6,
+          "option_tag": "all MSCA except Special needs allowances and COFUND Choose Europe",
+          "option_tag_status": "Confirmed",
+          "text": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities.",
+          "af_v6_heading": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities",
+          "af_v6_heading_page": 29,
+          "af_v6_heading_glosses": []
+        },
+        {
+          "id": "imp-magnitude",
+          "anchor": "2.4",
+          "source_page": 6,
+          "option_tag": "MSCA Doctoral networks, Postdoctoral fellowships and Staff exchanges",
+          "option_tag_status": "Confirmed",
+          "text": "The magnitude and importance of the project’s contribution to the expected scientific, societal and economic impacts.",
+          "af_v6_heading": "The magnitude and importance of the project’s contribution to the expected scientific, societal and economic impacts (project’s pathways towards impact)",
+          "af_v6_heading_page": 29,
+          "af_v6_heading_glosses": [
+            " (project’s pathways towards impact)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "implementation",
+      "name": "Quality and efficiency of the implementation",
+      "weight_pct": 20,
+      "threshold_score": 3,
+      "score_field": "Score 3",
+      "weighting_page": 7,
+      "source_page": 6,
+      "aspects": [
+        {
+          "id": "impl-workplan",
+          "anchor": "3.1",
+          "source_page": 6,
+          "option_tag": "all MSCA except Special needs allowances and COFUND Choose Europe",
+          "option_tag_status": "Confirmed",
+          "text": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages.",
+          "af_v6_heading": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
+          "af_v6_heading_page": 29,
+          "af_v6_heading_glosses": []
+        },
+        {
+          "id": "impl-participants",
+          "anchor": "3.2",
+          "source_page": 6,
+          "option_tag": "MSCA Doctoral networks and Staff exchanges",
+          "option_tag_status": "Confirmed",
+          "text": "Quality, capacity and role of each participant, including hosting arrangements and extent to which the consortium as a whole brings together the necessary expertise.",
+          "af_v6_heading": "Quality, capacity and role of each participant, including hosting arrangements and extent to which the consortium as a whole brings together the necessary expertise",
+          "af_v6_heading_page": 31,
+          "af_v6_heading_glosses": []
+        }
+      ]
+    }
+  ],
+  "excluded_aspects": [
+    {
+      "criterion": "excellence",
+      "source_page": 4,
+      "option_tag": "MSCA Postdoctoral fellowships",
+      "text": "Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host.",
+      "reason": "Tagged for MSCA Postdoctoral fellowships, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 4,
+      "option_tag": "MSCA Postdoctoral fellowships",
+      "text": "Quality and appropriateness of the researcher’s professional experience, competences and skills.",
+      "reason": "Tagged for MSCA Postdoctoral fellowships, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 4,
+      "option_tag": "MSCA Staff exchanges",
+      "text": "Soundness of the proposed approach to foster international intersectoral and interdisciplinary collaborations",
+      "reason": "Tagged for MSCA Staff exchanges, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 4,
+      "option_tag": "MSCA Staff exchanges",
+      "text": "Soundness of the proposed methodology (including consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality of open science practices)",
+      "reason": "Tagged for MSCA Staff exchanges, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 4,
+      "option_tag": "MSCA Staff exchanges",
+      "text": "Quality of the proposed interaction between the participating organisations in light of the research and innovation objectives.",
+      "reason": "Tagged for MSCA Staff exchanges, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": "4-5",
+      "option_tag": "MSCA COFUND",
+      "text": "Quality and novelty of the selection / recruitment process for the researchers (transparency, composition and organisation of selection committees, evaluation criteria, equal opportunities, the gender dimension and other diversity aspects) and quality and attractiveness of the appointment conditions, including competitiveness of the salary for the standards of the hosting countries.",
+      "reason": "Tagged for MSCA COFUND, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 5,
+      "option_tag": "MSCA COFUND",
+      "text": "Quality and pertinence of the programme’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
+      "reason": "Tagged for MSCA COFUND, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 5,
+      "option_tag": "MSCA COFUND",
+      "text": "Quality and novelty of the research options offered by the programme in terms of interdisciplinarity, inter-sectorality and level of international mobility. Quality of open science practices.",
+      "reason": "Tagged for MSCA COFUND, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 5,
+      "option_tag": "MSCA COFUND",
+      "text": "Quality, novelty and pertinence of the research training programme (including transferable skills, inter/multidisciplinary, inter-sectoral and gender as well as other diversity aspects).",
+      "reason": "Tagged for MSCA COFUND, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 5,
+      "option_tag": "MSCA COFUND",
+      "text": "Quality, novelty and pertinence of the supervision, career guidance and career development arrangements.",
+      "reason": "Tagged for MSCA COFUND, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 5,
+      "option_tag": "MSCA Special needs allowances",
+      "text": "Appropriateness and relevance of the proposed measures [or special needs items or services] that are necessary for the researcher/staff member to carry out the work in the linked MSCA action.",
+      "reason": "Tagged for MSCA Special needs allowances, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 5,
+      "option_tag": "MSCA COFUND Choose Europe",
+      "text": "Quality of the selection / recruitment process for the researchers (transparency, composition and organisation of selection committees, evaluation criteria, equal opportunities, the gender dimension and other diversity aspects)",
+      "reason": "Tagged for MSCA COFUND Choose Europe, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 5,
+      "option_tag": "MSCA COFUND Choose Europe",
+      "text": "Quality and attractiveness of the appointment conditions, including inclusive working conditions, quality and attractiveness of the research environment and the resources, training and career development opportunities provided throughout the project, and the competitiveness of remuneration rates for the standards of the hosting countries offered in the phase of the fellowship fully funded by the beneficiary.",
+      "reason": "Tagged for MSCA COFUND Choose Europe, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "excellence",
+      "source_page": 5,
+      "option_tag": "MSCA COFUND Choose Europe",
+      "text": "Quality and attractiveness of the concrete long-term career prospects that extend beyond the duration of the fellowship Quality and ambition of the research, innovation and/or academic objectives of the recruitment programme.",
+      "reason": "Tagged for MSCA COFUND Choose Europe, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "impact",
+      "source_page": 5,
+      "option_tag": "MSCA Postdoctoral fellowships",
+      "text": "Credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development.",
+      "reason": "Tagged for MSCA Postdoctoral fellowships, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "impact",
+      "source_page": 5,
+      "option_tag": "MSCA Staff exchanges",
+      "text": "Developing new and lasting research collaborations, achieving transfer of knowledge between participating organisations and contribution to improving research and innovation potential at the European and global level.",
+      "reason": "Tagged for MSCA Staff exchanges, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "impact",
+      "source_page": 5,
+      "option_tag": "MSCA Staff exchanges",
+      "text": "Credibility of the measures to enhance the career perspectives of staff members and contribution to their skills development.",
+      "reason": "Tagged for MSCA Staff exchanges, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "impact",
+      "source_page": 5,
+      "option_tag": "MSCA COFUND",
+      "text": "Strengthening human resources good practices at institutional, regional, national or international level, in particular through aligning the practices of participating organisations with the principles set out by the EU for human resources development in research and innovation.",
+      "reason": "Tagged for MSCA COFUND, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "impact",
+      "source_page": "5-6",
+      "option_tag": "MSCA COFUND",
+      "text": "Credibility of the proposed measures to enhance the career perspectives and employability of researchers and contribution to their skills development.",
+      "reason": "Tagged for MSCA COFUND, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "impact",
+      "source_page": 6,
+      "option_tag": "MSCA Special needs allowances",
+      "text": "Effectiveness of the proposed measures with respect to the work in the linked MSCA action.",
+      "reason": "Tagged for MSCA Special needs allowances, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "impact",
+      "source_page": 6,
+      "option_tag": "MSCA COFUND Choose Europe",
+      "text": "Contribution to addressing local human resource needs, to advancing regional/national specialisation strategies, and to strengthening European research, innovation and teaching capacity Strengthening human resources good practices at institutional, regional, national, or international level, in particular through aligning the practices of participating organisation with the principles set out by the EU for human resources development in research and innovation.",
+      "reason": "Tagged for MSCA COFUND Choose Europe, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "implementation",
+      "source_page": 6,
+      "option_tag": "MSCA Postdoctoral fellowships",
+      "text": "Quality and capacity of the host institutions and participating organisations, including hosting arrangements.",
+      "reason": "Tagged for MSCA Postdoctoral fellowships, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "implementation",
+      "source_page": 6,
+      "option_tag": "MSCA COFUND",
+      "text": "Quality and capacity of the host institution(s) and participating organisations (where appropriate), including hosting arrangements and extent to which they bring together the necessary expertise to successfully implement the research training programme.",
+      "reason": "Tagged for MSCA COFUND, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "implementation",
+      "source_page": 6,
+      "option_tag": "MSCA Special needs allowances",
+      "text": "Appropriateness of the resources deployed.",
+      "reason": "Tagged for MSCA Special needs allowances, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "implementation",
+      "source_page": 6,
+      "option_tag": "MSCA COFUND Choose Europe",
+      "text": "Quality, credibility and effectiveness of the recruitment plan, assessment of risks and appropriateness of the effort assigned towards offering concrete career prospects for recruited researchers.",
+      "reason": "Tagged for MSCA COFUND Choose Europe, which does not include Doctoral networks; must not be graded for a DN proposal."
+    },
+    {
+      "criterion": "implementation",
+      "source_page": 6,
+      "option_tag": "MSCA COFUND Choose Europe",
+      "text": "Quality and capacity of the recruiting institutions, including hosting arrangements and institutional procedures’ alignment with the European Charter for Researchers (institutions with the HRS4R label are exempted from providing further justification for this criterion) and the Agreement on Reforming Research Assessment.",
+      "reason": "Tagged for MSCA COFUND Choose Europe, which does not include Doctoral networks; must not be graded for a DN proposal."
+    }
+  ],
+  "excluded_aspects_sharing_included_text": [
+    {
+      "criterion": "excellence",
+      "source_page": 4,
+      "option_tag": "MSCA Staff exchanges",
+      "text": "Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art).",
+      "reason": "Tagged for MSCA Staff exchanges, but its text equals a DN aspect's under the same criterion. The text is graded once, under its DN tag; this bullet cannot be listed as excluded because the registry row would then match two scorecard entries."
+    }
+  ],
+  "excluded_sections": [
+    {
+      "section": "11",
+      "heading": "RAISE DN (Only for applicants of HORIZON-RAISE-2026-01-MSCA, 1 page)",
+      "source_page": 23,
+      "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+      "reason": "Part B2 section 11 belongs to HORIZON-RAISE-2026-01-MSCA, not to HORIZON-MSCA-2026-DN-01. It is no evaluation-form aspect, anchors no rubric and appears in no criterion appendix mapping."
+    }
+  ]
+}

@@ -1,0 +1,406 @@
+{
+  "rubric_set_id": "msca_dn_rubrics",
+  "version": "1.0.0",
+  "scorecard_id": "msca_dn_evaluation_scorecard",
+  "scorecard_version": "2.2",
+  "framing": "Specificity-based (spec decision 14): each rubric asks whether the section ADDRESSES its aspect with specific, verifiable content, never whether the prose is good. Every rubric keeps a substantiation step; where the pack carries no claim ledger the cell reports grounding UNASSESSABLE, never failed and never passed, so a sanitisation artifact is not penalised and the instrument stays whole for the authoritative evaluation. Expectation texts are the verbatim scorecard aspect texts (HE MSCA Evaluation Form V2.2, pp. 4-6); expectation_key equals the scorecard aspect id; anchors are the AF V6.0 Part B1 sub-sections 1.1-1.4, 2.1-2.4, 3.1-3.2. Part B2 sub-sections 4-8 carry no anchor and compete on selection terms (spec §4.2). Rubric prose, steps, selection terms and thresholds are authored and carry Assumed status. The two-value cell contract (addressal, grounding) is PE-04's.",
+  "criterion_appendix_mapping": {
+    "path": "harness/criterion_appendix_mapping_msca_dn.json",
+    "sha256": "36530cb0090fdf9ae36792b0e2361f282cde5015a4f8a188e1dd05b54cf59a08",
+    "rule": "The mapping is versioned with this rubric set: a change to it changes this pin and the rubric-set version, never the scoring-time assembly."
+  },
+  "rubrics": [
+    {
+      "expectation_key": "exc-obj",
+      "criterion_id": "excellence",
+      "expectation_text": "Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art).",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: named research and innovation objectives, individual doctoral-candidate projects with a title, objectives and expected results, and a stated advance over an identified state of the art. Generic ambition language, or objectives that cannot be told apart from any other network's, must not pass. Judge specificity and addressal; do not reward eloquence or formatting.",
+      "evaluation_steps": [
+        "List the spans that state research or innovation objectives, or an individual DC project (title, objectives, expected results, secondments).",
+        "Check each objective is concrete: an identifiable outcome, a scope, and a relation to a named state of the art or existing programme.",
+        "Check the DC projects are integrated into the overall programme rather than listed beside it.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "objective",
+        "objectives",
+        "state of the art",
+        "state-of-the-art",
+        "ambition",
+        "ambitious",
+        "research question",
+        "research questions",
+        "hypothesis",
+        "hypotheses",
+        "novelty",
+        "novel",
+        "advance",
+        "beyond",
+        "doctoral candidate",
+        "DC",
+        "individual research project",
+        "research programme",
+        "pertinence",
+        "overview"
+      ],
+      "anchor_sub_section_ids": [
+        "1.1"
+      ]
+    },
+    {
+      "expectation_key": "exc-method",
+      "criterion_id": "excellence",
+      "expectation_text": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality and appropriateness of open science practices).",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: a described overall methodology with its concepts, models and assumptions; how methods from different disciplines are integrated or why no interdisciplinary approach is needed; how the gender dimension and other diversity aspects enter the research content or why they do not; and which open science practices are adopted. Naming a practice without saying how it applies to this work must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans describing the overall methodology, including concepts, models and assumptions.",
+        "Check the integration of methods and disciplines is explained, or a justification is given for not needing one.",
+        "Check the gender dimension and other diversity aspects are addressed in the research content, or justified as not relevant; and that open science practices are named with how they apply.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "methodology",
+        "method",
+        "methods",
+        "approach",
+        "interdisciplinary",
+        "inter-disciplinary",
+        "multidisciplinary",
+        "gender dimension",
+        "gender",
+        "diversity",
+        "open science",
+        "open access",
+        "data management",
+        "FAIR",
+        "preregistration",
+        "reproducibility",
+        "concept",
+        "model",
+        "assumption",
+        "work package"
+      ],
+      "anchor_sub_section_ids": [
+        "1.2"
+      ]
+    },
+    {
+      "expectation_key": "exc-training",
+      "criterion_id": "excellence",
+      "expectation_text": "Quality and credibility of the training programme (including transferable skills, inter/multidisciplinary, inter-sectoral and gender as well as other diversity aspects).",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: an overview and content structure of the doctoral training programme, network-wide training events with a lead institution and timing, transferable-skills, inter/multidisciplinary and inter-sectoral training, and how network-wide events complement local programmes. A list of event names with no content or no link to the research must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans describing the training programme's structure and the network-wide training events, schools, courses and conferences.",
+        "Check the events are concrete: a topic, a lead or host, a timing or ECTS, and a link to the research or to transferable skills.",
+        "Check inter/multidisciplinary, inter-sectoral, gender and other diversity aspects of the training are addressed, and local programmes are complemented rather than duplicated.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "training",
+        "training programme",
+        "training event",
+        "training events",
+        "school",
+        "summer school",
+        "winter school",
+        "course",
+        "courses",
+        "workshop",
+        "ECTS",
+        "transferable skills",
+        "transferable",
+        "inter-sectoral",
+        "intersectoral",
+        "secondment",
+        "secondments",
+        "local training",
+        "doctoral programme",
+        "doctoral school",
+        "table 1"
+      ],
+      "anchor_sub_section_ids": [
+        "1.3"
+      ]
+    },
+    {
+      "expectation_key": "exc-supervision",
+      "criterion_id": "excellence",
+      "expectation_text": "Quality of the supervision (including mandatory joint supervision for industrial and joint doctorate projects).",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: the qualifications and supervision experience of the supervisors, how supervision of the doctoral candidates is organised with progress and review procedures, feedback mechanisms and support, and the joint supervision arrangements where the mode requires them. A statement that supervisors are experienced, with nothing behind it, must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans describing supervisor qualifications and experience, the supervision arrangements, and any joint supervision.",
+        "Check the arrangements are concrete: who supervises whom, how often progress is reviewed, what feedback and support exist, and what the career development plan contains.",
+        "Check the mandatory joint supervision is addressed for the declared implementation mode, or stated as not applicable for a standard DN.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "supervision",
+        "supervisor",
+        "supervisors",
+        "co-supervisor",
+        "co-supervision",
+        "joint supervision",
+        "supervisory",
+        "mentoring",
+        "mentor",
+        "career development plan",
+        "progress review",
+        "feedback",
+        "thesis",
+        "PhD",
+        "doctorate",
+        "guidelines for MSCA supervision",
+        "Charter"
+      ],
+      "anchor_sub_section_ids": [
+        "1.4"
+      ]
+    },
+    {
+      "expectation_key": "imp-structuring",
+      "criterion_id": "impact",
+      "expectation_text": "Contribution to structuring doctoral training at the European level and to strengthening European innovation capacity, including the potential for: a) meaningful contribution of the non-academic sector to the doctoral training, as appropriate to the implementation mode and research field b) developing sustainable elements of doctoral programmes.",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: how the project structures doctoral training at the European level and strengthens innovation capacity, what the non-academic sector contributes to the training (secondments, research, network-wide training) and which elements of the doctoral programme are designed to last beyond the funding. A claim of European structuring with no named mechanism must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans describing the contribution to structuring doctoral training at the European level and to innovation capacity.",
+        "Check the non-academic sector's contribution is concrete: named partners, secondments with purpose and duration, roles in research or training.",
+        "Check the sustainable elements are named and their continuation after the project is explained.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "structuring",
+        "European level",
+        "innovation capacity",
+        "non-academic",
+        "industry",
+        "industrial",
+        "sustainable",
+        "sustainability",
+        "lasting",
+        "beyond the project",
+        "after the project",
+        "doctoral programme",
+        "doctoral school",
+        "joint",
+        "network",
+        "secondment",
+        "secondments",
+        "collaboration"
+      ],
+      "anchor_sub_section_ids": [
+        "2.1"
+      ]
+    },
+    {
+      "expectation_key": "imp-career",
+      "criterion_id": "impact",
+      "expectation_text": "Credibility of the measures to enhance the career perspectives and employability of researchers and contribution to their skills development.",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: named measures that enhance the doctoral candidates' career perspectives and employability in academia and beyond, and the technical and transferable skills the project equips them with. A statement that careers will benefit, with no measure attached, must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans describing career measures, employability and skills development for the doctoral candidates.",
+        "Check the measures are concrete: a named activity, who delivers it, and the career option or skill it serves.",
+        "Check both academic and non-academic career paths are addressed, or the omission is justified.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "career",
+        "careers",
+        "employability",
+        "employment",
+        "skills",
+        "skill",
+        "transferable skills",
+        "career development",
+        "career perspectives",
+        "entrepreneurship",
+        "job",
+        "jobs",
+        "sector",
+        "academia",
+        "academic",
+        "non-academic",
+        "mentoring",
+        "alumni"
+      ],
+      "anchor_sub_section_ids": [
+        "2.2"
+      ]
+    },
+    {
+      "expectation_key": "imp-dissemination",
+      "criterion_id": "impact",
+      "expectation_text": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities.",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: a dissemination and exploitation plan with target groups, measures, objectives and indicators; communication activities with messages, tools and channels; and an outline strategy for managing intellectual property. A list of channels with no target group or objective must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans describing dissemination, exploitation and communication measures and the intellectual property strategy.",
+        "Check each measure names a target group, an objective and a way of monitoring it.",
+        "Check exploitation and IP management are addressed with concrete actions during and after the project.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "dissemination",
+        "exploitation",
+        "communication",
+        "outreach",
+        "public engagement",
+        "open access",
+        "publication",
+        "publications",
+        "intellectual property",
+        "IP",
+        "IPR",
+        "patent",
+        "target group",
+        "target groups",
+        "website",
+        "social media",
+        "stakeholder",
+        "stakeholders",
+        "indicator",
+        "indicators"
+      ],
+      "anchor_sub_section_ids": [
+        "2.3"
+      ]
+    },
+    {
+      "expectation_key": "imp-magnitude",
+      "criterion_id": "impact",
+      "expectation_text": "The magnitude and importance of the project’s contribution to the expected scientific, societal and economic impacts.",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: expected scientific, economic or technological, and societal impacts stated as effects of this project, with target groups, and with an indication of magnitude and importance, quantified where possible. Impacts stated for the field in general, or links too tenuous to be the project's own contribution, must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans stating expected scientific, economic/technological and societal impacts.",
+        "Check each impact is the project's own: a named result, a target group, and a pathway from result to impact.",
+        "Check magnitude and importance are indicated, with quantified estimates where the text offers them.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "impact",
+        "impacts",
+        "scientific impact",
+        "economic impact",
+        "technological impact",
+        "societal impact",
+        "pathway",
+        "pathways",
+        "outcome",
+        "outcomes",
+        "magnitude",
+        "importance",
+        "benefit",
+        "benefits",
+        "target group",
+        "beneficiaries",
+        "society",
+        "policy",
+        "market",
+        "industry"
+      ],
+      "anchor_sub_section_ids": [
+        "2.4"
+      ]
+    },
+    {
+      "expectation_key": "impl-workplan",
+      "criterion_id": "implementation",
+      "expectation_text": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages.",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: work packages with objectives, tasks, lead and participating organisations and the doctoral candidates involved; deliverables and milestones with due months and means of verification; dependencies between work packages; and a risk assessment with likelihood, severity and mitigation. A work plan with no timing, no dependencies or no risks must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans and table rows describing work packages, tasks, deliverables, milestones and risks.",
+        "Check the work plan is concrete: start and end months, leads, DCs per task, due dates and means of verification.",
+        "Check inter-work-package dependencies and the effort per work package are described, and the risk table carries mitigation per risk.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "work package",
+        "work packages",
+        "WP",
+        "task",
+        "tasks",
+        "deliverable",
+        "deliverables",
+        "milestone",
+        "milestones",
+        "risk",
+        "risks",
+        "mitigation",
+        "likelihood",
+        "severity",
+        "timeline",
+        "Gantt",
+        "month",
+        "months",
+        "dependency",
+        "dependencies",
+        "effort",
+        "lead participant",
+        "lead beneficiary"
+      ],
+      "anchor_sub_section_ids": [
+        "3.1"
+      ]
+    },
+    {
+      "expectation_key": "impl-participants",
+      "criterion_id": "implementation",
+      "expectation_text": "Quality, capacity and role of each participant, including hosting arrangements and extent to which the consortium as a whole brings together the necessary expertise.",
+      "rubric": "Decide whether the evidence pack shows the section ADDRESSES this aspect with SPECIFIC content: each participant's quality, capacity and role in light of its tasks, its infrastructure and hosting arrangements, the consortium's complementarity, the role of associated partners, and the expertise the consortium brings together as a whole. Reputation language with no named facility, role or task must not pass. Judge specificity and addressal.",
+      "evaluation_steps": [
+        "List the spans describing each participating organisation's capacity, infrastructure, role and hosting arrangements, including the participating-organisation tables.",
+        "Check each role is tied to tasks in the work plan and each hosting arrangement is concrete.",
+        "Check the consortium's complementarity and the associated partners' contributions are explained, and any non-associated third-country funding is justified.",
+        "Substantiation: if the pack carries claim-ledger entries, check the load-bearing statements against them and report grounding as passed or failed. If the pack carries no claim ledger, report grounding UNASSESSABLE — never failed and never passed — and say so in the rationale.",
+        "If pack_status is insufficient_context, or the spans do not substantively cover the aspect, do not report a clean pass."
+      ],
+      "pass_threshold": 0.6,
+      "selection_terms": [
+        "participant",
+        "participants",
+        "participating organisation",
+        "participating organisations",
+        "beneficiary",
+        "beneficiaries",
+        "associated partner",
+        "associated partners",
+        "consortium",
+        "complementarity",
+        "complementary",
+        "expertise",
+        "capacity",
+        "infrastructure",
+        "facilities",
+        "equipment",
+        "hosting",
+        "hosting arrangements",
+        "host",
+        "role",
+        "roles",
+        "laboratory",
+        "laboratories",
+        "non-academic",
+        "third country"
+      ],
+      "anchor_sub_section_ids": [
+        "3.2"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "mapping_id": "msca_dn_criterion_appendix_mapping",
+  "rubric_set_id": "msca_dn_rubrics",
+  "rubric_set_version": "1.0.0",
+  "scorecard_id": "msca_dn_evaluation_scorecard",
+  "purpose": "Which table rows each criterion receives beyond its own section at the criterion-grading stage (spec PE-02, PE-04). Versioned with the rubric set and never assembled at scoring time, because a silent change to it changes scores. Candidate sub-section ids follow the page map of spec §4.1: Tables 3.1 a-e sit in sub-section 3.1, Participating Organisations in sub-section 8.",
+  "status_rule": "Confirmed rows rest on an explicit cross-reference in the AF V6.0 text, quoted; Inferred rows state the inference chain (CLAUDE.md §12.2).",
+  "own_section_rule": "A criterion always receives its own sub-sections' tables; those are not listed here.",
+  "never_received": [
+    "Part B2 section 11 (RAISE DN): a different call's section."
+  ],
+  "rows": [
+    {
+      "criterion_id": "excellence",
+      "aspect_id": "exc-obj",
+      "table": "Table 3.1 a — Description of Work Packages",
+      "candidate_sub_section": "3.1",
+      "rows": "all work-package rows",
+      "status": "Confirmed",
+      "sources": [
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 11,
+          "quote": "The action should be divided in Work Packages and described in the Table 3.1a under the Implementation section."
+        }
+      ]
+    },
+    {
+      "criterion_id": "excellence",
+      "aspect_id": "exc-obj",
+      "table": "Table 3.1 d — DC Table",
+      "candidate_sub_section": "3.1",
+      "rows": "every DC row: planned start, duration, secondment months, non-academic months",
+      "status": "Inferred",
+      "inference": "§1.1 requires each DC project's planned secondments with purpose, timing, duration, host and sector; Table 3.1 d is where the durations are tabulated.",
+      "sources": [
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 11,
+          "quote": "Describe each DC’s individual research project, including for each a title, objectives, expected results, and planned secondments (purpose, timing, duration, host, sector)."
+        },
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 18,
+          "quote": "Total duration of secondments (months)"
+        }
+      ]
+    },
+    {
+      "criterion_id": "excellence",
+      "aspect_id": "exc-supervision",
+      "table": "Section 8 — Participating Organisations",
+      "candidate_sub_section": "8",
+      "rows": "'Role and Commitment of key persons (including supervisors)' per beneficiary",
+      "status": "Confirmed",
+      "sources": [
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 13,
+          "quote": "To avoid duplication, the role and scientific profile of the supervisors should only be listed in the \"Participating Organisations\" tables (see section 8 below)."
+        }
+      ]
+    },
+    {
+      "criterion_id": "impact",
+      "aspect_id": "imp-dissemination",
+      "table": "Table 3.1 a — Description of Work Packages",
+      "candidate_sub_section": "3.1",
+      "rows": "the work-package rows whose tasks carry dissemination, exploitation or communication",
+      "status": "Confirmed",
+      "sources": [
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 15,
+          "quote": "Concrete plans for sections 2.3 must be included in the corresponding table 3.1 a Description of Work Packages."
+        },
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 29,
+          "quote": "Concrete plans for sections 2.3 must be included in the corresponding implementation tables."
+        }
+      ]
+    },
+    {
+      "criterion_id": "impact",
+      "aspect_id": "imp-dissemination",
+      "table": "Table 3.1 b — Deliverables List",
+      "candidate_sub_section": "3.1",
+      "rows": "'Management, Training, Recruitment and Dissemination Deliverables' rows, type PDE",
+      "status": "Inferred",
+      "inference": "The template says 'implementation tables' in the plural and Table 3.1 b types a deliverable PDE for dissemination and/or exploitation of results.",
+      "sources": [
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 29,
+          "quote": "Concrete plans for sections 2.3 must be included in the corresponding implementation tables."
+        },
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 17,
+          "quote": "PDE = dissemination and/or exploitation of results"
+        }
+      ]
+    },
+    {
+      "criterion_id": "impact",
+      "aspect_id": "imp-structuring",
+      "table": "Table 3.1 d — DC Table",
+      "candidate_sub_section": "3.1",
+      "rows": "every DC row: secondment months and 'Total duration in non-academic sector (months)'",
+      "status": "Inferred",
+      "inference": "§2.1 a) names exposure of the DCs to the non-academic sector through secondments; the DC table's non-academic column measures it.",
+      "sources": [
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 14,
+          "quote": "meaningful exposure of Doctoral Candidates to the non-academic sector through secondments"
+        },
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 18,
+          "quote": "Total duration in non- academic sector (months)"
+        }
+      ]
+    },
+    {
+      "criterion_id": "implementation",
+      "aspect_id": "impl-participants",
+      "table": "Section 8 — Participating Organisations",
+      "candidate_sub_section": "8",
+      "rows": "all beneficiary and associated-partner entries",
+      "status": "Confirmed",
+      "sources": [
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 19,
+          "quote": "Appropriateness of the infrastructure and capacity of each participating organisation, as outlined in Section 8 (Participating Organisations), in light of the tasks allocated to them in the action;"
+        },
+        {
+          "source_path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 19,
+          "quote": "Role of associated partners to the programme (please see also section 8)."
+        }
+      ]
+    }
+  ]
+}

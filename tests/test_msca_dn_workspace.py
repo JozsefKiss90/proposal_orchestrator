@@ -33,6 +33,8 @@ REPO = find_repo_root()
 WORKSPACE = REPO / ws.WORKSPACE_REL
 REGISTER = REPO / ws.REGISTER_REL
 SOURCE_DIR = REPO / ws.SOURCE_DIR_REL
+#: The baseline target call's owner (spec PE-01, built at PE-02).
+DN_PROFILE = REPO / "harness/profiles/msca_dn_2026_default.json"
 
 #: The spec's §1 table, first 16 hex of each sha256. Typed from the spec on
 #: purpose: the test must catch a swapped or re-saved file, so it cannot read
@@ -175,17 +177,21 @@ class TestIntake:
 
     def test_call_id_is_the_historical_call_and_not_the_baseline_target(self) -> None:
         # No engine path reads call_id (spec PE-01), so this is the only check.
+        # The target call is read from its owner, the PE-02 profile; the
+        # workspace tool carries no copy of it.
         intake = read_esr_intake(WORKSPACE, ws.INTAKE_ID)
+        profile = json.loads(DN_PROFILE.read_text(encoding="utf-8"))
+        target = profile["target_call"]["call_id"]
         assert intake.call_id == ws.HISTORICAL_CALL_ID
-        assert intake.call_id != ws.BASELINE_TARGET_CALL_ID
-        assert "2025" in intake.call_id and "2026" in ws.BASELINE_TARGET_CALL_ID
+        assert intake.call_id != target
+        assert "2025" in intake.call_id and "2026" in target
+        assert not hasattr(ws, "BASELINE_TARGET_CALL_ID"), "the profile owns the target call"
 
-    def test_tripwire_repoint_the_target_call_at_the_profile_once_pe02_lands(self) -> None:
-        # Until PE-02 the target call is a constant in the authoring tool. The
-        # spec makes the profile its owner, so this test must fail the moment a
-        # DN profile exists and be rewritten to read the target call from it.
+    def test_the_profile_is_the_only_dn_profile_and_names_the_target_call(self) -> None:
         profiles = sorted((REPO / "harness/profiles").glob("msca_dn*.json"))
-        assert profiles == [], f"PE-02 landed ({profiles}); read BASELINE_TARGET_CALL_ID from the profile"
+        assert profiles == [DN_PROFILE]
+        profile = json.loads(DN_PROFILE.read_text(encoding="utf-8"))
+        assert profile["target_call"]["call_id"] == "HORIZON-MSCA-2026-DN-01"
 
     def test_the_esr_reference_names_the_esr_by_hash_and_the_register(self) -> None:
         intake = read_esr_intake(WORKSPACE, ws.INTAKE_ID)

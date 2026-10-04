@@ -1,0 +1,90 @@
+{
+  "report_id": "msca-dn-pe02-evaluation-bundle",
+  "report_kind": "validation",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-02 (DN evaluation bundle) in plans/msca_dn_pre_evaluation_spec.md",
+  "target_call": "HORIZON-MSCA-2026-DN-01",
+  "instrument_type": "MSCA-DN",
+  "authority": "CLAUDE.md §10.2, §10.5, §10.6, §12.1, §12.2, §15. The harness is out-of-band QA and never a runtime gate (harness/HARNESS.md). Not a constitutional amendment; §14.5 is not engaged.",
+  "question_asked": "Do the four artifacts of spec §3.4, plus the criterion appendix mapping, carry the DN evaluation form faithfully, with every value traceable to a stored source or declared with its status?",
+  "answer": "Yes, with the statuses below. Every aspect text, level, weight, threshold and quote is derived from a stored PDF and re-derived by the test. One option tag is Inferred (the §3.2 defect). Rubric wording is Assumed. Three of seven mapping rows are Inferred with their chain stated.",
+  "acceptance_criteria": [
+    {
+      "criterion": "All ten aspect texts byte-match the evaluation form, derived from the PDF and not typed, after #@...@# tags are stripped per §2.12.",
+      "met": true,
+      "evidence": "tools/author_msca_dn_bundle.py walks ef_he-msca_en.pdf pp. 4-6 through runner.source_index.read_page_text and replays byte-equal (--check). tests/harness/test_msca_dn_profile.py::TestScorecardTracesToTheForm asserts each text is on the page it names and that the walk yields exactly the ten. The #@ rule applies to the application-form headings, where the test first asserts a tag is present to strip."
+    },
+    {
+      "criterion": "The AF V6.0 section headings §1.1 to §3.2 confirm the ten anchors one-to-one, and a test pins that correspondence.",
+      "met": true,
+      "evidence": "TestApplicationFormHeadingsConfirmTheAnchors: each af_v6_heading is on its template page after tag stripping, the anchors appear in order, and each heading equals its aspect under the recorded rule (case, final period, two declared glosses)."
+    },
+    {
+      "criterion": "The §3.2 bracket resolution is recorded with its three grounds.",
+      "met": true,
+      "evidence": "provenance.untagged_bullet_resolution carries three grounds; the test checks the plural/singular ground and the no-open-bracket ground against the form, and that the ESR ground copies no ESR text."
+    },
+    {
+      "criterion": "The RIA and MSCA-PF registry entries are byte-identical after the DN entry is added; a test pins all three.",
+      "met": true,
+      "evidence": "TestRegistry pins the canonical sha256 of the RIA and MSCA-PF entries computed from the committed registry at 0e7118b, the DN rows against the scorecard, and loads all three profile bundles."
+    },
+    {
+      "criterion": "A test asserts the PF-only researcher-experience and two-way knowledge-transfer aspects cannot enter a DN assessment, and that section 11 cannot.",
+      "met": true,
+      "evidence": "TestExclusions: the two PF texts are absent from the ten expectations, present under excluded_aspects with the Postdoctoral fellowships tag, and parse as inapplicable under the DN grammar; section 11 sits in excluded_sections with its AF V6.0 p. 23 heading, anchors no rubric and is named in the mapping's never_received."
+    },
+    {
+      "criterion": "The criterion appendix mapping is versioned with the rubric set, not assembled at scoring time.",
+      "met": true,
+      "evidence": "rubrics_msca_dn.json pins the mapping's path and sha256; the mapping carries the rubric set id and version; TestCriterionAppendixMapping re-hashes the file and checks every source quote against the application-form page it names."
+    }
+  ],
+  "status_summary": {
+    "Confirmed": [
+      "ten aspect texts",
+      "six scoring levels",
+      "scale, overall threshold 70, maximum 100, weighting rule (form p. 2 and p. 7)",
+      "weights 50/30/20 (form pp. 5-7)",
+      "per-criterion threshold 3 and no-aspect-scores rule (General Annexes Part 15 p. 27)",
+      "nine option tags",
+      "ten AF V6.0 headings and their correspondence",
+      "section 11 heading and page",
+      "four mapping rows",
+      "RIA and MSCA-PF registry entries unchanged"
+    ],
+    "Inferred": [
+      "imp-career option tag (spec §3.2, three grounds)",
+      "three mapping rows (DC table for exc-obj, PDE deliverables for imp-dissemination, DC table non-academic months for imp-structuring)"
+    ],
+    "Assumed": [
+      "rubric prose, evaluation steps, selection terms and pass thresholds for all ten rubrics"
+    ],
+    "Unresolved": []
+  },
+  "findings": [
+    {
+      "id": "PE02-F1",
+      "finding": "The Staff exchanges Excellence bracket repeats the exc-obj text verbatim, and the substrate loader matches by text, so the duplicate cannot be listed as excluded. Recorded under excluded_aspects_sharing_included_text instead. A loader that matched on (tag, text) would remove the workaround; not changed here.",
+      "severity": "low"
+    },
+    {
+      "id": "PE02-F2",
+      "finding": "The COFUND Choose Europe Excellence bracket prints two aspects as one bullet ('... fellowship Quality and ambition of the research ...'). The derived excluded entry keeps the form's single bullet and carries a form_note.",
+      "severity": "low"
+    },
+    {
+      "id": "PE02-F3",
+      "finding": "Spec §2.1 states the ESR quotes all ten aspects verbatim; exc-training differs by a hyphenation line break. A layout artifact, recorded in the scorecard's provenance without ESR text.",
+      "severity": "informational"
+    }
+  ],
+  "what_was_checked_and_how": [
+    "py -3.10 -m tools.author_msca_dn_bundle --check: up to date.",
+    "py -3.10 -m pytest tests/harness/test_msca_dn_profile.py tests/test_msca_dn_workspace.py tests/harness/test_profile.py tests/harness/test_rubrics.py tests/harness/test_ria_profile.py tests/harness/test_expectations.py: green.",
+    "py -3.10 -m mypy tools/author_msca_dn_bundle.py: no error in the tool (pre-existing errors in runner/ untouched).",
+    "Full suite result recorded in the commit message."
+  ],
+  "recorded_in": "docs/tier4_orchestration_state/decision_log/msca-dn-pe02-evaluation-bundle_2026-10-04.json",
+  "authored_by": "operator with Claude Code, 2026-10-04"
+}

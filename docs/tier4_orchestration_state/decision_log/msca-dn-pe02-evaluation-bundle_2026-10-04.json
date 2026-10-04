@@ -1,0 +1,107 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe02-evaluation-bundle_2026-10-04",
+  "date": "2026-10-04",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-02 (DN evaluation bundle) in plans/msca_dn_pre_evaluation_spec.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §10.2 (the harness is an execution aid, never an authority), §10.6 (programme knowledge is not substituted for a source document that is present), §12.2 (four status categories), §12.3 (a contradiction between tiers is resolved explicitly and the prevailing tier recorded), §16.3 (no schema_id coined). Spec §2.5, §2.6, §2.12, §3, decisions 3, 5, 11, 14. Not a constitutional amendment.",
+  "decision": "The MSCA-DN pre-evaluation profile is carried by five data files and one additive registry entry, all authored by tools/author_msca_dn_bundle.py and replaying byte-equal. Scoring authority is the HE MSCA evaluation form V2.2 (Tier 2A) with the per-criterion threshold and the no-aspect-scores rule from General Annexes Part 15 p. 27 (Tier 1). Structural authority is the DN application form V6.0, with the V5.0 equivalence of spec §2.12 recorded in the scorecard's provenance. No harness Python changed.",
+  "tier_interactions_resolved": {
+    "annex_d_override": {
+      "conflict": "General Annexes Part 15 p. 27 (Tier 1) sets the overall threshold at 10 on the unweighted sum of the three criterion scores. The HE MSCA evaluation form p. 2 (Tier 2A) sets it at 70 points on a weighted total out of 100 (50/30/20).",
+      "prevailing_source": "The evaluation form (Tier 2A) for the overall threshold and the weighting.",
+      "reasoning": "The General Annexes themselves provide for it: the form's p. 2 states that 'Specific calls or topics may have different rules regarding threshols and weighting' (sic) and Annex D is the generic rule the instrument form specialises. The per-criterion threshold of 3 and the rule that scores are awarded for criteria, not aspects, are not in conflict and are taken from Tier 1. Recorded in evaluator_scorecard_msca_dn.json scoring.annex_d_override.",
+      "declared_status": "Confirmed"
+    },
+    "untagged_impact_bullet": {
+      "conflict": "The form's Impact bullet 'Credibility of the measures to enhance the career perspectives and employability of researchers ...' closes a bracket no [OPTION for ... opened (spec §3.2).",
+      "resolution": "Resolved to MSCA Doctoral networks on three grounds, each recorded in the scorecard's provenance.untagged_bullet_resolution: the plural matches the DN variants and the Postdoctoral fellowships bullet immediately below is singular; the ESR, read once in session, lists it among the four DN Impact aspects; no other bracket is open there, which the bracket walk in the tool records. The aspect's option_tag carries Inferred status; its text is Confirmed.",
+      "declared_status": "Inferred"
+    }
+  },
+  "declared_values": {
+    "aspect_texts_levels_weights_quotes": {
+      "declared_status": "Confirmed",
+      "reason": "Derived from the stored PDFs through runner.source_index.read_page_text by the tool and re-derived by tests/harness/test_msca_dn_profile.py."
+    },
+    "imp_career_option_tag": {
+      "value": "MSCA Doctoral networks",
+      "declared_status": "Inferred",
+      "reason": "See tier_interactions_resolved.untagged_impact_bullet."
+    },
+    "af_v6_heading_correspondence": {
+      "declared_status": "Confirmed",
+      "reason": "Each of the ten AF V6.0 template headings §1.1 to §3.2 equals its evaluation-form aspect after lower-casing, the final period and the two recorded glosses (2.1 '(=lasting)' and 'after the end of the DN funding'; 2.4 'project's pathways towards impact'). Re-derived by the test under a rule restated independently of the tool."
+    },
+    "rubric_prose_steps_terms_thresholds": {
+      "declared_status": "Assumed",
+      "reason": "No source prescribes a rubric's wording. Specificity-based per spec decision 14; every rubric keeps a substantiation step that reports grounding unassessable where the pack carries no claim ledger."
+    },
+    "criterion_appendix_mapping_rows": {
+      "declared_status": "Inferred",
+      "breakdown": {
+        "Confirmed": 4,
+        "Inferred": 3
+      },
+      "reason": "The set takes the weakest status of its rows. Confirmed rows quote an explicit cross-reference in the AF V6.0 text; Inferred rows state the inference chain. Each row carries its own status and the test checks every quote against the named page."
+    },
+    "profile_name": {
+      "value": "msca_dn_2026_default",
+      "declared_status": "Confirmed",
+      "reason": "Spec decision 3 names the profile msca_dn_2026_default; spec §3.4's file name msca_dn_default.json is the earlier wording. The decision's name is used for both the profile_id and the file."
+    },
+    "target_call_deadline": {
+      "value": "2026-11-24",
+      "declared_status": "Confirmed",
+      "reason": "Derived by the tool from docs/tier2b_topic_and_call_sources/work_programmes/msca/HORIZON-MSCA.json (call HORIZON-MSCA-2026-DN-01, topic HORIZON-MSCA-2026-DN-01-01) and re-derived by the test; the profile records the source path."
+    }
+  },
+  "artifacts": {
+    "scorecard": {
+      "path": "harness/evaluator_scorecard_msca_dn.json",
+      "sha256": "f0e16bf2c85657cef2969c5db94fe48d2ef097acd4617f2369fda3c9c0cb41b0"
+    },
+    "rubric_set": {
+      "path": "harness/rubrics_msca_dn.json",
+      "sha256": "2af878036f96796a3e26f05a248a7534d851230ab0ad1b5a1b5926bdf56f8468",
+      "version": "1.0.0"
+    },
+    "criterion_appendix_mapping": {
+      "path": "harness/criterion_appendix_mapping_msca_dn.json",
+      "sha256": "36530cb0090fdf9ae36792b0e2361f282cde5015a4f8a188e1dd05b54cf59a08",
+      "pinned_by": "rubrics_msca_dn.json criterion_appendix_mapping.sha256"
+    },
+    "profile": {
+      "path": "harness/profiles/msca_dn_2026_default.json",
+      "profile_version": "sha256:88b0f2c3ef08231a0cfa3a3a32a82914adee5e60858345e3f178f353889b598f"
+    },
+    "registry_entry": {
+      "path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+      "instrument_type": "MSCA-DN",
+      "note": "Additive. The RIA and MSCA-PF entries hash to their pre-DN values; the test pins all three because Phase 1 has destroyed the MSCA-PF entry before (demo F13)."
+    },
+    "tool": "tools/author_msca_dn_bundle.py",
+    "test": "tests/harness/test_msca_dn_profile.py"
+  },
+  "design_notes": {
+    "shared_text_bullet": "The Staff exchanges Excellence bracket repeats the exc-obj text verbatim. The substrate loader matches registry rows to scorecard entries by text, so the duplicate cannot sit in excluded_aspects without making the row ambiguous. It is recorded under excluded_aspects_sharing_included_text, a key the loader does not read, with its tag and the reason.",
+    "section_11": "Part B2 section 11 (RAISE DN) is no evaluation-form aspect, so it cannot carry an [OPTION] tag without inventing one. It is recorded under excluded_sections with its AF V6.0 heading and page, anchors no rubric, and the mapping's never_received names it.",
+    "known_variants": "The DN grammar adds plain 'COFUND' to the vocabulary the MSCA-PF profile uses, because the DN scorecard lists every COFUND bullet as excluded and the loader parses each excluded tag. Longest-first matching keeps 'COFUND Choose Europe' whole.",
+    "two_value_cell_contract": "The rubrics instruct the assessor to report grounding unassessable without a ledger; the structured two-value cell (addressal, grounding) is PE-04's contract and is not built here.",
+    "tripwire_closed": "tests/test_msca_dn_workspace.py's PE-01 tripwire is replaced: the target call is read from the profile and the workspace tool no longer carries BASELINE_TARGET_CALL_ID.",
+    "registry_write": "The registry is written through runner.atomic_write.atomic_write_text, which writes newlines verbatim, so the file's CRLF style survives and no torn write can land in a Tier 2A extracted file."
+  },
+  "side_effect": "The demo report's leakage-scan file count moves from 324 to 326 (this record and the PE-02 validation report). The three demo records that pin it now read 326 with a re-derivation note naming this date, and the blind-baseline report carries its ninth amendment, per the convention PE-01 followed.",
+  "known_gaps": {
+    "esr_training_aspect_hyphenation": "Nine of the ten aspect texts occur verbatim in the ESR; exc-training differs by a hyphenation line break ('inter- sectoral'). Spec §2.1 says all ten are verbatim; the difference is a layout artifact and no ESR text is stored here.",
+    "v6_date_discrepancy": "The AF V6.0 history table dates the version 26.03.2026; every page footer says 04.04.2026. The footer is cited and the discrepancy recorded, not resolved (spec §2.12).",
+    "docs_index_registries": "docs/index/ registries are not updated for the new harness files, consistent with the RIA profile ticket; CLAUDE.md §9.6 names them as master indices and the operator may wish to list the profile there."
+  },
+  "acceptance_criteria": {
+    "1_ten_aspect_texts_byte_match_the_evaluation_form_derived_not_typed": "MET. The tool derives them by walking the form's brackets; the test re-reads pages 4-6 and asserts each text is on the page it names and that the walk yields exactly these ten.",
+    "2_af_v6_headings_confirm_the_ten_anchors_one_to_one_with_tags_stripped": "MET. Headings derived from template pages 28-31 after #@...@# stripping; the test pins the anchor order and the correspondence rule, with the two glosses declared.",
+    "3_bracket_resolution_recorded_with_three_grounds": "MET. provenance.untagged_bullet_resolution; grounds 1 and 3 checked against the form by the test, ground 2 named without copying ESR text.",
+    "4_ria_and_pf_registry_entries_byte_identical_and_all_three_pinned": "MET. Canonical sha256 of each pre-existing entry pinned in the test from the committed registry; the DN rows equal the scorecard texts; all three bundles load (9, 6, 10 expectations).",
+    "5_pf_only_and_section_11_cannot_enter": "MET. The two PF-only texts are absent from the DN expectations, present in excluded_aspects, and inapplicable under the DN grammar; section 11 is in excluded_sections, anchors no rubric, and no mapping row names it."
+  }
+}

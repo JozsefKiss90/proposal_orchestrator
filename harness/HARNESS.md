@@ -315,12 +315,13 @@ carry `profile_id` and `profile_version`.
 no longer carries is recorded as absent (`present_in_registry=False`), not
 graded, and not an error: the scorecard is still reproduced.
 
-**Shipped profiles.** Two, each with its own scorecard and rubric set:
+**Shipped profiles.** Three, each with its own scorecard and rubric set:
 
 | Profile | Instrument | Scorecard | Rubrics | Expectations |
 |---|---|---|---|---|
 | `profiles/msca_pf_default.json` | MSCA-PF | `evaluator_scorecard_msca_pf.json` v2.2 | `rubrics_msca_pf.json` | 9, one excluded |
 | `profiles/ria_default.json` | RIA | `evaluator_scorecard_ria.json` v4.0 | `rubrics_ria.json` | 6, none excluded |
+| `profiles/msca_dn_2026_default.json` | MSCA-DN | `evaluator_scorecard_msca_dn.json` v2.2 | `rubrics_msca_dn.json` | 10, 26 excluded |
 
 `DEFAULT_PROFILE_PATH` still points at the MSCA-PF one; the RIA profile is
 selected with `--profile harness/profiles/ria_default.json`.
@@ -336,6 +337,24 @@ because the schema fits a multi-variant form better than a single-type one:
 unweighted). Both are declared in the scorecard's `provenance` and
 `scoring.weighting_note`, and recorded as Milestone 1 defects F1 and F2 in
 `docs/tier4_orchestration_state/validation_reports/ria-pre-evaluation-profile_2026-10-01.json`.
+
+The MSCA-DN profile is authored, not hand-written. `tools/author_msca_dn_bundle.py`
+derives the ten aspect texts, the scoring levels, the weights and every quote from
+the stored evaluation form and General Annexes Part 15. It derives the AF V6.0
+section headings with the `#@...@#` tags stripped. It replays byte-equal
+(`--check`). The form's one untagged Impact bullet is resolved to Doctoral
+networks with Inferred status and three grounds in the scorecard's provenance.
+
+The bundle carries two things the other profiles do not. `excluded_sections`
+records Part B2 section 11 (RAISE DN), which is no evaluation-form aspect and
+belongs to another call. `criterion_appendix_mapping_msca_dn.json` names the
+table rows each criterion receives beyond its own section at the criterion-grading
+stage. The rubric set pins that file's sha256, so a change to the mapping is a
+rubric-set change and never a scoring-time assembly. The profile also owns the
+baseline's target call (`target_call`), derived from the Tier 2B work-programme
+extract, which the ESR intake never carries. `tests/harness/test_msca_dn_profile.py`
+re-derives all of it and pins the RIA and MSCA-PF registry entries by hash, since
+Phase 1 has destroyed a registry entry before.
 
 ## Blind assessment (`blind_assessment.py` + `commands/blind_assessment.py`)
 

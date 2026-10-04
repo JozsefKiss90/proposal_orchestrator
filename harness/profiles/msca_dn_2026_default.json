@@ -1,0 +1,75 @@
+{
+  "profile_id": "msca_dn_2026_default",
+  "label": "MSCA Doctoral Networks — 2026 resubmission-readiness pre-evaluation profile",
+  "instrument": {
+    "registry_instrument_type": "MSCA-DN",
+    "name": "MSCA Doctoral Networks",
+    "form_name": "HE MSCA Evaluation Form"
+  },
+  "option_tag_grammar": {
+    "applicable_variant": "Doctoral networks",
+    "known_variants": [
+      "Doctoral networks",
+      "Postdoctoral fellowships",
+      "Staff exchanges",
+      "COFUND Choose Europe",
+      "COFUND",
+      "Special needs allowances"
+    ],
+    "variant_prefix": "MSCA ",
+    "all_except_prefix": "all MSCA except "
+  },
+  "criteria": [
+    {
+      "id": "excellence",
+      "registry_criterion_id": "Excellence",
+      "section_ids": [
+        "excellence_section"
+      ]
+    },
+    {
+      "id": "impact",
+      "registry_criterion_id": "Impact",
+      "section_ids": [
+        "impact_section"
+      ]
+    },
+    {
+      "id": "implementation",
+      "registry_criterion_id": "Implementation",
+      "section_ids": [
+        "implementation_section"
+      ]
+    }
+  ],
+  "registry_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+  "scorecard": {
+    "path": "harness/evaluator_scorecard_msca_dn.json",
+    "scorecard_id": "msca_dn_evaluation_scorecard",
+    "version": "2.2"
+  },
+  "rubric_set": {
+    "path": "harness/rubrics_msca_dn.json",
+    "rubric_set_id": "msca_dn_rubrics",
+    "version": "1.0.0"
+  },
+  "criterion_appendix_mapping": {
+    "path": "harness/criterion_appendix_mapping_msca_dn.json"
+  },
+  "structural_authority": {
+    "path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+    "version": "6.0",
+    "version_date": "2026-04-04",
+    "v5_equivalence_recorded_in": "harness/evaluator_scorecard_msca_dn.json provenance.v5_equivalence"
+  },
+  "target_call": {
+    "call_id": "HORIZON-MSCA-2026-DN-01",
+    "topic_id": "HORIZON-MSCA-2026-DN-01-01",
+    "deadline": "2026-11-24",
+    "source_path": "docs/tier2b_topic_and_call_sources/work_programmes/msca/HORIZON-MSCA.json",
+    "declared_status": "Confirmed",
+    "label": "resubmission readiness",
+    "owner_note": "The baseline's target call is owned by this profile, the run label and the report (spec PE-01). It never enters the ESR intake, whose call_id is the historical 2025 call."
+  },
+  "implementation_mode": "standard Doctoral Network (not DN-ID, not DN-JD)"
+}

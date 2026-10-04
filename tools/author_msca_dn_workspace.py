@@ -30,10 +30,10 @@ What it writes
 Two call bindings, one owner each (spec PE-01)
 ----------------------------------------------
 The intake's ``call_id`` names the call the ESR evaluated, the 2025 DN call.
-The baseline's target, ``HORIZON-MSCA-2026-DN-01``, belongs to the profile, the
-run label and the report and never to the intake. ``BASELINE_TARGET_CALL_ID`` is
-exported here only so the test can assert the two differ; no engine path reads
-``call_id``.
+The baseline's target, ``HORIZON-MSCA-2026-DN-01``, belongs to the profile
+(``harness/profiles/msca_dn_2026_default.json``, PE-02), the run label and the
+report and never to the intake. This tool carries no copy of it; the test reads
+the profile and asserts the two differ, since no engine path reads ``call_id``.
 
 Status of the declared values
 -----------------------------
@@ -91,10 +91,6 @@ DOCUMENT_ID = "MSCA-DN-2025_sanitised_part_b"
 SUBMISSION_ID = "MSCA-DN-2025-PROPOSAL-NUMBER-WITHHELD"
 #: The call the ESR evaluated. Owned by the intake.
 HISTORICAL_CALL_ID = "HORIZON-MSCA-2025-DN-01"
-#: The call the baseline targets. Owned by the profile, run label and report;
-#: exported here only for the test that no engine path performs.
-BASELINE_TARGET_CALL_ID = "HORIZON-MSCA-2026-DN-01"
-
 #: Where the sanitised copy declares its DN type; checked on that page, not typed.
 DN_TYPE_PAGE = 32
 DN_TYPE_MARKER = "standard Doctoral Network"
