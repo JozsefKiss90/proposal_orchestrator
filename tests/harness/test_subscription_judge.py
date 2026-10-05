@@ -12,17 +12,26 @@ No test here reaches a network or spawns a CLI; the transport is replaced.
 """
 from __future__ import annotations
 
+import subprocess
+import tempfile
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from harness.commands import _subscription_judge as sj
 from harness.judge import JudgeConfig, JudgeIndependenceError
 from runner.claude_transport import (
+    NO_TOOLS,
+    ClaudeCLIResolution,
     ClaudeCLIUnavailableError,
     ClaudeTransportError,
 )
+from runner.paths import find_repo_root
 
 PIN = "claude-sonnet-5"
 VERSION = "claude-cli-subscription@2026-10-02"
+REPO = find_repo_root()
 
 
 @pytest.fixture
@@ -42,6 +51,8 @@ def _backend(**kwargs) -> sj.ClaudeCLIJudgeBackend:
     kwargs.setdefault("model", PIN)
     kwargs.setdefault("max_tokens", 2048)
     kwargs.setdefault("log", lambda _msg: None)
+    kwargs.setdefault("repo_root", REPO)
+    kwargs.setdefault("working_dir", Path(tempfile.mkdtemp(prefix="test_assessor_")))
     return sj.ClaudeCLIJudgeBackend(**kwargs)
 
 
@@ -57,12 +68,31 @@ _MESSAGES = [
 
 
 class TestTheAssessorIsBlind:
-    def test_the_transport_is_given_no_tools(self, calls):
-        """With ``Read`` or ``Glob`` the assessor could open the drafting
-        context on disk, and would stop being a blind assessor without
-        announcing it."""
+    def test_the_transport_is_given_an_explicit_empty_tool_list(self, calls):
+        """``tools=None`` omits ``--tools`` and leaves the CLI's built-in set
+        live: measured 2026-10-04, a no-flag assessor read ``./CLAUDE.md``.
+        The backend must pass the explicit empty list, which the transport
+        turns into ``--tools ""`` plus ``--strict-mcp-config``."""
         _backend()(_MESSAGES)
-        assert calls[0]["tools"] is None
+        assert calls[0]["tools"] is not None
+        assert list(calls[0]["tools"]) == []
+
+    def test_the_transport_is_run_outside_the_repository(self, calls):
+        """``Popen`` inherits the caller's directory, which is the repository
+        root where the historical evaluation lives (spec 2.13, decision 12)."""
+        _backend()(_MESSAGES)
+        cwd = Path(calls[0]["cwd"]).resolve()
+        assert cwd.is_dir()
+        assert not cwd.is_relative_to(REPO.resolve())
+
+    def test_a_working_directory_inside_the_repository_is_refused(self):
+        inside = REPO / ".claude" / "runs"
+        with pytest.raises(sj.SubscriptionJudgeError, match="inside the repository"):
+            _backend(working_dir=inside)
+
+    def test_a_missing_working_directory_is_refused(self, tmp_path):
+        with pytest.raises(sj.SubscriptionJudgeError, match="does not exist"):
+            _backend(working_dir=tmp_path / "absent")
 
     def test_the_prompts_are_the_only_thing_that_reaches_it(self, calls):
         _backend()(_MESSAGES)
@@ -83,6 +113,73 @@ class TestTheAssessorIsBlind:
         with pytest.raises(sj.SubscriptionJudgeError):
             _backend()([{"role": "system", "content": "grade this"}])
         assert calls == []
+
+
+# --------------------------------------------------------------------------- #
+# Blindness at the argv level (spec PE-06, condition 3)
+# --------------------------------------------------------------------------- #
+
+
+def _fake_proc(stdout: str):
+    proc = MagicMock(spec=subprocess.Popen)
+    proc.communicate.return_value = (stdout, "")
+    proc.returncode = 0
+    proc.poll.return_value = 0
+    proc.pid = 4242
+    proc.stdin = MagicMock()
+    return proc
+
+
+class TestBlindnessAtTheArgvLevel:
+    """Drive the real backend into the real transport with ``Popen`` replaced.
+
+    ``test_the_transport_is_given_an_explicit_empty_tool_list`` pins the
+    Python keyword.  These pin what the operating system is asked to run,
+    which is the only level at which "no tools" is a fact about the child
+    process rather than about this module.
+    """
+
+    def _invoke(self) -> dict:
+        proc = _fake_proc('{"passed": true, "score": 0.9, "rationale": "ok"}')
+        with patch(
+            "runner.claude_transport.resolve_claude_cli",
+            return_value=ClaudeCLIResolution(path="claude", source="path"),
+        ), patch("runner.claude_transport.subprocess.Popen", return_value=proc) as popen:
+            _backend()(_MESSAGES)
+        return {"argv": popen.call_args.args[0], "kwargs": popen.call_args.kwargs}
+
+    def test_argv_carries_an_explicit_empty_tool_list(self):
+        argv = self._invoke()["argv"]
+        idx = argv.index("--tools")
+        assert argv[idx + 1] == ""
+
+    def test_argv_strips_mcp_servers(self):
+        """``--tools ""`` alone leaves the operator's MCP servers reachable
+        (measured 2026-10-05: a filesystem reader was still listed)."""
+        assert "--strict-mcp-config" in self._invoke()["argv"]
+
+    def test_argv_never_names_a_tool(self):
+        """Only the option tokens are inspected; the system prompt's text is an
+        option *value* and may say anything."""
+        argv = self._invoke()["argv"]
+        idx = argv.index("--tools")
+        values = [argv[idx + 1]]
+        assert argv.count("--tools") == 1
+        assert values == [""]
+        assert "default" not in values and "Read,Glob" not in values
+
+    def test_the_prompt_is_not_a_positional_after_tools(self):
+        """``--tools`` is variadic; a positional after it is absorbed into the
+        tool list.  The user prompt travels on stdin and the system prompt as
+        an option."""
+        argv = self._invoke()["argv"]
+        idx = argv.index("--tools")
+        assert argv[idx + 2].startswith("--")
+        assert "the evidence pack" not in argv
+
+    def test_the_child_runs_outside_the_repository(self):
+        cwd = Path(self._invoke()["kwargs"]["cwd"]).resolve()
+        assert not cwd.is_relative_to(REPO.resolve())
 
 
 # --------------------------------------------------------------------------- #
@@ -196,6 +293,40 @@ class TestWhatIndependenceSurvives:
         )
         assert assessor_pin(judge) == f"{PIN}@{VERSION}"
         assert "cli" in assessor_pin(judge)
+
+    def test_a_version_tag_that_does_not_name_the_transport_is_refused(self, tmp_path):
+        """Spec decision 10: the pin names the transport.  A report carrying
+        ``groq-llama@...`` over the subscription would misdescribe its assessor."""
+        cfg = JudgeConfig(model=PIN, version="groq-llama-3.3-70b@2026-08-03")
+        with pytest.raises(sj.SubscriptionJudgeError, match=sj.TRANSPORT_TAG):
+            sj.build_subscription_judge(cfg, prov_path=tmp_path / "prov.jsonl")
+
+    def test_the_builder_creates_a_working_directory_outside_the_repository(self, tmp_path):
+        cfg = JudgeConfig(model=PIN, version=VERSION)
+        _judge, backend = sj.build_subscription_judge(
+            cfg, prov_path=tmp_path / "prov.jsonl", repo_root=REPO, log=lambda _m: None
+        )
+        assert backend.working_dir.is_dir()
+        assert not backend.working_dir.resolve().is_relative_to(REPO.resolve())
+        assert not any(backend.working_dir.iterdir())
+
+    def test_the_builder_refuses_a_working_directory_inside_the_repository(self, tmp_path):
+        cfg = JudgeConfig(model=PIN, version=VERSION)
+        with pytest.raises(sj.SubscriptionJudgeError, match="inside the repository"):
+            sj.build_subscription_judge(
+                cfg, prov_path=tmp_path / "prov.jsonl", repo_root=REPO,
+                working_dir=REPO / "harness", log=lambda _m: None,
+            )
+
+    def test_the_invocation_record_says_what_the_child_could_reach(self, tmp_path):
+        cfg = JudgeConfig(model=PIN, version=VERSION)
+        _judge, backend = sj.build_subscription_judge(
+            cfg, prov_path=tmp_path / "prov.jsonl", repo_root=REPO, log=lambda _m: None
+        )
+        record = backend.invocation_record()
+        assert record["tools"] == ""
+        assert record["strict_mcp_config"] is True
+        assert record["working_directory_outside_repository"] is True
 
 
 class TestModelPinGuard:

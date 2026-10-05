@@ -21,10 +21,24 @@ the sections under assessment.  :func:`build_subscription_judge` builds through
 ``JudgeConfig``, so that guard is not bypassed here.
 
 **Context — preserved, and the blind lane rests on it.**  The assessor sees the
-rubric prompts over the frozen evidence pack, and nothing else.
-:class:`ClaudeCLIJudgeBackend` calls ``invoke_claude_text`` with ``tools=None``,
-so the CLI runs in pure print mode with no ``Read`` and no ``Glob``.  The
-assessor cannot open the drafting context, the assembled draft or the phase
+rubric prompts over the frozen evidence pack, and nothing else.  Two controls
+make that true, and both are tested at the level of the child process rather
+than of this module (``tests/harness/test_subscription_judge.py``):
+
+* :class:`ClaudeCLIJudgeBackend` calls ``invoke_claude_text`` with the
+  explicit empty tool list (``NO_TOOLS``), which the transport renders as
+  ``--tools "" --strict-mcp-config``.  ``tools=None`` is **not** that: it
+  omits the flag and leaves the CLI's built-in tools live.  Measured
+  2026-10-04, a no-flag assessor asked to read ``./CLAUDE.md`` did so; with
+  ``--tools ""`` it answered ``NO_TOOLS``.  Measured 2026-10-05, ``--tools ""``
+  alone still listed the operator's MCP servers, a filesystem reader among
+  them; ``--strict-mcp-config`` with no ``--mcp-config`` left the tool list
+  empty.  (Spec §2.13 and decision 12.)
+* The child runs in a fresh, empty **working directory outside the
+  repository**.  ``Popen`` otherwise inherits the harness's directory, which
+  is the repository root where the historical evaluation lives.
+
+The assessor cannot open the drafting context, the assembled draft or the phase
 outputs, because it cannot open anything.  A tool-enabled assessor would not be
 blind, and would stop being an assessor without saying so.
 
@@ -41,13 +55,16 @@ different-family assessor is.
 A report produced through this backend must say so.  The ``model@version`` pin
 is where it says it: set ``HARNESS_JUDGE_VERSION`` to a tag naming the
 transport, following the convention the Groq pin already uses
-(``llama-3.3-70b-versatile@groq-llama-3.3-70b@2026-08-03``).
+(``llama-3.3-70b-versatile@groq-llama-3.3-70b@2026-08-03``).  The builder
+refuses a version tag that does not contain :data:`TRANSPORT_TAG` (spec
+decision 10), so a report cannot carry this transport under another name.
 
 Advisory output only.  The harness is never a runtime gate, and this module does
 not change that.
 """
 from __future__ import annotations
 
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -55,21 +72,34 @@ from typing import Any, Callable
 from harness.judge import Judge, JudgeConfig, JudgeError
 from harness.provenance import ProvenanceLog
 from runner.claude_transport import (
+    NO_TOOLS,
     ClaudeCLIUnavailableError,
     ClaudeTransportError,
     invoke_claude_text,
 )
+from runner.paths import find_repo_root
 
 __all__ = [
     "CLAUDE_MODEL_ALIASES",
+    "TRANSPORT_TAG",
     "ClaudeCLIJudgeBackend",
     "SubscriptionJudgeError",
+    "assessor_working_dir",
     "build_subscription_judge",
     "is_claude_model_pin",
 ]
 
 #: The short aliases the ``claude`` CLI accepts in place of a full model id.
 CLAUDE_MODEL_ALIASES: frozenset[str] = frozenset({"sonnet", "opus", "haiku"})
+
+#: The token a version tag must carry to name this transport.  Matches the
+#: command's ``--transport`` choice (``harness.commands.blind_assessment.
+#: TRANSPORT_CLAUDE_CLI``); kept as a literal here so this module does not
+#: import the command that imports it.
+TRANSPORT_TAG: str = "claude-cli"
+
+#: Prefix of the fresh working directory the assessor child runs in.
+_WORKING_DIR_PREFIX: str = "blind_assessor_"
 
 #: Default retries on a transport failure.  The assessor writes nothing until
 #: every cell is graded, so one dropped subprocess would otherwise discard the
@@ -99,15 +129,54 @@ def is_claude_model_pin(model: str) -> bool:
     return name.startswith("claude") or name in CLAUDE_MODEL_ALIASES
 
 
+def _resolve_repo_root(repo_root: Path | None) -> Path:
+    return (repo_root if repo_root is not None else find_repo_root()).resolve()
+
+
+def _check_working_dir(working_dir: Path, repo_root: Path) -> Path:
+    """Return *working_dir* resolved, or raise when the child could see the repository."""
+    resolved = Path(working_dir).resolve()
+    if not resolved.is_dir():
+        raise SubscriptionJudgeError(
+            f"the assessor working directory does not exist: {resolved}"
+        )
+    if resolved.is_relative_to(repo_root):
+        raise SubscriptionJudgeError(
+            f"the assessor working directory {resolved} lies inside the repository "
+            f"{repo_root}; the child must run where the repository is not reachable "
+            "by path (spec decision 12)."
+        )
+    return resolved
+
+
+def assessor_working_dir(repo_root: Path | None = None) -> Path:
+    """Create and return a fresh, empty directory outside the repository.
+
+    The system temporary directory is used; it is refused if it turns out to
+    lie inside *repo_root* (an operator with ``TMPDIR`` pointed into the
+    checkout), because the control would then be a name only.
+    """
+    root = _resolve_repo_root(repo_root)
+    created = Path(tempfile.mkdtemp(prefix=_WORKING_DIR_PREFIX))
+    return _check_working_dir(created, root)
+
+
 class ClaudeCLIJudgeBackend:
     """A :class:`~runner.transport.tool_loop.ToolLoopBackend` over ``claude -p``.
 
     Conforms to the backend protocol the judge calls: ``(messages) -> {"content":
-    str, "tool_calls": None}``.  Every invocation is tool-free print mode, which
-    is what keeps the assessor blind (see the module docstring).
+    str, "tool_calls": None}``.  Every invocation is tool-free print mode in a
+    working directory outside the repository, which is what keeps the assessor
+    blind (see the module docstring).
 
     Parameters
     ----------
+    working_dir:
+        The directory the ``claude`` child runs in.  Must exist and must lie
+        outside *repo_root*; :func:`assessor_working_dir` makes one.
+    repo_root:
+        The repository the child must not reach.  Default: the root found from
+        the current directory.
     model:
         The assessor model.  A full id or a CLI alias.  Pinned by
         :class:`JudgeConfig`, never read from the environment here.
@@ -133,11 +202,15 @@ class ClaudeCLIJudgeBackend:
         *,
         model: str,
         max_tokens: int,
+        working_dir: Path,
+        repo_root: Path | None = None,
         timeout_seconds: int = 300,
         max_retries: int = DEFAULT_MAX_RETRIES,
         retry_delay: float = DEFAULT_RETRY_DELAY,
         log: Callable[[str], None] = print,
     ) -> None:
+        self.repo_root = _resolve_repo_root(repo_root)
+        self.working_dir = _check_working_dir(working_dir, self.repo_root)
         self.model = model
         self.max_tokens = max_tokens
         self.timeout_seconds = timeout_seconds
@@ -147,6 +220,17 @@ class ClaudeCLIJudgeBackend:
         #: Counters for the run summary.
         self.calls = 0
         self.retries = 0
+
+    def invocation_record(self) -> dict[str, Any]:
+        """What the child process could reach, for a report or a log line."""
+        return {
+            "tools": "",
+            "strict_mcp_config": True,
+            "working_directory": str(self.working_dir),
+            "working_directory_outside_repository": not self.working_dir.is_relative_to(
+                self.repo_root
+            ),
+        }
 
     @staticmethod
     def _join(messages: list[dict[str, Any]], role: str) -> str:
@@ -174,8 +258,12 @@ class ClaudeCLIJudgeBackend:
                     model=self.model,
                     max_tokens=self.max_tokens,
                     timeout_seconds=self.timeout_seconds,
-                    # No tools.  This is what keeps the assessor blind.
-                    tools=None,
+                    # The explicit empty list, never None: None omits --tools and
+                    # leaves the built-in set live.  Rendered by the transport as
+                    # --tools "" --strict-mcp-config.  With the working directory
+                    # outside the repository, this is what keeps the assessor blind.
+                    tools=NO_TOOLS,
+                    cwd=self.working_dir,
                 )
             except ClaudeCLIUnavailableError:
                 # Not retryable: the CLI is not on PATH, or the pinned path is
@@ -205,6 +293,8 @@ def build_subscription_judge(
     cfg: JudgeConfig,
     *,
     prov_path: Path,
+    repo_root: Path | None = None,
+    working_dir: Path | None = None,
     timeout_seconds: int = 300,
     max_retries: int = DEFAULT_MAX_RETRIES,
     log: Callable[[str], None] = print,
@@ -217,10 +307,14 @@ def build_subscription_judge(
     wrapper — there is no TPM or RPM cap to pace against, and the calls are
     sequential subprocesses.
 
+    *working_dir* defaults to a fresh directory from :func:`assessor_working_dir`.
+
     Raises
     ------
     SubscriptionJudgeError
-        If the pinned model is not one the ``claude`` CLI can resolve.  The
+        If the pinned model is not one the ``claude`` CLI can resolve; if the
+        version tag does not name this transport (:data:`TRANSPORT_TAG`); or if
+        the working directory is missing or lies inside the repository.  The
         drafter-model guard is :class:`JudgeConfig`'s and has already run by the
         time *cfg* exists.
     """
@@ -231,12 +325,26 @@ def build_subscription_judge(
             f"(e.g. 'claude-sonnet-5'); the Groq pin belongs to the "
             f"OpenAI-compatible transport."
         )
+    if TRANSPORT_TAG not in str(cfg.version):
+        raise SubscriptionJudgeError(
+            f"HARNESS_JUDGE_VERSION is {cfg.version!r}, which does not name this "
+            f"transport. The report records model@version and nothing else about "
+            f"the assessor, so the tag must contain {TRANSPORT_TAG!r} (e.g. "
+            f"'claude-cli-subscription@2026-10-05'); pass --assessor-version."
+        )
+    root = _resolve_repo_root(repo_root)
     backend = ClaudeCLIJudgeBackend(
         model=cfg.model,
         max_tokens=cfg.max_tokens,
+        working_dir=working_dir if working_dir is not None else assessor_working_dir(root),
+        repo_root=root,
         timeout_seconds=timeout_seconds,
         max_retries=max_retries,
         log=log,
+    )
+    log(
+        f"    assessor child: tools disabled (--tools \"\" --strict-mcp-config), "
+        f"working directory {backend.working_dir}"
     )
     judge = Judge(cfg, backend=backend, provenance_log=ProvenanceLog(prov_path))
     return judge, backend

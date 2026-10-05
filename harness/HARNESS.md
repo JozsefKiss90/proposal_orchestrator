@@ -390,7 +390,8 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Piece | Where |
 |---|---|
 | Candidate loader, content hash, bound report, writer, loader | `harness/blind_assessment.py` |
-| Module command (`preflight`, `assess`, `verify`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Module command (`preflight`, `assess`, `verify`, `freeze`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Frozen baseline: conditions, byte copy, freeze record, hash-checked loader | `harness/blind_baseline.py`; `--baseline-dir <dir>/blind_baseline_<sha12>.json` + `.freeze.json` |
 | Evidence preflight: realised pack set, pack-set hash, seven-section report | `harness/evidence_preflight.py`; reports `harness/blind_reports/preflight_<hash12>_<NNNN>.json` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
@@ -529,6 +530,61 @@ optional stamp and does not check it; the command does.
 sequence number for the same candidate hash and earlier reports stay
 byte-identical. `BlindAssessmentReport` enforces `advisory=True,
 blocking=False` at construction and on load.
+
+**Frozen baseline (`blind_baseline.py`, spec PE-06).** A written report becomes
+*the* baseline through
+
+    py -3.10 -m harness.commands.blind_assessment freeze --report <file> --candidate <dir> --baseline-dir <dir>
+
+The command re-binds the report to the candidate, then checks the baseline
+conditions by name (`BASELINE_CHECKS`). The conditions are:
+
+- dev-graph evidence: snapshot id, package id and policy version present;
+- the preflight pack-set hash and report present, the preflight file readable,
+  and its `pack_set_hash` equal to the report's;
+- candidate hash, profile version and assessor pin present;
+- an `assessor_transport` that the version tag names;
+- complete scope;
+- every cell with an N>=3 panel and an agreement value;
+- a median and a spread for every criterion, from a panel of at least five,
+  and a determined total.
+
+Any failing condition is named and nothing is written (exit 2). On success the
+report is copied byte for byte to `<baseline-dir>/blind_baseline_<sha12>.json`.
+A `harness.blind_baseline_freeze` record is written beside it. The record
+carries every binding, the per-cell `n`, agreement and score spread, the
+per-criterion score and spread, the total, and the report's own spread label
+(within-assessor repeatability). `checks_passed` is derived from the check
+list, never declared. A baseline directory holds one freeze; a second is
+refused. Later stages read it through `load_frozen_baseline`, which re-hashes
+the copy and refuses an edited one. The report carries `assessor_transport`
+(the command's `--transport` choice) and `assessor_invocation` (the backend's
+own account of what its child could reach), so both conditions are structural.
+
+**Blindness is tested, not asserted.** Three controls, each with a test that
+would fail if it broke:
+
+1. The subscription backend passes the transport the **explicit empty tool
+   list** (`runner.claude_transport.NO_TOOLS`), never `None`. `tools=None`
+   omits `--tools` and leaves the CLI's built-in tools live: measured
+   2026-10-04, a no-flag assessor asked to read `./CLAUDE.md` did so. The
+   transport renders the empty list as `--tools "" --strict-mcp-config`,
+   because `--tools ""` alone still exposes the operator's MCP servers
+   (measured 2026-10-05: a filesystem reader was listed; with
+   `--strict-mcp-config` the tool list was empty).
+2. The child runs in a fresh empty **working directory outside the
+   repository** (`assessor_working_dir`); one inside is refused.
+3. The argv is pinned at the level handed to the operating system, not at the
+   Python keyword (`tests/harness/test_subscription_judge.py::TestBlindnessAtTheArgvLevel`,
+   with `Popen` replaced). A **planted-marker test**
+   (`tests/harness/test_blind_baseline.py::TestPlantedMarkers`) writes a unique
+   string into the historical evaluation and into a Tier 5 draft. It shows the
+   string reaches no rendered prompt, the materialised candidate or the report.
+   A non-vacuity check shows the candidate text does reach the prompts.
+
+The subscription builder also refuses a `HARNESS_JUDGE_VERSION` that does not
+contain `claude-cli`, so a report from that transport cannot carry another
+transport's tag.
 
 ## What the harness does *not* do (through E4)
 

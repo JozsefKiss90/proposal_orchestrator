@@ -664,6 +664,15 @@ class BlindAssessmentReport:
     #: gave none; the command always gives both.
     preflight_pack_set_hash: str = ""
     preflight_report: str = ""
+    #: The transport the assessor spoke (spec PE-06): the command's
+    #: ``--transport`` choice.  The pin alone is ``model@version`` and names
+    #: the transport only by convention; this field makes the declaration
+    #: structural so the frozen baseline can check that the two agree.  Empty
+    #: when a library caller gave none.
+    assessor_transport: str = ""
+    #: What the assessor child process could reach, as the backend reports it
+    #: (tools, MCP, working directory).  Empty when the backend does not say.
+    assessor_invocation: dict[str, Any] = dataclasses.field(default_factory=dict)
     notes: str = _ADVISORY_NOTE
     advisory: bool = True
     blocking: bool = False
@@ -773,6 +782,8 @@ class BlindAssessmentReport:
             "include_claims": self.include_claims,
             "preflight_pack_set_hash": self.preflight_pack_set_hash,
             "preflight_report": self.preflight_report,
+            "assessor_transport": self.assessor_transport,
+            "assessor_invocation": dict(self.assessor_invocation),
             "notes": self.notes,
             "summary": self.summary,
             "cells": [c.to_dict() for c in self.cells],
@@ -824,6 +835,8 @@ def assess_candidate(
     criterion_token_budget: int = UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
     preflight_hash: str = "",
     preflight_report: str = "",
+    assessor_transport: str = "",
+    assessor_invocation: Mapping[str, Any] | None = None,
 ) -> BlindAssessmentReport:
     """Assess one candidate against *bundle* with *judge*; return the bound report.
 
@@ -857,6 +870,11 @@ def assess_candidate(
     caller re-bound before calling (spec PE-05; :mod:`harness.evidence_preflight`).
     This function does not check them: the module command does, before the
     assessor exists.  A library caller that gives none leaves both empty.
+
+    *assessor_transport* records the transport the command chose, so the
+    frozen baseline can check that the assessor pin names it.
+    *assessor_invocation* is the backend's own account of what its child
+    process could reach, when the backend gives one.
     """
     if n < MIN_MAJORITY_SAMPLES:
         raise BlindAssessmentError(
@@ -954,6 +972,8 @@ def assess_candidate(
         criterion_scoring=criterion_scoring,
         preflight_pack_set_hash=preflight_hash,
         preflight_report=preflight_report,
+        assessor_transport=assessor_transport,
+        assessor_invocation=dict(assessor_invocation or {}),
     )
 
 

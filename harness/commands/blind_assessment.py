@@ -8,7 +8,10 @@ the production pipeline, and writes a bound report
 (:mod:`harness.blind_assessment`).  A second sub-command re-binds a persisted
 report to the candidate on disk and rejects it when the candidate changed.  A
 third, ``preflight``, realises the evidence the assessor would read and binds
-it by hash before any quota is spent (:mod:`harness.evidence_preflight`).
+it by hash before any quota is spent (:mod:`harness.evidence_preflight`).  A
+fourth, ``freeze``, checks a written report against the baseline conditions and
+copies it, with a freeze record, into a durable baseline directory
+(:mod:`harness.blind_baseline`).
 
 Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
 
@@ -16,6 +19,7 @@ Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT)
     py -3.10 -m harness.commands.blind_assessment assess --document <id> --preflight <file> [...]
     py -3.10 -m harness.commands.blind_assessment assess --candidate <dir> --preflight <file>
     py -3.10 -m harness.commands.blind_assessment verify --report <file> --candidate <dir>
+    py -3.10 -m harness.commands.blind_assessment freeze --report <file> --candidate <dir> --baseline-dir <dir>
 
 ``preflight`` and ``assess`` share every evidence-selecting flag (``--budget``,
 ``--span-fraction``, ``--no-claims``, ``--criterion-budget``, ``--transport``,
@@ -42,6 +46,8 @@ assessment could not run or the report or preflight was rejected
 (fail-closed; nothing written).  ``preflight``: ``0`` written with no flag;
 ``1`` written with flags the operator should read (a missing anchor, a
 truncated pack, an incomplete package, a leak); ``2`` could not run.
+``freeze``: ``0`` frozen; ``2`` refused, naming every failed condition,
+nothing written.
 
 The command lives inside the harness package so the one-way ``harness ->
 runner`` import boundary holds.  Advisory artifact; never a runtime gate
@@ -69,6 +75,7 @@ from harness.blind_assessment import (
     render_report,
     write_report,
 )
+from harness.blind_baseline import freeze_baseline, render_freeze
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
@@ -153,6 +160,7 @@ def _live_judge(args: argparse.Namespace, repo_root: Path) -> Judge:
         judge, _backend = build_subscription_judge(
             cfg,
             prov_path=repo_root / args.provenance,
+            repo_root=repo_root,
             timeout_seconds=args.cli_timeout,
             max_retries=args.max_retries,
         )
@@ -326,6 +334,26 @@ def _parser() -> argparse.ArgumentParser:
     p_verify.add_argument("--candidate", required=True)
     p_verify.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
     p_verify.add_argument("--profile", default=None)
+
+    p_freeze = sub.add_parser(
+        "freeze",
+        help=(
+            "freeze a written report as the blind baseline: check the baseline "
+            "conditions, copy the report and write a freeze record into --baseline-dir"
+        ),
+    )
+    p_freeze.add_argument("--report", required=True, help="the blind report to freeze")
+    p_freeze.add_argument("--candidate", required=True,
+                          help="the materialised candidate directory the report is bound to")
+    p_freeze.add_argument(
+        "--baseline-dir", required=True,
+        help=(
+            "directory to hold the frozen copy and its freeze record; must hold no "
+            "earlier freeze (a frozen baseline is never replaced). Relative to --repo-root"
+        ),
+    )
+    p_freeze.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
+    p_freeze.add_argument("--profile", default=None)
     return ap
 
 
@@ -369,6 +397,17 @@ def _build_evidence(
     )
 
 
+def _invocation_record(judge: Judge) -> dict:
+    """The backend's account of what its child could reach, if it keeps one.
+
+    The subscription backend does (``invocation_record``); the OpenAI-compatible
+    backend has no child process and an injected test backend says nothing.
+    """
+    backend = getattr(judge, "_backend", None)
+    record = getattr(backend, "invocation_record", None)
+    return dict(record()) if callable(record) else {}
+
+
 def _is_transport_failure(exc: BaseException) -> bool:
     """Whether *exc* came from an assessor transport rather than the harness.
 
@@ -407,6 +446,22 @@ def main(
             )
             print(render_report(data))
             print(f"\nverified: report is bound to the candidate at {args.candidate}")
+            return 0
+        if args.command == "freeze":
+            baseline_dir = Path(args.baseline_dir)
+            if not baseline_dir.is_absolute():
+                baseline_dir = repo_root / baseline_dir
+            frozen = freeze_baseline(
+                args.report,
+                args.candidate,
+                bundle.profile,
+                baseline_dir=baseline_dir,
+                profile_version=bundle.version,
+                repo_root=repo_root,
+                clock=clock,
+            )
+            print(render_freeze(frozen.record))
+            print(f"\nfrozen -> {frozen.freeze_path}")
             return 0
 
         out_dir = Path(args.out_dir)
@@ -469,6 +524,8 @@ def main(
             criterion_token_budget=params.criterion_token_budget,
             preflight_hash=preflight_hash,
             preflight_report=Path(args.preflight).as_posix(),
+            assessor_transport=args.transport,
+            assessor_invocation=_invocation_record(assessor),
         )
         path = write_report(report, out_dir)
         data = report.to_dict()

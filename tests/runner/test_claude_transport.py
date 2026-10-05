@@ -34,6 +34,7 @@ from runner.claude_transport import (
     ClaudeCLIUnavailableError,
     ClaudeTransportError,
     DEFAULT_TIMEOUT_SECONDS,
+    NO_TOOLS,
     _CLI_MAX_OUTPUT_TOKENS_VAR,
     _CLI_PATH_ENV_VAR,
     _MAX_OUTPUT_TOKENS_DEFAULT,
@@ -219,11 +220,40 @@ class TestToolsParameter:
         cmd = mock_popen.call_args.args[0]
         assert "--tools" not in cmd
 
-    def test_no_tools_flag_when_tools_is_empty_list(self) -> None:
+    def test_an_empty_tool_list_disables_every_tool_at_the_argv_level(self) -> None:
+        """``tools=[]`` is not ``tools=None``.  Omitting ``--tools`` leaves the
+        CLI's built-in set live (measured 2026-10-04: a no-flag call read
+        ``./CLAUDE.md``); ``--tools ""`` disables it.  The user's MCP servers
+        survive ``--tools ""`` (measured 2026-10-05: the init event still listed
+        a filesystem reader), so ``--strict-mcp-config`` is emitted with it."""
         with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
             invoke_claude_text(**_call_kwargs(), tools=[])
         cmd = mock_popen.call_args.args[0]
-        assert "--tools" not in cmd
+        idx = cmd.index("--tools")
+        assert cmd[idx + 1] == ""
+        assert "--strict-mcp-config" in cmd
+
+    def test_the_no_tools_marker_is_an_empty_list(self) -> None:
+        assert list(NO_TOOLS) == []
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            invoke_claude_text(**_call_kwargs(), tools=NO_TOOLS)
+        cmd = mock_popen.call_args.args[0]
+        assert cmd[cmd.index("--tools") + 1] == ""
+
+    def test_a_named_tool_list_does_not_strip_mcp_servers(self) -> None:
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            invoke_claude_text(**_call_kwargs(), tools=["Read"])
+        assert "--strict-mcp-config" not in mock_popen.call_args.args[0]
+
+    def test_the_empty_tools_flag_precedes_the_system_prompt_flag(self) -> None:
+        """``--tools`` is variadic at the CLI; the next option terminates it.
+        The system prompt must therefore follow as an option, never as a
+        positional, or it is absorbed into the tool list."""
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            invoke_claude_text(**_call_kwargs(), tools=[])
+        cmd = mock_popen.call_args.args[0]
+        idx = cmd.index("--tools")
+        assert cmd[idx + 2].startswith("--")
 
     def test_single_tool_produces_tools_flag(self) -> None:
         with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
@@ -246,6 +276,30 @@ class TestToolsParameter:
         tools_idx = cmd.index("--tools")
         system_idx = cmd.index("--system-prompt")
         assert tools_idx < system_idx
+
+
+# ---------------------------------------------------------------------------
+# Working directory
+# ---------------------------------------------------------------------------
+
+
+class TestWorkingDirectory:
+    def test_no_cwd_by_default(self) -> None:
+        """Unchanged behaviour: the child inherits the caller's directory."""
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            invoke_claude_text(**_call_kwargs())
+        assert mock_popen.call_args.kwargs.get("cwd") is None
+
+    def test_cwd_is_handed_to_popen(self, tmp_path: Path) -> None:
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            invoke_claude_text(**_call_kwargs(), cwd=tmp_path)
+        assert mock_popen.call_args.kwargs["cwd"] == str(tmp_path)
+
+    def test_a_missing_cwd_is_refused_before_spawning(self, tmp_path: Path) -> None:
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            with pytest.raises(ClaudeTransportError, match="working directory"):
+                invoke_claude_text(**_call_kwargs(), cwd=tmp_path / "absent")
+        assert mock_popen.call_count == 0
 
 
 # ---------------------------------------------------------------------------

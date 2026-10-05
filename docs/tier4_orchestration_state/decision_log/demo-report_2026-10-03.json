@@ -11,7 +11,7 @@
   "acceptance_criteria": {
     "1_every_scope_question_has_an_answer_backed_by_a_tier_4_artifact": "MET. Four questions, four answers, each row of the report's first table names the artifact it reads. The planner question is answered on a declared synthetic run and says so; no real-rerun answer exists and none is claimed.",
     "2_defects_found_are_listed_as_candidate_milestone_2_tickets": "MET. Twenty-six candidates, M1 to M26. M1 to M6 keep the ids the change-scenarios record gave them; M7 to M26 are drawn from the findings of every other demo record and name their source.",
-    "3_the_leakage_test_passes_on_the_whole_branch": "MET as the scan defines it. runner.leakage_scan over 330 files (re-derived 2026-10-05 after PE-01 to PE-05 added eight Tier 3/4 records; the 2026-10-03 scan saw 322): no new leak, exit 0. 11 pre-existing hits remain, all in docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json, which names the project it purged and which this branch does not rewrite. The report says NOT CLEAN and no new leak, in those words."
+    "3_the_leakage_test_passes_on_the_whole_branch": "MET as the scan defines it. runner.leakage_scan over 331 files (re-derived 2026-10-05 after PE-01 to PE-06 added nine Tier 3/4 records; the 2026-10-03 scan saw 322): no new leak, exit 0. 11 pre-existing hits remain, all in docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json, which names the project it purged and which this branch does not rewrite. The report says NOT CLEAN and no new leak, in those words."
   },
   "decisions": [
     {

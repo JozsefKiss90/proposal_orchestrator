@@ -1,0 +1,85 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe06-blind-baseline_2026-10-05",
+  "date": "2026-10-05",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-06 (Blind baseline, frozen) in plans/msca_dn_pre_evaluation_spec.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (where a process is non-deterministic its inputs, parameters and outputs are documented so the output is auditable), §12.1 (every output identifies its source inputs), §15 (a declared failure is preferred to a fabricated completion). Spec §2.13, decisions 10, 11 and 12, and ticket PE-06. Not a constitutional amendment.",
+  "decision": "The blind baseline is frozen by a separate, Claude-free freeze command that checks a written blind report against the baseline conditions, copies it byte for byte into a baseline directory under a name derived from its content hash, and writes a freeze record beside it carrying every binding the report declares. The conditions are: dev-graph evidence with snapshot id, package id and policy version; the preflight pack-set hash and report, with the preflight file re-read and its pack_set_hash compared to the report's; candidate hash, profile version and assessor pin; an assessor_transport field that the version tag names; complete scope; cells each with an N>=3 panel and an agreement value; a criterion score with median and spread for every criterion from a panel of at least five and a determined total. The record's checks_passed is derived from the enumerated check list, never declared. A failing condition is named and nothing is written. A baseline directory holds one freeze; a second is refused. Later stages load the baseline through a loader that re-hashes the copy and refuses an edited one. Blindness of the assessor is established by three tested controls rather than asserted: the subscription backend passes the transport an explicit empty tool list, which the transport renders as --tools \"\" --strict-mcp-config at the argv level; the child process runs in a fresh empty directory outside the repository, refused when it lies inside; and a planted-marker test shows that a unique string written into the historical evaluation (as a document record and as a Tier 4 esr artifact) and into a Tier 5 draft reaches no rendered prompt, the materialised candidate or the report.",
+  "declared_values": {
+    "empty_tool_list_is_distinct_from_no_flag": {
+      "value": "tools=None omits --tools and leaves the CLI's built-in tool set live; an empty sequence emits --tools \"\" and --strict-mcp-config; a non-empty sequence emits --tools <comma-joined>. The blind backend passes the empty sequence.",
+      "declared_status": "Confirmed",
+      "reason": "Measured 2026-10-04 from the repository root (spec §2.13): a no-flag call asked to read ./CLAUDE.md returned its first line; --tools \"\" with the prompt on stdin returned NO_TOOLS. Measured again 2026-10-05 with model claude-haiku-4-5-20251001 through the transport's exact argv order (--tools \"\" before --system-prompt, prompt on stdin): the result was NO_TOOLS, but the session's init event still listed the operator's MCP servers as available tools, among them a filesystem reader. With --strict-mcp-config added and no --mcp-config, the init event listed zero tools and zero MCP servers and the model, asked to list its tools, answered NO_TOOLS. Both flags are therefore required and both are emitted together; the measurement outputs are in the session scratchpad and are reproduced by the argv tests."
+    },
+    "mcp_servers_survive_tools_empty": {
+      "value": true,
+      "declared_status": "Confirmed",
+      "reason": "A second blindness gap the spec did not measure. --tools governs the built-in set only; MCP servers configured in the operator's user, project or local settings are loaded regardless and expose tools the model can call. --strict-mcp-config restricts MCP servers to those named by --mcp-config, of which the blind invocation passes none."
+    },
+    "working_directory_outside_repository": {
+      "value": "a fresh directory created by tempfile.mkdtemp with prefix blind_assessor_, resolved and refused if it lies under the repository root; the builder logs it, and the command stamps the backend's invocation_record (tools, strict_mcp_config, working directory, outside_repository) on the report as assessor_invocation, which the freeze copies into its bindings",
+      "declared_status": "Assumed",
+      "reason": "Spec decision 12 requires the assessor process to run outside the repository. The transport gains a cwd parameter so the Popen child no longer inherits the harness's directory. The system temporary directory is adopted as the location; an operator whose TMPDIR points into the checkout is refused rather than silently given a control in name only."
+    },
+    "version_tag_names_transport": {
+      "value": "the subscription builder refuses a HARNESS_JUDGE_VERSION that does not contain 'claude-cli'; the report carries assessor_transport, the command's --transport choice; the freeze requires assessor_transport to be present and to appear in assessor_version",
+      "declared_status": "Assumed",
+      "reason": "Spec decision 10 asks for a version tag naming the transport and the report records model@version and nothing else about the assessor. A convention enforced nowhere would let a subscription run carry the Groq tag. The field makes the declaration structural; the freeze check makes the convention a condition. The openai-compatible lane's existing tag groq-llama-3.3-70b@2026-08-03 does not name its transport and would need a tag containing 'openai-compatible' before a report from it could be frozen; that lane has no baseline to freeze on this branch."
+    },
+    "baseline_directory": {
+      "value": "operator-supplied --baseline-dir, relative to --repo-root; for this milestone docs/tier4_orchestration_state/msca_dn/baseline/",
+      "declared_status": "Assumed",
+      "reason": "The harness may name no instrument, so the default cannot be the DN path. Spec §6 places the milestone's Tier 4 artifacts under docs/tier4_orchestration_state/msca_dn/, and PE-08 names its comparison by the blind report hash, which the freeze record supplies as report_sha256."
+    },
+    "one_freeze_per_directory": {
+      "value": true,
+      "declared_status": "Assumed",
+      "reason": "Frozen means not replaced. A rerun is a new baseline and goes in another directory; PE-07 and PE-08 then say which they read. The copy and the record are named by the report's sha256 so two baselines could never collide by name either."
+    },
+    "cell_spread_definition": {
+      "value": "the panel's agreement fraction and n from the majority verdict, plus the max-min of the member scores when at least two are numeric; criterion spread is the max-min of the N sample medians as PE-04 defines it",
+      "declared_status": "Inferred",
+      "reason": "A cell is a majority vote over N>=3 samples and carries agreement and n already; the freeze copies them rather than inventing a second statistic. Both spreads are labelled within-assessor repeatability per spec decision 11 and the freeze record carries the report's own spread_label verbatim."
+    }
+  },
+  "artifacts": {
+    "modules": [
+      "runner/claude_transport.py: NO_TOOLS; tools is None / empty / non-empty are three argv shapes; cwd parameter handed to Popen, a missing directory refused before spawning",
+      "harness/commands/_subscription_judge.py: ClaudeCLIJudgeBackend takes working_dir and repo_root, passes tools=NO_TOOLS and cwd to the transport, exposes invocation_record(); assessor_working_dir(); build_subscription_judge takes repo_root and working_dir and refuses a version tag without TRANSPORT_TAG",
+      "harness/blind_assessment.py: BlindAssessmentReport.assessor_transport; assess_candidate stamps it",
+      "harness/blind_baseline.py (new): check_baseline_report, freeze_baseline, load_frozen_baseline, render_freeze; record type harness.blind_baseline_freeze 1.0.0",
+      "harness/commands/blind_assessment.py: the freeze sub-command; assess stamps assessor_transport; the subscription builder receives repo_root"
+    ],
+    "tests": [
+      "tests/harness/test_blind_baseline.py (new): the conditions by name, the freeze command end to end on the synthetic dev-graph world, the planted-marker test (condition 2)",
+      "tests/harness/test_subscription_judge.py: the explicit empty tool list and the external working directory at the Python keyword, and TestBlindnessAtTheArgvLevel driving the real backend into the real transport with Popen replaced (conditions 1 and 3); the version-tag rule",
+      "tests/runner/test_claude_transport.py: the three argv shapes of tools; cwd"
+    ],
+    "documentation": "harness/HARNESS.md (blind assessment section: freeze, blindness controls, assessor_transport)"
+  },
+  "run_status": {
+    "baseline_run": "NOT RUN in this ticket. The assessor run spends the operator's Max subscription quota (10 cells x 3 samples plus 3 criteria x 5 samples, 45 subprocess calls) and the standing operator instruction of 2026-08-28 is that quota-spending runs are launched by the operator. The commands are recorded below; the freeze follows the run.",
+    "commands": [
+      "py -3.10 -m harness.commands.blind_assessment preflight --document MSCA-DN-2025_sanitised_part_b --graph-root workspaces/msca_dn --profile harness/profiles/msca_dn_2026_default.json --transport claude-cli --no-claims --out-dir harness/blind_reports",
+      "py -3.10 -m harness.commands.blind_assessment assess --document MSCA-DN-2025_sanitised_part_b --graph-root workspaces/msca_dn --profile harness/profiles/msca_dn_2026_default.json --transport claude-cli --no-claims --out-dir harness/blind_reports --preflight harness/blind_reports/preflight_<hash12>_<NNNN>.json --assessor-model claude-sonnet-5 --assessor-version claude-cli-subscription@2026-10-05",
+      "py -3.10 -m harness.commands.blind_assessment freeze --report harness/blind_reports/blind_<hash12>_<NNNN>.json --candidate harness/blind_reports/candidates/<document node id> --profile harness/profiles/msca_dn_2026_default.json --baseline-dir docs/tier4_orchestration_state/msca_dn/baseline"
+    ]
+  },
+  "side_effect": "The leakage-scan file count pinned by the demo report moved from 330 to 331: this record in Tier 4. The four pinned places were amended (plans/reports/dev_graph_demo_report_2026-10-03.md, decision_log/demo-report_2026-10-03.json, validation_reports/demo-report_2026-10-03.json, validation_reports/demo-candidate-blind-baseline_2026-10-01.json). The freeze will move it again when the operator writes the baseline.",
+  "known_gaps": [
+    "The transport's cli-prompt skill mode (runner/skill_runtime.py) still passes tools=None and so still runs with the built-in tool set live; spec §2.13 records this as outside the milestone. The TAPM mode passes a named list and is unaffected.",
+    "The demo's blind baseline of 2026-10-02 (harness/blind_reports/blind_e518c50023ee_0001.json) was produced before these controls existed, from the repository root, with MCP servers reachable; its blindness is established for the package and not for the assessor process, as §2.13 already records.",
+    "The planted-marker test proves the markers do not reach the prompts through the package; it cannot prove the child process did not read them, which is what the argv-level tests and the working directory are for. The transport's stream-json init event reports the tool list and cwd the CLI actually started with; persisting it per call would close the remaining gap and is not done here. The report's assessor_invocation is the backend's declaration of the argv it builds, not a readback of the child.",
+    "The freeze does not require assessor_invocation: an injected test backend has none and the openai-compatible lane has no child process. A report from a subscription backend older than this change would therefore pass the freeze with an empty invocation; the demo report of 2026-10-02 is such a report and has no baseline directory.",
+    "The openai-compatible lane's version tag convention is not enforced by its builder; only the freeze checks it."
+  ],
+  "acceptance_criteria": {
+    "report_binds_candidate_profile_pin_snapshot_package_preflight": "tests/harness/test_blind_baseline.py::TestFreeze::test_the_record_binds_everything_the_ticket_names; each binding refused by name when absent in ::TestTheConditions.",
+    "pin_names_transport": "::TestTheConditions (pin_names_transport) and tests/harness/test_subscription_judge.py::TestWhatIndependenceSurvives::test_a_version_tag_that_does_not_name_the_transport_is_refused.",
+    "cells_and_criterion_scores_present_with_spreads": "::TestFreeze::test_cells_and_criterion_scores_are_present_with_spreads; a cells-only run cannot be frozen; a criterion panel below five is refused (::TestTheConditions::test_a_criterion_panel_below_five_is_refused); a missing or moved preflight file is refused (::test_a_preflight_file_that_is_gone_is_refused, ::test_a_preflight_file_whose_hash_moved_is_refused).",
+    "blindness_condition_1_tools_empty_and_cwd_outside": "tests/harness/test_subscription_judge.py::TestTheAssessorIsBlind and ::TestBlindnessAtTheArgvLevel::test_the_child_runs_outside_the_repository.",
+    "blindness_condition_2_planted_markers": "tests/harness/test_blind_baseline.py::TestPlantedMarkers, with a non-vacuity check that the candidate text does reach the prompts.",
+    "blindness_condition_3_argv_level_empty_tool_list": "tests/harness/test_subscription_judge.py::TestBlindnessAtTheArgvLevel::test_argv_carries_an_explicit_empty_tool_list and ::test_argv_strips_mcp_servers, with Popen replaced so the assertion is over the argv handed to the operating system."
+  }
+}

@@ -34,7 +34,8 @@ import signal
 import subprocess
 import threading
 import time
-from typing import NamedTuple
+from pathlib import Path
+from typing import NamedTuple, Sequence
 
 
 logger = logging.getLogger(__name__)
@@ -130,6 +131,17 @@ class ClaudeCLITimeoutError(ClaudeTransportError):
 #: Default timeout for Claude CLI invocations (seconds).
 #: Skill invocations may produce large responses; 5 minutes is generous.
 DEFAULT_TIMEOUT_SECONDS: int = 300
+
+#: The explicit "no tools" marker for :func:`invoke_claude_text`.
+#:
+#: ``tools=None`` omits ``--tools`` and leaves the CLI's built-in tool set
+#: live — a no-flag print-mode call read ``./CLAUDE.md`` when asked (measured
+#: 2026-10-04).  An empty list emits ``--tools ""``, which the CLI documents as
+#: "disable all tools", together with ``--strict-mcp-config``, because the
+#: operator's MCP servers survive ``--tools ""`` on their own (measured
+#: 2026-10-05: the init event still listed a filesystem reader).  A caller
+#: that needs a model which can open nothing passes this, never ``None``.
+NO_TOOLS: tuple[str, ...] = ()
 
 #: Maximum safe length for the --system-prompt CLI argument (characters).
 #: On Windows, CreateProcess limits the command line to ~32,767 chars.
@@ -799,7 +811,8 @@ def invoke_claude_text(
     model: str,
     max_tokens: int,
     timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS,
-    tools: list[str] | None = None,
+    tools: Sequence[str] | None = None,
+    cwd: Path | str | None = None,
 ) -> str:
     """Invoke the local ``claude`` CLI in print mode and return response text.
 
@@ -826,11 +839,21 @@ def invoke_claude_text(
     timeout_seconds:
         Maximum wall-clock seconds to wait for the CLI to complete.
     tools:
-        Optional list of tool names to make available to Claude during
-        execution (e.g. ``["Read", "Glob"]``).  When provided with a
-        non-empty list, appends ``--tools <comma-joined>`` to the CLI
-        command.  When ``None`` (default) or empty, no ``--tools`` flag
-        is added and Claude operates in pure print mode.
+        Tool names to make available to Claude during execution (e.g.
+        ``["Read", "Glob"]``), appended as ``--tools <comma-joined>``.
+        Three values are distinct at the CLI:
+
+        * ``None`` (default) — no ``--tools`` flag.  The CLI's **built-in
+          tool set stays live**; this is not a tool-free invocation.
+        * an empty sequence (:data:`NO_TOOLS`) — ``--tools ""`` plus
+          ``--strict-mcp-config``: no built-in tool and no MCP server.  The
+          model can open nothing.
+        * a non-empty sequence — exactly those built-in tools.
+    cwd:
+        Working directory for the child process.  ``None`` (default) inherits
+        the caller's.  A caller that must keep the repository out of the
+        model's reach passes a directory outside it; a directory that does
+        not exist is refused before anything is spawned.
 
     Returns
     -------
@@ -873,9 +896,26 @@ def invoke_claude_text(
         "--verbose",
     ]
 
-    # Append --tools flag when tools are specified.
-    if tools:
-        cmd.extend(["--tools", ",".join(tools)])
+    # --tools: None omits the flag (built-in set live); an empty sequence is
+    # the explicit "disable all tools" form, and MCP servers are stripped with
+    # it because --tools "" alone leaves them reachable.  --tools is variadic
+    # at the CLI, so the next element must be an option, never a positional:
+    # the system prompt follows as --system-prompt and the user prompt goes
+    # on stdin.
+    if tools is not None:
+        if len(tools) == 0:
+            cmd.extend(["--tools", "", "--strict-mcp-config"])
+        else:
+            cmd.extend(["--tools", ",".join(tools)])
+
+    _cwd: str | None = None
+    if cwd is not None:
+        _cwd_path = Path(cwd)
+        if not _cwd_path.is_dir():
+            raise ClaudeTransportError(
+                f"Claude CLI working directory does not exist: {_cwd_path}"
+            )
+        _cwd = str(_cwd_path)
 
     # Determine how to pass the system prompt.
     # When the system prompt fits within safe OS command-line limits, pass
@@ -917,6 +957,7 @@ def invoke_claude_text(
             encoding="utf-8",
             shell=False,
             env=_env,
+            cwd=_cwd,
             **_tree_killable_popen_kwargs(),
         )
     except FileNotFoundError:
