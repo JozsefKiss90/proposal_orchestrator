@@ -390,7 +390,8 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Piece | Where |
 |---|---|
 | Candidate loader, content hash, bound report, writer, loader | `harness/blind_assessment.py` |
-| Module command (`assess`, `verify`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Module command (`preflight`, `assess`, `verify`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Evidence preflight: realised pack set, pack-set hash, seven-section report | `harness/evidence_preflight.py`; reports `harness/blind_reports/preflight_<hash12>_<NNNN>.json` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
 | Document route (`--document`) | evidence via `runner.dev_graph.build_package` under the `blind_pre_evaluation` view; materialised under `<out-dir>/candidates/<document node id>/` |
@@ -469,6 +470,52 @@ criterion score is bound to the report like a cell; `verify` checks the
 binding. `--skip-criterion-scores` runs the cells only. The library default
 (`assess_candidate(criterion_samples=None)`) skips the stage; the command runs
 it.
+
+**Evidence preflight (`evidence_preflight.py`).** A Claude-free command run
+before any quota is spent:
+
+    py -3.10 -m harness.commands.blind_assessment preflight --document <id> --graph-root <repo> [...]
+
+It takes the same evidence-selecting flags as `assess` (`--budget`,
+`--span-fraction`, `--no-claims`, `--criterion-budget`, `--transport`,
+`--package-budget`, `--import-manifest`), realises every pack and criterion
+input exactly as `assess` would, and writes
+`preflight_<hash12>_<NNNN>.json` beside the blind reports (never overwritten).
+The report carries seven things: the anchors present against the rubrics the
+profile declares (a missing anchor is reported, not raised); the `not_relevant`
+exclusions per expectation with their token cost, which no other artifact shows
+because that exclusion never flips a pack to `insufficient_context`; the
+`over_budget` exclusions and the pack status they produced; the table rendering
+and row-parse counts over the candidate's pipe-delimited rows, against the
+import manifest when one exists; the package completeness under the package
+budget; the leakage scan, meaning the package guard, the snapshot's input list
+against every `esr` directory on disk (the historical evaluation is never
+snapshotted) and the instance-one word scan over the graph root; and the pins.
+Exit `0` with no flag, `1` with flags to read, `2` when it could not run.
+
+**Pack-set hash.** The pins are the candidate hash, profile version, rubric set,
+scorecard, appendix mapping, policy, snapshot and package, **and** every input
+that selects evidence. The three budgets arrive as flags and are covered by no
+other pin; the demo recorded a case (F9, 2026-10-02) where a provider's
+rate-limit ceiling fixed the pack budget and so predetermined every grade. The
+binding is therefore the **pack-set hash**: a canonical hash over each realised
+pack's selection record (without its machine path) plus the exact text it
+renders for the assessor, and each criterion input's hash. A change to any
+selection input that changes what the assessor sees moves it, whether or not
+anyone listed that input. The parameter values are recorded beside the hash,
+because a bare mismatch does not say what moved. The hash is a hash of an
+output and is not provenance: two extractor versions producing byte-identical
+packs are indistinguishable by it, so the import manifest, which carries the
+extraction, normalisation and table-rendering versions, is pinned separately by
+its sha256.
+
+**`assess` requires it.** `assess --preflight <file>` loads the report,
+re-derives the pack set under its own flags, and refuses (exit 2, before the
+assessor is constructed, nothing written) when the candidate hash, the profile,
+any parameter, the manifest pin or any pack moved, naming every field that did.
+On a match the blind report carries `preflight_pack_set_hash` and
+`preflight_report`. The library function `assess_candidate` takes the hash as an
+optional stamp and does not check it; the command does.
 
 **Immutability.** The writer never overwrites: a rerun writes the next
 sequence number for the same candidate hash and earlier reports stay

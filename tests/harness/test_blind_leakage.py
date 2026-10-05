@@ -19,6 +19,7 @@ import pytest
 
 import harness.blind_assessment as ba
 import harness.commands.blind_assessment as cmd
+from tests.harness._preflight import preflighted
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
 from harness.rubrics import load_profile_bundle
@@ -178,8 +179,8 @@ def _judge(tmp_path: Path, backend) -> Judge:
 def _run(world: Path, bundle, backend, *extra: str, out: Path | None = None) -> tuple[int, Path]:
     out = out or (world / "reports")
     code = cmd.main(
-        ["assess", "--document", "CAND-1", "--graph-root", str(world), "--out-dir", str(out),
-         "--repo-root", str(world), "--profile", str(bundle.profile.source_path), *extra],
+        preflighted(["assess", "--document", "CAND-1", "--graph-root", str(world), "--out-dir", str(out),
+         "--repo-root", str(world), "--profile", str(bundle.profile.source_path), *extra]),
         judge=_judge(world, backend),
         clock=lambda: FROZEN,
     )
@@ -388,9 +389,9 @@ class TestIntakeAndLabel:
         evidence = ba.build_blind_evidence(world, "CAND-1", profile_version=bundle.version, out_dir=world / "r")
         backend = RecordingBackend()
         code = cmd.main(
-            ["assess", "--candidate", str(evidence.candidate_dir), "--graph-root", str(world),
+            preflighted(["assess", "--candidate", str(evidence.candidate_dir), "--graph-root", str(world),
              "--out-dir", str(world / "d"), "--repo-root", str(world),
-             "--profile", str(bundle.profile.source_path), "--intake", "INTAKE-5"],
+             "--profile", str(bundle.profile.source_path), "--intake", "INTAKE-5"]),
             judge=_judge(world, backend), clock=lambda: FROZEN,
         )
         assert code == 2

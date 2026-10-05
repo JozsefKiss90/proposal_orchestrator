@@ -495,8 +495,10 @@ class TestDryRun:
         """
         candidate = _candidate(tmp_path / "candidate", bundle)
         out_dir = tmp_path / "reports"
+        from tests.harness._preflight import preflighted
+
         code = command.main(
-            [
+            preflighted([
                 "assess",
                 "--candidate",
                 str(candidate),
@@ -508,7 +510,7 @@ class TestDryRun:
                 str(out_dir),
                 "--provenance",
                 str(tmp_path / "provenance.jsonl"),
-            ],
+            ]),
             judge=_judge(tmp_path, ScriptedBackend()),
             clock=lambda: FROZEN,
         )

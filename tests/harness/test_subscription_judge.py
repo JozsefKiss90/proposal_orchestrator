@@ -217,7 +217,7 @@ class TestCommandWiring:
     def test_the_default_transport_is_still_the_independent_one(self):
         from harness.commands.blind_assessment import TRANSPORT_OPENAI, _parser
 
-        args = _parser().parse_args(["assess", "--candidate", "x"])
+        args = _parser().parse_args(["assess", "--candidate", "x", "--preflight", "x"])
         assert args.transport == TRANSPORT_OPENAI
 
     def test_the_pin_flags_beat_the_harness_env_file(self, monkeypatch, tmp_path):
@@ -235,7 +235,7 @@ class TestCommandWiring:
         monkeypatch.setenv("HARNESS_JUDGE_VERSION", "groq-pin@2026-08-03")
         args = cmd._parser().parse_args(
             [
-                "assess", "--candidate", "x",
+                "assess", "--candidate", "x", "--preflight", "x",
                 "--transport", cmd.TRANSPORT_CLAUDE_CLI,
                 "--assessor-model", PIN,
                 "--assessor-version", VERSION,
@@ -254,7 +254,7 @@ class TestCommandWiring:
         monkeypatch.setattr(_common, "load_harness_env", lambda: None)
         args = cmd._parser().parse_args(
             [
-                "assess", "--candidate", "x",
+                "assess", "--candidate", "x", "--preflight", "x",
                 "--transport", cmd.TRANSPORT_CLAUDE_CLI,
                 "--assessor-model", SKILL_MODEL,
                 "--assessor-version", VERSION,
@@ -273,7 +273,7 @@ class TestCommandWiring:
         assert UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET > DEFAULT_PACK_TOKEN_BUDGET
         # Resolved from the transport after parsing, so the flag default is None.
         args = cmd._parser().parse_args(
-            ["assess", "--candidate", "x", "--transport", cmd.TRANSPORT_CLAUDE_CLI]
+            ["assess", "--candidate", "x", "--preflight", "x", "--transport", cmd.TRANSPORT_CLAUDE_CLI]
         )
         assert args.budget is None
 
@@ -288,7 +288,7 @@ class TestCommandWiring:
             hj, "resolve_judge_config", lambda: JudgeConfig(model=PIN, version=VERSION)
         )
         args = ba._parser().parse_args(
-            ["assess", "--candidate", "x", "--transport", ba.TRANSPORT_CLAUDE_CLI]
+            ["assess", "--candidate", "x", "--preflight", "x", "--transport", ba.TRANSPORT_CLAUDE_CLI]
         )
         judge = ba._live_judge(args, tmp_path)
         assert isinstance(judge._backend, sj.ClaudeCLIJudgeBackend)

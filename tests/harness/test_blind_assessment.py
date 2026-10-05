@@ -17,6 +17,7 @@ import pytest
 
 import harness.blind_assessment as ba
 import harness.commands.blind_assessment as cmd
+from tests.harness._preflight import preflighted
 from harness.judge import Judge, JudgeConfig, JudgeResponseError
 from harness.provenance import ProvenanceLog
 from harness.rubrics import load_profile_bundle
@@ -315,9 +316,9 @@ class TestAssessor:
         out = tmp_path / "reports"
         judge = _judge(tmp_path, ScriptedBackend(PASS_JSON, '{"rationale": "no verdict"}'))
         code = cmd.main(
-            ["assess", "--candidate", str(candidate), "--out-dir", str(out),
+            preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
-             "--profile", str(bundle.profile.source_path)],
+             "--profile", str(bundle.profile.source_path)]),
             judge=judge,
             clock=lambda: FROZEN,
         )
@@ -409,9 +410,9 @@ class TestCommand:
         candidate = _candidate(tmp_path, bundle)
         out = tmp_path / "reports"
         code = cmd.main(
-            ["assess", "--candidate", str(candidate), "--out-dir", str(out),
+            preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
-             "--profile", str(bundle.profile.source_path)],
+             "--profile", str(bundle.profile.source_path)]),
             judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
@@ -435,9 +436,9 @@ class TestCommand:
         candidate = _candidate(tmp_path, bundle)
         out = tmp_path / "reports"
         cmd.main(
-            ["assess", "--candidate", str(candidate), "--out-dir", str(out),
+            preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
-             "--profile", str(bundle.profile.source_path)],
+             "--profile", str(bundle.profile.source_path)]),
             judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
@@ -457,9 +458,9 @@ class TestCommand:
     def test_partial_candidate_exits_1(self, tmp_path, bundle):
         candidate = _candidate(tmp_path, bundle, drop="feasibility_section")
         code = cmd.main(
-            ["assess", "--candidate", str(candidate), "--out-dir", str(tmp_path / "r"),
+            preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(tmp_path / "r"),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
-             "--profile", str(bundle.profile.source_path)],
+             "--profile", str(bundle.profile.source_path)]),
             judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
@@ -616,7 +617,7 @@ class TestCommandCriterionScoring:
     def test_assess_scores_criteria_by_default_with_five_samples(self, tmp_path, bundle):
         backend = DualBackend()
         out = tmp_path / "reports"
-        code = cmd.main(self._args(bundle, _candidate(tmp_path, bundle), out),
+        code = cmd.main(preflighted(self._args(bundle, _candidate(tmp_path, bundle), out)),
                         judge=_judge(tmp_path, backend), clock=lambda: FROZEN)
         assert code == 0
         (path,) = list(out.iterdir())
@@ -628,7 +629,7 @@ class TestCommandCriterionScoring:
     def test_skip_and_no_claims_flags(self, tmp_path, bundle):
         out = tmp_path / "reports"
         code = cmd.main(
-            self._args(bundle, _candidate(tmp_path, bundle), out) + ["--skip-criterion-scores", "--no-claims"],
+            preflighted(self._args(bundle, _candidate(tmp_path, bundle), out) + ["--skip-criterion-scores", "--no-claims"]),
             judge=_judge(tmp_path, ScriptedBackend()), clock=lambda: FROZEN,
         )
         assert code == 0
@@ -639,7 +640,7 @@ class TestCommandCriterionScoring:
 
     def test_criterion_n_below_the_minimum_exits_2(self, tmp_path, bundle):
         out = tmp_path / "reports"
-        code = cmd.main(self._args(bundle, _candidate(tmp_path, bundle), out) + ["--criterion-n", "2"],
+        code = cmd.main(preflighted(self._args(bundle, _candidate(tmp_path, bundle), out) + ["--criterion-n", "2"]),
                         judge=_judge(tmp_path, DualBackend()), clock=lambda: FROZEN)
         assert code == 2
         assert not out.exists() or not list(out.iterdir())

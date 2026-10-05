@@ -1,0 +1,76 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe05-evidence-preflight_2026-10-05",
+  "date": "2026-10-05",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-05 (Evidence preflight) in plans/msca_dn_pre_evaluation_spec.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs; where a process is parameterised the inputs and parameters are documented so the output is auditable), §12.1 (every output identifies its source inputs and flags what was absent), §12.4 (a missing mandatory input is declared, never papered over). Spec decision 16 and ticket PE-05; demo finding F9 of 2026-10-02, where a rate-limit-derived pack ceiling predetermined every grade. Not a constitutional amendment.",
+  "decision": "A separate, Claude-free preflight command realises every evidence pack and criterion input the blind lane would build under the exact parameters the operator will assess with, reports what each pack kept and dropped and why, and binds the realised pack set by hash. The assess command requires a preflight report, re-derives the pack set under its own flags before the assessor is constructed, and refuses on any mismatch naming every field that moved. The blind report carries the preflight's pack-set hash. The seven reported things are the anchors present against the rubrics the profile declares, the not_relevant exclusions per expectation with their token cost, the over_budget exclusions, the table rendering and row-parse counts, the package completeness under the package budget, the leakage scan including that no snapshot input lies under an esr directory, and the pins: candidate, profile, rubric set, scorecard, appendix mapping, policy, snapshot, package, and every input that selects evidence.",
+  "declared_values": {
+    "preflight_required_on_assess": {
+      "value": true,
+      "declared_status": "Assumed",
+      "reason": "Adopted from spec decision 16: the harness stays advisory to the pipeline while the preflight is mandatory to the operator. The library function assess_candidate takes the hash as an optional stamp and does not check it; the module command checks it before any assessor exists, so a mismatch spends no quota."
+    },
+    "pack_set_hash_composition": {
+      "value": "canonical hash over {packs: {expectation/section: per-pack hash}, criteria: {criterion: input_hash, token_budget, complete, incompleteness}}; a per-pack hash is the canonical hash of the pack's selection record without its machine path plus the exact text the pack renders for the assessor; a pack that could not be built hashes its reason (section_missing or anchor_missing) and the missing anchors",
+      "declared_status": "Inferred",
+      "reason": "The rendered text is what the assessor reads, so hashing it binds the evidence rather than a description of it. The selection record carries the budget, the include_claims choice, the terms and the anchors, so a parameter that changes none of the selected text still moves the hash when it is recorded there. The section path is dropped because the document route materialises the candidate under the out directory and a machine path would make the hash non-portable. The parameter values travel beside the hash, not inside it, because a bare mismatch does not say what moved."
+    },
+    "import_manifest_pinned_separately": {
+      "value": "the import manifest at <graph root>/docs/tier4_orchestration_state/dev_graph/imports/<document id>.json, or the one named by --import-manifest, is pinned by its plain sha256 and its versions block is recorded; assess re-binds the sha256 when the preflight pinned one",
+      "declared_status": "Inferred",
+      "reason": "A hash of an output cannot identify the process that produced it: two extractor or normalisation versions that happen to produce byte-identical packs are indistinguishable by the pack-set hash. The manifest carries those versions. The spec's PE-05 text as committed in 2b2a0fa states that the pack hash captures the extraction and normalisation versions; this record implements the stronger reading that the spec's previous revision (1783ea6) carried, which binds the manifest as a second pin. Both readings are satisfied: the pack-set hash is present and the manifest pin is additional."
+    },
+    "esr_never_snapshotted_check": {
+      "value": "the preflight lists the snapshot's input files, asserts that none has a path segment named esr, and lists every directory named esr under the graph root's and the repository's Tier 4 with whether it lies under the graph root and whether any snapshot input lies under it",
+      "declared_status": "Assumed",
+      "reason": "Spec decision 12 keeps the historical evaluation as a Tier 4 artifact the builder never reads, under docs/tier4_orchestration_state/msca_dn/esr/. The harness may name no instrument, so the check is by the directory segment rather than the full path. At the time of writing no esr directory exists on the branch; the check is in place for PE-08, which authors the record."
+    },
+    "word_scan_root": {
+      "value": "graph root",
+      "declared_status": "Assumed",
+      "reason": "runner.leakage_scan is repository-root-bound and its globs name Tier 3, Tier 4, Tier 5 and the vault relative to the root it is given. Passing the graph root scans the workspace's own records, which the branch-wide scan does not reach. On the directory route there is no graph root and the scan is reported not applicable."
+    },
+    "preflight_exit_codes": {
+      "value": {"0": "written, no flag", "1": "written, flags to read before spending quota", "2": "could not run, nothing written"},
+      "declared_status": "Assumed",
+      "reason": "Mirrors the assess command's convention, where 1 is the advisory partial-coverage outcome. A flag is a missing section, a missing anchor, a pack over budget, an incomplete criterion input, a table row that fails to parse or disagrees with the manifest, an incomplete package, a leakage-guard failure, a snapshot input under an esr directory, or a new instance-one leak. Flags never block assess; the mismatch rule does."
+    }
+  },
+  "artifacts": {
+    "modules": [
+      "harness/evidence_preflight.py (new): PackParams, the realised pack set and its hash, the seven report sections, the report writer and loader, check_preflight, rendering",
+      "harness/blind_assessment.py: BlindAssessmentReport gains preflight_pack_set_hash and preflight_report; assess_candidate stamps them; next_report_path is public and takes a prefix so the two writers share one naming rule",
+      "harness/evidence_pack.py: split_paragraphs is public",
+      "harness/commands/blind_assessment.py: the preflight sub-command; the evidence-selecting flags are shared by preflight and assess; assess requires --preflight and re-binds it before the assessor is constructed; --import-manifest"
+    ],
+    "tests": [
+      "tests/harness/test_evidence_preflight.py (new): the realised pack set and its hash, the seven things on both routes, the command, the shipped candidate re-derived offline",
+      "tests/harness/_preflight.py (new helper): binds an assess argv to a fresh preflight for the existing command tests"
+    ],
+    "documentation": "harness/HARNESS.md (blind assessment section, evidence preflight)"
+  },
+  "measured_on_the_shipped_candidate": {
+    "basis": "tests/harness/test_evidence_preflight.py::TestShippedCandidate re-derives these from workspaces/msca_dn under the blind lane's parameters (token budget 32768, no ceiling, claims withheld, criterion budget 32768).",
+    "anchors": "10 of 10 rubrics have every declared anchor present",
+    "packs": "10 packs, all complete; no over_budget exclusion",
+    "criterion_inputs": "3 of 3 complete",
+    "tables": "88 rows rendered, 88 parsed, agreeing with the import manifest",
+    "package": "complete under the default package budget",
+    "leakage": "guard passed; no snapshot input under an esr directory; word scan over the graph root reports no new leak",
+    "flags": "none"
+  },
+  "side_effect": "The leakage-scan file count pinned by the demo report moved from 329 to 330: this record in Tier 4. The four pinned places were amended (plans/reports/dev_graph_demo_report_2026-10-03.md, decision_log/demo-report_2026-10-03.json, validation_reports/demo-report_2026-10-03.json, validation_reports/demo-candidate-blind-baseline_2026-10-01.json).",
+  "known_gaps": [
+    "The preflight cannot bind the assessor pin, which is unknown before assess; PE-06 binds it on the blind report alongside the preflight hash.",
+    "The pack-set hash is not provenance. Where no import manifest exists (the directory route, or a document imported without one) the extraction and normalisation versions are unbound.",
+    "The word scan uses the standing instance-one denylist; it says nothing about nouns the denylist does not carry.",
+    "tests/harness/test_dev_graph_t03_end_to_end.py::test_t03_scenario_end_to_end fails at HEAD before this ticket (its scripted backend is not criterion-aware since PE-04) and still fails after it; it is not caused by the preflight."
+  ],
+  "acceptance_criteria": {
+    "no_required_evidence_omitted_without_explanation": "Every pack lists its not_relevant and over_budget exclusions with counts and token cost; a pack that could not be built names the missing section or anchor; the flags name each. tests/harness/test_evidence_preflight.py::TestTheSevenThings.",
+    "a_changed_candidate_invalidates_the_preflight": "assess re-derives the pack set and refuses, naming candidate_hash and the pack that moved. ::TestCommand::test_a_changed_candidate_invalidates_the_preflight; a changed budget and a tampered profile version are refused likewise.",
+    "not_relevant_volume_is_visible": "Per expectation and in total, with token cost, while the pack status stays complete. ::TestTheSevenThings::test_not_relevant_exclusions_per_expectation_with_their_token_cost."
+  }
+}

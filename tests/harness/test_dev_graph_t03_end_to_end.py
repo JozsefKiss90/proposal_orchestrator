@@ -37,6 +37,7 @@ import pytest
 
 import harness.blind_assessment as ba
 import harness.commands.blind_assessment as cmd
+from tests.harness._preflight import preflighted
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
 from harness.rubrics import load_profile_bundle
@@ -279,8 +280,8 @@ def _assess(root: Path, profile: Path, backend, out: Path, *extra: str) -> tuple
     """Run the blind command on document CAND-1 and return (exit code, report)."""
     before = {p.name for p in out.iterdir() if p.is_file()} if out.exists() else set()
     code = cmd.main(
-        ["assess", "--document", "CAND-1", "--graph-root", str(root), "--out-dir", str(out),
-         "--repo-root", str(root), "--profile", str(profile), *extra],
+        preflighted(["assess", "--document", "CAND-1", "--graph-root", str(root), "--out-dir", str(out),
+         "--repo-root", str(root), "--profile", str(profile), *extra]),
         judge=_judge(root, backend, out.name),
         clock=lambda: FROZEN,
     )

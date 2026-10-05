@@ -80,6 +80,7 @@ __all__ = [
     "EvidencePackError",
     "estimate_tokens",
     "normalize_terms",
+    "split_paragraphs",
     "ProseSpan",
     "PackClaim",
     "ExcludedItem",
@@ -479,8 +480,16 @@ def _load_sub_sections(path: Path) -> list[tuple[str, str]]:
     return pairs
 
 
-def _split_paragraphs(content: str) -> list[str]:
+def split_paragraphs(content: str) -> list[str]:
+    """The pack builder's paragraph split: blank-line separated, stripped, empties dropped.
+
+    Public so the evidence preflight counts rendered table rows over exactly the
+    paragraphs the pack builder selects from.
+    """
     return [p.strip() for p in re.split(r"\n\s*\n", content) if p.strip()]
+
+
+_split_paragraphs = split_paragraphs
 
 
 # --------------------------------------------------------------------------- #

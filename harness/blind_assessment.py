@@ -138,6 +138,7 @@ __all__ = [
     "BlindAssessmentReport",
     "assess_candidate",
     "write_report",
+    "next_report_path",
     "load_report",
     "render_report",
 ]
@@ -158,8 +159,13 @@ DEFAULT_REPORTS_DIR: Path = Path("harness/blind_reports")
 #: Default provenance trail for the command (harness-owned, repo-relative).
 DEFAULT_PROVENANCE_PATH: Path = Path("harness/provenance/blind_assessment.jsonl")
 
-#: Report file name: ``blind_<12 hex of the candidate hash>_<NNNN>.json``.
-_REPORT_NAME_RE = re.compile(r"^blind_(?P<hash>[0-9a-f]{12})_(?P<seq>\d{4})\.json$")
+#: Report file name: ``<prefix>_<12 hex of the candidate hash>_<NNNN>.json``;
+#: the blind report uses prefix ``blind``, the evidence preflight ``preflight``.
+def _report_name_re(prefix: str) -> re.Pattern[str]:
+    return re.compile(rf"^{re.escape(prefix)}_(?P<hash>[0-9a-f]{{12}})_(?P<seq>\d{{4}})\.json$")
+
+
+_REPORT_NAME_RE = _report_name_re("blind")
 
 #: The only dev-graph view the blind lane builds evidence under.
 BLIND_VIEW: str = "blind_pre_evaluation"
@@ -652,6 +658,12 @@ class BlindAssessmentReport:
     include_claims: bool = True
     #: The criterion-scoring stage (spec PE-04), when it ran.
     criterion_scoring: CriterionScoring | None = None
+    #: The evidence preflight this assessment was bound to (spec PE-05): the
+    #: pack-set hash the command re-derived and checked before any assessor
+    #: call, and the report it was read from.  Empty when a library caller
+    #: gave none; the command always gives both.
+    preflight_pack_set_hash: str = ""
+    preflight_report: str = ""
     notes: str = _ADVISORY_NOTE
     advisory: bool = True
     blocking: bool = False
@@ -759,6 +771,8 @@ class BlindAssessmentReport:
             "evidence_view": self.evidence_view,
             "evidence_source": self.evidence_source,
             "include_claims": self.include_claims,
+            "preflight_pack_set_hash": self.preflight_pack_set_hash,
+            "preflight_report": self.preflight_report,
             "notes": self.notes,
             "summary": self.summary,
             "cells": [c.to_dict() for c in self.cells],
@@ -808,6 +822,8 @@ def assess_candidate(
     include_claims: bool = True,
     criterion_samples: int | None = None,
     criterion_token_budget: int = UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET,
+    preflight_hash: str = "",
+    preflight_report: str = "",
 ) -> BlindAssessmentReport:
     """Assess one candidate against *bundle* with *judge*; return the bound report.
 
@@ -836,6 +852,11 @@ def assess_candidate(
     point of the lane, so it defaults to the uncapped assessor budget rather
     than the cells' pack budget, and an input that does not fit is reported
     not scored rather than cut.
+
+    *preflight_hash* and *preflight_report* stamp the evidence preflight the
+    caller re-bound before calling (spec PE-05; :mod:`harness.evidence_preflight`).
+    This function does not check them: the module command does, before the
+    assessor exists.  A library caller that gives none leaves both empty.
     """
     if n < MIN_MAJORITY_SAMPLES:
         raise BlindAssessmentError(
@@ -931,6 +952,8 @@ def assess_candidate(
         evidence_source=EVIDENCE_SOURCE_DEV_GRAPH if evidence is not None else EVIDENCE_SOURCE_DIRECTORY,
         include_claims=include_claims,
         criterion_scoring=criterion_scoring,
+        preflight_pack_set_hash=preflight_hash,
+        preflight_report=preflight_report,
     )
 
 
@@ -939,15 +962,24 @@ def assess_candidate(
 # --------------------------------------------------------------------------- #
 
 
-def _next_report_path(reports_dir: Path, digest: str) -> Path:
+def next_report_path(reports_dir: Path, digest: str, *, prefix: str = "blind") -> Path:
+    """The next free ``<prefix>_<hash12>_<NNNN>.json`` under *reports_dir* for *digest*.
+
+    Shared by the blind report writer and the evidence preflight writer so the
+    two never overwrite each other or themselves.
+    """
     short = digest.split(":", 1)[1][:12]
+    pattern = _report_name_re(prefix)
     taken = 0
     if reports_dir.is_dir():
         for existing in reports_dir.iterdir():
-            m = _REPORT_NAME_RE.match(existing.name)
+            m = pattern.match(existing.name)
             if m and m.group("hash") == short:
                 taken = max(taken, int(m.group("seq")))
-    return reports_dir / f"blind_{short}_{taken + 1:04d}.json"
+    return reports_dir / f"{prefix}_{short}_{taken + 1:04d}.json"
+
+
+_next_report_path = next_report_path
 
 
 def write_report(
@@ -1092,6 +1124,11 @@ def render_report(report: Mapping[str, Any]) -> str:
         lines.append(
             f"evidence:  source={report.get('evidence_source', EVIDENCE_SOURCE_DIRECTORY)} "
             "(no dev-graph package; the leakage guard did not run)\n"
+        )
+    if report.get("preflight_pack_set_hash"):
+        lines.append(
+            f"preflight: pack set {str(report.get('preflight_pack_set_hash') or '')[:19]}  "
+            f"{report.get('preflight_report', '')}\n"
         )
     missing = report.get("partial_coverage") or []
     if missing:
