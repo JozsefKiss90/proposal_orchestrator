@@ -63,7 +63,7 @@ import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any, Mapping
 
 from runner.atomic_write import atomic_write_json
 from runner.dev_graph import HISTORICAL_FEEDBACK_TAGS, build_snapshot
@@ -76,6 +76,7 @@ from harness.blind_assessment import (
     BlindAssessmentError,
     BlindEvidence,
     Candidate,
+    Clock,
     LeakageError,
     assert_no_leakage,
     candidate_hash,
@@ -90,7 +91,6 @@ from harness.evidence_pack import (
     KIND_PROSE_SPAN,
     PACK_INSUFFICIENT_CONTEXT,
     EvidencePack,
-    estimate_tokens,
     split_paragraphs,
 )
 from harness.profile import canonical_hash
@@ -115,7 +115,6 @@ __all__ = [
     "render_preflight",
     "file_sha256",
     "resolve_import_manifest",
-    "estimate_tokens",
 ]
 
 #: The ``record_type`` of a persisted preflight report.
@@ -146,9 +145,6 @@ _ADVISORY_NOTE: str = (
     "assess requires it and refuses when the realised packs, the candidate, the "
     "profile or any selection parameter moved (see harness/HARNESS.md)."
 )
-
-Clock = Callable[[], str]
-
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -217,6 +213,13 @@ class RealisedPack:
     section_missing: bool = False
 
     @property
+    def reason(self) -> str:
+        """Why no pack was built: ``section_missing`` or ``anchor_missing``; empty when one was."""
+        if self.pack is not None:
+            return ""
+        return "section_missing" if self.section_missing else "anchor_missing"
+
+    @property
     def binding_record(self) -> dict[str, Any]:
         """What the hash covers: the selection record without its machine
         path, plus the exact text the assessor would read."""
@@ -224,7 +227,7 @@ class RealisedPack:
             return {
                 "expectation_key": self.expectation_key,
                 "section_id": self.section_id,
-                "error": "section_missing" if self.section_missing else "anchor_missing",
+                "error": self.reason,
                 "missing_anchors": list(self.missing_anchors),
             }
         record = self.pack.to_dict()
@@ -255,7 +258,7 @@ class RealisedPack:
             base.update(
                 {
                     "status": "not_built",
-                    "reason": "section_missing" if self.section_missing else "anchor_missing",
+                    "reason": self.reason,
                     "missing_anchors": list(self.missing_anchors),
                 }
             )
@@ -287,11 +290,20 @@ class RealisedPackSet:
 
     packs: tuple[RealisedPack, ...]
     criterion_inputs: tuple[CriterionInput, ...]
+    params: PackParams
 
     @property
     def hash(self) -> str:
+        """Canonical over the per-pack hashes, the criterion inputs and the parameters.
+
+        The parameters are inside the hash as well as beside it: a ceiling or a span
+        fraction that happens to select the same text must still move the hash, because
+        the frozen blind report binds this hash alone (spec PE-06) and finding F9 was
+        exactly a ceiling nobody recorded.
+        """
         return canonical_hash(
             {
+                "params": self.params.to_dict(),
                 "packs": {f"{p.expectation_key}/{p.section_id}": p.hash for p in self.packs},
                 "criteria": {
                     c.criterion_id: {
@@ -344,7 +356,7 @@ def realise_pack_set(bundle: ProfileBundle, candidate: Candidate, params: PackPa
         build_criterion_input(bundle, candidate, cid, token_budget=params.criterion_token_budget)
         for cid in bundle.profile.criterion_ids
     )
-    return RealisedPackSet(packs=tuple(packs), criterion_inputs=inputs)
+    return RealisedPackSet(packs=tuple(packs), criterion_inputs=inputs, params=params)
 
 
 # --------------------------------------------------------------------------- #
@@ -718,7 +730,7 @@ def _flags(
         if not leakage["guard"].get("passed"):
             flags.append(f"leakage guard failed: {leakage['guard'].get('error')}")
         if not leakage["esr"].get("never_snapshotted"):
-            flags.append("a snapshot input lies under an esr directory")
+            flags.append("the snapshot read an esr directory")
         if not leakage["word_scan"].get("ok"):
             flags.append(f"word scan: {leakage['word_scan']['new_violations']} new instance-one leak(s)")
     return tuple(flags)
@@ -800,8 +812,8 @@ def run_preflight(
         document_id=evidence.document_id if evidence is not None else "",
         snapshot_id=evidence.snapshot_id if evidence is not None else "",
         package_id=evidence.package.package_id if evidence is not None else "",
-        policy_version=str(evidence.package.manifest["policy_version"]) if evidence is not None else "",
-        evidence_view=str(evidence.package.manifest["view"]) if evidence is not None else "",
+        policy_version=str(evidence.package.manifest.get("policy_version", "")) if evidence is not None else "",
+        evidence_view=str(evidence.package.manifest.get("view", "")) if evidence is not None else "",
     )
 
 
@@ -814,8 +826,6 @@ def write_preflight(report: PreflightReport, reports_dir: Path | str) -> Path:
     """Write *report* as ``preflight_<hash12>_<NNNN>.json``; never overwrite."""
     out_dir = Path(reports_dir)
     target = next_report_path(out_dir, report.candidate_hash, prefix=_REPORT_PREFIX)
-    if target.exists():
-        raise BlindAssessmentError(f"preflight {target} already exists — reports are immutable.")
     out_dir.mkdir(parents=True, exist_ok=True)
     atomic_write_json(report.to_dict(), target, prefix="evidence_preflight_")
     return target
@@ -848,12 +858,14 @@ def check_preflight(
     realised: RealisedPackSet,
     params: PackParams,
     import_manifest_sha256: str | None = None,
+    evidence: BlindEvidence | None = None,
 ) -> str:
     """Re-bind a loaded preflight to what is about to be assessed.
 
     Returns the pack-set hash when the preflight describes exactly this
     candidate, profile, parameter set and realised pack set (and the same
-    import manifest, when the preflight pinned one).  Otherwise raises
+    import manifest, when the preflight pinned one, and the same snapshot, package
+    and policy, when *evidence* is given).  Otherwise raises
     :class:`PreflightMismatch` naming **every** field that moved, pack by pack.
     """
     moved: list[str] = []
@@ -870,6 +882,10 @@ def check_preflight(
     then_params: Mapping[str, Any] = raw_params if isinstance(raw_params, Mapping) else {}
     for key, now in params.to_dict().items():
         _cmp(f"params.{key}", then_params.get(key), now)
+    if evidence is not None:
+        _cmp("snapshot_id", data.get("snapshot_id"), evidence.snapshot_id)
+        _cmp("package_id", data.get("package_id"), evidence.package.package_id)
+        _cmp("policy_version", data.get("policy_version"), str(evidence.package.manifest.get("policy_version", "")))
     pinned = data.get("import_manifest")
     if isinstance(pinned, Mapping) and pinned.get("sha256"):
         _cmp("import_manifest.sha256", pinned.get("sha256"), import_manifest_sha256)

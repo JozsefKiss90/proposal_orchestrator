@@ -28,6 +28,8 @@ from harness.evidence_pack import (
     EXCLUDED_OVER_BUDGET,
     PACK_COMPLETE,
     PACK_INSUFFICIENT_CONTEXT,
+    estimate_tokens,
+    split_paragraphs,
 )
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
@@ -256,7 +258,15 @@ class TestRealisedPackSet:
 
     @pytest.mark.parametrize(
         "change",
-        [dict(token_budget=2000), dict(include_claims=False), dict(criterion_token_budget=4096)],
+        [
+            dict(token_budget=2000),
+            dict(include_claims=False),
+            dict(criterion_token_budget=4096),
+            # These two select the same text on this candidate and must still move the
+            # hash: the frozen blind report binds the hash alone (F9 was an unrecorded ceiling).
+            dict(span_budget_fraction=0.5),
+            dict(max_token_budget=3052),
+        ],
     )
     def test_the_hash_moves_with_each_selection_parameter(self, world, change):
         root, _ = world
@@ -283,6 +293,25 @@ class TestRealisedPackSet:
         realised = _realise(world, _candidate(root, drop_section="reach_section"))
         (reach,) = [p for p in realised.packs if p.expectation_key == "reach-uptake"]
         assert reach.pack is None and reach.section_missing
+
+    def test_every_paragraph_is_included_or_carries_a_reason(self, world):
+        """Spec acceptance: no required evidence is omitted without an explanation."""
+        root, bundle = world
+        cand = _candidate(root)
+        realised = _realise(world, cand, token_budget=110)
+        candidate = ba.load_candidate(cand, bundle.profile)
+        for p in realised.packs:
+            paragraphs = sum(
+                len(split_paragraphs(sub["content"]))
+                for sub in candidate.contents[p.section_id]["sub_sections"]
+            )
+            record = p.to_dict()
+            accounted = (
+                record["included"]["spans"]
+                + record[EXCLUDED_NOT_RELEVANT]["spans"]
+                + record[EXCLUDED_OVER_BUDGET]["spans"]
+            )
+            assert accounted == paragraphs, (p.expectation_key, record)
 
     def test_criterion_inputs_are_realised_alongside_the_packs(self, world):
         root, _ = world
@@ -335,7 +364,7 @@ class TestTheSevenThings:
         # One irrelevant paragraph and no irrelevant claim: the cost is that paragraph's.
         assert nov["not_relevant"]["spans"] == 1
         # The cost is the rendered span (key line + text), so at least the text itself.
-        assert nov["not_relevant"]["tokens"] >= pf.estimate_tokens(IRRELEVANT)
+        assert nov["not_relevant"]["tokens"] >= estimate_tokens(IRRELEVANT)
         assert nov["status"] == PACK_COMPLETE  # not_relevant never flips the status
         totals = data["exclusions"]
         assert totals[EXCLUDED_NOT_RELEVANT]["items"] == sum(

@@ -449,6 +449,7 @@ def main(
             realised=realised,
             params=params,
             import_manifest_sha256=file_sha256(manifest[0]) if manifest is not None else None,
+            evidence=evidence,
         )
         intake = read_esr_intake(graph_root, args.intake) if args.intake else None
         assessor = judge if judge is not None else _live_judge(args, repo_root)

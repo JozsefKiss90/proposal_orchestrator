@@ -481,16 +481,22 @@ It takes the same evidence-selecting flags as `assess` (`--budget`,
 `--package-budget`, `--import-manifest`), realises every pack and criterion
 input exactly as `assess` would, and writes
 `preflight_<hash12>_<NNNN>.json` beside the blind reports (never overwritten).
-The report carries seven things: the anchors present against the rubrics the
-profile declares (a missing anchor is reported, not raised); the `not_relevant`
-exclusions per expectation with their token cost, which no other artifact shows
-because that exclusion never flips a pack to `insufficient_context`; the
-`over_budget` exclusions and the pack status they produced; the table rendering
-and row-parse counts over the candidate's pipe-delimited rows, against the
-import manifest when one exists; the package completeness under the package
-budget; the leakage scan, meaning the package guard, the snapshot's input list
-against every `esr` directory on disk (the historical evaluation is never
-snapshotted) and the instance-one word scan over the graph root; and the pins.
+The report carries seven things:
+
+1. The anchors present, against the rubrics the profile declares. A missing
+   anchor is reported, not raised.
+2. The `not_relevant` exclusions per expectation, with their token cost. No
+   other artifact shows them, because that exclusion never flips a pack to
+   `insufficient_context`.
+3. The `over_budget` exclusions and the pack status they produced.
+4. The table rendering and row-parse counts over the candidate's pipe-delimited
+   rows, against the import manifest when one exists.
+5. The package completeness under the package budget.
+6. The leakage scan: the package guard, the snapshot's input list against every
+   `esr` directory on disk (the historical evaluation is never snapshotted), and
+   the instance-one word scan over the graph root.
+7. The pins.
+
 Exit `0` with no flag, `1` with flags to read, `2` when it could not run.
 
 **Pack-set hash.** The pins are the candidate hash, profile version, rubric set,
@@ -500,10 +506,11 @@ other pin; the demo recorded a case (F9, 2026-10-02) where a provider's
 rate-limit ceiling fixed the pack budget and so predetermined every grade. The
 binding is therefore the **pack-set hash**: a canonical hash over each realised
 pack's selection record (without its machine path) plus the exact text it
-renders for the assessor, and each criterion input's hash. A change to any
-selection input that changes what the assessor sees moves it, whether or not
-anyone listed that input. The parameter values are recorded beside the hash,
-because a bare mismatch does not say what moved. The hash is a hash of an
+renders for the assessor, each criterion input's hash, and the parameter values
+themselves. A change to any selection input moves it, whether or not it changed
+the selected text, and whether or not anyone listed that input. The parameter
+values are also recorded beside the hash, because a bare mismatch does not say
+what moved. The hash is a hash of an
 output and is not provenance: two extractor versions producing byte-identical
 packs are indistinguishable by it, so the import manifest, which carries the
 extraction, normalisation and table-rendering versions, is pinned separately by
@@ -512,7 +519,8 @@ its sha256.
 **`assess` requires it.** `assess --preflight <file>` loads the report,
 re-derives the pack set under its own flags, and refuses (exit 2, before the
 assessor is constructed, nothing written) when the candidate hash, the profile,
-any parameter, the manifest pin or any pack moved, naming every field that did.
+any parameter, the snapshot, package or policy, the manifest pin or any pack
+moved, naming every field that did.
 On a match the blind report carries `preflight_pack_set_hash` and
 `preflight_report`. The library function `assess_candidate` takes the hash as an
 optional stamp and does not check it; the command does.
