@@ -11,7 +11,9 @@ third, ``preflight``, realises the evidence the assessor would read and binds
 it by hash before any quota is spent (:mod:`harness.evidence_preflight`).  A
 fourth, ``freeze``, checks a written report against the baseline conditions and
 copies it, with a freeze record, into a durable baseline directory
-(:mod:`harness.blind_baseline`).
+(:mod:`harness.blind_baseline`).  A fifth, ``audit``, runs the Claude-free
+integrity audit over the parsed table rows and the claim ledger and binds the
+result to the frozen baseline when one is given (:mod:`harness.integrity_audit`).
 
 Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
 
@@ -20,6 +22,7 @@ Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT)
     py -3.10 -m harness.commands.blind_assessment assess --candidate <dir> --preflight <file>
     py -3.10 -m harness.commands.blind_assessment verify --report <file> --candidate <dir>
     py -3.10 -m harness.commands.blind_assessment freeze --report <file> --candidate <dir> --baseline-dir <dir>
+    py -3.10 -m harness.commands.blind_assessment audit --document <id> [--graph-root <repo>] [--baseline-dir <dir>]
 
 ``preflight`` and ``assess`` share every evidence-selecting flag (``--budget``,
 ``--span-fraction``, ``--no-claims``, ``--criterion-budget``, ``--transport``,
@@ -47,7 +50,10 @@ assessment could not run or the report or preflight was rejected
 ``1`` written with flags the operator should read (a missing anchor, a
 truncated pack, an incomplete package, a leak); ``2`` could not run.
 ``freeze``: ``0`` frozen; ``2`` refused, naming every failed condition,
-nothing written.
+nothing written.  ``audit``: ``0`` written with no flag; ``1`` written with
+flags the operator should read (a vacuous ledger, a ledger entry contradicting
+the import contract, a re-derived baseline, a parse failure); ``2`` could not
+run.  Findings never move the exit code: they are the product, not a verdict.
 
 The command lives inside the harness package so the one-way ``harness ->
 runner`` import boundary holds.  Advisory artifact; never a runtime gate
@@ -76,6 +82,7 @@ from harness.blind_assessment import (
     write_report,
 )
 from harness.blind_baseline import freeze_baseline, render_freeze
+from harness.integrity_audit import render_audit, run_audit, write_audit
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
@@ -354,6 +361,37 @@ def _parser() -> argparse.ArgumentParser:
     )
     p_freeze.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
     p_freeze.add_argument("--profile", default=None)
+
+    p_audit = sub.add_parser(
+        "audit",
+        help=(
+            "integrity audit: five consistency checks over the parsed table rows, the "
+            "claim ledger enumerated Unresolved, bound to the frozen baseline; no assessor call"
+        ),
+    )
+    what = p_audit.add_mutually_exclusive_group(required=True)
+    what.add_argument("--candidate", help="directory holding <section_id>.json artifacts")
+    what.add_argument("--document",
+                      help="dev-graph document snapshot (node id, or a document id with one current version)")
+    p_audit.add_argument("--graph-root", default=None,
+                         help="repository root holding the dev-graph records (default: --repo-root)")
+    p_audit.add_argument("--project", default=None,
+                         help="project label for the package request (default: the document id)")
+    p_audit.add_argument("--package-budget", type=int, default=DEFAULT_PACKAGE_BUDGET,
+                         help="dev-graph package size budget for the document route")
+    p_audit.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
+    p_audit.add_argument("--profile", default=None,
+                         help="pre-evaluation profile JSON (default: the harness default profile)")
+    p_audit.add_argument("--out-dir", default=str(DEFAULT_REPORTS_DIR),
+                         help="directory for the new audit report (never overwritten)")
+    p_audit.add_argument(
+        "--baseline-dir", default=None,
+        help=(
+            "the frozen blind baseline to bind to (relative to --repo-root). The report "
+            "states whether its candidate hash and snapshot id equal the baseline's, or "
+            "that the baseline was re-derived; without it the report says none was consulted"
+        ),
+    )
     return ap
 
 
@@ -395,6 +433,59 @@ def _build_evidence(
         budget=args.package_budget,
         project=args.project,
     )
+
+
+def _audit(
+    args: argparse.Namespace,
+    bundle: ProfileBundle,
+    graph_root: Path,
+    out_dir: Path,
+    repo_root: Path,
+    clock: Callable[[], str] | None,
+) -> int:
+    """The ``audit`` sub-command: parse, check, enumerate, bind, write; then show
+    that the snapshot id did not move by rebuilding it after the write."""
+    from runner.dev_graph import build_snapshot
+
+    evidence = _build_evidence(args, bundle, graph_root, out_dir)
+    candidate_dir = evidence.candidate_dir if evidence is not None else Path(args.candidate)
+    candidate = load_candidate(candidate_dir, bundle.profile)
+    baseline_dir = None
+    if args.baseline_dir:
+        baseline_dir = Path(args.baseline_dir)
+        if not baseline_dir.is_absolute():
+            baseline_dir = repo_root / baseline_dir
+    report = run_audit(
+        candidate,
+        profile_id=bundle.profile_id,
+        profile_version=bundle.version,
+        candidate_path=_portable(Path(candidate_dir), repo_root),
+        evidence=evidence,
+        baseline_dir=baseline_dir,
+        out_dir=out_dir,
+        graph_root=graph_root if evidence is not None else None,
+        clock=clock,
+    )
+    path = write_audit(report, out_dir)
+    print(render_audit(report.to_dict()))
+    print(f"\naudit -> {path}")
+    flags = list(report.flags)
+    if evidence is not None:
+        after = build_snapshot(graph_root).snapshot_id
+        if after == evidence.snapshot_id:
+            print(f"snapshot id after the write: {after} (unchanged)")
+        else:
+            print(f"snapshot id after the write: {after} (MOVED from {evidence.snapshot_id})")
+            flags.append("snapshot id moved during the audit")
+    return 1 if flags else 0
+
+
+def _portable(path: Path, repo_root: Path) -> str:
+    """*path* relative to *repo_root* when it lies under it, else as given."""
+    try:
+        return path.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 def _invocation_record(judge: Judge) -> dict:
@@ -468,6 +559,8 @@ def main(
         if not out_dir.is_absolute():
             out_dir = repo_root / out_dir
         graph_root = Path(args.graph_root).resolve() if args.graph_root else repo_root
+        if args.command == "audit":
+            return _audit(args, bundle, graph_root, out_dir, repo_root, clock)
         params = _pack_params(args)
         evidence = _build_evidence(args, bundle, graph_root, out_dir)
 

@@ -390,8 +390,9 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Piece | Where |
 |---|---|
 | Candidate loader, content hash, bound report, writer, loader | `harness/blind_assessment.py` |
-| Module command (`preflight`, `assess`, `verify`, `freeze`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Module command (`preflight`, `assess`, `verify`, `freeze`, `audit`) | `py -3.10 -m harness.commands.blind_assessment` |
 | Frozen baseline: conditions, byte copy, freeze record, hash-checked loader | `harness/blind_baseline.py`; `--baseline-dir <dir>/blind_baseline_<sha12>.json` + `.freeze.json` |
+| Integrity audit: five consistency checks over parsed rows, grounding axis Unresolved, baseline binding | `harness/integrity_audit.py`; reports `<out-dir>/integrity_<hash12>_<NNNN>.json` |
 | Evidence preflight: realised pack set, pack-set hash, seven-section report | `harness/evidence_preflight.py`; reports `harness/blind_reports/preflight_<hash12>_<NNNN>.json` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
@@ -585,6 +586,44 @@ would fail if it broke:
 The subscription builder also refuses a `HARNESS_JUDGE_VERSION` that does not
 contain `claude-cli`, so a report from that transport cannot carry another
 transport's tag.
+
+**Integrity audit (`integrity_audit.py`, spec PE-07).** A Claude-free,
+deterministic audit of one candidate, run after the baseline is frozen:
+
+    py -3.10 -m harness.commands.blind_assessment audit --document <id> --graph-root <repo> [--baseline-dir <dir>]
+
+It reads the same materialised section artifacts the blind lane reads, parses
+the rendered pipe-delimited rows (a repeated header at a page break re-opens
+the same table; a row that opens no new entry is merged into the previous one)
+and the label-value work-package blocks, and runs five checks in spec order:
+work-package block fields and DCs involved against the DC projects of 1.1;
+each deliverable's package and window; each milestone against the
+deliverables it names (naming none is reported as *undeclared*, with the
+related packages' deliverable months as context, never as a failure); the DC
+table against the 1.1 projects (the recruiting participant against the host
+line is *not comparable* after sanitisation and is reported as such); the
+risk table against mitigations named in prose, and whether any row states a
+threshold. Every finding has a `kind` from a closed set (`inconsistency`,
+`missing_field`, `unparsed_cell`, `undeclared_dependency`, `out_of_window`,
+`not_comparable`, `unlinked_prose`), a subject, the paragraphs it cites, and
+the row text. **No finding is a score**; a test pins that no score-shaped key
+appears in a report, and findings never move the exit code.
+
+The grounding axis enumerates the ledger (`validation_status.claim_statuses`)
+and reports every claim `Unresolved` with the reason *supporting sources
+removed by sanitisation* (spec decision 15). No judge runs. A vacuous ledger
+is flagged; a ledger entry declaring a status other than `unresolved` is
+flagged with its declaration visible and still reported Unresolved. The
+ledger's `source_ref` is the claim's own verified span into the proposal's
+page sources, carried as `assertion_location`, never treated as a source.
+
+The audit writes only its report, and the command rebuilds the snapshot after
+the write to show the id did not move. With `--baseline-dir` it loads the
+freeze through `load_frozen_baseline` and states one of: `bound` (candidate
+hash and snapshot id equal), `re-derived` (same candidate, moved snapshot id;
+flagged), `candidate_differs`, or `snapshot_unknown` (directory route). Without
+it the report says no baseline was consulted. Exit `1` on any flag, `2` when
+the audit could not run (a baseline directory with no readable freeze included).
 
 ## What the harness does *not* do (through E4)
 

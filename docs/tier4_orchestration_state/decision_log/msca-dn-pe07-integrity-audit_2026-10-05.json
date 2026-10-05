@@ -1,0 +1,84 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe07-integrity-audit_2026-10-05",
+  "date": "2026-10-05",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-07 (Integrity audit) in plans/msca_dn_pre_evaluation_spec.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §12.1 (every output identifies its source inputs and flags assumptions), §12.2 (the four status categories; every ledger claim here is Unresolved), §15 (a declared gap over a fabricated completion). Spec decisions 8, 14 and 15, the consequence 'PE-07 must run after the baseline is frozen', and ticket PE-07. Not a constitutional amendment.",
+  "decision": "The integrity audit is a Claude-free, deterministic command (audit) in the harness module command. It reads the same materialised section artifacts the blind lane reads, parses the rendered pipe-delimited rows at audit time (spec decision 8: the rendering is the structure) and the label-value work-package blocks that Table 3.1 a became in the sanitised copy (spec §2.11), and runs the five checks the ticket lists, in its order. Every finding is one of seven enumerated kinds (inconsistency, missing_field, unparsed_cell, undeclared_dependency, out_of_window, not_comparable, unlinked_prose), names its subject, cites the paragraphs it read and quotes the row. No finding is a score: the report carries counts by check and by kind and nothing that ranks the proposal, a test pins that no score-shaped key appears in it, and findings never move the exit code. The grounding axis enumerates the ledger of every section artifact through the same loader the pack builder uses and reports every claim Unresolved with the one reason 'supporting sources removed by sanitisation'; no judge runs. A vacuous ledger is flagged; a ledger entry declaring a status other than unresolved is flagged with its declaration visible and still reported Unresolved. The audit writes only its report, and the command rebuilds the snapshot after the write to show the id did not move. With --baseline-dir it loads the freeze through the hash-checked loader and states bound, re-derived, candidate_differs or snapshot_unknown; without it the report says no baseline was consulted.",
+  "declared_values": {
+    "ledger_source_ref_is_a_location": {
+      "value": "The materialised ledger's source_ref is the claim's own verified span into the proposal's page sources (SRC-DN-P<nn>#<start>-<end>), written by the blind lane's materialiser from the import's verified_span. The audit carries it as assertion_location and never treats it as a source; only a declared status other than unresolved is flagged.",
+      "declared_status": "Confirmed",
+      "reason": "harness/blind_assessment.py::materialise_candidate writes the span id as source_ref; the PE-03 record declares every claim unconfirmed/Unresolved with a span that locates the assertion. The first draft of the audit flagged all 44 spans as external sources, which was wrong, and was corrected before this record was written."
+    },
+    "milestone_dependency_is_what_the_row_names": {
+      "value": "A milestone depends on the deliverables its title or means-of-verification cell names by id (D<n>.<m>). A row naming none is reported undeclared_dependency, with the deliverables of its related package(s) and their months as context.",
+      "declared_status": "Assumed",
+      "reason": "The DN form's milestone table carries no dependency column, so the only dependency the proposal can declare is a named deliverable. Inferring one from the related package would be a judgment the audit is not allowed to make; listing the package's deliverable months beside the row lets the human make it. On this candidate every one of the 16 milestones is undeclared, which is the fact behind the ESR's Implementation shortcoming on work-package dependencies (spec §2.7)."
+    },
+    "host_line_not_comparable": {
+      "value": "The DC table's recruiting participant (Academic Beneficiary A ... I) and the 1.1 project's host line (a type description) are reported not_comparable, one finding per DC, with both values.",
+      "declared_status": "Confirmed",
+      "reason": "Sanitisation removed the identifiers on both sides (fidelity register, §5 of the spec's risk table). Dropping the comparison would hide a check the resubmission needs; reporting it failed would penalise a sanitisation artifact (spec decision 14's principle applied to consistency)."
+    },
+    "mitigation_prose_is_linked_by_vocabulary": {
+      "value": "A prose paragraph names a mitigation when it matches a closed pattern (risks mitigated, mitigation of risks, contingency, reserve pool, risk-management procedure/plan/measure, risk register, fallback, back-up plan); a hit ending in a colon absorbs the bullets that follow it; it links to a risk row when they share at least three content words.",
+      "declared_status": "Assumed",
+      "reason": "A first pattern that matched any 'mitigat' caught 'bias-mitigation workflows' and 'risk-management artefacts' in sections 1.2 and 2.4, which are not risk mitigations. The narrowed pattern leaves two hits on this candidate (Task 5.2 and the ethics section's 'These risks will be mitigated through:'), both linked to rows. The three-word overlap is a threshold with no calibration behind it and is recorded as such."
+    },
+    "audit_report_location": {
+      "value": "docs/tier4_orchestration_state/msca_dn/audit/integrity_<hash12>_<NNNN>.json, with the materialised candidate the report binds to under candidates/ beside it, as the blind lane keeps its own under harness/blind_reports/candidates/.",
+      "declared_status": "Assumed",
+      "reason": "Spec §6 names no audit location; the comparisons directory is PE-08's. The harness names no instrument, so --out-dir is the operator's. The report is written outside the graph root (workspaces/msca_dn), which the audit flags if violated."
+    },
+    "run_before_the_freeze": {
+      "value": "This record's run was made before the operator's blind baseline run and freeze (PE-06 run_status: NOT RUN). Its baseline block says no_baseline. The operator reruns with --baseline-dir docs/tier4_orchestration_state/msca_dn/baseline after the freeze; the rerun is byte-equal except audited_at, writes and the baseline block, and the command prints the snapshot id after the write.",
+      "declared_status": "Confirmed",
+      "reason": "The spec's consequence 'PE-07 must run after the baseline is frozen' exists because writing Tier 3 records moves the snapshot id. The audit writes no Tier 3 record and no dev-graph record, so running it first changes nothing the freeze will stamp; the snapshot id it read (sha256:1c8fd6b5f2e8...) is the one build_snapshot returns over the workspace today, before and after the write. The acceptance clause is met by the binding statement, not by the order of runs."
+    }
+  },
+  "run": {
+    "command": "py -3.10 -m harness.commands.blind_assessment audit --document MSCA-DN-2025_sanitised_part_b --graph-root workspaces/msca_dn --profile harness/profiles/msca_dn_2026_default.json --out-dir docs/tier4_orchestration_state/msca_dn/audit",
+    "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json",
+    "candidate_hash": "sha256:13ad3ad81d7ee231b1e09922c9d74268dddb3cd43ed819f72bf757e01d2dd355",
+    "snapshot_id": "sha256:1c8fd6b5f2e810546bb013af1975eafba5f87f9dbeb909a545507f0e4eb07914",
+    "package_id": "sha256:4b0d55593ae47aafadad196bc334929b13ae5acf63a9d1a455fb7b9dd05038df",
+    "exit_code": 0,
+    "parse": "88 rows rendered, 88 parsed, 8 continuation rows merged; deliverables 28, milestones 16, DCs 9, risks 10; 7 work-package blocks; 9 DC projects; no unparsed row; no flag",
+    "findings_by_check": {
+      "wp_table_vs_prose": "compared 68; inconsistency 4, missing_field 3. WP4 declares no lead participant, no participants and no DCs involved (the block carries only title, window, objectives and tasks). WP1 declares DCs 1,2,4,6,8 while DC9's host line names WP1; WP2 declares DCs 1,2,3,5,9 while DC8's host line names WP2 and DC9's does not. WP6 and WP7 declare DC1-9 while no 1.1 host line names either.",
+      "deliverable_wp_window": "compared 28; no finding. Every deliverable's package is described and every due month lies within its window.",
+      "milestone_dependencies": "compared 16; undeclared_dependency 16, out_of_window 1. No milestone names a deliverable. M7.3 (follow-up research proposal) is due M48 while WP7 runs M1-M36.",
+      "dc_table_vs_projects": "compared 35; out_of_window 9, not_comparable 9. Every DC starts M5 for 36 months, so runs to M40, while every package it names ends M36. The DC set agrees (DC1-9 in both). Recruiting participant against host line: not comparable, nine times.",
+      "risk_table_vs_prose": "compared 12; no finding. One row states a threshold (risk 1: recruitment, 'after 60% of the intended recruitment period'). Two prose paragraphs name a mitigation and both link to rows."
+    },
+    "grounding": "45 claims enumerated from the three section ledgers (excellence 35, impact 4, implementation 6); 45 Unresolved; reason 'supporting sources removed by sanitisation'; every declared status unresolved; not vacuous",
+    "baseline": "no_baseline (no freeze exists yet); snapshot id after the write unchanged"
+  },
+  "artifacts": {
+    "modules": [
+      "harness/integrity_audit.py (new): parse_candidate (rows, work-package blocks, DC projects, prose), run_checks (five CheckResults), enumerate_grounding, bind_baseline, IntegrityAuditReport, run_audit, write_audit, load_audit, render_audit; record type integrity_audit_report 1.0.0",
+      "harness/commands/blind_assessment.py: the audit sub-command (--candidate | --document, --graph-root, --baseline-dir, --out-dir); repo-relative candidate_path; the snapshot id rebuilt and printed after the write"
+    ],
+    "tests": [
+      "tests/harness/test_integrity_audit.py (new, 64 tests): the parser over hand-built rows; each check over a consistent world and one planted defect per finding kind; no score-shaped key; the grounding axis; the baseline statuses; the command on the synthetic dev-graph world (bound, re-derived, fail-closed, byte-equal replay, snapshot unchanged); the MSCA-DN workspace figures above"
+    ],
+    "documentation": "harness/HARNESS.md (blind assessment section: the integrity audit)"
+  },
+  "side_effect": "The leakage-scan file count pinned by the demo report moved from 331 to 336: this record, the audit report and the three materialised candidate sections under docs/tier4_orchestration_state/msca_dn/audit/candidates/. The four pinned places were amended (plans/reports/dev_graph_demo_report_2026-10-03.md, decision_log/demo-report_2026-10-03.json, validation_reports/demo-report_2026-10-03.json, validation_reports/demo-candidate-blind-baseline_2026-10-01.json). The scan reports no new leak.",
+  "known_gaps": [
+    "The WP6 and WP7 findings (all DCs declared, no host line names them) are literal disagreements between two declarations; whether a training or impact package should appear on a DC's host line is for the human, not the audit.",
+    "The DC window finding assumes a package's end month bounds the DC work it names. A 36-month contract starting M5 ends M40 under any package ending M36; the proposal gives no project duration the audit could read, and M7.3 at M48 suggests one longer than 36 months. Both facts are reported, neither is resolved.",
+    "The three-word overlap that links prose mitigations to risk rows is uncalibrated.",
+    "The audit reads the form's own labels (Numbe r / Number, DC No., Description of risk, WP Number:, Host:). A proposal rendered under a different form needs the header signatures extended; the parser reports an unrecognised table as data rows before any header, never silently.",
+    "This run precedes the freeze; the baseline block will be filled by the operator's rerun."
+  ],
+  "acceptance_criteria": {
+    "unsupported_claims_missing_sources_uncertain_facts_stay_visible_as_separate_findings": "The grounding rows (45, every one Unresolved with its reason), the not_comparable findings (9) and the undeclared_dependency findings (16) are three separate structures in the report; tests/harness/test_integrity_audit.py::TestGrounding, ::TestCheckDcs::test_the_host_is_reported_not_comparable_with_both_values, ::TestCheckMilestones::test_an_undeclared_dependency_is_context_not_failure.",
+    "no_consistency_finding_is_reported_as_a_proposal_quality_score": "::TestNoScore::test_no_score_shaped_key_anywhere; Finding.kind is a closed enumeration; the exit code ignores findings (::TestCommand).",
+    "baseline_snapshot_id_unchanged_or_rederived_said": "::TestCommand::test_document_route_binds_snapshot_and_leaves_it_unchanged (snapshot rebuilt after the write), ::test_bound_to_a_frozen_baseline, ::test_a_rederived_baseline_is_said_and_flagged; the run above printed the id unchanged.",
+    "grounding_axis_enumerates_the_pe03_ledger": "::TestMscaDnWorkspace::test_grounding_axis pins 45 claims, all Unresolved, reason verbatim from decision 15; ::TestGrounding::test_a_vacuous_ledger_is_flagged.",
+    "five_checks_read_parsed_rows_not_the_ledger": "run_checks takes only ParsedTables; ::TestGrounding::test_a_vacuous_ledger_is_flagged shows the checks run unchanged over an empty ledger."
+  }
+}
