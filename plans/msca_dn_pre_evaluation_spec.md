@@ -73,30 +73,14 @@ threshold is 10 on the unweighted sum of three; the MSCA evaluation form overrid
 weighted total out of 100, which the ESR confirms. That override is a tier interaction and goes in
 the decision log per §12.3.
 
-**2.7 The sanitised copy has zero figures, and its work-package dependencies are sparse and
-informal.** No images on any page. No Gantt chart and no work-package dependency diagram. DN AF
-V5.0 mandates neither, so this is not a template omission.
+**2.7 The sanitised copy has zero figures, and no dependency description in any form.** No
+images on any page. No Gantt chart and no work-package dependency diagram. DN AF V5.0 mandates
+neither, so this is not a template omission.
 
-**Measured.** The strings `dependenc`, `interdepend`, `Gantt` and `critical path` occur **zero**
-times across all 84 pages.
-
-**Also measured, and it bounds the claim.** Inter-work-package relations do appear, stated without
-those words:
-
-- p. 44, Task 3.1: *"Explainability methods will be integrated in collaboration with WP1."*
-- p. 48, Task 4.6: *"Transfer methods developed in earlier work packages into industrial
-  medical-device environments."*
-
-Plus four `in WP<n>` references and one `builds on`.
-
-**Reviewed judgment, not measurement.** An earlier draft of this section concluded there was "no
-dependency description in any form". Zero keyword matches do not establish that. What the evidence
-supports is that relations exist but are sparse and informal, with no systematic account. That is
-consistent with the ESR's Implementation shortcoming, *"the description of dependencies between
-work packages"*, which criticises an inadequate description rather than a missing one.
-
-The keyword counts go in the register's derived half. This judgment goes in the declared half, per
-decision 9, and the operator owns it.
+The stronger measurement is textual. The strings `dependenc`, `interdepend`, `Gantt` and
+`critical path` occur **zero** times across all 84 pages. The ESR's Implementation shortcoming is
+precisely *"the description of dependencies between work packages"*. Whatever carried that in the
+original does not survive here, and the absence is measured rather than inferred.
 
 **2.8 The sanitised copy has zero citations.** No bracketed numbers, no author-year, no DOIs, no
 URLs, no reference list. The prose still asserts *"Systematic reviews confirm that adoption is
@@ -322,18 +306,18 @@ comment rests on.
 | 2 | Move both PDFs to `docs/tier3_project_instantiation/source_materials/msca_dn/` | Stops the demo's Tier 3 and the real project's Tier 3 sharing a directory, and gives the fidelity register a home beside its subject |
 | 3 | One profile, `msca_dn_2026_default`, pinned to on-disk 2026-2027 sources and to AF **V6.0** | The 2025 call and work programme are absent. A 2025 profile would rest on generic programme knowledge, which §10.6 and §13.9 forbid while sources are reachable elsewhere. §2.12 now shows the V5.0 and V6.0 forms are structurally identical for this call, so the vintage mismatch costs nothing |
 | 4 | The blind cell reports addressal and grounding as two values; ledger grounding is withheld from the blind lane and owned by the integrity audit | The ledger is not trustworthy for an imported proposal — 90 of the demo's claims declare source-grounding with no span. `expectation_grounding.py` already owns that axis, and `rubric.py` combines the two without blending. Two values is what stops an unassessable half from reading as a clean score |
-| 5 | A separate criterion-grading stage, five samples per criterion, for the holistic 0–5 score | General Annexes p. 27 awards scores for criteria, not aspects. The cells inform the grading; they are never arithmetic input. "One extra call" was the earlier wording and contradicted decision 11 and PE-04, which both specify N=5 |
+| 5 | One extra judge call per criterion for the holistic 0–5 score | General Annexes p. 27 awards scores for criteria, not aspects. The cells inform the call; they are never arithmetic input |
 | 6 | Add `include_claims: bool = True` to `build_evidence_pack`; the DN blind lane passes `False` | Makes decision 4 structural rather than prompt-level. One record then serves both lanes, so integrity findings and the baseline share a candidate hash |
 | 7 | Import all of Part B1 and B2; B2 as implementation sub-sections | Dropping B2 would make several ESR observations unassessable for a reason the import caused |
 | 8 | Tables render to pipe-delimited rows, one paragraph per row | Row boundaries survive, each row is independently selectable, and the budget filler never splits a row. Byte-reproducible from the PDF |
-| 9 | Fidelity register carries derived and declared halves, each marked. Every sub-section carries two independent fields, `presence` and `transformation` | A declaration must never be mistaken for a measurement. The missing figures, the keyword counts and Table 3.1 a's flattening to label-value lines are checks that rerun; the reflow, the dependency judgment and the per-sub-section fidelity are declarations only the operator can make. Two fields because a present but heavily sanitised section is not an absent one, and collapsing them would send a false evidence gap into PE-08 |
+| 9 | Fidelity register carries derived and declared halves, each marked | A declaration must never be mistaken for a measurement. The missing figures, the zero dependency strings and Table 3.1 a's flattening to label-value lines are checks that rerun; the reflow and the per-sub-section fidelity are declarations only the operator can make |
 | 10 | Assessor: `--transport claude-cli`, `claude-sonnet-5`, version tag naming the transport | The Groq pin's key returned 401, and its TPM ceiling forces the 3000-token pack budget that predetermined the demo's grades. The drafter here is a human, so grader–generator model independence is not at stake. Transport and vendor independence are lost and the report's pin says so |
-| 11 | N=3 for the ten cells, N=5 for the three criterion scores; report median and spread, labelled **within-assessor repeatability** | The quoted number gets the most evidence. The spread measures one pinned assessor's run-to-run variability over an identical prompt, and nothing else. It cannot say how much of the distance from 85.80 is assessor variance: that would need a second assessor, and the ESR's figures come from human evaluators. An earlier wording claimed the decomposition and the report must not |
+| 11 | N=3 for the ten cells, N=5 for the three criterion scores; report median and spread | The quoted number gets the most evidence, and the spread shows how much of any gap is assessor variance |
 | 12 | The ESR lives as an immutable Tier 4 artifact the builder never reads. Separately, the assessor runs with `--tools ""` from a working directory outside the repository, and a planted-marker test checks the rendered prompts | Snapshot exclusion makes the ESR unreachable *through the package*, and that is all it makes. It says nothing about what the assessor process can open. §2.13 measured that gap and found it open. The two controls are independent and the spec needs both. `finding` nodes have no record source anyway (§2.10) |
 | 13 | ESR observations are operator-authored, verbatim, severity from the ESR's own wording; strengths recorded too | Nothing inferred in the one artifact that must stay verbatim. The ESR already labels eight shortcoming clusters. Strengths let the comparison catch a blind finding the evaluators praised |
 | 14 | Every DN rubric keeps a substantiation step. Where the pack carries no claim ledger the cell reports grounding **unassessable**, never failed and never passed. Specificity is judged in addition, not instead | Sanitisation removed the reference apparatus (§2.8), but the rubric set is reused at PE-09 and for the resubmission. Deleting a dimension to suit one damaged candidate would carry the workaround into the authoritative evaluation. Unassessable keeps the instrument whole and still refuses to penalise a sanitisation artifact |
 | 15 | PE-07 audits internal consistency now; the grounding axis is wired but reports every claim Unresolved with reason "supporting sources removed by sanitisation" | A claim extracted from the proposal is trivially entailed by the proposal. Consistency is substantive here and is where the ESR actually found a shortcoming |
-| 16 | Preflight is a separate command whose hash `assess` requires and re-binds. It binds **two** hashes: the realised pack set and the import manifest | Keeps the harness advisory to the pipeline while making the preflight mandatory to the operator. Mirrors the existing `verify` discipline. The pack-set hash detects any change in selected evidence. It is not provenance: a hash of an output cannot identify the process that produced it, so two extractor versions that happen to agree byte-for-byte are indistinguishable by it. An earlier wording claimed the pack hash covered extraction and normalisation versions, which was wrong |
+| 16 | Preflight is a separate command whose hash `assess` requires and re-binds. The hash covers the realised pack set, not just the candidate, profile and policy pins | Keeps the harness advisory to the pipeline while making the preflight mandatory to the operator. Mirrors the existing `verify` discipline. Packs are deterministic in their inputs, so hashing the packs themselves captures every selection parameter, including ones nobody remembered to enumerate |
 | 17 | Schema bump to `orch.dev_graph.document_snapshot.v2`, which requires a span for `source_grounded`; v1 is grandfathered | Closing the hole in place would break the demo record, 72 committed package manifests, 4 snapshot artifacts, and a test that pins the blank `source_ref` as expected behaviour. The demo closed on 2026-10-03 |
 | 18 | Sanitisation provenance goes in a `provenance` header on the fidelity register, which the intake references | `EsrIntake`'s eight fields are fixed and none can carry it. A new artifact beats a schema extension, consistent with decision 12 |
 
@@ -422,10 +406,6 @@ Scoring authority is the evaluation form. Structural authority is AF **V6.0**, w
 equivalence of §2.12 recorded in the bundle's provenance. Part B2 section 11, RAISE DN, is listed
 among the excluded aspects: it belongs to `HORIZON-RAISE-2026-01-MSCA`, not to this call.
 
-A fifth artifact: the **criterion appendix mapping**, naming which table rows each criterion
-receives beyond its own section. It is versioned with the rubric set, not assembled at scoring
-time, because a silent change to it changes scores.
-
 **Acceptance.** All ten aspect texts byte-match the evaluation form, derived from the PDF and not
 typed, after `#@...@#` tags are stripped per §2.12. The AF V6.0 section headings §1.1 to §3.2
 confirm the ten anchors one-to-one, and a test pins that correspondence. The §3.2 bracket
@@ -492,21 +472,15 @@ Cross-section evidence is the one case needing design. `build_evidence_pack` tak
 the deliverables table in `implementation_section` is not expressible as one pack. Those rows are
 named as a declared appendix rather than left to term matching.
 
-There is no pack in this lane, so there is no pack status to inherit. The criterion input is the
-section bytes plus the appendix rows the PE-02 mapping declares, and both need their own
-accounting.
-
-**Acceptance.** Every criterion score names its **complete** input by hash — section bytes and
-appendix rows together, not the section alone. A completeness check covers that whole input: every
-declared appendix row resolved, and the assembled input fit the budget without truncation. The
-appendix mapping version is recorded on every score. No criterion score is produced from aspect
-findings alone, and a test asserts that.
+**Acceptance.** Every criterion score names the section bytes it read, by hash. A criterion pack
+carries its own completeness status. No criterion score is produced from aspect findings alone,
+and a test asserts that.
 
 **Acceptance.** With `include_claims=False` no claim is loaded, rendered or charged to the budget,
 and prose receives the whole usable budget. PF and RIA behaviour is unchanged. No code path derives
 a criterion score from cell arithmetic. A test pins 4.20 / 4.50 / 4.20 → 85.80.
 
-### PE-05 — Evidence preflight
+### PE-05 — Evidence preflight (next)
 
 A command reporting seven things:
 
@@ -530,17 +504,10 @@ The complete set of inputs to `build_evidence_pack` is `expectation_key`, `secti
 `max_token_budget`, plus `include_claims`. The profile's rubric-set version covers the terms and
 the anchors. The three budgets arrive as CLI flags and are covered by nothing.
 
-So the preflight binds the **realised pack set**, which is deterministic in all of the above and
-so detects any change in selected evidence, including from parameters nobody enumerated.
-
-It binds the **import manifest** separately. A hash of an output cannot identify the process that
-made it: two extractor or normalisation versions that produce byte-identical packs are
-indistinguishable by the pack hash. That is adequate for replaying this baseline and inadequate as
-provenance, which matters at PE-09, where the same extractor meets the unsanitised original. The
-manifest carries the extractor version, the normalisation version and the table-rendering version.
-
-The parameter values are reported alongside both hashes, because a bare mismatch does not say what
-moved.
+So the preflight hash binds the **realised pack set**, which is deterministic in all of the above
+and so captures parameters nobody enumerated, including the extraction and normalisation
+versions. The parameter values are reported alongside it, because a bare hash mismatch does not
+say what moved.
 
 **Acceptance.** No required evidence is omitted without an explanation in the report. A changed
 candidate invalidates the preflight. `not_relevant` volume is visible, since that exclusion does
@@ -616,9 +583,9 @@ Historical and resubmission profiles stay separate wherever their rules differ.
 | The copy is an 84-page reflow of a 34-page original | Declared in the register (§2.11); no page-based judgment is admissible, and none is made |
 | Zero citations survived | Grounding is reported unassessable per decision 14, never failed and never passed. The substantiation step stays in the rubric set for PE-09 |
 | The assessor process can read the repository (§2.13) | Open until decision 12's `--tools ""`, the external working directory and PE-06's planted-marker test are in place. Wider than this milestone: cli-prompt mode shares the defect |
-| Zero figures survived | Recorded. Bears on the ESR's work-package dependency shortcoming, but does not by itself establish that dependencies are undescribed — see §2.7, where the keyword counts are derived and the adequacy judgment is declared |
+| Zero figures survived | Recorded; bears directly on the ESR's work-package dependency shortcoming |
 | The 2025 call and work programme are absent | Decision 3 avoids depending on them. For the application form the gap is closed: §2.12 measures V5.0 against V6.0 and finds no structural difference for this call. The work programme and call text remain 2026-only |
-| §5 Network organisation is heavily sanitised | Recorded `presence: present`, `transformation: identifiers removed`. It carries 9,830 characters across pp. 68–72, including the Supervisory Board and work-package leads. It is **not** `omitted`, and labelling it so would send a false evidence gap into PE-08 |
+| §5 Network organisation is fully sanitised | Declared `omitted` in the register; aspect 3.2 evidence is reduced |
 | Ethics occupies the §6 slot, which matches no AF Part B2 section | Recorded in the mapping; not graded by any DN aspect |
 | AF §10 Declaration on the use of AI is absent | Recorded; not graded by any DN aspect |
 | Repeated samples measure repeatability, not expert agreement | Stated on every report carrying a spread |
