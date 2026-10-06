@@ -700,6 +700,28 @@ accident, and the run fails closed carrying the parser's message. The criterion
 system prompt now also asks for strict JSON in as many words, which moved the
 criterion `prompt_hash`.
 
+**Salvage (`salvage`).** One-off recovery for a run that spent its quota before
+the checkpoint existed. The `claude` CLI writes one session transcript per
+assessor call under `~/.claude/projects/<slugified working directory>/`, and the
+assessor child runs one session per call in a fresh temp directory, so that
+directory is a complete record of the run. `salvage` rebuilds every cell prompt
+from this profile and this candidate and matches each transcript on the recorded
+user prompt, which must equal the rebuilt one byte for byte. The one allowance is
+line endings: the prompt reached the child through a pipe that translated them,
+and that single deterministic transformation is undone before comparing.
+
+The binding is computed by the same `_cache_binding` the assess run uses, so a
+salvaged checkpoint either resumes or is refused, never half-matches. A
+transcript matching nothing is named and left out, which costs the resumed run
+one live call and can never cost it a wrong answer. A recorded response that
+will not parse is written and immediately marked discarded, so it is redrawn.
+
+Only the cells are recovered. A criterion prompt carries the drawing run's
+aspect findings, so it cannot be rebuilt from the candidate alone, and the
+criterion system prompt changed when the strict-JSON instruction was added —
+replaying a response drawn before that would let a report claim a score from a
+prompt that never produced it.
+
 ## What the harness does *not* do (through E4)
 
 - It computes only the metrics built so far (E1.5 calibration, E2 status-aware

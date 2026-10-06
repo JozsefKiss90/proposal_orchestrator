@@ -510,6 +510,9 @@ class TestDryRun:
                 str(out_dir),
                 "--provenance",
                 str(tmp_path / "provenance.jsonl"),
+                # This case assesses against the real repository root, so the
+                # default checkpoint would land in the working tree.
+                "--no-checkpoint",
             ]),
             judge=_judge(tmp_path, ScriptedBackend()),
             clock=lambda: FROZEN,

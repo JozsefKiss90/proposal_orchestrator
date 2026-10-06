@@ -490,6 +490,209 @@ class TestTheCommandResumes:
 
 
 # --------------------------------------------------------------------------- #
+# 6. Salvage: the CLI's own transcripts become a checkpoint
+# --------------------------------------------------------------------------- #
+
+
+def _fake_transcript(path, user: str, response: str) -> None:
+    """A ``claude`` CLI session file, shaped as the CLI writes one.
+
+    The user prompt carries CRLF because the transport writes it to the
+    child's stdin and the pipe translates; the salvage must undo exactly that.
+    """
+    lines = [
+        {"type": "user", "message": {"role": "user", "content": user.replace("\n", "\r\n")}},
+        {
+            "type": "assistant",
+            "message": {
+                "role": "assistant",
+                "stop_reason": "end_turn",
+                "content": [{"type": "text", "text": response}],
+            },
+        },
+    ]
+    path.write_text(
+        "".join(json.dumps(l) + "\n" for l in lines), encoding="utf-8"
+    )
+
+
+class TestSalvage:
+    """Nothing is guessed: a recorded prompt must equal a rebuilt one exactly."""
+
+    def _world(self, tmp_path):
+        from tests.harness.test_blind_assessment import (
+            _candidate as blind_candidate,
+            _synthetic_world as blind_world,
+        )
+        from harness.blind_assessment import load_candidate
+        from harness.rubrics import load_profile_bundle
+
+        repo = tmp_path / "repo"
+        world = blind_world(repo)
+        bundle = load_profile_bundle(str(world), repo_root=repo)
+        candidate_dir = blind_candidate(tmp_path, bundle)
+        candidate = load_candidate(candidate_dir, bundle.profile)
+        return repo, bundle, candidate_dir, candidate
+
+    def _cell_prompts(self, bundle, candidate):
+        from harness.rubrics import build_pack_for, build_rubric_prompts
+        from harness.evidence_pack import (
+            DEFAULT_PACK_TOKEN_BUDGET,
+            DEFAULT_SPAN_BUDGET_FRACTION,
+            MAX_PACK_TOKEN_BUDGET,
+        )
+
+        out = []
+        for rubric in bundle.rubric_set.rubrics:
+            for section_id in bundle.profile.section_ids_for(rubric.criterion_id):
+                path = candidate.sections.get(section_id)
+                if path is None:
+                    continue
+                pack = build_pack_for(
+                    rubric,
+                    path,
+                    token_budget=DEFAULT_PACK_TOKEN_BUDGET,
+                    span_budget_fraction=DEFAULT_SPAN_BUDGET_FRACTION,
+                    max_token_budget=MAX_PACK_TOKEN_BUDGET,
+                    include_claims=True,
+                )
+                out.append(build_rubric_prompts(rubric, pack))
+        return out
+
+    def _argv(self, bundle, candidate_dir, repo, out, transcripts, checkpoint):
+        from tests.harness._preflight import preflighted
+
+        argv = preflighted(
+            [
+                "assess",
+                "--candidate", str(candidate_dir),
+                "--out-dir", str(out),
+                "--repo-root", str(repo),
+                "--profile", str(bundle.profile.source_path),
+            ],
+            clock=lambda: FROZEN,
+        )
+        salvage = ["salvage" if t == "assess" else t for t in argv]
+        return argv, salvage + [
+            "--transcripts", str(transcripts),
+            "--checkpoint", str(checkpoint),
+            "--assessor-model", "fake-assessor",
+            "--assessor-version", "pin-7",
+        ]
+
+    def test_salvaged_cells_replay_and_only_the_criteria_are_redrawn(self, tmp_path):
+        import harness.commands.blind_assessment as cmd
+        from tests.harness.test_blind_assessment import PASS_JSON, DualBackend
+
+        repo, bundle, candidate_dir, candidate = self._world(tmp_path)
+        out, transcripts = tmp_path / "reports", tmp_path / "transcripts"
+        transcripts.mkdir()
+        checkpoint = tmp_path / "ck.jsonl"
+
+        prompts = self._cell_prompts(bundle, candidate)
+        i = 0
+        for _system, user in prompts:
+            for _sample in range(3):
+                _fake_transcript(transcripts / f"{i:04d}.jsonl", user, PASS_JSON)
+                i += 1
+
+        argv, salvage_argv = self._argv(
+            bundle, candidate_dir, repo, out, transcripts, checkpoint
+        )
+        assert cmd.main(salvage_argv, clock=lambda: FROZEN) == 0
+
+        backend = DualBackend()
+        code = cmd.main(
+            argv + ["--resume", str(checkpoint)],
+            judge=_judge(tmp_path, backend),
+            clock=lambda: FROZEN,
+        )
+        assert code == 0
+        # Every cell came back from the transcripts; only the criteria were drawn.
+        assert backend.cell_calls == 0
+        assert backend.criterion_calls == 5 * len(bundle.profile.criterion_ids)
+        data = json.loads(next(out.iterdir()).read_text(encoding="utf-8"))
+        assert data["replayed_calls"] == len(prompts) * 3
+        assert data["live_calls"] == backend.criterion_calls
+
+    def test_a_transcript_that_matches_nothing_is_named_and_left_out(self, tmp_path, capsys):
+        import harness.commands.blind_assessment as cmd
+        from tests.harness.test_blind_assessment import PASS_JSON
+
+        repo, bundle, candidate_dir, candidate = self._world(tmp_path)
+        out, transcripts = tmp_path / "reports", tmp_path / "transcripts"
+        transcripts.mkdir()
+        checkpoint = tmp_path / "ck.jsonl"
+        system, user = self._cell_prompts(bundle, candidate)[0]
+        _fake_transcript(transcripts / "0000.jsonl", user, PASS_JSON)
+        _fake_transcript(transcripts / "0001.jsonl", "a prompt nobody built", PASS_JSON)
+
+        _argv, salvage_argv = self._argv(
+            bundle, candidate_dir, repo, out, transcripts, checkpoint
+        )
+        assert cmd.main(salvage_argv, clock=lambda: FROZEN) == 0
+        printed = capsys.readouterr().out
+        assert "NOT RECOVERED - 1 transcript(s)" in printed
+        assert "0001.jsonl" in printed
+
+        resumed = ResponseCache(
+            checkpoint,
+            CacheBinding.from_dict(
+                json.loads(checkpoint.read_text(encoding="utf-8").splitlines()[0])["binding"]
+            ),
+            resume=True,
+        )
+        assert resumed.replayable == 1
+        assert resumed.take(prompt_hash(system, user)) == PASS_JSON
+
+    def test_a_recorded_response_that_will_not_parse_is_marked_and_redrawn(self, tmp_path):
+        import harness.commands.blind_assessment as cmd
+
+        repo, bundle, candidate_dir, candidate = self._world(tmp_path)
+        out, transcripts = tmp_path / "reports", tmp_path / "transcripts"
+        transcripts.mkdir()
+        checkpoint = tmp_path / "ck.jsonl"
+        _system, user = self._cell_prompts(bundle, candidate)[0]
+        _fake_transcript(transcripts / "0000.jsonl", user, "not json at all")
+
+        _argv, salvage_argv = self._argv(
+            bundle, candidate_dir, repo, out, transcripts, checkpoint
+        )
+        assert cmd.main(salvage_argv, clock=lambda: FROZEN) == 1
+        resumed = ResponseCache(
+            checkpoint,
+            CacheBinding.from_dict(
+                json.loads(checkpoint.read_text(encoding="utf-8").splitlines()[0])["binding"]
+            ),
+            resume=True,
+        )
+        assert resumed.replayable == 0
+
+    def test_the_salvaged_binding_equals_the_one_assess_computes(self, tmp_path):
+        """A binding that disagreed by one field would refuse the resume."""
+        import harness.commands.blind_assessment as cmd
+        from tests.harness.test_blind_assessment import PASS_JSON
+
+        repo, bundle, candidate_dir, candidate = self._world(tmp_path)
+        out, transcripts = tmp_path / "reports", tmp_path / "transcripts"
+        transcripts.mkdir()
+        checkpoint = tmp_path / "ck.jsonl"
+        _system, user = self._cell_prompts(bundle, candidate)[0]
+        _fake_transcript(transcripts / "0000.jsonl", user, PASS_JSON)
+        _argv, salvage_argv = self._argv(
+            bundle, candidate_dir, repo, out, transcripts, checkpoint
+        )
+        assert cmd.main(salvage_argv, clock=lambda: FROZEN) == 0
+
+        header = json.loads(checkpoint.read_text(encoding="utf-8").splitlines()[0])
+        written = CacheBinding.from_dict(header["binding"])
+        assert written.assessor_pin == "fake-assessor@pin-7"
+        assert written.n == 3 and written.criterion_samples == 5
+        assert written.candidate_hash.startswith("sha256:")
+        assert written.preflight_pack_set_hash.startswith("sha256:")
+
+
+# --------------------------------------------------------------------------- #
 # Fixtures: the smallest real scoring block, and one real criterion prompt
 # --------------------------------------------------------------------------- #
 

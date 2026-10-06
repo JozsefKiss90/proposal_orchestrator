@@ -23,7 +23,7 @@ ASSESS_ONLY_VALUE_FLAGS: frozenset[str] = frozenset(
     {
         "--intake", "--provenance", "--n", "--criterion-n", "--tpm", "--rpm", "--max-retries",
         "--assessor-model", "--assessor-version", "--cli-timeout", "--preflight",
-        "--checkpoint", "--resume",
+        "--checkpoint", "--resume", "--transcripts",
     }
 )
 

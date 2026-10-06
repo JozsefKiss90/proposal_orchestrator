@@ -62,10 +62,11 @@ runner`` import boundary holds.  Advisory artifact; never a runtime gate
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
-from typing import Callable, Sequence
+from typing import Callable, Mapping, Sequence
 
 from harness.blind_assessment import (
     DEFAULT_PACKAGE_BUDGET,
@@ -110,6 +111,7 @@ from harness.judge import Judge, JudgeError
 from harness.profile import ProfileError
 from harness.routing import DeterministicCoverageError
 from harness.rubrics import ProfileBundle, RubricError, load_profile_bundle
+from harness.provenance import prompt_hash
 from harness.response_cache import (
     CacheBinding,
     ResponseCache,
@@ -119,6 +121,11 @@ from harness.response_cache import (
 from harness.verdict import MIN_MAJORITY_SAMPLES
 from runner.dev_graph import DevGraphError, read_esr_intake
 from runner.leakage_scan import LeakageError as LeakageScanError
+
+#: How the transport delimits a system prompt too long for the CLI flag
+#: (``runner.claude_transport``); a salvaged transcript may carry it.
+_EMBEDDED_SYSTEM_MARKER: str = "=== SYSTEM INSTRUCTIONS (embedded due to length) ==="
+_EMBEDDED_SYSTEM_END: str = "=== END SYSTEM INSTRUCTIONS ===\n\n"
 
 #: Where a run checkpoints its raw assessor responses when none is named.
 #: Runtime state under the repository root, deliberately not --out-dir: a
@@ -148,6 +155,32 @@ def _env_int(name: str, default: int) -> int:
     return int(v) if v else default
 
 
+def _judge_config(args: argparse.Namespace):
+    """Resolve the pinned assessor config from the environment and the flags.
+
+    Split out of :func:`_live_judge` because the salvage command needs the pin
+    (it goes into the checkpoint binding) and must not build a transport to
+    learn it.
+    """
+    import dataclasses
+
+    from harness.commands._common import load_harness_env
+    from harness.judge import JudgeConfig, resolve_judge_config
+
+    load_harness_env()
+    if args.assessor_model and args.assessor_version:
+        # Both flags given: the pin need not exist in the environment at all.
+        return JudgeConfig(model=args.assessor_model, version=args.assessor_version)
+    cfg = resolve_judge_config()  # fail-closed if the assessor pin is unset
+    if args.assessor_model or args.assessor_version:
+        cfg = dataclasses.replace(
+            cfg,
+            model=args.assessor_model or cfg.model,
+            version=args.assessor_version or cfg.version,
+        )
+    return cfg
+
+
 def _live_judge(args: argparse.Namespace, repo_root: Path) -> Judge:
     """The live assessor: the ``.env.harness`` pin over the chosen transport.
 
@@ -158,23 +191,7 @@ def _live_judge(args: argparse.Namespace, repo_root: Path) -> Judge:
     the assessor's blindness both survive that trade.  See
     ``harness/commands/_subscription_judge.py`` for what each axis costs.
     """
-    import dataclasses
-
-    from harness.commands._common import load_harness_env
-    from harness.judge import JudgeConfig, resolve_judge_config
-
-    load_harness_env()
-    if args.assessor_model and args.assessor_version:
-        # Both flags given: the pin need not exist in the environment at all.
-        cfg = JudgeConfig(model=args.assessor_model, version=args.assessor_version)
-    else:
-        cfg = resolve_judge_config()  # fail-closed if the assessor pin is unset
-        if args.assessor_model or args.assessor_version:
-            cfg = dataclasses.replace(
-                cfg,
-                model=args.assessor_model or cfg.model,
-                version=args.assessor_version or cfg.version,
-            )
+    cfg = _judge_config(args)
     if args.transport == TRANSPORT_CLAUDE_CLI:
         from harness.commands._subscription_judge import build_subscription_judge
 
@@ -376,6 +393,37 @@ def _parser() -> argparse.ArgumentParser:
         help="write no response checkpoint; a failed run is then redrawn in full",
     )
 
+    p_salvage = sub.add_parser(
+        "salvage",
+        help=(
+            "rebuild a response checkpoint from the claude CLI's own session "
+            "transcripts, so a run that spent its quota before the checkpoint "
+            "existed can be resumed instead of redrawn"
+        ),
+    )
+    _add_evidence_args(p_salvage)
+    p_salvage.add_argument("--preflight", required=True,
+                           help="the preflight the salvaged run was bound to")
+    p_salvage.add_argument(
+        "--transcripts", required=True,
+        help=(
+            "directory of the run's .jsonl session transcripts, one per assessor "
+            "call (the CLI writes them under ~/.claude/projects/<working directory>)"
+        ),
+    )
+    p_salvage.add_argument("--checkpoint", required=True,
+                           help="the checkpoint file to write; must not exist")
+    p_salvage.add_argument("--n", type=int, default=MIN_MAJORITY_SAMPLES,
+                           help="the --n the salvaged run used (it binds the checkpoint)")
+    p_salvage.add_argument("--criterion-n", type=int, default=DEFAULT_CRITERION_SAMPLES,
+                           help="the --criterion-n the salvaged run used (it binds the checkpoint)")
+    p_salvage.add_argument("--skip-criterion-scores", action="store_true",
+                           help="set it if the salvaged run set it; it binds the checkpoint")
+    p_salvage.add_argument("--assessor-model", default=None,
+                           help="the assessor model pin the salvaged run used")
+    p_salvage.add_argument("--assessor-version", default=None,
+                           help="the assessor version pin the salvaged run used")
+
     p_verify = sub.add_parser("verify", help="re-bind a persisted report to a candidate")
     p_verify.add_argument("--report", required=True)
     p_verify.add_argument("--candidate", required=True)
@@ -559,6 +607,32 @@ def _is_transport_failure(exc: BaseException) -> bool:
     return bool(candidates) and isinstance(exc, candidates)
 
 
+def _cache_binding(
+    args: argparse.Namespace,
+    *,
+    digest: str,
+    pin: str,
+    profile_version: str,
+    preflight_hash: str,
+    params: PackParams,
+) -> CacheBinding:
+    """The binding a run's checkpoint carries.
+
+    One builder for both commands: a checkpoint salvage writes must equal the
+    one the assess run computes, or the resume is refused.  Two copies of this
+    expression would be two chances to disagree.
+    """
+    return CacheBinding(
+        candidate_hash=digest,
+        profile_version=profile_version,
+        assessor_pin=pin,
+        preflight_pack_set_hash=preflight_hash,
+        include_claims=params.include_claims,
+        n=args.n,
+        criterion_samples=None if args.skip_criterion_scores else args.criterion_n,
+    )
+
+
 def _open_checkpoint(
     args: argparse.Namespace,
     *,
@@ -583,14 +657,13 @@ def _open_checkpoint(
     """
     if args.no_checkpoint:
         return None
-    binding = CacheBinding(
-        candidate_hash=digest,
+    binding = _cache_binding(
+        args,
+        digest=digest,
+        pin=pin,
         profile_version=profile_version,
-        assessor_pin=pin,
-        preflight_pack_set_hash=preflight_hash,
-        include_claims=params.include_claims,
-        n=args.n,
-        criterion_samples=None if args.skip_criterion_scores else args.criterion_n,
+        preflight_hash=preflight_hash,
+        params=params,
     )
     if args.resume:
         path = Path(args.resume)
@@ -617,6 +690,199 @@ def _report_checkpoint(checkpoint: ResponseCache | None) -> None:
         f"{checkpoint.path}\nresume with the same flags plus: --resume {checkpoint.path}",
         file=sys.stderr,
     )
+
+
+def _read_transcript(path: Path) -> tuple[str, str]:
+    """The (user prompt, assistant response) of one ``claude`` CLI session file.
+
+    The CLI writes one JSONL transcript per session under
+    ``~/.claude/projects/<slugified working directory>/``.  The assessor child
+    runs one session per call in a fresh temp directory, so one file is one
+    assessor call.  The response is reassembled from every top-level assistant
+    turn by the transport's own joiner, so a generation that spanned turns is
+    read exactly as the transport read it.  The system prompt is NOT recorded
+    (it went to the CLI as ``--system-prompt``), which is why the caller
+    matches on the user prompt and rebuilds the system prompt itself.
+
+    The recorded user prompt has CRLF line endings on Windows: the transport
+    writes it to the child's stdin, and the pipe translates.  They are
+    translated back, and nothing else is normalised — a match must otherwise
+    be byte for byte.
+    """
+    from runner.claude_transport import AssistantTurn, _join_assistant_turns
+
+    user = ""
+    turns: list[AssistantTurn] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(event, Mapping):
+            continue
+        if event.get("parentToolUseId") or event.get("parent_tool_use_id"):
+            continue
+        message = event.get("message")
+        if not isinstance(message, Mapping):
+            continue
+        content = message.get("content")
+        text = (
+            content
+            if isinstance(content, str)
+            else "".join(
+                b.get("text") or ""
+                for b in (content or [])
+                if isinstance(b, Mapping) and b.get("type") == "text"
+            )
+        )
+        if event.get("type") == "user" and not user:
+            # The prompt reached the child through a pipe, which on Windows
+            # translated every newline to CRLF before the CLI recorded it.
+            # Undoing that one deterministic transformation is what lets the
+            # recorded prompt be compared to the rebuilt one byte for byte;
+            # nothing else about the text is touched.
+            user = text.replace("\r\n", "\n")
+        elif event.get("type") == "assistant":
+            stop = message.get("stop_reason")
+            turns.append(AssistantTurn(text, stop if isinstance(stop, str) else None))
+    return user, _join_assistant_turns(turns)
+
+
+def _salvage(
+    args: argparse.Namespace,
+    bundle: ProfileBundle,
+    candidate,
+    *,
+    digest: str,
+    preflight_hash: str,
+    params: PackParams,
+    repo_root: Path,
+) -> int:
+    """Turn a directory of ``claude`` CLI transcripts into a response checkpoint.
+
+    One-off recovery for a run that spent its quota before the checkpoint
+    existed.  Nothing is guessed: each transcript's recorded user prompt must
+    equal, byte for byte, a prompt rebuilt here from this profile and this
+    candidate.  A transcript that matches nothing is named and left out, which
+    costs the resumed run one live call and can never cost it a wrong answer.
+
+    Only the cells are recovered.  A criterion prompt carries the aspect
+    findings of the run that drew it, so it cannot be rebuilt from the
+    candidate alone; and the criterion system prompt changed when the
+    strict-JSON instruction was added, so replaying a criterion response drawn
+    before that would let a report claim a score from a prompt that never
+    produced it.  Those calls are redrawn.
+    """
+    from harness.evidence_pack import EvidencePackError
+    from harness.rubrics import build_pack_for, build_rubric_prompts
+    from runner.json_extract import extract_first_json_object
+
+    transcripts = Path(args.transcripts)
+    if not transcripts.is_absolute():
+        transcripts = repo_root / transcripts
+    if not transcripts.is_dir():
+        raise BlindAssessmentError(f"transcript directory not found: {transcripts}")
+    files = sorted(transcripts.glob("*.jsonl"), key=lambda p: p.stat().st_mtime)
+    if not files:
+        raise BlindAssessmentError(f"no .jsonl transcript in {transcripts}")
+
+    # Rebuild every cell prompt this candidate yields, in the order assess
+    # issues them.  The index is keyed by the user prompt, which is the only
+    # half the transcript records.
+    index: dict[str, tuple[str, str]] = {}
+    collisions: set[str] = set()
+    for rubric in bundle.rubric_set.rubrics:
+        for section_id in bundle.profile.section_ids_for(rubric.criterion_id):
+            path = candidate.sections.get(section_id)
+            if path is None:
+                continue
+            try:
+                pack = build_pack_for(
+                    rubric,
+                    path,
+                    token_budget=params.token_budget,
+                    span_budget_fraction=params.span_budget_fraction,
+                    max_token_budget=params.max_token_budget,
+                    include_claims=params.include_claims,
+                )
+            except EvidencePackError as exc:
+                raise BlindAssessmentError(
+                    f"could not rebuild the pack for {rubric.expectation_key}/{section_id}: {exc}"
+                ) from exc
+            system, user = build_rubric_prompts(rubric, pack)
+            if user in index and index[user] != (system, user):
+                collisions.add(user)
+            index[user] = (system, user)
+    if collisions:
+        raise BlindAssessmentError(
+            f"{len(collisions)} rebuilt cell prompt(s) share a user prompt under two "
+            "system prompts; a transcript could not be attributed to one of them."
+        )
+
+    pin = f"{(cfg := _judge_config(args)).model}@{cfg.version}"
+    binding = _cache_binding(
+        args,
+        digest=digest,
+        pin=pin,
+        profile_version=bundle.version,
+        preflight_hash=preflight_hash,
+        params=params,
+    )
+    path = Path(args.checkpoint)
+    if not path.is_absolute():
+        path = repo_root / path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    cache = ResponseCache(path, binding)
+
+    recovered = malformed = 0
+    unmatched: list[tuple[Path, str]] = []
+    for f in files:
+        user, response = _read_transcript(f)
+        hit = index.get(user)
+        if hit is None and user.startswith(_EMBEDDED_SYSTEM_MARKER):
+            # The transport embeds an over-long system prompt in the user
+            # prompt; strip the envelope and try the plain form.
+            tail = user.split(_EMBEDDED_SYSTEM_END, 1)
+            hit = index.get(tail[1].lstrip("\n")) if len(tail) == 2 else None
+        if hit is None or not response.strip():
+            unmatched.append((f, user.splitlines()[0] if user else "<no user prompt>"))
+            continue
+        cache.record(prompt_hash(*hit), response)
+        if extract_first_json_object(response) is None:
+            # Recorded for the record, never replayed: the run that drew it
+            # could not use it either.
+            cache.discard_last("recorded response carries no parseable JSON object")
+            malformed += 1
+        else:
+            recovered += 1
+
+    expected = len(index) * args.n
+    print(
+        f"SALVAGE - {recovered} cell response(s) recovered from {len(files)} transcript(s)\n"
+        f"checkpoint: {path}\n"
+        f"binding:    candidate {digest[:19]}  profile {bundle.version[:19]}\n"
+        f"            assessor {pin}  preflight {preflight_hash[:19]}\n"
+        f"            n={args.n} criterion_samples={binding.criterion_samples} "
+        f"include_claims={params.include_claims}\n"
+        f"cells:      {recovered} of {expected} expected "
+        f"({len(index)} prompt(s) x {args.n} sample(s))"
+    )
+    if malformed:
+        print(f"malformed:  {malformed} recorded response(s) will not parse; each is redrawn")
+    if unmatched:
+        print(
+            f"\nNOT RECOVERED - {len(unmatched)} transcript(s) matched no rebuilt cell "
+            "prompt. Each costs the resumed run one live call, never a wrong answer.\n"
+            "Criterion calls belong here: their prompts carry the drawing run's aspect "
+            "findings, and the criterion system prompt has changed since."
+        )
+        for f, first in unmatched:
+            print(f"  {f.name}  {first[:88]}")
+    print(f"\nresume with: --resume {path}")
+    return 0 if recovered else 1
 
 
 def main(
@@ -700,6 +966,16 @@ def main(
             import_manifest_sha256=file_sha256(manifest[0]) if manifest is not None else None,
             evidence=evidence,
         )
+        if args.command == "salvage":
+            return _salvage(
+                args,
+                bundle,
+                candidate,
+                digest=candidate_hash(candidate),
+                preflight_hash=preflight_hash,
+                params=params,
+                repo_root=repo_root,
+            )
         intake = read_esr_intake(graph_root, args.intake) if args.intake else None
         assessor = judge if judge is not None else _live_judge(args, repo_root)
         checkpoint = _open_checkpoint(
