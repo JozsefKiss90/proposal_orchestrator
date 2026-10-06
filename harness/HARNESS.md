@@ -595,7 +595,7 @@ deterministic audit of one candidate, run after the baseline is frozen:
 It reads the same materialised section artifacts the blind lane reads, parses
 the rendered pipe-delimited rows (a repeated header at a page break re-opens
 the same table; a row that opens no new entry is merged into the previous one)
-and the label-value work-package blocks, and runs five checks in spec order:
+and the label-value work-package headers, and runs five checks in spec order:
 work-package block fields and DCs involved against the DC projects of 1.1;
 each deliverable's package and window; each milestone against the
 deliverables it names (naming none is reported as *undeclared*, with the
@@ -608,6 +608,37 @@ threshold. Every finding has a `kind` from a closed set (`inconsistency`,
 `not_comparable`, `unlinked_prose`), a subject, the paragraphs it cites, and
 the row text. **No finding is a score**; a test pins that no score-shaped key
 appears in a report, and findings never move the exit code.
+
+**The work-package header (`split_header_fields`).** A header field is
+`<label> <value>`, and the labels are looked for in the order the application
+form fixes them: `WP Number`, `WP title`, `Start month - End month` (or a
+standalone `Start month` and `End month`), `Lead participant`, `Participants`,
+`DCs involved`, `Objectives`. Each label is searched for only after the label
+before it, so a value that happens to carry a later label's word cannot be read
+as that label, and a paragraph is a header only if it *opens* with a label. One
+rule therefore reads both layouts the extraction produces: a paragraph per
+label, and every label of a header run into one paragraph, which is what page 45
+of the revised MSCA-DN candidate carries. A collapsed header parses to the same
+fields and keeps its one paragraph as the block's location, so every finding
+over it still cites a real paragraph and quotes the candidate's text.
+`collapsed_header_labels` on the parsed block records which labels arrived that
+way, matching the import register's `headers_collapsed_into_one_block`. The
+header precedes the task list: once a block's tasks have begun, a paragraph that
+merely opens with a label word is body prose, may fill a field the header left
+unset, and never replaces one. An unreadable timing value, a `WP Number` value
+carrying more than a number, and a field declared twice with two different
+values are each reported as an `unparsed_cell` finding quoting the header, never
+guessed.
+
+**Ligatures (`fold_ligatures`, `Folded`).** A PDF may carry `fi` as one code
+point, so a search for the unligatured spelling misses it. Every comparison and
+search in the module runs over the folded form: the table-heading normaliser,
+the content-word tokeniser the risk check links prose by, the header labels and
+the DC-project patterns. Nothing in a report quotes the folded form. `Folded`
+maps a match back through an offset map and every value is cut out of the
+candidate's own text, so a ligature changes what matches and never what a
+finding says. Original text, source offsets, assertion locations and candidate
+hashes are untouched.
 
 The grounding axis enumerates the ledger (`validation_status.claim_statuses`)
 and reports every claim `Unresolved` with the reason *supporting sources

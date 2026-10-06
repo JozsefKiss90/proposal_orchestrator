@@ -6,7 +6,7 @@ What this is
 A Claude-free, deterministic audit of one candidate. It reads the same
 materialised section artifacts the blind lane reads, parses the rendered
 pipe-delimited table rows (spec decision 8: the rendering *is* the structure)
-and the label-value work-package blocks, and runs five consistency checks:
+and the label-value work-package headers, and runs five consistency checks:
 
 1. **Work-package table against work-package prose** — lead, start and end
    month, DCs involved; every field present, every task numbered under its
@@ -30,6 +30,37 @@ or one place that says less than the check needs. No finding is a score, a
 grade or a pass: the report carries counts of findings by kind and nothing
 that ranks the proposal. A reader who wants a quality judgment reads the blind
 baseline, not this.
+
+Reading the work-package header
+-------------------------------
+Table 3.1 a is flattened to prose (spec §2.11), and how it flattens depends on
+the typesetting: one page gives each header label its own text block, another
+runs every label of a header into one. :func:`split_header_fields` reads both by
+one rule. A header field is ``<label> <value>``, and each label is looked for
+only after the label before it, in the order the application form fixes
+(:data:`WP_HEADER_FIELDS`). The ordering is what makes the rule safe: a value
+that happens to carry a later label's word cannot be read as that label. A
+paragraph is a header only if it *opens* with a label, so a sentence of prose
+is never mistaken for one, and the header precedes the task list, so a label
+word inside a task description cannot redeclare a field. Either layout yields
+the same fields and keeps the paragraph they were read from as the block's
+location, so every finding over a collapsed header still cites a real paragraph
+and quotes the candidate's own text. :attr:`WpBlock.collapsed_header_labels`
+records which labels arrived in the ``WP Number`` paragraph, matching what the
+import's fidelity register measures. A field that is present but unreadable is
+reported, never guessed: see :attr:`WpBlock.unparsed`.
+
+Ligatures
+---------
+A PDF may carry ``fi`` as the single code point U+FB01, and a search for the
+unligatured spelling does not match it. Every comparison and search here runs
+over the folded form (:func:`fold_ligatures`): heading normalisation, the
+content words the risk check links prose by, the header labels, the DC-project
+patterns. Nothing in a report quotes the folded form. :class:`Folded` maps a
+match back through an offset map and every value is cut out of the candidate's
+own text, so a ligature changes what matches and never what a finding says.
+Original text, source offsets, assertion locations and candidate hashes are
+untouched.
 
 The grounding axis
 ------------------
@@ -69,7 +100,7 @@ Constitutional authority:
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterator, Mapping, Sequence
@@ -268,9 +299,81 @@ class CheckResult:
 # --------------------------------------------------------------------------- #
 
 
+#: Typographic ligatures a PDF may carry as one code point, and the letters each
+#: stands for. The import's fidelity register measures which of these the
+#: candidate text holds; this module folds them before it compares or searches,
+#: so ``Beneficiary`` and ``Bene`` + U+FB01 + ``ciary`` agree.
+LIGATURES: Mapping[str, str] = {
+    "ﬀ": "ff",
+    "ﬁ": "fi",
+    "ﬂ": "fl",
+    "ﬃ": "ffi",
+    "ﬄ": "ffl",
+    "ﬅ": "st",
+    "ﬆ": "st",
+}
+_RE_LIGATURE = re.compile("[" + "".join(LIGATURES) + "]")
+
+
+def fold_ligatures(text: str) -> str:
+    """The comparison form of *text*: every ligature spelled out in letters.
+
+    Folding is for matching only. Nothing in a report quotes the folded form:
+    every value and every piece of evidence is cut out of the original text.
+    """
+    if not text or not _RE_LIGATURE.search(text):
+        return text
+    return _RE_LIGATURE.sub(lambda m: LIGATURES[m.group(0)], text)
+
+
+def fold_with_offsets(text: str) -> tuple[str, tuple[int, ...]]:
+    """The folded text, and for each folded index the original index it came from.
+
+    A ligature is one code point standing for two or three letters, so folding
+    lengthens the string and shifts every offset after it. The map turns an
+    offset in the folded form back into an offset in the candidate's own text.
+    The map carries one extra entry so an end offset resolves too.
+    """
+    if not _RE_LIGATURE.search(text):
+        return text, tuple(range(len(text) + 1))
+    out: list[str] = []
+    origin: list[int] = []
+    for i, ch in enumerate(text):
+        letters = LIGATURES.get(ch, ch)
+        out.append(letters)
+        origin.extend([i] * len(letters))
+    origin.append(len(text))
+    return "".join(out), tuple(origin)
+
+
+@dataclass(frozen=True)
+class Folded:
+    """One paragraph held in both representations at once.
+
+    :attr:`text` is what the patterns of this module run over. :attr:`raw` is
+    what the candidate says, and what :meth:`cut` returns, so a ligature can
+    change what matches and never what a finding reports.
+    """
+
+    raw: str
+    text: str
+    origin: tuple[int, ...]
+
+    @classmethod
+    def of(cls, raw: str) -> "Folded":
+        text, origin = fold_with_offsets(raw)
+        return cls(raw, text, origin)
+
+    def cut(self, start: int, end: int | None = None) -> str:
+        """The candidate's own text under a folded span, outer whitespace removed."""
+        stop = len(self.text) if end is None else end
+        return self.raw[self.origin[start] : self.origin[stop]].strip()
+
+
 def _norm(cell: str) -> str:
-    """Whitespace removed, lowercased: ``"Numbe r"`` and ``"Number"`` agree."""
-    return re.sub(r"\s+", "", cell).lower()
+    """Whitespace removed, ligatures folded, lowercased: ``"Numbe r"``, ``"Number"``
+    and a ligatured spelling of the same heading all agree."""
+    return re.sub(r"\s+", "", fold_ligatures(cell)).lower()
 
 
 _DASH = r"[–—\-]"
@@ -278,16 +381,6 @@ _RE_MONTH = re.compile(r"\bM\s?0*(\d+)\b")
 _RE_RANGE = re.compile(rf"(\d+)\s*{_DASH}\s*(\d+)")
 _RE_INT = re.compile(r"\b(\d+)\b")
 _RE_DELIV_ID = re.compile(r"D(\d+)\.(\d+)")
-_RE_WP_BLOCK = re.compile(r"^WP\s*Number:?\s*(\d+)\s*$", re.IGNORECASE)
-_RE_WP_TITLE = re.compile(
-    rf"^WP\s*title:?\s*(?P<title>.*?)\s*Start\s*month\s*{_DASH}\s*End\s*month:?\s*"
-    rf"M\s?0*(?P<start>\d+)\s*{_DASH}\s*M\s?0*(?P<end>\d+)\s*$",
-    re.IGNORECASE,
-)
-_RE_WP_TITLE_ONLY = re.compile(r"^WP\s*title:?\s*(?P<title>.*)$", re.IGNORECASE)
-_RE_LEAD = re.compile(r"^Lead\s+(?:participant|beneficiary):?\s*(?P<value>.*)$", re.IGNORECASE)
-_RE_PARTICIPANTS = re.compile(r"^Participants:?\s*(?P<value>.*)$", re.IGNORECASE)
-_RE_DCS = re.compile(r"^DCs?\s+involved:?\s*(?P<value>.*)$", re.IGNORECASE)
 _RE_TASK = re.compile(r"^Task\s+(\d+)\.(\d+)\b", re.IGNORECASE)
 _RE_TABLE_CAPTION = re.compile(r"^Table\s+\d", re.IGNORECASE)
 _RE_DC_HEADING = re.compile(rf"^DC\s?(\d+)\s*{_DASH}\s*(?P<title>.+)$")
@@ -318,8 +411,12 @@ _STOPWORDS = frozenset(
 
 
 def _tokens(text: str) -> frozenset[str]:
+    """Content words of *text*, ligatures folded so a ligatured spelling of a word
+    counts as that word."""
     return frozenset(
-        t for t in re.findall(r"[a-z][a-z\-]{3,}", text.lower()) if t not in _STOPWORDS
+        t
+        for t in re.findall(r"[a-z][a-z\-]{3,}", fold_ligatures(text).lower())
+        if t not in _STOPWORDS
     )
 
 
@@ -357,6 +454,99 @@ def _refs(text: str, *, prefix: str = "") -> tuple[tuple[int, ...] | None, str |
     if not numbers:
         return (), raw
     return tuple(sorted(numbers)), None
+
+
+# --------------------------------------------------------------------------- #
+# The work-package header: one label-aware rule for both extracted layouts
+# --------------------------------------------------------------------------- #
+
+#: Field names of the work-package header, as the parser keys them.
+FIELD_NUMBER: str = "number"
+FIELD_TITLE: str = "title"
+FIELD_WINDOW: str = "window"
+FIELD_START: str = "start_month"
+FIELD_END: str = "end_month"
+FIELD_LEAD: str = "lead"
+FIELD_PARTICIPANTS: str = "participants"
+FIELD_DCS: str = "dcs"
+FIELD_OBJECTIVES: str = "objectives"
+
+#: Each header field and the label it is written under, in the order the
+#: application form fixes. The order *is* the parsing rule: a label is looked
+#: for only after the label before it, so a value that happens to carry a later
+#: label's word cannot be mistaken for that label. ``Start month - End month``
+#: is tried before the standalone months, because it spans both of their words.
+_NOT_LETTER = r"(?<![A-Za-z])"
+WP_HEADER_FIELDS: tuple[tuple[str, "re.Pattern[str]"], ...] = (
+    (FIELD_NUMBER, re.compile(rf"{_NOT_LETTER}WP\s*(?:Number|No\.?)\s*:?", re.IGNORECASE)),
+    (FIELD_TITLE, re.compile(rf"{_NOT_LETTER}WP\s*title\s*:?", re.IGNORECASE)),
+    (FIELD_WINDOW,
+     re.compile(rf"{_NOT_LETTER}Start\s*month\s*{_DASH}\s*End\s*month\s*:?", re.IGNORECASE)),
+    (FIELD_START, re.compile(rf"{_NOT_LETTER}Start\s*month\s*:?", re.IGNORECASE)),
+    (FIELD_END, re.compile(rf"{_NOT_LETTER}End\s*month\s*:?", re.IGNORECASE)),
+    (FIELD_LEAD,
+     re.compile(rf"{_NOT_LETTER}Lead\s+(?:participant|beneficiary)s?\s*:?", re.IGNORECASE)),
+    (FIELD_PARTICIPANTS, re.compile(rf"{_NOT_LETTER}Participants\s*:?", re.IGNORECASE)),
+    (FIELD_DCS, re.compile(rf"{_NOT_LETTER}DCs?\s+involved\s*:?", re.IGNORECASE)),
+    (FIELD_OBJECTIVES, re.compile(rf"{_NOT_LETTER}Objectives?\s*:?", re.IGNORECASE)),
+)
+
+
+@dataclass(frozen=True)
+class LabelField:
+    """One ``<label> <value>`` pair read off a header paragraph.
+
+    ``label`` and ``value`` are the candidate's own text, cut out of the
+    paragraph; the match that found them ran over the ligature-folded form.
+    """
+
+    field: str
+    label: str
+    value: str
+
+
+def split_header_fields(text: str) -> tuple[LabelField, ...]:
+    """The work-package header fields *text* carries, in the order it carries them.
+
+    One rule reads both layouts the extraction produces:
+
+    * a paragraph per label, as on a page whose header cells became separate
+      text blocks (``"Lead participant Academic Beneficiary A"``);
+    * every label of a header run into one paragraph, as on page 45 of the
+      revised candidate (``"WP Number: 4 WP title: ... DCs involved 3,5,6,7,8,9"``).
+
+    Returns ``()`` unless the paragraph *opens* with a label, so a sentence of
+    prose that happens to use a label's word is never read as a header. A field
+    whose label is present with nothing after it yields an empty ``value``; the
+    caller decides whether the paragraph that follows is that value.
+    """
+    folded = Folded.of(text)
+    offset = len(folded.text) - len(folded.text.lstrip())
+    opens_at: int | None = None
+    for index, (_, pattern) in enumerate(WP_HEADER_FIELDS):
+        if pattern.match(folded.text, offset):
+            opens_at = index
+            break
+    if opens_at is None:
+        return ()
+    hits: list[tuple[str, int, int]] = []
+    position = offset
+    for name, pattern in WP_HEADER_FIELDS[opens_at:]:
+        found = pattern.search(folded.text, position)
+        if found is None:
+            continue
+        hits.append((name, found.start(), found.end()))
+        position = found.end()
+    out: list[LabelField] = []
+    for i, (name, start, end) in enumerate(hits):
+        stop = hits[i + 1][1] if i + 1 < len(hits) else len(folded.text)
+        out.append(LabelField(name, folded.cut(start, end), folded.cut(end, stop)))
+    return tuple(out)
+
+
+def _opens_wp_block(text: str) -> bool:
+    """Whether *text* opens a work-package block, in either layout."""
+    return any(f.field == FIELD_NUMBER for f in split_header_fields(text))
 
 
 @dataclass(frozen=True)
@@ -429,6 +619,17 @@ class WpBlock:
     tasks: tuple[tuple[int, int], ...]
     where: Where
     unparsed: tuple[str, ...] = ()
+    objectives: str | None = None
+    header_text: str = ""
+    """The paragraph the block opens with, as the candidate spells it."""
+    collapsed_header_labels: tuple[str, ...] = ()
+    """Labels beyond ``WP Number`` that the opening paragraph also carried.
+
+    Empty when the header gave each label its own paragraph; populated when a
+    re-typeset page ran them together, as page 45 of the revised candidate
+    does. Either way the fields are read; this records which layout they came
+    from, and matches the import register's headers_collapsed_into_one_block.
+    """
 
     @property
     def window(self) -> tuple[int, int] | None:
@@ -446,6 +647,8 @@ class WpBlock:
             "dcs_text": self.dcs_text,
             "tasks": [f"{a}.{b}" for a, b in self.tasks],
             "where": self.where.to_dict(),
+            "collapsed_header_labels": list(self.collapsed_header_labels),
+            "unparsed": list(self.unparsed),
         }
 
 
@@ -610,87 +813,227 @@ def parse_candidate(candidate: Candidate) -> ParsedTables:
     )
 
 
+@dataclass
+class _WpHeaderState:
+    """The fields of one work-package header as they accumulate.
+
+    The first declaration of a field wins; a second, different declaration of
+    the same field is reported rather than silently preferred.
+    """
+
+    number: int
+    where: Where
+    header_text: str
+    title: str | None = None
+    start: int | None = None
+    end: int | None = None
+    lead: str | None = None
+    participants: str | None = None
+    objectives: str | None = None
+    dcs_text: str | None = None
+    dcs: tuple[int, ...] | None = None
+    dcs_seen: bool = False
+    tasks: list[tuple[int, int]] = field(default_factory=list)
+    unparsed: list[str] = field(default_factory=list)
+    collapsed: list[str] = field(default_factory=list)
+    fill_only: bool = False
+    """Set once the task list has begun.
+
+    The application form puts the header labels before the tasks, so after the
+    first task a paragraph opening with a label word (``"Objectives include:"``
+    inside a task description) is prose. It may still fill a field the header
+    left unset; it never replaces one, and a difference is not a disagreement
+    worth reporting.
+    """
+
+    def absorb(self, fields: Sequence[LabelField], *, collapsed: bool) -> None:
+        for item in fields:
+            if item.field == FIELD_NUMBER:
+                continue
+            if collapsed:
+                self.collapsed.append(item.label)
+            self.set(item.field, item.value)
+
+    def set(self, name: str, value: str) -> None:
+        value = value.strip()
+        if name == FIELD_TITLE:
+            self._once("title", "WP title", value)
+        elif name == FIELD_WINDOW:
+            self._window(value)
+        elif name == FIELD_START:
+            self._month("start", "start month", value)
+        elif name == FIELD_END:
+            self._month("end", "end month", value)
+        elif name == FIELD_LEAD:
+            self._once("lead", "lead participant", value)
+        elif name == FIELD_PARTICIPANTS:
+            self._once("participants", "participants", value)
+        elif name == FIELD_OBJECTIVES:
+            self._once("objectives", "objectives", value)
+        elif name == FIELD_DCS:
+            self._set_dcs(value)
+
+    def _once(self, attr: str, label: str, value: str) -> None:
+        if not value:
+            return
+        held = getattr(self, attr)
+        if held is None:
+            setattr(self, attr, value)
+        elif held != value and not self.fill_only:
+            self.unparsed.append(
+                f"{label} is declared twice and the two do not agree: "
+                f"{held[:60]!r} then {value[:60]!r}"
+            )
+
+    def _window(self, value: str) -> None:
+        if not value:
+            return
+        months = [int(m) for m in _RE_MONTH.findall(value)]
+        if len(months) == 2:
+            self._month("start", "start month", f"M{months[0]}")
+            self._month("end", "end month", f"M{months[1]}")
+            return
+        if not self.fill_only:
+            self.unparsed.append(
+                f"start/end month not parsable from the header value {value[:80]!r}"
+            )
+
+    def _month(self, attr: str, label: str, value: str) -> None:
+        if not value:
+            return
+        months = [int(m) for m in _RE_MONTH.findall(value)]
+        if len(months) != 1:
+            if not self.fill_only:
+                self.unparsed.append(f"{label} not parsable from {value[:80]!r}")
+            return
+        held = getattr(self, attr)
+        if held is None:
+            setattr(self, attr, months[0])
+        elif held != months[0] and not self.fill_only:
+            self.unparsed.append(
+                f"{label} is declared twice and the two do not agree: M{held} then M{months[0]}"
+            )
+
+    def _set_dcs(self, value: str) -> None:
+        if self.dcs_seen and self.dcs_text:
+            if value and value != self.dcs_text and not self.fill_only:
+                self.unparsed.append(
+                    f"DCs involved is declared twice and the two do not agree: "
+                    f"{self.dcs_text[:60]!r} then {value[:60]!r}"
+                )
+            return
+        self.dcs_seen = True
+        self.dcs_text = value
+        self.dcs, unread = _refs(value, prefix="DC")
+        if unread and not self.fill_only:
+            self.unparsed.append(f"DCs involved not parsable: {unread!r}")
+
+    def build(self) -> WpBlock:
+        return WpBlock(
+            number=self.number,
+            title=self.title,
+            start=self.start,
+            end=self.end,
+            lead=self.lead,
+            participants=self.participants,
+            dcs=self.dcs if self.dcs_seen else (),
+            dcs_text=self.dcs_text if self.dcs_seen else None,
+            tasks=tuple(self.tasks),
+            where=self.where,
+            unparsed=tuple(self.unparsed),
+            objectives=self.objectives,
+            header_text=self.header_text,
+            collapsed_header_labels=tuple(self.collapsed),
+        )
+
+
 def _parse_wp_blocks(prose: Sequence[Paragraph]) -> tuple[WpBlock, ...]:
-    """The label-value work-package blocks (Table 3.1 a flattened to prose, spec §2.11)."""
+    """The label-value work-package blocks (Table 3.1 a flattened to prose).
+
+    One rule reads both layouts: a header field is ``<label> <value>``, and the
+    labels come in the order the application form fixes (see
+    :func:`split_header_fields`). A page that gives each label its own paragraph
+    and a page that runs every label of a header into one paragraph therefore
+    yield the same fields, and both keep the paragraph they were read from as
+    the block's location.
+    """
     blocks: list[WpBlock] = []
-    i = 0
-    n = len(prose)
+    i, n = 0, len(prose)
     while i < n:
-        m = _RE_WP_BLOCK.match(prose[i].text)
-        if not m:
+        head = split_header_fields(prose[i].text)
+        opener = next((f for f in head if f.field == FIELD_NUMBER), None)
+        if opener is None:
             i += 1
             continue
-        number = int(m.group(1))
-        where = prose[i].where
-        title = start = end = lead = participants = dcs_text = None
-        dcs: tuple[int, ...] | None = ()
-        dcs_seen = False
-        tasks: list[tuple[int, int]] = []
-        bad: list[str] = []
+        number = _RE_INT.search(opener.value)
+        if number is None:
+            i += 1
+            continue
+        state = _WpHeaderState(
+            number=int(number.group(1)), where=prose[i].where, header_text=prose[i].text
+        )
+        if opener.value.strip() != number.group(1):
+            state.unparsed.append(
+                f"the WP Number value carries more than a number: {opener.value.strip()[:80]!r}"
+            )
+        state.absorb(head, collapsed=True)
         j = i + 1
         while j < n:
-            t = prose[j].text
-            if _RE_WP_BLOCK.match(t) or _RE_TABLE_CAPTION.match(t) or _RE_DC_HEADING.match(t):
+            para = prose[j]
+            if (
+                para.where.section_id != state.where.section_id
+                or para.where.sub_section_id != state.where.sub_section_id
+            ):
                 break
-            if prose[j].where.section_id != where.section_id or prose[j].where.sub_section_id != where.sub_section_id:
+            folded = fold_ligatures(para.text)
+            if _RE_TABLE_CAPTION.match(folded) or _RE_DC_HEADING.match(folded):
                 break
-            mt = _RE_WP_TITLE.match(t)
-            if mt:
-                title, start, end = mt.group("title").strip(), int(mt.group("start")), int(mt.group("end"))
-            elif _RE_WP_TITLE_ONLY.match(t) and title is None:
-                title = _RE_WP_TITLE_ONLY.match(t).group("title").strip()  # type: ignore[union-attr]
-                bad.append(f"WP title line carries no parsable start/end month: {t[:80]!r}")
-            elif _RE_LEAD.match(t):
-                lead = _RE_LEAD.match(t).group("value").strip() or None  # type: ignore[union-attr]
-                if lead is None and j + 1 < n and not _looks_like_label(prose[j + 1].text):
-                    lead = prose[j + 1].text.strip()
+            fields = split_header_fields(para.text)
+            if any(f.field == FIELD_NUMBER for f in fields):
+                break
+            if fields:
+                state.absorb(fields, collapsed=False)
+                tail = fields[-1]
+                if not tail.value and j + 1 < n and not _looks_like_label(prose[j + 1].text):
+                    state.set(tail.field, prose[j + 1].text.strip())
                     j += 1
-            elif _RE_PARTICIPANTS.match(t):
-                participants = _RE_PARTICIPANTS.match(t).group("value").strip() or None  # type: ignore[union-attr]
-                if participants is None and j + 1 < n and not _looks_like_label(prose[j + 1].text):
-                    participants = prose[j + 1].text.strip()
-                    j += 1
-            elif _RE_DCS.match(t):
-                dcs_seen = True
-                dcs_text = _RE_DCS.match(t).group("value").strip()  # type: ignore[union-attr]
-                if not dcs_text and j + 1 < n and not _looks_like_label(prose[j + 1].text):
-                    dcs_text = prose[j + 1].text.strip()
-                    j += 1
-                dcs, unread = _refs(dcs_text, prefix="DC")
-                if unread:
-                    bad.append(f"DCs involved not parsable: {unread!r}")
             else:
-                mk = _RE_TASK.match(t)
-                if mk:
-                    tasks.append((int(mk.group(1)), int(mk.group(2))))
+                task = _RE_TASK.match(folded)
+                if task:
+                    state.tasks.append((int(task.group(1)), int(task.group(2))))
+                    state.fill_only = True
             j += 1
-        blocks.append(
-            WpBlock(
-                number=number, title=title, start=start, end=end, lead=lead,
-                participants=participants, dcs=dcs if dcs_seen else (),
-                dcs_text=dcs_text if dcs_seen else None, tasks=tuple(tasks), where=where,
-                unparsed=tuple(bad),
-            )
-        )
+        blocks.append(state.build())
         i = j
     return tuple(blocks)
 
 
 def _looks_like_label(text: str) -> bool:
+    """Whether *text* opens something other than a value: a header label, a task,
+    a table caption, a DC project heading."""
+    folded = fold_ligatures(text)
     return bool(
-        _RE_WP_BLOCK.match(text) or _RE_WP_TITLE_ONLY.match(text) or _RE_LEAD.match(text)
-        or _RE_PARTICIPANTS.match(text) or _RE_DCS.match(text) or _RE_TASK.match(text)
-        or _RE_TABLE_CAPTION.match(text) or re.match(r"^Objectives?:?\s*$", text, re.IGNORECASE)
+        split_header_fields(text)
+        or _RE_TASK.match(folded)
+        or _RE_TABLE_CAPTION.match(folded)
+        or _RE_DC_HEADING.match(folded)
     )
 
 
 def _parse_dc_projects(prose: Sequence[Paragraph]) -> tuple[DcProject, ...]:
-    """The per-DC research projects of section 1.1: ``DC<n> – <title>``, a Host line, secondment bullets."""
+    """The per-DC research projects of section 1.1.
+
+    ``DC<n> - <title>`` opens one, a ``Host:`` line names its host and the work
+    packages it brackets, and the secondment bullets are counted. Every pattern
+    runs over the ligature-folded paragraph; every value is cut out of the
+    candidate's own text.
+    """
     projects: list[DcProject] = []
     i = 0
     n = len(prose)
     while i < n:
-        m = _RE_DC_HEADING.match(prose[i].text)
+        head = Folded.of(prose[i].text)
+        m = _RE_DC_HEADING.match(head.text)
         if not m:
             i += 1
             continue
@@ -702,15 +1045,17 @@ def _parse_dc_projects(prose: Sequence[Paragraph]) -> tuple[DcProject, ...]:
         in_secondments = False
         j = i + 1
         while j < n:
-            t = prose[j].text
-            if _RE_DC_HEADING.match(t) or _RE_WP_BLOCK.match(t) or _RE_TABLE_CAPTION.match(t):
+            para = Folded.of(prose[j].text)
+            t = para.text
+            if _RE_DC_HEADING.match(t) or _opens_wp_block(prose[j].text) or _RE_TABLE_CAPTION.match(t):
                 break
             if prose[j].where.section_id != where.section_id or prose[j].where.sub_section_id != where.sub_section_id:
                 break
-            if _RE_HOST.match(t) and host is None:
-                host = _RE_HOST.match(t).group("value").strip()  # type: ignore[union-attr]
+            host_line = _RE_HOST.match(t)
+            if host_line and host is None:
+                host = para.cut(host_line.start("value"), host_line.end("value"))
                 found: set[int] = set()
-                for inner in _RE_HOST_WPS.findall(host):
+                for inner in _RE_HOST_WPS.findall(fold_ligatures(host)):
                     nums, _ = _refs(inner, prefix="WP")
                     found.update(nums or ())
                 host_wps = tuple(sorted(found))
@@ -725,8 +1070,8 @@ def _parse_dc_projects(prose: Sequence[Paragraph]) -> tuple[DcProject, ...]:
                 break
             j += 1
         projects.append(
-            DcProject(number=number, title=m.group("title").strip(), host=host, host_wps=host_wps,
-                      secondment_bullets=bullets, where=where)
+            DcProject(number=number, title=head.cut(m.start("title"), m.end("title")), host=host,
+                      host_wps=host_wps, secondment_bullets=bullets, where=where)
         )
         i = j
     return tuple(projects)
@@ -839,7 +1184,8 @@ def _check_wp(parsed: ParsedTables) -> CheckResult:
                                         f"{subject} declares no {name}", (b.where,),
                                         (f"WP Number: {b.number}",)))
         for text in b.unparsed:
-            findings.append(Finding(cid, KIND_UNPARSED, subject, text, (b.where,)))
+            findings.append(Finding(cid, KIND_UNPARSED, subject, text, (b.where,),
+                                    (b.header_text[:160],) if b.header_text else ()))
         for a, k in b.tasks:
             compared += 1
             if a != b.number:
@@ -1098,7 +1444,7 @@ def _check_risks(parsed: ParsedTables) -> CheckResult:
     # that ends in a colon introduces a list; its bullets are read with it.
     prose_hits: list[tuple[Paragraph, str]] = []
     for i, p in enumerate(parsed.prose):
-        if not _RE_MITIGATION_PROSE.search(p.text):
+        if not _RE_MITIGATION_PROSE.search(fold_ligatures(p.text)):
             continue
         text = p.text
         if text.rstrip().endswith(":"):

@@ -1,0 +1,135 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe07-label-aware-wp-header_2026-10-06",
+  "date": "2026-10-06",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-07 (Integrity audit) in plans/msca_dn_pre_evaluation_spec.md; follow-up to msca-dn-pe03-resolved-fixes-revision_2026-10-06",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §12.1 (an output names its inputs and flags its assumptions), §12.2 (the four status categories; every ledger claim stays Unresolved), §13.3 (no project fact is invented), §15 (a declared gap over a fabricated completion). Spec decisions 8, 14 and 15 and ticket PE-07. Not a constitutional amendment.",
+  "decision": "The integrity audit reads the work-package header by one label-aware rule instead of by label blocks. A header field is '<label> <value>', and the labels are looked for in the order the application form fixes them, each only after the label before it. A paragraph is a header only if it opens with a label. This reads both layouts the extraction produces: one paragraph per label, and every label of a header run into one paragraph. The audit also folds typographic ligatures before it compares or searches, and cuts every value and every piece of evidence out of the candidate's own text through an offset map, so a ligature changes what matches and never what a finding reports.",
+  "why": "The revised sanitised candidate re-typesets page 45 and runs every WP4 header label into the 'WP Number: 4' block. The block-splitting parser saw six work packages instead of seven and reported WP4 as described by no block, which produced 23 downstream findings over deliverables, milestones, risks and DC projects whose single cause was the parse. Those findings were misleading: WP4's number, title, timing, lead participant, participants and DCs are all explicitly stated on that paragraph. msca-dn-pe03-resolved-fixes-revision_2026-10-06 recorded the collapse and left the parser to a PE-07 change. This is that change.",
+  "rule": {
+    "declared_status": "Confirmed",
+    "basis": "harness/integrity_audit.py: split_header_fields, WP_HEADER_FIELDS, _parse_wp_blocks, fold_ligatures, Folded",
+    "general_not_special_cased": "No rule in the parser names WP4, page 45, or this candidate. The label table and the ordering are the whole rule, and they hold for any work package of any document.",
+    "label_order": [
+      "WP Number",
+      "WP title",
+      "Start month - End month",
+      "Start month",
+      "End month",
+      "Lead participant / Lead beneficiary",
+      "Participants",
+      "DCs involved",
+      "Objectives"
+    ],
+    "why_the_order_is_the_rule": "Searching for a label only after the label before it means a value that happens to carry a later label's word cannot be read as that label. The combined 'Start month - End month' label is tried before the standalone months because it spans both of their words.",
+    "the_header_precedes_the_task_list": "Once a block's task list has begun, a paragraph that merely opens with a label word is body prose: it may fill a field the header left unset, never replaces one, and no disagreement is reported. Without this, the task-description sentence 'Objectives include:' inside WP4 read as a second declaration of Objectives.",
+    "ambiguity_is_reported_not_guessed": "A timing value that yields no month pair, a WP Number value carrying more than a number, and a field declared twice with two different values are each recorded on the block and surfaced as an unparsed_cell finding that quotes the header paragraph. Nothing is inferred and no missing value is supplied."
+  },
+  "ligatures": {
+    "declared_status": "Confirmed",
+    "basis": "harness/integrity_audit.LIGATURES, fold_ligatures, fold_with_offsets, Folded",
+    "folded": "U+FB00 ff, U+FB01 fi, U+FB02 fl, U+FB03 ffi, U+FB04 ffl, U+FB05 st, U+FB06 st",
+    "where": "Every comparison and search of the module: the table-heading normaliser, the content-word tokeniser the risk check links prose by, the header labels, the DC-project patterns, the mitigation pattern.",
+    "what_is_preserved": "Original text, source offsets, assertion locations and candidate hashes. Folding lengthens the string, so a match over the folded form is mapped back through an offset map and the value is sliced out of the candidate's own text. The revised candidate's WP4 lead reads 'Academic Bene' + U+FB01 + 'ciary E' in the report, as the page spells it.",
+    "measured_elsewhere": "The import's fidelity register measures which ligatures the page texts carry (known_extraction_limitations.ligatures) and now records that the audit folds them under read_by."
+  },
+  "results": {
+    "declared_status": "Confirmed",
+    "basis": "derived: two audit runs of the deterministic command, one per revision, on this working tree",
+    "revised_candidate": {
+      "node": "MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+      "work_package_blocks": 7,
+      "findings_total": 40,
+      "findings_by_kind": {
+        "inconsistency": 5,
+        "undeclared_dependency": 16,
+        "out_of_window": 10,
+        "not_comparable": 9
+      },
+      "before_this_change": "six blocks, 65 findings"
+    },
+    "first_candidate": {
+      "node": "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+      "findings_total": 42,
+      "unchanged": "Every finding of the committed PE-07 report over the first copy is reproduced kind for kind, subject for subject and detail for detail. The first copy gives each label its own paragraph, so the widened rule reads it identically. No parser correction was needed for it and none is claimed."
+    },
+    "removed_by_the_parsing": {
+      "basis": "derived: the finding sets of the two audit runs over the revised candidate, before and after this change, differenced by check, kind, subject and detail",
+      "removed_outright": {
+        "count": 26,
+        "all_one_cause": "WP4 had no parsed block, so every WP-keyed check reported it undescribed.",
+        "by_check": {
+          "wp_table_vs_prose": "8: seven 'Task 4.x is described under WP3' (the tasks fell into the previous block) and one 'WP4 is referenced but no work-package block describes it'",
+          "deliverable_wp_window": "3: D4.1, D4.2 and D4.3 belong to WP4, which no block describes",
+          "milestone_dependencies": "2: M4.1 and M4.2 relate to WP4, which no block describes",
+          "dc_table_vs_projects": "9: each DC project names WP4, which no block describes",
+          "risk_table_vs_prose": "4: risks 3, 4, 5 and 7 involve WP4, which no block describes"
+        }
+      },
+      "restated_with_the_same_subject_and_months": {
+        "count": 9,
+        "what": "The nine DC contracts running to M40 against packages ending M36. The finding is the same; WP4's own window is now known, so each detail reads 'WP4 ends M36' alongside the others."
+      },
+      "added": {
+        "count": 1,
+        "what": "WP4's declared DC set against the DC projects of 1.1. See the_one_finding_the_revision_adds."
+      },
+      "arithmetic": "65 - 26 + 1 = 40.",
+      "against_the_first_copy": "42 findings become 40: the three missing_field findings over WP4 are resolved by the revision itself, and one inconsistency is added. This is what tests/harness/test_integrity_audit.py::TestMscaDnWorkspace::test_the_revision_differs_from_the_first_copy_by_four_findings pins."
+    },
+    "substantive_findings_that_remain": {
+      "wp_table_vs_prose": "5 inconsistencies. WP1, WP2, WP6 and WP7 declare DC sets that disagree with the DC projects of 1.1, and WP4 now does too.",
+      "milestone_dependencies": "16 undeclared dependencies (context, not failures) and M7.3 due M48 against a WP7 that ends M36.",
+      "dc_table_vs_projects": "9 contracts running to M40 against packages that end M36, and 9 recruiting-participant-against-host pairs the sanitisation made not comparable.",
+      "deliverable_wp_window": "none",
+      "risk_table_vs_prose": "none"
+    },
+    "the_one_finding_the_revision_adds": {
+      "finding": "WP4 declares DCs involved [3, 5, 6, 7, 8, 9]; the DC projects in 1.1 that name WP4 on their host line are [1, 2, 3, 4, 5, 6, 7, 8, 9]",
+      "why_it_is_new": "The first copy stated no DC set for WP4, so the comparison did not run. The revision states one, and it disagrees. This is a fact about the proposal, not about the parser.",
+      "declared_status": "Confirmed",
+      "location": "implementation_section 3.1 paragraph 30"
+    }
+  },
+  "grounding_axis_unchanged": "All 45 claims of the revised candidate stay Unresolved for the one declared reason, 'supporting sources removed by sanitisation'. Nothing here confirms a claim, and no judge ran.",
+  "artifacts": {
+    "changed": [
+      "harness/integrity_audit.py",
+      "tools/import_external_proposal.py",
+      "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+      "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json",
+      "tests/harness/test_integrity_audit.py",
+      "tests/test_msca_dn_import.py"
+    ],
+    "unchanged": [
+      "Both sanitised PDFs, at their recorded hashes.",
+      "Both document records, so both node ids are unchanged: the revision is still MSCA-DN-2025_sanitised_part_b@b51a103520b58ded.",
+      "All 168 historical page-source records of both revisions.",
+      "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json, the first revision's register.",
+      "workspaces/msca_dn/.../imports/MSCA-DN-2025_sanitised_part_b.json, the first revision's manifest.",
+      "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json, the committed PE-07 report over the first copy, and the candidate directory it was taken over."
+    ],
+    "no_new_audit_report_committed": "The two audit runs behind the figures above were written outside the repository. Committing a report over the revised candidate belongs with the operator's preflight and freeze, which this act does not perform."
+  },
+  "manifest_register_pointer_fix": {
+    "declared_status": "Confirmed",
+    "what_was_wrong": "render_manifest emitted fidelity_register_derived_half from the module-level REGISTER_REL, which is the first revision's register. The revised manifest therefore pointed a reader at measurements of the first revision's pages while its own candidate block named its own register.",
+    "fix": "The field is rendered from revision.register_rel, so each revision points at its own register. The first revision's manifest is byte-identical, because its own register is the file the constant named.",
+    "test": "tests/test_msca_dn_import.py::TestRevisions::test_each_manifest_names_its_own_fidelity_register and ::test_the_derived_half_a_manifest_points_at_is_the_one_in_that_file, over every revision."
+  },
+  "what_remains_measured_as_a_limitation": {
+    "wp4_header_collapse": "Still measured and still recorded. The page text has not changed: WP4's labels still open no blocks of their own, 458 characters of page 45 are still set at 9.8 pt, and the register still records the collapse under known_extraction_limitations.work_package_header_blocks. What changed is that the audit reads it; a reader that splits on label blocks alone is still subject to the consequence, and the register's read_by field says who reads it and how.",
+    "ligature": "Still measured. Page 45 still carries U+FB01 twice; the audit folds it, and the register's read_by field says so.",
+    "body_point_size": "Still does not hold. Withdrawing the PE-01 declaration is the operator's act, untouched here.",
+    "line_endings": "Unchanged. core.autocrlf is true with no .gitattributes, so a checkout that rewrites these LF artifacts with CRLF makes --check fail.",
+    "workspace_outside_the_leakage_scan": "Unchanged from PE-01 and PE-03."
+  },
+  "checks_run": {
+    "import_check_byte_equal": "py -3.10 -m tools.import_external_proposal --check: up to date after the regeneration.",
+    "workspace_check_byte_equal": "py -3.10 -m tools.author_msca_dn_workspace --check: up to date, untouched.",
+    "tests": "tests/harness/test_integrity_audit.py, tests/test_msca_dn_import.py, tests/test_msca_dn_workspace.py, tests/harness/test_evidence_preflight.py, tests/runner/test_dev_graph_intake.py, tests/runner/test_dev_graph_packages.py",
+    "audits": "The audit command over both revisions, the revised one by document route and the first by its archived candidate directory."
+  },
+  "not_done": "No assessor run, no preflight, no new frozen baseline, no ESR comparison, no commit and no push. A fresh preflight is required before the next assessment because the regenerated import manifest changes its binding; the operator runs it."
+}

@@ -75,6 +75,22 @@ def _wp_block(n: int, title: str, start: int, end: int, lead: str, dcs: str, tas
     ]
 
 
+def _wp_block_combined(
+    n: int, title: str, start: int, end: int, lead: str, dcs: str, tasks: tuple[str, ...]
+) -> list[str]:
+    """The same work package with every header label run into one paragraph.
+
+    This is the layout page 45 of the revised MSCA-DN candidate carries: the
+    re-typeset header became one extracted text block instead of six.
+    """
+    return [
+        f"WP Number: {n} WP title: {title} Start month - End month: M{start}-M{end} "
+        f"Lead participant {lead} Participants Beneficiaries A, B DCs involved {dcs} "
+        f"Objectives Do the work.",
+        *[f"Task {n}.{i + 1} - {t}: Text." for i, t in enumerate(tasks)],
+    ]
+
+
 def _dc_project(n: int, title: str, wps: str, secondments: int = 2) -> list[str]:
     return [
         f"DC{n} – {title}",
@@ -206,6 +222,142 @@ class TestParser:
         assert [(p.number, p.host_wps, p.secondment_bullets) for p in parsed.dc_projects] == [
             (1, (1, 2), 2), (2, (2,), 2),
         ]
+
+    def test_a_combined_header_parses_to_the_same_fields_as_separate_labels(self, tmp_path, profile):
+        """Page 45 of the revised candidate runs every WP4 label into the
+        'WP Number:' block. One label-aware rule reads both layouts, so the two
+        spellings of one work package yield the same fields."""
+        args = (1, "Methods", 1, 24, "Beneficiary A", "1", ("Analysis", "Design"))
+        separate, combined = consistent_world(), consistent_world()
+        tail = separate["S3"][len(_wp_block(*args)):]
+        combined["S3"] = _wp_block_combined(*args) + tail
+        a = ia.parse_candidate(load_candidate(write_candidate(tmp_path / "a", separate), profile.profile))
+        b = ia.parse_candidate(load_candidate(write_candidate(tmp_path / "b", combined), profile.profile))
+        for name in ("number", "title", "start", "end", "lead", "participants", "dcs", "tasks"):
+            assert getattr(a.wp(1), name) == getattr(b.wp(1), name), name
+        assert a.wp(1).collapsed_header_labels == ()
+        assert b.wp(1).collapsed_header_labels == (
+            "WP title:", "Start month - End month:", "Lead participant", "Participants",
+            "DCs involved", "Objectives",
+        )
+
+    def test_a_combined_header_keeps_its_one_paragraph_as_the_location(self, tmp_path, profile):
+        """Every field of a collapsed header was read from one paragraph, so every
+        finding over that block points at that paragraph and can quote its text."""
+        world = consistent_world()
+        world["S3"] = _wp_block_combined(1, "Methods", 1, 24, "Beneficiary A", "1", ("Analysis",))
+        parsed = ia.parse_candidate(load_candidate(write_candidate(tmp_path, world), profile.profile))
+        block = parsed.wp(1)
+        assert block.where == ia.Where("S3", "3.1", 0)
+        assert block.header_text.startswith("WP Number: 1 WP title: Methods")
+
+    def test_the_header_fields_are_read_in_the_order_the_form_fixes(self):
+        fields = ia.split_header_fields(
+            "WP Number: 4 WP title: Clinical Adaptation & Case Studies "
+            "Start month - End month: M1-M36 Lead participant Beneficiary E "
+            "Participants Beneficiaries I, F DCs involved 3,5,6 Objectives To adapt models."
+        )
+        assert [(f.field, f.value) for f in fields] == [
+            (ia.FIELD_NUMBER, "4"),
+            (ia.FIELD_TITLE, "Clinical Adaptation & Case Studies"),
+            (ia.FIELD_WINDOW, "M1-M36"),
+            (ia.FIELD_LEAD, "Beneficiary E"),
+            (ia.FIELD_PARTICIPANTS, "Beneficiaries I, F"),
+            (ia.FIELD_DCS, "3,5,6"),
+            (ia.FIELD_OBJECTIVES, "To adapt models."),
+        ]
+
+    def test_a_standalone_start_and_end_month_label_is_read_too(self):
+        fields = ia.split_header_fields("WP Number: 2 Start month: M6 End month: M30")
+        assert [(f.field, f.value) for f in fields] == [
+            (ia.FIELD_NUMBER, "2"), (ia.FIELD_START, "M6"), (ia.FIELD_END, "M30"),
+        ]
+
+    def test_a_prose_sentence_using_a_label_word_is_not_a_header(self, tmp_path, profile):
+        """A paragraph must *open* with a label, and the header precedes the task
+        list, so a task description saying 'Objectives include:' neither opens a
+        block nor redeclares a field."""
+        assert ia.split_header_fields("We describe the WP title below.") == ()
+        assert ia.split_header_fields("Participation is open to all.") == ()
+        world = consistent_world()
+        world["S3"] = [
+            *_wp_block(1, "Methods", 1, 24, "Beneficiary A", "1", ("Analysis",)),
+            "Objectives include: a benchmark.",
+        ]
+        parsed = ia.parse_candidate(load_candidate(write_candidate(tmp_path, world), profile.profile))
+        assert len(parsed.wp_blocks) == 1
+        assert parsed.wp(1).unparsed == ()
+        assert parsed.wp(1).objectives == "Do the work."
+
+    def test_an_unreadable_timing_field_is_reported_not_guessed(self, tmp_path, profile):
+        world = consistent_world()
+        world["S3"] = [
+            "WP Number: 1",
+            "WP title: Methods Start month - End month: to be confirmed",
+            "Lead participant Beneficiary A",
+        ]
+        parsed = ia.parse_candidate(load_candidate(write_candidate(tmp_path, world), profile.profile))
+        block = parsed.wp(1)
+        assert (block.start, block.end) == (None, None)
+        assert block.title == "Methods"
+        assert any("start/end month not parsable" in u for u in block.unparsed)
+
+    def test_a_field_declared_twice_and_disagreeing_is_reported(self, tmp_path, profile):
+        world = consistent_world()
+        world["S3"] = [
+            "WP Number: 1",
+            "WP title: Methods Start month - End month: M1 - M24",
+            "Lead participant Beneficiary A",
+            "Lead participant Beneficiary Z",
+        ]
+        parsed = ia.parse_candidate(load_candidate(write_candidate(tmp_path, world), profile.profile))
+        block = parsed.wp(1)
+        assert block.lead == "Beneficiary A"
+        assert any("lead participant is declared twice" in u for u in block.unparsed)
+
+    @pytest.mark.parametrize("ligatured, plain", [
+        ("Bene\ufb01ciary", "Beneficiary"),
+        ("e\ufb03cient", "efficient"),
+        ("o\ufb00er", "offer"),
+        ("\ufb02ow", "flow"),
+    ])
+    def test_a_ligatured_spelling_compares_equal_to_the_ordinary_one(self, ligatured, plain):
+        assert ia.fold_ligatures(ligatured) == plain
+        assert ia._norm(ligatured) == ia._norm(plain)
+        assert ia._tokens(ligatured) == ia._tokens(plain)
+
+    def test_folding_maps_a_match_back_to_the_candidates_own_spelling(self):
+        folded = ia.Folded.of("Lead participant Academic Bene\ufb01ciary E")
+        assert folded.text == "Lead participant Academic Beneficiary E"
+        assert folded.cut(0, len(folded.text)) == "Lead participant Academic Bene\ufb01ciary E"
+        (lead,) = ia.split_header_fields("Lead participant Academic Bene\ufb01ciary E")
+        assert (lead.field, lead.value) == (ia.FIELD_LEAD, "Academic Bene\ufb01ciary E")
+
+    def test_a_ligatured_combined_header_parses_and_keeps_its_own_spelling(self, tmp_path, profile):
+        world = consistent_world()
+        world["S3"] = _wp_block_combined(
+            1, "Methods", 1, 24, "Academic Bene\ufb01ciary A", "1", ("Analysis",)
+        )
+        parsed = ia.parse_candidate(load_candidate(write_candidate(tmp_path, world), profile.profile))
+        block = parsed.wp(1)
+        assert block.lead == "Academic Bene\ufb01ciary A"
+        assert (block.start, block.end, block.dcs) == (1, 24, (1,))
+
+    def test_folding_is_what_links_a_ligatured_mitigation_to_its_risk_row(self, tmp_path, profile):
+        """The risk check links a prose mitigation to a row by three shared content
+        words. Here one of the three is ligatured in the row, so without folding
+        only two match and the audit would report prose no row carries."""
+        world = consistent_world()
+        world["S3"] = [
+            "Table 3.1 e Project Risks",
+            RISK_HEADER,
+            _row("Drift", "Low", "Low", "1", "The \ufb01xed benchmark."),
+            "Drift risks will be mitigated by the fixed benchmark.",
+        ]
+        report = _audit(tmp_path, profile, world)
+        (risk,) = [c for c in report.checks if c.check_id == "risk_table_vs_prose"]
+        assert [f.kind for f in risk.findings if f.kind == ia.KIND_UNLINKED_PROSE] == []
+        assert "prose paragraphs naming a mitigation: 1; risk rows they link to: [0]" in risk.notes
 
     @pytest.mark.parametrize("text, expected", [
         ("M12", ((12,), None)), ("M01", ((1,), None)), ("M12, M24, M36", ((12, 24, 36), None)),
@@ -672,40 +824,63 @@ class TestMscaDnWorkspace:
         assert len(parse["dc_projects"]) == 9
         assert parse["unparsed"] == [] and report["flags"] == []
 
-    def test_the_revision_lost_one_work_package_block_to_its_retypeset_header(self, report):
-        """The revised copy re-typeset the WP4 header at 9.8 pt and ran every
-        label into the 'WP Number:' block, so the block parser sees six work
-        packages, not seven. The fidelity register measures the same collapse.
-        """
-        assert len(report["parse"]["wp_blocks"]) == 6
+    def test_the_revisions_collapsed_wp4_header_is_read_and_recorded(self, report):
+        """The revised copy re-typeset the WP4 header at 9.8 pt and ran every label
+        into the 'WP Number:' block. The label-aware rule reads all seven work
+        packages from it; the fidelity register still measures the collapse, and
+        the audit records which block it read in that layout."""
+        blocks = report["parse"]["wp_blocks"]
+        assert [b["number"] for b in blocks] == [1, 2, 3, 4, 5, 6, 7]
+        assert {
+            b["number"]: b["collapsed_header_labels"] for b in blocks if b["collapsed_header_labels"]
+        } == {
+            4: ["WP title:", "Start month - End month:", "Lead participant", "Participants",
+                "DCs involved", "Objectives"],
+        }
         limitations = json.loads(
             (REPO / ie.ACTIVE_REVISION.register_rel).read_text(encoding="utf-8")
         )["provenance"]["known_extraction_limitations"]["work_package_header_blocks"]
         assert limitations["wp_number_blocks"] == [1, 2, 3, 4, 5, 6, 7]
         assert [c["work_package"] for c in limitations["headers_collapsed_into_one_block"]] == [4]
+        assert "split_header_fields" in limitations["read_by"]
+
+    def test_wp4s_explicitly_stated_fields_are_read_from_its_one_paragraph(self, report):
+        """Every WP4 field the revision states is read, in the candidate's own
+        spelling, ligature and all; all of them point at paragraph 30 of 3.1."""
+        (wp4,) = [b for b in report["parse"]["wp_blocks"] if b["number"] == 4]
+        assert wp4["title"] == "Clinical Adaptation & Case Studies"
+        assert (wp4["start"], wp4["end"]) == (1, 36)
+        assert wp4["lead"] == "Academic Bene\ufb01ciary E"
+        assert wp4["participants"] == "Academic Bene\ufb01ciaries I, F, G, B, C"
+        assert (wp4["dcs"], wp4["dcs_text"]) == ([3, 5, 6, 7, 8, 9], "3,5,6,7,8,9")
+        assert wp4["tasks"] == ["4.0", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6"]
+        assert wp4["where"] == {
+            "section_id": "implementation_section", "sub_section_id": "3.1", "paragraph_index": 30,
+        }
+        assert wp4["unparsed"] == []
 
     def test_findings_by_check(self, report):
         by_check = {c["check_id"]: c["findings_by_kind"] for c in report["checks"]}
         assert by_check == {
-            "wp_table_vs_prose": {"inconsistency": 11, "missing_field": 1},
-            "deliverable_wp_window": {"inconsistency": 3},
-            "milestone_dependencies": {
-                "inconsistency": 2, "undeclared_dependency": 16, "out_of_window": 1,
-            },
-            "dc_table_vs_projects": {
-                "inconsistency": 9, "out_of_window": 9, "not_comparable": 9,
-            },
-            "risk_table_vs_prose": {"inconsistency": 4},
+            "wp_table_vs_prose": {"inconsistency": 5},
+            "deliverable_wp_window": {},
+            "milestone_dependencies": {"undeclared_dependency": 16, "out_of_window": 1},
+            "dc_table_vs_projects": {"out_of_window": 9, "not_comparable": 9},
+            "risk_table_vs_prose": {},
         }
+        assert report["findings_total"] == 40
 
     def test_the_named_findings(self, report):
         details = {f["detail"] for c in report["checks"] for f in c["findings"]}
-        # The revision added WP4's lead participant line, so the PE-07 finding
-        # over the first copy is gone. It was replaced by the parse collapse.
+        # The revision supplies WP4's lead, participants and DCs, so the three
+        # PE-07 missing_field findings over the first copy are gone.
         assert "WP4 declares no lead participant" not in details
-        assert "WP4 is referenced but no work-package block describes it" in details
+        assert "WP4 declares no participants" not in details
+        assert "WP4 declares no DCs involved" not in details
+        # Nothing reports WP4 as undescribed any more, in any check.
+        assert not [d for d in details if "no work-package block describes" in d]
         assert "M7.3 is due M48; its related WP7 runs M1-M36" in details
-        assert "DC1 runs M5-M40 (36 months); WP1 ends M36, WP2 ends M36, WP4 ends M36" not in details
+        assert "DC1 runs M5-M40 (36 months); WP1 ends M36, WP2 ends M36, WP4 ends M36" in details
         assert any(
             d.startswith("WP1 declares DCs involved [1, 2, 4, 6, 8]; the DC projects in 1.1 that name WP1")
             for d in details
@@ -713,15 +888,37 @@ class TestMscaDnWorkspace:
         (risk,) = [c for c in report["checks"] if c["check_id"] == "risk_table_vs_prose"]
         assert "threshold stated in any risk row: yes (risk 1: '60%')" in risk["notes"]
 
-    def test_every_wp4_finding_traces_to_the_collapsed_header(self, report):
-        """The revision's extra findings are all one cause, not many: WP4 has
-        no parsed block, so every WP-keyed check reports it missing."""
-        wp4 = [
-            f["detail"] for c in report["checks"] for f in c["findings"]
-            if "which no work-package block describes" in f["detail"]
-            or f["detail"] == "WP4 is referenced but no work-package block describes it"
+    def test_the_one_finding_the_revision_adds_is_wp4s_own_dc_set(self, report):
+        """Reading WP4's fields does not make its findings disappear: the DC set it
+        now states disagrees with the DC projects of 1.1, which the first copy
+        could not be checked for because it stated no set."""
+        (wp,) = [c for c in report["checks"] if c["check_id"] == "wp_table_vs_prose"]
+        (wp4,) = [f for f in wp["findings"] if f["subject"] == "WP4"]
+        assert wp4["kind"] == ia.KIND_INCONSISTENCY
+        assert wp4["context"] == {
+            "declared": [3, 5, 6, 7, 8, 9],
+            "from_dc_projects": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        }
+        assert wp4["where"][0] == {
+            "section_id": "implementation_section", "sub_section_id": "3.1", "paragraph_index": 30,
+        }
+        assert wp4["evidence"] == ["DCs involved 3,5,6,7,8,9"]
+
+    def test_the_revision_differs_from_the_first_copy_by_four_findings(self, report):
+        """Against the committed PE-07 report over the first copy: three
+        missing_field findings resolved, one inconsistency added, nothing else."""
+        first = json.loads(
+            (REPO / "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json")
+            .read_text(encoding="utf-8")
+        )
+        before = {(f["kind"], f["subject"], f["detail"])
+                  for c in first["checks"] for f in c["findings"]}
+        after = {(f["kind"], f["subject"], f["detail"])
+                 for c in report["checks"] for f in c["findings"]}
+        assert sorted(k + " " + s for k, s, _ in before - after) == [
+            "missing_field WP4", "missing_field WP4", "missing_field WP4",
         ]
-        assert wp4 and all("WP4" in d for d in wp4)
+        assert [(k, s) for k, s, _ in after - before] == [(ia.KIND_INCONSISTENCY, "WP4")]
 
     def test_the_committed_pe07_report_over_the_first_copy_is_unchanged(self):
         """The earlier audit is history and stays readable: it names the

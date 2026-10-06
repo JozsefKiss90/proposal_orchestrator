@@ -587,6 +587,31 @@ class TestRevisions:
             values = [str(getattr(r, field)) for r in REVISIONS]
             assert len(set(values)) == len(REVISIONS), field
 
+    def test_each_manifest_names_its_own_fidelity_register(self) -> None:
+        """A revision's derived half was measured from that revision's extraction,
+        so its manifest must point at its own register and never a sibling's."""
+        for revision in REVISIONS:
+            manifest = json.loads(
+                (REPO / ie.manifest_rel(revision)).read_text(encoding="utf-8")
+            )
+            own = revision.register_rel.as_posix()
+            assert manifest["fidelity_register_derived_half"] == f"{own}#derived"
+            assert manifest["candidate"]["fidelity_register"] == own
+
+    def test_the_derived_half_a_manifest_points_at_is_the_one_in_that_file(self) -> None:
+        """Following the pointer lands on measurements of this revision's own pages:
+        the register it names records this revision_id."""
+        for revision in REVISIONS:
+            manifest = json.loads(
+                (REPO / ie.manifest_rel(revision)).read_text(encoding="utf-8")
+            )
+            rel, _, fragment = manifest["fidelity_register_derived_half"].partition("#")
+            assert fragment == "derived"
+            register = json.loads((REPO / rel).read_text(encoding="utf-8"))
+            assert "derived" in register
+            if revision.supersedes is not None:
+                assert register["provenance"]["revision"]["revision_id"] == revision.revision_id
+
     def test_the_record_of_the_active_revision_names_its_predecessor(self) -> None:
         active = ie.ACTIVE_REVISION
         predecessor = ie.revision_by_id(active.supersedes)

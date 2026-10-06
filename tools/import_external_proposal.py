@@ -1033,8 +1033,16 @@ def _work_package_header_blocks(imp: Import) -> dict[str, Any]:
         "consequence": (
             "A work package whose labels ran into its 'WP Number:' block has no separate "
             "'WP title:', 'Lead participant', 'Participants' or 'DCs involved' block. The text is "
-            "all there; a reader that splits a work package by its label blocks does not see that "
-            "work package's fields and may report it as undescribed."
+            "all there; a reader that splits a work package by its label blocks alone does not see "
+            "that work package's fields and may report it as undescribed."
+        ),
+        "read_by": (
+            "The integrity audit (PE-07) reads both layouts: harness/integrity_audit."
+            "split_header_fields treats a header field as '<label> <value>' and looks for each "
+            "label only after the label before it, in the order the application form fixes, so a "
+            "collapsed header yields the same fields as one paragraph per label and keeps the "
+            "paragraph it was read from as its location. Any other reader that splits on label "
+            "blocks alone is still subject to the consequence above."
         ),
     }
 
@@ -1076,6 +1084,12 @@ def extraction_limitations(repo_root: Path, revision: Revision) -> dict[str, Any
                 "A ligature is one code point. A search for the unligatured spelling "
                 "('Beneficiary') does not match the ligatured one ('Benefi' + U+FB01), so a reader "
                 "matching names or labels over this text must fold ligatures first."
+            ),
+            "read_by": (
+                "The integrity audit (PE-07) folds them: harness/integrity_audit.fold_ligatures "
+                "supplies the comparison form and harness.integrity_audit.Folded maps a match on "
+                "it back to the candidate's own text, so a ligature changes what matches and never "
+                "what a finding quotes. Any other reader of this text must fold them itself."
             ),
         },
         "prose_below_the_body_point_size": {
@@ -1249,7 +1263,9 @@ def render_manifest(
             ),
         },
         "extraction_losses": _losses(imp),
-        "fidelity_register_derived_half": f"{REGISTER_REL.as_posix()}#derived",
+        # This revision's own register, never the first revision's: each revision
+        # owns the register whose derived half was measured from its extraction.
+        "fidelity_register_derived_half": f"{revision.register_rel.as_posix()}#derived",
     }
 
 
