@@ -42,6 +42,7 @@ from typing import Any, Callable
 
 from runner.json_extract import extract_first_json_object
 from harness.provenance import ProvenanceLog, ProvenanceRecord, prompt_hash
+from harness.response_cache import ResponseCache
 from harness.verdict import (
     MIN_MAJORITY_SAMPLES,
     MajorityVerdict,
@@ -285,6 +286,11 @@ class Judge:
     clock:
         Optional callable returning an ISO-8601 timestamp for provenance
         (injectable for reproducible tests).
+    response_cache:
+        Optional :class:`~harness.response_cache.ResponseCache`.  When present,
+        every raw response is checkpointed as it arrives, and a cache opened in
+        resume mode serves the calls it already holds instead of spawning them
+        again.  A long run then survives a failure in its last call.
     """
 
     def __init__(
@@ -294,11 +300,13 @@ class Judge:
         backend: Backend | None = None,
         provenance_log: ProvenanceLog | None = None,
         clock: Clock | None = None,
+        response_cache: ResponseCache | None = None,
     ) -> None:
         self.config = config
         self._backend = backend
         self._provenance_log = provenance_log
         self._clock = clock or _default_clock
+        self._response_cache = response_cache
 
     @property
     def clock(self) -> Clock:
@@ -310,6 +318,32 @@ class Judge:
         clock the judge would have used, so its trail stays comparable.
         """
         return self._clock
+
+    @property
+    def response_cache(self) -> ResponseCache | None:
+        """The attached response checkpoint, if any (read-only).
+
+        Every assessor call this judge makes passes through
+        :meth:`raw_invoke`, so the cache attached here covers the whole run:
+        the cells, the criterion samples and anything else a caller drives.
+        """
+        return self._response_cache
+
+    def attach_response_cache(self, cache: ResponseCache) -> None:
+        """Attach a checkpoint to a judge built elsewhere.
+
+        The live assessors are built by their own builders
+        (``build_paced_judge``, ``build_subscription_judge``), so a command
+        that wants a checkpoint attaches it after the fact.  A second cache is
+        refused: two caches would each hold half a run and neither would
+        replay it.
+        """
+        if self._response_cache is not None:
+            raise JudgeError(
+                f"this judge already writes to checkpoint "
+                f"{self._response_cache.path}; a second one would split the run."
+            )
+        self._response_cache = cache
 
     @property
     def provenance_log(self) -> ProvenanceLog | None:
@@ -352,7 +386,22 @@ class Judge:
         """Send one chat request and return the raw content string.
 
         Raises :class:`JudgeResponseError` if the backend returns no content.
+
+        This is the single seam every assessor call passes through, so it is
+        where the response checkpoint lives
+        (:mod:`harness.response_cache`).  With a cache attached in resume
+        mode, a call the checkpoint covers is served from it and no
+        subprocess is spawned; otherwise the live response is checkpointed
+        verbatim before it is returned to the caller that will parse it.
+        Replay is byte-faithful: the same response text, through the same
+        parsers, never a repaired or regenerated one.
         """
+        cache = self._response_cache
+        key = prompt_hash(system_prompt, user_prompt) if cache is not None else ""
+        if cache is not None:
+            replayed = cache.take(key)
+            if replayed is not None:
+                return replayed
         backend = self._get_backend()
         result = backend(
             [
@@ -363,7 +412,20 @@ class Judge:
         content = result.get("content") if isinstance(result, dict) else None
         if not content or not str(content).strip():
             raise JudgeResponseError("Judge backend returned empty content.")
+        if cache is not None:
+            cache.record(key, str(content))
         return str(content)
+
+    def _discard_last_response(self, reason: str) -> None:
+        """Tell the checkpoint that the last response was unusable, if one is attached.
+
+        The cache sits below the parsers and cannot tell a good response from a
+        bad one; this is how it is told.  A discarded response stays in the
+        file but is never replayed, so a resumed run redraws that call instead
+        of failing on the same bytes again.
+        """
+        if self._response_cache is not None:
+            self._response_cache.discard_last(reason)
 
     # -- verdicts --------------------------------------------------------- #
 
@@ -386,11 +448,16 @@ class Judge:
         raw = self.raw_invoke(system_prompt, user_prompt)
         payload = extract_first_json_object(raw)
         if payload is None:
-            raise JudgeResponseError(
-                f"Judge returned no parseable JSON object for {metric!r}/"
-                f"{property_key!r}: {raw[:200]!r}"
+            reason = (
+                f"no parseable JSON object for {metric!r}/{property_key!r}: {raw[:200]!r}"
             )
-        verdict = _verdict_from_payload(payload, metric=metric, property_key=property_key)
+            self._discard_last_response(reason)
+            raise JudgeResponseError(f"Judge returned {reason}")
+        try:
+            verdict = _verdict_from_payload(payload, metric=metric, property_key=property_key)
+        except JudgeResponseError as exc:
+            self._discard_last_response(str(exc))
+            raise
         if sample_index is not None:
             verdict = dataclasses.replace(verdict, sample_index=sample_index)
 

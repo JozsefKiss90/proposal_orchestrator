@@ -75,7 +75,9 @@ from harness.blind_assessment import (
     BlindAssessmentError,
     BlindEvidence,
     assess_candidate,
+    assessor_pin,
     build_blind_evidence,
+    candidate_hash,
     load_candidate,
     load_report,
     render_report,
@@ -108,9 +110,20 @@ from harness.judge import Judge, JudgeError
 from harness.profile import ProfileError
 from harness.routing import DeterministicCoverageError
 from harness.rubrics import ProfileBundle, RubricError, load_profile_bundle
+from harness.response_cache import (
+    CacheBinding,
+    ResponseCache,
+    ResponseCacheError,
+    next_checkpoint_path,
+)
 from harness.verdict import MIN_MAJORITY_SAMPLES
 from runner.dev_graph import DevGraphError, read_esr_intake
 from runner.leakage_scan import LeakageError as LeakageScanError
+
+#: Where a run checkpoints its raw assessor responses when none is named.
+#: Runtime state under the repository root, deliberately not --out-dir: a
+#: failed run must still leave the report directory empty.
+DEFAULT_CHECKPOINT_DIR: str = ".harness/checkpoints"
 
 #: Every fail-closed error the command converts to exit code 2.
 _CLI_ERRORS = (
@@ -125,6 +138,7 @@ _CLI_ERRORS = (
     DeterministicCoverageError,
     JudgeError,
     LeakageScanError,
+    ResponseCacheError,
     OSError,
 )
 
@@ -335,6 +349,32 @@ def _parser() -> argparse.ArgumentParser:
         "--cli-timeout", type=int, default=_env_int("HARNESS_CLI_TIMEOUT", 300),
         help="per-call wall-clock limit for the claude-cli transport, in seconds",
     )
+    ckpt = p_assess.add_mutually_exclusive_group()
+    ckpt.add_argument(
+        "--checkpoint", default=None,
+        help=(
+            "where to checkpoint every raw assessor response as it arrives "
+            f"(default: {DEFAULT_CHECKPOINT_DIR}/checkpoint_<hash12>_<NNNN>.jsonl "
+            "under --repo-root; never --out-dir, which holds reports). A run that "
+            "fails on its last call can then be resumed instead of redrawn. An "
+            "existing file is never appended to: name a new one, or --resume"
+        ),
+    )
+    ckpt.add_argument(
+        "--resume", default=None,
+        help=(
+            "resume an earlier run from its checkpoint: every call the file "
+            "already holds is replayed from it and no quota is spent on it; the "
+            "run goes live from the first call it does not cover, appending to the "
+            "same file. The checkpoint's binding - candidate, profile, assessor "
+            "pin, preflight pack set, sample counts - must equal this run's. The "
+            "report declares how many of its calls were replayed"
+        ),
+    )
+    ckpt.add_argument(
+        "--no-checkpoint", action="store_true",
+        help="write no response checkpoint; a failed run is then redrawn in full",
+    )
 
     p_verify = sub.add_parser("verify", help="re-bind a persisted report to a candidate")
     p_verify.add_argument("--report", required=True)
@@ -519,6 +559,66 @@ def _is_transport_failure(exc: BaseException) -> bool:
     return bool(candidates) and isinstance(exc, candidates)
 
 
+def _open_checkpoint(
+    args: argparse.Namespace,
+    *,
+    repo_root: Path,
+    digest: str,
+    pin: str,
+    profile_version: str,
+    preflight_hash: str,
+    params: PackParams,
+) -> ResponseCache | None:
+    """Open this run's response checkpoint, or ``None`` when asked for none.
+
+    The binding is everything that decides which prompts the run issues and
+    what the answers mean.  It is written into a new checkpoint and checked
+    against a resumed one, so one candidate's responses can never be replayed
+    into another candidate's report.
+
+    The default location is :data:`DEFAULT_CHECKPOINT_DIR` under the repository
+    root, never ``--out-dir``: a checkpoint is runtime state, and the report
+    directory holds reports.  A failed run writes no report and that stays
+    true.
+    """
+    if args.no_checkpoint:
+        return None
+    binding = CacheBinding(
+        candidate_hash=digest,
+        profile_version=profile_version,
+        assessor_pin=pin,
+        preflight_pack_set_hash=preflight_hash,
+        include_claims=params.include_claims,
+        n=args.n,
+        criterion_samples=None if args.skip_criterion_scores else args.criterion_n,
+    )
+    if args.resume:
+        path = Path(args.resume)
+        if not path.is_absolute():
+            path = Path(args.repo_root).resolve() / path
+        return ResponseCache(path, binding, resume=True)
+    if args.checkpoint:
+        path = Path(args.checkpoint)
+        if not path.is_absolute():
+            path = Path(args.repo_root).resolve() / path
+    else:
+        directory = repo_root / DEFAULT_CHECKPOINT_DIR
+        directory.mkdir(parents=True, exist_ok=True)
+        path = next_checkpoint_path(directory, digest)
+    return ResponseCache(path, binding)
+
+
+def _report_checkpoint(checkpoint: ResponseCache | None) -> None:
+    """Name the checkpoint on a failed run, so the quota already spent is reusable."""
+    if checkpoint is None or checkpoint.live + checkpoint.replayed == 0:
+        return
+    print(
+        f"{checkpoint.live + checkpoint.replayed} assessor call(s) are checkpointed at "
+        f"{checkpoint.path}\nresume with the same flags plus: --resume {checkpoint.path}",
+        file=sys.stderr,
+    )
+
+
 def main(
     argv: Sequence[str] | None = None,
     *,
@@ -529,6 +629,7 @@ def main(
     the live path builds the paced assessor from ``.env.harness``."""
     args = _parser().parse_args(argv)
     repo_root = Path(args.repo_root).resolve()
+    checkpoint: ResponseCache | None = None
     try:
         bundle = load_profile_bundle(args.profile, repo_root=repo_root)
         if args.command == "verify":
@@ -601,6 +702,22 @@ def main(
         )
         intake = read_esr_intake(graph_root, args.intake) if args.intake else None
         assessor = judge if judge is not None else _live_judge(args, repo_root)
+        checkpoint = _open_checkpoint(
+            args,
+            repo_root=repo_root,
+            digest=candidate_hash(candidate),
+            pin=assessor_pin(assessor),
+            profile_version=bundle.version,
+            preflight_hash=preflight_hash,
+            params=params,
+        )
+        if checkpoint is not None:
+            assessor.attach_response_cache(checkpoint)
+            held = checkpoint.replayable
+            print(
+                f"    checkpoint {checkpoint.path}"
+                + (f" - replaying {held} recorded call(s) before going live" if held else "")
+            )
         report = assess_candidate(
             assessor,
             bundle,
@@ -627,6 +744,7 @@ def main(
         return 1 if report.scope == SCOPE_PARTIAL else 0
     except _CLI_ERRORS as exc:
         print(f"blind assessment could not run (fail-closed): {exc}", file=sys.stderr)
+        _report_checkpoint(checkpoint)
         return 2
     except Exception as exc:
         # A transport failure — a rejected key, an unreachable endpoint, a CLI
@@ -640,6 +758,7 @@ def main(
             f"{type(exc).__name__}: {exc}",
             file=sys.stderr,
         )
+        _report_checkpoint(checkpoint)
         return 2
 
 

@@ -23,11 +23,14 @@ ASSESS_ONLY_VALUE_FLAGS: frozenset[str] = frozenset(
     {
         "--intake", "--provenance", "--n", "--criterion-n", "--tpm", "--rpm", "--max-retries",
         "--assessor-model", "--assessor-version", "--cli-timeout", "--preflight",
+        "--checkpoint", "--resume",
     }
 )
 
 #: Flags only ``assess`` takes, without a value.
-ASSESS_ONLY_SWITCHES: frozenset[str] = frozenset({"--skip-criterion-scores"})
+ASSESS_ONLY_SWITCHES: frozenset[str] = frozenset(
+    {"--skip-criterion-scores", "--no-checkpoint"}
+)
 
 
 def preflighted(argv: Sequence[str], *, clock: Callable[[], str] | None = None) -> list[str]:

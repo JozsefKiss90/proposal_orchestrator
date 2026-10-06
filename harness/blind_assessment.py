@@ -673,6 +673,16 @@ class BlindAssessmentReport:
     #: What the assessor child process could reach, as the backend reports it
     #: (tools, MCP, working directory).  Empty when the backend does not say.
     assessor_invocation: dict[str, Any] = dataclasses.field(default_factory=dict)
+    #: The response checkpoint this run wrote, and how its calls were obtained
+    #: (:mod:`harness.response_cache`).  ``replayed_calls`` counts assessor
+    #: calls served from a resumed checkpoint rather than drawn live.  A report
+    #: with replayed calls is built from the bytes the assessor gave in the
+    #: earlier run, through the same parsers; it is not a fresh draw, and these
+    #: fields are where it says so.  All three are empty/zero when no
+    #: checkpoint was attached.
+    checkpoint_path: str = ""
+    replayed_calls: int = 0
+    live_calls: int = 0
     notes: str = _ADVISORY_NOTE
     advisory: bool = True
     blocking: bool = False
@@ -784,6 +794,9 @@ class BlindAssessmentReport:
             "preflight_report": self.preflight_report,
             "assessor_transport": self.assessor_transport,
             "assessor_invocation": dict(self.assessor_invocation),
+            "checkpoint_path": self.checkpoint_path,
+            "replayed_calls": self.replayed_calls,
+            "live_calls": self.live_calls,
             "notes": self.notes,
             "summary": self.summary,
             "cells": [c.to_dict() for c in self.cells],
@@ -943,6 +956,12 @@ def assess_candidate(
             scores.append(dataclasses.replace(score, candidate_hash=digest))
         criterion_scoring = combine_criterion_scores(scores, bundle.scoring)
     rubric_set = bundle.rubric_set
+    # The checkpoint's own account of the run: how many assessor calls were
+    # replayed from an earlier one and how many were drawn here.  Read off the
+    # judge so a library caller that attached a cache gets the declaration
+    # without passing it twice.
+    cache = getattr(judge, "response_cache", None)
+    cache_stats = cache.stats() if cache is not None else {}
     return BlindAssessmentReport(
         candidate_hash=digest,
         candidate_path=candidate.root.as_posix(),
@@ -974,6 +993,9 @@ def assess_candidate(
         preflight_report=preflight_report,
         assessor_transport=assessor_transport,
         assessor_invocation=dict(assessor_invocation or {}),
+        checkpoint_path=str(cache_stats.get("checkpoint_path", "")),
+        replayed_calls=int(cache_stats.get("replayed_calls", 0)),
+        live_calls=int(cache_stats.get("live_calls", 0)),
     )
 
 
@@ -1149,6 +1171,14 @@ def render_report(report: Mapping[str, Any]) -> str:
         lines.append(
             f"preflight: pack set {str(report.get('preflight_pack_set_hash') or '')[:19]}  "
             f"{report.get('preflight_report', '')}\n"
+        )
+    if report.get("checkpoint_path"):
+        replayed = int(report.get("replayed_calls") or 0)
+        lines.append(
+            f"assessor:  {int(report.get('live_calls') or 0)} call(s) drawn here, "
+            f"{replayed} replayed from the checkpoint"
+            + ("  [NOT a fresh draw]" if replayed else "")
+            + f"\n           {report.get('checkpoint_path', '')}\n"
         )
     missing = report.get("partial_coverage") or []
     if missing:

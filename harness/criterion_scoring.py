@@ -47,6 +47,7 @@ Constitutional authority:
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import statistics
 from dataclasses import dataclass
 from typing import Any, Mapping, Protocol, Sequence
@@ -65,6 +66,8 @@ __all__ = [
     "CRITERION_SCORING_METRIC",
     "DEFAULT_CRITERION_SAMPLES",
     "SPREAD_LABEL",
+    "MAX_SAMPLE_REDRAWS",
+    "DiscardedDraw",
     "SCORED",
     "NOT_SCORED",
     "APPENDIX_APPENDED",
@@ -398,7 +401,10 @@ def build_criterion_prompts(
         '{"score": <number>, '
         '"shortcomings": ["<one named shortcoming>", ...], '
         '"strengths": ["<one named strength>", ...], '
-        '"rationale": "<two to four sentences naming the decisive passages>"}'
+        '"rationale": "<two to four sentences naming the decisive passages>"}\n'
+        "Emit strict JSON. No trailing comma before } or ], no comment, no code "
+        "fence, no text outside the object. The response is parsed by machine and "
+        "a single stray character discards it."
     )
     user = criterion_input.text
     if aspect_findings:
@@ -478,6 +484,8 @@ class CriterionScore:
     factor: float
     weighted_points: float | None
     aspect_findings_attached: bool
+    #: Draws discarded as malformed and asked again (empty on a clean run).
+    discarded_draws: tuple[DiscardedDraw, ...] = ()
     profile_version: str = ""
     assessor_pin: str = ""
     candidate_hash: str = ""
@@ -507,11 +515,19 @@ class CriterionScore:
             "factor": self.factor,
             "weighted_points": self.weighted_points,
             "aspect_findings_attached": self.aspect_findings_attached,
+            "discarded_draws": [d.to_dict() for d in self.discarded_draws],
             "candidate_hash": self.candidate_hash,
             "profile_version": self.profile_version,
             "assessor_pin": self.assessor_pin,
             "evidence_type": "Inferred",
         }
+
+
+#: Extra draws allowed for a single sample whose response will not parse.
+#: Three draws in all.  A malformed response is never repaired; it is drawn
+#: again over the identical prompt, and every discarded draw is recorded on
+#: the score (:class:`DiscardedDraw`).
+MAX_SAMPLE_REDRAWS: int = 2
 
 
 def criterion_property_key(criterion_id: str) -> str:
@@ -529,6 +545,81 @@ def _str_list(payload: Mapping[str, Any], key: str, *, required: bool) -> tuple[
             f"criterion score response: {key!r} must be a list of non-empty strings; got {value!r}."
         )
     return tuple(v.strip() for v in value)
+
+
+@dataclass(frozen=True)
+class DiscardedDraw:
+    """One assessor draw that would not parse, and was drawn again.
+
+    Kept so that a re-ask never hides: the score a report carries names every
+    draw that was thrown away, why it was thrown, and the sha256 and length of
+    the text that was thrown.
+    """
+
+    sample_index: int
+    attempt: int
+    reason: str
+    response_sha256: str
+    response_chars: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "sample_index": self.sample_index,
+            "attempt": self.attempt,
+            "reason": self.reason,
+            "response_sha256": self.response_sha256,
+            "response_chars": self.response_chars,
+        }
+
+
+def _draw_sample(
+    judge: Judge, system: str, user: str, scoring: Scoring, index: int
+) -> tuple[CriterionSample, list[DiscardedDraw]]:
+    """Draw one parseable sample, re-asking a malformed draw up to the budget.
+
+    Re-asking is not repairing.  The no-repair rule this module works under
+    forbids mending what the assessor said; it does not forbid asking again.
+    Nothing from a discarded draw reaches the score: the text is not patched,
+    not merged and not partially read.  It is recorded — index, attempt, the
+    parser's own message, hash and length — and a fresh draw is taken over the
+    identical prompt.
+
+    The budget (:data:`MAX_SAMPLE_REDRAWS`) is small on purpose.  One stray
+    character in an otherwise sound answer is worth a second ask: a trailing
+    comma before the closing brace cost a 45-call run at call 44 on
+    2026-10-06.  An assessor that cannot produce the schema three times running
+    is not having an accident, and the run then fails closed carrying the
+    parser's message.
+    """
+    discarded: list[DiscardedDraw] = []
+    for attempt in range(MAX_SAMPLE_REDRAWS + 1):
+        raw = judge.raw_invoke(system, user)
+        try:
+            return _parse_sample(raw, scoring, index), discarded
+        except JudgeResponseError as exc:
+            # Below the parser, the checkpoint cannot tell a usable response
+            # from an unusable one.  Say so, or a resumed run would replay
+            # this draw and fail on it again.
+            cache = getattr(judge, "response_cache", None)
+            if cache is not None:
+                cache.discard_last(str(exc))
+            if attempt >= MAX_SAMPLE_REDRAWS:
+                raise JudgeResponseError(
+                    f"{exc} (sample {index}: {attempt + 1} draw(s) over an identical "
+                    f"prompt, every one malformed; nothing was repaired)"
+                ) from exc
+            discarded.append(
+                DiscardedDraw(
+                    sample_index=index,
+                    attempt=attempt,
+                    reason=str(exc),
+                    response_sha256=hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+                    response_chars=len(raw),
+                )
+            )
+    raise CriterionScoringError(  # pragma: no cover - the loop returns or raises
+        "unreachable: the redraw loop exited without a sample"
+    )
 
 
 def _parse_sample(raw: str, scoring: Scoring, index: int) -> CriterionSample:
@@ -651,9 +742,10 @@ def grade_criterion(
     digest = prompt_hash(system, user)
     samples: list[CriterionSample] = []
     records: list[ProvenanceRecord] = []
+    discarded: list[DiscardedDraw] = []
     for i in range(n):
-        raw = judge.raw_invoke(system, user)
-        sample = _parse_sample(raw, scoring, i)
+        sample, thrown = _draw_sample(judge, system, user, scoring, i)
+        discarded.extend(thrown)
         verdict = Verdict(
             metric=CRITERION_SCORING_METRIC,
             property_key=common["property_key"],
@@ -677,6 +769,7 @@ def grade_criterion(
     threshold = scoring.individual_threshold
     return CriterionScore(
         status=SCORED,
+        discarded_draws=tuple(discarded),
         score=median,
         spread=spread,
         samples=tuple(samples),

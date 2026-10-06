@@ -1,0 +1,604 @@
+{
+  "record_type": "evidence_preflight_report",
+  "metric": "evidence_preflight",
+  "advisory": true,
+  "blocking": false,
+  "preflight_at": "2026-10-06T15:42:17.065290+00:00",
+  "candidate_hash": "sha256:242f1afb02c8a0acd2c6a1d2178a9904ebcbf2b9f332c92672f849f61088dbdc",
+  "candidate_path": "C:/Code/proposal_demo/proposal_orchestrator/harness/blind_reports/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+  "evidence_source": "dev_graph_blind_view",
+  "document": "MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+  "document_id": "MSCA-DN-2025_sanitised_part_b",
+  "snapshot_id": "sha256:a5176eef3a01f998367b3eaf356b6f84953beb6da8408ad737460b12533ed24c",
+  "package_id": "sha256:1e929eee75bae6955390d96ee586b5f757eec84701f3de52b873e000d7a64b15",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+  "evidence_view": "blind_pre_evaluation",
+  "profile_id": "msca_dn_2026_default",
+  "profile_version": "sha256:550f9528736c9857ec3af8ed57267b98769ed9fe89117bc5e786a3e5f0eac479",
+  "rubric_set_id": "msca_dn_rubrics",
+  "rubric_set_version": "1.0.0",
+  "rubric_set_fingerprint": "sha256:2bbf01bf81fc3658c75e7f71875f7c0dd17ccaaf916587480d6688ac2f47ce7a",
+  "scorecard_id": "msca_dn_evaluation_scorecard",
+  "scorecard_version": "2.2",
+  "scorecard_hash": "sha256:03d3773131f21d3a81c7e29b702086600ab5e36ee7e6e7866b967e3cb9b5aef8",
+  "appendix_mapping": {
+    "mapping_id": "msca_dn_criterion_appendix_mapping",
+    "path": "C:/Code/proposal_demo/proposal_orchestrator/harness/criterion_appendix_mapping_msca_dn.json",
+    "sha256": "36530cb0090fdf9ae36792b0e2361f282cde5015a4f8a188e1dd05b54cf59a08"
+  },
+  "params": {
+    "token_budget": 32768,
+    "span_budget_fraction": 0.6,
+    "max_token_budget": null,
+    "include_claims": false,
+    "criterion_token_budget": 32768
+  },
+  "pack_set_hash": "sha256:25d8aae9b31c9a06663aa8c64a2c748b02d9cb943529bb73944af45f435b1130",
+  "import_manifest": {
+    "path": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json",
+    "sha256": "01ffaa7588eb267ee71b5d2436d2616495b40228b5c2cbb5a5dde97a6c63712a",
+    "record_type": "external_proposal_import_manifest",
+    "versions": {
+      "extractor": "1.0.0",
+      "normalisation": "1.0.0",
+      "table_rendering": "1.0.0",
+      "claim_extraction": "1.0.0",
+      "page_text_method": "pymupdf_page_text_whitespace_normalised",
+      "table_strategy": "lines_strict"
+    }
+  },
+  "anchors": {
+    "declared_rubrics": 10,
+    "rubrics_with_every_anchor_present": 10,
+    "missing": [],
+    "rubrics": [
+      {
+        "expectation_key": "exc-obj",
+        "criterion_id": "excellence",
+        "section_id": "excellence_section",
+        "section_present": true,
+        "anchors": [
+          "1.1"
+        ],
+        "present": [
+          "1.1"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "exc-method",
+        "criterion_id": "excellence",
+        "section_id": "excellence_section",
+        "section_present": true,
+        "anchors": [
+          "1.2"
+        ],
+        "present": [
+          "1.2"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "exc-training",
+        "criterion_id": "excellence",
+        "section_id": "excellence_section",
+        "section_present": true,
+        "anchors": [
+          "1.3"
+        ],
+        "present": [
+          "1.3"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "exc-supervision",
+        "criterion_id": "excellence",
+        "section_id": "excellence_section",
+        "section_present": true,
+        "anchors": [
+          "1.4"
+        ],
+        "present": [
+          "1.4"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "imp-structuring",
+        "criterion_id": "impact",
+        "section_id": "impact_section",
+        "section_present": true,
+        "anchors": [
+          "2.1"
+        ],
+        "present": [
+          "2.1"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "imp-career",
+        "criterion_id": "impact",
+        "section_id": "impact_section",
+        "section_present": true,
+        "anchors": [
+          "2.2"
+        ],
+        "present": [
+          "2.2"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "imp-dissemination",
+        "criterion_id": "impact",
+        "section_id": "impact_section",
+        "section_present": true,
+        "anchors": [
+          "2.3"
+        ],
+        "present": [
+          "2.3"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "imp-magnitude",
+        "criterion_id": "impact",
+        "section_id": "impact_section",
+        "section_present": true,
+        "anchors": [
+          "2.4"
+        ],
+        "present": [
+          "2.4"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "impl-workplan",
+        "criterion_id": "implementation",
+        "section_id": "implementation_section",
+        "section_present": true,
+        "anchors": [
+          "3.1"
+        ],
+        "present": [
+          "3.1"
+        ],
+        "missing": []
+      },
+      {
+        "expectation_key": "impl-participants",
+        "criterion_id": "implementation",
+        "section_id": "implementation_section",
+        "section_present": true,
+        "anchors": [
+          "3.2"
+        ],
+        "present": [
+          "3.2"
+        ],
+        "missing": []
+      }
+    ]
+  },
+  "packs": [
+    {
+      "expectation_key": "exc-obj",
+      "criterion_id": "excellence",
+      "section_id": "excellence_section",
+      "hash": "sha256:92f3338880e4d7beb5160d15e6eea4cfb0d5b3f05acb957051599fcab80bcf22",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 7233,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "1.1"
+      ],
+      "included": {
+        "spans": 321,
+        "claims": 0,
+        "tokens": 7274
+      },
+      "not_relevant": {
+        "spans": 276,
+        "claims": 0,
+        "tokens": 6313
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "exc-method",
+      "criterion_id": "excellence",
+      "section_id": "excellence_section",
+      "hash": "sha256:0ede7cb959d35df5aa6bdd85da5250a5d05b2aea3add5255703644b7ae78d353",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 3786,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "1.2"
+      ],
+      "included": {
+        "spans": 177,
+        "claims": 0,
+        "tokens": 3790
+      },
+      "not_relevant": {
+        "spans": 420,
+        "claims": 0,
+        "tokens": 9797
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "exc-training",
+      "criterion_id": "excellence",
+      "section_id": "excellence_section",
+      "hash": "sha256:f1fd97c9f92482aac655e4e94044e6c141732555d9c4692685f46460fbdd2402",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 3506,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "1.3"
+      ],
+      "included": {
+        "spans": 88,
+        "claims": 0,
+        "tokens": 3465
+      },
+      "not_relevant": {
+        "spans": 509,
+        "claims": 0,
+        "tokens": 10122
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "exc-supervision",
+      "criterion_id": "excellence",
+      "section_id": "excellence_section",
+      "hash": "sha256:c8e0a0eda6eac8d03ca2f4658ef2340bc623c12667681f86df7175453f50fa58",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 2920,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "1.4"
+      ],
+      "included": {
+        "spans": 88,
+        "claims": 0,
+        "tokens": 2884
+      },
+      "not_relevant": {
+        "spans": 509,
+        "claims": 0,
+        "tokens": 10703
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "imp-structuring",
+      "criterion_id": "impact",
+      "section_id": "impact_section",
+      "hash": "sha256:ac9a046ffbe71fe3e12abd10f6d3c1073e4550153f7e2a1dbc35586f1aab72e1",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 2619,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "2.1"
+      ],
+      "included": {
+        "spans": 39,
+        "claims": 0,
+        "tokens": 2563
+      },
+      "not_relevant": {
+        "spans": 78,
+        "claims": 0,
+        "tokens": 2488
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "imp-career",
+      "criterion_id": "impact",
+      "section_id": "impact_section",
+      "hash": "sha256:2312f157a9429548162b1ac3fa4b855644db4936dc589acf77aba50ae060a158",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 1628,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "2.2"
+      ],
+      "included": {
+        "spans": 29,
+        "claims": 0,
+        "tokens": 1570
+      },
+      "not_relevant": {
+        "spans": 88,
+        "claims": 0,
+        "tokens": 3481
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "imp-dissemination",
+      "criterion_id": "impact",
+      "section_id": "impact_section",
+      "hash": "sha256:f431979fd7c92745836f8d195b2dd9727748f64185b46e659bdab9f7e7a9f7ef",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 2081,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "2.3"
+      ],
+      "included": {
+        "spans": 62,
+        "claims": 0,
+        "tokens": 2030
+      },
+      "not_relevant": {
+        "spans": 55,
+        "claims": 0,
+        "tokens": 3021
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "imp-magnitude",
+      "criterion_id": "impact",
+      "section_id": "impact_section",
+      "hash": "sha256:1601fd4f02d8f8349990770e4f36f4d37f96d08ef3dc7e6213ac43a6d2154bb4",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 2837,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "2.4"
+      ],
+      "included": {
+        "spans": 42,
+        "claims": 0,
+        "tokens": 2782
+      },
+      "not_relevant": {
+        "spans": 75,
+        "claims": 0,
+        "tokens": 2269
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "impl-workplan",
+      "criterion_id": "implementation",
+      "section_id": "implementation_section",
+      "hash": "sha256:1acc208eb974e9f225ca073dc2a58f88f2b7a3697bbb8575e20d81bbb87d7367",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 9256,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "3.1"
+      ],
+      "included": {
+        "spans": 252,
+        "claims": 0,
+        "tokens": 9275
+      },
+      "not_relevant": {
+        "spans": 334,
+        "claims": 0,
+        "tokens": 7071
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "expectation_key": "impl-participants",
+      "criterion_id": "implementation",
+      "section_id": "implementation_section",
+      "hash": "sha256:d2aad91da3fd768cbd83e8d9007396ce51acf323c41d4c7214c1e0f457af69a7",
+      "status": "complete",
+      "token_budget": 32768,
+      "token_estimate": 7184,
+      "include_claims": false,
+      "anchor_sub_section_ids": [
+        "3.2"
+      ],
+      "included": {
+        "spans": 197,
+        "claims": 0,
+        "tokens": 7181
+      },
+      "not_relevant": {
+        "spans": 389,
+        "claims": 0,
+        "tokens": 9165
+      },
+      "over_budget": {
+        "spans": 0,
+        "claims": 0,
+        "tokens": 0
+      }
+    }
+  ],
+  "exclusions": {
+    "not_relevant": {
+      "items": 2733,
+      "tokens": 64430
+    },
+    "over_budget": {
+      "items": 0,
+      "tokens": 0
+    }
+  },
+  "criterion_inputs": [
+    {
+      "criterion_id": "excellence",
+      "section_ids": [
+        "excellence_section"
+      ],
+      "present_section_ids": [
+        "excellence_section"
+      ],
+      "input_hash": "sha256:503ade094320d2bea5bec5cb8e0d3cdea51f0642689e9f14fcd2d495d7628079",
+      "section_hash": "sha256:e8c2aa78ddeced3391de471fb33527f318d682e5c1cf3f8fabd8467e352c83b5",
+      "token_estimate": 20599,
+      "token_budget": 32768,
+      "complete": true,
+      "incompleteness": [],
+      "appendix_rows": 3
+    },
+    {
+      "criterion_id": "impact",
+      "section_ids": [
+        "impact_section"
+      ],
+      "present_section_ids": [
+        "impact_section"
+      ],
+      "input_hash": "sha256:5f0e3c8cebc1052f29183fa6435064083a676d8f7204d6ee769041901325d9ff",
+      "section_hash": "sha256:308e3998b823972c21bc5c656a8503941fc55593220b5008d3d2557353d02565",
+      "token_estimate": 12007,
+      "token_budget": 32768,
+      "complete": true,
+      "incompleteness": [],
+      "appendix_rows": 3
+    },
+    {
+      "criterion_id": "implementation",
+      "section_ids": [
+        "implementation_section"
+      ],
+      "present_section_ids": [
+        "implementation_section"
+      ],
+      "input_hash": "sha256:4fb56e6f0a5a558d462b7a6a067ee62c2d1a98bab0dc2991432738769ff2f439",
+      "section_hash": "sha256:160f187671933f79deb9c023a35f6c505e4f74d80ed7e9fb43325063ede04037",
+      "token_estimate": 14392,
+      "token_budget": 32768,
+      "complete": true,
+      "incompleteness": [],
+      "appendix_rows": 1
+    }
+  ],
+  "tables": {
+    "rows_rendered": 88,
+    "rows_parsed": 88,
+    "rows_unparsed": [],
+    "cells": 610,
+    "per_section": {
+      "excellence_section": {
+        "rows_rendered": 0,
+        "rows_parsed": 0,
+        "cells": 0
+      },
+      "impact_section": {
+        "rows_rendered": 0,
+        "rows_parsed": 0,
+        "cells": 0
+      },
+      "implementation_section": {
+        "rows_rendered": 88,
+        "rows_parsed": 88,
+        "cells": 610
+      }
+    },
+    "manifest": {
+      "count": 17,
+      "rows_rendered": 88,
+      "rows_parsed": 88
+    },
+    "agrees_with_manifest": true
+  },
+  "package": {
+    "budget": 200000,
+    "completeness": "complete",
+    "included": 111,
+    "exclusions": {
+      "policy_forbidden": 1
+    },
+    "unresolved": 136,
+    "worst_declared_status": "Unresolved"
+  },
+  "leakage": {
+    "guard": {
+      "view": "blind_pre_evaluation",
+      "forbidden_types": [
+        "assessment",
+        "change_request",
+        "finding"
+      ],
+      "forbidden_tags": [
+        "historical_feedback",
+        "historical_score",
+        "repair_plan",
+        "target_score"
+      ],
+      "items_checked": 111,
+      "passed": true
+    },
+    "esr": {
+      "snapshot_id": "sha256:a5176eef3a01f998367b3eaf356b6f84953beb6da8408ad737460b12533ed24c",
+      "snapshot_inputs": 3,
+      "inputs_under_esr": [],
+      "esr_directories": [],
+      "never_snapshotted": true
+    },
+    "word_scan": {
+      "root": "graph_root",
+      "files_scanned": 7,
+      "ok": true,
+      "clean": true,
+      "new_violations": 0,
+      "pre_existing_violations": 0,
+      "violations": []
+    }
+  },
+  "flags": [],
+  "notes": "Advisory to a human, never run-blocking. The pack-set hash binds the evidence the blind assessor would read under exactly these parameters; assess requires it and refuses when the realised packs, the candidate, the profile or any selection parameter moved (see harness/HARNESS.md)."
+}

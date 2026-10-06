@@ -656,6 +656,50 @@ flagged), `candidate_differs`, or `snapshot_unknown` (directory route). Without
 it the report says no baseline was consulted. Exit `1` on any flag, `2` when
 the audit could not run (a baseline directory with no readable freeze included).
 
+## Response checkpoint and the bounded re-ask (`response_cache.py`)
+
+An assess run is 45 assessor calls on the shipped profile and writes nothing
+until the last one is graded. On 2026-10-06 call 44 came back as sound JSON
+ending `..."rationale": "...", }` — one trailing comma — and the fail-closed
+parse discarded 43 paid-for calls with it. Two changes, neither of which
+loosens a parser.
+
+**Every raw response is checkpointed as it arrives.** `Judge.raw_invoke` is the
+single seam every assessor call passes through, so the cache lives there. The
+file is JSONL under `.harness/checkpoints/` (never `--out-dir`: a failed run
+still writes no report), one header record carrying the run's binding and one
+record per response. `--resume <file>` replays those bytes through the same
+parsers, provenance builders and verdict arithmetic, then goes live from the
+first call the file does not cover, appending to it. `--no-checkpoint` writes
+none.
+
+A replay is the response the assessor actually gave, not a fresh draw, and the
+report says which it had: `replayed_calls`, `live_calls` and `checkpoint_path`,
+rendered as `[NOT a fresh draw]` whenever anything was replayed.
+
+Refusals, all fail-closed: an existing checkpoint is never appended to without
+`--resume`; a checkpoint names the candidate hash, profile version, assessor
+pin, preflight pack-set hash, `include_claims` and both sample counts, and
+resuming into a binding that moved is refused with every moved field named; an
+edited response (sha256 mismatch) is refused, not read.
+
+**A response the parsers rejected is kept and never replayed.** The cache sits
+below the parsers and cannot tell a usable response from an unusable one, so
+`Judge.evaluate` and `criterion_scoring._draw_sample` tell it: a discard marker
+is appended beside the record. The bytes stay in the file as the faithful
+record of what the assessor said; a resume skips them and redraws that call.
+Without this, the response that killed a run would kill every resume of it.
+
+**A malformed criterion sample is drawn again**, up to
+`MAX_SAMPLE_REDRAWS` (two extra draws, three in all), over the identical
+prompt. Re-asking is not repairing: nothing from a discarded draw is patched,
+merged or partly read, and every one is recorded on the score as a
+`DiscardedDraw` — index, attempt, the parser's own message, sha256 and length.
+An assessor that cannot produce the schema three times running is not having an
+accident, and the run fails closed carrying the parser's message. The criterion
+system prompt now also asks for strict JSON in as many words, which moved the
+criterion `prompt_hash`.
+
 ## What the harness does *not* do (through E4)
 
 - It computes only the metrics built so far (E1.5 calibration, E2 status-aware

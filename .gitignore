@@ -13,6 +13,9 @@ docs/tier4_orchestration_state/graph_compile/
 # regenerable Tier-4 state projected into any vault. The owned folder skeleton is
 # tracked; the generated PGS-*.md mirror nodes are not.
 **/18_phase_gate_state/PGS-*.md
+# Blind-assessment response checkpoints: raw assessor responses kept so a
+# failed run can be resumed instead of redrawn. Runtime state, never a report.
+.harness/
 .claude/skill_diag/
 .claude/semantic_diag/
 .claude/runs/
