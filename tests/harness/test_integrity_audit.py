@@ -43,6 +43,8 @@ REPO = find_repo_root()
 DN_WORKSPACE = REPO / "workspaces" / "msca_dn"
 DN_PROFILE = REPO / "harness" / "profiles" / "msca_dn_2026_default.json"
 DN_DOCUMENT = "MSCA-DN-2025_sanitised_part_b"
+if DN_WORKSPACE.is_dir():  # the revision table names the PDFs and registers
+    from tools import import_external_proposal as ie
 
 
 # --------------------------------------------------------------------------- #
@@ -667,28 +669,74 @@ class TestMscaDnWorkspace:
         assert {k: v["rows"] for k, v in parse["tables"].items()} == {
             "deliverables": 28, "milestones": 16, "dcs": 9, "risks": 10,
         }
-        assert len(parse["wp_blocks"]) == 7 and len(parse["dc_projects"]) == 9
+        assert len(parse["dc_projects"]) == 9
         assert parse["unparsed"] == [] and report["flags"] == []
+
+    def test_the_revision_lost_one_work_package_block_to_its_retypeset_header(self, report):
+        """The revised copy re-typeset the WP4 header at 9.8 pt and ran every
+        label into the 'WP Number:' block, so the block parser sees six work
+        packages, not seven. The fidelity register measures the same collapse.
+        """
+        assert len(report["parse"]["wp_blocks"]) == 6
+        limitations = json.loads(
+            (REPO / ie.ACTIVE_REVISION.register_rel).read_text(encoding="utf-8")
+        )["provenance"]["known_extraction_limitations"]["work_package_header_blocks"]
+        assert limitations["wp_number_blocks"] == [1, 2, 3, 4, 5, 6, 7]
+        assert [c["work_package"] for c in limitations["headers_collapsed_into_one_block"]] == [4]
 
     def test_findings_by_check(self, report):
         by_check = {c["check_id"]: c["findings_by_kind"] for c in report["checks"]}
         assert by_check == {
-            "wp_table_vs_prose": {"inconsistency": 4, "missing_field": 3},
-            "deliverable_wp_window": {},
-            "milestone_dependencies": {"undeclared_dependency": 16, "out_of_window": 1},
-            "dc_table_vs_projects": {"out_of_window": 9, "not_comparable": 9},
-            "risk_table_vs_prose": {},
+            "wp_table_vs_prose": {"inconsistency": 11, "missing_field": 1},
+            "deliverable_wp_window": {"inconsistency": 3},
+            "milestone_dependencies": {
+                "inconsistency": 2, "undeclared_dependency": 16, "out_of_window": 1,
+            },
+            "dc_table_vs_projects": {
+                "inconsistency": 9, "out_of_window": 9, "not_comparable": 9,
+            },
+            "risk_table_vs_prose": {"inconsistency": 4},
         }
 
     def test_the_named_findings(self, report):
         details = {f["detail"] for c in report["checks"] for f in c["findings"]}
-        assert "WP4 declares no lead participant" in details
-        assert "WP4 declares no DCs involved" in details
+        # The revision added WP4's lead participant line, so the PE-07 finding
+        # over the first copy is gone. It was replaced by the parse collapse.
+        assert "WP4 declares no lead participant" not in details
+        assert "WP4 is referenced but no work-package block describes it" in details
         assert "M7.3 is due M48; its related WP7 runs M1-M36" in details
-        assert "DC1 runs M5-M40 (36 months); WP1 ends M36, WP2 ends M36, WP4 ends M36" in details
-        assert any(d.startswith("WP1 declares DCs involved [1, 2, 4, 6, 8]; the DC projects in 1.1 that name WP1") for d in details)
+        assert "DC1 runs M5-M40 (36 months); WP1 ends M36, WP2 ends M36, WP4 ends M36" not in details
+        assert any(
+            d.startswith("WP1 declares DCs involved [1, 2, 4, 6, 8]; the DC projects in 1.1 that name WP1")
+            for d in details
+        )
         (risk,) = [c for c in report["checks"] if c["check_id"] == "risk_table_vs_prose"]
         assert "threshold stated in any risk row: yes (risk 1: '60%')" in risk["notes"]
+
+    def test_every_wp4_finding_traces_to_the_collapsed_header(self, report):
+        """The revision's extra findings are all one cause, not many: WP4 has
+        no parsed block, so every WP-keyed check reports it missing."""
+        wp4 = [
+            f["detail"] for c in report["checks"] for f in c["findings"]
+            if "which no work-package block describes" in f["detail"]
+            or f["detail"] == "WP4 is referenced but no work-package block describes it"
+        ]
+        assert wp4 and all("WP4" in d for d in wp4)
+
+    def test_the_committed_pe07_report_over_the_first_copy_is_unchanged(self):
+        """The earlier audit is history and stays readable: it names the
+        superseded node and keeps the figures it was written with."""
+        historical = json.loads(
+            (REPO / "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json")
+            .read_text(encoding="utf-8")
+        )
+        first = ie.revision_by_id("sanitised_v1")
+        assert historical["document"] == ie.node_id_of(REPO, first)
+        assert historical["findings_total"] == 42
+        assert historical["findings_by_kind"] == {
+            "inconsistency": 4, "missing_field": 3, "undeclared_dependency": 16,
+            "out_of_window": 10, "not_comparable": 9,
+        }
 
     def test_grounding_axis(self, report):
         g = report["grounding"]

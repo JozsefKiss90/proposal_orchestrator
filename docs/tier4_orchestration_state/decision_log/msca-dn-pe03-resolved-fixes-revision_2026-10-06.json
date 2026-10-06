@@ -1,0 +1,119 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe03-resolved-fixes-revision_2026-10-06",
+  "date": "2026-10-06",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-03 (External proposal import) in plans/msca_dn_pre_evaluation_spec.md, re-run for a revised sanitised derivative ahead of PE-06 and PE-07.",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §12.2 (four status categories), §13.3 (no project fact is invented), §13.8 (an incomplete or contradicted state is flagged, never papered over). Operator instruction of 2026-10-06 to prepare sanitized_proposal_resolved_fixes.pdf for PE-06 and PE-07 while preserving the previous version.",
+  "decision": "A second sanitised derivative of the same 2025 submission is imported as a new document version that supersedes the first. The two revisions share the document id, the intake and the call binding, and differ in their bytes. Each revision owns its source-id prefix, its import manifest and its fidelity register, so the first revision's page texts, spans, document record and register are untouched and its import still replays byte-equal.",
+  "inputs": {
+    "revision": {
+      "revision_id": "resolved_fixes",
+      "path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_resolved_fixes.pdf",
+      "sha256": "f0794272a765591e1a8393c212f76279caa6c40a167f046b4fb8fab7d5a05143",
+      "pages": 84,
+      "is_submitted_document": false,
+      "declared_status": "Confirmed",
+      "basis": "derived from the stored bytes; re-derived by tests/test_msca_dn_import.py"
+    },
+    "predecessor": {
+      "revision_id": "sanitised_v1",
+      "path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_final.pdf",
+      "sha256": "5474569f33d20174bfd76f088c10002edf1e82cfdc4fc5a41849f67c0ec1e1ca",
+      "restored": "Commit e6e386e removed this file from the working tree while the PE-03 import, the PE-05 preflight pin and the PE-07 audit all rest on it. It is restored from e6e386e^ at its recorded hash. Without it the first import cannot replay and 27 MSCA-DN tests fail."
+    }
+  },
+  "mechanism": {
+    "supersession": "runner.dev_graph.revisions.build_provenance resolves the predecessor against the built snapshot; runner.dev_graph.builder.build_snapshot turns the provenance into the 'supersedes' edge. harness.blind_assessment.resolve_document then refuses the superseded node as a candidate, so the bare document id resolves to exactly one current version.",
+    "why_not_create_candidate_version": "runner.dev_graph.revisions.create_candidate_version reads the candidate from a JSON file and imports under schema v1. This importer derives the candidate in memory from the PDF and needs schema v2, so it calls build_provenance and import_candidate directly. The supersession mechanism is the engine's own; only the candidate source and the schema id differ.",
+    "no_change_record": "runner.dev_graph.changes.record_change accepts only the five Tier 3 record paths and rebuilds a before/after snapshot pair, so it is not replayable inside a byte-equal importer. provenance.change_id names the revision; no change record stands behind it and nothing in the build resolves it. Stated in the manifest.",
+    "source_id_prefixing": "Each revision takes its own source-id prefix (SRC-DN, SRC-DN-RF). One sources.json holds both sets, because the builder reads one source index per graph root. Reusing the prefix would have re-pointed the first revision's spans at the new page texts, silently changing what a superseded claim resolves to.",
+    "bootstrap_order": "The source index is rendered and written without provenance before any record, because provenance is resolved against a graph that cannot be built until every span has a source. Provenance is not part of the content version, so both renderings of the index agree byte for byte; author() asserts it."
+  },
+  "intake": {
+    "intake_id": "msca-dn-2025-sanitised-v1",
+    "changed": false,
+    "reason": "A revision is a new derivative of the same historical submission. The intake declares the document id, the submission id and the historical call, none of which the revision changes, and versioning lives in the document record. The immutable intake therefore stands and no replacement was created."
+  },
+  "artifacts": {
+    "document_record": {
+      "path": "docs/tier4_orchestration_state/dev_graph/documents/MSCA-DN-2025_sanitised_part_b/b51a103520b58ded0bdae399cbbf81eddaf1416890320b17f4342e278116691f.json",
+      "schema_id": "orch.dev_graph.document_snapshot.v2",
+      "content_version": "sha256:b51a103520b58ded0bdae399cbbf81eddaf1416890320b17f4342e278116691f",
+      "node_id": "MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+      "state": "imported",
+      "supersedes": "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db"
+    },
+    "import_manifest": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json",
+    "fidelity_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+    "source_index": "workspaces/msca_dn/docs/tier3_project_instantiation/source_materials/sources.json",
+    "preserved": {
+      "first_document_record": "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+      "first_import_manifest": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json",
+      "first_fidelity_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+      "first_page_sources": "SRC-DN-P01 to SRC-DN-P84, byte-identical and still in sources.json",
+      "pre_revision_snapshot": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/snapshots/1c8fd6b5f2e810546bb013af1975eafba5f87f9dbeb909a545507f0e4eb07914.json",
+      "pre_revision_snapshot_reason": "The PE-07 integrity report pins snapshot sha256:1c8fd6b5..., the build that held only the first candidate. Adding the revision changes the live snapshot id, so the pinned one is archived under its own hash and load_snapshot still returns it. Written once by runner.dev_graph.changes.store_snapshot; content-addressed, so it is never rewritten."
+    }
+  },
+  "figures": {
+    "pages": 84,
+    "pages_identical_to_the_predecessor": 83,
+    "pages_changed": [
+      45
+    ],
+    "sub_sections_changed": [
+      "3.1"
+    ],
+    "tables": 17,
+    "rows_rendered": 88,
+    "rows_parsed": 88,
+    "claims": 45,
+    "claims_without_span": 1,
+    "extraction_loss_pages": 0,
+    "non_whitespace_characters": 104010,
+    "images": 0,
+    "citation_markers": 0
+  },
+  "what_the_revision_changed": {
+    "declared_status": "Confirmed",
+    "basis": "derived: the page-by-page comparison in the import manifest",
+    "summary": "One page of 84 differs. Page 45 re-typesets the WP4 header block of Table 3.1 a: the Task 4.0 paragraph moves earlier in reading order, two en dashes become hyphens, and a 'Lead participant / Participants / DCs involved' header is added. The added header is set at 9.8 pt and carries an 'fi' ligature.",
+    "resolved": "The PE-07 finding 'WP4 declares no lead participant' is gone: the revision supplies the line.",
+    "introduced": "The added header runs into the 'WP Number: 4' block instead of opening blocks of its own, so the integrity audit's work-package block parser sees six work packages, not seven, and reports WP4 as described by no block. See known_gaps."
+  },
+  "declarations_rechecked": {
+    "basis": "Every PE-01 transformation declaration a measurement can settle, re-run against the revision's bytes. Recorded in the revision's register under provenance.transformation.rechecked_for_this_revision.",
+    "hold": [
+      "figures",
+      "citations",
+      "table_3_1a",
+      "reflow_page_count"
+    ],
+    "no_longer_hold": [
+      "body_point_size"
+    ],
+    "body_point_size": "The PE-01 declaration 'body 12 pt' no longer covers all the prose: 458 characters on page 45 are set at 9.8 pt. Reported, not rewritten; withdrawing a declaration is the operator's act."
+  },
+  "known_gaps": {
+    "wp4_header_collapse": {
+      "declared_status": "Confirmed",
+      "what": "In the revision, every WP4 header label runs into the 'WP Number: 4' block, so 'WP title:', 'Lead participant', 'Participants' and 'DCs involved' open no block of their own for WP4. The text is present; the fields are not separable by the label-block rule.",
+      "effect": "The Claude-free integrity audit parses six work-package blocks instead of seven and reports 65 findings against the first copy's 42. Twenty-three of the extra findings are one cause: WP4 is referenced by deliverables, milestones, risks and DC projects that no parsed block describes.",
+      "not_repaired_here": "The audit's parser is PE-07's, not the importer's. Changing it would move PE-07 findings for every document under no ticket, so the collapse is measured and recorded (register, known_extraction_limitations.work_package_header_blocks) and left for the operator to decide: re-export page 45 so the labels open their own blocks, or widen the parser under a PE-07 change."
+    },
+    "ligature": "Page 45 carries U+FB01 twice, in 'Benefi' + ligature + 'ciary'. A plain-text search for 'Beneficiary' does not match it, so a reader matching partner labels over this text must fold ligatures first. The first copy carries no ligature.",
+    "line_endings": "core.autocrlf is true and the repository has no .gitattributes. These artifacts are written with LF and compared byte for byte, so a checkout that rewrites them with CRLF makes --check fail. Pre-existing for the whole workspace; not introduced here.",
+    "workspace_outside_the_leakage_scan": "Unchanged from PE-01 and PE-03: runner/leakage_scan.py does not glob workspaces/, which now holds the full text of two revisions in 168 sources and two records."
+  },
+  "acceptance_criteria": {
+    "1_previous_version_preserved": "MET. The first revision's document record, import manifest, fidelity register and 84 page sources are byte-identical to what was committed; its PDF is restored at its recorded hash; the snapshot its PE-07 report pins is archived and still loads.",
+    "2_importer_adapted_and_verified_not_assumed": "MET. The page count, every heading marker, the section boundaries, the tables and the page map were measured on the revision before anything was written. All 84 pages, all 15 sub-sections, all 17 tables and all 88 rows carry over; the one page-map discrepancy (sub-section 8 opens on p. 75, declared 76) is unchanged from the first copy and recorded.",
+    "3_new_version_with_supersession": "MET. One new immutable record under the same document id, carrying provenance to the predecessor at the version this build holds. The supersedes edge is in the snapshot and the graph validates with no dangling reference.",
+    "4_provenance_accurate_and_not_carried_forward_blind": "MET. A manifest and a register of its own, naming it a revised sanitised derivative. Every settleable PE-01 declaration re-checked against the revision's bytes; the one that no longer holds is named.",
+    "5_intake_and_resolution": "MET. The intake is unchanged and still names the document and the historical call. The bare document id and the exact node id both resolve to the revision; the superseded node is refused as a candidate.",
+    "6_byte_identical_reproduction": "MET. Every generated artifact was deleted and rebuilt from the two PDFs alone, reproducing all six files at their recorded hashes. --check is clean for both tools.",
+    "7_ledger_contract_unchanged": "MET. All 45 claims in both revisions are unconfirmed, Unresolved and not_applicable. No claim is Confirmed because the proposal asserts it, and no Tier 3 project model was reconstructed."
+  },
+  "not_done": "No assessor run, no preflight, no new frozen baseline and no ESR comparison. The operator runs those; this record covers preparation and verification only."
+}

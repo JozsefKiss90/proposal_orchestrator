@@ -204,10 +204,26 @@ def pdf_text(path: Path) -> str:
     return "\n".join(read_page_text(path, page) for page in range(1, pdf_page_count(path) + 1))
 
 
-def _input_rows(repo_root: Path) -> list[dict[str, Any]]:
-    """The register's input table, hashes and page counts derived from disk."""
+def _input_rows(repo_root: Path, revision: Any = None) -> list[dict[str, Any]]:
+    """The register's input table, hashes and page counts derived from disk.
+
+    *revision* (a ``tools.import_external_proposal.Revision``) replaces the
+    ``candidate`` row with that revision's PDF, so a revision's register
+    describes the file it was derived from and the first register keeps its
+    own. ``None`` means the first sanitised derivative, unchanged.
+    """
+    specs = INPUTS
+    if revision is not None:
+        specs = tuple(
+            InputSpec(
+                "candidate", revision.candidate_role, revision.pdf_rel.as_posix(),
+                revision.candidate_version, (DN_TYPE_MARKER,),
+            )
+            if spec.role_key == "candidate" else spec
+            for spec in INPUTS
+        )
     rows: list[dict[str, Any]] = []
-    for spec in INPUTS:
+    for spec in specs:
         path = repo_root / spec.path
         if not path.is_file():
             raise AuthoringError(f"input missing: {spec.path}")
@@ -236,20 +252,31 @@ def _input_rows(repo_root: Path) -> list[dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 
 
-def render_register(repo_root: Path) -> dict[str, Any]:
-    # PE-03 owns the derived half; imported here so the register has one renderer.
-    from tools.import_external_proposal import derive_register_half
+def render_register(repo_root: Path, revision: Any = None) -> dict[str, Any]:
+    """The fidelity register of *revision*, or of the first sanitised derivative.
 
-    derived = derive_register_half(repo_root)
-    rows = _input_rows(repo_root)
+    A revision gets its own register file. The first one is never re-rendered
+    with a later revision's measurements, because its derived half is the
+    evidence for the document record that was imported from it.
+    """
+    # PE-03 owns the derived half; imported here so the register has one renderer.
+    from tools.import_external_proposal import REVISION_ORIGINAL, derive_register_half
+
+    revision = revision if revision is not None else REVISION_ORIGINAL
+    is_first = revision.supersedes is None
+    derived = derive_register_half(repo_root, revision)
+    rows = _input_rows(repo_root, None if is_first else revision)
     by_key = {r["role_key"]: r for r in rows}
     candidate = by_key["candidate"]
     esr = by_key["esr"]
-    if candidate["pages"] != 84:
-        raise AuthoringError(f"candidate: expected the 84-page sanitised copy, found {candidate['pages']} pages")
-    if DN_TYPE_MARKER not in read_page_text(repo_root / CANDIDATE_PDF_REL, DN_TYPE_PAGE):
+    if candidate["pages"] != revision.expected_pages:
+        raise AuthoringError(
+            f"candidate: expected the {revision.expected_pages}-page sanitised copy, "
+            f"found {candidate['pages']} pages"
+        )
+    if DN_TYPE_MARKER not in read_page_text(repo_root / revision.pdf_rel, DN_TYPE_PAGE):
         raise AuthoringError(f"candidate: {DN_TYPE_MARKER!r} not found on p. {DN_TYPE_PAGE}")
-    return {
+    register: dict[str, Any] = {
         "record_type": REGISTER_RECORD_TYPE,
         "schema_ref": _SCHEMA_REF,
         "artifact_purpose": (
@@ -360,6 +387,141 @@ def render_register(repo_root: Path) -> dict[str, Any]:
             "sub_sections": [],
         },
     }
+    if is_first:
+        return register
+    return _revise_register(repo_root, register, revision, derived)
+
+
+#: The operator's PE-01 transformation declarations that a revision re-checks
+#: against its own bytes. Each names the derived measurement that settles it.
+_RECHECKED_DECLARATIONS: tuple[tuple[str, str], ...] = (
+    ("figures", "figures"),
+    ("citations", "citation_marker_counts"),
+    ("body_point_size", "body_point_size"),
+    ("table_3_1a", "table_3_1a"),
+    ("reflow_page_count", "pages"),
+)
+
+
+def _recheck(derived: dict[str, Any], prior: dict[str, Any]) -> dict[str, Any]:
+    """Each carried PE-01 transformation declaration against this revision's measurement.
+
+    ``holds`` is derived from the measurement, never declared. A declaration
+    that no longer holds is reported as not holding; it is not rewritten,
+    because only the operator may withdraw a declaration (spec decision 9).
+    """
+    tr = prior
+    ps = derived["body_point_size"]
+    t31a = derived["table_3_1a"]
+    figures = derived["figures"]
+    citations = derived["citation_marker_counts"]
+    out: dict[str, Any] = {
+        "basis": (
+            "Every PE-01 declaration that a measurement can settle, re-run against this revision's "
+            "bytes by tools/import_external_proposal.derive_register_half. 'holds' is derived. A "
+            "declaration that does not hold is reported, not rewritten: withdrawing one is the "
+            "operator's act."
+        ),
+        "figures": {
+            "declaration": tr["figures"],
+            "measured": figures,
+            "holds": figures["images_on_any_page"] == 0,
+        },
+        "citations": {
+            "declaration": tr["citations"],
+            "measured": citations,
+            "holds": set(citations.values()) == {0},
+        },
+        "body_point_size": {
+            "declaration": tr["reformatting"]["body_point_size"],
+            "measured_distribution": ps["distribution"],
+            "measured_other_size_character_sets": ps["other_sizes_character_sets"],
+            "holds": ps["other_sizes_are_bullets_and_spaces_only"],
+            "consequence_if_not": (
+                "A point size other than the declared body size carries prose, not only bullet "
+                "glyphs. The declaration 'body 12 pt' is then incomplete for this revision: part of "
+                "the text is set smaller. Recorded here and in the derived half; not repaired."
+            ),
+        },
+        "table_3_1a": {
+            "declaration": tr["reformatting"]["table_3_1a"],
+            "measured_label_block_counts": t31a["label_block_counts"],
+            "measured_wp_number_blocks": t31a["wp_number_blocks"],
+            "holds": t31a["flattened_to_label_value_blocks"],
+            "note": (
+                "The flattening holds while each named label opens at least one prose block. The "
+                "per-label counts are recorded as measured: a label that falls short of the work "
+                "package count did not open its own block on every work package."
+            ),
+        },
+        "reflow_page_count": {
+            "declaration": tr["reflow"]["current_pages"],
+            "measured": derived["pages"],
+            "holds": tr["reflow"]["current_pages"] == derived["pages"],
+        },
+    }
+    out["declarations_that_no_longer_hold"] = sorted(
+        name for name, _ in _RECHECKED_DECLARATIONS if out[name]["holds"] is False
+    )
+    return out
+
+
+def _revise_register(
+    repo_root: Path, register: dict[str, Any], revision: Any, derived: dict[str, Any]
+) -> dict[str, Any]:
+    """The register of a superseding revision: the PE-01 header, re-checked.
+
+    Nothing is carried forward silently. Every declaration a measurement can
+    settle is re-run against this revision's bytes and reported with its
+    verdict, and the register says in its own header that it describes a
+    revised derivative rather than the original submission.
+    """
+    from tools.import_external_proposal import (
+        extraction_limitations,
+        manifest_rel,
+        revision_by_id,
+    )
+
+    predecessor = revision_by_id(revision.supersedes)
+    prov = register["provenance"]
+    prior = dict(prov["transformation"])
+    prov["current_assessment_artifact"]["kind"] = (
+        "revised sanitised derivative of the historical submission"
+    )
+    prov["current_assessment_artifact"]["statement"] = (
+        "This file is not the text the ESR evaluated, and it is not the first sanitised derivative "
+        "either. It is a later sanitised derivative of the same historical submission, and no "
+        "result over it is a result over the submission."
+    )
+    prov["transformation"]["basis"] = (
+        "the PE-01 operator declarations, carried to this revision and re-checked against its own "
+        "bytes under 'rechecked_for_this_revision'; the declarations themselves are unchanged"
+    )
+    prov["transformation"]["rechecked_for_this_revision"] = _recheck(derived, prior)
+    prov["revision"] = {
+        "revision_id": revision.revision_id,
+        "summary": revision.summary,
+        "declared_status": "Confirmed",
+        "basis": "derived: the page-by-page comparison in the import manifest",
+        "supersedes": {
+            "revision_id": predecessor.revision_id,
+            "path": predecessor.pdf_rel.as_posix(),
+            "sha256": hashlib.sha256((repo_root / predecessor.pdf_rel).read_bytes()).hexdigest(),
+            "fidelity_register": predecessor.register_rel.as_posix(),
+            "import_manifest": manifest_rel(predecessor).as_posix(),
+            "retained": (
+                "The predecessor PDF, its register, its import manifest, its page texts and its "
+                "document record are retained unchanged. This register does not replace that one."
+            ),
+        },
+        "same_historical_submission": (
+            "Both revisions are sanitised derivatives of the one 2025 submission. The intake, the "
+            "document id and the call binding are unchanged; only the derivative's bytes differ."
+        ),
+    }
+    prov["known_extraction_limitations"] = extraction_limitations(repo_root, revision)
+    register["ticket"] = "PE-01 header, re-checked for this revision at PE-03"
+    return register
 
 
 def intake_fields(repo_root: Path) -> dict[str, Any]:

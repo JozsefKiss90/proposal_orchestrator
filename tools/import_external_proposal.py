@@ -88,6 +88,7 @@ from runner.external_proposal import (
     is_row,
     join_segments,
     locate,
+    nonws_len,
     page_accounting,
     parse_row,
     split_sentences,
@@ -103,6 +104,7 @@ from tools import author_msca_dn_workspace as ws
 
 SPEC_REL = ws.SPEC_REL
 WORKSPACE_REL = ws.WORKSPACE_REL
+SOURCE_DIR_REL = ws.SOURCE_DIR_REL
 CANDIDATE_PDF_REL = ws.CANDIDATE_PDF_REL
 REGISTER_REL = ws.REGISTER_REL
 INTAKE_ID = ws.INTAKE_ID
@@ -116,6 +118,115 @@ SOURCE_ID_FORMAT = "SRC-DN-P{page:02d}"
 DOCUMENT_TITLE = "Sanitised derivative of the MSCA-DN 2025 Part B (PROJECT-X)"
 #: The copy's own acronym for the project; the real one stays with the original.
 EXPECTED_PAGES = 84
+
+
+# --------------------------------------------------------------------------- #
+# Revisions of the sanitised derivative
+# --------------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class Revision:
+    """One revision of the sanitised derivative, and everything that is keyed
+    by it.
+
+    A revision is a new sanitised PDF of the same historical submission, so
+    every revision shares the ``document_id`` and the intake, and differs in
+    its bytes, its page texts and therefore its content version. Nothing is
+    shared that a span could resolve through: each revision owns its
+    ``source_id_prefix``, so a ``verified_span`` of one revision can never
+    resolve into another revision's page text.
+    """
+
+    revision_id: str
+    pdf_rel: Path
+    source_id_prefix: str
+    """``SRC-DN`` for the first import; a revision takes its own prefix so the
+    earlier spans keep pointing at the earlier page texts."""
+    manifest_name: str
+    """File name of the import manifest. The first revision keeps the name it
+    was committed under; a later one is suffixed."""
+    register_rel: Path
+    expected_pages: int
+    candidate_role: str
+    """The fidelity register's input-table ``role`` for this PDF."""
+    candidate_version: str
+    """The fidelity register's input-table ``version`` for this PDF."""
+    supersedes: Optional[str] = None
+    """``revision_id`` of the revision this one supersedes, or ``None``."""
+    change_id: Optional[str] = None
+    """Plain identifier naming the revision in the document provenance."""
+    summary: str = ""
+    """What this revision is, in one sentence, for the manifest and register."""
+
+    @property
+    def source_id_format(self) -> str:
+        return self.source_id_prefix + "-P{page:02d}"
+
+    def source_id(self, page: int) -> str:
+        return self.source_id_format.format(page=page)
+
+
+_ORIGINAL_ROLE = (
+    "Current assessment artifact: a sanitised derivative of the historical submission, "
+    "reflowed from 34 to 84 pages. Not the submitted text."
+)
+
+REVISION_ORIGINAL = Revision(
+    revision_id="sanitised_v1",
+    pdf_rel=SOURCE_DIR_REL / "sanitized_proposal_final.pdf",
+    source_id_prefix="SRC-DN",
+    manifest_name="MSCA-DN-2025_sanitised_part_b.json",
+    register_rel=SOURCE_DIR_REL / "fidelity_register.json",
+    expected_pages=84,
+    candidate_role=_ORIGINAL_ROLE,
+    candidate_version="sanitised derivative, 84 pages (reflow of a 34-page original)",
+    summary=(
+        "The first sanitised derivative imported at PE-03. Retained unchanged so its "
+        "document record, its page texts and every span into them stay reproducible."
+    ),
+)
+
+REVISION_RESOLVED_FIXES = Revision(
+    revision_id="resolved_fixes",
+    pdf_rel=SOURCE_DIR_REL / "sanitized_proposal_resolved_fixes.pdf",
+    source_id_prefix="SRC-DN-RF",
+    manifest_name="MSCA-DN-2025_sanitised_part_b.resolved_fixes.json",
+    register_rel=SOURCE_DIR_REL / "fidelity_register_resolved_fixes.json",
+    expected_pages=84,
+    candidate_role=(
+        "Current assessment artifact: a revised sanitised derivative of the same historical "
+        "submission, reflowed from 34 to 84 pages. Not the submitted text, and not the first "
+        "sanitised derivative either."
+    ),
+    candidate_version=(
+        "revised sanitised derivative, 84 pages (reflow of a 34-page original); supersedes the "
+        "first sanitised derivative"
+    ),
+    supersedes="sanitised_v1",
+    change_id="msca-dn-2025-sanitised-resolved-fixes",
+    summary=(
+        "A revised sanitised derivative of the same submission. The page count, the section "
+        "boundaries and 83 of the 84 page texts are unchanged; page 45 was re-typeset."
+    ),
+)
+
+#: Every revision, oldest first. ``render_all`` writes all of them, so a
+#: revision never silently drops the page texts an earlier span resolves into.
+REVISIONS: tuple[Revision, ...] = (REVISION_ORIGINAL, REVISION_RESOLVED_FIXES)
+
+#: The revision a new assessment reads: the newest, and the one no other
+#: revision supersedes.
+ACTIVE_REVISION: Revision = REVISION_RESOLVED_FIXES
+
+
+def revision_by_id(revision_id: str) -> Revision:
+    for rev in REVISIONS:
+        if rev.revision_id == revision_id:
+            return rev
+    raise ImportRefused(
+        f"unknown revision {revision_id!r}; known: {[r.revision_id for r in REVISIONS]}"
+    )
 
 #: Keyword counts the register's derived half records (spec §2.7), measured
 #: case-insensitively over the collapsed text of every page.
@@ -211,18 +322,29 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-@lru_cache(maxsize=2)
+@lru_cache(maxsize=8)
 def _extract(pdf: str, sha256: str) -> tuple[PageExtract, ...]:
     return extract_document(Path(pdf))
 
 
-def extract(repo_root: Path) -> tuple[PageExtract, ...]:
-    pdf = repo_root / CANDIDATE_PDF_REL
+def extract(repo_root: Path, revision: Revision = REVISION_ORIGINAL) -> tuple[PageExtract, ...]:
+    """Every page of *revision*'s PDF, or refuse.
+
+    The page count is checked against the revision's declared one rather than
+    assumed: a revision that reflowed to a different length must be declared,
+    not discovered downstream.
+    """
+    pdf = repo_root / revision.pdf_rel
     if not pdf.is_file():
-        raise ImportRefused(f"candidate missing: {CANDIDATE_PDF_REL.as_posix()}")
+        raise ImportRefused(
+            f"candidate missing for revision {revision.revision_id}: {revision.pdf_rel.as_posix()}"
+        )
     pages = _extract(str(pdf), _sha256(pdf))
-    if len(pages) != EXPECTED_PAGES:
-        raise ImportRefused(f"candidate: expected {EXPECTED_PAGES} pages, found {len(pages)}")
+    if len(pages) != revision.expected_pages:
+        raise ImportRefused(
+            f"candidate {revision.pdf_rel.as_posix()}: expected {revision.expected_pages} pages, "
+            f"found {len(pages)}"
+        )
     return pages
 
 
@@ -326,7 +448,7 @@ def map_sub_sections(paragraphs: Sequence[Paragraph]) -> tuple[tuple[SubSection,
 
 
 def extract_claims(
-    subs: Sequence[SubSection], pages: Sequence[PageExtract]
+    subs: Sequence[SubSection], pages: Sequence[PageExtract], revision: Revision = REVISION_ORIGINAL
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """The audit claim ledger: one claim per rule-selected sentence, first
     occurrence of a sentence text wins, each with a span into its page."""
@@ -358,7 +480,7 @@ def extract_claims(
                 for page in para.pages:
                     hit = locate(by_page[page], sentence)
                     if hit is not None:
-                        span = {"source_id": SOURCE_ID_FORMAT.format(page=page), "start": hit[0], "end": hit[1]}
+                        span = {"source_id": revision.source_id(page), "start": hit[0], "end": hit[1]}
                         break
                 claim_id = f"{sub.spec.sub_section_id}-c{n:03d}"
                 if span is None:
@@ -387,6 +509,7 @@ def extract_claims(
 
 @dataclass(frozen=True)
 class Import:
+    revision: Revision
     pages: tuple[PageExtract, ...]
     sub_sections: tuple[SubSection, ...]
     criterion_content: dict[str, str]
@@ -410,8 +533,62 @@ def _document_id(repo_root: Path) -> str:
     return read_esr_intake(repo_root / WORKSPACE_REL, INTAKE_ID).document_id
 
 
-def build_import(repo_root: Path) -> Import:
-    pages = extract(repo_root)
+def node_id_of(repo_root: Path, revision: Revision) -> str:
+    """The dev-graph node id *revision*'s document record has or would have.
+
+    Derived from the revision's own PDF, never typed, so a predecessor
+    reference cannot drift from the record it names.
+    """
+    imp = build_import(repo_root, revision)
+    return document_node_id(imp.candidate["document_id"], imp.record["content_version"])
+
+
+def build_document_provenance(repo_root: Path, revision: Revision) -> Optional[dict[str, Any]]:
+    """The provenance *revision*'s record carries, or ``None`` for a first import.
+
+    Uses the engine's own supersession mechanism
+    (:func:`runner.dev_graph.revisions.build_provenance`): the predecessor is
+    resolved against the built snapshot, so the declared predecessor version
+    is the one this build actually holds, and
+    :func:`runner.dev_graph.builder.build_snapshot` turns the result into the
+    ``supersedes`` edge. A superseded snapshot stops being a current
+    candidate, which is what lets the document id keep resolving to exactly
+    one version (``harness.blind_assessment.resolve_document``).
+
+    ``change_id`` names the revision. No change record is written for it:
+    ``runner.dev_graph.changes.record_change`` accepts only the five Tier 3
+    record paths and rebuilds a before/after snapshot pair, so it is neither
+    applicable to a replacement source PDF nor replayable inside a byte-equal
+    importer. The manifest states this where the id appears.
+    """
+    if revision.supersedes is None:
+        return None
+    from runner.dev_graph.builder import build_snapshot
+    from runner.dev_graph.revisions import build_provenance
+
+    predecessor = revision_by_id(revision.supersedes)
+    previous_node = node_id_of(repo_root, predecessor)
+    snapshot = build_snapshot(repo_root / WORKSPACE_REL)
+    return build_provenance(
+        snapshot,
+        supersedes=previous_node,
+        change_id=revision.change_id or revision.revision_id,
+        evidence=(),
+    )
+
+
+def build_import(
+    repo_root: Path, revision: Revision = REVISION_ORIGINAL, *, with_provenance: bool = True
+) -> Import:
+    """The whole import of *revision*, derived from its PDF.
+
+    *with_provenance* resolves the superseded snapshot against the built graph,
+    which needs the source index on disk. The source index is itself rendered
+    from an import, so rendering it uses ``with_provenance=False``: provenance
+    is not part of the content version and no source record depends on it, so
+    the two renderings agree on everything the index carries.
+    """
+    pages = extract(repo_root, revision)
     paragraphs = join_segments(pages)
     subs, criterion_content = map_sub_sections(paragraphs)
     title_1_1 = _af_v6_heading(repo_root, "1.1")
@@ -420,7 +597,7 @@ def build_import(repo_root: Path) -> Import:
         if s.spec.sub_section_id == "1.1" and s.spec.declared_title is None else s
         for s in subs
     )
-    claims, stats = extract_claims(subs, pages)
+    claims, stats = extract_claims(subs, pages, revision)
     sections = []
     for section_id, section_title in SECTIONS:
         sections.append(
@@ -444,9 +621,12 @@ def build_import(repo_root: Path) -> Import:
         "commitments": [],
     }
     record, record_rel = render_record(
-        candidate, "tools/import_external_proposal.py candidate", schema_id=DOCUMENT_SCHEMA_ID_V2
+        candidate,
+        "tools/import_external_proposal.py candidate",
+        provenance=build_document_provenance(repo_root, revision) if with_provenance else None,
+        schema_id=DOCUMENT_SCHEMA_ID_V2,
     )
-    return Import(pages, subs, criterion_content, candidate, stats, record, record_rel)
+    return Import(revision, pages, subs, criterion_content, candidate, stats, record, record_rel)
 
 
 # --------------------------------------------------------------------------- #
@@ -458,9 +638,10 @@ def _pages_of(sub: SubSection) -> set[int]:
     return {pg for p in sub.paragraphs for pg in p.pages}
 
 
-def render_sources(repo_root: Path, imp: Optional[Import] = None) -> dict[str, Any]:
-    imp = imp or build_import(repo_root)
-    sha = _sha256(repo_root / CANDIDATE_PDF_REL)
+def render_source_records(repo_root: Path, imp: Import) -> list[dict[str, Any]]:
+    """One ``source`` record per page of *imp*'s revision, in page order."""
+    revision = imp.revision
+    sha = _sha256(repo_root / revision.pdf_rel)
     claims_by_page: dict[int, list[str]] = {}
     for c in imp.candidate["claims"]:
         span = c.get("verified_span")
@@ -476,7 +657,7 @@ def render_sources(repo_root: Path, imp: Optional[Import] = None) -> dict[str, A
         carries = subs_by_page.get(p.page, [])
         sources.append(
             {
-                "source_id": SOURCE_ID_FORMAT.format(page=p.page),
+                "source_id": revision.source_id(p.page),
                 "title": f"{DOCUMENT_TITLE}, page {p.page} of {len(imp.pages)}",
                 "kind": "call_document_page",
                 "kind_note": (
@@ -495,7 +676,7 @@ def render_sources(repo_root: Path, imp: Optional[Import] = None) -> dict[str, A
                 },
                 "resolves_to": {
                     "class": "stored_document",
-                    "stored_path": CANDIDATE_PDF_REL.as_posix(),
+                    "stored_path": revision.pdf_rel.as_posix(),
                     "stored_path_relative_to": "the repository root, not this graph root (spec decision 2)",
                     "sha256": sha,
                     "document_id": imp.candidate["document_id"],
@@ -526,6 +707,40 @@ def render_sources(repo_root: Path, imp: Optional[Import] = None) -> dict[str, A
                 ],
             }
         )
+    return sources
+
+
+def render_sources(repo_root: Path, imps: Optional[Sequence[Import]] = None) -> dict[str, Any]:
+    """The graph root's whole source index: every revision's pages, oldest first.
+
+    One file holds every revision because the dev-graph builder reads exactly
+    one ``sources.json`` per graph root. Keeping the earlier revision's records
+    in it is what lets the earlier document record keep resolving its spans,
+    so a superseded candidate stays reproducible rather than becoming a
+    dangling reference.
+    """
+    imps = list(imps if imps is not None else build_imports(repo_root, with_provenance=False))
+    sources: list[dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
+    for imp in imps:
+        sources.extend(render_source_records(repo_root, imp))
+        candidates.append(
+            {
+                "revision_id": imp.revision.revision_id,
+                "path": imp.revision.pdf_rel.as_posix(),
+                "sha256": _sha256(repo_root / imp.revision.pdf_rel),
+                "pages": len(imp.pages),
+                "source_id_format": imp.revision.source_id_format,
+                "supersedes_revision": imp.revision.supersedes,
+            }
+        )
+    seen: dict[str, str] = {}
+    for src in sources:
+        if src["source_id"] in seen:
+            raise ImportRefused(
+                f"two revisions claim the source id {src['source_id']!r}; a revision needs its own prefix"
+            )
+        seen[src["source_id"]] = src["resolves_to"]["stored_path"]
     return {
         "record_type": SOURCE_INDEX_RECORD_TYPE,
         "schema_ref": (
@@ -536,12 +751,17 @@ def render_sources(repo_root: Path, imp: Optional[Import] = None) -> dict[str, A
         "provenance_class": "derived",
         "artifact_purpose": (
             "The Tier 3 source index of the MSCA-DN pre-evaluation graph root: one source per page of "
-            "the sanitised copy, each holding that page's extracted text, so a verified_span resolves "
-            "to a page and an offset (spec §6). Written by PE-03."
+            "each revision of the sanitised copy, each holding that page's extracted text, so a "
+            "verified_span resolves to a page and an offset (spec §6). Written by PE-03."
         ),
         "spec": SPEC_REL,
         "written_by": "tools/import_external_proposal.py",
-        "candidate": {"path": CANDIDATE_PDF_REL.as_posix(), "sha256": sha, "pages": len(imp.pages)},
+        "revision_note": (
+            "Every revision keeps its own source-id prefix and its own records. A span written "
+            "against an earlier revision therefore resolves into that revision's page text and never "
+            "into a later one, which is what keeps a superseded document record reproducible."
+        ),
+        "candidates": candidates,
         "versions": versions(),
         "sources": sources,
     }
@@ -675,9 +895,9 @@ def _point_sizes(imp: Import) -> dict[str, Any]:
     }
 
 
-def derive_register_half(repo_root: Path) -> dict[str, Any]:
+def derive_register_half(repo_root: Path, revision: Revision = REVISION_ORIGINAL) -> dict[str, Any]:
     """The fidelity register's ``derived`` half (spec decision 9), from the PDF alone."""
-    imp = build_import(repo_root)
+    imp = build_import(repo_root, revision)
     labels = ("WP Number:", "WP title:", "Lead participant")
     label_counts = {
         label: sum(1 for s in imp.sub_sections for p in s.paragraphs if p.kind == "prose" and p.text.startswith(label))
@@ -694,7 +914,7 @@ def derive_register_half(repo_root: Path) -> dict[str, Any]:
             "by tests/test_msca_dn_import.py. A declaration in the provenance header is not changed by "
             "a measurement here; where the two differ the difference is recorded, not resolved."
         ),
-        "candidate_sha256": _sha256(repo_root / CANDIDATE_PDF_REL),
+        "candidate_sha256": _sha256(repo_root / revision.pdf_rel),
         "pages": len(imp.pages),
         "versions": versions(),
         "figures": {
@@ -718,13 +938,238 @@ def derive_register_half(repo_root: Path) -> dict[str, Any]:
         "per_page_extraction_losses": _losses(imp),
         "sub_sections": _sub_section_rows(imp),
         "page_map_discrepancies": _discrepancies(imp),
-        "import_manifest": (WORKSPACE_REL / IMPORTS_REL / f"{imp.candidate['document_id']}.json").as_posix(),
+        "import_manifest": manifest_rel(revision).as_posix(),
     }
 
 
-def render_manifest(repo_root: Path, imp: Optional[Import] = None) -> dict[str, Any]:
+def _page_comparison(repo_root: Path, imp: Import, predecessor: Revision) -> dict[str, Any]:
+    """Per-page comparison of *imp*'s page texts against *predecessor*'s.
+
+    Derived, never declared: what a revision changed is measured by comparing
+    the two extractions page by page under the same normalisation.
+    """
+    before = extract(repo_root, predecessor)
+    after = imp.pages
+    rows: list[dict[str, Any]] = []
+    for b, a in zip(before, after):
+        if b.text == a.text:
+            continue
+        rows.append(
+            {
+                "page": a.page,
+                "chars_before": len(b.text),
+                "chars_after": len(a.text),
+                "nonws_before": nonws_len(b.text),
+                "nonws_after": nonws_len(a.text),
+                "blocks_before": len(b.blocks),
+                "blocks_after": len(a.blocks),
+                "tables_before": len(b.tables),
+                "tables_after": len(a.tables),
+            }
+        )
+    charset_before = {c for pg in before for c in pg.text if ord(c) > 127}
+    charset_after = {c for pg in after for c in pg.text if ord(c) > 127}
+    return {
+        "compared_with_revision": predecessor.revision_id,
+        "compared_with_path": predecessor.pdf_rel.as_posix(),
+        "compared_with_sha256": _sha256(repo_root / predecessor.pdf_rel),
+        "pages_before": len(before),
+        "pages_after": len(after),
+        "pages_identical": sum(1 for b, a in zip(before, after) if b.text == a.text),
+        "pages_changed": [r["page"] for r in rows],
+        "changed_pages": rows,
+        "characters_gained": "".join(sorted(charset_after - charset_before)),
+        "characters_lost": "".join(sorted(charset_before - charset_after)),
+        "basis": (
+            "derived: both PDFs are extracted through runner.external_proposal under the versions "
+            "this manifest records, and the page texts are compared as strings. A page counted "
+            "identical is byte-equal after whitespace normalisation."
+        ),
+    }
+
+
+#: Typographic ligatures a PDF may carry as one code point. A plain-text search
+#: for the unligatured spelling misses them, so their presence is recorded.
+LIGATURES: str = "ﬀﬁﬂﬃﬄﬅﬆ"
+
+#: The label-value lines Table 3.1 a was flattened to. A reader that splits a
+#: work package into fields expects each of these to open its own prose block.
+WP_HEADER_LABELS: tuple[str, ...] = (
+    "WP Number:", "WP title:", "Start month", "Lead participant", "Participants", "DCs involved",
+)
+_WP_NUMBER = re.compile(r"^WP Number:\s*(\d+)(?!\d)")
+
+
+def _work_package_header_blocks(imp: Import) -> dict[str, Any]:
+    """Which work-package headers survived the flattening as separate blocks.
+
+    A header whose labels all ran into the ``WP Number:`` block is still
+    present as text, but a reader that splits a work package by its labels
+    cannot see its fields. Measured, because a revision can break this without
+    changing a single word.
+    """
+    sub = next(
+        (s for s in imp.sub_sections if s.spec.sub_section_id == "3.1"), None
+    )
+    blocks = [] if sub is None else [p.text for p in sub.paragraphs if p.kind == "prose"]
+    collapsed: list[dict[str, Any]] = []
+    numbers: list[int] = []
+    for text in blocks:
+        m = _WP_NUMBER.match(text)
+        if m is None:
+            continue
+        numbers.append(int(m.group(1)))
+        inline = [lab for lab in WP_HEADER_LABELS if lab != "WP Number:" and lab in text]
+        if inline:
+            collapsed.append(
+                {"work_package": int(m.group(1)), "labels_run_into_the_block": inline}
+            )
+    return {
+        "wp_number_blocks": sorted(numbers),
+        "headers_collapsed_into_one_block": collapsed,
+        "label_blocks": {
+            lab: sum(1 for t in blocks if t.startswith(lab)) for lab in WP_HEADER_LABELS
+        },
+        "consequence": (
+            "A work package whose labels ran into its 'WP Number:' block has no separate "
+            "'WP title:', 'Lead participant', 'Participants' or 'DCs involved' block. The text is "
+            "all there; a reader that splits a work package by its label blocks does not see that "
+            "work package's fields and may report it as undescribed."
+        ),
+    }
+
+
+def extraction_limitations(repo_root: Path, revision: Revision) -> dict[str, Any]:
+    """What a reader of this revision's text must not assume. All measured.
+
+    Every entry is derived from the extraction, so a limitation cannot be
+    declared away and cannot be forgotten when a revision changes the copy.
+    """
+    imp = build_import(repo_root, revision)
+    pages = imp.pages
+    ligature_pages: dict[str, list[int]] = {}
+    ligature_counts: dict[str, int] = {}
+    for page in pages:
+        for ch in LIGATURES:
+            n = page.text.count(ch)
+            if n:
+                ligature_counts[ch] = ligature_counts.get(ch, 0) + n
+                ligature_pages.setdefault(ch, []).append(page.page)
+    sizes = _point_sizes(imp)
+    off_body_prose = {
+        size: {"characters": sizes["distribution"][size], "character_set": chars}
+        for size, chars in sizes["other_sizes_character_sets"].items()
+        if set(chars) - {"•", " "}
+    }
+    losses = _losses(imp)
+    return {
+        "basis": (
+            "derived: measured from this revision's extraction by "
+            "tools/import_external_proposal.extraction_limitations, and re-derived by "
+            "tests/test_msca_dn_import.py. Recorded, never repaired."
+        ),
+        "ligatures": {
+            "present": sorted(ligature_counts),
+            "counts": {ch: ligature_counts[ch] for ch in sorted(ligature_counts)},
+            "pages": {ch: sorted(set(ligature_pages[ch])) for ch in sorted(ligature_pages)},
+            "consequence": (
+                "A ligature is one code point. A search for the unligatured spelling "
+                "('Beneficiary') does not match the ligatured one ('Benefi' + U+FB01), so a reader "
+                "matching names or labels over this text must fold ligatures first."
+            ),
+        },
+        "prose_below_the_body_point_size": {
+            "body_point_size": sizes["body_point_size"],
+            "sizes_carrying_more_than_bullets": off_body_prose,
+            "consequence": (
+                "Text set smaller than the declared body size is prose, not decoration. No "
+                "page-based judgment of length or density was admissible from this file already "
+                "(spec §2.11); this is a second reason."
+            ),
+        },
+        "table_cells_not_in_page_reading_order": {
+            "cells": losses["character_order_losses"]["cells"],
+            "where": losses["character_order_losses"]["where"],
+            "consequence": (
+                "Every character is present and the per-page accounting balances, but the cell's "
+                "text is not a contiguous substring of the page. A span into the page cannot be "
+                "derived from such a cell."
+            ),
+        },
+        "claims_without_a_span": {
+            "count": imp.claims_stats["without_span"],
+            "claims": imp.claims_stats["claims_without_span"],
+            "consequence": (
+                "A sentence that straddles a page break lives in no single page source, so the "
+                "ledger carries it with no verified_span. It is still a claim; it is not locatable."
+            ),
+        },
+        "work_package_header_blocks": _work_package_header_blocks(imp),
+        "page_map_discrepancies": _discrepancies(imp),
+        "not_the_submitted_text": (
+            "This is a sanitised derivative. Figures are absent and citations were removed, so no "
+            "judgment of evidence base, length or page-limit compliance is admissible from it."
+        ),
+    }
+
+
+def _revision_block(repo_root: Path, imp: Import) -> dict[str, Any]:
+    """What this revision is and what it supersedes. Declared and derived, marked."""
+    revision = imp.revision
+    out: dict[str, Any] = {
+        "revision_id": revision.revision_id,
+        "summary": revision.summary,
+        "source_id_prefix": revision.source_id_prefix,
+        "is_submitted_document": False,
+        "is_the_first_sanitised_derivative": revision.supersedes is None,
+        "all_revisions": [r.revision_id for r in REVISIONS],
+    }
+    if revision.supersedes is None:
+        out["supersedes"] = None
+        return out
+    predecessor = revision_by_id(revision.supersedes)
+    provenance = imp.record.get("provenance") or {}
+    out["supersedes"] = {
+        "revision_id": predecessor.revision_id,
+        "path": predecessor.pdf_rel.as_posix(),
+        "sha256": _sha256(repo_root / predecessor.pdf_rel),
+        "node_id": (provenance.get("supersedes") or {}).get("id"),
+        "node_version": (provenance.get("supersedes") or {}).get("version"),
+        "import_manifest": manifest_rel(predecessor).as_posix(),
+        "fidelity_register": predecessor.register_rel.as_posix(),
+        "mechanism": (
+            "runner.dev_graph.revisions.build_provenance wrote the record's provenance and "
+            "runner.dev_graph.builder.build_snapshot turns it into the 'supersedes' edge. The "
+            "predecessor record, its page texts and its spans are untouched; it stops being a "
+            "current candidate and stays readable as history."
+        ),
+    }
+    out["change_id"] = provenance.get("change_id")
+    out["change_record"] = {
+        "written": False,
+        "why": (
+            "runner.dev_graph.changes.record_change accepts only the five Tier 3 record paths and "
+            "rebuilds a before/after snapshot pair, so it neither covers a replaced source PDF nor "
+            "replays byte-equal inside this importer. The change_id names the revision; no change "
+            "record stands behind it, and nothing in the build resolves it."
+        ),
+    }
+    out["comparison_with_predecessor"] = _page_comparison(repo_root, imp, predecessor)
+    return out
+
+
+def manifest_rel(revision: Revision) -> Path:
+    """Repo-relative path of *revision*'s import manifest."""
+    return WORKSPACE_REL / IMPORTS_REL / revision.manifest_name
+
+
+def render_manifest(
+    repo_root: Path, imp: Optional[Import] = None, imps: Optional[Sequence[Import]] = None
+) -> dict[str, Any]:
     imp = imp or build_import(repo_root)
-    sources_bytes = canonical_json_bytes(render_sources(repo_root, imp))
+    revision = imp.revision
+    records = render_source_records(repo_root, imp)
+    sources_bytes = canonical_json_bytes(render_sources(repo_root, imps))
     doc_id = imp.candidate["document_id"]
     return {
         "record_type": MANIFEST_RECORD_TYPE,
@@ -733,12 +1178,13 @@ def render_manifest(repo_root: Path, imp: Optional[Import] = None) -> dict[str, 
         "ticket": "PE-03",
         "tool": "tools/import_external_proposal.py",
         "candidate": {
-            "path": CANDIDATE_PDF_REL.as_posix(),
-            "sha256": _sha256(repo_root / CANDIDATE_PDF_REL),
+            "path": revision.pdf_rel.as_posix(),
+            "sha256": _sha256(repo_root / revision.pdf_rel),
             "pages": len(imp.pages),
             "is_submitted_document": False,
-            "fidelity_register": REGISTER_REL.as_posix(),
+            "fidelity_register": revision.register_rel.as_posix(),
         },
+        "revision": _revision_block(repo_root, imp),
         "versions": versions(),
         "document": {
             "document_id": doc_id,
@@ -756,8 +1202,15 @@ def render_manifest(repo_root: Path, imp: Optional[Import] = None) -> dict[str, 
         "sources": {
             "path": SOURCES_REL.as_posix(),
             "count": len(imp.pages),
-            "source_id_format": SOURCE_ID_FORMAT,
+            "source_id_format": revision.source_id_format,
             "sha256": hashlib.sha256(sources_bytes).hexdigest(),
+            "sha256_covers": (
+                "the whole source index of the graph root, every revision's records included; one "
+                "file is what runner/dev_graph/builder.py reads per graph root"
+            ),
+            "records_sha256": hashlib.sha256(canonical_json_bytes(records)).hexdigest(),
+            "records_sha256_covers": "only this revision's own source records, in page order",
+            "revisions_in_the_file": [r.revision_id for r in REVISIONS],
         },
         "page_map": {
             "declared_from": f"{SPEC_REL} §4.1",
@@ -805,16 +1258,44 @@ def render_manifest(repo_root: Path, imp: Optional[Import] = None) -> dict[str, 
 # --------------------------------------------------------------------------- #
 
 
+def build_imports(repo_root: Path, *, with_provenance: bool = True) -> list[Import]:
+    """Every revision's import, oldest first."""
+    return [
+        build_import(repo_root, revision, with_provenance=with_provenance)
+        for revision in REVISIONS
+    ]
+
+
+def render_sources_bytes(repo_root: Path) -> bytes:
+    """The source index alone, without resolving any provenance.
+
+    The one artifact an empty graph root can be bootstrapped from: a document
+    record's provenance is resolved against the built graph, and the graph
+    cannot be built until every span has a source to resolve into.
+    """
+    return canonical_json_bytes(render_sources(repo_root, build_imports(repo_root, with_provenance=False)))
+
+
 def render_all(repo_root: Path) -> dict[str, bytes]:
-    """Every file PE-03 authors, as the bytes it should hold on disk."""
-    imp = build_import(repo_root)
-    doc_id = imp.candidate["document_id"]
-    return {
-        (WORKSPACE_REL / SOURCES_REL).as_posix(): canonical_json_bytes(render_sources(repo_root, imp)),
-        (WORKSPACE_REL / imp.record_rel).as_posix(): canonical_json_bytes(imp.record),
-        (WORKSPACE_REL / IMPORTS_REL / f"{doc_id}.json").as_posix(): canonical_json_bytes(render_manifest(repo_root, imp)),
-        REGISTER_REL.as_posix(): canonical_json_bytes(ws.render_register(repo_root)),
+    """Every file PE-03 authors, as the bytes it should hold on disk.
+
+    Every revision is rendered, not only the active one: the source index is
+    one file per graph root, and a revision that stopped writing the earlier
+    revision's page records would break the earlier record's spans.
+    """
+    imps = build_imports(repo_root)
+    out: dict[str, bytes] = {
+        (WORKSPACE_REL / SOURCES_REL).as_posix(): canonical_json_bytes(render_sources(repo_root, imps)),
     }
+    for imp in imps:
+        out[(WORKSPACE_REL / imp.record_rel).as_posix()] = canonical_json_bytes(imp.record)
+        out[manifest_rel(imp.revision).as_posix()] = canonical_json_bytes(
+            render_manifest(repo_root, imp, imps)
+        )
+        out[imp.revision.register_rel.as_posix()] = canonical_json_bytes(
+            ws.render_register(repo_root, imp.revision)
+        )
+    return out
 
 
 def check(repo_root: Path) -> list[str]:
@@ -827,20 +1308,43 @@ def check(repo_root: Path) -> list[str]:
 
 
 def author(repo_root: Path) -> list[str]:
-    """Write every file; return the relative paths that changed."""
-    imp = build_import(repo_root)
+    """Write every file; return the relative paths that changed.
+
+    The source index is written before any document record, because a record
+    whose spans name records the file does not yet carry would not build.
+    """
     changed: list[str] = []
-    record_rel = (WORKSPACE_REL / imp.record_rel).as_posix()
-    for rel, data in render_all(repo_root).items():
+    sources_rel = (WORKSPACE_REL / SOURCES_REL).as_posix()
+    # Bootstrap: the source index is written first and without building the
+    # graph, because the provenance of every later record is resolved against a
+    # graph that cannot be built until the spans have sources to resolve into.
+    sources_bytes = render_sources_bytes(repo_root)
+    sources_target = repo_root / sources_rel
+    if not sources_target.is_file() or sources_target.read_bytes() != sources_bytes:
+        atomic_write_text(sources_bytes.decode("utf-8"), sources_target)
+        changed.append(sources_rel)
+    imps = build_imports(repo_root)
+    rendered = render_all(repo_root)
+    if rendered[sources_rel] != sources_bytes:  # pragma: no cover - guards the bootstrap
+        raise ImportRefused(
+            "the source index rendered with and without provenance differ; provenance must not "
+            "reach the source index"
+        )
+    by_record = {(WORKSPACE_REL / imp.record_rel).as_posix(): imp for imp in imps}
+    order = [rel for rel in rendered if rel != sources_rel]
+    for rel in order:
+        data = rendered[rel]
         target = repo_root / rel
         if target.is_file() and target.read_bytes() == data:
             continue
-        if rel == record_rel:
+        imp = by_record.get(rel)
+        if imp is not None:
             # The engine's writer owns immutability: a changed record is a new version.
             import_candidate(
                 repo_root / WORKSPACE_REL,
                 imp.candidate,
                 where="tools/import_external_proposal.py candidate",
+                provenance=imp.record.get("provenance"),
                 schema_id=DOCUMENT_SCHEMA_ID_V2,
             )
         else:

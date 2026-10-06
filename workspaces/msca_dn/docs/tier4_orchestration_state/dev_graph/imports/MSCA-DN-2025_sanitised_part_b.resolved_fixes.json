@@ -5,23 +5,64 @@
   "ticket": "PE-03",
   "tool": "tools/import_external_proposal.py",
   "candidate": {
-    "path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_final.pdf",
-    "sha256": "5474569f33d20174bfd76f088c10002edf1e82cfdc4fc5a41849f67c0ec1e1ca",
+    "path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_resolved_fixes.pdf",
+    "sha256": "f0794272a765591e1a8393c212f76279caa6c40a167f046b4fb8fab7d5a05143",
     "pages": 84,
     "is_submitted_document": false,
-    "fidelity_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json"
+    "fidelity_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json"
   },
   "revision": {
-    "revision_id": "sanitised_v1",
-    "summary": "The first sanitised derivative imported at PE-03. Retained unchanged so its document record, its page texts and every span into them stay reproducible.",
-    "source_id_prefix": "SRC-DN",
+    "revision_id": "resolved_fixes",
+    "summary": "A revised sanitised derivative of the same submission. The page count, the section boundaries and 83 of the 84 page texts are unchanged; page 45 was re-typeset.",
+    "source_id_prefix": "SRC-DN-RF",
     "is_submitted_document": false,
-    "is_the_first_sanitised_derivative": true,
+    "is_the_first_sanitised_derivative": false,
     "all_revisions": [
       "sanitised_v1",
       "resolved_fixes"
     ],
-    "supersedes": null
+    "supersedes": {
+      "revision_id": "sanitised_v1",
+      "path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_final.pdf",
+      "sha256": "5474569f33d20174bfd76f088c10002edf1e82cfdc4fc5a41849f67c0ec1e1ca",
+      "node_id": "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+      "node_version": "sha256:35f5ceb97423c4e4cfcb13952dd0e6f9beb4011796ca752ddb00df30a5cd4a32",
+      "import_manifest": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json",
+      "fidelity_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+      "mechanism": "runner.dev_graph.revisions.build_provenance wrote the record's provenance and runner.dev_graph.builder.build_snapshot turns it into the 'supersedes' edge. The predecessor record, its page texts and its spans are untouched; it stops being a current candidate and stays readable as history."
+    },
+    "change_id": "msca-dn-2025-sanitised-resolved-fixes",
+    "change_record": {
+      "written": false,
+      "why": "runner.dev_graph.changes.record_change accepts only the five Tier 3 record paths and rebuilds a before/after snapshot pair, so it neither covers a replaced source PDF nor replays byte-equal inside this importer. The change_id names the revision; no change record stands behind it, and nothing in the build resolves it."
+    },
+    "comparison_with_predecessor": {
+      "compared_with_revision": "sanitised_v1",
+      "compared_with_path": "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_final.pdf",
+      "compared_with_sha256": "5474569f33d20174bfd76f088c10002edf1e82cfdc4fc5a41849f67c0ec1e1ca",
+      "pages_before": 84,
+      "pages_after": 84,
+      "pages_identical": 83,
+      "pages_changed": [
+        45
+      ],
+      "changed_pages": [
+        {
+          "page": 45,
+          "chars_before": 1213,
+          "chars_after": 1326,
+          "nonws_before": 1062,
+          "nonws_after": 1159,
+          "blocks_before": 15,
+          "blocks_after": 12,
+          "tables_before": 0,
+          "tables_after": 0
+        }
+      ],
+      "characters_gained": "ﬁ",
+      "characters_lost": "",
+      "basis": "derived: both PDFs are extracted through runner.external_proposal under the versions this manifest records, and the page texts are compared as strings. A page counted identical is byte-equal after whitespace normalisation."
+    }
   },
   "versions": {
     "extractor": "1.0.0",
@@ -36,9 +77,9 @@
     "title": "Sanitised derivative of the MSCA-DN 2025 Part B (PROJECT-X)",
     "schema_id": "orch.dev_graph.document_snapshot.v2",
     "state": "imported",
-    "record_path": "docs/tier4_orchestration_state/dev_graph/documents/MSCA-DN-2025_sanitised_part_b/bdb8670f6987e4db012498c70abc2629c4186a83a18a8286cb8ffb4fdc8d3d84.json",
-    "content_version": "sha256:bdb8670f6987e4db012498c70abc2629c4186a83a18a8286cb8ffb4fdc8d3d84",
-    "node_id": "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+    "record_path": "docs/tier4_orchestration_state/dev_graph/documents/MSCA-DN-2025_sanitised_part_b/b51a103520b58ded0bdae399cbbf81eddaf1416890320b17f4342e278116691f.json",
+    "content_version": "sha256:b51a103520b58ded0bdae399cbbf81eddaf1416890320b17f4342e278116691f",
+    "node_id": "MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
     "sections": [
       {
         "section_id": "excellence_section",
@@ -75,10 +116,10 @@
   "sources": {
     "path": "docs/tier3_project_instantiation/source_materials/sources.json",
     "count": 84,
-    "source_id_format": "SRC-DN-P{page:02d}",
+    "source_id_format": "SRC-DN-RF-P{page:02d}",
     "sha256": "56cdbe7d4b87b077b1272404929c09bae0f62b7cdeec24f2cb870db852a9b8b6",
     "sha256_covers": "the whole source index of the graph root, every revision's records included; one file is what runner/dev_graph/builder.py reads per graph root",
-    "records_sha256": "ae1b07e517fca9f118b73ed706882ea824955125a60c1dfa6a1bb8623f32f95a",
+    "records_sha256": "8579420fa72def57c0630a736524bff3642644ed8231fb73a81c1941df1f4473",
     "records_sha256_covers": "only this revision's own source records, in page order",
     "revisions_in_the_file": [
       "sanitised_v1",
@@ -254,9 +295,9 @@
         "heading": "3.1. Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
         "title": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
         "title_source": "candidate heading",
-        "paragraphs": 145,
+        "paragraphs": 142,
         "table_rows": 88,
-        "characters": 27977,
+        "characters": 28087,
         "claims": 1
       },
       {
@@ -701,7 +742,7 @@
   "claims": {
     "count": 45,
     "rule": "every sentence of the prose that matches a named pattern of runner.external_proposal.CLAIM_RULES; table rows and headings are not sentences",
-    "sentences": 1348,
+    "sentences": 1345,
     "duplicates_removed": 0,
     "without_span": 1,
     "claims_without_span": [
@@ -725,8 +766,8 @@
   },
   "extraction_losses": {
     "unit": "non-whitespace characters: the only thing the normalisation moves is whitespace",
-    "total_page_chars": 103913,
-    "total_accounted": 103913,
+    "total_page_chars": 104010,
+    "total_accounted": 104010,
     "pages_with_loss": [],
     "character_order_losses": {
       "cells": 3,
