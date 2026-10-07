@@ -563,6 +563,19 @@ the copy and refuses an edited one. The report carries `assessor_transport`
 (the command's `--transport` choice) and `assessor_invocation` (the backend's
 own account of what its child could reach), so both conditions are structural.
 
+**The bound bytes are protected from line-ending translation.** Every
+binding above is a sha256 of file bytes: the frozen copy, the preflight
+report, the import manifest the preflight pins, the ESR record and the
+dispositions, the rubric set's pin on the criterion appendix mapping, and the
+byte-equal `--check` of the two authoring tools. Under `core.autocrlf=true` a
+fresh checkout rewrote all of them LF to CRLF and seven of eight bindings
+failed (measured 2026-10-07 on a worktree of `67a3174`; decision log
+`msca-dn-line-ending-bindings_2026-10-07`). The repository's `.gitattributes`
+marks those trees `-text`, so git stores and checks out their bytes
+unchanged; the scope is only the hashed trees, nothing is renormalised, and
+no recorded hash was regenerated. A new byte-bound artifact outside those
+trees needs a rule there before it is committed.
+
 **Blindness is tested, not asserted.** Three controls, each with a test that
 would fail if it broke:
 

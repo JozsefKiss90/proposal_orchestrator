@@ -1,0 +1,26 @@
+# Byte-exact artifacts.
+#
+# The files below are bound by the sha256 of their bytes: the frozen blind
+# baseline and its preflight report (harness/blind_baseline.py), the import
+# manifest pin inside the preflight (harness/evidence_preflight.py), the ESR
+# record and dispositions of the comparison (harness/esr_comparison.py), the
+# rubric set's pin on the criterion appendix mapping (harness/appendix_mapping.py),
+# the fidelity register's input hashes, and the byte-equal --check of
+# tools/import_external_proposal.py and tools/author_msca_dn_workspace.py.
+#
+# With core.autocrlf=true a fresh checkout rewrites LF to CRLF and every one of
+# those bindings fails (decision log msca-dn-line-ending-bindings_2026-10-07).
+# `-text` tells git to store and check out these files byte for byte. It does
+# not renormalise anything already committed, and diffs still work.
+#
+# Scope: only trees whose bytes are hashed. Code, prose and the demo instance
+# keep the platform default.
+
+*.pdf binary
+docs/tier2a_instrument_schemas/**/*.rtf -text
+docs/tier3_project_instantiation/source_materials/msca_dn/** -text
+docs/tier4_orchestration_state/msca_dn/** -text
+workspaces/** -text
+harness/blind_reports/** -text
+harness/*.json -text
+harness/profiles/** -text
