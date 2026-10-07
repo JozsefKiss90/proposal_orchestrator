@@ -1,0 +1,697 @@
+{
+  "record_type": "esr_semantic_adjudications",
+  "schema_version": "1.0",
+  "advisory": true,
+  "blocking": false,
+  "artifact_purpose": "R03 of plans/pe08_review_and_pe09_handoff_tickets.md. A deterministic comparison can be syntactically correct and still compare two different relationships. This record adjudicates every such dispute the R02 review raised: what the rule compared, what the copy and the sources actually say, what that means, and what is left for the operator. Each row separates a measurement from an interpretation and gives each its own status, so a reader can see where the evidence stops and the reading begins.",
+  "spec": "plans/msca_dn_pre_evaluation_spec.md",
+  "ticket": "R03 of plans/pe08_review_and_pe09_handoff_tickets.md",
+  "declared_by": "drafted in a Claude Code session, 2026-10-07; every interpretation is a provisional reading for operator review and none records an operator decision",
+  "declared_on": "2026-10-07",
+  "review_state": "agent_drafted_pending_operator_review",
+  "status_note": "status is the status of the statement it sits on (CLAUDE.md 12.2): Confirmed where a named source evidences it directly, Inferred where it follows from confirmed evidence, Assumed where it rests on no direct evidence, Unresolved where this copy and these sources cannot settle it.",
+  "classification_note": "classification uses the five the ticket names and two more. actual_inconsistency: the two things compared disagree and the candidate states both. ambiguous_relationship: the two things compared are different properties, or the comparison is sound and what it means is not settled by the sources available. extraction_issue: the text a check read is not the text the page carries. sanitisation_limitation: the evidence a claim needs was removed from this copy. unsupported_checker_assumption: a rule compares relations the sources do not tie, or expects a value no source requires. The two added: unsupported_lane_claim, a blind-lane statement the input that lane received contradicts - none of the five, because nothing was mis-extracted, nothing was removed and no deterministic rule is involved; and dispute_not_sustained, a dispute the review raised that the measurement does not sustain, where the row stands as recorded. No enum of any existing report is changed by this record.",
+  "failure_mode_note": "failure_mode applies to a row the harness missed: evidence_not_read when no lane output engages with the point, evidence_read_and_rated_adequate when a lane cited the passage and judged it sufficient, evidence_read_and_misattributed when a lane credited one artifact with a neighbouring artifact's property, evidence_read_but_not_interrogated when a lane read the passage and asked a different question of it. The distinction is recorded, not counted: no rate in any artifact uses it.",
+  "comparison": "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json",
+  "comparison_sha256": "9732dde500397981a133461e29d93ae657ba444199a31d84d39731f9c5ec7848",
+  "esr_record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+  "esr_record_sha256": "2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb",
+  "dispositions": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+  "dispositions_sha256": "5c0da82c111582d8ad30306a69daad721b4f0ab18d74adfc5fd9c3ca6ab6c0ff",
+  "baseline_report": "docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06/blind_baseline_f60ae6e0a2a1.json",
+  "baseline_report_sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01",
+  "candidate": "docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+  "candidate_hash": "sha256:242f1afb02c8a0acd2c6a1d2178a9904ebcbf2b9f332c92672f849f61088dbdc",
+  "fidelity_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+  "fidelity_register_sha256": "aafed265f4e9b43b9d88d13f394fef2e812cbfa5405d53bb6720cb303c9ecfc1",
+  "tier2a_application_form": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).rtf",
+  "tier2a_application_form_sha256": "00a48b993fe013ac79a09bcf3d2b6d9ac72da6840d355e9d7ff412009c636918",
+  "audits": {
+    "cited_by_the_dispositions": {
+      "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+      "sha256": "8d81965489e36c1d90fead6af30cab046bc3f54fd5392637f918495ebc524b5b"
+    },
+    "successor": {
+      "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json",
+      "sha256": "ace64d7d4ca37686ec3475a76143799ec4f955370541f3af10569ae76b9a4739"
+    },
+    "first_revision": {
+      "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json",
+      "sha256": "1b66a7cc0823b8e13692ec00aaebe632ad0c3bf775fe9d567c892c97864bff13"
+    }
+  },
+  "audit_effect": {
+    "statement": "Two rules were corrected (A01, A02) and three check notes added (A01, A02, A03). The successor audit is bound to the same candidate and the same snapshot as the report the dispositions cite, which is byte-unchanged. Every reference the comparison recorded still resolves against it.",
+    "cited_report_findings": 40,
+    "successor_findings": 29,
+    "removed": "nine out_of_window findings over DC1-DC9 (A01) and the WP6 and WP7 DC-set findings (A02)",
+    "restated": "the WP1, WP2 and WP4 DC-set findings, in the direction now compared (A02)",
+    "added": "none",
+    "first_revision_effect": "the same eleven findings fall away over the first sanitised copy, 42 to 31; its committed report is historical evidence and is not regenerated, because the dev graph serves only the current document version"
+  },
+  "code_changes": [
+    {
+      "component": "harness/integrity_audit.py::_check_dcs",
+      "change": "the appointment window is compared with a work-package window only for overlap; an appointment outlasting every package is a check note naming the months",
+      "adjudication_id": "A01",
+      "tests": [
+        "tests/harness/test_integrity_audit.py::TestCheckDcs::test_a_contract_outlasting_its_packages_is_noted_not_faulted",
+        "tests/harness/test_integrity_audit.py::TestCheckDcs::test_an_appointment_that_never_overlaps_its_package_is_a_finding",
+        "tests/harness/test_integrity_audit.py::TestCheckDcs::test_an_appointment_inside_its_packages_is_neither_a_finding_nor_a_note"
+      ]
+    },
+    {
+      "component": "harness/integrity_audit.py::_check_wp",
+      "change": "DCs involved is compared by containment in one direction, and the check note states which direction and why the reverse is not compared",
+      "adjudication_id": "A02",
+      "tests": [
+        "tests/harness/test_integrity_audit.py::TestCheckWorkPackages::test_a_dc_whose_project_names_the_package_must_be_declared",
+        "tests/harness/test_integrity_audit.py::TestCheckWorkPackages::test_a_package_may_involve_a_dc_whose_project_does_not_name_it",
+        "tests/harness/test_integrity_audit.py::TestCheckWorkPackages::test_the_package_check_says_which_direction_it_compares"
+      ]
+    },
+    {
+      "component": "harness/integrity_audit.py::_check_milestones",
+      "change": "a check note states that a dependency is not a column of the milestones table, so an undeclared_dependency finding records an absence; no kind is changed",
+      "adjudication_id": "A03",
+      "tests": [
+        "tests/harness/test_integrity_audit.py::TestCheckMilestones::test_an_undeclared_dependency_is_noted_as_resting_on_no_declared_value",
+        "tests/harness/test_integrity_audit.py::TestCheckMilestones::test_the_note_is_absent_when_every_milestone_names_its_deliverable"
+      ]
+    }
+  ],
+  "requires_the_original": [
+    "ESR-E-04 under A06: whether the submission stated the cohort's sites and operators, which the register records as prose omitted or rephrased",
+    "ESR-Q-01 under A11: whether the submission carried a Gantt or dependency figure, which this copy could not preserve"
+  ],
+  "adjudications": [
+    {
+      "adjudication_id": "A01",
+      "subject": "the rule that a doctoral candidate's appointment must end inside the window of every work package the candidate's own project names",
+      "rule": "dc_table_vs_projects reported out_of_window when start + duration - 1 exceeded the end month of a work package named on the candidate's host line in 1.1.",
+      "observation_ids": [],
+      "compared_relation": {
+        "left": "the appointment period of the recruitment table: a planned start month plus a duration in months",
+        "right": "the activity window of a work package: a start month and an end month",
+        "same_relation": false
+      },
+      "classification": "unsupported_checker_assumption",
+      "failure_mode": "not_applicable",
+      "measured": {
+        "statement": "All nine appointments read M5 and 36 months, so each ends M40. All seven work packages run M1-M36. The rule therefore fired nine times, once per candidate, with the same arithmetic. The candidate states no project duration anywhere.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "| DC1 | Academic Beneficiary A | Academic Beneficiary A | M5 | 36 | 12 | 9 |"
+          },
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "WP title: Impact and Innovation Start month – End month: M1 – M36"
+          },
+          {
+            "source": "tier2a_application_form",
+            "locator": "Table 3.1d DC Table, the duration column header",
+            "quote": "3-36 (up to 48 for DN-JD)"
+          },
+          {
+            "source": "tier2a_application_form",
+            "locator": "Table 3.1d DC Table, the start column header",
+            "quote": "Planned Start Month"
+          },
+          {
+            "source": "measurement",
+            "statement": "A search of all three sections for a stated project duration returns nothing: the only occurrences of 48 are M7.3's due month and a training-day topic in 1.3 ('sustainability beyond project duration')."
+          },
+          {
+            "source": "audit_finding",
+            "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+            "check": "dc_table_vs_projects",
+            "index": 1,
+            "text": "DC1 runs M5-M40 (36 months); WP1 ends M36, WP2 ends M36, WP4 ends M36"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "The appointment is bounded by its own column, which the application form caps at 36 months. No source ties that period to a work-package window, and the copy itself expects doctorates to outlast the funded period. A compliant 36-month appointment starting after month 1 outlasts a package ending at the project's own last month, so the rule fires on correct drafting.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "5",
+            "quote": "Where doctoral programmes extend beyond the funded period, institutions may provide complementary resources"
+          }
+        ]
+      },
+      "consequence": "Nine out_of_window findings removed. The check now reports only non-overlap, the one relation the two windows share, and carries the overrun as a note with its months. The limit of that test is declared here: one month of overlap passes it. A stronger test would need a premise no source gives, and the obvious candidate is false - a 36-month appointment cannot cover a 36-month package unless it starts in month 1. Overlap is the strongest sound test available, and the appointment's end is noted rather than judged.",
+      "operator_decision": "The note stands for review on its own merits: nine candidates are employed to M40 while no work package runs past M36. Decide in R05 whether the work plan should state activity for months 37-40, or a project duration, or neither."
+    },
+    {
+      "adjudication_id": "A02",
+      "subject": "the rule that a work package's declared DCs must equal the candidates whose 1.1 projects name that package",
+      "rule": "wp_table_vs_prose reported inconsistency when the two sets were unequal in either direction.",
+      "observation_ids": [],
+      "compared_relation": {
+        "left": "DCs involved: the candidates who do the package's tasks",
+        "right": "the packages named on a candidate's own host line in 1.1: where that candidate's doctoral research sits",
+        "same_relation": false
+      },
+      "classification": "unsupported_checker_assumption",
+      "failure_mode": "not_applicable",
+      "measured": {
+        "statement": "WP6 (training) and WP7 (impact) each declare DC1-9, and no host line in 1.1 names either package. Set equality reported both. WP5 (coordination and management) declares no candidates at all, so both sets are empty there and equality held. WP3's two sets coincide exactly, so the test passed there too. Only the four research packages WP1-WP4 appear on any host line.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "WP title: Training and Career Development Start month – End month: M1 – M36"
+          },
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "DCs involved DC1-9"
+          },
+          {
+            "source": "candidate",
+            "section_id": "excellence_section",
+            "sub_section_id": "1.1",
+            "quote": "Academic medical centre with expertise in digital health and rare-disease research (WP1, WP3, WP4)"
+          },
+          {
+            "source": "audit_finding",
+            "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+            "check": "wp_table_vs_prose",
+            "index": 3,
+            "text": "WP6 declares DCs involved [1, 2, 3, 4, 5, 6, 7, 8, 9]; the DC projects in 1.1 that name WP6 on their host line are []"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "A host line states the packages one candidate's research sits in, not every package that candidate works in. Training, dissemination and management packages involve the whole cohort without appearing on any host line. One direction does hold: a candidate whose own project names a package works in it, so that package must declare the candidate.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "tier2a_application_form",
+            "locator": "Table 3.1a, the work-description cell",
+            "quote": "and/or DC(s) will do it."
+          },
+          {
+            "source": "tier2a_application_form",
+            "locator": "Table 3.1a, the field label",
+            "quote": "DCs involved"
+          }
+        ]
+      },
+      "consequence": "Equality replaced by containment in the supported direction. WP6 and WP7 are no longer reported. WP1, WP2 and WP4 are reported again, each naming the omitted candidates: DC9 for WP1, DC8 for WP2, DC1, DC2 and DC4 for WP4. A check note states the direction compared.",
+      "operator_decision": "One signal is given up: WP2 declares DC9, whose host line names WP1, WP3 and WP4. Under containment that is no longer reported. Decide whether the declared-only direction should return as a weaker observation, which would also report WP6 and WP7 again."
+    },
+    {
+      "adjudication_id": "A03",
+      "subject": "the rule that a milestone should name a deliverable it depends on",
+      "rule": "milestone_dependencies reports undeclared_dependency for every milestone whose row names no deliverable.",
+      "observation_ids": [
+        "ESR-Q-03"
+      ],
+      "compared_relation": {
+        "left": "the milestone row the application form fixes",
+        "right": "a dependency on a deliverable",
+        "same_relation": null
+      },
+      "classification": "unsupported_checker_assumption",
+      "failure_mode": "not_applicable",
+      "measured": {
+        "statement": "The milestones table the application form fixes carries six columns: number, title, related work package(s), lead beneficiary, due date and means of verification. None is a dependency. All 16 milestones of the copy carry a means of verification, and all 16 are reported. Those 16 findings are 16 of the 40 the committed report holds.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "tier2a_application_form",
+            "locator": "Table 3.1c Milestones List, column header",
+            "quote": "Related Work Package(s)"
+          },
+          {
+            "source": "tier2a_application_form",
+            "locator": "Table 3.1c Milestones List, column header",
+            "quote": "Means of Verification"
+          },
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "Table 3.1 c Milestones List"
+          },
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "| M1.2 | Fairness, sensitivity, uncertainty and causality"
+          },
+          {
+            "source": "audit_finding",
+            "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+            "check": "milestone_dependencies",
+            "index": 4,
+            "text": "M1.2 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "No source requires a milestone to name a deliverable. The expectation is a drafting recommendation, so each finding records an absence rather than a value the copy contradicts. The finding text already said the deliverables were context and not judged; the kind did not.",
+        "status": "Confirmed",
+        "evidence": []
+      },
+      "consequence": "The kind is unchanged, so every reference into the committed report still resolves. A check note now states that a dependency is not a column and that the findings record an absence. The 16 may not be counted as ESR detection.",
+      "operator_decision": "Decide whether the rule earns its 16 findings, or should be retired in favour of the two tests that rest on declared values: a named deliverable the table does not list, and a milestone due before a deliverable it names."
+    },
+    {
+      "adjudication_id": "A04",
+      "subject": "the finding that M7.3 is due M48 while WP7 runs M1-M36",
+      "rule": "milestone_dependencies compares a milestone's due month with the window of each work package its own row relates it to.",
+      "observation_ids": [
+        "ESR-Q-03"
+      ],
+      "compared_relation": {
+        "left": "a milestone's due date",
+        "right": "the window of the work package the milestone's own row names",
+        "same_relation": true
+      },
+      "classification": "ambiguous_relationship",
+      "failure_mode": "not_applicable",
+      "measured": {
+        "statement": "M7.3 is due M48 and relates to WP7, which declares M1-M36. The comparison is sound: the form's own related-work-package column binds the two. M7.3 is the only milestone outside its window; the other 15 fall between M01 and M30.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "| M7.3 | Follow-up research proposal | 7 | Academic Beneficiary H | M48 | Submission of at least one follow-up collaborative research proposal |"
+          },
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "WP title: Impact and Innovation Start month – End month: M1 – M36"
+          },
+          {
+            "source": "measurement",
+            "statement": "The 16 due months are M01, M03, M05, M07, M10, M18 (four), M20, M24 (four), M30 and M48."
+          },
+          {
+            "source": "audit_finding",
+            "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+            "check": "milestone_dependencies",
+            "index": 15,
+            "text": "M7.3 is due M48; its related WP7 runs M1-M36"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "What the gap means is not settled. M7.3 is the submission of a follow-up proposal, which a consortium may intend after the funded period. Whether M48 lies inside the project cannot be established here: the copy declares no duration, and Tier 2B holds no extract for HORIZON-MSCA-2025-DN-01.",
+        "status": "Unresolved",
+        "evidence": [
+          {
+            "source": "measurement",
+            "statement": "docs/tier2b_topic_and_call_sources/call_extracts/ holds extracts for three topics, none of them a MSCA-DN call; the MSCA work programme record states durations for Postdoctoral Fellowships only."
+          }
+        ]
+      },
+      "consequence": "The finding is retained unchanged. It is the one audit finding that carries ESR-Q-03, and the only one of the three the dispositions cite.",
+      "operator_decision": "Decide whether a follow-up-proposal milestone after the work plan ends is a misalignment to correct or an intentional commitment to move out of the milestone table. Either way, state the project duration."
+    },
+    {
+      "adjudication_id": "A05",
+      "subject": "the blind finding that all work packages run uniformly M1-M36 with no intermediate milestones shown",
+      "rule": "none; this is an assessor statement, not a deterministic check.",
+      "observation_ids": [
+        "ESR-Q-01",
+        "ESR-Q-03"
+      ],
+      "compared_relation": {
+        "left": "the claim that no intermediate milestones are shown",
+        "right": "the milestones table of the section the assessor received",
+        "same_relation": true
+      },
+      "classification": "unsupported_lane_claim",
+      "failure_mode": "not_applicable",
+      "measured": {
+        "statement": "The assessor read the whole implementation section: 57,567 characters, complete, no incompleteness recorded. The section's own sub-section contents total 56,801 characters. That input carries the milestones table with a due month for each of 16 milestones, ten distinct months from M01 to M48. Four of the five sibling samples describe that table, one of them naming due dates spread across the project lifetime. The clause is therefore contradicted by the input the lane received.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "blind_finding",
+            "kind": "criterion_shortcoming",
+            "criterion_id": "implementation",
+            "sample_index": 0,
+            "index": 3,
+            "text": "All WPs run uniformly M1-M36 with no intermediate milestones or Gantt-style sequencing shown, giving limited insight into task dependencies and critical path."
+          },
+          {
+            "source": "blind_finding",
+            "kind": "criterion_strength",
+            "criterion_id": "implementation",
+            "sample_index": 3,
+            "index": 1,
+            "text": "Deliverables and milestones tables are detailed and specific, with clear leads, types, dissemination levels, verification means and due dates spread across the project lifetime"
+          },
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "Table 3.1 c Milestones List"
+          },
+          {
+            "source": "measurement",
+            "statement": "The implementation criterion's recorded input is characters 57567, complete true, incompleteness [], section hash sha256:160f187671933f79deb9c023a35f6c505e4f74d80ed7e9fb43325063ede04037."
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "This is neither an extraction issue nor a sanitisation limitation: the milestones table survived and reached the assessor. The companion clauses are true of the copy — the seven windows are identical and no Gantt or dependency figure is present. Only the milestone clause fails.",
+        "status": "Inferred",
+        "evidence": []
+      },
+      "consequence": "The sentence may not be cited as evidence that the lane detected a milestone-timing criticism. ESR-Q-01 keeps its other two citations, which carry the dependency point on their own. ESR-Q-03 loses its only blind citation.",
+      "operator_decision": "Confirm that a citation contradicted by the assessor's own input is withdrawn rather than retained with a caveat. Both rows are affected; neither disposition changes on this ground alone."
+    },
+    {
+      "adjudication_id": "A06",
+      "subject": "ESR-E-04: whether 'sample sizes are not specified' is the ESR's multihospital, multi-operator design",
+      "rule": "none; a citation of one blind shortcoming against one ESR sentence.",
+      "observation_ids": [
+        "ESR-E-04"
+      ],
+      "compared_relation": {
+        "left": "cohort magnitude: sample size, data-access timelines, power",
+        "right": "cohort composition: how many hospitals, how many operators, how representative of contemporary European practice",
+        "same_relation": false
+      },
+      "classification": "ambiguous_relationship",
+      "failure_mode": "evidence_read_but_not_interrogated",
+      "measured": {
+        "statement": "The one cited shortcoming names sample sizes, data-access timelines and power considerations. No sample and no cell names a site count, an operator count or representativeness. Task 4.3 survives and says multicentre, with data sources listed and no counts.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "blind_finding",
+            "kind": "criterion_shortcoming",
+            "criterion_id": "excellence",
+            "sample_index": 0,
+            "index": 3,
+            "text": "Feasibility details for the clinical cohorts (ALS, TAVI, HF, critical care) such as sample sizes, data access timelines or power considerations are not specified"
+          },
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "Task 4.3 – AI Implementation for Transcatheter Aortic Valve Implantation (TAVI)"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "Magnitude and composition are different properties of a cohort, so the citation does not support the ESR's proposition and the partial detection rests on no finding. What remains is a choice between two readings. The absence of site and operator counts is readable from the copy, which makes the row a miss. The register records prose omitted or rephrased for this task, which makes it unmeasurable here.",
+        "status": "Unresolved",
+        "evidence": [
+          {
+            "source": "fidelity_register",
+            "pointer": "provenance/transformation/prose"
+          }
+        ]
+      },
+      "consequence": "The blind citation is withdrawn. The disposition cannot stay partially_observable, which requires a finding.",
+      "operator_decision": "Choose between not_detected_despite_sufficient_preserved_evidence and not_assessable. The first holds if the missing counts are readable from this copy; the second if the register's record of rephrased prose means the submission may have carried them."
+    },
+    {
+      "adjudication_id": "A07",
+      "subject": "ESR-E-03: whether the retrospective-only evaluation design was a degree disagreement or a point the lane never reached",
+      "rule": "none; a review of what the lane said about the point.",
+      "observation_ids": [
+        "ESR-E-03"
+      ],
+      "compared_relation": {
+        "left": "the ESR's criticism of limited prospective validation",
+        "right": "every output of the blind lane",
+        "same_relation": null
+      },
+      "classification": "dispute_not_sustained",
+      "failure_mode": "evidence_not_read",
+      "measured": {
+        "statement": "The frozen baseline never uses the words prospective, shadow or retrospective: not in any of the 15 criterion samples, not in any of the 10 cells. The copy states the progression from retrospective analyses toward shadow-mode evaluations in 1.1.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "candidate",
+            "section_id": "excellence_section",
+            "sub_section_id": "1.1",
+            "quote": "The programme performs healthcare-embedded case studies that progress from retrospective analyses toward shadow-mode and implementation-oriented evaluations."
+          },
+          {
+            "source": "measurement",
+            "statement": "A case-insensitive search of the whole frozen baseline report for 'prospective', 'shadow' and 'retrospectiv' returns zero matches."
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "R02 left open whether a lane that read the shadow-mode sentence as a prospective plan would be wrong. The measurement closes it: no lane output engages with the evaluation design either way. This is a plain miss, not a disagreement of degree.",
+        "status": "Confirmed",
+        "evidence": []
+      },
+      "consequence": "The disposition not_detected_despite_sufficient_preserved_evidence stands, and the uncertainty R02 recorded is withdrawn.",
+      "operator_decision": null
+    },
+    {
+      "adjudication_id": "A08",
+      "subject": "ESR-E-07: whether a passage the lane cited approvingly can be a missed criticism of the local-training description",
+      "rule": "none; a review of what the lane said about the passage.",
+      "observation_ids": [
+        "ESR-E-07"
+      ],
+      "compared_relation": {
+        "left": "the ESR's criticism that complementation is described thinly",
+        "right": "the exc-training cell, which cites the same passage as adequate",
+        "same_relation": true
+      },
+      "classification": "ambiguous_relationship",
+      "failure_mode": "evidence_read_and_rated_adequate",
+      "measured": {
+        "statement": "The exc-training cell passed with 3 of 3 members in agreement, and its members state that complementarity of network-wide and local programmes is explicitly stated, citing the paragraph the ESR faults. No sample faults its depth.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "candidate",
+            "section_id": "excellence_section",
+            "sub_section_id": "1.3",
+            "quote": "Wherever possible, these courses are made available on-site or online to DCs from other beneficiary institutions, thereby increasing efficiency and coherence."
+          },
+          {
+            "source": "blind_finding",
+            "kind": "cell_member",
+            "expectation_key": "exc-training",
+            "member_index": 0,
+            "text_contains": "complementarity of network-wide vs local programmes is explicitly stated"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "The lane read the passage the evaluators read and rated it sufficient. That is a calibration disagreement, not a blindness, and it is a different failure from ESR-E-03's. The row remains a miss: the lane produced no criticism.",
+        "status": "Inferred",
+        "evidence": []
+      },
+      "consequence": "The disposition stands, qualified by the failure mode recorded here. The detection rate does not distinguish the two failures, and nothing in R03 changes that.",
+      "operator_decision": "Decide whether a calibration disagreement should be counted against the lane in the same figure as a point it never reached. ESR-E-07 and ESR-E-09 have this shape; ESR-Q-02 has a third."
+    },
+    {
+      "adjudication_id": "A09",
+      "subject": "ESR-E-09: whether the measurement of supervisory quality was missed or rated adequate",
+      "rule": "none; a review of what the lane said about the passage.",
+      "observation_ids": [
+        "ESR-E-09"
+      ],
+      "compared_relation": {
+        "left": "the ESR's criticism that the measurement of supervisory quality is generic",
+        "right": "the exc-supervision cell, which lists feedback questionnaires among the structure it rates adequate",
+        "same_relation": true
+      },
+      "classification": "ambiguous_relationship",
+      "failure_mode": "evidence_read_and_rated_adequate",
+      "measured": {
+        "statement": "The exc-supervision cell passed with 2 of 3 members, and its members list annual progress reports and feedback questionnaires among the supervision structure they rate adequate. No sample asks how quality is measured. The one sentence that answers it survives in 1.4.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "candidate",
+            "section_id": "excellence_section",
+            "sub_section_id": "1.4",
+            "quote": "Training and supervision quality are monitored through annual progress reports, PCDP updates and anonymous feedback questionnaires completed by DCs after major training events."
+          },
+          {
+            "source": "blind_finding",
+            "kind": "cell_member",
+            "expectation_key": "exc-supervision",
+            "member_index": 0,
+            "text_contains": "annual progress reports, feedback questionnaires"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "As with ESR-E-07, the lane read the sentence and judged it sufficient where the evaluators called it generic. The row remains a miss by the same calibration failure.",
+        "status": "Inferred",
+        "evidence": []
+      },
+      "consequence": "The disposition stands, qualified by the failure mode recorded here.",
+      "operator_decision": "Taken with ESR-E-07 under A08; no separate decision."
+    },
+    {
+      "adjudication_id": "A10",
+      "subject": "ESR-Q-02: why the deliverables table's missing validation column was not reported",
+      "rule": "none; a review of what the lane said about the two tables.",
+      "observation_ids": [
+        "ESR-Q-02"
+      ],
+      "compared_relation": {
+        "left": "the deliverables table, which carries no validation or acceptance column",
+        "right": "the milestones table, which carries means of verification",
+        "same_relation": false
+      },
+      "classification": "unsupported_lane_claim",
+      "failure_mode": "evidence_read_and_misattributed",
+      "measured": {
+        "statement": "All five implementation samples praise the tables. Four attribute verification means to the deliverables and milestones tables jointly, while only the milestones table carries that column. The deliverables header has eight columns and none is validation or acceptance. The application form asks for no such column either.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "candidate",
+            "section_id": "implementation_section",
+            "sub_section_id": "3.1",
+            "quote": "| Numbe r | Deliverable Title | Short Description | W P | Lead Beneficiary | Typ e | Disseminatio n | Due |"
+          },
+          {
+            "source": "blind_finding",
+            "kind": "criterion_strength",
+            "criterion_id": "implementation",
+            "sample_index": 0,
+            "index": 1,
+            "text": "Detailed deliverables and milestones tables with explicit leads, types, dissemination levels and verification means support traceable monitoring of implementation."
+          },
+          {
+            "source": "tier2a_application_form",
+            "locator": "Table 3.1b Deliverables List, column header",
+            "quote": "Due Date"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "The miss has a traceable cause: the lane read the milestones table's verification column and credited it to both tables, so it never asked how a deliverable is validated. The absence is readable from the copy, which is why the row counts against the lane. The ESR's point is one of substance, not of form compliance, since the form asks for no validation column.",
+        "status": "Inferred",
+        "evidence": []
+      },
+      "consequence": "The disposition not_detected_despite_sufficient_preserved_evidence stands. The misattribution is recorded as the cause and as a lane defect worth carrying into PE-09.",
+      "operator_decision": "Confirm that a strength statement conflating two tables is reported to the assessor's own account in PE-09, alongside A05."
+    },
+    {
+      "adjudication_id": "A11",
+      "subject": "ESR-Q-01: which of its three blind citations survive",
+      "rule": "none; a review of three citations against one ESR sentence.",
+      "observation_ids": [
+        "ESR-Q-01"
+      ],
+      "compared_relation": {
+        "left": "the ESR's criticism that inter-WP dependencies and the critical path are not mapped",
+        "right": "three blind shortcomings the dispositions cite",
+        "same_relation": true
+      },
+      "classification": "sanitisation_limitation",
+      "failure_mode": "not_applicable",
+      "measured": {
+        "statement": "Two of the three citations carry the ESR's point squarely: dependencies and critical-path logic are not mapped beyond narrative cross-references, and no Gantt or dependency diagram is shown. The third is the sentence A05 disputes.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "blind_finding",
+            "kind": "criterion_shortcoming",
+            "criterion_id": "implementation",
+            "sample_index": 2,
+            "index": 1,
+            "text": "Inter-WP dependencies and critical-path logic (e.g., how WP1 explainability outputs feed WP2/WP3/WP4 timing) are not mapped beyond occasional narrative cross-references."
+          },
+          {
+            "source": "blind_finding",
+            "kind": "criterion_shortcoming",
+            "criterion_id": "implementation",
+            "sample_index": 3,
+            "index": 4,
+            "text": "No Gantt chart, task-dependency diagram, or explicit timeline justification beyond uniform M1-M36 spans for all WPs, limiting assessment of workplan sequencing logic"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "The dependency point stands on the two clean citations. The register's measurement of zero images on any page remains the reason the row is partial and not detected: a Gantt or dependency figure in the submission would have been lost, so part of the lane's basis is an absence this copy created.",
+        "status": "Inferred",
+        "evidence": [
+          {
+            "source": "fidelity_register",
+            "pointer": "derived/figures/images_on_any_page"
+          }
+        ]
+      },
+      "consequence": "The sample-0 citation is withdrawn; the other two are retained. The disposition partially_observable is unchanged and still rests on a finding and a register entry.",
+      "operator_decision": "Confirm the withdrawal of the one citation. No disposition changes."
+    },
+    {
+      "adjudication_id": "A12",
+      "subject": "ESR-Q-03: what carries the row once A03, A04 and A05 are applied",
+      "rule": "none; the net effect on one row.",
+      "observation_ids": [
+        "ESR-Q-03"
+      ],
+      "compared_relation": {
+        "left": "the ESR's criticism that the definitions and timing of some milestones are not well aligned with the overall proposal",
+        "right": "one blind citation and three audit citations",
+        "same_relation": null
+      },
+      "classification": "ambiguous_relationship",
+      "failure_mode": "not_applicable",
+      "measured": {
+        "statement": "The dispositions cite one blind shortcoming and three audit findings. A05 withdraws the blind citation. A03 withdraws the two undeclared_dependency citations, which rest on no sourced requirement. A04 retains the M7.3 window finding, which is a timing misalignment between a milestone and the work plan the copy itself declares.",
+        "status": "Confirmed",
+        "evidence": [
+          {
+            "source": "audit_finding",
+            "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+            "check": "milestone_dependencies",
+            "index": 15,
+            "text": "M7.3 is due M48; its related WP7 runs M1-M36"
+          },
+          {
+            "source": "audit_finding",
+            "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+            "check": "milestone_dependencies",
+            "index": 16,
+            "text": "M7.3 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged"
+          },
+          {
+            "source": "audit_finding",
+            "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+            "check": "milestone_dependencies",
+            "index": 9,
+            "text": "M4.2 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged"
+          }
+        ]
+      },
+      "interpretation": {
+        "statement": "One finding survives and it matches the ESR's point on timing. The row stays detected, by the integrity audit alone, on M7.3's window. The definitions half of the ESR sentence is carried by no finding, so the row may read as partial rather than detected.",
+        "status": "Unresolved",
+        "evidence": []
+      },
+      "consequence": "detected_by narrows from both lanes to the integrity audit. The citation set narrows from four findings to one. Whether the disposition stays independently_detected is the operator's.",
+      "operator_decision": "Decide between independently_detected on the timing half alone and partially_observable, given that no finding addresses the definitions of the milestones. Then settle A04's question about M7.3 itself."
+    }
+  ]
+}

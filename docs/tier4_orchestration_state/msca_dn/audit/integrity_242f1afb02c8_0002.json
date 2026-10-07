@@ -1,0 +1,2219 @@
+{
+  "record_type": "integrity_audit_report",
+  "metric": "integrity_audit",
+  "schema_version": "1.0.0",
+  "advisory": true,
+  "blocking": false,
+  "audited_at": "2026-10-07T18:42:24.963924+00:00",
+  "candidate_hash": "sha256:242f1afb02c8a0acd2c6a1d2178a9904ebcbf2b9f332c92672f849f61088dbdc",
+  "candidate_path": "docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+  "evidence_source": "dev_graph_blind_view",
+  "document": "MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+  "document_id": "MSCA-DN-2025_sanitised_part_b",
+  "snapshot_id": "sha256:a5176eef3a01f998367b3eaf356b6f84953beb6da8408ad737460b12533ed24c",
+  "package_id": "sha256:1e929eee75bae6955390d96ee586b5f757eec84701f3de52b873e000d7a64b15",
+  "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+  "profile_id": "msca_dn_2026_default",
+  "profile_version": "sha256:550f9528736c9857ec3af8ed57267b98769ed9fe89117bc5e786a3e5f0eac479",
+  "parse": {
+    "rows_rendered": 88,
+    "rows_parsed": 88,
+    "rows_merged": 8,
+    "tables": {
+      "deliverables": {
+        "columns": [
+          "Numbe r",
+          "Deliverable Title",
+          "Short Description",
+          "W P",
+          "Lead Beneficiary",
+          "Typ e",
+          "Disseminatio n",
+          "Due"
+        ],
+        "rows": 28
+      },
+      "milestones": {
+        "columns": [
+          "Number",
+          "Title",
+          "Related WP",
+          "Lead Beneficiary",
+          "Due Date",
+          "Means of Verification"
+        ],
+        "rows": 16
+      },
+      "dcs": {
+        "columns": [
+          "DC No.",
+          "Recruiting Participant",
+          "PhD Awarding Entity",
+          "Planned Start Month",
+          "Duration (months)",
+          "Total Duration of Secondments (months)",
+          "Total Duration in Non- academic Sector (months)"
+        ],
+        "rows": 9
+      },
+      "risks": {
+        "columns": [
+          "Description of risk",
+          "Likelihood",
+          "Severity",
+          "WPs involved",
+          "Proposed risk-mitigation measures"
+        ],
+        "rows": 10
+      }
+    },
+    "wp_blocks": [
+      {
+        "number": 1,
+        "title": "Trustworthy, Explainable and Causal AI",
+        "start": 1,
+        "end": 36,
+        "lead": "Academic Beneficiary A",
+        "participants": "Academic Beneficiaries B, C, D, E",
+        "dcs": [
+          1,
+          2,
+          4,
+          6,
+          8
+        ],
+        "dcs_text": "1,2,4,6,8",
+        "tasks": [
+          "1.1",
+          "1.2",
+          "1.3",
+          "1.4"
+        ],
+        "where": {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "paragraph_index": 0
+        },
+        "collapsed_header_labels": [],
+        "unparsed": []
+      },
+      {
+        "number": 2,
+        "title": "Interoperable, Robust and Privacy-Preserving AI Systems",
+        "start": 1,
+        "end": 36,
+        "lead": "Academic Beneficiary F",
+        "participants": "Academic Beneficiaries C, G, A",
+        "dcs": [
+          1,
+          2,
+          3,
+          5,
+          9
+        ],
+        "dcs_text": "1,2,3,5,9",
+        "tasks": [
+          "2.1",
+          "2.2",
+          "2.3",
+          "2.4"
+        ],
+        "where": {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "paragraph_index": 10
+        },
+        "collapsed_header_labels": [],
+        "unparsed": []
+      },
+      {
+        "number": 3,
+        "title": "Human-AI Collaboration",
+        "start": 1,
+        "end": 36,
+        "lead": "Academic Beneficiary B",
+        "participants": "Academic Beneficiaries H, I, F",
+        "dcs": [
+          3,
+          4,
+          6,
+          7,
+          9
+        ],
+        "dcs_text": "3,4,6,7,9",
+        "tasks": [
+          "3.1",
+          "3.2",
+          "3.3",
+          "3.4"
+        ],
+        "where": {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "paragraph_index": 20
+        },
+        "collapsed_header_labels": [],
+        "unparsed": []
+      },
+      {
+        "number": 4,
+        "title": "Clinical Adaptation & Case Studies",
+        "start": 1,
+        "end": 36,
+        "lead": "Academic Beneﬁciary E",
+        "participants": "Academic Beneﬁciaries I, F, G, B, C",
+        "dcs": [
+          3,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "dcs_text": "3,5,6,7,8,9",
+        "tasks": [
+          "4.0",
+          "4.1",
+          "4.2",
+          "4.3",
+          "4.4",
+          "4.5",
+          "4.6"
+        ],
+        "where": {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "paragraph_index": 30
+        },
+        "collapsed_header_labels": [
+          "WP title:",
+          "Start month - End month:",
+          "Lead participant",
+          "Participants",
+          "DCs involved",
+          "Objectives"
+        ],
+        "unparsed": []
+      },
+      {
+        "number": 5,
+        "title": "Coordination and management",
+        "start": 1,
+        "end": 36,
+        "lead": "Academic Beneficiary A",
+        "participants": "All beneficiaries",
+        "dcs": [],
+        "dcs_text": "–",
+        "tasks": [
+          "5.1",
+          "5.2"
+        ],
+        "where": {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "paragraph_index": 109
+        },
+        "collapsed_header_labels": [],
+        "unparsed": []
+      },
+      {
+        "number": 6,
+        "title": "Training and Career Development",
+        "start": 1,
+        "end": 36,
+        "lead": "Academic Beneficiary D",
+        "participants": "All beneficiaries",
+        "dcs": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "dcs_text": "DC1-9",
+        "tasks": [
+          "6.1",
+          "6.2",
+          "6.3"
+        ],
+        "where": {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "paragraph_index": 117
+        },
+        "collapsed_header_labels": [],
+        "unparsed": []
+      },
+      {
+        "number": 7,
+        "title": "Impact and Innovation",
+        "start": 1,
+        "end": 36,
+        "lead": "Academic Beneficiary H",
+        "participants": "Academic Beneficiary A",
+        "dcs": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "dcs_text": "DC1-9",
+        "tasks": [
+          "7.1",
+          "7.2",
+          "7.3"
+        ],
+        "where": {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "paragraph_index": 127
+        },
+        "collapsed_header_labels": [],
+        "unparsed": []
+      }
+    ],
+    "dc_projects": [
+      {
+        "number": 1,
+        "title": "Physiology-aware AI for clinical decision support",
+        "host": "Research-intensive European university with expertise in biomedical signal processing and explainable AI (WP1, WP2, WP4)",
+        "host_wps": [
+          1,
+          2,
+          4
+        ],
+        "secondment_bullets": 3,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 54
+        }
+      },
+      {
+        "number": 2,
+        "title": "Causal multimodal integration for cardiovascular risk prediction",
+        "host": "Technical university with expertise in medical imaging, multimodal AI and causal modelling (WP1, WP2, WP4)",
+        "host_wps": [
+          1,
+          2,
+          4
+        ],
+        "secondment_bullets": 2,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 70
+        }
+      },
+      {
+        "number": 3,
+        "title": "AI-ready clinical data and processing environments",
+        "host": "University medical centre with expertise in medical informatics and health-data infrastructures (WP2, WP3, WP4)",
+        "host_wps": [
+          2,
+          3,
+          4
+        ],
+        "secondment_bullets": 3,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 85
+        }
+      },
+      {
+        "number": 4,
+        "title": "Sensitivity and uncertainty modelling for trustworthy AI",
+        "host": "Research and technology organisation with expertise in explainable AI and computational physiology (WP1, WP3, WP4)",
+        "host_wps": [
+          1,
+          3,
+          4
+        ],
+        "secondment_bullets": 3,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 102
+        }
+      },
+      {
+        "number": 5,
+        "title": "Privacy-preserving embedded AI for contactless physiological monitoring",
+        "host": "Technical university specialising in biomedical measurement technologies (WP2, WP4)",
+        "host_wps": [
+          2,
+          4
+        ],
+        "secondment_bullets": 2,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 118
+        }
+      },
+      {
+        "number": 6,
+        "title": "Human-in-the-loop causal AI for physiological signals and medical imaging",
+        "host": "Technical university with expertise in explainable AI and biosignal analysis (WP1, WP3, WP4)",
+        "host_wps": [
+          1,
+          3,
+          4
+        ],
+        "secondment_bullets": 3,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 134
+        }
+      },
+      {
+        "number": 7,
+        "title": "Trustworthiness monitoring for digital health services",
+        "host": "University with expertise in digital health, health informatics and human- computer interaction (WP3, WP4)",
+        "host_wps": [
+          3,
+          4
+        ],
+        "secondment_bullets": 1,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 150
+        }
+      },
+      {
+        "number": 8,
+        "title": "Causal machine learning and counterfactual analysis for interventional medicine",
+        "host": "University research institute focusing on AI in cardiovascular medicine (WP1, WP2, WP4)",
+        "host_wps": [
+          1,
+          2,
+          4
+        ],
+        "secondment_bullets": 2,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 164
+        }
+      },
+      {
+        "number": 9,
+        "title": "Clinical adaptation and prognostic modelling for rare neurological disease",
+        "host": "Academic medical centre with expertise in digital health and rare-disease research (WP1, WP3, WP4)",
+        "host_wps": [
+          1,
+          3,
+          4
+        ],
+        "secondment_bullets": 2,
+        "where": {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "paragraph_index": 179
+        }
+      }
+    ],
+    "prose_paragraphs": 1212,
+    "unparsed": []
+  },
+  "checks": [
+    {
+      "check_id": "wp_table_vs_prose",
+      "title": "Work-package table against work-package prose",
+      "compared": 69,
+      "findings_total": 3,
+      "findings_by_kind": {
+        "inconsistency": 3
+      },
+      "findings": [
+        {
+          "check": "wp_table_vs_prose",
+          "kind": "inconsistency",
+          "subject": "WP1",
+          "detail": "WP1 declares DCs involved [1, 2, 4, 6, 8]; DC9 names WP1 on its host line in 1.1 and WP1 does not declare it",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 0
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 179
+            }
+          ],
+          "evidence": [
+            "DCs involved 1,2,4,6,8"
+          ],
+          "context": {
+            "declared": [
+              1,
+              2,
+              4,
+              6,
+              8
+            ],
+            "from_dc_projects": [
+              1,
+              2,
+              4,
+              6,
+              8,
+              9
+            ],
+            "not_declared": [
+              9
+            ]
+          }
+        },
+        {
+          "check": "wp_table_vs_prose",
+          "kind": "inconsistency",
+          "subject": "WP2",
+          "detail": "WP2 declares DCs involved [1, 2, 3, 5, 9]; DC8 names WP2 on its host line in 1.1 and WP2 does not declare it",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 10
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 164
+            }
+          ],
+          "evidence": [
+            "DCs involved 1,2,3,5,9"
+          ],
+          "context": {
+            "declared": [
+              1,
+              2,
+              3,
+              5,
+              9
+            ],
+            "from_dc_projects": [
+              1,
+              2,
+              3,
+              5,
+              8
+            ],
+            "not_declared": [
+              8
+            ]
+          }
+        },
+        {
+          "check": "wp_table_vs_prose",
+          "kind": "inconsistency",
+          "subject": "WP4",
+          "detail": "WP4 declares DCs involved [3, 5, 6, 7, 8, 9]; DC1, DC2, DC4 name WP4 on their host line in 1.1 and WP4 does not declare them",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 30
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 54
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 70
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 102
+            }
+          ],
+          "evidence": [
+            "DCs involved 3,5,6,7,8,9"
+          ],
+          "context": {
+            "declared": [
+              3,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "from_dc_projects": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "not_declared": [
+              1,
+              2,
+              4
+            ]
+          }
+        }
+      ],
+      "notes": [
+        "DCs involved is compared in one direction: a package is reported when a DC project names a package its DCs involved does not declare. A package declaring a DC whose project does not name it is not reported — the reverse is not compared, because a DC project names the packages that candidate's own research sits in, not every package the candidate works in"
+      ]
+    },
+    {
+      "check_id": "deliverable_wp_window",
+      "title": "Each deliverable's work package exists and its month fits the window",
+      "compared": 28,
+      "findings_total": 0,
+      "findings_by_kind": {},
+      "findings": [],
+      "notes": []
+    },
+    {
+      "check_id": "milestone_dependencies",
+      "title": "Each milestone's month against the deliverables it depends on",
+      "compared": 16,
+      "findings_total": 17,
+      "findings_by_kind": {
+        "undeclared_dependency": 16,
+        "out_of_window": 1
+      },
+      "findings": [
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M0.1",
+          "detail": "M0.1 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 184
+            }
+          ],
+          "evidence": [
+            "| M0.1 | Website and social-media channels online | 7 | Academic Beneficiary A | M01 | Publicly available website, communication channels and launch announcemen"
+          ],
+          "context": {
+            "related_wps": [
+              7
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D7.1",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D7.2",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D7.3",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D7.4",
+                "months": [
+                  30
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M0.2",
+          "detail": "M0.2 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 186
+            }
+          ],
+          "evidence": [
+            "| M0.2 | Establishment of Supervisory Board, Innovation and Sustainability Committee, and DEC Committee | 5 | Academic Beneficiary A | M03 | Meeting records and"
+          ],
+          "context": {
+            "related_wps": [
+              5
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D5.1",
+                "months": [
+                  1
+                ]
+              },
+              {
+                "id": "D5.2",
+                "months": [
+                  3
+                ]
+              },
+              {
+                "id": "D5.3",
+                "months": [
+                  6
+                ]
+              },
+              {
+                "id": "D5.4",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D5.5",
+                "months": [
+                  18
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M0.3",
+          "detail": "M0.3 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 187
+            }
+          ],
+          "evidence": [
+            "| M0.3 | Recruitment completed | 5,6 | Academic Beneficiary A | M05 | Signed employment contracts and recruitment records |"
+          ],
+          "context": {
+            "related_wps": [
+              5,
+              6
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D5.1",
+                "months": [
+                  1
+                ]
+              },
+              {
+                "id": "D5.2",
+                "months": [
+                  3
+                ]
+              },
+              {
+                "id": "D5.3",
+                "months": [
+                  6
+                ]
+              },
+              {
+                "id": "D5.4",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D5.5",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D6.1",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D6.2",
+                "months": [
+                  12,
+                  36
+                ]
+              },
+              {
+                "id": "D6.3",
+                "months": [
+                  36
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M1.1",
+          "detail": "M1.1 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 188
+            }
+          ],
+          "evidence": [
+            "| M1.1 | Development of explainable AI models for cardiovascular data | 1 | Academic Beneficiary A | M18 | Software prototypes and internal technical reports |"
+          ],
+          "context": {
+            "related_wps": [
+              1
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D1.1",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D1.2",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D1.3",
+                "months": [
+                  24
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M1.2",
+          "detail": "M1.2 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 189
+            }
+          ],
+          "evidence": [
+            "| M1.2 | Fairness, sensitivity, uncertainty and causality module integration and benchmarking | 1 | Academic Beneficiary B | M24 | Scientific publications, benc"
+          ],
+          "context": {
+            "related_wps": [
+              1
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D1.1",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D1.2",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D1.3",
+                "months": [
+                  24
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M2.1",
+          "detail": "M2.1 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 190
+            }
+          ],
+          "evidence": [
+            "| M2.1 | Multimodal data-integration prototype and recommendations | 2 | Academic Beneficiaries C and G | M20 | Prototype implementation, assessment tools and s"
+          ],
+          "context": {
+            "related_wps": [
+              2
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D2.1",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D2.2",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D2.3",
+                "months": [
+                  30
+                ]
+              },
+              {
+                "id": "D2.4",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D2.5",
+                "months": [
+                  24
+                ]
+              },
+              {
+                "id": "D2.6",
+                "months": [
+                  36
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M2.2",
+          "detail": "M2.2 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 191
+            }
+          ],
+          "evidence": [
+            "| M2.2 | Processing- environment prototypes and recommendations | 2 | Academic Beneficiaries H and G | M30 | Prototype implementation, assessment tools and scie"
+          ],
+          "context": {
+            "related_wps": [
+              2
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D2.1",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D2.2",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D2.3",
+                "months": [
+                  30
+                ]
+              },
+              {
+                "id": "D2.4",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D2.5",
+                "months": [
+                  24
+                ]
+              },
+              {
+                "id": "D2.6",
+                "months": [
+                  36
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M3.1",
+          "detail": "M3.1 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 192
+            }
+          ],
+          "evidence": [
+            "| M3.1 | Development of human-in-the-loop AI platform | 3 | Academic Beneficiary B | M18 | Open-source software library and demonstration platform |"
+          ],
+          "context": {
+            "related_wps": [
+              3
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D3.1",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D3.2",
+                "months": [
+                  24
+                ]
+              },
+              {
+                "id": "D3.3",
+                "months": [
+                  12
+                ]
+              },
+              {
+                "id": "D3.4",
+                "months": [
+                  12
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M4.1",
+          "detail": "M4.1 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 194
+            }
+          ],
+          "evidence": [
+            "| M4.1 | Expansion of the federated-learning network to additional clinical sites | 4 | Academic Beneficiary E | M18 | Federated-learning node installed and suc"
+          ],
+          "context": {
+            "related_wps": [
+              4
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D4.1",
+                "months": [
+                  6
+                ]
+              },
+              {
+                "id": "D4.2",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D4.3",
+                "months": [
+                  30
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M4.2",
+          "detail": "M4.2 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 195
+            }
+          ],
+          "evidence": [
+            "| M4.2 | Evaluation of AI models in retrospective clinical studies | 4 | All beneficiaries | M24 | Scientific publications and evaluation reports derived from c"
+          ],
+          "context": {
+            "related_wps": [
+              4
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D4.1",
+                "months": [
+                  6
+                ]
+              },
+              {
+                "id": "D4.2",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D4.3",
+                "months": [
+                  30
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M6.1",
+          "detail": "M6.1 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 196
+            }
+          ],
+          "evidence": [
+            "| M6.1 | Personal Career Development Plans established for all doctoral candidates | 6 | Academic Beneficiary F | M07 | Completed and signed PCDP documentation "
+          ],
+          "context": {
+            "related_wps": [
+              6
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D6.1",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D6.2",
+                "months": [
+                  12,
+                  36
+                ]
+              },
+              {
+                "id": "D6.3",
+                "months": [
+                  36
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M6.2",
+          "detail": "M6.2 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 197
+            }
+          ],
+          "evidence": [
+            "| M6.2 | 60% of secondments implemented | 6 | Academic Beneficiary F | M24 | Secondment reports and review documentation |"
+          ],
+          "context": {
+            "related_wps": [
+              6
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D6.1",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D6.2",
+                "months": [
+                  12,
+                  36
+                ]
+              },
+              {
+                "id": "D6.3",
+                "months": [
+                  36
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M6.3",
+          "detail": "M6.3 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 198
+            }
+          ],
+          "evidence": [
+            "| M6.3 | Establishment of PhD committees | 6 | Academic Beneficiary F | M10 | Meeting minutes and committee records |"
+          ],
+          "context": {
+            "related_wps": [
+              6
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D6.1",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D6.2",
+                "months": [
+                  12,
+                  36
+                ]
+              },
+              {
+                "id": "D6.3",
+                "months": [
+                  36
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M7.1",
+          "detail": "M7.1 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 199
+            }
+          ],
+          "evidence": [
+            "| M7.1 | European AI Knowledge Hub operational | 7 | Academic Beneficiary A | M18 | Publicly available platform, learning materials and training resources |"
+          ],
+          "context": {
+            "related_wps": [
+              7
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D7.1",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D7.2",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D7.3",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D7.4",
+                "months": [
+                  30
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M7.2",
+          "detail": "M7.2 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 200
+            }
+          ],
+          "evidence": [
+            "| M7.2 | Dissemination of scientific results | 7 | All beneficiaries | M24 | Scientific publications, conference presentations and dissemination records |"
+          ],
+          "context": {
+            "related_wps": [
+              7
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D7.1",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D7.2",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D7.3",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D7.4",
+                "months": [
+                  30
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "out_of_window",
+          "subject": "M7.3",
+          "detail": "M7.3 is due M48; its related WP7 runs M1-M36",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 201
+            },
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 127
+            }
+          ],
+          "evidence": [
+            "| M7.3 | Follow-up research proposal | 7 | Academic Beneficiary H | M48 | Submission of at least one follow-up collaborative research proposal |"
+          ],
+          "context": {
+            "month": 48,
+            "window": [
+              1,
+              36
+            ]
+          }
+        },
+        {
+          "check": "milestone_dependencies",
+          "kind": "undeclared_dependency",
+          "subject": "M7.3",
+          "detail": "M7.3 names no deliverable it depends on; the deliverables of its related package(s) and their months are listed as context, not judged",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 201
+            }
+          ],
+          "evidence": [
+            "| M7.3 | Follow-up research proposal | 7 | Academic Beneficiary H | M48 | Submission of at least one follow-up collaborative research proposal |"
+          ],
+          "context": {
+            "related_wps": [
+              7
+            ],
+            "deliverables_of_related_wps": [
+              {
+                "id": "D7.1",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D7.2",
+                "months": [
+                  12,
+                  24,
+                  36
+                ]
+              },
+              {
+                "id": "D7.3",
+                "months": [
+                  18
+                ]
+              },
+              {
+                "id": "D7.4",
+                "months": [
+                  30
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "notes": [
+        "16 of 16 milestones name no deliverable they depend on; a dependency is not a column of the milestones table, so each of those findings records an absence, not a declared value the candidate contradicts. The deliverables of the related packages are carried as context and no month was judged against them"
+      ]
+    },
+    {
+      "check_id": "dc_table_vs_projects",
+      "title": "DC table against the individual DC research projects in 1.1",
+      "compared": 35,
+      "findings_total": 9,
+      "findings_by_kind": {
+        "not_comparable": 9
+      },
+      "findings": [
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC1",
+          "detail": "DC1: the table names recruiting participant 'Academic Beneficiary A'; the 1.1 project describes its host as 'Research-intensive European university with expertise in biomedical signal processing and explainable AI (WP1, WP2, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 204
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 54
+            }
+          ],
+          "evidence": [
+            "| DC1 | Academic Beneficiary A | Academic Beneficiary A | M5 | 36 | 12 | 9 |"
+          ],
+          "context": {
+            "recruiting_participant": "Academic Beneficiary A",
+            "host_line": "Research-intensive European university with expertise in biomedical signal processing and explainable AI (WP1, WP2, WP4)"
+          }
+        },
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC2",
+          "detail": "DC2: the table names recruiting participant 'Academic Beneficiary B'; the 1.1 project describes its host as 'Technical university with expertise in medical imaging, multimodal AI and causal modelling (WP1, WP2, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 206
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 70
+            }
+          ],
+          "evidence": [
+            "| DC2 | Academic Beneficiary B | Academic Beneficiary B | M5 | 36 | 7 | 3 |"
+          ],
+          "context": {
+            "recruiting_participant": "Academic Beneficiary B",
+            "host_line": "Technical university with expertise in medical imaging, multimodal AI and causal modelling (WP1, WP2, WP4)"
+          }
+        },
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC3",
+          "detail": "DC3: the table names recruiting participant 'Academic Beneficiary C'; the 1.1 project describes its host as 'University medical centre with expertise in medical informatics and health-data infrastructures (WP2, WP3, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 207
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 85
+            }
+          ],
+          "evidence": [
+            "| DC3 | Academic Beneficiary C | Academic Beneficiary C | M5 | 36 | 12 | 12 |"
+          ],
+          "context": {
+            "recruiting_participant": "Academic Beneficiary C",
+            "host_line": "University medical centre with expertise in medical informatics and health-data infrastructures (WP2, WP3, WP4)"
+          }
+        },
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC4",
+          "detail": "DC4: the table names recruiting participant 'Non- academic Beneficiary D'; the 1.1 project describes its host as 'Research and technology organisation with expertise in explainable AI and computational physiology (WP1, WP3, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 208
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 102
+            }
+          ],
+          "evidence": [
+            "| DC4 | Non- academic Beneficiary D | Associated Academic Institution D | M5 | 36 | 7 | 3 |"
+          ],
+          "context": {
+            "recruiting_participant": "Non- academic Beneficiary D",
+            "host_line": "Research and technology organisation with expertise in explainable AI and computational physiology (WP1, WP3, WP4)"
+          }
+        },
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC5",
+          "detail": "DC5: the table names recruiting participant 'Academic Beneficiary E'; the 1.1 project describes its host as 'Technical university specialising in biomedical measurement technologies (WP2, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 209
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 118
+            }
+          ],
+          "evidence": [
+            "| DC5 | Academic Beneficiary E | Academic Beneficiary E | M5 | 36 | 8 | 8 |"
+          ],
+          "context": {
+            "recruiting_participant": "Academic Beneficiary E",
+            "host_line": "Technical university specialising in biomedical measurement technologies (WP2, WP4)"
+          }
+        },
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC6",
+          "detail": "DC6: the table names recruiting participant 'Academic Beneficiary F'; the 1.1 project describes its host as 'Technical university with expertise in explainable AI and biosignal analysis (WP1, WP3, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 210
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 134
+            }
+          ],
+          "evidence": [
+            "| DC6 | Academic Beneficiary F | Academic Beneficiary F | M5 | 36 | 9 | 9 |"
+          ],
+          "context": {
+            "recruiting_participant": "Academic Beneficiary F",
+            "host_line": "Technical university with expertise in explainable AI and biosignal analysis (WP1, WP3, WP4)"
+          }
+        },
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC7",
+          "detail": "DC7: the table names recruiting participant 'Academic Beneficiary G'; the 1.1 project describes its host as 'University with expertise in digital health, health informatics and human- computer interaction (WP3, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 211
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 150
+            }
+          ],
+          "evidence": [
+            "| DC7 | Academic Beneficiary G | Academic Beneficiary G | M5 | 36 | 10 | 0 |"
+          ],
+          "context": {
+            "recruiting_participant": "Academic Beneficiary G",
+            "host_line": "University with expertise in digital health, health informatics and human- computer interaction (WP3, WP4)"
+          }
+        },
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC8",
+          "detail": "DC8: the table names recruiting participant 'Academic Beneficiary H'; the 1.1 project describes its host as 'University research institute focusing on AI in cardiovascular medicine (WP1, WP2, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 212
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 164
+            }
+          ],
+          "evidence": [
+            "| DC8 | Academic Beneficiary H | Academic Beneficiary H | M5 | 36 | 9 | 9 |"
+          ],
+          "context": {
+            "recruiting_participant": "Academic Beneficiary H",
+            "host_line": "University research institute focusing on AI in cardiovascular medicine (WP1, WP2, WP4)"
+          }
+        },
+        {
+          "check": "dc_table_vs_projects",
+          "kind": "not_comparable",
+          "subject": "DC9",
+          "detail": "DC9: the table names recruiting participant 'Academic Beneficiary I'; the 1.1 project describes its host as 'Academic medical centre with expertise in digital health and rare-disease research (WP1, WP3, WP4)'. The identifiers were removed by sanitisation, so the two cannot be compared",
+          "where": [
+            {
+              "section_id": "implementation_section",
+              "sub_section_id": "3.1",
+              "paragraph_index": 213
+            },
+            {
+              "section_id": "excellence_section",
+              "sub_section_id": "1.1",
+              "paragraph_index": 179
+            }
+          ],
+          "evidence": [
+            "| DC9 | Academic Beneficiary I | Academic Beneficiary I | M5 | 36 | 8 | 8 |"
+          ],
+          "context": {
+            "recruiting_participant": "Academic Beneficiary I",
+            "host_line": "Academic medical centre with expertise in digital health and rare-disease research (WP1, WP3, WP4)"
+          }
+        }
+      ],
+      "notes": [
+        "9 of the 9 appointments with a readable start and duration end after M36, the last month any work package runs. The latest ends M40 (DC1 to M40, DC2 to M40, DC3 to M40, DC4 to M40, DC5 to M40, DC6 to M40, DC7 to M40, DC8 to M40, DC9 to M40). The candidate declares no project window, so whether these appointments fit the project was not compared. The recruitment table's duration column is the only bound the candidate states"
+      ]
+    },
+    {
+      "check_id": "risk_table_vs_prose",
+      "title": "Risk table against the mitigations named in prose; thresholds",
+      "compared": 12,
+      "findings_total": 0,
+      "findings_by_kind": {},
+      "findings": [],
+      "notes": [
+        "threshold stated in any risk row: yes (risk 1: '60%')",
+        "prose paragraphs naming a mitigation: 2; risk rows they link to: [1, 3, 4, 6, 7]"
+      ]
+    }
+  ],
+  "findings_total": 29,
+  "findings_by_kind": {
+    "inconsistency": 3,
+    "undeclared_dependency": 16,
+    "out_of_window": 1,
+    "not_comparable": 9
+  },
+  "grounding": {
+    "axis": "grounding",
+    "judge": null,
+    "reason": "supporting sources removed by sanitisation",
+    "assertion_location_note": "assertion_location is the claim's verified span into the proposal's own page sources (spec PE-03): it locates the assertion and is not evidence for it",
+    "claims_total": 45,
+    "unresolved": 45,
+    "vacuous": false,
+    "flags": [],
+    "rows": [
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c001#0",
+        "claim_id": "1.1-c001",
+        "claim_summary": "Systematic reviews confirm that adoption is slowed by fragmented data environments, limited explainability and a lack of prospective clinical evidence.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P01#393-544",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c002#1",
+        "claim_id": "1.1-c002",
+        "claim_summary": "In cardiovascular applications, the literature reveals broad enthusiasm but few implementation case studies and no clear pathways for compliance with emerging AI regulations.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P01#545-719",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c003#2",
+        "claim_id": "1.1-c003",
+        "claim_summary": "• KPI1.1: ≥1 multimodal AI model integrated with causal modules.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P01#2056-2120",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c004#3",
+        "claim_id": "1.1-c004",
+        "claim_summary": "• KPI1.2: ≥10 clinicians test the tool and ≥80% report improved confidence in AI- supported decisions.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#0-102",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c005#4",
+        "claim_id": "1.1-c005",
+        "claim_summary": "• KPI1.3: ≥1 joint report or white paper citing causal evidence generated within the project.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#103-196",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c006#5",
+        "claim_id": "1.1-c006",
+        "claim_summary": "• KPI2.1: successful integration of ≥4 data modalities into a unified semantic schema.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#579-665",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c007#6",
+        "claim_id": "1.1-c007",
+        "claim_summary": "• KPI2.2: ≥1 pilot model per use case integrating ≥3 formalised clinical or physiological rules.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#666-762",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c008#7",
+        "claim_id": "1.1-c008",
+        "claim_summary": "• KPI2.3: ≥1 data exchange protocol between academic and industrial partners.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#763-840",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c009#8",
+        "claim_id": "1.1-c009",
+        "claim_summary": "• KPI2.4: ≥1 published guideline or white paper reviewed by technical, clinical and regulatory stakeholders.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#841-949",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c010#9",
+        "claim_id": "1.1-c010",
+        "claim_summary": "• KPI3.1: clinician and patient usability ratings ≥80%.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#1208-1263",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c011#10",
+        "claim_id": "1.1-c011",
+        "claim_summary": "• KPI3.2: ≥2 co-design workshops with ≥15 participants.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#1264-1319",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c012#11",
+        "claim_id": "1.1-c012",
+        "claim_summary": "• KPI3.3: ≥3 AI tools supporting interactive clinician feedback and retraining mechanisms.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P02#1320-1410",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c013#12",
+        "claim_id": "1.1-c013",
+        "claim_summary": "• KPI4.1: ≥1 health-economic or cost-effectiveness evaluation.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P03#318-380",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c014#13",
+        "claim_id": "1.1-c014",
+        "claim_summary": "• KPI4.2: ≥2 policy briefs or white papers.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P03#381-424",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c015#14",
+        "claim_id": "1.1-c015",
+        "claim_summary": "• ≥1 regulatory-readiness toolkit publication.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P03#849-895",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c016#15",
+        "claim_id": "1.1-c016",
+        "claim_summary": "Beyond the state of the art: scientific and technical innovations",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P10#1235-1300",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.1-c017#16",
+        "claim_id": "1.1-c017",
+        "claim_summary": "Beyond the state of the art: clinical adaptation, governance and awareness",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P11#1171-1245",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c001#17",
+        "claim_id": "1.4-c001",
+        "claim_summary": "H-index ~13, ~80 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P27#1261-1290",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c002#18",
+        "claim_id": "1.4-c002",
+        "claim_summary": "H-index ~16, ~80 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P28#186-215",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c003#19",
+        "claim_id": "1.4-c003",
+        "claim_summary": "H-index ~35, ~155 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P28#604-634",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c004#20",
+        "claim_id": "1.4-c004",
+        "claim_summary": "H-index >60, >800 publications (combined laboratory output)",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P28#942-1001",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c005#21",
+        "claim_id": "1.4-c005",
+        "claim_summary": "More than 50 completed doctoral supervisions within associated laboratory environment",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P28#1002-1087",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c006#22",
+        "claim_id": "1.4-c006",
+        "claim_summary": "10+ years supervision; approximately 10+ completed PhDs; multiple ongoing doctoral candidates",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P29#293-386",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c007#23",
+        "claim_id": "1.4-c007",
+        "claim_summary": "H-index ~33, >130 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P29#262-292",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c008#24",
+        "claim_id": "1.4-c008",
+        "claim_summary": "10+ years supervision; multiple completed and ongoing PhDs",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P29#653-711",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c009#25",
+        "claim_id": "1.4-c009",
+        "claim_summary": "H-index ~25, >220 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P29#622-652",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c010#26",
+        "claim_id": "1.4-c010",
+        "claim_summary": "Approximately 30 years supervision; >35 completed PhDs",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P29#1029-1083",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c011#27",
+        "claim_id": "1.4-c011",
+        "claim_summary": "H-index ~57, >500 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P29#998-1028",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c012#28",
+        "claim_id": "1.4-c012",
+        "claim_summary": "H-index ~25-30; >100 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P29#1291-1324",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c013#29",
+        "claim_id": "1.4-c013",
+        "claim_summary": "~25 years supervision;",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P29#1325-1347",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c014#30",
+        "claim_id": "1.4-c014",
+        "claim_summary": "H-index ~15; ~80 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P30#308-337",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c015#31",
+        "claim_id": "1.4-c015",
+        "claim_summary": "H-index ~23, ~140 publications",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P30#636-666",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c016#32",
+        "claim_id": "1.4-c016",
+        "claim_summary": "• Within the first three months, the ITP and DC jointly agree a Personal Career Development Plan (PCDP), specifying research objectives, training needs, secondments, open-science commitments and career goals.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P31#0-208",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c017#33",
+        "claim_id": "1.4-c017",
+        "claim_summary": "The PCDP is reviewed at least every six months and updated when needed; key milestones are aligned with host doctoral-school requirements and network deliverables, and PCDP updates are validated through the Supervisory Board as part of training monitoring activities.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P31#209-476",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "excellence_section",
+        "entry_key": "1.4-c018#34",
+        "claim_id": "1.4-c018",
+        "claim_summary": "• Regular meetings between DCs and their main supervisors (typically every 2–4 weeks) focus on scientific progress, skills development and well-being.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P31#561-711",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "impact_section",
+        "entry_key": "2.1-c001#0",
+        "claim_id": "2.1-c001",
+        "claim_summary": "All DCs will complete a substantial secondment (4-6 months) in another sector, typically hosted by non-academic partners (hospitals, SMEs, large industry or regulatory/standardisation bodies).",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P32#2098-2290",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "impact_section",
+        "entry_key": "2.1-c002#1",
+        "claim_id": "2.1-c002",
+        "claim_summary": "Measurable outcomes include at least three joint doctoral courses, three transferable- skills modules and the majority (≥ 80%) of secondment months in non-academic settings.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P33#282-455",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "impact_section",
+        "entry_key": "2.2-c001#2",
+        "claim_id": "2.2-c001",
+        "claim_summary": "Within their first three months, each Doctoral Candidate (DC) establishes a Personal Career Development Plan (PCDP) with their supervisory team, detailing research milestones, scientific and transferable-skills targets, secondments, teaching and outreach contributions, and short-, medium- and long-term career objectives.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P34#1544-1866",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "impact_section",
+        "entry_key": "2.3-c001#3",
+        "claim_id": "2.3-c001",
+        "claim_summary": "Each doctoral candidate is expected to produce at least three peer-reviewed publications or conference contributions during the project, yielding a minimum of approximately 27 scientific outputs.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P36#1119-1314",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "implementation_section",
+        "entry_key": "3.1-c001#0",
+        "claim_id": "3.1-c001",
+        "claim_summary": "Task 1.1 - Fairness analysis of state-of-the-art AI models in specific populations: Underrepresented groups are often insufficiently represented in training data, leading to dataset shifts and performance disparities.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P42#443-660",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "implementation_section",
+        "entry_key": "3.2-c001#1",
+        "claim_id": "3.2-c001",
+        "claim_summary": "• Clinical registries and biobanks (Academic Beneficiary I): multimodal registries and biobanks combining clinical, biomarker, biosignal and imaging data, plus advanced electrophysiology, imaging and neurophysiology facilities supporting WP3–4 use cases.",
+        "declared_status": "unresolved",
+        "assertion_location": "",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "implementation_section",
+        "entry_key": "3.2-c002#2",
+        "claim_id": "3.2-c002",
+        "claim_summary": "These complementarities are embedded in the network’s design: each DC project combines at least two environments through co-supervision and international/intersectoral secondments.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P66#1953-2133",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "implementation_section",
+        "entry_key": "4-c001#3",
+        "claim_id": "4-c001",
+        "claim_summary": "Calls will remain open for at least one month, with deadline extensions and reinforced outreach if the applicant pool lacks gender balance or sufficient qualified candidates.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P68#143-317",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "implementation_section",
+        "entry_key": "4-c002#4",
+        "claim_id": "4-c002",
+        "claim_summary": "All calls will be launched at project start, the application window will run for at least one month, evaluation and interviews will follow immediately, and appointments are expected between months four and six.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P68#1979-2189",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      },
+      {
+        "section_id": "implementation_section",
+        "entry_key": "8-c001#5",
+        "claim_id": "8-c001",
+        "claim_summary": "A research and technology organisation linked to a world-leading technological university, with extensive participation in international collaborative research programmes and doctoral training initiatives.",
+        "declared_status": "unresolved",
+        "assertion_location": "SRC-DN-RF-P78#320-525",
+        "status": "Unresolved",
+        "severity": "unresolved",
+        "reason": "supporting sources removed by sanitisation"
+      }
+    ]
+  },
+  "baseline": {
+    "baseline_dir": "C:/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06",
+    "report_copy": "blind_baseline_f60ae6e0a2a1.json",
+    "report_sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01",
+    "candidate_hash_frozen": "sha256:242f1afb02c8a0acd2c6a1d2178a9904ebcbf2b9f332c92672f849f61088dbdc",
+    "candidate_hash_audited": "sha256:242f1afb02c8a0acd2c6a1d2178a9904ebcbf2b9f332c92672f849f61088dbdc",
+    "snapshot_id_frozen": "sha256:a5176eef3a01f998367b3eaf356b6f84953beb6da8408ad737460b12533ed24c",
+    "snapshot_id_audited": "sha256:a5176eef3a01f998367b3eaf356b6f84953beb6da8408ad737460b12533ed24c",
+    "status": "bound",
+    "statement": "candidate hash and snapshot id equal the frozen baseline's; the audit is bound to the baseline"
+  },
+  "writes": [
+    "C:/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json"
+  ],
+  "flags": [],
+  "notes": "Advisory to a human, never run-blocking. Every finding names two places in the proposal that do not agree, or one that says less than the check needs; no finding is a proposal-quality score and the counts rank nothing. The grounding axis reports every claim Unresolved for one declared reason and runs no judge (spec decision 15)."
+}

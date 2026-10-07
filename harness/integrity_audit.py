@@ -11,7 +11,7 @@ and the label-value work-package headers, and runs five consistency checks:
 1. **Work-package table against work-package prose** — lead, start and end
    month, DCs involved; every field present, every task numbered under its
    own package, and the DCs a package declares against the packages each DC
-   project in section 1.1 declares.
+   project in section 1.1 declares, in one direction only (see below).
 2. **Each deliverable's work package exists, and its month fits that
    package's window.**
 3. **Each milestone's month against the months of the deliverables it depends
@@ -19,9 +19,10 @@ and the label-value work-package headers, and runs five consistency checks:
    naming none is reported as *undeclared*, with the related packages'
    deliverable months beside it as context, never as a failure.
 4. **DC table against the individual DC research projects described in
-   1.1** — the DC set, each DC's packages against the package windows, and
-   the recruiting participant against the project's host line, which the
-   sanitisation made *not comparable* and which is reported as such.
+   1.1** — the DC set, each appointment against the windows of the packages
+   its project names (see below), and the recruiting participant against the
+   project's host line, which the sanitisation made *not comparable* and which
+   is reported as such.
 5. **Risk table against the mitigations named in prose, and whether any
    threshold is stated.**
 
@@ -30,6 +31,31 @@ or one place that says less than the check needs. No finding is a score, a
 grade or a pass: the report carries counts of findings by kind and nothing
 that ranks the proposal. A reader who wants a quality judgment reads the blind
 baseline, not this.
+
+What a check may compare
+------------------------
+A check may only compare two statements the sources tie together. Where they
+do not, the audit notes what it saw and judges nothing (ticket R03 of
+``plans/pe08_review_and_pe09_handoff_tickets.md``). Two comparisons are
+one-directional or absent for that reason.
+
+*DCs involved* is reported only when a DC project in 1.1 names a package that
+package's own set omits. A candidate whose research sits in a package works in
+it, so the package must declare them. The reverse does not hold. A host line
+names where one candidate's research sits, not every package that candidate
+works in. That is why training, dissemination and management packages involve
+the whole cohort and appear on no host line.
+
+*An appointment period* is compared with a package window for overlap only: a
+candidate has to be employed while the package they contribute to runs. An
+appointment that outlasts every package is a check note carrying the months,
+not a finding — the recruitment table's own duration column is the only bound
+the candidate states, and no source ties that period to a package window.
+
+*A milestone naming no deliverable* keeps its ``undeclared_dependency`` kind,
+and a check note says what that kind rests on: a dependency is not a column of
+the milestones table, so the finding records an absence rather than a declared
+value the candidate contradicts.
 
 Reading the work-package header
 -------------------------------
@@ -1192,19 +1218,26 @@ def _check_wp(parsed: ParsedTables) -> CheckResult:
                 findings.append(Finding(cid, KIND_INCONSISTENCY, subject,
                                         f"Task {a}.{k} is described under {subject}", (b.where,),
                                         (f"Task {a}.{k}",)))
-        # DCs involved against the DC projects naming this package.
+        # One direction only: a DC whose own project names this package works in
+        # it, so this package must declare that DC.  See "What a check may
+        # compare" above for why the reverse is not an inconsistency.
         if b.dcs_text is not None and parsed.dc_projects:
             compared += 1
             from_projects = tuple(sorted(p.number for p in parsed.dc_projects if b.number in p.host_wps))
             declared = tuple(sorted(p.number for p in parsed.dc_projects)) if b.dcs is None else b.dcs
-            if declared != from_projects:
+            not_declared = tuple(n for n in from_projects if n not in declared)
+            if not_declared:
+                named = ", ".join(f"DC{n}" for n in not_declared)
+                one = len(not_declared) == 1
+                verb, whose, them = ("names", "its", "it") if one else ("name", "their", "them")
                 findings.append(Finding(
                     cid, KIND_INCONSISTENCY, subject,
-                    f"{subject} declares DCs involved {list(declared)}; the DC projects in 1.1 that "
-                    f"name {subject} on their host line are {list(from_projects)}",
-                    (b.where,) + tuple(p.where for p in parsed.dc_projects if b.number in p.host_wps),
+                    f"{subject} declares DCs involved {list(declared)}; {named} {verb} {subject} "
+                    f"on {whose} host line in 1.1 and {subject} does not declare {them}",
+                    (b.where,) + tuple(p.where for p in parsed.dc_projects if p.number in not_declared),
                     (f"DCs involved {b.dcs_text}",),
-                    {"declared": list(declared), "from_dc_projects": list(from_projects)},
+                    {"declared": list(declared), "from_dc_projects": list(from_projects),
+                     "not_declared": list(not_declared)},
                 ))
     referenced: dict[int, list[Where]] = {}
     for d in _deliverables(parsed):
@@ -1222,7 +1255,17 @@ def _check_wp(parsed: ParsedTables) -> CheckResult:
             findings.append(Finding(cid, KIND_MISSING_FIELD, f"WP{w}",
                                     f"WP{w} is referenced but no work-package block describes it",
                                     tuple(referenced[w][:3])))
-    notes = () if parsed.wp_blocks else ("no work-package block found; the check compared nothing",)
+    notes: tuple[str, ...] = ()
+    if not parsed.wp_blocks:
+        notes += ("no work-package block found; the check compared nothing",)
+    elif parsed.dc_projects:
+        notes += (
+            "DCs involved is compared in one direction: a package is reported when a DC project "
+            "names a package its DCs involved does not declare. A package declaring a DC whose "
+            "project does not name it is not reported — the reverse is not compared, because a "
+            "DC project names the packages that candidate's own research sits in, not every "
+            "package the candidate works in",
+        )
     return CheckResult(cid, title, compared, tuple(findings), notes)
 
 
@@ -1337,7 +1380,17 @@ def _check_milestones(parsed: ParsedTables) -> CheckResult:
             f"package(s) and their months are listed as context, not judged",
             row.where, (row.text[:160],), context,
         ))
-    notes = () if milestones else ("no milestones table found; the check compared nothing",)
+    notes: tuple[str, ...] = ()
+    if not milestones:
+        notes += ("no milestones table found; the check compared nothing",)
+    undeclared = sum(1 for f in findings if f.kind == KIND_UNDECLARED)
+    if undeclared:
+        notes += (
+            f"{undeclared} of {len(milestones)} milestones name no deliverable they depend on; a "
+            "dependency is not a column of the milestones table, so each of those findings records "
+            "an absence, not a declared value the candidate contradicts. The deliverables of the "
+            "related packages are carried as context and no month was judged against them",
+        )
     return CheckResult(cid, title, compared, tuple(findings), notes)
 
 
@@ -1348,6 +1401,10 @@ def _check_dcs(parsed: ParsedTables) -> CheckResult:
     table = _dcs(parsed)
     projects = {p.number: p for p in parsed.dc_projects}
     in_table = {d["number"] for d in table}
+    wp_ends = [b.window[1] for b in parsed.wp_blocks if b.window is not None]
+    latest_wp_end = max(wp_ends) if wp_ends else None
+    appointments_read = 0
+    outlasting: list[tuple[str, int]] = []
     if table or projects:
         compared += 1
         if in_table != set(projects):
@@ -1380,7 +1437,10 @@ def _check_dcs(parsed: ParsedTables) -> CheckResult:
                                     f"{subject}: start month or duration not parsable", row.where, (row.text[:160],)))
         else:
             last = d["start"] + d["duration"] - 1
-            ended_early: list[tuple[int, int]] = []
+            # Overlap only: a DC has to be employed while the package they
+            # contribute to runs.  See "What a check may compare" above for why
+            # the appointment's end is noted and not judged.
+            disjoint: list[tuple[int, int, int]] = []
             for w in p.host_wps:
                 compared += 1
                 block = parsed.wp(w)
@@ -1388,29 +1448,45 @@ def _check_dcs(parsed: ParsedTables) -> CheckResult:
                     findings.append(Finding(cid, KIND_INCONSISTENCY, subject,
                                             f"{subject}'s project names WP{w}, which no work-package block describes",
                                             (p.where,)))
-                elif block.window is not None and last > block.end:
-                    ended_early.append((w, block.end))
-            if ended_early:
-                wps = ", ".join(f"WP{w} ends M{e}" for w, e in ended_early)
+                    continue
+                window = block.window
+                if window is not None and (last < window[0] or d["start"] > window[1]):
+                    disjoint.append((w, window[0], window[1]))
+            if disjoint:
+                wps = ", ".join(f"WP{w}, which runs M{s}-M{e}" for w, s, e in disjoint)
                 where = row.where + (p.where,) + tuple(
-                    b.where for w, _ in ended_early for b in parsed.wp_blocks if b.number == w
+                    b.where for w, _, _ in disjoint for b in parsed.wp_blocks if b.number == w
                 )
                 findings.append(Finding(
                     cid, KIND_OUT_OF_WINDOW, subject,
-                    f"{subject} runs M{d['start']}-M{last} ({d['duration']} months); {wps}",
+                    f"{subject} runs M{d['start']}-M{last} ({d['duration']} months); its project "
+                    f"names {wps}, and the two do not overlap",
                     where, (row.text[:160],),
-                    {"dc_window": [d["start"], last], "wps_ending_before": [list(x) for x in ended_early]},
+                    {"dc_window": [d["start"], last], "wps_not_overlapping": [list(x) for x in disjoint]},
                 ))
+            appointments_read += 1
+            if latest_wp_end is not None and last > latest_wp_end:
+                outlasting.append((subject, last))
         if d["duration"] is not None and d["secondments"] is not None and d["secondments"] > d["duration"]:
             compared += 1
             findings.append(Finding(cid, KIND_INCONSISTENCY, subject,
                                     f"{subject}: {d['secondments']} secondment months exceed the {d['duration']}-month contract",
                                     row.where, (row.text[:160],)))
-    notes = ()
+    notes: tuple[str, ...] = ()
     if not table:
         notes += ("no DC table found; the check compared nothing",)
     if not projects:
         notes += ("no DC project blocks found in prose; the check compared nothing",)
+    if outlasting:
+        notes += (
+            f"{len(outlasting)} of the {appointments_read} appointments with a readable start "
+            f"and duration end after M{latest_wp_end}, the last month any work package runs. "
+            f"The latest ends "
+            f"M{max(m for _, m in outlasting)} "
+            f"({', '.join(f'{i} to M{m}' for i, m in outlasting)}). The candidate declares no "
+            "project window, so whether these appointments fit the project was not compared. "
+            "The recruitment table's duration column is the only bound the candidate states",
+        )
     return CheckResult(cid, title, compared, tuple(findings), notes)
 
 

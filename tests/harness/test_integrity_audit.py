@@ -46,6 +46,26 @@ DN_DOCUMENT = "MSCA-DN-2025_sanitised_part_b"
 if DN_WORKSPACE.is_dir():  # the revision table names the PDFs and registers
     from tools import import_external_proposal as ie
 
+DN_MATERIALISED = REPO / "docs" / "tier4_orchestration_state" / "msca_dn" / "audit" / "candidates"
+
+
+def _dn_findings(revision) -> set[tuple[str, str, str]]:
+    """Every finding the current rules give over one materialised DN candidate.
+
+    The directory route, so a superseded document version can be read: the
+    dev graph serves only the current one.
+    """
+    from harness.profile import load_profile
+
+    directory = DN_MATERIALISED / ie.node_id_of(REPO, revision)
+    assert directory.is_dir(), f"the materialised candidate is not committed: {directory}"
+    candidate = load_candidate(directory, load_profile(DN_PROFILE))
+    return {
+        (f.kind, f.subject, f.detail)
+        for c in ia.run_checks(ia.parse_candidate(candidate))
+        for f in c.findings
+    }
+
 
 # --------------------------------------------------------------------------- #
 # A small consistent world, built the way the importer renders one
@@ -179,6 +199,11 @@ def _audit(tmp_path: Path, profile, world, **kw) -> ia.IntegrityAuditReport:
 def _findings(report: ia.IntegrityAuditReport, check_id: str) -> list[ia.Finding]:
     (c,) = [c for c in report.checks if c.check_id == check_id]
     return list(c.findings)
+
+
+def _notes(report: ia.IntegrityAuditReport, check_id: str) -> tuple[str, ...]:
+    (c,) = [c for c in report.checks if c.check_id == check_id]
+    return c.notes
 
 
 # --------------------------------------------------------------------------- #
@@ -413,13 +438,36 @@ class TestCheckWorkPackages:
         assert ("WP1", "WP1 declares no lead participant") in missing
         assert ("WP1", "WP1 declares no DCs involved") in missing
 
-    def test_dcs_involved_against_the_dc_projects(self, tmp_path, profile):
+    def test_a_dc_whose_project_names_the_package_must_be_declared(self, tmp_path, profile):
         world = consistent_world()
         world["S3"] = [p.replace("DCs involved 1,2", "DCs involved 2") for p in world["S3"]]
         f = _findings(_audit(tmp_path, profile, world), "wp_table_vs_prose")
         (x,) = [x for x in f if x.kind == ia.KIND_INCONSISTENCY]
         assert x.subject == "WP2"
-        assert x.context == {"declared": [2], "from_dc_projects": [1, 2]}
+        assert x.detail == (
+            "WP2 declares DCs involved [2]; DC1 names WP2 on its host line in 1.1 and WP2 does "
+            "not declare it"
+        )
+        assert x.context == {"declared": [2], "from_dc_projects": [1, 2], "not_declared": [1]}
+
+    def test_a_package_may_involve_a_dc_whose_project_does_not_name_it(self, tmp_path, profile):
+        """Training, dissemination and management packages involve every DC.
+
+        A doctoral candidate's project in 1.1 names the research packages their
+        thesis sits in, not every package they work in, so the declared set is
+        the wider of the two.  R03 of plans/pe08_review_and_pe09_handoff_tickets.md:
+        set equality between the two reported WP6 and WP7 of the MSCA-DN candidate,
+        which declare DC1-9 while no project names either package.
+        """
+        world = consistent_world()
+        world["S3"] = _wp_block(3, "Training", 1, 36, "Beneficiary A", "1,2", ("Schools",)) + world["S3"]
+        f = _findings(_audit(tmp_path, profile, world), "wp_table_vs_prose")
+        assert [x.to_dict() for x in f if x.kind == ia.KIND_INCONSISTENCY] == []
+
+    def test_the_package_check_says_which_direction_it_compares(self, tmp_path, profile):
+        notes = _notes(_audit(tmp_path, profile, consistent_world()), "wp_table_vs_prose")
+        assert any("names a package its DCs involved does not declare" in n for n in notes)
+        assert any("the reverse is not compared" in n for n in notes)
 
     def test_a_task_under_the_wrong_package(self, tmp_path, profile):
         world = consistent_world()
@@ -491,6 +539,26 @@ class TestCheckMilestones:
         }
         assert "not judged" in x.detail
 
+    def test_an_undeclared_dependency_is_noted_as_resting_on_no_declared_value(self, tmp_path, profile):
+        """R03: 16 of the MSCA-DN candidate's 40 findings were of this one kind.
+
+        The milestones table carries no dependency column, so the finding records
+        an absence rather than a declared value the candidate contradicts.  The
+        note says so, beside the count, so the kind is not read as a violation.
+        """
+        world = consistent_world()
+        world["S3"] = [p.replace("D1.2 delivered", "Framework in the repository") for p in world["S3"]]
+        notes = _notes(_audit(tmp_path, profile, world), "milestone_dependencies")
+        assert any(
+            "1 of 2 milestones name no deliverable they depend on; a dependency is not a column "
+            "of the milestones table" in n for n in notes
+        )
+        assert any("records an absence, not a declared value the candidate contradicts" in n for n in notes)
+
+    def test_the_note_is_absent_when_every_milestone_names_its_deliverable(self, tmp_path, profile):
+        notes = _notes(_audit(tmp_path, profile, consistent_world()), "milestone_dependencies")
+        assert not any("name no deliverable they depend on" in n for n in notes)
+
     def test_a_milestone_outside_its_related_window(self, tmp_path, profile):
         world = consistent_world()
         world["S3"] = [p.replace("| M2.1 | Trials complete | 2 | Beneficiary B | M36 |",
@@ -511,14 +579,48 @@ class TestCheckDcs:
         (x,) = [x for x in f if x.subject == "DC set"]
         assert x.context == {"table": [1, 2], "projects": [1]}
 
-    def test_a_contract_running_past_its_packages(self, tmp_path, profile):
+    def test_a_contract_outlasting_its_packages_is_noted_not_faulted(self, tmp_path, profile):
+        """An appointment period and a work-package window are different relations.
+
+        R03 of plans/pe08_review_and_pe09_handoff_tickets.md: the appointment is
+        bounded by the recruitment table's own duration column, and nothing in the
+        candidate says it must end inside the window of every package the project
+        names.  The overrun is reported as a note, with the months, because no
+        project window is declared to compare it against.
+        """
         world = consistent_world()
         world["S3"] = [p.replace("| DC1 | Beneficiary A | Beneficiary A | M1 | 24 |",
                                  "| DC1 | Beneficiary A | Beneficiary A | M6 | 36 |") for p in world["S3"]]
+        report = _audit(tmp_path, profile, world)
+        assert [x.to_dict() for x in _findings(report, "dc_table_vs_projects")
+                if x.kind == ia.KIND_OUT_OF_WINDOW] == []
+        notes = _notes(report, "dc_table_vs_projects")
+        assert any(
+            "1 of the 2 appointments with a readable start and duration end after M36, the "
+            "last month any work package runs. The latest ends M41" in n for n in notes
+        )
+        assert any("The candidate declares no project window" in n for n in notes)
+
+    def test_an_appointment_that_never_overlaps_its_package_is_a_finding(self, tmp_path, profile):
+        """The relation the two do share: a DC must be employed while the package runs."""
+        world = consistent_world()
+        world["S3"] = [p.replace("Start month – End month: M6 – M36", "Start month – End month: M30 – M36")
+                       for p in world["S3"]]
+        world["S3"] = [p.replace("| DC1 | Beneficiary A | Beneficiary A | M1 | 24 |",
+                                 "| DC1 | Beneficiary A | Beneficiary A | M1 | 6 |") for p in world["S3"]]
         f = _findings(_audit(tmp_path, profile, world), "dc_table_vs_projects")
-        (x,) = [x for x in f if x.kind == ia.KIND_OUT_OF_WINDOW]
-        assert x.detail == "DC1 runs M6-M41 (36 months); WP1 ends M24, WP2 ends M36"
-        assert x.context == {"dc_window": [6, 41], "wps_ending_before": [[1, 24], [2, 36]]}
+        (x,) = [x for x in f if x.subject == "DC1" and x.kind == ia.KIND_OUT_OF_WINDOW]
+        assert x.detail == (
+            "DC1 runs M1-M6 (6 months); its project names WP2, which runs M30-M36, and the two "
+            "do not overlap"
+        )
+        assert x.context == {"dc_window": [1, 6], "wps_not_overlapping": [[2, 30, 36]]}
+
+    def test_an_appointment_inside_its_packages_is_neither_a_finding_nor_a_note(self, tmp_path, profile):
+        report = _audit(tmp_path, profile, consistent_world())
+        assert [x.to_dict() for x in _findings(report, "dc_table_vs_projects")
+                if x.kind == ia.KIND_OUT_OF_WINDOW] == []
+        assert not any("appointments end after" in n for n in _notes(report, "dc_table_vs_projects"))
 
     def test_secondments_longer_than_the_contract(self, tmp_path, profile):
         world = consistent_world()
@@ -862,13 +964,13 @@ class TestMscaDnWorkspace:
     def test_findings_by_check(self, report):
         by_check = {c["check_id"]: c["findings_by_kind"] for c in report["checks"]}
         assert by_check == {
-            "wp_table_vs_prose": {"inconsistency": 5},
+            "wp_table_vs_prose": {"inconsistency": 3},
             "deliverable_wp_window": {},
             "milestone_dependencies": {"undeclared_dependency": 16, "out_of_window": 1},
-            "dc_table_vs_projects": {"out_of_window": 9, "not_comparable": 9},
+            "dc_table_vs_projects": {"not_comparable": 9},
             "risk_table_vs_prose": {},
         }
-        assert report["findings_total"] == 40
+        assert report["findings_total"] == 29
 
     def test_the_named_findings(self, report):
         details = {f["detail"] for c in report["checks"] for f in c["findings"]}
@@ -880,24 +982,42 @@ class TestMscaDnWorkspace:
         # Nothing reports WP4 as undescribed any more, in any check.
         assert not [d for d in details if "no work-package block describes" in d]
         assert "M7.3 is due M48; its related WP7 runs M1-M36" in details
-        assert "DC1 runs M5-M40 (36 months); WP1 ends M36, WP2 ends M36, WP4 ends M36" in details
-        assert any(
-            d.startswith("WP1 declares DCs involved [1, 2, 4, 6, 8]; the DC projects in 1.1 that name WP1")
-            for d in details
-        )
+        assert (
+            "WP1 declares DCs involved [1, 2, 4, 6, 8]; DC9 names WP1 on its host line in 1.1 "
+            "and WP1 does not declare it"
+        ) in details
         (risk,) = [c for c in report["checks"] if c["check_id"] == "risk_table_vs_prose"]
         assert "threshold stated in any risk row: yes (risk 1: '60%')" in risk["notes"]
 
+    def test_the_appointments_outlasting_the_packages_are_noted_not_faulted(self, report):
+        """R03: nine findings said a 36-month appointment from M5 ends after the
+        packages it names. The appointment period and a package window are
+        different relations, so the overrun is a note and the count is zero."""
+        (dcs,) = [c for c in report["checks"] if c["check_id"] == "dc_table_vs_projects"]
+        assert dcs["findings_by_kind"] == {"not_comparable": 9}
+        assert any(
+            "9 of the 9 appointments with a readable start and duration end after M36, the "
+            "last month any work package runs. The latest ends M40" in n for n in dcs["notes"]
+        )
+
+    def test_every_milestone_lacking_a_dependency_is_noted_as_an_absence(self, report):
+        (ms,) = [c for c in report["checks"] if c["check_id"] == "milestone_dependencies"]
+        assert any(
+            "16 of 16 milestones name no deliverable they depend on; a dependency is not a column "
+            "of the milestones table" in n for n in ms["notes"]
+        )
+
     def test_the_one_finding_the_revision_adds_is_wp4s_own_dc_set(self, report):
         """Reading WP4's fields does not make its findings disappear: the DC set it
-        now states disagrees with the DC projects of 1.1, which the first copy
-        could not be checked for because it stated no set."""
+        now states omits three candidates whose own projects name WP4, which the
+        first copy could not be checked for because it stated no set."""
         (wp,) = [c for c in report["checks"] if c["check_id"] == "wp_table_vs_prose"]
         (wp4,) = [f for f in wp["findings"] if f["subject"] == "WP4"]
         assert wp4["kind"] == ia.KIND_INCONSISTENCY
         assert wp4["context"] == {
             "declared": [3, 5, 6, 7, 8, 9],
             "from_dc_projects": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "not_declared": [1, 2, 4],
         }
         assert wp4["where"][0] == {
             "section_id": "implementation_section", "sub_section_id": "3.1", "paragraph_index": 30,
@@ -905,20 +1025,41 @@ class TestMscaDnWorkspace:
         assert wp4["evidence"] == ["DCs involved 3,5,6,7,8,9"]
 
     def test_the_revision_differs_from_the_first_copy_by_four_findings(self, report):
-        """Against the committed PE-07 report over the first copy: three
-        missing_field findings resolved, one inconsistency added, nothing else."""
-        first = json.loads(
-            (REPO / "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json")
-            .read_text(encoding="utf-8")
-        )
-        before = {(f["kind"], f["subject"], f["detail"])
-                  for c in first["checks"] for f in c["findings"]}
+        """Three missing_field findings resolved, one inconsistency added, nothing
+        else. Both sides run under the current rules, so the difference is the
+        revision's and not R03's."""
+        before = _dn_findings(ie.revision_by_id("sanitised_v1"))
         after = {(f["kind"], f["subject"], f["detail"])
                  for c in report["checks"] for f in c["findings"]}
         assert sorted(k + " " + s for k, s, _ in before - after) == [
             "missing_field WP4", "missing_field WP4", "missing_field WP4",
         ]
         assert [(k, s) for k, s, _ in after - before] == [(ia.KIND_INCONSISTENCY, "WP4")]
+
+    def test_the_r03_corrections_drop_eleven_findings_and_restate_three(self, report):
+        """Against the committed PE-08 report, which the dispositions cite: the
+        nine DC appointment overruns and the WP6/WP7 whole-cohort sets are gone,
+        the three remaining WP sets are restated in the direction now compared,
+        and nothing new is claimed."""
+        old = json.loads(
+            (REPO / "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json")
+            .read_text(encoding="utf-8")
+        )
+        before = {(f["kind"], f["subject"], f["detail"])
+                  for c in old["checks"] for f in c["findings"]}
+        after = {(f["kind"], f["subject"], f["detail"])
+                 for c in report["checks"] for f in c["findings"]}
+        assert old["findings_total"] == 40 and report["findings_total"] == 29
+        gone = sorted(f"{k} {s}" for k, s, _ in before - after)
+        assert gone == [
+            "inconsistency WP1", "inconsistency WP2", "inconsistency WP4",
+            "inconsistency WP6", "inconsistency WP7",
+            *[f"out_of_window DC{n}" for n in range(1, 10)],
+        ]
+        # The three WP sets come back restated; no subject is new.
+        assert sorted(f"{k} {s}" for k, s, _ in after - before) == [
+            "inconsistency WP1", "inconsistency WP2", "inconsistency WP4",
+        ]
 
     def test_the_committed_pe07_report_over_the_first_copy_is_unchanged(self):
         """The earlier audit is history and stays readable: it names the

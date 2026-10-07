@@ -640,6 +640,24 @@ threshold. Every finding has a `kind` from a closed set (`inconsistency`,
 the row text. **No finding is a score**; a test pins that no score-shaped key
 appears in a report, and findings never move the exit code.
 
+**What a check compares, and what it only notes (ticket R03).** Two of those
+comparisons put unlike things side by side and were corrected. *DCs involved*
+is now compared in one direction only: a package is reported when a DC project
+in 1.1 names a package that package's own DC set omits. The reverse is not
+reported, because a host line states the packages one candidate's research
+sits in, not every package that candidate works in — which is why every
+training, dissemination and management package involves the whole cohort and
+appears on no host line. *An appointment period* is compared with a
+work-package window for overlap only: a candidate has to be employed while the
+package they contribute to runs. An appointment that outlasts every package is
+a check note with its months, not a finding, because the recruitment table's
+own duration column is the only bound the candidate states and no source ties
+that period to a package window. A third note says what the milestone check
+rests on: a dependency is not a column of the milestones table, so an
+`undeclared_dependency` finding records an absence rather than a declared
+value the candidate contradicts. No `kind` changed, so every reference an
+earlier report recorded still resolves.
+
 **The work-package header (`split_header_fields`).** A header field is
 `<label> <value>`, and the labels are looked for in the order the application
 form fixes them: `WP Number`, `WP title`, `Start month - End month` (or a
@@ -775,11 +793,18 @@ evidence supports the proposition the ESR states (`semantic_agreement`:
 agreed, disputed, unresolved, not_applicable), the basis for that judgment
 and its §12.2 status, what the ESR complains of (`esr_complaint`: an absent
 detail, an inadequately explained one, both, other), the uncertainty, a
-recommendation (retain, revisit in R03, revisit after the R04 declaration,
-revisit after the private network) and a recommended disposition. A row that
-is not "agreed, retain" must name an `operator_decision`: a disputed row
-without a question hands the operator a disagreement and nothing to decide.
-A recommended disposition that differs from the comparison's needs one too.
+recommendation (retain, revisit in R03, adjudicated, revisit after the R04
+declaration, revisit after the private network) and a recommended disposition.
+A row that is not "agreed, retain" must name an `operator_decision`: a disputed
+row without a question hands the operator a disagreement and nothing to decide.
+A recommended disposition that differs from the comparison's needs one too, and
+so does an `adjudicated` row — an adjudication is a reading, never an approval.
+
+A notes file may also name an `adjudication_record` and a
+`supersession_note`. The record is re-hashed and listed among the report's
+inputs, and the report refuses to cite reasoning it cannot hash. The note is
+printed above the counts, so a second rendering of one comparison explains
+itself instead of leaving a reader to diff two reports.
 
 Measured on every run and refused on failure: every observation of the ESR
 record covered exactly once, every reference resolved again through the
@@ -796,7 +821,29 @@ praised as the evaluators did and 6 criticisms it caught; the report states
 that split before any rate. Two artifacts are written, sharing a sequence
 number and overwriting nothing: the full review and a decisions file holding
 only the questions. Markdown, LF, under the `-text` tree, so a committed
-report replays byte for byte apart from its `Generated:` line.
+report replays byte for byte apart from its `Generated:` line. Each committed
+report names the notes record it was rendered from, and a test rebuilds each
+from that record rather than from file order, so a second rendering never
+makes the first unreproducible.
+
+**Semantic adjudication (ticket R03).** A reference that resolves perfectly
+can still be about a different proposition, and no code settles that. The
+adjudication record (`esr_semantic_adjudications`) is where a reader does,
+one row per dispute: what the rule compared and whether the two are the same
+relation, a *measured* half and an *interpretation* half with a §12.2 status
+each, the consequence, and the decision left for the operator. Evidence is
+quoted by reference — candidate quote, blind finding, audit finding, register
+pointer, application-form column — and
+`tests/harness/test_semantic_adjudications.py` resolves every one of them
+through the comparison's own resolvers, re-hashes every named input, and
+refuses a record whose evidence does not hold. Classifications are the five
+the ticket names plus `unsupported_lane_claim`, for an assessor statement the
+input that assessor received contradicts; it is neither an extraction issue
+nor a sanitisation limitation, because nothing was mis-read and nothing was
+removed. A `failure_mode` separates a point no lane output engages with from a
+passage a lane read and rated adequate, read and misattributed, or read and
+asked a different question of. The distinction is recorded, never counted: no
+rate in any artifact uses it.
 
 ## Response checkpoint and the bounded re-ask (`response_cache.py`)
 

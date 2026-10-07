@@ -34,6 +34,10 @@ Reference validity and semantic agreement are two fields, not one.  A blind
 finding can resolve perfectly against the baseline and still be about a
 different proposition than the ESR sentence it was filed under; that is the
 subject of R03, and this report is where such a row is named and handed over.
+A notes record may then name the adjudication record that took the row up
+(``adjudication_record``, recommendation ``adjudicated``). The report lists it
+among its inputs with its own hash, and the row still names the decision left
+for the operator: an adjudication is a reading and not an approval.
 Counts keep strengths apart from criticisms for the same reason: the
 comparison's ``independently_detected`` rows include strengths the blind lane
 praised as the evaluators did, and nothing here may present that total as
@@ -129,14 +133,19 @@ COMPLAINTS: tuple[str, ...] = (
     COMPLAINT_NOT_APPLICABLE,
 )
 
-#: What the reviewer recommends happen to the row next.
+#: What the reviewer recommends happen to the row next.  ``adjudicated`` is for
+#: a row a later semantic adjudication has taken up: the reasoning lives in the
+#: record the notes name in ``adjudication_record``, and what is left for the
+#: human is still named in ``operator_decision``.  It is not an approval.
 RECOMMENDATION_RETAIN = "retain"
 RECOMMENDATION_R03 = "revisit_in_r03"
+RECOMMENDATION_ADJUDICATED = "adjudicated"
 RECOMMENDATION_AFTER_DECLARATION = "revisit_after_declaration"
 RECOMMENDATION_AFTER_PRIVATE_NETWORK = "revisit_after_private_network"
 RECOMMENDATIONS: tuple[str, ...] = (
     RECOMMENDATION_RETAIN,
     RECOMMENDATION_R03,
+    RECOMMENDATION_ADJUDICATED,
     RECOMMENDATION_AFTER_DECLARATION,
     RECOMMENDATION_AFTER_PRIVATE_NETWORK,
 )
@@ -214,6 +223,26 @@ class ReviewNotes:
     def declared_by(self) -> str:
         return str(self.data.get("declared_by") or "")
 
+    @property
+    def supersession_note(self) -> str:
+        """Why this notes record exists beside an earlier one, or ``""``.
+
+        A later ticket may re-read a comparison the first notes already read.
+        The note says what changed and what did not. The report prints it, so a
+        reader of the second rendering is not left to diff the two.
+        """
+        return str(self.data.get("supersession_note") or "")
+
+    @property
+    def adjudication_record(self) -> str:
+        """Repository path of the semantic adjudication record, or ``""``.
+
+        A later ticket may adjudicate rows this file first drafted. The notes
+        then name the record that holds the reasoning, and the report lists it
+        among its inputs with its own hash.
+        """
+        return str(self.data.get("adjudication_record") or "")
+
 
 def _text(row: Mapping[str, Any], key: str, *, label: str, required: bool) -> str | None:
     value = row.get(key)
@@ -282,6 +311,15 @@ def load_review_notes(path: Path | str) -> ReviewNotes:
             f"{', '.join(REVIEW_STATES)} is permitted. An agent-drafted review never "
             "records operator approval."
         )
+    if "adjudication_record" in data and not (
+        isinstance(data["adjudication_record"], str) and data["adjudication_record"].strip()
+    ):
+        raise OperatorReviewError(
+            f"review notes {p}: 'adjudication_record' must be the repository path of the "
+            "record that holds the adjudication reasoning, or absent."
+        )
+    if "supersession_note" in data:
+        _text(data, "supersession_note", label=f"review notes {p}", required=True)
     rows = data.get("rows")
     if not isinstance(rows, list) or not rows:
         raise OperatorReviewError(f"review notes {p} hold no rows.")
@@ -763,6 +801,8 @@ class Review:
     rows: tuple[ReviewRow, ...]
     counts: Mapping[str, Any]
     generated_at: str
+    #: The semantic adjudication record, when the notes name one.
+    adjudication: InputRecord | None = None
 
     @property
     def decisions(self) -> tuple[ReviewRow, ...]:
@@ -833,6 +873,26 @@ def build_review(
         rows=tuple(built),
         counts=counts,
         generated_at=(clock or _utc_now)(),
+        adjudication=_adjudication_record(inputs, notes),
+    )
+
+
+def _adjudication_record(inputs: ResolvedInputs, notes: ReviewNotes) -> InputRecord | None:
+    """Hash the adjudication record the notes name, or refuse when it is gone."""
+    declared = notes.adjudication_record
+    if not declared:
+        return None
+    path = _under(inputs.repo_root, declared)
+    if not path.is_file():
+        raise OperatorReviewError(
+            f"the review notes name adjudication record {declared!r}, which is not a file. "
+            "A report may not cite reasoning it cannot hash."
+        )
+    return InputRecord(
+        role="semantic adjudications",
+        path=_portable(path, inputs.repo_root),
+        sha256=file_sha256(path),
+        note="the reasoning behind every row this review reports as adjudicated",
     )
 
 
@@ -911,10 +971,15 @@ def render_review(review: Review) -> str:
     add(f"Generated: {review.generated_at}  ")
     add(f"Review state: **{review.notes.review_state}**  ")
     add(f"Drafted by: {review.notes.declared_by}  ")
+    if review.adjudication is not None:
+        add(f"Adjudications: `{_cell(review.adjudication.path)}`  ")
     add("Ticket: R02 of `plans/pe08_review_and_pe09_handoff_tickets.md`")
     add("")
     add(_PROVISIONAL)
     add("")
+    if review.notes.supersession_note:
+        add(review.notes.supersession_note)
+        add("")
     add(
         "This report reads the committed PE-08 comparison. It changes no disposition, "
         "writes no revision and calls no assessor. Every reference below was resolved "
@@ -936,6 +1001,12 @@ def render_review(review: Review) -> str:
         f"| review notes | `{_cell(_portable(review.notes.path, review.inputs.repo_root))}` "
         f"| `{_cell(review.notes.sha256[:16])}…` | the declared half of this report |"
     )
+    if review.adjudication is not None:
+        a = review.adjudication
+        add(
+            f"| {_cell(a.role)} | `{_cell(a.path)}` | `{_cell((a.sha256 or '')[:16])}…` "
+            f"| {_cell(a.note)} |"
+        )
     add("")
     add(
         "Each hash above was recomputed from the file on disk. A mismatch refuses the "
@@ -1289,6 +1360,8 @@ def render_decisions(review: Review, *, review_name: str | None = None) -> str:
     add(f"Generated: {review.generated_at}  ")
     add(f"Review state: **{review.notes.review_state}**  ")
     add("Ticket: R02 of `plans/pe08_review_and_pe09_handoff_tickets.md`  ")
+    if review.adjudication is not None:
+        add(f"Adjudications: `{_cell(review.adjudication.path)}`  ")
     add(f"Full report: `{review_name or _REVIEW_PREFIX}` (same directory)  ")
     add(
         "Comparison: "

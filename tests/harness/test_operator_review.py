@@ -50,9 +50,18 @@ from tests.harness.test_esr_comparison import (  # noqa: F401 - fixtures
 REPO = find_repo_root()
 DN_COMPARISON = REPO / "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json"
 DN_NOTES = REPO / "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1.json"
+DN_NOTES_R03 = REPO / "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json"
 DN_REVIEWS = REPO / "docs/tier4_orchestration_state/msca_dn/reviews"
 
 _GENERATED = re.compile(r"^Generated: .*$", re.MULTILINE)
+_NOTES_ROW = re.compile(r"^\| review notes \| `([^`]+)` \|", re.MULTILINE)
+
+
+def _notes_named_by(report: Path) -> Path:
+    """The notes record a committed report lists in its own input inventory."""
+    match = _NOTES_ROW.search(report.read_text(encoding="utf-8"))
+    assert match, f"{report.name} names no review notes in its inputs"
+    return REPO / match.group(1)
 
 
 # --------------------------------------------------------------------------- #
@@ -582,6 +591,56 @@ class TestTheRenderedReport:
         assert code == 2
         assert "a question for the operator" in capsys.readouterr().err
 
+    def test_an_adjudicated_row_still_names_the_operators_decision(self, written):
+        """``adjudicated`` records that a later ticket took the row up. It is not
+        an approval, so the row must still hand the operator a question."""
+        def mutate(data):
+            data["rows"][0]["recommendation"] = orv.RECOMMENDATION_ADJUDICATED
+        _edit(written["notes"], mutate)
+        _rebind(written)
+        with pytest.raises(orv.OperatorReviewError, match="operator_decision"):
+            orv.load_review_notes(written["notes"])
+
+    def test_an_adjudicated_row_with_a_question_is_accepted(self, written):
+        def mutate(data):
+            data["rows"][0]["recommendation"] = orv.RECOMMENDATION_ADJUDICATED
+            data["rows"][0]["operator_decision"] = "Confirm the adjudication's reading."
+        _edit(written["notes"], mutate)
+        _rebind(written)
+        notes = orv.load_review_notes(written["notes"])
+        assert notes.rows["OBS-1"]["recommendation"] == orv.RECOMMENDATION_ADJUDICATED
+
+    def test_an_adjudication_record_is_listed_among_the_inputs_with_its_hash(self, written):
+        record = _write_json(
+            written["world"] / "docs" / "review" / "adjudications.json", {"adjudications": []}
+        )
+        _edit(
+            written["notes"],
+            lambda d: d.__setitem__("adjudication_record", "docs/review/adjudications.json"),
+        )
+        _rebind(written)
+        text = _report_text(written)
+        assert "| semantic adjudications | `docs/review/adjudications.json` |" in text
+        assert orv.file_sha256(record)[:16] in text
+        assert "Adjudications: `docs/review/adjudications.json`" in text
+
+    def test_an_adjudication_record_that_is_not_there_is_refused(self, written):
+        _edit(
+            written["notes"],
+            lambda d: d.__setitem__("adjudication_record", "docs/review/gone.json"),
+        )
+        _rebind(written)
+        code, _ = _review(written)
+        assert code != 0
+
+    def test_a_supersession_note_is_printed_so_a_second_rendering_explains_itself(self, written):
+        _edit(
+            written["notes"],
+            lambda d: d.__setitem__("supersession_note", "The first record stays as written."),
+        )
+        _rebind(written)
+        assert "The first record stays as written." in _report_text(written)
+
     def test_a_recommended_change_is_marked_in_the_row(self, written):
         def mutate(data):
             data["rows"][0]["recommended_disposition"] = "partially_observable"
@@ -602,10 +661,10 @@ class TestTheRenderedReport:
     not DN_COMPARISON.is_file() or not DN_NOTES.is_file(), reason="MSCA-DN artifacts absent"
 )
 class TestCommittedMscaDn:
-    def _build(self) -> orv.Review:
+    def _build(self, notes_path: Path | None = None) -> orv.Review:
         profile = load_profile_bundle(str(DN_PROFILE), repo_root=REPO)
         resolved = orv.resolve_inputs(DN_COMPARISON, repo_root=REPO, profile=profile.profile)
-        notes = orv.load_review_notes(DN_NOTES)
+        notes = orv.load_review_notes(notes_path or DN_NOTES)
         return orv.build_review(resolved, notes, clock=lambda: FROZEN)
 
     def test_the_notes_cover_the_esr_records_observations_exactly_once(self):
@@ -647,16 +706,65 @@ class TestCommittedMscaDn:
                 assert row.decision, row.observation_id
 
     @pytest.mark.skipif(not DN_REVIEWS.is_dir(), reason="the review has not been written yet")
-    def test_the_committed_report_is_reproduced_by_re_rendering(self):
-        review = self._build()
-        report = sorted(DN_REVIEWS.glob("operator_review_*.md"))[-1]
-        decisions = sorted(DN_REVIEWS.glob("operator_decisions_*.md"))[-1]
-        for path, rendered in (
-            (report, orv.render_review(review)),
-            (decisions, orv.render_decisions(review, review_name=report.name)),
-        ):
-            recorded = path.read_text(encoding="utf-8")
-            assert _GENERATED.sub("", recorded) == _GENERATED.sub("", rendered), path.name
+    def test_every_committed_report_is_reproduced_from_the_notes_it_names(self):
+        """Each rendering is rebuilt from the notes record it lists as its own.
+
+        Pairing by its own inventory, not by file order: a second rendering of
+        the same comparison reads different notes, and the earlier report must
+        stay reproducible after it.
+        """
+        reports = sorted(DN_REVIEWS.glob("operator_review_*.md"))
+        assert reports
+        for report in reports:
+            notes_path = _notes_named_by(report)
+            review = self._build(notes_path)
+            decisions = report.parent / report.name.replace(
+                "operator_review_", "operator_decisions_"
+            )
+            for path, rendered in (
+                (report, orv.render_review(review)),
+                (decisions, orv.render_decisions(review, review_name=report.name)),
+            ):
+                recorded = path.read_text(encoding="utf-8")
+                assert _GENERATED.sub("", recorded) == _GENERATED.sub("", rendered), path.name
+
+    @pytest.mark.skipif(not DN_NOTES_R03.is_file(), reason="R03 has not been written yet")
+    def test_the_r03_notes_adjudicate_the_seven_rows_r02_handed_on(self):
+        """R02's record is untouched: its seven rows still ask for R03. R03's
+        record carries the same seven as adjudicated, each with a question."""
+        handed = {
+            oid
+            for oid, row in orv.load_review_notes(DN_NOTES).rows.items()
+            if row["recommendation"] == orv.RECOMMENDATION_R03
+        }
+        assert handed == {
+            "ESR-E-03", "ESR-E-04", "ESR-E-07", "ESR-E-09", "ESR-Q-01", "ESR-Q-02", "ESR-Q-03",
+        }
+        r03 = orv.load_review_notes(DN_NOTES_R03)
+        adjudicated = {
+            oid
+            for oid, row in r03.rows.items()
+            if row["recommendation"] == orv.RECOMMENDATION_ADJUDICATED
+        }
+        assert adjudicated == handed
+        for oid in sorted(adjudicated):
+            assert (r03.rows[oid].get("operator_decision") or "").strip(), oid
+        assert (REPO / r03.adjudication_record).is_file()
+        assert r03.supersession_note
+
+    @pytest.mark.skipif(not DN_NOTES_R03.is_file(), reason="R03 has not been written yet")
+    def test_r03_changes_no_row_r02_had_settled(self):
+        """Only the handed-over rows differ, and only in their declared fields."""
+        before = orv.load_review_notes(DN_NOTES).rows
+        after = orv.load_review_notes(DN_NOTES_R03).rows
+        assert set(before) == set(after)
+        differing = {oid for oid in before if before[oid] != after[oid]}
+        assert differing == {
+            "ESR-E-03", "ESR-E-04", "ESR-E-07", "ESR-E-09", "ESR-Q-01", "ESR-Q-02", "ESR-Q-03",
+        }
+        for oid in sorted(differing):
+            assert before[oid]["semantic_agreement"] == after[oid]["semantic_agreement"], oid
+            assert before[oid]["esr_complaint"] == after[oid]["esr_complaint"], oid
 
     def test_the_two_committed_artifacts_name_each_other_and_share_a_run(self):
         report = sorted(DN_REVIEWS.glob("operator_review_*.md"))[-1]

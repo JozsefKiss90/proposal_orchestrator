@@ -1,0 +1,120 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-semantic-adjudication_2026-10-07",
+  "date": "2026-10-07",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket R03 of plans/pe08_review_and_pe09_handoff_tickets.md: adjudicate the semantic false positives and the ESR matching the R02 review handed on, and correct the audit rules that compare unlike relations",
+  "authority": "CLAUDE.md §9.1 (docs/ is the durable record), §9.4 (a decision that affects future interpretation is written here), §9.5 (an output is reproducible from its documented inputs), §10.5 (every material claim names its tiered source), §10.6 (Tier 1 and Tier 2 sources govern; generic programme knowledge is a last resort and must be flagged), §11.2 (Tier 2A governs instrument structure), §12.2 (the four status categories), §12.3 (a contradiction is resolved explicitly and the resolution recorded), §13.2 (no invented call constraint), §15 (explicit failure over fabricated completion).",
+  "problem": {
+    "declared_status": "Confirmed",
+    "basis": "the seven rows the R02 review notes recommend 'revisit_in_r03', read in the committed artifacts",
+    "statement": "A deterministic comparison can be syntactically correct and still compare two different relationships. Eleven of the 40 findings in the audit the dispositions cite rested on such a comparison, and three ESR rows were credited to a lane on evidence about something else.",
+    "detail": [
+      "Nine findings said a 36-month appointment starting M5 ends after the work packages it names. Every package ends M36, so the rule fired once per candidate on the same arithmetic.",
+      "Two findings said WP6 and WP7 declare DC1-9 while no DC project in 1.1 names either. Training and impact packages involve the whole cohort and appear on no host line, so set equality cannot hold for them in any compliant proposal.",
+      "Sixteen findings said a milestone names no deliverable it depends on. The milestones table the application form fixes has no dependency column.",
+      "One blind shortcoming said no intermediate milestones are shown. The implementation section the assessor received carries the milestones table with a due month for each of 16 milestones.",
+      "ESR-E-04's partial detection rested on a finding about sample sizes, where the ESR faults a multihospital, multi-operator design."
+    ]
+  },
+  "decision": {
+    "declared_status": "Confirmed",
+    "basis": "the adjudication record, the rule corrections and the verification below",
+    "two_halves_per_row": "Every adjudication separates a measured half from an interpretation half and gives each its own §12.2 status. A01's measurement is Confirmed and its reading is Confirmed; A04's measurement is Confirmed and its reading Unresolved, because the candidate declares no project duration and Tier 2B holds no extract for this call. A reader can see where the evidence stops.",
+    "tier2a_is_the_authority_for_what_a_table_means": "The two rule corrections rest on the MSCA-DN Part B application form, not on programme knowledge (§10.6, §11.2). Table 3.1d's duration column reads '3-36 (up to 48 for DN-JD)' and ties the appointment to nothing else. Table 3.1a asks applicants to say which organisation and DCs will do each task. Table 3.1c carries number, title, related work package(s), lead beneficiary, due date and means of verification, and no dependency. Each quote is checked against the form's own bytes by a test.",
+    "the_limit_of_the_overlap_test_is_declared": "One month of overlap passes it, so the appointment's end is noted and never judged. A stronger test would need a premise no source gives, and the obvious candidate is false: a 36-month appointment cannot cover a 36-month package unless it starts in month 1. Overlap is the strongest sound test available, and A01 says so rather than leaving a reader to find it.",
+    "corrections_are_general": "No WP4, M7.3 or page-specific exception was added. DCs involved is compared by containment in the one direction the two statements support, so WP1, WP2 and WP4 are still reported and name the omitted candidates. The appointment window is compared for overlap, so a candidate employed outside the package they contribute to is still reported — a case the old rule never tested. Representative positive and negative cases are in the audit suite.",
+    "an_absence_is_noted_not_re_kinded": "The 16 milestone findings keep their kind and their text. Re-kinding them would break every reference the committed comparison recorded into that report, and the ticket asks for the distinction in prose rather than in an enum. A check note states that a dependency is not a column, so the kind is not read as a violation.",
+    "which_vocabularies_were_extended_and_why": "Item 6 forbids changing an existing report enum silently. Two report enums were candidates and neither changed: the audit's finding kinds and the comparison's dispositions. Every reference an earlier artifact recorded into them still resolves. What did gain a value is the review notes' own recommendation vocabulary, which R02 introduced for the declared half: 'adjudicated' says a later ticket took the row up. That is not silent — it is in the module constant, in the notes' own vocabulary list, in harness/HARNESS.md, and under test, and the loader still demands an operator_decision for such a row. The adjudication record coins its own vocabularies rather than borrowing any report's.",
+    "the_record_adds_two_classes_and_defines_all_seven": "The ticket names five classes and two cases need a sixth and seventh. A blind-lane statement contradicted by the input that lane received is none of the five: nothing was mis-extracted and nothing was removed by sanitisation. That is 'unsupported_lane_claim' (A05, A10). A dispute the review raised that the measurement does not sustain is none of them either, because the row stands as recorded and no comparison was mis-framed. That is 'dispute_not_sustained' (A07, where the baseline turns out to say nothing about the evaluation design in any sample or cell). The record defines all seven, so each label is defensible from the artifact itself, and no enum of any existing report is changed.",
+    "the_missed_rows_differ_in_kind": "A failure_mode separates a point no lane output engages with (ESR-E-03: the frozen baseline never uses the words prospective, shadow or retrospective) from a passage a lane read and rated adequate (ESR-E-07, ESR-E-09, each cited approvingly by its cell's own members) and one a lane read and misattributed (ESR-Q-02: four of five samples credit the deliverables table with the milestones table's verification column). The distinction is recorded and no rate uses it.",
+    "the_review_is_regenerated_not_edited": "R02's notes and its rendered report stay byte-unchanged. R03 writes a second notes record and renders a second report from it. The R02 decision record expected the regeneration to run over a successor comparison; it does not, because writing a successor comparison is R05's step. The review therefore reads the same comparison with the adjudicated reading, and each committed report now names the notes record it was rendered from so the first stays reproducible.",
+    "nothing_is_approved": "Every adjudicated row carries recommendation 'adjudicated' and still names an operator_decision. review_state has one permitted value and no 'approved' value exists. An adjudication is a reading for review."
+  },
+  "what_changed_in_the_findings": {
+    "declared_status": "Confirmed",
+    "basis": "the two audit reports, compared by kind, subject and detail in a test",
+    "cited_report": "integrity_242f1afb02c8_0001.json, 40 findings, byte-unchanged",
+    "successor": "integrity_242f1afb02c8_0002.json, 29 findings, bound to the same candidate and the same snapshot",
+    "removed": "nine out_of_window findings over DC1-DC9; the WP6 and WP7 DC-set findings",
+    "restated": "the WP1, WP2 and WP4 DC-set findings, each now naming the candidates the package omits: DC9, DC8, and DC1, DC2, DC4",
+    "added": "none",
+    "first_sanitised_copy": "the same eleven findings fall away over the first copy, 42 to 31. Its committed report is historical evidence and is not regenerated: the dev graph serves only the current document version, so a successor there could not be bound to a snapshot. The figure is measured in a test over the materialised candidate instead."
+  },
+  "the_decisions_put_to_the_operator": {
+    "declared_status": "Confirmed",
+    "basis": "the adjudication record's operator_decision fields and the R03 review notes",
+    "rule_questions": [
+      "A01: nine candidates are employed to M40 while no work package runs past M36. Whether the work plan should state activity for months 37-40, or a project duration, is an R05 drafting decision.",
+      "A02: WP2 declares DC9, whose host line names WP1, WP3 and WP4. The declared-only direction is no longer reported. Whether it should return as a weaker observation is open; reporting it would report WP6 and WP7 again.",
+      "A03: whether the milestone-dependency rule earns its 16 findings, or should be retired in favour of the two tests that rest on declared values."
+    ],
+    "row_questions": [
+      "ESR-E-04: the disposition cannot stay partially_observable. Choose not_detected_despite_sufficient_preserved_evidence or not_assessable.",
+      "ESR-E-07 and ESR-E-09: whether a calibration disagreement counts against the lane in the same figure as a point it never reached.",
+      "ESR-Q-01: confirm the withdrawal of the sample-0 citation; the disposition does not change.",
+      "ESR-Q-02: confirm the misattribution is reported to the assessor's own account in PE-09.",
+      "ESR-Q-03: whether the row stays independently_detected on the timing half alone, and whether M7.3 after the work plan ends is an error or an intended commitment."
+    ],
+    "for_the_private_network": [
+      "ESR-E-04: whether the submission stated the cohort's sites and operators.",
+      "ESR-Q-01: whether the submission carried a Gantt or dependency figure."
+    ]
+  },
+  "verification": {
+    "declared_status": "Confirmed",
+    "basis": "run on 2026-10-07 in the working tree of this branch",
+    "audit_suite": "tests/harness/test_integrity_audit.py, 92 tests, all passing. New or rewritten: a DC a package omits is reported and names it; a package involving a DC whose project does not name it is not reported; the check states which direction it compares; an appointment outlasting its packages is a note with its months and not a finding; an appointment that never overlaps its package is a finding; an appointment inside its packages is neither; the milestone note fires with its count and is absent when every milestone names its deliverable. The workspace figures are re-pinned to 29, and a new test compares the successor with the committed report finding by finding.",
+    "adjudication_record": "tests/harness/test_semantic_adjudications.py, 27 tests. Every named input re-hashed; every candidate quote resolved through the comparison's own resolver; every blind and audit reference resolved and its recorded text compared; every register pointer resolved; every application-form quote found in the form's own bytes; the observation ids drawn from the ESR record and covering all seven rows R02 handed on; the vocabularies documented in the record itself; an unresolved reading obliged to name a decision; the finding figures taken from the two reports.",
+    "review_suite": "tests/harness/test_operator_review.py, 73 tests. New: an adjudicated row without a question is refused; with one it is accepted; a named adjudication record is listed with its hash and in the header; a record that is not there refuses the review; a supersession note is printed. The committed-report test now rebuilds each report from the notes record that report names, so both renderings are reproducible.",
+    "first_rendering_unchanged": "operator_review_9732dde50039_0001.md and its decisions file re-render byte for byte from review_notes_f60ae6e0a2a1.json, apart from the Generated line.",
+    "suite_shape": "Per directory, as the R01 and R02 records require: tests/harness gives 12 failed and 5 errors, the recorded baseline for this branch, none of them in the files touched here. Whole-suite counts are not comparable with per-directory ones."
+  },
+  "artifacts": {
+    "new": [
+      "docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json",
+      "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json",
+      "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0002.md",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_decisions_9732dde50039_0002.md",
+      "tests/harness/test_semantic_adjudications.py",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-semantic-adjudication_2026-10-07.json"
+    ],
+    "changed": [
+      "harness/integrity_audit.py (_check_wp containment and its note, _check_dcs overlap and its note, _check_milestones note)",
+      "harness/operator_review.py (the 'adjudicated' recommendation, the adjudication record and the supersession note)",
+      "tests/harness/test_integrity_audit.py",
+      "tests/harness/test_operator_review.py",
+      "harness/HARNESS.md"
+    ],
+    "unchanged_bytes": [
+      "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json",
+      "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0001.json",
+      "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+      "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+      "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1.json",
+      "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json",
+      "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0001.md",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_decisions_9732dde50039_0001.md",
+      "docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06/",
+      "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+      "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json"
+    ],
+    "hashes": {
+      "docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json": "354db83d36727c05c03a348a8040c65bfb721b0f41fa8889ac60fa24a3c7f6af",
+      "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json": "37c4797249f67ad3d51f39ac03ce22514350faaddb8105edd5accd6929fbb247",
+      "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json": "ace64d7d4ca37686ec3475a76143799ec4f955370541f3af10569ae76b9a4739",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0002.md": "b6d0419654483c0ed6be49906e8d000465058e63068d2ccad28e1784abe76f71",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_decisions_9732dde50039_0002.md": "abbf4fc398e54ceb4f54855b5871d7dceb06acccbc4ccf4fc9df5127a26a0300"
+    }
+  },
+  "consequences": {
+    "declared_status": "Inferred",
+    "basis": "the decision above",
+    "for_r04": "Unchanged. The three rows that need a preservation declaration and the six that need the original are the same rows; A06 and A11 name the two whose reading turns on a register entry.",
+    "for_r05": "The successor dispositions cite this record by path and hash. Three citation sets narrow: ESR-Q-01 loses one blind finding, ESR-Q-03 loses one blind and two audit findings, ESR-E-04 loses its only finding and so cannot stay partially_observable. The successor comparison should cite the successor audit, whose indices differ from the cited report's because eleven findings are gone.",
+    "for_pe09": "Two lane defects go to the assessor's own account rather than to the proposal: the milestone claim of A05 and the table conflation of A10. Both are statements the assessor's own input contradicts, and neither is a scoring disagreement.",
+    "not_done": "No disposition was changed, no comparison was rewritten, no proposal text, date, partner assignment or scientific commitment was touched, and no assessor was run."
+  }
+}
