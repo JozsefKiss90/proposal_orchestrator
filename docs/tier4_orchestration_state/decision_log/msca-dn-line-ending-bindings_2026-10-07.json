@@ -1,0 +1,73 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-line-ending-bindings_2026-10-07",
+  "date": "2026-10-07",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, follow-up to PE-08 (commit 67a3174): protect reproducibility of the byte-bound artifacts before operator review and PE-09",
+  "authority": "CLAUDE.md §9.1 (docs/ is the durable record), §9.5 (outputs reproducible from documented inputs), §12.1 (an output names its inputs), §13.5 (no decision held only in agent memory); spec decision 16 (the preflight binds the realised pack set and the import manifest by hash) and PE-06 (the frozen baseline is a byte copy whose loader re-hashes it).",
+  "problem": {
+    "declared_status": "Confirmed",
+    "basis": "measured on a detached worktree of 67a3174 created with the repository's own git configuration (core.autocrlf=true, no .gitattributes)",
+    "statement": "Every binding of the blind lane is a sha256 over file bytes. Git translated LF to CRLF on a fresh checkout and the bindings failed.",
+    "fresh_checkout_of_67a3174": {
+      "frozen_baseline": "FAIL: the report copy hashed to cbffc841ae7a… against the freeze's f60ae6e0a2a1…; load_frozen_baseline refused it as edited after freezing",
+      "preflight_report_sha": "FAIL: harness/blind_reports/preflight_242f1afb02c8_0001.json (CRLF) != freeze.preflight_report_sha256",
+      "import_manifest_pin": "FAIL: the resolved-fixes import manifest (CRLF) != the pin inside the preflight",
+      "esr_record_binding": "FAIL: the ESR record (CRLF) != dispositions.esr_record_sha256",
+      "dispositions_sha_as_recorded": "PASS, by accident: the dispositions were committed LF but comparison_f60ae6e0a2a1_0001.json recorded the sha of the CRLF working copy, so the CRLF checkout happened to match",
+      "import_external_proposal_check": "FAIL: 7 files would change (page records, both manifests, both registers, sources.json)",
+      "author_msca_dn_workspace_check": "FAIL: 3 files would change (README, intake, register)",
+      "compare": "FAIL (exit 2): the rubric set pins harness/criterion_appendix_mapping_msca_dn.json by bytes; the CRLF copy hashed to 9f7ccf8f… against the pinned 36530cb0…",
+      "result": "1 of 8 checks passed"
+    },
+    "two_blobs_held_bytes_other_than_the_hashed_ones": {
+      "rtf": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).rtf: fidelity_register.json pins sha256 00a48b993fe013ac…, the hash of the CRLF file as stored on disk; git had normalised the blob to LF (sha256 4e936a5fb55fbdca…) at commit, so the committed bytes were not the pinned bytes and the register test passed only on an autocrlf checkout",
+      "dispositions": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json: written by the PE-08 session through Path.write_text, which on Windows produced CRLF; comparison_f60ae6e0a2a1_0001.json and revisions_f60ae6e0a2a1_0001.json record sha256 5c0da82c111582d8… (the CRLF bytes); git normalised the blob to LF (sha256 fa1310c9facf5800…). The ESR-record binding inside the file is unaffected; the recorded dispositions sha is informational and not checked at load time"
+    }
+  },
+  "decision": {
+    "declared_status": "Confirmed",
+    "basis": "the committed .gitattributes at 5b57f09 and the verification below",
+    "rule": "A .gitattributes at the repository root marks the hashed trees -text: *.pdf binary; docs/tier2a_instrument_schemas/**/*.rtf; docs/tier3_project_instantiation/source_materials/msca_dn/**; docs/tier4_orchestration_state/msca_dn/**; workspaces/**; harness/blind_reports/**; harness/*.json; harness/profiles/**. Git stores and checks out these files byte for byte on every platform. -text rather than eol=lf because the guarantee needed is 'the committed bytes are the hashed bytes', not 'the bytes are LF'; diffs still work.",
+    "scope": "Only trees whose bytes are hashed. Code, prose, the demo instance and the Tier 1/2 extracted registries keep the platform default. No blanket renormalisation: the index already held LF for every covered text file except the two below, and git add --renormalize was run on those two only.",
+    "two_blobs_re_stored": "The RTF and the dispositions were re-added under the new attribute so their blobs now hold the bytes their recorded hashes were computed over (00a48b993fe013ac… and 5c0da82c111582d8…). No recorded hash was regenerated; the register, the comparison and the revisions artifact are byte-identical to 67a3174.",
+    "three_working_copies_restored": "harness/evaluator_scorecard_msca_pf.json, harness/profiles/ria_default.json and harness/rubrics_msca_pf.json were CRLF in the working tree from an earlier autocrlf checkout. Neither their CRLF nor their LF sha256 is recorded anywhere in docs/, harness/ or tests/ (the profile and rubric-set fingerprints are canonical, format-invariant hashes), so the working copies were re-checked-out to the committed LF bytes; nothing was committed for them.",
+    "preserved_unchanged": "The three PDFs, the ESR PDF, both candidate document records and page sources, the frozen baseline and its freeze record, the preflight report, both import manifests, both fidelity registers, the ESR record, the integrity audits, comparison_0001 and revisions_0001."
+  },
+  "verification": {
+    "declared_status": "Confirmed",
+    "basis": "run on 2026-10-07 against a detached worktree of 5b57f09 created with the same git configuration (core.autocrlf=true), i.e. a fresh checkout",
+    "method": "a verification script that re-hashes every binding and runs the two --check commands and the compare command: (1) load_frozen_baseline; (2) preflight report sha256 against the freeze record; (3) the import-manifest pin inside the preflight; (4) the ESR record sha256 against the dispositions; (5) the dispositions sha256 against the one recorded in comparison_0001 (informational); (6) py -3.10 -m tools.import_external_proposal --check; (7) py -3.10 -m tools.author_msca_dn_workspace --check; (8) py -3.10 -m harness.commands.blind_assessment compare over the committed inputs with the rows, summary and score block compared field by field with comparison_f60ae6e0a2a1_0001.json",
+    "fresh_checkout_of_5b57f09": {
+      "eol_on_disk": "the seven LF-bound files check out LF, the two CRLF-bound files check out CRLF",
+      "checks_1_to_8": "8 of 8 passed; the compare rows, summary and score block are identical to comparison_0001 (compared_at, writes and revisions_artifact excluded as volatile)",
+      "focused_tests": "tests/test_msca_dn_workspace.py, tests/test_msca_dn_import.py, tests/harness/test_esr_comparison.py::TestCommittedMscaDn, tests/harness/test_blind_baseline.py: 156 passed in the fresh checkout"
+    },
+    "working_tree": {
+      "checks_1_to_8": "8 of 8 passed before and after the change",
+      "focused_tests": "tests/test_msca_dn_workspace.py, tests/test_msca_dn_import.py, tests/harness/test_esr_comparison.py, tests/harness/test_blind_baseline.py: 199 passed"
+    },
+    "full_suite": "not run: no Python changed. The PE-08 record of 2026-10-07 holds the last full-suite figures (206 failed, 6391 passed; transport 401s and documented runner failures)."
+  },
+  "consequences": {
+    "declared_status": "Inferred",
+    "basis": "the rule and the verification above",
+    "for_pe09": "A clone of this branch inside the private network reproduces every binding without touching core.autocrlf. The verification script's eight checks are the acceptance test for that clone and should be re-run there before any assessment.",
+    "for_future_artifacts": "A new byte-bound artifact outside the covered trees needs a rule in .gitattributes before it is committed; HARNESS.md says so beside the freeze record.",
+    "for_the_authoring_tools": "Both --check commands compare against canonical LF bytes, so a CRLF checkout of workspaces/** or the registers would have reported 10 spurious changes; the rule removes that false signal."
+  },
+  "not_done": "Parts 2 to 6 of the operator's 2026-10-07 request (the operator-review table, the semantic false-positive review, the fidelity declarations, the successor dispositions and the PE-09 checklist) were stopped before starting, on the operator's instruction to finish part 1 only. One finding from the reconnaissance is recorded here so it is not lost: tools/author_msca_dn_workspace.render_register hard-codes declared.sub_sections as an empty list and tools/import_external_proposal.render_all rewrites both registers from it, so an operator declaration in the declared half would be overwritten by the next authoring run and would fail --check; that fix belongs to part 4 and is not made here.",
+  "artifacts": {
+    "new": [
+      ".gitattributes",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-line-ending-bindings_2026-10-07.json"
+    ],
+    "re_stored_bytes_only": [
+      "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).rtf",
+      "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json"
+    ],
+    "changed": [
+      "harness/HARNESS.md (paragraph on the protected bytes beside the freeze record)"
+    ]
+  }
+}
