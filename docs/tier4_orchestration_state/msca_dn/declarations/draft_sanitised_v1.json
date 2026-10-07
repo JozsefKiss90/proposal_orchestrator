@@ -1,0 +1,1072 @@
+{
+  "record_type": "fidelity_declaration_draft",
+  "schema_ref": "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml carries no schema for a fidelity declaration draft, and no schema_id is coined here.",
+  "artifact_purpose": "A draft of the fidelity register's declared half for one revision of the MSCA-DN sanitised derivative: what can be declared from measurement, what rests on the operator's PE-01 declaration, and what stays Unresolved until the submitted original is read inside the private network. Prepared for operator review; it declares nothing.",
+  "spec": "plans/msca_dn_pre_evaluation_spec.md",
+  "ticket": "R04 of plans/pe08_review_and_pe09_handoff_tickets.md",
+  "advisory": true,
+  "blocking": false,
+  "revision_id": "sanitised_v1",
+  "derived_inventory": [
+    "1.1",
+    "1.2",
+    "1.3",
+    "1.4",
+    "2.1",
+    "2.2",
+    "2.3",
+    "2.4",
+    "3.1",
+    "3.2",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+  ],
+  "declared_by": "drafted in a Claude Code session, 2026-10-07, from the committed registers, import manifests, dispositions and review notes. Every row is a proposal for operator review and none records an operator declaration",
+  "declared_on": "2026-10-07",
+  "review_state": "agent_drafted_pending_operator_review",
+  "claim_scopes": {
+    "extraction_fidelity_against_the_sanitised_pdf": "Whether this sub-section is present in the extraction of this revision's sanitised PDF, and whether the extraction lost anything. Measured here.",
+    "difference_between_the_sanitised_revisions": "Whether this sub-section differs from the predecessor revision's. Measured here, by the import manifest's page-by-page comparison and the two derived halves.",
+    "fidelity_against_the_submitted_original": "Whether this sub-section says what the submitted original said. Not measurable here: the original is stored only in the private network. Checkable at PE-09 alone."
+  },
+  "status_vocabulary": "CLAUDE.md §12.2: Confirmed (directly evidenced by a named source), Inferred (derived from confirmed evidence, chain stated), Assumed (adopted in the absence of direct evidence), Unresolved (conflicting or missing information). No other value is used, and no status is raised by a measurement in a different claim scope.",
+  "inputs": [
+    {
+      "role": "the register this declaration belongs to",
+      "path": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+      "sha256": "5c9ce4e34af8c120ce266effba7ee7719e92cff91671de1be1f3bcb3e205e4e9"
+    },
+    {
+      "role": "the import manifest behind its derived half",
+      "path": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json",
+      "sha256": "fb2b5271f722b2a4833fa2119cae96b6691a7dcb05643ea4b3adcacb9d7571e0"
+    },
+    {
+      "role": "the ESR dispositions, for the dependencies below",
+      "path": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+      "sha256": "5c0da82c111582d8ad30306a69daad721b4f0ab18d74adfc5fd9c3ca6ab6c0ff"
+    },
+    {
+      "role": "the active review notes, for each row's recommendation",
+      "path": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json",
+      "sha256": "37c4797249f67ad3d51f39ac03ce22514350faaddb8105edd5accd6929fbb247"
+    }
+  ],
+  "prior_declarations": {
+    "declaration_input": "docs/tier3_project_instantiation/source_materials/msca_dn/declarations/sanitised_v1.json",
+    "input_present": false,
+    "declared_in_the_input": [],
+    "declared_in_the_register_today": [],
+    "carried_through_unchanged": [],
+    "drafted_here": [
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "2.1",
+      "2.2",
+      "2.3",
+      "2.4",
+      "3.1",
+      "3.2",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "rule": "An operator declaration is read from the durable input and carried into the payload byte-for-byte, never redrafted and never restated at a stronger status (ticket R04 step 6). This draft fills only the sub-sections the input does not declare."
+  },
+  "declarations_checked": [
+    {
+      "declaration": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation/figures",
+      "declared": "all lost; the copy carries zero images on any page",
+      "measurement": "derived/figures/images_on_any_page = 0",
+      "verdict": "holds"
+    },
+    {
+      "declaration": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation/citations",
+      "declared": "all removed; no bracketed numbers, author-year, DOIs, URLs or reference list",
+      "measurement": "derived/citation_marker_counts = author_year: 0, bracketed_numbers: 0, doi: 0, url: 0",
+      "verdict": "holds"
+    },
+    {
+      "declaration": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation/reformatting/body_point_size",
+      "declared": 12,
+      "measurement": "derived/body_point_size: the body is 12.0 pt; other sizes 10.0 pt over 1040 character(s); other_sizes_are_bullets_and_spaces_only = true",
+      "verdict": "holds"
+    },
+    {
+      "declaration": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation/reformatting/table_3_1a",
+      "declared": "flattened to label-value lines (WP Number:, WP title:, Lead participant)",
+      "measurement": "derived/table_3_1a/label_block_counts = Lead participant: 6, WP Number:: 7, WP title:: 7",
+      "verdict": "qualified_in_place",
+      "note": "The label counts differ, and the derived half's own basis already says they are recorded as measured and may differ. No correction is proposed: the register records the difference rather than resolving it."
+    }
+  ],
+  "esr_dependencies": {
+    "dispositions": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+    "binds_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+    "note": "No ESR disposition binds this revision: the comparison is bound to the register at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json. A declaration here changes no disposition until a successor comparison binds this revision.",
+    "by_sub_section": [],
+    "declaration_dependent_without_a_sub_section": []
+  },
+  "adoption": {
+    "target": "docs/tier3_project_instantiation/source_materials/msca_dn/declarations/sanitised_v1.json",
+    "steps": [
+      "Record the operator review of this draft, row by row.",
+      "Correct each row the review changes, and replace every row's 'declared_by' with the operator's own attribution.",
+      "Write the reviewed payload to docs/tier3_project_instantiation/source_materials/msca_dn/declarations/sanitised_v1.json (py -3.10 -m tools.draft_fidelity_declarations --emit-input sanitised_v1 prints this draft's payload unchanged).",
+      "py -3.10 -m tools.author_msca_dn_workspace  (the first revision's register)",
+      "py -3.10 -m tools.import_external_proposal  (every revision's register)",
+      "py -3.10 -m tools.author_msca_dn_workspace --check  and  py -3.10 -m tools.import_external_proposal --check  (both exit 0)",
+      "Re-record the register hash in every artifact this draft lists under adoption/pinned_by_hash, or state why each stays as written."
+    ],
+    "provenance_record_must_carry": [
+      "the reviewer, the date, and the draft sha256 the review was taken over",
+      "a per-row decision: adopted as drafted, adopted as corrected, or withheld",
+      "the register sha256 before and after, and what each pinned artifact now records",
+      "every row whose status the review changed, and the evidence that moved it",
+      "which proposed corrections to the provenance header were applied, and which stand"
+    ],
+    "register_sha256_before_adoption": "5c9ce4e34af8c120ce266effba7ee7719e92cff91671de1be1f3bcb3e205e4e9",
+    "pinned_by_hash": [
+      {
+        "path": "docs/tier4_orchestration_state/decision_log/msca-dn-pe03-external-proposal-import_2026-10-04.json",
+        "records": "the full sha256"
+      },
+      {
+        "path": "docs/tier4_orchestration_state/validation_reports/msca-dn-pe03-external-proposal-import_2026-10-04.json",
+        "records": "the full sha256"
+      }
+    ],
+    "referenced_by_path": [
+      "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-drafts_2026-10-07.json",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-input_2026-10-07.json",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-pe01-workspace_2026-10-04.json",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-pe03-external-proposal-import_2026-10-04.json",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-pe03-resolved-fixes-revision_2026-10-06.json",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-pe07-label-aware-wp-header_2026-10-06.json",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-semantic-adjudication_2026-10-07.json",
+      "docs/tier4_orchestration_state/validation_reports/msca-dn-pe03-external-proposal-import_2026-10-04.json",
+      "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json",
+      "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json",
+      "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/intake/msca-dn-2025-sanitised-v1.json",
+      "plans/pe08_review_and_pe09_handoff_tickets.md"
+    ],
+    "import_manifest": {
+      "path": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json",
+      "sha256": "fb2b5271f722b2a4833fa2119cae96b6691a7dcb05643ea4b3adcacb9d7571e0",
+      "changed_by_adoption": false,
+      "why": "The manifest renders the derived half and the page comparison. Neither reads a declaration, so adoption leaves its bytes as they are.",
+      "pinned_by_hash": [],
+      "referenced_by_path": [
+        "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+        "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+        "docs/tier4_orchestration_state/decision_log/msca-dn-pe03-external-proposal-import_2026-10-04.json",
+        "docs/tier4_orchestration_state/decision_log/msca-dn-pe03-resolved-fixes-revision_2026-10-06.json",
+        "docs/tier4_orchestration_state/validation_reports/msca-dn-pe03-external-proposal-import_2026-10-04.json",
+        "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json"
+      ]
+    },
+    "preservation_rule": "The historical artifacts stay as written. A comparison that pinned the old hash stays replayable from the register version it names, so a re-recording is a successor artifact and never an edit in place."
+  },
+  "declaration_input": {
+    "record_type": "fidelity_declarations",
+    "revision_id": "sanitised_v1",
+    "sub_sections": [
+      {
+        "sub_section_id": "1.1",
+        "title": "Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/1.1: 302 prose block(s), 0 table row(s), 19601 characters and 17 extracted claim(s), over derived pages 1-14 (declared 1-13). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/1.1/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 1.1 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "1.2",
+        "title": "Soundness of the proposed methodology",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/1.2: 150 prose block(s), 0 table row(s), 7315 characters and 0 extracted claim(s), over derived pages 14-22 (declared 14-21). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/1.2/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 1.2 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "1.3",
+        "title": "Quality and credibility of the training programme",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/1.3: 66 prose block(s), 0 table row(s), 10010 characters and 0 extracted claim(s), over derived pages 22-27 (declared 22-26). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/1.3/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 1.3 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "1.4",
+        "title": "Quality of the supervision (including mandatory joint supervision for industrial and joint doctorate projects)",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/1.4: 79 prose block(s), 0 table row(s), 7947 characters and 18 extracted claim(s), over derived pages 27-32 (declared 27-31). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/1.4/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 1.4 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "2.1",
+        "title": "Contribution to structuring doctoral training at the European level and to strengthening European innovation capacity, including the potential for: Meaningful contribution of the non-academic sector to the doctoral training, as appropriate to the implementation mode and research field",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/2.1: 21 prose block(s), 0 table row(s), 5294 characters and 2 extracted claim(s), over derived pages 32-34 (declared 32-33). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/2.1/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 2.1 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "2.2",
+        "title": "Credibility of the measures to enhance the career perspectives and employability of researchers and contribution to their skills development",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/2.2: 20 prose block(s), 0 table row(s), 3135 characters and 1 extracted claim(s), over derived pages 34-36 (declared 34-35). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/2.2/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 2.2 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "2.3",
+        "title": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/2.3: 56 prose block(s), 0 table row(s), 5240 characters and 1 extracted claim(s), over derived pages 36-39 (declared 36-38). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/2.3/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 2.3 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "2.4",
+        "title": "The magnitude and importance of the project’s contribution to the expected scientific, societal and economic impacts",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/2.4: 20 prose block(s), 0 table row(s), 4769 characters and 0 extracted claim(s), over derived pages 39-41 (declared 39-40). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/2.4/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 2.4 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "3.1",
+        "title": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/3.1: 145 prose block(s), 88 table row(s), 27977 characters and 1 extracted claim(s), over derived pages 41-65 (declared 41-64). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": [
+            {
+              "kind": "table_cells_not_in_reading_order",
+              "detail": "3 table cell(s) on page(s) 51, 57, 63 carry every character but not as a contiguous substring of the page, so no span into the page can be derived from them",
+              "source": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#tables/cells_not_contiguous_in_page_text"
+            }
+          ]
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 88 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/3.1/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; page 45 falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 3.1 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "3.2",
+        "title": "Quality, capacity and role of each participant, including hosting arrangements and extent to which the consortium as a whole brings together the necessary expertise (Sanitized)",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/3.2: 25 prose block(s), 0 table row(s), 4783 characters and 2 extracted claim(s), over derived pages 65-67 (declared 65-66). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": [
+            {
+              "kind": "claims_without_a_span",
+              "detail": "1 claim(s) — 3.2-c001 — straddle a page break and live in no single page source, so they are present but not locatable",
+              "source": "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#claims/claims_without_span"
+            }
+          ]
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/3.2/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 3.2 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "4",
+        "title": "Recruitment strategy (including how the project will strive to adhere to the Code of Conduct for the Recruitment of Researchers) (Sanitized)",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/4: 5 prose block(s), 0 table row(s), 3265 characters and 2 extracted claim(s), over derived pages 67-68 (declared 67-67). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/4/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 4 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "5",
+        "title": "Network organisation (Fully Sanitized)",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/5: 64 prose block(s), 0 table row(s), 7221 characters and 0 extracted claim(s), over derived pages 68-72 (declared 68-72). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/5/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 5 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "6",
+        "title": "Ethics Self-Assessment (Sanitized)",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/6: 26 prose block(s), 0 table row(s), 2328 characters and 0 extracted claim(s), over derived pages 73-74 (declared 73-74). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/6/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 6 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "7",
+        "title": "Environmental aspects in light of the MSCA Green Charter (Sanitized)",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/7: 27 prose block(s), 0 table row(s), 2868 characters and 0 extracted claim(s), over derived pages 74-75 (declared 74-75). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": []
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/7/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 7 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      },
+      {
+        "sub_section_id": "8",
+        "title": "Participating Organisations",
+        "presence": {
+          "value": "present in this revision's extraction",
+          "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/8: 209 prose block(s), 0 table row(s), 8249 characters and 1 extracted claim(s), over derived pages 75-84 (declared 76-84). File-level accounting: 103913 of 103913 non-whitespace characters accounted for, 0 page(s) with loss.",
+          "scope_limit": "This states what the extraction of this PDF holds. It is not a statement about the submitted original: see fidelity_to_submitted_original on this row.",
+          "caveats": [
+            {
+              "kind": "page_map_discrepancy",
+              "detail": "the declared start page is 76 and the derived one is 75",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/page_map_discrepancies"
+            }
+          ]
+        },
+        "transformation": {
+          "value": "sanitised: identifiers generalised, some prose omitted or rephrased, every figure lost and every citation removed. How much prose was changed in this sub-section is not measured.",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "scope_note": "The operator's document-wide declaration about the step from the submission to this copy. The per-sub-section judgment on the same claim is this row's fidelity_to_submitted_original, and it stays Unresolved.",
+          "declared_status": "Assumed",
+          "basis": "the operator's PE-01 declaration at docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/transformation, Assumed where it stands. The parts of it listed under measured_parts are Confirmed document-wide by the derived half. The status of this field is the weaker of the two, because the part that matters per sub-section — how much prose moved — has no measurement.",
+          "measured_parts": [
+            {
+              "fact": "no image appears on any page of the copy (0 images)",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/figures/images_on_any_page",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "no citation marker survives anywhere in the copy: author_year = 0, bracketed_numbers = 0, doi = 0, url = 0",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/citation_marker_counts",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "the body text of the copy is set at 12.0 pt",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/body_point_size",
+              "declared_status": "Confirmed"
+            },
+            {
+              "fact": "this sub-section carries 0 rendered table row(s) in the copy",
+              "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#derived/sub_sections/8/table_rows",
+              "declared_status": "Confirmed"
+            }
+          ],
+          "not_measured": "The amount of prose omitted or rephrased in this sub-section, and whether any passage was removed rather than rewritten. No artifact in this repository measures either; both need the submitted original (PE-09)."
+        },
+        "revision_difference": {
+          "value": "no predecessor revision: this is the first sanitised derivative",
+          "claim_scope": "difference_between_the_sanitised_revisions",
+          "declared_status": "Confirmed",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance carries no 'revision' block, and workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.json#revision records this revision as the first sanitised derivative. The successor revision 'resolved_fixes' differs from this one on page(s) 45; none falls inside this sub-section, per workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json#revision/comparison_with_predecessor."
+        },
+        "fidelity_to_submitted_original": {
+          "value": "not established for this sub-section",
+          "claim_scope": "fidelity_against_the_submitted_original",
+          "declared_status": "Unresolved",
+          "basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json#provenance/authoritative_original records the original as stored in the private network only, and nothing in this repository compares this sub-section against it. The presence claim and the extraction accounting on this row bound the step from this PDF to its extraction, not the step from the submission to this PDF.",
+          "resolution_requires": "an operator reading of sub-section 8 against the submitted original, inside the private network (plans/msca_dn_pre_evaluation_spec.md, PE-09). Until that reading is recorded the status stays Unresolved: no measurement available here can raise it."
+        },
+        "declared_by": "R04 draft, pending operator confirmation; replace with the operator's own attribution on adoption",
+        "declared_on": "2026-10-07",
+        "review_state": "agent_drafted_pending_operator_review"
+      }
+    ]
+  }
+}

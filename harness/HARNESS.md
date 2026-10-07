@@ -396,6 +396,24 @@ does not, unless the register records older input bytes than the input now has �
 operator withdrew that row by editing the input, and the input is the newer
 statement. The declarations directory holds a README with the format.
 
+Both inputs are absent today, so both declared halves are empty. R04 drafted what
+each could say: `tools/draft_fidelity_declarations.py` transforms the registers,
+the import manifests, the dispositions and the active review notes into one draft
+per revision under `docs/tier4_orchestration_state/msca_dn/declarations/`, plus a
+review checklist. Each draft covers its revision's whole derived inventory and
+carries the adoptable input verbatim under `declaration_input`. It keeps three
+claims apart, because each is checkable somewhere else:
+
+- extraction fidelity against the sanitised PDF — Confirmed, from the derived half;
+- the difference between the sanitised revisions — Confirmed, from the manifest's
+  page-by-page comparison;
+- fidelity against the submitted original — Unresolved on every row, until PE-09.
+
+Each draft also enumerates what adoption would cost — the artifacts that
+pin that register's bytes — and which dispositions lean on which sub-section's
+declaration. The renderer never writes into Tier 3, and no row claims operator
+authorship.
+
 ## Blind assessment (`blind_assessment.py` + `commands/blind_assessment.py`)
 
 The blind pre-evaluation lane assesses one specified candidate against a
