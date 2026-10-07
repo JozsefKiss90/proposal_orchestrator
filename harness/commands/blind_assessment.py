@@ -16,7 +16,10 @@ integrity audit over the parsed table rows and the claim ledger and binds the
 result to the frozen baseline when one is given (:mod:`harness.integrity_audit`).
 A sixth, ``compare``, resolves the operator's ESR record and dispositions
 against the frozen baseline and writes the comparison and the revision
-priorities (:mod:`harness.esr_comparison`).
+priorities (:mod:`harness.esr_comparison`).  A seventh, ``review``, renders a
+written comparison as the operator's review table: every observation once,
+every reference resolved again, the counts recomputed, and the agent-drafted
+review notes carried as declarations (:mod:`harness.operator_review`).
 
 Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
 
@@ -27,6 +30,7 @@ Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT)
     py -3.10 -m harness.commands.blind_assessment freeze --report <file> --candidate <dir> --baseline-dir <dir>
     py -3.10 -m harness.commands.blind_assessment audit --document <id> [--graph-root <repo>] [--baseline-dir <dir>]
     py -3.10 -m harness.commands.blind_assessment compare --baseline-dir <dir> --esr <file> --dispositions <file> --candidate <dir> --register <file> --out-dir <dir>
+    py -3.10 -m harness.commands.blind_assessment review --comparison <file> --notes <file> --out-dir <dir>
 
 ``preflight`` and ``assess`` share every evidence-selecting flag (``--budget``,
 ``--span-fraction``, ``--no-claims``, ``--criterion-budget``, ``--transport``,
@@ -58,6 +62,10 @@ nothing written.  ``audit``: ``0`` written with no flag; ``1`` written with
 flags the operator should read (a vacuous ledger, a ledger entry contradicting
 the import contract, a re-derived baseline, a parse failure); ``2`` could not
 run.  Findings never move the exit code: they are the product, not a verdict.
+``review``: ``0`` both artifacts written; ``2`` refused — an input that moved
+under the comparison, a reference that no longer resolves, a count that
+disagrees with the comparison's summary, or a disputed row with no question
+for the operator.
 
 The command lives inside the harness package so the one-way ``harness ->
 runner`` import boundary holds.  Advisory artifact; never a runtime gate
@@ -99,6 +107,14 @@ from harness.esr_comparison import (
     render_comparison,
     run_comparison,
     write_comparison,
+)
+from harness.operator_review import (
+    OperatorReviewError,
+    build_review,
+    load_review_notes,
+    render_summary,
+    resolve_inputs,
+    write_review,
 )
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
@@ -150,6 +166,7 @@ DEFAULT_CHECKPOINT_DIR: str = ".harness/checkpoints"
 _CLI_ERRORS = (
     BlindAssessmentError,
     EsrComparisonError,
+    OperatorReviewError,
     DevGraphError,
     RubricError,
     ProfileError,
@@ -521,6 +538,23 @@ def _parser() -> argparse.ArgumentParser:
     p_cmp.add_argument("--profile", default=None)
     p_cmp.add_argument("--out-dir", required=True,
                        help="directory for the comparison and revisions artifacts (never overwritten)")
+
+    p_rev = sub.add_parser(
+        "review",
+        help=(
+            "operator review table over a written comparison: every observation once, "
+            "every reference re-resolved, counts recomputed, and the agent-drafted "
+            "review notes carried as declarations; two Markdown artifacts, no assessor call"
+        ),
+    )
+    p_rev.add_argument("--comparison", required=True,
+                       help="a written comparison report; every other input is read from it")
+    p_rev.add_argument("--notes", required=True,
+                       help="the review notes (an 'esr_review_notes' record) bound to that comparison")
+    p_rev.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
+    p_rev.add_argument("--profile", default=None)
+    p_rev.add_argument("--out-dir", required=True,
+                       help="directory for the review and decisions artifacts (never overwritten)")
     return ap
 
 
@@ -654,6 +688,31 @@ def _compare(
     print(f"\ncomparison -> {path}")
     print(f"revisions  -> {revisions}")
     return 1 if report.flags else 0
+
+
+def _review(
+    args: argparse.Namespace,
+    bundle: ProfileBundle,
+    repo_root: Path,
+    clock: Callable[[], str] | None,
+) -> int:
+    """The ``review`` sub-command: re-bind the comparison's inputs, re-resolve
+    every reference, recount, and write the two Markdown artifacts."""
+    def _under_root(raw: str) -> Path:
+        p = Path(raw)
+        return p if p.is_absolute() else repo_root / p
+
+    inputs = resolve_inputs(
+        _under_root(args.comparison), repo_root=repo_root, profile=bundle.profile
+    )
+    notes = load_review_notes(_under_root(args.notes))
+    review = build_review(inputs, notes, clock=clock)
+    out_dir = _under_root(args.out_dir)
+    report, decisions = write_review(review, out_dir)
+    print(render_summary(review))
+    print(f"\nreview    -> {report}")
+    print(f"decisions -> {decisions}")
+    return 0
 
 
 def _portable(path: Path, repo_root: Path) -> str:
@@ -1011,6 +1070,8 @@ def main(
             return 0
         if args.command == "compare":
             return _compare(args, bundle, repo_root, clock)
+        if args.command == "review":
+            return _review(args, bundle, repo_root, clock)
 
         out_dir = Path(args.out_dir)
         if not out_dir.is_absolute():

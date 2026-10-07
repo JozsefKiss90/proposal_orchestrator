@@ -1,0 +1,91 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-operator-review-table_2026-10-07",
+  "date": "2026-10-07",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket R02 of plans/pe08_review_and_pe09_handoff_tickets.md: produce a complete operator-review table over the committed PE-08 comparison, before R03 adjudicates the disputed relationships",
+  "authority": "CLAUDE.md §9.1 (docs/ is the durable record), §9.4 (a decision that affects future interpretation is written here), §9.5 (an output is reproducible from its documented inputs), §10.5 (every material claim names its tiered source), §12.1 (an output names its inputs, states its inferences, flags its assumptions), §12.2 (the four status categories), §15 (explicit failure over fabricated completion); spec decision 13 (the ESR's own severity wording per cluster) and PE-08's disposition vocabulary.",
+  "problem": {
+    "declared_status": "Confirmed",
+    "basis": "read in the committed artifacts and in the ticket's own problem statement",
+    "statement": "The PE-08 comparison is a hash-bound JSON artifact whose dispositions and proposed revisions were drafted by Claude. No human can review it as it stands, and nothing in it separates a reference that resolves from a reference that is about the right thing.",
+    "detail": [
+      "comparison_f60ae6e0a2a1_0001.json carries 29 rows, 135 KB, with resolved findings, verified quotes and register pointers, and no reading order for a human.",
+      "The comparison's summary says 15 rows are 'independently_detected'. Nine of those are strengths the blind lane praised; only 6 are criticisms it caught. A reader of the summary alone can take 15 for criticisms detected.",
+      "A blind finding can resolve perfectly against the frozen baseline and still be about a different proposition than the ESR sentence it was filed under. The comparison records resolution and has no field for that difference.",
+      "The six alleged misses rest on preservation statuses declared Assumed, and the eight contested strengths rest on evidence the register says sanitisation may have removed. Neither is visible without reading the rows."
+    ]
+  },
+  "decision": {
+    "declared_status": "Confirmed",
+    "basis": "the implementation in harness/operator_review.py, the notes in docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1.json, and the verification below",
+    "two_halves": "The review has a measured half and a declared half, as the comparison does. Measured by the generator on every run: the input inventory with every hash recomputed from disk, the re-resolution of every reference the comparison recorded, and every count. Declared in the review notes: whether the resolved evidence supports the ESR's proposition, what the ESR complains of, the uncertainty, the recommendation and the decision the operator must take. The generator carries a declaration through and computes none of it.",
+    "resolution_and_agreement_are_separate_fields": "'The reference resolves' and 'the reference is about this proposition' are two columns, never one. Resolution is measured; agreement is declared with a §12.2 status. A row whose finding resolves and whose proposition does not match is the subject of R03, and the report names it rather than settling it.",
+    "inputs_come_from_the_comparison": "The command takes --comparison, --notes and --out-dir. The ESR record, dispositions, frozen baseline, candidate, historical candidate, register and audits are read from the comparison's own bindings. A report that could be rendered against a different ESR record or candidate than the comparison used would be a new interpretation wearing the comparison's bindings.",
+    "fail_closed": "The review is refused and nothing is written when: an input's bytes no longer hash to what the comparison recorded; the candidate's content hash moved; the comparison's rows are not the ESR record's observations, in its order; an observation has no note or a note names an unknown observation; a reference no longer resolves, or resolves to text the comparison did not record; a register pointer holds another value; a recomputed count disagrees with the comparison's summary; a row's vocabulary is outside its closed set; a row that is not 'agreed, retain' carries no question for the operator. Exit code 2, as the other sub-commands.",
+    "no_artifact_may_claim_approval": "review_state has exactly one permitted value, 'agent_drafted_pending_operator_review'. There is deliberately no 'approved' value: operator acceptance is recorded in R05 by the operator, not by an artifact an agent writes. The loader refuses any other value by name.",
+    "a_disputed_row_must_carry_a_question": "A row whose semantic_agreement is not 'agreed', or whose recommendation is not 'retain', or whose recommended disposition differs from the comparison's, must name an operator_decision. Nineteen of the 29 rows do. The remaining ten are agreed and retained, and say so.",
+    "counts_keep_criticisms_apart_from_strengths": "Every count is recomputed from the rows and reported twice: once over the 15 criticisms (8 shortcomings, 7 minor) and once over the 14 strengths. The detection paragraph states the split of the 'independently_detected' total before any rate appears, with the numbers measured rather than written. Lane attribution is a four-way table (blind only, audit only, both, neither) over each group. The criticisms table splits each disposition into shortcomings and minor shortcomings beside the total. The lane buckets are exclusive — a row both lanes found is counted once, under 'both lanes' — and the report says so beside the table, because the comparison's own by_lane counts membership and its integrity-audit figure of 1 is that same row.",
+    "severity_is_the_esrs_own": "An observation's severity is its cluster's, taken from the ESR record's clusters block, and the report says how many observations share each cluster. No severity is invented per split observation (the ticket's rule). ESR-E-01 and ESR-E-02 share one ESR sentence, which is the only such split and is the first question in the decisions file.",
+    "two_artifacts_nothing_overwritten": "operator_review_<sha12>_<NNNN>.md and operator_decisions_<sha12>_<NNNN>.md, keyed by the comparison's sha256 and sharing a sequence number, as the comparison and its revisions do. An earlier review stays as the operator read it. The sequence number comes from harness.blind_assessment.next_report_path, which gained a suffix parameter rather than being reimplemented for Markdown. The decisions file names the review file written in the same run, and both carry one timestamp.",
+    "the_report_is_reproducible": "Every path is written relative to the repository root, so the rendering does not depend on the directory the command ran from, and the Markdown is written with LF under the .gitattributes '-text' tree. Re-rendering the committed report reproduces it byte for byte apart from the 'Generated:' line, which a test asserts.",
+    "what_r02_does_not_do": "It changes no disposition, writes no revision, recomputes no score and calls no assessor. It writes two Markdown files and touches nothing else. The comparison, the revisions artifact, the dispositions and the ESR record are byte-unchanged.",
+    "why_a_generator_and_not_a_hand_written_report": "The ticket permits a standalone Markdown report with no test suite. A generator was chosen because the report's factual half is then reproducible from documented inputs (§9.5) and its reference claims are measured rather than asserted: 'every quoted reference resolves against its named artifact' is the acceptance criterion, and a hand-written report could only claim it. The cost is a new record type and a new sub-command, both documented here and in harness/HARNESS.md.",
+    "the_advisory_invariant": "The notes record carries advisory=true and blocking=false and the loader refuses it without them, as every other harness record does (harness/HARNESS.md). Both rendered artifacts state the same in prose: the review evaluates no gate and blocks no phase. The notes' schema_version is checked against the version this module reads, so a future format change is a refusal rather than a silent misreading.",
+    "the_harness_stays_instrument_agnostic": "No instrument or call name is written into the module. Both artifact titles name their subject from the comparison's own bindings — the baseline's intake id, or the candidate document when the baseline carries no intake. The agnosticism lint of tests/harness/test_profile.py (no instrument literal in harness Python outside the profile loader) caught the first draft, which hard-coded the instrument in both titles."
+  },
+  "the_decisions_put_to_the_operator": {
+    "declared_status": "Inferred",
+    "basis": "the review notes, rendered in operator_decisions_9732dde50039_0001.md",
+    "total": 19,
+    "of_29_rows": "ten rows are agreed and retained with no question: ESR-E-S01, ESR-E-S02, ESR-E-06, ESR-E-S04, ESR-I-S03, ESR-I-01, ESR-I-02, ESR-Q-S01, ESR-Q-04, ESR-Q-S04.",
+    "for_r03_semantic_adjudication": "ESR-E-03, ESR-E-04, ESR-E-07, ESR-E-09, ESR-Q-01, ESR-Q-02, ESR-Q-03. Three of these are the ticket's own examples: ESR-Q-03 (M7.3 at M48 against WP7 at M1-M36, and whether 'names no deliverable it depends on' is a sourced requirement), ESR-Q-01 (a blind finding that says no intermediate milestones are shown, which the copy's own milestones table contradicts), and the question of whether a passage the lane read and praised can be a missed criticism (ESR-E-07, ESR-E-09, ESR-Q-02).",
+    "for_r04_declaration_dependent": "ESR-E-02, ESR-E-08, ESR-I-S01. Each needs a preservation statement before its disposition is final.",
+    "for_pe09_original_dependent": "ESR-E-05, ESR-E-S03, ESR-E-S05, ESR-I-S04, ESR-Q-S02, ESR-Q-S03. Each asks what the submitted original carried, which only the private network can answer.",
+    "for_r05_scope": "ESR-I-S02 and ESR-I-S05: whether a blind finding on a point the evaluators praised enters the revision plan at all."
+  },
+  "verification": {
+    "declared_status": "Confirmed",
+    "basis": "run on 2026-10-07 in the working tree of this branch",
+    "new_tests": "tests/harness/test_operator_review.py, 66 tests. The notes loader: a wrong record type, invalid JSON, each missing header field, a review_state claiming approval, an observation reviewed twice, each closed vocabulary, an empty basis, a basis that is not text, a disputed row with no question, an agreed row needing none. Binding over the synthetic world: notes bound to another comparison, an ESR record, dispositions or register edited after the comparison, a candidate section edited, and the inventory naming every input with its hash. Coverage and resolution: a missing note, an unknown note, rows that are not the ESR record's observations, a blind finding whose text moved, a blind index that no longer resolves, a quote no longer in the candidate, a register pointer whose value moved, and the per-row reference counts. Counts: criticisms and strengths apart, lanes per row, and four ways a summary that disagrees with the rows is refused. The rendered artifacts: both files written with one sequence number, nothing overwritten, every observation once as a heading, the review state and the provisional label, criticisms apart from strengths, the two separate fields, the decisions list holding exactly the rows with questions, quotes kept out of table cells, a pipe escaped, two renders byte-identical, the rendering independent of the working directory, the terminal summary, and a recommended disposition change refused without a question. The committed artifacts: the notes cover the ESR record's 29 observations in its order, every reference still resolves, the counts are 15 criticisms and 14 strengths with 6 detected, 6 missed and 8 contested strengths, every non-agreed row carries a question, and re-rendering reproduces both committed files apart from the 'Generated:' line. Added after the code review: notes without advisory=true or blocking=false are refused, a schema version this module does not read is refused, the committed pair names each other and carries one timestamp, and the title names the subject the comparison binds rather than an instrument.",
+    "focused_suites": "tests/harness/test_operator_review.py, test_esr_comparison.py, test_blind_assessment.py, test_blind_baseline.py, test_blind_leakage.py, test_evidence_preflight.py, test_integrity_audit.py, test_response_cache.py, test_ria_profile.py, test_subscription_judge.py, test_msca_dn_profile.py: 463 passed.",
+    "mypy": "py -3.10 -m mypy -m harness.operator_review: no error in the new module. On harness.commands.blind_assessment: 145 errors, identical to the same command in a detached worktree of 5159e5a, none in the changed files. On harness.blind_assessment: 133, likewise identical to the baseline.",
+    "id_coverage": "The generator refuses unless the comparison's row ids equal the ESR record's observation ids, in the ESR's order, and the notes cover exactly those ids. The committed run wrote both artifacts, so all three id sets agree.",
+    "references": "Every reference of every row was resolved again through harness.esr_comparison's own resolvers and compared with the text the comparison recorded: 168 references across the 29 rows, all resolved.",
+    "full_suite": "Run in four parts on the final tree (the machine killed two whole-suite runs for low memory): tests/harness 12 failed, 1162 passed, 5 errors; tests/runner 19 failed, 4301 passed; the top-level files 18 failed, 1207 passed. 54 failing or erroring ids in all, and every one of them is also failing in a whole-suite run of a detached worktree of 5159e5a (214 failed, 6418 passed, 5 errors): the diff of the two sorted id lists carries no working-tree-only entry, so this change introduces no failure. An earlier whole-suite run of the working tree gave 207 failed, 6505 passed, and its id diff against that same baseline carried exactly one working-tree-only entry — tests/harness/test_profile.py::TestNoInstrumentLiterals::test_harness_python_carries_no_instrument_name, the agnosticism lint, which the hard-coded instrument in the two artifact titles broke. That is fixed and the test passes. The whole-run count (207, 214) is far above the per-directory count (54) in both the working tree and the baseline: this suite carries order-dependent failures, which is why the comparison is of id sets and never of counts.",
+    "nothing_overwritten": "git status shows the comparison, revisions, dispositions, ESR record, registers, audits, baseline and freeze record unmodified. The only new files are the review notes, the two Markdown artifacts, the module, the tests and this record.",
+    "byte_equality": "The two authoring tools' byte-equal checks still exit 0 ('up to date'), and the comparison, revisions, dispositions, ESR record and both fidelity registers hash identically to 5159e5a."
+  },
+  "consequences": {
+    "declared_status": "Inferred",
+    "basis": "the decision above",
+    "for_r03": "The seven rows recommended 'revisit_in_r03' are its input, with the compared relation and the uncertainty already stated for each. R03 adjudicates them; if it changes a finding or a rule, it writes a successor audit and the review is regenerated against the successor comparison, not edited.",
+    "for_r04": "Three rows depend on a preservation declaration and six more on the original. R04's declarations are the answer to the first group, and each row names the sub-section whose declaration it needs.",
+    "for_r05": "The successor dispositions cite this review by path and hash. Two rows ask whether a finding on a praised point enters the revision plan, which is a scope decision R05 records rather than assumes.",
+    "for_pe09": "Six rows cannot be settled in this environment. They are the private-network review list, and none of them imports the original here.",
+    "what_this_does_not_settle": "Whether a resolved finding is about the ESR's proposition, whether the copy preserves the evidence an observation rested on, and whether a praised point survived sanitisation. The first is R03's, the second R04's, the third PE-09's. The review states each as an open question with its basis.",
+    "residual_risk": "The semantic-agreement judgments are agent-drafted. A wrong 'agreed' hides a dispute from the operator, and the generator cannot detect it: it checks that a reference resolves, not that a judgment is sound. The mitigation is the review state, which says so on every page, and the basis field, which names the evidence each judgment rests on so a reader can disagree with it."
+  },
+  "artifacts": {
+    "new": [
+      "harness/operator_review.py",
+      "tests/harness/test_operator_review.py",
+      "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1.json",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0001.md",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_decisions_9732dde50039_0001.md",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-operator-review-table_2026-10-07.json"
+    ],
+    "changed": [
+      "harness/commands/blind_assessment.py (the 'review' sub-command, its exit codes and its refusal path)",
+      "harness/blind_assessment.py (next_report_path and _report_name_re take a suffix, so the Markdown writer reuses the shared sequencer instead of copying it)",
+      "harness/HARNESS.md (the operator review section and the table rows)"
+    ],
+    "unchanged_bytes": [
+      "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json",
+      "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0001.json",
+      "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+      "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+      "both integrity audits, both materialised candidates, the frozen baseline and its freeze record, both fidelity registers"
+    ]
+  }
+}

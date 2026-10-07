@@ -406,10 +406,11 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Piece | Where |
 |---|---|
 | Candidate loader, content hash, bound report, writer, loader | `harness/blind_assessment.py` |
-| Module command (`preflight`, `assess`, `verify`, `freeze`, `audit`, `compare`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Module command (`preflight`, `assess`, `verify`, `freeze`, `audit`, `compare`, `review`) | `py -3.10 -m harness.commands.blind_assessment` |
 | Frozen baseline: conditions, byte copy, freeze record, hash-checked loader | `harness/blind_baseline.py`; `--baseline-dir <dir>/blind_baseline_<sha12>.json` + `.freeze.json` |
 | Integrity audit: five consistency checks over parsed rows, grounding axis Unresolved, baseline binding | `harness/integrity_audit.py`; reports `<out-dir>/integrity_<hash12>_<NNNN>.json` |
 | ESR comparison: one row per historical observation, declared dispositions resolved against the frozen baseline, scores compared apart | `harness/esr_comparison.py`; `<out-dir>/comparison_<sha12>_<NNNN>.json` + `revisions_<sha12>_<NNNN>.json` |
+| Operator review: a written comparison rendered for a human, every reference re-resolved, counts recomputed, agreement declared | `harness/operator_review.py`; `<out-dir>/operator_review_<sha12>_<NNNN>.md` + `operator_decisions_<sha12>_<NNNN>.md` |
 | Evidence preflight: realised pack set, pack-set hash, seven-section report | `harness/evidence_preflight.py`; reports `harness/blind_reports/preflight_<hash12>_<NNNN>.json` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
@@ -751,6 +752,51 @@ are partly observable, with 8 carrying a blind shortcoming on the praised
 point. No row is `addressed`. The dispositions are declarations for operator
 review; `tests/harness/test_esr_comparison.py` re-resolves them against the
 committed artifacts.
+
+**Operator review (`operator_review.py`, ticket R02).** The comparison is a
+JSON artifact bound by hashes; the operator has to read it. This renders it:
+
+    py -3.10 -m harness.commands.blind_assessment review --comparison <comparison_*.json>
+        --notes <review_notes_*.json> --out-dir <dir>
+
+Every other input is read from the comparison, not from the command line. A
+report that could be rendered against a different ESR record or candidate
+than the comparison used would be a new interpretation wearing the
+comparison's bindings. Each named input is re-hashed on disk — ESR record,
+dispositions, register, every audit, the frozen report copy, the candidate's
+content hash — and a mismatch refuses the review.
+
+The **review notes** are the declared half, one row per observation, drafted
+by an agent and labelled so: `review_state` has exactly one permitted value,
+`agent_drafted_pending_operator_review`. Like every record here the notes
+carry `advisory: true` and `blocking: false`, and a notes file without them,
+or of a schema version this module does not read, is refused. A row declares whether the resolved
+evidence supports the proposition the ESR states (`semantic_agreement`:
+agreed, disputed, unresolved, not_applicable), the basis for that judgment
+and its §12.2 status, what the ESR complains of (`esr_complaint`: an absent
+detail, an inadequately explained one, both, other), the uncertainty, a
+recommendation (retain, revisit in R03, revisit after the R04 declaration,
+revisit after the private network) and a recommended disposition. A row that
+is not "agreed, retain" must name an `operator_decision`: a disputed row
+without a question hands the operator a disagreement and nothing to decide.
+A recommended disposition that differs from the comparison's needs one too.
+
+Measured on every run and refused on failure: every observation of the ESR
+record covered exactly once, every reference resolved again through the
+comparison's own resolvers **and** to the text the comparison recorded, and
+every count recomputed from the rows and cross-checked against the
+comparison's summary. Resolution is a measurement and agreement is a
+declaration; they are separate fields, because a finding can resolve
+perfectly against the baseline and still be about something else. That is
+what R03 adjudicates, and this report is where such a row is named.
+
+Counts keep criticisms apart from strengths. On the MSCA-DN case the
+comparison's 15 `independently_detected` rows are 9 strengths the blind lane
+praised as the evaluators did and 6 criticisms it caught; the report states
+that split before any rate. Two artifacts are written, sharing a sequence
+number and overwriting nothing: the full review and a decisions file holding
+only the questions. Markdown, LF, under the `-text` tree, so a committed
+report replays byte for byte apart from its `Generated:` line.
 
 ## Response checkpoint and the bounded re-ask (`response_cache.py`)
 

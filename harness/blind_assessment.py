@@ -159,10 +159,14 @@ DEFAULT_REPORTS_DIR: Path = Path("harness/blind_reports")
 #: Default provenance trail for the command (harness-owned, repo-relative).
 DEFAULT_PROVENANCE_PATH: Path = Path("harness/provenance/blind_assessment.jsonl")
 
-#: Report file name: ``<prefix>_<12 hex of the candidate hash>_<NNNN>.json``;
+#: Report file name: ``<prefix>_<12 hex of the candidate hash>_<NNNN><suffix>``;
 #: the blind report uses prefix ``blind``, the evidence preflight ``preflight``.
-def _report_name_re(prefix: str) -> re.Pattern[str]:
-    return re.compile(rf"^{re.escape(prefix)}_(?P<hash>[0-9a-f]{{12}})_(?P<seq>\d{{4}})\.json$")
+#: The suffix is ``.json`` for every bound record and ``.md`` for the operator
+#: review's Markdown pair.
+def _report_name_re(prefix: str, suffix: str = ".json") -> re.Pattern[str]:
+    return re.compile(
+        rf"^{re.escape(prefix)}_(?P<hash>[0-9a-f]{{12}})_(?P<seq>\d{{4}}){re.escape(suffix)}$"
+    )
 
 
 _REPORT_NAME_RE = _report_name_re("blind")
@@ -1004,21 +1008,24 @@ def assess_candidate(
 # --------------------------------------------------------------------------- #
 
 
-def next_report_path(reports_dir: Path, digest: str, *, prefix: str = "blind") -> Path:
-    """The next free ``<prefix>_<hash12>_<NNNN>.json`` under *reports_dir* for *digest*.
+def next_report_path(
+    reports_dir: Path, digest: str, *, prefix: str = "blind", suffix: str = ".json"
+) -> Path:
+    """The next free ``<prefix>_<hash12>_<NNNN><suffix>`` under *reports_dir* for *digest*.
 
-    Shared by the blind report writer and the evidence preflight writer so the
-    two never overwrite each other or themselves.
+    Shared by every writer that must not overwrite itself or another: the blind
+    report, the evidence preflight, the integrity audit, the ESR comparison,
+    and — with ``suffix=".md"`` — the operator review's Markdown pair.
     """
     short = digest.split(":", 1)[1][:12]
-    pattern = _report_name_re(prefix)
+    pattern = _report_name_re(prefix, suffix)
     taken = 0
     if reports_dir.is_dir():
         for existing in reports_dir.iterdir():
             m = pattern.match(existing.name)
             if m and m.group("hash") == short:
                 taken = max(taken, int(m.group("seq")))
-    return reports_dir / f"{prefix}_{short}_{taken + 1:04d}.json"
+    return reports_dir / f"{prefix}_{short}_{taken + 1:04d}{suffix}"
 
 
 _next_report_path = next_report_path
