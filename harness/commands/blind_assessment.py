@@ -19,7 +19,10 @@ against the frozen baseline and writes the comparison and the revision
 priorities (:mod:`harness.esr_comparison`).  A seventh, ``review``, renders a
 written comparison as the operator's review table: every observation once,
 every reference resolved again, the counts recomputed, and the agent-drafted
-review notes carried as declarations (:mod:`harness.operator_review`).
+review notes carried as declarations (:mod:`harness.operator_review`).  An
+eighth, ``diff``, measures what moved between a comparison and its successor:
+dispositions, citations, counts and revision priorities
+(:mod:`harness.comparison_diff`).
 
 Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
 
@@ -31,6 +34,7 @@ Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT)
     py -3.10 -m harness.commands.blind_assessment audit --document <id> [--graph-root <repo>] [--baseline-dir <dir>]
     py -3.10 -m harness.commands.blind_assessment compare --baseline-dir <dir> --esr <file> --dispositions <file> --candidate <dir> --register <file> --out-dir <dir>
     py -3.10 -m harness.commands.blind_assessment review --comparison <file> --notes <file> --out-dir <dir>
+    py -3.10 -m harness.commands.blind_assessment diff --before <comparison> --after <comparison> --out-dir <dir>
 
 ``preflight`` and ``assess`` share every evidence-selecting flag (``--budget``,
 ``--span-fraction``, ``--no-claims``, ``--criterion-budget``, ``--transport``,
@@ -65,7 +69,10 @@ run.  Findings never move the exit code: they are the product, not a verdict.
 ``review``: ``0`` both artifacts written; ``2`` refused — an input that moved
 under the comparison, a reference that no longer resolves, a count that
 disagrees with the comparison's summary, or a disputed row with no question
-for the operator.
+for the operator.  ``diff``: ``0`` both artifacts written with no flag; ``1``
+written with a flag (an ESR shortcoming the successor stopped proposing a
+revision for); ``2`` refused — two comparisons over different evidence,
+covering different observations, or with a missing revisions artifact.
 
 The command lives inside the harness package so the one-way ``harness ->
 runner`` import boundary holds.  Advisory artifact; never a runtime gate
@@ -116,6 +123,13 @@ from harness.operator_review import (
     resolve_inputs,
     write_review,
 )
+from harness.comparison_diff import (
+    ComparisonDiffError,
+    diff_comparisons,
+    load_pair_member,
+    write_diff,
+)
+from harness.comparison_diff import render_summary as render_diff_summary
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
@@ -167,6 +181,7 @@ _CLI_ERRORS = (
     BlindAssessmentError,
     EsrComparisonError,
     OperatorReviewError,
+    ComparisonDiffError,
     DevGraphError,
     RubricError,
     ProfileError,
@@ -555,6 +570,26 @@ def _parser() -> argparse.ArgumentParser:
     p_rev.add_argument("--profile", default=None)
     p_rev.add_argument("--out-dir", required=True,
                        help="directory for the review and decisions artifacts (never overwritten)")
+
+    p_diff = sub.add_parser(
+        "diff",
+        help=(
+            "what moved between a comparison and its successor: dispositions, "
+            "citations, register basis, counts and revision priorities, measured "
+            "from the two written artifacts; no assessor call"
+        ),
+    )
+    p_diff.add_argument("--before", required=True,
+                       help="the predecessor comparison report")
+    p_diff.add_argument("--after", required=True,
+                       help="the successor comparison report, over the same baseline, "
+                            "ESR record and candidate")
+    p_diff.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
+    p_diff.add_argument("--profile", default=None,
+                       help="loaded by the shared dispatch; the diff reads the two written "
+                            "comparisons and uses no profile")
+    p_diff.add_argument("--out-dir", required=True,
+                       help="directory for the diff artifacts (never overwritten)")
     return ap
 
 
@@ -651,23 +686,19 @@ def _compare(
 ) -> int:
     """The ``compare`` sub-command: load, bind, resolve every declared reference,
     write the comparison and the revision priorities."""
-    def _under_root(raw: str) -> Path:
-        p = Path(raw)
-        return p if p.is_absolute() else repo_root / p
-
-    baseline_dir = _under_root(args.baseline_dir)
+    baseline_dir = _under_root(args.baseline_dir, repo_root)
     frozen = load_frozen_baseline(baseline_dir)
-    esr = load_esr_record(_under_root(args.esr))
-    dispositions = load_dispositions(_under_root(args.dispositions))
-    candidate_dir = _under_root(args.candidate)
+    esr = load_esr_record(_under_root(args.esr, repo_root))
+    dispositions = load_dispositions(_under_root(args.dispositions, repo_root))
+    candidate_dir = _under_root(args.candidate, repo_root)
     candidate = load_candidate(candidate_dir, bundle.profile)
     historical = None
     historical_path = None
     if args.historical_candidate:
-        historical_dir = _under_root(args.historical_candidate)
+        historical_dir = _under_root(args.historical_candidate, repo_root)
         historical = load_candidate(historical_dir, bundle.profile)
         historical_path = _portable(historical_dir, repo_root)
-    register = load_register(_under_root(args.register))
+    register = load_register(_under_root(args.register, repo_root))
     audits = load_audits(args.audit, repo_root=repo_root)
     report = run_comparison(
         frozen=frozen,
@@ -682,7 +713,7 @@ def _compare(
         repo_root=repo_root,
         clock=clock,
     )
-    out_dir = _under_root(args.out_dir)
+    out_dir = _under_root(args.out_dir, repo_root)
     path, revisions = write_comparison(report, out_dir)
     print(render_comparison(report.data))
     print(f"\ncomparison -> {path}")
@@ -698,21 +729,41 @@ def _review(
 ) -> int:
     """The ``review`` sub-command: re-bind the comparison's inputs, re-resolve
     every reference, recount, and write the two Markdown artifacts."""
-    def _under_root(raw: str) -> Path:
-        p = Path(raw)
-        return p if p.is_absolute() else repo_root / p
-
     inputs = resolve_inputs(
-        _under_root(args.comparison), repo_root=repo_root, profile=bundle.profile
+        _under_root(args.comparison, repo_root), repo_root=repo_root, profile=bundle.profile
     )
-    notes = load_review_notes(_under_root(args.notes))
+    notes = load_review_notes(_under_root(args.notes, repo_root))
     review = build_review(inputs, notes, clock=clock)
-    out_dir = _under_root(args.out_dir)
+    out_dir = _under_root(args.out_dir, repo_root)
     report, decisions = write_review(review, out_dir)
     print(render_summary(review))
     print(f"\nreview    -> {report}")
     print(f"decisions -> {decisions}")
     return 0
+
+
+def _diff(
+    args: argparse.Namespace,
+    repo_root: Path,
+    clock: Callable[[], str] | None,
+) -> int:
+    """The ``diff`` sub-command: load both written comparisons with the revisions
+    artifact beside each, bind them to one body of evidence, and write the diff."""
+    before = load_pair_member(_under_root(args.before, repo_root), what="predecessor")
+    after = load_pair_member(_under_root(args.after, repo_root), what="successor")
+    diff = diff_comparisons(before, after, repo_root=repo_root, clock=clock)
+    out_dir = _under_root(args.out_dir, repo_root)
+    report, markdown = write_diff(diff, out_dir)
+    print(render_diff_summary(diff))
+    print(f"\ndiff     -> {report}")
+    print(f"markdown -> {markdown}")
+    return 1 if diff["flags"] else 0
+
+
+def _under_root(raw: str, repo_root: Path) -> Path:
+    """*raw* as given when absolute, else resolved under *repo_root*."""
+    p = Path(raw)
+    return p if p.is_absolute() else repo_root / p
 
 
 def _portable(path: Path, repo_root: Path) -> str:
@@ -1072,6 +1123,8 @@ def main(
             return _compare(args, bundle, repo_root, clock)
         if args.command == "review":
             return _review(args, bundle, repo_root, clock)
+        if args.command == "diff":
+            return _diff(args, repo_root, clock)
 
         out_dir = Path(args.out_dir)
         if not out_dir.is_absolute():

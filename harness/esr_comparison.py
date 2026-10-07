@@ -35,10 +35,21 @@ Dispositions (the closed set, spec PE-08)
     register entry. Never counted as a model failure and never dropped.
 ``not_detected_despite_sufficient_preserved_evidence``
     The copy preserves the evidence (quoted and verified) and no finding
-    names the point. The only disposition that counts against the lane.
+    names the point. The only disposition that counts against the lane. The
+    quote is measured; the *sufficiency* of the evidence is a declaration, and
+    a ``Confirmed`` one needs the register's declared half to say so
+    (:func:`check_preservation_claim`). Under dispositions schema 1.1 the row
+    also names the register entry its preservation claim rests on.
 ``addressed``
     The revision the baseline assesses no longer exhibits the point. Needs a
     verified quote from the historical copy and one from the current copy.
+
+A proposed revision may carry a ``revision_plan`` (ticket R05): the evidence
+it rests on, the human role that owns it with the source that names it, what
+has to be confirmed before it can be written, where in the proposal it goes,
+and what carrying it out commits someone to. :func:`check_revision_plan`
+refuses an incomplete plan, and refuses one that names a commitment and
+nothing to confirm. A row that declares no plan carries no plan key.
 
 Criterion scores are compared separately from the qualitative rows. No
 deduction is attributed to any individual criticism, and the difference from
@@ -113,6 +124,60 @@ BLIND_REFERENCE_KINDS: Mapping[str, tuple[str, ...]] = {
 #: The four status categories of CLAUDE.md §12.2, for declared fields.
 DECLARED_STATUSES: tuple[str, ...] = ("Confirmed", "Inferred", "Assumed", "Unresolved")
 
+#: Dispositions record versions this module reads. 1.0 is the PE-08 record; 1.1
+#: adds the R05 rule that a miss names the register entry its preservation
+#: claim rests on, and is otherwise identical. An unknown version is refused
+#: rather than read under the rules of a version it does not declare.
+DISPOSITIONS_SCHEMA_VERSIONS: tuple[str, ...] = ("1.0", "1.1")
+
+#: The versions that hold a miss to naming its register basis. 1.0 does not:
+#: the PE-08 record named one on a single row of six, and tightening the rule
+#: under its own version would make that comparison unreplayable.
+VERSIONS_REQUIRING_A_MISS_BASIS: tuple[str, ...] = ("1.1",)
+
+#: The review state a dispositions record and each of its rows may declare
+#: (ticket R05 item 2 and acceptance criterion 2). A record that declares none
+#: is read exactly as before; a record that declares one has that state
+#: carried into the comparison, so no reading of the artifact can take an
+#: agent's recommendation for an operator's decision.
+REVIEW_STATE_AGENT_DRAFTED = "agent_drafted_pending_operator_review"
+REVIEW_STATE_OPERATOR_REVIEWED = "operator_reviewed"
+RECORD_REVIEW_STATES: tuple[str, ...] = (
+    REVIEW_STATE_AGENT_DRAFTED,
+    REVIEW_STATE_OPERATOR_REVIEWED,
+)
+
+#: The review state of one row.
+ROW_REVIEW_STATES: tuple[str, ...] = (
+    "agent_recommended_pending_operator_review",
+    "operator_decision_required",
+    "operator_confirmed",
+)
+
+#: What a revision plan must say (ticket R05 item 6).
+REVISION_PLAN_FIELDS: tuple[str, ...] = (
+    "evidence",
+    "responsible_role",
+    "requires_confirmation",
+    "proposal_location",
+    "commitment_kind",
+)
+
+#: What carrying out a revision commits a human to. The four non-editorial
+#: commitments are the four things ticket R05 item 6 says must stay proposals
+#: until a human confirms them: a numerical target, a study design, data or
+#: site access, and a partner commitment. The fifth is the one this repository
+#: cannot settle at all — a claim that needs the submitted original (PE-09).
+REVISION_COMMITMENT_EDITORIAL = "editorial_change"
+REVISION_COMMITMENT_KINDS: tuple[str, ...] = (
+    REVISION_COMMITMENT_EDITORIAL,
+    "requires_numerical_target",
+    "requires_study_design",
+    "requires_data_access",
+    "requires_partner_commitment",
+    "requires_original_check",
+)
+
 LANE_BLIND = "blind_lane"
 LANE_AUDIT = "integrity_audit"
 
@@ -134,6 +199,18 @@ _NOT_ASSESSABLE_STATEMENT = (
 _DETECTION_BASIS = (
     "shortcomings and minor shortcomings whose disposition is not 'addressed' "
     "and not 'not_assessable_from_this_copy'; strengths are reported but not rated"
+)
+_REVIEW_STATE_DRAFT = (
+    "The dispositions this comparison resolves are agent-drafted and pending "
+    "operator review. Every count below is a count of declarations in that "
+    "state, and nothing here records an operator decision. The general note on "
+    "this report describes the dispositions as the operator's; for this record "
+    "that reading is wrong, and this field governs."
+)
+_REVIEW_STATE_REVIEWED = (
+    "The dispositions this comparison resolves record an operator review. The "
+    "review is of the declarations, not of the measurements: every reference "
+    "was resolved against the artifact it names either way."
 )
 _NOTE = (
     "Advisory to a human, never run-blocking. Every disposition is declared by "
@@ -247,6 +324,16 @@ class Dispositions:
     def baseline_report_sha256(self) -> str:
         return str(self.data.get("baseline_report_sha256") or "")
 
+    @property
+    def schema_version(self) -> str:
+        return str(self.data.get("schema_version") or "")
+
+    @property
+    def review_state(self) -> str | None:
+        """The state the record declares, or ``None`` when it declares none."""
+        state = self.data.get("review_state")
+        return str(state) if state is not None else None
+
 
 def load_dispositions(path: Path | str) -> Dispositions:
     """Load the operator's dispositions, fail-closed on shape."""
@@ -257,6 +344,18 @@ def load_dispositions(path: Path | str) -> Dispositions:
     for key in ("baseline_report_sha256", "esr_record_sha256", "declared_by", "rows"):
         if key not in data:
             raise EsrComparisonError(f"dispositions {p} lack {key!r}.")
+    state = data.get("review_state")
+    if state is not None and state not in RECORD_REVIEW_STATES:
+        raise EsrComparisonError(
+            f"dispositions {p} declare review_state {state!r}; one of "
+            f"{', '.join(RECORD_REVIEW_STATES)} is required when the field is present."
+        )
+    version = data.get("schema_version")
+    if version not in DISPOSITIONS_SCHEMA_VERSIONS:
+        raise EsrComparisonError(
+            f"dispositions {p} declare schema_version {version!r}; this module reads "
+            f"{', '.join(DISPOSITIONS_SCHEMA_VERSIONS)}."
+        )
     rows = data["rows"]
     if not isinstance(rows, list) or not rows:
         raise EsrComparisonError(f"dispositions {p} hold no rows.")
@@ -549,6 +648,122 @@ def _declared(row: Mapping[str, Any], key: str, *, label: str, required: bool) -
     return str(value)
 
 
+def declared_half_entry(register: Mapping[str, Any], sub_section_id: str) -> Mapping[str, Any] | None:
+    """The register's declared-half row for *sub_section_id*, or ``None``.
+
+    The declared half is the operator's per-sub-section statement; the derived
+    half is the importer's measurement of the PDF. Only the declared half says
+    anything about the step from the submission to this copy, which is what a
+    claim of preserved evidence is about.
+    """
+    declared = register.get("declared")
+    if not isinstance(declared, Mapping):
+        return None
+    for entry in declared.get("sub_sections") or []:
+        if isinstance(entry, Mapping) and str(entry.get("sub_section_id")) == str(sub_section_id):
+            return entry
+    return None
+
+
+def _presence_declared(entry: Mapping[str, Any]) -> bool:
+    """Whether a declared-half entry states a presence value."""
+    presence = entry.get("presence")
+    if isinstance(presence, str):
+        return bool(presence.strip())
+    if isinstance(presence, Mapping):
+        return bool(str(presence.get("value") or "").strip())
+    return False
+
+
+def check_preservation_claim(
+    register: Mapping[str, Any],
+    *,
+    current: Sequence[Mapping[str, Any]],
+    status: str | None,
+    label: str,
+) -> None:
+    """What a declared ``evidence_preserved_status`` is held to.
+
+    The quote on a miss is a measurement: ``verify_evidence`` found it in the
+    named sub-section of this candidate. The *sufficiency* of that evidence is
+    a claim about the submission, which no artifact here measures. So the
+    status stays a declaration, and only a ``Confirmed`` one is constrained:
+    it needs the register's declared half to carry a ``presence`` statement for
+    every sub-section the preserved passage is quoted from. An ``Inferred``,
+    ``Assumed`` or ``Unresolved`` status says the claim rests on reasoning or
+    on nothing, and stands as declared.
+    """
+    if status != "Confirmed":
+        return
+    for ref in current:
+        sub = str(ref.get("sub_section_id"))
+        entry = declared_half_entry(register, sub)
+        if entry is None:
+            raise EsrComparisonError(
+                f"{label}: 'evidence_preserved_status' is 'Confirmed', but the register's "
+                f"declared half carries no entry for sub-section {sub}. Confirmed "
+                "preservation is a declaration about the submission; the derived half "
+                "measures this PDF's extraction and cannot carry it."
+            )
+        if not _presence_declared(entry):
+            raise EsrComparisonError(
+                f"{label}: the register's declared half declares no 'presence' for "
+                f"sub-section {sub}, so 'Confirmed' preservation has no basis."
+            )
+
+
+def check_revision_plan(revision: Mapping[str, Any], *, label: str) -> None:
+    """Refuse a revision plan that does not say who owns the change (ticket R05).
+
+    A proposed revision is a sentence anyone can write. A plan names the
+    evidence it rests on, the human role that owns it, what has to be
+    confirmed before it can be written, where in the proposal it goes, and
+    whether carrying it out commits someone to something new. A plan that
+    needs a commitment and names nothing to confirm is refused: that is the
+    shape in which a proposal passes itself off as a decision.
+    """
+    plan = revision.get("revision_plan")
+    if plan is None:
+        return
+    if not isinstance(plan, Mapping):
+        raise EsrComparisonError(f"{label}: revision_plan must be an object.")
+    for key in REVISION_PLAN_FIELDS:
+        if key not in plan:
+            raise EsrComparisonError(f"{label}: revision_plan lacks {key!r}.")
+    for key in ("evidence", "proposal_location"):
+        value = plan[key]
+        if not isinstance(value, list) or not value or not all(
+            isinstance(v, str) and v.strip() for v in value
+        ):
+            raise EsrComparisonError(
+                f"{label}: revision_plan {key!r} must be a non-empty list of strings."
+            )
+    role = plan["responsible_role"]
+    if not isinstance(role, Mapping) or not str(role.get("role") or "").strip() or not str(
+        role.get("source") or ""
+    ).strip():
+        raise EsrComparisonError(
+            f"{label}: revision_plan responsible_role needs a 'role' and the 'source' that "
+            "names it; a role invented here would be a project fact (CLAUDE.md §13.3)."
+        )
+    kind = plan["commitment_kind"]
+    if kind not in REVISION_COMMITMENT_KINDS:
+        raise EsrComparisonError(
+            f"{label}: revision_plan commitment_kind {kind!r}; one of "
+            f"{', '.join(REVISION_COMMITMENT_KINDS)} is required."
+        )
+    confirm = plan["requires_confirmation"]
+    if not isinstance(confirm, list) or not all(isinstance(v, str) and v.strip() for v in confirm):
+        raise EsrComparisonError(
+            f"{label}: revision_plan requires_confirmation must be a list of strings."
+        )
+    if kind != REVISION_COMMITMENT_EDITORIAL and not confirm:
+        raise EsrComparisonError(
+            f"{label}: revision_plan commitment_kind is {kind!r} and names nothing to "
+            "confirm; a revision that commits a human states what they must confirm."
+        )
+
+
 def check_row_rules(
     observation: Mapping[str, Any],
     disposition: str,
@@ -557,11 +772,19 @@ def check_row_rules(
     audit: Sequence[Mapping[str, Any]],
     current: Sequence[Mapping[str, Any]],
     historical: Sequence[Mapping[str, Any]],
-    register: Sequence[Mapping[str, Any]],
+    register_refs: Sequence[Mapping[str, Any]],
+    register: Mapping[str, Any],
     row: Mapping[str, Any],
     label: str,
+    schema_version: str,
 ) -> None:
-    """Refuse a disposition whose declared basis does not carry it."""
+    """Refuse a disposition whose declared basis does not carry it.
+
+    *register_refs* are the register pointers this row resolved; *register* is
+    the register record itself, which the preservation rule reads. Both are
+    required: a default would quietly apply the laxer rule to a caller that
+    forgot one.
+    """
     kind = observation["kind"]
     findings = len(blind) + len(audit)
     explanation = row.get("explanation")
@@ -581,13 +804,13 @@ def check_row_rules(
             raise EsrComparisonError(
                 f"{label}: 'partially_observable' needs at least one blind or audit finding."
             )
-        if not register:
+        if not register_refs:
             raise EsrComparisonError(
                 f"{label}: 'partially_observable' needs a fidelity-register entry naming "
                 "what the copy preserves only in part."
             )
     elif disposition == DISPOSITION_NOT_ASSESSABLE:
-        if not register:
+        if not register_refs:
             raise EsrComparisonError(
                 f"{label}: 'not_assessable_from_this_copy' needs a fidelity-register entry "
                 "naming what sanitisation removed."
@@ -603,7 +826,14 @@ def check_row_rules(
                 f"{label}: 'not_detected_despite_sufficient_preserved_evidence' needs the "
                 "preserved passage quoted from the current copy."
             )
-        _declared(row, "evidence_preserved_status", label=label, required=True)
+        status = _declared(row, "evidence_preserved_status", label=label, required=True)
+        if schema_version in VERSIONS_REQUIRING_A_MISS_BASIS and not register_refs:
+            raise EsrComparisonError(
+                f"{label}: 'not_detected_despite_sufficient_preserved_evidence' needs a "
+                "fidelity-register entry naming what the copy preserves; the disposition "
+                "claims preservation and the register is what records it."
+            )
+        check_preservation_claim(register, current=current, status=status, label=label)
     elif disposition == DISPOSITION_ADDRESSED:
         if kind == OBSERVATION_KIND_STRENGTH:
             raise EsrComparisonError(f"{label}: a strength cannot be 'addressed'.")
@@ -795,11 +1025,19 @@ def run_comparison(
             if not isinstance(revision, Mapping) or not str(revision.get("text") or "").strip():
                 raise EsrComparisonError(f"{label}: proposed_revision needs a text.")
             _declared(revision, "declared_status", label=f"{label} (proposed_revision)", required=True)
+            check_revision_plan(revision, label=f"{label} (proposed_revision)")
         _declared(row, "evidence_preserved_status", label=label, required=False)
+        review_status = row.get("review_status")
+        if review_status is not None and review_status not in ROW_REVIEW_STATES:
+            raise EsrComparisonError(
+                f"{label}: review_status {review_status!r}; one of "
+                f"{', '.join(ROW_REVIEW_STATES)} is required when the field is present."
+            )
         check_row_rules(
             obs, disposition,
             blind=blind, audit=audit_refs, current=current, historical=historical,
-            register=register_refs, row=row, label=label,
+            register_refs=register_refs, register=register.data, row=row, label=label,
+            schema_version=dispositions.schema_version,
         )
         lanes = sorted({LANE_BLIND for _ in blind} | {LANE_AUDIT for _ in audit_refs})
         contests = obs["kind"] == OBSERVATION_KIND_STRENGTH and any(
@@ -848,9 +1086,30 @@ def run_comparison(
             "counted_in_detection_rate": counted,
             "contests_historical_strength": contests,
             "proposed_revision": row.get("proposed_revision"),
+            # Only a row that declares a review status carries one, so a record
+            # that declares none keeps the row shape it had before ticket R05.
+            **({"review_status": review_status} if review_status is not None else {}),
         })
 
     summary = _summarise(rows, baseline_criteria)
+    unresolved = [
+        r["observation_id"] for r in rows if r.get("disposition_status") == "Unresolved"
+    ]
+    if unresolved:
+        # A count has to count something, so an Unresolved row is counted under
+        # the disposition it declares. CLAUDE.md §12.2 says such a status needs
+        # resolution before downstream use, so the figures are provisional on
+        # these rows and the summary says which.
+        summary["declarations_unresolved"] = {
+            "rows": unresolved,
+            "statement": (
+                f"{len(unresolved)} row(s) declare a disposition status of 'Unresolved' "
+                "(CLAUDE.md §12.2: resolution required before downstream use). Each is "
+                "counted above under the disposition it declares, because a count must "
+                "count something. Every figure that includes one is provisional on the "
+                "operator decision the dispositions record names for that row."
+            ),
+        }
     scores = _compare_scores(esr, baseline, frozen.record)
     revisions = _prioritise(rows, weights, esr_criteria=sorted(esr_criteria))
     open_without_revision = [
@@ -892,6 +1151,8 @@ def run_comparison(
             "sha256": dispositions.sha256,
             "declared_by": dispositions.data.get("declared_by"),
             "declared_on": dispositions.data.get("declared_on"),
+            **({"review_state": dispositions.review_state}
+               if dispositions.review_state is not None else {}),
         },
         "candidate": {
             "path": candidate_path,
@@ -916,6 +1177,23 @@ def run_comparison(
         "flags": flags,
         "notes": _NOTE,
     }
+    if dispositions.review_state is not None:
+        # The generic note says the dispositions are the operator's. A record
+        # that declares a review state says whose they actually are, and the
+        # comparison must carry that rather than leave a reader to find it two
+        # files away.
+        data["review_state"] = {
+            "state": dispositions.review_state,
+            "statement": (
+                _REVIEW_STATE_DRAFT
+                if dispositions.review_state == REVIEW_STATE_AGENT_DRAFTED
+                else _REVIEW_STATE_REVIEWED
+            ),
+            "rows_needing_an_operator_decision": [
+                r["observation_id"] for r in rows
+                if r.get("review_status") == "operator_decision_required"
+            ],
+        }
     revisions_record = {
         "record_type": REVISIONS_RECORD_TYPE,
         "schema_version": COMPARISON_SCHEMA_VERSION,
@@ -1044,7 +1322,7 @@ def _prioritise(rows: Sequence[Mapping[str, Any]], weights: Mapping[str, float],
 
     def entry(r: Mapping[str, Any], rank: int | None) -> dict[str, Any]:
         rev = r.get("proposed_revision") if isinstance(r.get("proposed_revision"), Mapping) else None
-        return {
+        out = {
             "priority": rank,
             "observation_id": r["observation_id"],
             "criterion_id": r["criterion_id"],
@@ -1056,6 +1334,12 @@ def _prioritise(rows: Sequence[Mapping[str, Any]], weights: Mapping[str, float],
             "revision_status": None if rev is None else rev.get("declared_status"),
             "needs_private_network": r["disposition"] == DISPOSITION_NOT_ASSESSABLE,
         }
+        # Only a row that declares a plan carries one, so a dispositions record
+        # that declares none keeps the artifact shape it had before ticket R05.
+        plan = None if rev is None else rev.get("revision_plan")
+        if plan is not None:
+            out["revision_plan"] = plan
+        return out
 
     open_rows = sorted(
         [r for r in rows if r["disposition"] != DISPOSITION_ADDRESSED and r["kind"] != OBSERVATION_KIND_STRENGTH],
@@ -1121,6 +1405,12 @@ def render_comparison(data: Mapping[str, Any]) -> str:
         f"assessor:      {b.get('assessor_pin')}  transport={b.get('assessor_transport')}",
         f"ESR record:    {(data.get('esr_record') or {}).get('path')}",
         f"dispositions:  {(data.get('dispositions') or {}).get('path')}",
+        *(
+            [f"review state:  {(data['review_state'])['state']}  "
+             f"(operator decisions required on "
+             f"{len(data['review_state']['rows_needing_an_operator_decision'])} row(s))"]
+            if data.get("review_state") else []
+        ),
         f"observations:  {s.get('observations')}  assessable {s.get('assessable')} "
         f"({s.get('assessable_fraction')})  not assessable {s.get('not_assessable')}",
     ]
@@ -1144,6 +1434,12 @@ def render_comparison(data: Mapping[str, Any]) -> str:
     t = sc.get("total") or {}
     lines.append(f"  total: {t.get('historical')} vs {t.get('blind')} (diff {t.get('difference')})")
     lines.append("no deduction is attributed to any individual criticism")
+    unresolved = (s.get("declarations_unresolved") or {}).get("rows") or []
+    if unresolved:
+        lines.append(
+            f"provisional: {len(unresolved)} row(s) declare an Unresolved status "
+            f"({', '.join(unresolved)})"
+        )
     for flag in data.get("flags") or []:
         lines.append(f"FLAG: {flag}")
     return "\n".join(lines)
@@ -1151,11 +1447,21 @@ def render_comparison(data: Mapping[str, Any]) -> str:
 
 __all__ = [
     "COMPARISON_RECORD_TYPE",
+    "DECLARED_STATUSES",
     "DISPOSITIONS",
     "DISPOSITIONS_RECORD_TYPE",
+    "DISPOSITIONS_SCHEMA_VERSIONS",
     "ESR_RECORD_TYPE",
     "OBSERVATION_KINDS",
+    "RECORD_REVIEW_STATES",
     "REVISIONS_RECORD_TYPE",
+    "REVISION_COMMITMENT_EDITORIAL",
+    "REVISION_COMMITMENT_KINDS",
+    "REVISION_PLAN_FIELDS",
+    "REVIEW_STATE_AGENT_DRAFTED",
+    "REVIEW_STATE_OPERATOR_REVIEWED",
+    "ROW_REVIEW_STATES",
+    "VERSIONS_REQUIRING_A_MISS_BASIS",
     "ComparisonReport",
     "Dispositions",
     "EsrComparisonError",
@@ -1163,7 +1469,10 @@ __all__ = [
     "LoadedAudit",
     "Register",
     "load_register",
+    "check_preservation_claim",
+    "check_revision_plan",
     "check_row_rules",
+    "declared_half_entry",
     "load_audits",
     "load_comparison",
     "load_dispositions",

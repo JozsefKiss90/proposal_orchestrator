@@ -707,3 +707,230 @@ class TestCommittedMscaDn:
         assert s["assessable"] + s["not_assessable"] == s["observations"]
         assert s["not_assessable_counted_as_failure"] is False
         assert all(e["proposed_revision"] for e in rev["open"])
+
+
+# --------------------------------------------------------------------------- #
+# What "sufficient preserved evidence" is actually checked against (ticket R05)
+# --------------------------------------------------------------------------- #
+
+
+def _rewrite_register(inputs, mutate) -> None:
+    """Edit the fidelity register in place through *mutate(data)*."""
+    path = inputs["register"]
+    data = json.loads(path.read_text(encoding="utf-8"))
+    mutate(data)
+    _write_json(path, data)
+
+
+class TestPreservationIsMeasuredNotAsserted:
+    """A miss asserts the copy preserved what the evaluators read. The quote is
+    measured against the candidate; the sufficiency of that evidence is a
+    declaration, and a 'Confirmed' one needs the register's declared half."""
+
+    def test_a_confirmed_preservation_status_needs_the_declared_half(self, inputs, capsys):
+        _rewrite(inputs, lambda d: _row(d, "OBS-2").update(evidence_preserved_status="Confirmed"))
+        code, _ = _compare(inputs)
+        assert code == 2
+        err = capsys.readouterr().err
+        assert "'evidence_preserved_status' is 'Confirmed'" in err
+        assert "declared half" in err and "S2" in err
+
+    def test_a_declared_entry_carries_confirmed_for_the_quoted_sub_section(self, inputs):
+        _rewrite(inputs, lambda d: _row(d, "OBS-2").update(evidence_preserved_status="Confirmed"))
+        _rewrite_register(inputs, lambda d: d["declared"]["sub_sections"].append(
+            {"sub_section_id": "S2", "presence": {"value": "present in the submission"},
+             "transformation": {"value": "unchanged"}}
+        ))
+        code, out = _compare(inputs)
+        assert code == 0
+        row = _row(ec.load_comparison(next(out.glob("comparison_*.json"))), "OBS-2")
+        assert row["evidence_preserved_status"] == "Confirmed"
+
+    def test_a_declared_entry_without_a_presence_value_does_not_carry_confirmed(self, inputs, capsys):
+        _rewrite(inputs, lambda d: _row(d, "OBS-2").update(evidence_preserved_status="Confirmed"))
+        _rewrite_register(inputs, lambda d: d["declared"]["sub_sections"].append(
+            {"sub_section_id": "S2", "transformation": {"value": "unchanged"}}
+        ))
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "declares no 'presence'" in capsys.readouterr().err
+
+    def test_assumed_preservation_stands_on_its_own(self, inputs):
+        """Today's declared halves are empty. 'Assumed' says so and is accepted."""
+        code, out = _compare(inputs)
+        assert code == 0
+        row = _row(ec.load_comparison(next(out.glob("comparison_*.json"))), "OBS-2")
+        assert row["evidence_preserved_status"] == "Assumed"
+
+
+class TestDispositionsSchemaVersion:
+    def test_an_unknown_schema_version_is_refused(self, inputs, capsys):
+        _rewrite(inputs, lambda d: d.update(schema_version="2.0"))
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "schema_version '2.0'" in capsys.readouterr().err
+
+    def test_version_1_1_makes_a_miss_name_its_register_basis(self, inputs, capsys):
+        _rewrite(inputs, lambda d: d.update(schema_version="1.1"))
+        code, _ = _compare(inputs)
+        assert code == 2
+        err = capsys.readouterr().err
+        assert "needs a fidelity-register entry" in err and "OBS-2" in err
+
+    def test_version_1_0_leaves_that_row_as_it_was(self, inputs):
+        """The committed PE-08 dispositions are 1.0 and must still compare."""
+        code, _ = _compare(inputs)
+        assert code == 0
+
+    def test_version_1_1_accepts_the_miss_once_the_basis_is_named(self, inputs):
+        def mutate(d):
+            d["schema_version"] = "1.1"
+            _row(d, "OBS-2")["evidence_basis"] = ["provenance/transformation/citations"]
+        _rewrite(inputs, mutate)
+        code, out = _compare(inputs)
+        assert code == 0
+        row = _row(ec.load_comparison(next(out.glob("comparison_*.json"))), "OBS-2")
+        assert row["evidence_basis"][0]["pointer"] == "provenance/transformation/citations"
+
+
+class TestRevisionPlan:
+    """Ticket R05 item 6: a revision names its evidence, the human who owns it,
+    what has to be confirmed, where it goes, and whether it is a commitment."""
+
+    PLAN = {
+        "evidence": ["the quoted passage in S2"],
+        "responsible_role": {"role": "Project Coordinator", "source": "S2 of the candidate"},
+        "requires_confirmation": ["that month four is feasible for task three"],
+        "proposal_location": ["S2"],
+        "commitment_kind": "requires_study_design",
+    }
+
+    def _plan(self, **over) -> dict:
+        return {**copy.deepcopy(self.PLAN), **over}
+
+    def test_a_plan_is_carried_into_both_artifacts(self, inputs):
+        _rewrite(inputs, lambda d: _row(d, "OBS-2")["proposed_revision"].update(
+            revision_plan=self._plan()))
+        code, out = _compare(inputs)
+        assert code == 0
+        row = _row(ec.load_comparison(next(out.glob("comparison_*.json"))), "OBS-2")
+        assert row["proposed_revision"]["revision_plan"]["commitment_kind"] == (
+            "requires_study_design")
+        rev = json.loads(next(out.glob("revisions_*.json")).read_text(encoding="utf-8"))
+        entry = next(e for e in rev["open"] if e["observation_id"] == "OBS-2")
+        assert entry["revision_plan"]["responsible_role"]["role"] == "Project Coordinator"
+
+    def test_a_row_without_a_plan_carries_no_plan_key(self, inputs):
+        """The 1.0 revisions artifact keeps its exact shape."""
+        code, out = _compare(inputs)
+        assert code == 0
+        rev = json.loads(next(out.glob("revisions_*.json")).read_text(encoding="utf-8"))
+        assert all("revision_plan" not in e for e in rev["open"])
+
+    def test_a_plan_missing_a_field_is_refused(self, inputs, capsys):
+        plan = self._plan()
+        plan.pop("proposal_location")
+        _rewrite(inputs, lambda d: _row(d, "OBS-2")["proposed_revision"].update(revision_plan=plan))
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "revision_plan lacks 'proposal_location'" in capsys.readouterr().err
+
+    def test_an_unknown_commitment_kind_is_refused(self, inputs, capsys):
+        _rewrite(inputs, lambda d: _row(d, "OBS-2")["proposed_revision"].update(
+            revision_plan=self._plan(commitment_kind="nice_to_have")))
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "commitment_kind 'nice_to_have'" in capsys.readouterr().err
+
+    def test_a_commitment_must_name_what_has_to_be_confirmed(self, inputs, capsys):
+        _rewrite(inputs, lambda d: _row(d, "OBS-2")["proposed_revision"].update(
+            revision_plan=self._plan(requires_confirmation=[])))
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "names nothing to confirm" in capsys.readouterr().err
+
+    def test_an_editorial_change_need_not(self, inputs):
+        _rewrite(inputs, lambda d: _row(d, "OBS-2")["proposed_revision"].update(
+            revision_plan=self._plan(commitment_kind="editorial_change", requires_confirmation=[])))
+        code, _ = _compare(inputs)
+        assert code == 0
+
+    def test_a_role_without_a_source_is_refused(self, inputs, capsys):
+        _rewrite(inputs, lambda d: _row(d, "OBS-2")["proposed_revision"].update(
+            revision_plan=self._plan(responsible_role={"role": "the Coordinator"})))
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "responsible_role needs a 'role' and the 'source'" in capsys.readouterr().err
+
+
+# --------------------------------------------------------------------------- #
+# Whose declarations these are, and which of them are unresolved (ticket R05)
+# --------------------------------------------------------------------------- #
+
+
+class TestReviewState:
+    def test_a_record_that_declares_none_is_read_as_before(self, inputs):
+        """The PE-08 record declares no review state and must keep its shape."""
+        code, out = _compare(inputs)
+        assert code == 0
+        data = ec.load_comparison(next(out.glob("comparison_*.json")))
+        assert "review_state" not in data
+        assert "review_state" not in data["dispositions"]
+        assert all("review_status" not in r for r in data["rows"])
+
+    def test_an_unknown_record_review_state_is_refused(self, inputs, capsys):
+        _rewrite(inputs, lambda d: d.update(review_state="approved"))
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "review_state 'approved'" in capsys.readouterr().err
+
+    def test_a_declared_state_is_carried_and_qualifies_the_general_note(self, inputs):
+        _rewrite(inputs, lambda d: d.update(review_state=ec.REVIEW_STATE_AGENT_DRAFTED))
+        code, out = _compare(inputs)
+        assert code == 0
+        data = ec.load_comparison(next(out.glob("comparison_*.json")))
+        assert data["dispositions"]["review_state"] == ec.REVIEW_STATE_AGENT_DRAFTED
+        state = data["review_state"]
+        assert state["state"] == ec.REVIEW_STATE_AGENT_DRAFTED
+        assert "nothing here records an operator decision" in state["statement"]
+        assert "this field governs" in state["statement"]
+        assert ec.REVIEW_STATE_AGENT_DRAFTED in ec.render_comparison(data)
+
+    def test_an_unknown_row_review_status_is_refused(self, inputs, capsys):
+        _rewrite(inputs, lambda d: _row(d, "OBS-1").update(review_status="fine"))
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "review_status 'fine'" in capsys.readouterr().err
+
+    def test_a_row_status_is_carried_and_the_questions_are_listed(self, inputs):
+        def mutate(d):
+            d["review_state"] = ec.REVIEW_STATE_AGENT_DRAFTED
+            _row(d, "OBS-1")["review_status"] = "operator_decision_required"
+            _row(d, "OBS-2")["review_status"] = "agent_recommended_pending_operator_review"
+        _rewrite(inputs, mutate)
+        code, out = _compare(inputs)
+        assert code == 0
+        data = ec.load_comparison(next(out.glob("comparison_*.json")))
+        assert _row(data, "OBS-1")["review_status"] == "operator_decision_required"
+        assert data["review_state"]["rows_needing_an_operator_decision"] == ["OBS-1"]
+
+
+class TestUnresolvedDeclarations:
+    def test_no_unresolved_row_means_no_block(self, inputs):
+        code, out = _compare(inputs)
+        assert code == 0
+        summary = ec.load_comparison(next(out.glob("comparison_*.json")))["summary"]
+        assert "declarations_unresolved" not in summary
+
+    def test_an_unresolved_row_is_counted_and_named(self, inputs, capsys):
+        """A count must count something; the summary says which rows are provisional."""
+        _rewrite(inputs, lambda d: _row(d, "OBS-1").update(declared_status="Unresolved"))
+        code, out = _compare(inputs)
+        assert code == 0
+        data = ec.load_comparison(next(out.glob("comparison_*.json")))
+        block = data["summary"]["declarations_unresolved"]
+        assert block["rows"] == ["OBS-1"]
+        assert "§12.2" in block["statement"]
+        # still counted under the disposition it declares
+        assert data["summary"]["by_disposition"]["independently_detected"] == 2
+        assert "provisional: 1 row(s)" in ec.render_comparison(data)

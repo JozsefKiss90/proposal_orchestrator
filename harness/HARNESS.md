@@ -424,11 +424,12 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Piece | Where |
 |---|---|
 | Candidate loader, content hash, bound report, writer, loader | `harness/blind_assessment.py` |
-| Module command (`preflight`, `assess`, `verify`, `freeze`, `audit`, `compare`, `review`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Module command (`preflight`, `assess`, `verify`, `freeze`, `audit`, `compare`, `review`, `diff`) | `py -3.10 -m harness.commands.blind_assessment` |
 | Frozen baseline: conditions, byte copy, freeze record, hash-checked loader | `harness/blind_baseline.py`; `--baseline-dir <dir>/blind_baseline_<sha12>.json` + `.freeze.json` |
 | Integrity audit: five consistency checks over parsed rows, grounding axis Unresolved, baseline binding | `harness/integrity_audit.py`; reports `<out-dir>/integrity_<hash12>_<NNNN>.json` |
 | ESR comparison: one row per historical observation, declared dispositions resolved against the frozen baseline, scores compared apart | `harness/esr_comparison.py`; `<out-dir>/comparison_<sha12>_<NNNN>.json` + `revisions_<sha12>_<NNNN>.json` |
 | Operator review: a written comparison rendered for a human, every reference re-resolved, counts recomputed, agreement declared | `harness/operator_review.py`; `<out-dir>/operator_review_<sha12>_<NNNN>.md` + `operator_decisions_<sha12>_<NNNN>.md` |
+| Comparison diff: what moved between a comparison and its successor — dispositions, citations, counts, priorities | `harness/comparison_diff.py`; `<out-dir>/review_diff_<sha12>_<NNNN>.json` + `.md` |
 | Evidence preflight: realised pack set, pack-set hash, seven-section report | `harness/evidence_preflight.py`; reports `harness/blind_reports/preflight_<hash12>_<NNNN>.json` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
@@ -862,6 +863,92 @@ removed. A `failure_mode` separates a point no lane output engages with from a
 passage a lane read and rated adequate, read and misattributed, or read and
 asked a different question of. The distinction is recorded, never counted: no
 rate in any artifact uses it.
+
+**The successor dispositions and the diff (ticket R05).** R02, R03 and R04
+reviewed the PE-08 dispositions without changing one, because a recommendation
+is a question. R05 writes the reviewed reading down as a *successor* record and
+compares it, leaving the predecessor exactly as the operator read it:
+
+    py -3.10 -m tools.author_successor_dispositions [--check]
+    py -3.10 -m harness.commands.blind_assessment compare --dispositions <successor> ... (as above)
+    py -3.10 -m harness.commands.blind_assessment diff --before <comparison> --after <comparison>
+        --out-dir <dir>
+
+`tools/author_successor_dispositions.py` is a deterministic transform of the
+committed predecessor: an enumerated set of changes, every hash computed from
+the file on disk, `--check` a byte-equal replay. On the MSCA-DN case three rows
+change what they declare. ESR-E-04 moves from `partially_observable` to a miss.
+ESR-Q-01 and ESR-Q-03 lose the citations R03 withdrew. ESR-Q-03's surviving
+M7.3 finding is re-filed against the successor audit, whose
+`milestone_dependencies` findings are index-for-index the predecessor's. The
+fourteen strengths are carried through untouched.
+
+**Whose declarations these are.** A dispositions record may declare a
+`review_state`, and each row a `review_status`. A record declaring neither is
+read exactly as before, which is why the PE-08 record still replays byte for
+byte. A declared state reaches the comparison twice: in the `dispositions`
+block, and in a top-level `review_state` block. That block states that every
+count is a count of declarations in that state, lists the rows needing an
+operator decision, and says that where the general note calls the dispositions
+the operator's, that reading is wrong for this record. The rendering prints the
+state. On the MSCA-DN successor the state is
+`agent_drafted_pending_operator_review` and nineteen of twenty-nine rows are
+`operator_decision_required` — this record's six questions and every row the
+R03 notes still put a question on. No row is `operator_confirmed`.
+
+**An Unresolved declaration is counted and named.** Two successor rows declare
+a disposition status of `Unresolved`, and §12.2 says such a status needs
+resolution before downstream use. A count must count something, so each is
+counted under the disposition it declares. The summary's
+`declarations_unresolved` block names the rows and states that every figure
+including one is provisional on an operator decision. The block is absent when
+no row is Unresolved.
+
+Two rules govern a miss. **What it is held to.**
+The quote is a measurement — `verify_evidence` finds it in the named
+sub-section. The *sufficiency* of that evidence is a claim about the
+submission that nothing here measures, so `evidence_preserved_status` stays a
+declaration; `check_preservation_claim` refuses only the one value that
+overstates it. A `Confirmed` status needs the register's declared half to carry
+a `presence` statement for every sub-section the passage is quoted from, because
+the declared half is the only artifact about the step from the submission to
+this copy. Both declared halves are empty, so no row can be `Confirmed` until
+the R04 drafts are adopted, and the rule is exercised by tests rather than by
+the live data. **Naming the basis.** Dispositions schema `1.1` additionally
+makes every miss name the register entry its preservation claim rests on. The
+PE-08 record is `1.0` and only one of its six misses named one, so the rule is
+version-gated and that record still compares and still replays. An unknown
+schema version is refused.
+
+**The revision plans.** Each proposed revision may carry a `revision_plan`:
+the evidence, the human role that owns it, what has to be confirmed first,
+where in the proposal it goes, and the `commitment_kind`.
+`check_revision_plan` refuses an incomplete plan, and refuses one that names a
+commitment and nothing to confirm. The six kinds are `editorial_change`,
+`requires_original_check`, and the four things ticket R05 keeps as proposals
+until a human confirms them: `requires_numerical_target`,
+`requires_study_design`, `requires_data_access`,
+`requires_partner_commitment`. Every role is quoted from the candidate's own
+governance and work-package text with a verbatim anchor a test resolves; a role
+this repository cannot point at would be an invented project fact (§13.3). A
+row that declares no plan carries no plan key, so the `1.0` revisions artifact
+keeps its exact shape. On the MSCA-DN case all fifteen ESR shortcomings stay
+open and none of the plans is editorial: not one can be written from what this
+copy already carries.
+
+`comparison_diff.py` measures the rest and declares nothing. It refuses a pair
+that is not two readings of one body of evidence: a different baseline report,
+ESR record, candidate or observation set, or a moved score comparison. It then
+reports, per row, the disposition and its status, the preservation status, the
+lanes, the register pointers, the quoted passages, and whether the explanation
+or the revision moved. Blind and audit citations are reported with what was
+withdrawn and what was added. So is the rank the row holds in each revisions
+artifact, found beside its comparison under the name that comparison recorded.
+Every leaf of the summary is reported before and after, prose included: a
+changed basis sentence changes how a figure reads. One flag: an ESR
+shortcoming the successor leaves out of the revision list with any disposition
+but `addressed` — the harness missing a point is not a reason to stop
+proposing the fix.
 
 ## Response checkpoint and the bounded re-ask (`response_cache.py`)
 

@@ -1,0 +1,1549 @@
+{
+  "record_type": "esr_dispositions",
+  "schema_version": "1.1",
+  "artifact_purpose": "The successor declared half of the PE-08 comparison (ticket R05). One disposition per observation of the same ESR record, over the same frozen baseline and the same candidate as the predecessor, with the citations R03 withdrew removed, the one disposition R03 recommends moving moved, and one revision plan per ESR shortcoming. The predecessor stays on disk and stays replayable; this record is what the review recommends, not what the operator has decided.",
+  "spec": "plans/msca_dn_pre_evaluation_spec.md",
+  "ticket": "R05 of plans/pe08_review_and_pe09_handoff_tickets.md",
+  "advisory": true,
+  "blocking": false,
+  "review_state": "agent_drafted_pending_operator_review",
+  "review_status_note": "Every row carries its own review_status, which the comparison carries through. 'operator_decision_required' is every observation this record or the R03 review notes still put a question on; the rest are 'agent_recommended_pending_operator_review'. No row is 'operator_confirmed', because no operator has reviewed this record.",
+  "written_by": "tools/author_successor_dispositions.py",
+  "supersedes": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+  "supersedes_sha256": "5c0da82c111582d8ad30306a69daad721b4f0ab18d74adfc5fd9c3ca6ab6c0ff",
+  "supersession_note": "The PE-08 dispositions stay as written and the comparison rendered from them stays as the operator read it. Nothing here edits either. A successor record exists because a reviewed reading must be citable without destroying the reading it reviewed: the predecessor is the provisional interpretation, this is the recommendation, and the operator's decision is still outstanding on the rows listed under open_operator_decisions.",
+  "baseline_report_sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01",
+  "baseline_dir": "docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06",
+  "esr_record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+  "esr_record_sha256": "2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb",
+  "candidate": "docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+  "historical_candidate": "docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+  "fidelity_register": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+  "fidelity_register_sha256": "aafed265f4e9b43b9d88d13f394fef2e812cbfa5405d53bb6720cb303c9ecfc1",
+  "fidelity_register_note": "The same register, byte for byte, as the predecessor cites. R04 drafted what its declared half could say and the operator has not adopted it, so the declared half is still empty and no row's preservation claim can be Confirmed: harness.esr_comparison refuses a Confirmed evidence_preserved_status that no declared-half presence statement carries. Every miss here declares Assumed or Unresolved. Adopting docs/tier4_orchestration_state/msca_dn/declarations/draft_resolved_fixes.json would change the register's bytes and therefore the hash this record and the predecessor's comparison pin; see that draft's adoption block for what else pins it.",
+  "audits": [
+    "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json",
+    "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json"
+  ],
+  "audit_note": "ESR-Q-03's one surviving audit citation is filed against the successor audit docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json, which R03 wrote after correcting two rules. It is bound to the same candidate and the same snapshot as docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json, which the predecessor cited and which stays on disk as historical evidence; its milestone_dependencies findings are index-for-index the same, so the citation names the same finding. The first-revision audit is passed for the historical copy.",
+  "review_inputs": {
+    "predecessor_comparison": "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json",
+    "predecessor_comparison_sha256": "9732dde500397981a133461e29d93ae657ba444199a31d84d39731f9c5ec7848",
+    "operator_review": "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0002.md",
+    "review_notes": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json",
+    "review_notes_sha256": "37c4797249f67ad3d51f39ac03ce22514350faaddb8105edd5accd6929fbb247",
+    "adjudication_record": "docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json",
+    "adjudication_record_sha256": "354db83d36727c05c03a348a8040c65bfb721b0f41fa8889ac60fa24a3c7f6af",
+    "declaration_draft": "docs/tier4_orchestration_state/msca_dn/declarations/draft_resolved_fixes.json",
+    "declaration_draft_note": "cited by path and not by hash. The draft's own adoption block enumerates every artifact that names the register, this record included, so hashing the draft here would make the two records chase each other: a re-render of the draft would move this record, which would move the comparison written from it, whose hash names the diff artifact, which the draft would then have to enumerate. The draft is a review input, not a binding this comparison rests on."
+  },
+  "declared_by": "drafted in a Claude Code session, 2026-10-07, from the R02 review table and the R03 adjudication record. Every disposition is an agent recommendation pending operator review; none records an operator decision",
+  "declared_on": "2026-10-07",
+  "declared_status_note": "declared_status is the status of the disposition judgment itself (CLAUDE.md section 12.2): Inferred where it follows from resolved findings and verified quotes, Assumed where it rests on a register declaration about what sanitisation removed, Unresolved where the adjudication left the reading to the operator. evidence_preserved_status is the status of the preservation claim a miss makes. It is Assumed where the document-wide provenance declaration is the only basis, and Unresolved on ESR-E-04, where the choice between a miss and an unassessable row is open. A Confirmed value would need the register's declared half, which is empty.",
+  "decision_state": {
+    "state": "agent_drafted_pending_operator_review",
+    "statement": "No row of this record is operator-approved. Four rows carry a question the operator has to answer before this record can be called a decision, and two more ask whether a contested strength enters the revision plan. The comparison written from this record is a labelled draft for the same reason.",
+    "rows_whose_declarations_changed": [
+      "ESR-E-04",
+      "ESR-Q-01",
+      "ESR-Q-03"
+    ],
+    "rows_whose_register_basis_grew": [
+      "ESR-E-02",
+      "ESR-E-03",
+      "ESR-E-04",
+      "ESR-E-07",
+      "ESR-E-08",
+      "ESR-E-09",
+      "ESR-Q-02"
+    ],
+    "register_basis_note": "Schema 1.1 makes every miss name the register entry its preservation claim rests on, so each of the seven carries the derived measurement of the sub-section the passage was quoted from alongside the document-wide prose declaration. Nothing a row declares about the point itself changes with it.",
+    "revision_plans_added": 15,
+    "rows_needing_an_operator_decision": [
+      "ESR-E-01",
+      "ESR-E-02",
+      "ESR-E-03",
+      "ESR-E-04",
+      "ESR-E-05",
+      "ESR-E-07",
+      "ESR-E-08",
+      "ESR-E-09",
+      "ESR-E-S03",
+      "ESR-E-S05",
+      "ESR-I-S01",
+      "ESR-I-S02",
+      "ESR-I-S04",
+      "ESR-I-S05",
+      "ESR-Q-01",
+      "ESR-Q-02",
+      "ESR-Q-03",
+      "ESR-Q-S02",
+      "ESR-Q-S03"
+    ],
+    "rows_carried_through_untouched": 14,
+    "rows_carried_through_note": "the fourteen ESR strengths: no plan, no register basis and no declaration moves on any of them"
+  },
+  "open_operator_decisions": [
+    {
+      "observation_id": "ESR-E-04",
+      "adjudication_id": "A06",
+      "question": "Is the absence of site and operator counts readable from this copy, or may the submission have carried them?",
+      "options": [
+        "not_detected_despite_sufficient_preserved_evidence (what this record declares)",
+        "not_assessable_from_this_copy"
+      ],
+      "effect_if_changed": "the rated shortcomings fall from 14 to 13, 'not assessable' rises from 1 to 2, and the miss count falls from 7 to 6; rate_detected rises from 0.43 to 0.46",
+      "declared_pending": true
+    },
+    {
+      "observation_id": "ESR-Q-03",
+      "adjudication_id": "A12",
+      "question": "Does one audit finding on milestone timing carry an ESR sentence about both the definitions and the timing of milestones?",
+      "options": [
+        "independently_detected, by the integrity audit alone (what this record declares)",
+        "partially_observable, the definitions half being carried by no finding"
+      ],
+      "effect_if_changed": "detected falls from 6 to 5 and partial rises from 1 to 2; rate_detected falls from 0.43 to 0.36 and rate_detected_or_partial is unchanged",
+      "declared_pending": true
+    },
+    {
+      "observation_id": "ESR-Q-03",
+      "adjudication_id": "A04",
+      "question": "Is M7.3 at M48 against a WP7 window of M1-M36 an inconsistency to fix, or an intended post-project commitment to move out of the milestone table?",
+      "options": [
+        "fix the window",
+        "move the commitment out of the milestones table"
+      ],
+      "effect_if_changed": "the proposed revision, not the disposition",
+      "declared_pending": true
+    },
+    {
+      "observation_id": "ESR-Q-01",
+      "adjudication_id": "A05, A11",
+      "question": "Confirm that a citation its own assessor input contradicts is withdrawn rather than caveated.",
+      "options": [
+        "withdraw (what this record declares)",
+        "retain with a caveat"
+      ],
+      "effect_if_changed": "the citation set of ESR-Q-01 and ESR-Q-03; no disposition",
+      "declared_pending": true
+    },
+    {
+      "observation_id": "ESR-I-S02",
+      "adjudication_id": null,
+      "question": "Does the post-project funding plan enter the revision plan even though the evaluators praised this aspect?",
+      "options": [
+        "leave as praised",
+        "revise against the contesting blind finding"
+      ],
+      "effect_if_changed": "one more open revision; no disposition and no count",
+      "declared_pending": true
+    },
+    {
+      "observation_id": "ESR-I-S05",
+      "adjudication_id": null,
+      "question": "Does the societal-impact indicator gap enter the revision plan, given that ESR-I-02 already asks for magnitude on the economic pathway?",
+      "options": [
+        "fold into ESR-I-02's revision",
+        "give it its own revision"
+      ],
+      "effect_if_changed": "one more open revision; no disposition and no count",
+      "declared_pending": true
+    }
+  ],
+  "revision_plan_note": "Each proposed revision carries a plan: the evidence it rests on, the human role that owns it quoted from the candidate's own governance and work-package text, what has to be confirmed before it can be written, where in the proposal it goes, and what carrying it out commits someone to. The four commitment kinds other than editorial_change and requires_original_check are the four things ticket R05 item 6 keeps as proposals until a human confirms them: a numerical target, a study design, data or site access, a partner commitment. None of the fifteen is editorial: not one can be written from what this copy already carries.",
+  "addressed_rows": "None. The resolved-fixes revision re-typeset page 45 (the WP4 header) and changed nothing an ESR observation names, so no row is 'addressed'. The historical candidate is given so the rule can be exercised and so the comparison binds both copies.",
+  "rows": [
+    {
+      "observation_id": "ESR-E-S01",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 0,
+          "index": 0
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 0,
+          "index": 6
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 3,
+          "index": 0
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "exc-obj"
+        }
+      ],
+      "explanation": "Every criterion sample lists the four-pillar architecture and the nine integrated DC projects as strengths, and the exc-obj cell passes 3/3 with the 'Beyond the state of the art' subsection named. The blind lane praises the same points the evaluators praised. Its shortcomings on the KPIs (process counts, no comparators) do not contradict the ESR, which calls the objectives 'overall verifiable'.",
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-E-S02",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 3,
+          "index": 2
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 4,
+          "index": 2
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "exc-method"
+        }
+      ],
+      "explanation": "The methodology's closed-loop pipeline and its discipline integration are listed as strengths in four of five samples and the exc-method cell passes 3/3 at the highest cell score of the report (0.79). The blind lane's 'conceptual level' shortcomings are the ESR's own next sentence (ESR-E-01), not a contradiction of this strength.",
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-E-01",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 1,
+          "index": 1
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 0,
+          "index": 2
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 2,
+          "index": 1
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 3,
+          "index": 7
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 4,
+          "index": 3
+        }
+      ],
+      "current_evidence": [
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.2",
+          "quote": "The resulting closed-loop methodology follows the sequence:"
+        },
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.2",
+          "quote": "and is consistently applied across all research projects and healthcare use cases."
+        }
+      ],
+      "explanation": "All five criterion samples say the causal-AI methodology stays at pipeline level without named techniques, estimators or validation metrics. That is the ESR's first clause (conceptual paradigms, methods, validation metrics). The quoted passage is the pipeline the blind lane describes; the copy preserves it in full.",
+      "proposed_revision": {
+        "text": "Under 1.2, add one paragraph per pipeline stage naming the identification strategy, the estimators and the validation metrics each DC project will use, with the retrospective cohort it applies to. Prefer a table: stage, method, metric, DC.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-01, page 2, Criterion 1 comment, cluster C1 point 1",
+            "the blind excellence shortcoming cited on this row, resolved against the frozen baseline",
+            "the two 1.2 passages quoted on this row, verified in the candidate"
+          ],
+          "responsible_role": {
+            "role": "the lead participants of WP1-WP4",
+            "source": "implementation_section/3.1",
+            "anchor": "Lead participant",
+            "basis": "each work-package block of the work plan carries a 'Lead participant' line, and the methods, dependencies and deliverables at issue are those packages'"
+          },
+          "requires_confirmation": [
+            "the identification strategy and the estimator each DC project will use",
+            "the validation metric per pipeline stage and the retrospective cohort it applies to"
+          ],
+          "proposal_location": [
+            "excellence_section/1.2, the AI/ML methodology block"
+          ],
+          "commitment_kind": "requires_study_design"
+        }
+      },
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-02",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "declared_status": "Inferred",
+      "evidence_preserved_status": "Assumed",
+      "current_evidence": [
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.2",
+          "quote": "Open science is implemented within the constraints imposed by medical-data protection and high-risk AI governance."
+        },
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.2",
+          "quote": "data-protection regulations."
+        }
+      ],
+      "evidence_basis": [
+        "derived/sub_sections/1.2",
+        "provenance/transformation/prose"
+      ],
+      "explanation": "The methodology sub-section is present and carries only passing references to data protection; no passage describes security measures for clinical data handled by AI, which is what the ESR found insufficient. No blind shortcoming or cell rationale names security. The register records prose as 'some passages omitted or rephrased', so the preservation of this gap is declared, not measured: a security passage may have been removed, but the ESR says the submission itself lacked detail, so the copy cannot have less than the evaluators saw in kind.",
+      "proposed_revision": {
+        "text": "Add a short 'Security of clinical data' paragraph under 1.2 (or 1.2's open science block): threat model, access control for federated nodes, encryption in transit and at rest, audit logging, and who owns incident response. Cross-reference the ethics self-assessment.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-02, page 2, Criterion 1 comment, cluster C1 point 1",
+            "the two 1.2 passages quoted on this row: data protection is mentioned, security is not described",
+            "fidelity_register#provenance/transformation/prose: some passages omitted or rephrased"
+          ],
+          "responsible_role": {
+            "role": "the lead participant of WP2",
+            "source": "implementation_section/3.1",
+            "anchor": "WP Number: 2",
+            "basis": "implementation_section/3.2 places secure medical-data and interoperability infrastructures at Academic Beneficiaries E and G, and data-protection expertise at G and H, supporting WP2"
+          },
+          "requires_confirmation": [
+            "the threat model and the access-control design for the federated nodes",
+            "who owns incident response across the hosts",
+            "that the ethics self-assessment carries the same account"
+          ],
+          "proposal_location": [
+            "excellence_section/1.2, the open-science and data-protection block",
+            "implementation_section/6, the ethics self-assessment"
+          ],
+          "commitment_kind": "requires_study_design"
+        }
+      },
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-03",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "declared_status": "Inferred",
+      "evidence_preserved_status": "Assumed",
+      "current_evidence": [
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "quote": "Conduct retrospective evaluations across:"
+        },
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "Retrospective multicentre evaluation of multimodal causal AI models in structural heart disease."
+        },
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.1",
+          "quote": "The programme performs healthcare-embedded case studies that progress from retrospective analyses toward shadow-mode and implementation-oriented evaluations."
+        }
+      ],
+      "explanation": "The copy states retrospective evaluation in the objectives, the WP4 tasks and the state-of-the-art section, and names no prospective validation beyond 'shadow-mode'. The blind lane did not raise the retrospective-only design in any sample, nor in the exc-method or impl-workplan cells. The evidence the ESR rested on is present in the copy.",
+      "proposed_revision": {
+        "text": "State a prospective validation plan for at least one cardiovascular use case: a shadow-mode or silent-trial design with pre-registered endpoints, the site(s), the month window and the DC responsible, and say why the other use cases stay retrospective.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-03, page 2, Criterion 1 comment, cluster C1 point 2",
+            "the 1.1 and 3.1 passages quoted on this row: evaluation is retrospective",
+            "adjudication A07: the dispute R02 raised is not sustained and the row is a plain miss"
+          ],
+          "responsible_role": {
+            "role": "the lead participant of WP4",
+            "source": "implementation_section/3.1",
+            "anchor": "WP title: Clinical Adaptation & Case Studies",
+            "basis": "WP4 runs the clinical adaptation and case studies the ESR criticises"
+          },
+          "requires_confirmation": [
+            "that a shadow-mode or silent-trial design is feasible at a named clinical site",
+            "the pre-registered endpoints and the month window",
+            "which DC project carries the prospective arm"
+          ],
+          "proposal_location": [
+            "implementation_section/3.1, the WP4 task that evaluates cardiovascular models",
+            "excellence_section/1.2, the methodology block"
+          ],
+          "commitment_kind": "requires_study_design"
+        }
+      },
+      "evidence_basis": [
+        "derived/sub_sections/1.1",
+        "derived/sub_sections/3.1",
+        "provenance/transformation/prose"
+      ],
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-04",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "declared_status": "Unresolved",
+      "evidence_basis": [
+        "derived/sub_sections/3.1",
+        "provenance/transformation/prose"
+      ],
+      "current_evidence": [
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "Task 4.3 – AI Implementation for Transcatheter Aortic Valve Implantation (TAVI)"
+        },
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "Data sources include:"
+        }
+      ],
+      "explanation": "Adjudication A06 compared the one cited blind shortcoming with the ESR sentence and found two different properties of a cohort: the finding names sample sizes, data-access timelines and power, the ESR names the multihospital, multi-operator design needed to reflect contemporary European practice. No sample and no cell names a site count, an operator count or representativeness. The citation is therefore withdrawn, and 'partially_observable' loses the finding it requires. Task 4.3 survives, says multicentre, lists data sources and gives no counts, so the absence is readable here and this row records a miss. The alternative reading is 'not_assessable_from_this_copy': the register records prose omitted or rephrased for this task, so the submission may have carried the counts. Both statuses on this row are Unresolved until the operator chooses.",
+      "proposed_revision": {
+        "text": "Give Task 4.3 its cohort: number of hospitals and countries, number of operators and procedures per site, the years covered, and how site and operator heterogeneity enter the causal model as variables.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-04, page 2, Criterion 1 comment, cluster C1 point 3",
+            "the Task 4.3 passages quoted on this row: multicentre, with data sources listed and no counts",
+            "adjudication A06: cohort magnitude and cohort composition are different properties"
+          ],
+          "responsible_role": {
+            "role": "the lead participant of WP4",
+            "source": "implementation_section/3.1",
+            "anchor": "WP title: Clinical Adaptation & Case Studies",
+            "basis": "WP4 runs the clinical adaptation and case studies the ESR criticises"
+          },
+          "requires_confirmation": [
+            "the number of hospitals, countries, operators and procedures per site available to Task 4.3",
+            "the years the cohort covers",
+            "whether site and operator heterogeneity can enter the causal model as variables"
+          ],
+          "proposal_location": [
+            "implementation_section/3.1, Task 4.3"
+          ],
+          "commitment_kind": "requires_data_access"
+        }
+      },
+      "evidence_preserved_status": "Unresolved",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-05",
+      "disposition": "not_assessable_from_this_copy",
+      "declared_status": "Assumed",
+      "evidence_basis": [
+        "provenance/transformation/prose",
+        "provenance/transformation/identifiers"
+      ],
+      "explanation": "The ESR refers to 'the database' and its contributing clinicians. The copy contains no passage describing a database with clinician contributors: the word does not occur in Part B. The referent was either generalised with the identifiers or omitted with the passages the register records as 'omitted or rephrased', so neither the blind lane nor a reader of this copy can assess the point. The closest blind finding (small clinician samples in KPIs) concerns KPI targets, not the database.",
+      "proposed_revision": {
+        "text": "Where the registry or database is introduced, state the number of contributing clinicians and sites, their roles in data curation, and the governance of contributions. If the database was named in the submission, keep the passage.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-05, page 2, Criterion 1 comment, cluster C1 point 4",
+            "fidelity_register#provenance/transformation/identifiers: partner, people and place names generalised",
+            "fidelity_register#provenance/transformation/prose: some passages omitted or rephrased"
+          ],
+          "responsible_role": {
+            "role": "Project Coordinator",
+            "source": "implementation_section/5",
+            "anchor": "Project Coordinator and Management Team",
+            "basis": "the Coordinating Beneficiary is responsible for overall scientific, administrative and financial coordination, and monitors deliverables, milestones, risks and compliance across all work packages"
+          },
+          "requires_confirmation": [
+            "whether the submitted original named the registry or database and its contributing clinicians (PE-09)",
+            "the number of contributing clinicians and sites, and their roles in data curation"
+          ],
+          "proposal_location": [
+            "excellence_section/1.2, where the registry or database is introduced",
+            "excellence_section/1.1"
+          ],
+          "commitment_kind": "requires_original_check"
+        }
+      },
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-06",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 0,
+          "index": 7
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 1,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 2,
+          "index": 2
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 3,
+          "index": 6
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 4,
+          "index": 4
+        }
+      ],
+      "current_evidence": [
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.2",
+          "quote": "Sex, gender and additional diversity characteristics are treated as scientific variables."
+        },
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.2",
+          "quote": "represented in causal structures as potential causes, effects or mediators,"
+        }
+      ],
+      "explanation": "All five samples say the gender and diversity dimension is stated in general terms without concrete operational links to the cohorts or cardiology-specific issues, which is the ESR's point. The ESR also credits the variables approach; the blind strengths of sample 4 do the same.",
+      "proposed_revision": {
+        "text": "Add two or three cardiology-specific examples under 'Gender dimension and diversity aspects': sex differences in presentation and outcomes for the TAVI, heart-failure and critical-care cohorts, the variables available in each dataset, and the subgroup analyses planned.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-06, page 2, Criterion 2 comment, cluster C2",
+            "the two 1.2 passages quoted on this row, under 'Gender dimension and diversity aspects'",
+            "the blind excellence shortcoming cited on this row"
+          ],
+          "responsible_role": {
+            "role": "the lead participant of WP4",
+            "source": "implementation_section/3.1",
+            "anchor": "WP title: Clinical Adaptation & Case Studies",
+            "basis": "WP4 runs the clinical adaptation and case studies the ESR criticises"
+          },
+          "requires_confirmation": [
+            "which sex- and gender-disaggregated variables each cohort dataset actually carries",
+            "which subgroup analyses are powered in the TAVI, heart-failure and critical-care cohorts"
+          ],
+          "proposal_location": [
+            "excellence_section/1.2, 'Gender dimension and diversity aspects'"
+          ],
+          "commitment_kind": "requires_study_design"
+        }
+      },
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-E-S03",
+      "disposition": "partially_observable",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 0,
+          "index": 3
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 1,
+          "index": 5
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 3,
+          "index": 5
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 4,
+          "index": 5
+        }
+      ],
+      "evidence_basis": [
+        "provenance/transformation/identifiers",
+        "provenance/transformation/citations"
+      ],
+      "explanation": "One sample lists open science as concretely specified; three say no repositories, licences or governance are named. The ESR credits 'preprints, and repositories', which means the submission named them. The register records identifiers generalised and citations removed, so the names the evaluators saw are the kind of content sanitisation strips. The blind contest therefore rests in part on removed evidence and the strength is only partly observable here.",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-S04",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 0,
+          "index": 4
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 2,
+          "index": 1
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 3,
+          "index": 3
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "exc-training"
+        }
+      ],
+      "explanation": "Four of five samples list the training programme (named events, TG1-TG6 mapping, triple-i) as a strength and the exc-training cell passes 3/3. Sample 0's shortcoming that the description is an events listing is a nuance the ESR shares in cluster C3.",
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-E-07",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "declared_status": "Inferred",
+      "evidence_preserved_status": "Assumed",
+      "current_evidence": [
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.3",
+          "quote": "Wherever possible, these courses are made available on-site or online to DCs from other beneficiary institutions, thereby increasing efficiency and coherence."
+        },
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.3",
+          "quote": "Local training at host organizations"
+        }
+      ],
+      "explanation": "The local-training paragraph survives in full under 1.3.4 and is the only place the copy relates local and network-wide training. The exc-training cell members read it as 'complementarity explicitly stated' and no sample faults its depth. The evaluators found the systematic description of complementation thin; the blind lane read the same paragraph and did not.",
+      "proposed_revision": {
+        "text": "Add a short table under 1.3.4: for each host, the local doctoral-school modules each DC takes, the network-wide event that builds on them, and the ECTS or hours. One row per DC makes the complementation systematic.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-07, page 3, Criterion 1 comment, cluster C3",
+            "the two 1.3 passages quoted on this row, in the network-wide training block",
+            "adjudication A08: a lane read the passage and rated it adequate rather than missing it"
+          ],
+          "responsible_role": {
+            "role": "Supervisory Board (SB)",
+            "source": "implementation_section/5",
+            "anchor": "Monitoring supervision quality and training implementation",
+            "basis": "the Supervisory Board monitors supervision quality and training implementation, including Individual Training Panels, PhD Committees and Personal Career Development Plans"
+          },
+          "requires_confirmation": [
+            "the local doctoral-school modules each host requires of its DC",
+            "the ECTS or hours per local module and per network-wide event"
+          ],
+          "proposal_location": [
+            "excellence_section/1.3, section 1.3.4"
+          ],
+          "commitment_kind": "requires_partner_commitment"
+        }
+      },
+      "evidence_basis": [
+        "derived/sub_sections/1.3",
+        "provenance/transformation/prose"
+      ],
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-08",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "declared_status": "Inferred",
+      "evidence_preserved_status": "Assumed",
+      "current_evidence": [
+        {
+          "section_id": "impact_section",
+          "sub_section_id": "2.2",
+          "quote": "Training in IP protection, entrepreneurship, innovation management and the use of a Research-to-Innovation (R2I) canvas enables fellows to identify and articulate the scientific, technological and societal value of their work."
+        },
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.3",
+          "quote": "TG5 – Innovation, entrepreneurship and impact"
+        }
+      ],
+      "explanation": "Entrepreneurship training appears as a training goal (TG5), as a session topic led by non-academic partners and as a sentence under 2.2; none says how fellows apply it. No blind sample or cell names entrepreneurship. The passages the ESR judged are present.",
+      "proposed_revision": {
+        "text": "Give TG5 a mechanism: a business-case or R2I-canvas exercise per DC with a deliverable month, a pitch session at a named network event, and a mentor from an industrial partner. Say which deliverable records it.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-08, page 3, Criterion 1 comment, cluster C3",
+            "the 1.3 and 2.2 passages quoted on this row: TG5 and the Research-to-Innovation canvas",
+            "fidelity_register#provenance/transformation/prose"
+          ],
+          "responsible_role": {
+            "role": "Innovation and Sustainability Committee",
+            "source": "implementation_section/5",
+            "anchor": "the Innovation and Sustainability Committee",
+            "basis": "one of the four key bodies of the governance structure"
+          },
+          "requires_confirmation": [
+            "an industrial partner willing to mentor the exercise and host the pitch session",
+            "the deliverable and month that record the business-case exercise"
+          ],
+          "proposal_location": [
+            "excellence_section/1.3, TG5",
+            "impact_section/2.2"
+          ],
+          "commitment_kind": "requires_partner_commitment"
+        }
+      },
+      "evidence_basis": [
+        "derived/sub_sections/1.3",
+        "derived/sub_sections/2.2",
+        "provenance/transformation/prose"
+      ],
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-S05",
+      "disposition": "partially_observable",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 2,
+          "index": 4
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "excellence",
+          "sample_index": 4,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 0,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 2,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "excellence",
+          "sample_index": 4,
+          "index": 6
+        },
+        {
+          "kind": "cell_member",
+          "expectation_key": "exc-supervision",
+          "member_index": 2
+        }
+      ],
+      "evidence_basis": [
+        "provenance/transformation/identifiers"
+      ],
+      "explanation": "The supervision structure (ITP, PCDP, Supervisory Board, escalation) is listed as a strength in every sample, matching the ESR's 'well-structured and multi-layered approach'. The supervisors' experience is contested: three samples call the profiles uneven or anonymised, and one cell member fails the cell. The register records identifiers generalised, so the profiles the evaluators read as 'experienced and highly qualified' reach this copy as 'Supervisor A-K' with no names, which is what the blind lane faults. The strength is observable for the structure and not for the people.",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-E-09",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "declared_status": "Inferred",
+      "evidence_preserved_status": "Assumed",
+      "current_evidence": [
+        {
+          "section_id": "excellence_section",
+          "sub_section_id": "1.4",
+          "quote": "Training and supervision quality are monitored through annual progress reports, PCDP updates and anonymous feedback questionnaires completed by DCs after major training events."
+        }
+      ],
+      "explanation": "The one sentence on measuring supervisory quality survives. The exc-supervision cell members cite it as a strength (feedback questionnaires) and no sample asks how quality is measured. The evaluators found it generic; the blind lane did not.",
+      "proposed_revision": {
+        "text": "Name the measures: a supervision-quality questionnaire with a stated instrument, its cadence, the indicator thresholds that trigger Supervisory Board action, and the person who reviews the results.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-E-09, page 3, Criterion 1 comment, cluster C4",
+            "the 1.4 passage quoted on this row",
+            "adjudication A09: a lane read the supervision passage and asked a different question of it"
+          ],
+          "responsible_role": {
+            "role": "Supervisory Board (SB)",
+            "source": "implementation_section/5",
+            "anchor": "Monitoring supervision quality and training implementation",
+            "basis": "the Supervisory Board monitors supervision quality and training implementation, including Individual Training Panels, PhD Committees and Personal Career Development Plans"
+          },
+          "requires_confirmation": [
+            "the supervision-quality instrument and its cadence",
+            "the indicator thresholds that trigger Supervisory Board action",
+            "who reviews the results and when"
+          ],
+          "proposal_location": [
+            "excellence_section/1.4, supervision quality"
+          ],
+          "commitment_kind": "requires_partner_commitment"
+        }
+      },
+      "evidence_basis": [
+        "derived/sub_sections/1.4",
+        "provenance/transformation/prose"
+      ],
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-I-S01",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 0,
+          "index": 0
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 2,
+          "index": 0
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 4,
+          "index": 0
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 0,
+          "index": 0
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 3,
+          "index": 0
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "imp-structuring"
+        }
+      ],
+      "explanation": "Every sample lists the structured secondments, non-academic co-supervision and Supervisory Board roles as strengths, and the imp-structuring cell passes 3/3. Three samples add that the '80% of secondment months in non-academic settings' target is contradicted by the DC table (about 74%, DC7 with none). The evaluators did not note that arithmetic; it is a blind finding on a praised point and is carried as contested.",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-I-S02",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 0,
+          "index": 2
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 1,
+          "index": 2
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 3,
+          "index": 2
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 1,
+          "index": 5
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 2,
+          "index": 4
+        }
+      ],
+      "explanation": "The knowledge hub, ECTS integration, alumni hub and the Innovation and Sustainability Committee are listed as strengths in every sample, matching the ESR's 'virtual knowledge hub' and sustained collaboration. Two samples find the post-project funding plan a list of programme names; the ESR does not fault it. Carried as contested.",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-I-S03",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 0,
+          "index": 1
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 1,
+          "index": 1
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 4,
+          "index": 2
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "imp-career"
+        }
+      ],
+      "explanation": "The PCDP within three months, the multi-mentor PhD committee and the transferable-skills modules are listed as strengths in every sample and the imp-career cell passes 3/3 at 0.78. No sample contests the career measures.",
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-I-S04",
+      "disposition": "partially_observable",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 0,
+          "index": 3
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 0,
+          "index": 1
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 1,
+          "index": 1
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 3,
+          "index": 1
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 4,
+          "index": 1
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "imp-dissemination"
+        }
+      ],
+      "evidence_basis": [
+        "derived/figures/images_on_any_page",
+        "provenance/transformation/figures",
+        "provenance/transformation/identifiers"
+      ],
+      "explanation": "The ESR credits clear objectives, measurable indicators and identified target groups. The blind lane lists the R2I canvas and IP framework as strengths but four samples find the communication plan generic, with no audience segmentation or communication KPIs, and the imp-dissemination cell fails 2/3. The register records every figure lost and identifiers generalised; a dissemination table or figure of target groups and indicators, and named journals and venues, are what sanitisation removes. The contest may rest on removed evidence, so the strength is partly observable.",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-I-01",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 1,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 2,
+          "index": 3
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 3,
+          "index": 3
+        }
+      ],
+      "current_evidence": [
+        {
+          "section_id": "impact_section",
+          "sub_section_id": "2.3",
+          "quote": "Beneficiaries will protect commercially relevant results through appropriate intellectual- property instruments."
+        },
+        {
+          "section_id": "impact_section",
+          "sub_section_id": "2.3",
+          "quote": "Regular IP reviews will identify protectable outcomes and recommend appropriate exploitation routes, including:"
+        }
+      ],
+      "explanation": "Three samples say the IP strategy restates Horizon Europe boilerplate without naming which results are protectable or how. That is the ESR's point that strategies to protect industrial outcomes are not convincingly elaborated. The quoted passages are the generic commitments the blind lane describes.",
+      "proposed_revision": {
+        "text": "Under the IP strategy, list the three or four results most likely to carry industrial value (per WP), the protection route for each (patent, trade secret, open licence), the owner, and the decision point in months. Tie each to its R2I canvas.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-I-01, page 3, Criterion 2 comment, cluster C5",
+            "the two 2.3 passages quoted on this row, under 'Strategy for the management of intellectual property and foreseen protection measures'",
+            "the blind impact shortcoming cited on this row"
+          ],
+          "responsible_role": {
+            "role": "IP and Exploitation Panel",
+            "source": "implementation_section/5",
+            "anchor": "an IP and Exploitation Panel reviews",
+            "basis": "the panel sits within the DEC governance structure and reviews inventions"
+          },
+          "requires_confirmation": [
+            "which results carry industrial value, per work package, and who owns each",
+            "the protection route and the decision month for each result"
+          ],
+          "proposal_location": [
+            "impact_section/2.3, the intellectual-property and protection block"
+          ],
+          "commitment_kind": "requires_partner_commitment"
+        }
+      },
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-I-S05",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 1,
+          "index": 4
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "impact",
+          "sample_index": 4,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 2,
+          "index": 1
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 4,
+          "index": 4
+        }
+      ],
+      "explanation": "Two samples credit the scientific, economic and societal impact pathways as distinct and coherent, the ESR's 'highly credible' and 'well-justified'. Two samples contest the societal side: no evaluation mechanism ties training outputs to health-system outcomes and the claims carry no indicators. The ESR's 'cross-site transportability' indicator survives in 1.1 and 1.2. Carried as contested.",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-I-02",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 0,
+          "index": 2
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 1,
+          "index": 2
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 2,
+          "index": 0
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 3,
+          "index": 2
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "impact",
+          "sample_index": 4,
+          "index": 0
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "imp-magnitude"
+        }
+      ],
+      "current_evidence": [
+        {
+          "section_id": "impact_section",
+          "sub_section_id": "2.4",
+          "quote": "Human capital and innovation ecosystems The project will train a cohort of specialists with expertise at the intersection of AI, healthcare, governance and implementation, strengthening Europe's competitiveness and innovation capacity in digital health."
+        }
+      ],
+      "explanation": "Every sample and all three imp-magnitude cell members say the magnitude of impact is stated qualitatively with no quantified targets; the cell is the lowest of the report (0.48, uncovered). The ESR's finding is the same, limited to economic and technological impact. The quoted passage is the human-capital pathway the ESR names.",
+      "proposed_revision": {
+        "text": "Under 2.4 economic and technological impact, give one magnitude per pathway: number of hospitals and SMEs adopting the toolkit by M36 and M60, number of trained specialists and their destinations, the EHDS/FHIR-aligned components released, and a baseline for each. Keep the three pathways; add the numbers.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-I-02, page 4, Criterion 2 comment, cluster C6",
+            "the 2.4 passage quoted on this row: three impact pathways, stated without magnitude",
+            "the blind impact shortcoming cited on this row"
+          ],
+          "responsible_role": {
+            "role": "Dissemination, Exploitation and Communication (DEC) Committee",
+            "source": "implementation_section/5",
+            "anchor": "Defining and monitoring key performance indicators",
+            "basis": "the DEC Committee defines and monitors the key performance indicators, including publications, software releases, policy outputs and outreach"
+          },
+          "requires_confirmation": [
+            "the adoption numbers per pathway at M36 and M60, and the baseline for each",
+            "that each number is defensible without a market study the project does not run"
+          ],
+          "proposal_location": [
+            "impact_section/2.4, expected economic and technological impact"
+          ],
+          "commitment_kind": "requires_numerical_target"
+        }
+      },
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-Q-S01",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 0,
+          "index": 0
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 2,
+          "index": 0
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 4,
+          "index": 0
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 0,
+          "index": 1
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "impl-workplan"
+        }
+      ],
+      "explanation": "Every sample lists the seven-WP structure with objectives, tasks, leads and DCs, and the deliverables and milestones tables, as strengths; the impl-workplan cell passes 3/3 at 0.78. This is the ESR's 'overall of good quality' with coherent allocation and well-defined deliverables and milestones.",
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-Q-01",
+      "disposition": "partially_observable",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 2,
+          "index": 1
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 3,
+          "index": 4
+        }
+      ],
+      "current_evidence": [
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "Explainability methods will be integrated in collaboration with WP1."
+        },
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.2",
+          "quote": "Foundational AI outputs flow into infrastructure and deployment activities and then into clinical and digital-health pilots"
+        }
+      ],
+      "evidence_basis": [
+        "derived/figures/images_on_any_page",
+        "provenance/transformation/figures",
+        "derived/dependency_keyword_counts"
+      ],
+      "explanation": "Two of the three blind shortcomings the predecessor cited carry the ESR's point squarely: inter-WP dependencies and critical-path logic are not mapped beyond narrative cross-references, and no Gantt or dependency diagram is shown. The third is withdrawn. Adjudication A05 found it contradicted by the input that assessor received: it states that no intermediate milestones are shown, and the implementation section it read carries the milestones table with a due month for each of sixteen milestones across ten distinct months. The dependency point stands on the two remaining citations. The register measures zero images on any page, so a Gantt or dependency figure in the submission would have been lost and part of the lane's basis is an absence this copy created. That is why the row stays partial rather than detected.",
+      "proposed_revision": {
+        "text": "Add a dependency table to 3.1: for each WP, the inputs it needs from other WPs with the deliverable id and month, and the outputs it hands on. Reinstate the Gantt with milestone markers if one existed; a table survives reflow where a figure may not.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-Q-01, page 4, Criterion 3 comment, cluster C7 point 1",
+            "the two remaining blind implementation shortcomings cited on this row",
+            "fidelity_register#derived/figures/images_on_any_page: zero images on any page"
+          ],
+          "responsible_role": {
+            "role": "the lead participants of WP1-WP4",
+            "source": "implementation_section/3.1",
+            "anchor": "Lead participant",
+            "basis": "each work-package block of the work plan carries a 'Lead participant' line, and the methods, dependencies and deliverables at issue are those packages'"
+          },
+          "requires_confirmation": [
+            "for each work package, the inputs it needs from others with the deliverable id and month",
+            "whether the submission carried a Gantt or dependency figure that sanitisation removed (PE-09)"
+          ],
+          "proposal_location": [
+            "implementation_section/3.1, the work-plan block"
+          ],
+          "commitment_kind": "requires_study_design"
+        }
+      },
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-Q-02",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "declared_status": "Inferred",
+      "evidence_preserved_status": "Assumed",
+      "current_evidence": [
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "| Numbe r | Deliverable Title | Short Description | W P | Lead Beneficiary | Typ e | Disseminatio n | Due |"
+        },
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "| D1.2 | Sensitivity & Uncertainty Quantification Methodologies | Clinician- facing tools to enable safe human-in-the- loop interaction. | 1 | Academic Beneficiary D | PDE | PU | M18 |"
+        }
+      ],
+      "explanation": "The deliverables table survives with 28 parsed rows and carries no validation or acceptance column; the milestones table carries 'Means of Verification' but the deliverables do not. The blind lane praised the deliverables table in every sample and no sample or cell asks how deliverables are validated; the audit's deliverable check found no window violations and does not test validation. The evaluators' point is observable in the table as it stands.",
+      "proposed_revision": {
+        "text": "Add a 'Validation' column to the scientific deliverables table, or one sentence per technical deliverable (D1.x-D4.x) naming the acceptance test, the benchmark or the clinical reviewer that signs it off.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-Q-02, page 4, Criterion 3 comment, cluster C7 point 2",
+            "the two 3.1 passages quoted on this row, from the deliverables table",
+            "adjudication A10: the one blind sentence about this point misattributes a neighbouring artifact's property, so no lane carries it"
+          ],
+          "responsible_role": {
+            "role": "the lead participants of WP1-WP4",
+            "source": "implementation_section/3.1",
+            "anchor": "Lead participant",
+            "basis": "each work-package block of the work plan carries a 'Lead participant' line, and the methods, dependencies and deliverables at issue are those packages'"
+          },
+          "requires_confirmation": [
+            "the acceptance test or benchmark for each technical deliverable",
+            "the clinical reviewer who signs off each clinical deliverable"
+          ],
+          "proposal_location": [
+            "implementation_section/3.1, the scientific deliverables table"
+          ],
+          "commitment_kind": "requires_study_design"
+        }
+      },
+      "evidence_basis": [
+        "derived/sub_sections/3.1",
+        "provenance/transformation/reformatting/tables_3_1b_to_e"
+      ],
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-Q-03",
+      "disposition": "independently_detected",
+      "declared_status": "Unresolved",
+      "audit_findings": [
+        {
+          "report": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json",
+          "check": "milestone_dependencies",
+          "index": 15
+        }
+      ],
+      "current_evidence": [
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "| M7.3 | Follow-up research proposal | 7 | Academic Beneficiary H | M48 | Submission of at least one follow-up collaborative research proposal |"
+        },
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "| M4.2 | Evaluation of AI models in retrospective clinical studies | 4 | All beneficiaries | M24 | Scientific publications and evaluation reports derived from clinical case studies |"
+        }
+      ],
+      "explanation": "One finding survives of the four the predecessor cited. Adjudication A03 withdraws the two 'undeclared_dependency' citations: a dependency is not a column of the milestones table, so the finding records an absent column and not a misaligned milestone. Adjudication A05 withdraws the blind citation, which the assessor's own input contradicts. What remains, per A04, is the M7.3 window finding: M7.3 is due M48 and its related WP7 runs M1-M36, a timing misalignment the copy itself declares. The citation is re-filed against the successor audit, whose milestone_dependencies findings are index-for-index those of the audit the predecessor cited. So the row is detected by the integrity audit alone, on timing. No finding addresses the definitions half of the ESR sentence, which is why the operator is asked whether the row stays 'independently_detected' or becomes 'partially_observable'.",
+      "proposed_revision": {
+        "text": "Move M7.3 inside the project window or make it a post-project commitment outside the milestone table. For every milestone, name the deliverable(s) it depends on and check the due month follows them. Define M4.2 against a stated evaluation endpoint rather than 'publications'.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-Q-03, page 4, Criterion 3 comment, cluster C7 point 3",
+            "the surviving audit finding: M7.3 is due M48 and its related WP7 runs M1-M36",
+            "the M7.3 and M4.2 milestone rows quoted on this row",
+            "adjudication A04: the window conflict is a timing misalignment the copy itself declares"
+          ],
+          "responsible_role": {
+            "role": "Project Coordinator",
+            "source": "implementation_section/5",
+            "anchor": "Project Coordinator and Management Team",
+            "basis": "the Coordinating Beneficiary is responsible for overall scientific, administrative and financial coordination, and monitors deliverables, milestones, risks and compliance across all work packages"
+          },
+          "requires_confirmation": [
+            "whether M7.3 moves inside the project window or becomes a post-project commitment",
+            "the deliverable each milestone depends on, and that its due month follows them",
+            "the evaluation endpoint M4.2 is defined against"
+          ],
+          "proposal_location": [
+            "implementation_section/3.1, the milestones table"
+          ],
+          "commitment_kind": "requires_partner_commitment"
+        }
+      },
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-Q-04",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 2,
+          "index": 3
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 3,
+          "index": 1
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 0,
+          "index": 1
+        }
+      ],
+      "current_evidence": [
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "Ongoing support, supervision and monitoring mechanisms during thesis preparation."
+        },
+        {
+          "section_id": "implementation_section",
+          "sub_section_id": "3.1",
+          "quote": "If not deemed sufficient after 60% of the intended recruitment period, efofrts will be reinforced."
+        }
+      ],
+      "explanation": "Three samples say several mitigations are generic and carry no quantitative thresholds or contingency owners, which is the ESR's finding. The copy preserves the risk table in full: one risk states a 60% trigger and the others none, so the audit's threshold check reports nothing while the blind lane reads the generic rows the ESR read.",
+      "proposed_revision": {
+        "text": "For each risk give a measurable trigger (a month, a count or a percentage) and the owner who acts on it, as risk 1 already does with its 60% rule. Add two or three technical risks for WP1-WP3 (causal-model validity, federated-learning failure) with the same structure.",
+        "declared_status": "Assumed",
+        "revision_plan": {
+          "evidence": [
+            "ESR-Q-04, page 4, Criterion 3 comment, cluster C8",
+            "the two 3.1 passages quoted on this row, from the risk table",
+            "the blind implementation shortcoming cited on this row"
+          ],
+          "responsible_role": {
+            "role": "Project Coordinator",
+            "source": "implementation_section/5",
+            "anchor": "Project Coordinator and Management Team",
+            "basis": "the Coordinating Beneficiary is responsible for overall scientific, administrative and financial coordination, and monitors deliverables, milestones, risks and compliance across all work packages"
+          },
+          "requires_confirmation": [
+            "a measurable trigger per risk: a month, a count or a percentage",
+            "the owner who acts on each trigger",
+            "the two or three technical risks WP1-WP3 carry and their triggers"
+          ],
+          "proposal_location": [
+            "implementation_section/3.1, the risk table"
+          ],
+          "commitment_kind": "requires_numerical_target"
+        }
+      },
+      "review_status": "agent_recommended_pending_operator_review"
+    },
+    {
+      "observation_id": "ESR-Q-S02",
+      "disposition": "partially_observable",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 0,
+          "index": 3
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 3,
+          "index": 3
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 3,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 0,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 1,
+          "index": 2
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 4,
+          "index": 1
+        },
+        {
+          "kind": "cell",
+          "expectation_key": "impl-participants"
+        }
+      ],
+      "evidence_basis": [
+        "provenance/transformation/identifiers",
+        "derived/sub_sections/8/characters"
+      ],
+      "explanation": "The infrastructure-to-WP mapping and the three-axis complementarity argument are listed as strengths in every sample and the impl-participants cell passes 3/3. Three samples contest capacity: the organisation descriptions are 'generic institutional boilerplate' with no track record. The register records identifiers generalised, and section 8 reaches this copy as unnamed 'Academic Beneficiary A-I' profiles, so the track-record evidence the evaluators read is what sanitisation removed. Observable for the structure, not for the capacity claims.",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-Q-S03",
+      "disposition": "partially_observable",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 0,
+          "index": 5
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 1,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 2,
+          "index": 4
+        },
+        {
+          "kind": "criterion_shortcoming",
+          "criterion_id": "implementation",
+          "sample_index": 3,
+          "index": 3
+        },
+        {
+          "kind": "cell_member",
+          "expectation_key": "impl-participants",
+          "member_index": 1
+        }
+      ],
+      "evidence_basis": [
+        "derived/sub_sections/5/characters",
+        "provenance/transformation/identifiers"
+      ],
+      "explanation": "Four samples call the hosting arrangements generic: one sentence under 3.2 on accredited doctoral schools and international offices. The evaluators found the same arrangements credible. Section 5 (network organisation) is recorded as fully sanitised with identifiers removed, and the per-institution hosting detail the evaluators may have read there does not reach this copy. The blind contest and the ESR's credit cannot be reconciled from this copy.",
+      "review_status": "operator_decision_required"
+    },
+    {
+      "observation_id": "ESR-Q-S04",
+      "disposition": "independently_detected",
+      "declared_status": "Inferred",
+      "blind_findings": [
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 0,
+          "index": 4
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 1,
+          "index": 4
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 3,
+          "index": 5
+        },
+        {
+          "kind": "criterion_strength",
+          "criterion_id": "implementation",
+          "sample_index": 4,
+          "index": 4
+        }
+      ],
+      "explanation": "Four samples list the associated partners' differentiated roles (industrial secondment hosts, causal-AI co-supervision, external cohorts) as strengths and the cell members cite 3.2's partner paragraphs. This is the ESR's 'roles of all associated partners are described in detail'. Sample 3 adds that their infrastructure is less detailed than the beneficiaries'; the ESR does not fault it.",
+      "review_status": "agent_recommended_pending_operator_review"
+    }
+  ]
+}

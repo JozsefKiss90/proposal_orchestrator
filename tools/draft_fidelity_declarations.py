@@ -93,7 +93,6 @@ no gate, invokes no Claude, reads no higher tier it writes to, and coins no
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from dataclasses import dataclass
@@ -195,7 +194,7 @@ def _read_json(repo_root: Path, rel: Path, label: str) -> dict[str, Any]:
 
 
 def _sha256(repo_root: Path, rel: Path) -> str:
-    return hashlib.sha256((repo_root / rel).read_bytes()).hexdigest()
+    return fd.file_sha256(repo_root / rel)
 
 
 def load_register(repo_root: Path, revision: Revision) -> dict[str, Any]:

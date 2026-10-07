@@ -1,0 +1,625 @@
+{
+  "record_type": "esr_revision_priorities",
+  "schema_version": "1.0",
+  "advisory": true,
+  "blocking": false,
+  "compared_at": "2026-10-07T22:16:57.191012+00:00",
+  "baseline_report_sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01",
+  "candidate_hash": "sha256:242f1afb02c8a0acd2c6a1d2178a9904ebcbf2b9f332c92672f849f61088dbdc",
+  "esr_record_sha256": "2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb",
+  "dispositions_sha256": "fbed6abdb1c7bcf78aed5455b0616dd07bd05a30262c1e5ab8a01e61ae819576",
+  "priority_rule": "severity first (shortcoming before minor shortcoming before strength), then the criterion's weight, then disposition (not detected, detected, partial, not assessable), then the ESR's own order. 'addressed' rows are listed as closed. The order is derived from the declared rows; no priority is declared by hand.",
+  "open": [
+    {
+      "priority": 1,
+      "observation_id": "ESR-E-02",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-method",
+      "kind": "shortcoming",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "historical_finding": "However, AI/ML plans- specifically conceptual paradigms, methods, and validation metrics, as well as critical security aspects for handling clinical data with AI are insufficiently detailed.",
+      "proposed_revision": "Add a short 'Security of clinical data' paragraph under 1.2 (or 1.2's open science block): threat model, access control for federated nodes, encryption in transit and at rest, audit logging, and who owns incident response. Cross-reference the ethics self-assessment.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-02, page 2, Criterion 1 comment, cluster C1 point 1",
+          "the two 1.2 passages quoted on this row: data protection is mentioned, security is not described",
+          "fidelity_register#provenance/transformation/prose: some passages omitted or rephrased"
+        ],
+        "responsible_role": {
+          "role": "the lead participant of WP2",
+          "source": "implementation_section/3.1",
+          "anchor": "WP Number: 2",
+          "basis": "implementation_section/3.2 places secure medical-data and interoperability infrastructures at Academic Beneficiaries E and G, and data-protection expertise at G and H, supporting WP2"
+        },
+        "requires_confirmation": [
+          "the threat model and the access-control design for the federated nodes",
+          "who owns incident response across the hosts",
+          "that the ethics self-assessment carries the same account"
+        ],
+        "proposal_location": [
+          "excellence_section/1.2, the open-science and data-protection block",
+          "implementation_section/6, the ethics self-assessment"
+        ],
+        "commitment_kind": "requires_study_design"
+      }
+    },
+    {
+      "priority": 2,
+      "observation_id": "ESR-E-03",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-method",
+      "kind": "shortcoming",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "historical_finding": "It is also not fully clear how some of the chosen methods will deliver key objectives: cardiovascular AI models are evaluated only retrospectively with limited plans for prospective validation;",
+      "proposed_revision": "State a prospective validation plan for at least one cardiovascular use case: a shadow-mode or silent-trial design with pre-registered endpoints, the site(s), the month window and the DC responsible, and say why the other use cases stay retrospective.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-03, page 2, Criterion 1 comment, cluster C1 point 2",
+          "the 1.1 and 3.1 passages quoted on this row: evaluation is retrospective",
+          "adjudication A07: the dispute R02 raised is not sustained and the row is a plain miss"
+        ],
+        "responsible_role": {
+          "role": "the lead participant of WP4",
+          "source": "implementation_section/3.1",
+          "anchor": "WP title: Clinical Adaptation & Case Studies",
+          "basis": "WP4 runs the clinical adaptation and case studies the ESR criticises"
+        },
+        "requires_confirmation": [
+          "that a shadow-mode or silent-trial design is feasible at a named clinical site",
+          "the pre-registered endpoints and the month window",
+          "which DC project carries the prospective arm"
+        ],
+        "proposal_location": [
+          "implementation_section/3.1, the WP4 task that evaluates cardiovascular models",
+          "excellence_section/1.2, the methodology block"
+        ],
+        "commitment_kind": "requires_study_design"
+      }
+    },
+    {
+      "priority": 3,
+      "observation_id": "ESR-E-04",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-method",
+      "kind": "shortcoming",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "historical_finding": "the cohort is not sufficient concerning the multihospital, multi-operator design needed to reflect contemporary European TAVI practice to capture the diversity;",
+      "proposed_revision": "Give Task 4.3 its cohort: number of hospitals and countries, number of operators and procedures per site, the years covered, and how site and operator heterogeneity enter the causal model as variables.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-04, page 2, Criterion 1 comment, cluster C1 point 3",
+          "the Task 4.3 passages quoted on this row: multicentre, with data sources listed and no counts",
+          "adjudication A06: cohort magnitude and cohort composition are different properties"
+        ],
+        "responsible_role": {
+          "role": "the lead participant of WP4",
+          "source": "implementation_section/3.1",
+          "anchor": "WP title: Clinical Adaptation & Case Studies",
+          "basis": "WP4 runs the clinical adaptation and case studies the ESR criticises"
+        },
+        "requires_confirmation": [
+          "the number of hospitals, countries, operators and procedures per site available to Task 4.3",
+          "the years the cohort covers",
+          "whether site and operator heterogeneity can enter the causal model as variables"
+        ],
+        "proposal_location": [
+          "implementation_section/3.1, Task 4.3"
+        ],
+        "commitment_kind": "requires_data_access"
+      }
+    },
+    {
+      "priority": 4,
+      "observation_id": "ESR-E-01",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-method",
+      "kind": "shortcoming",
+      "disposition": "independently_detected",
+      "historical_finding": "However, AI/ML plans- specifically conceptual paradigms, methods, and validation metrics, as well as critical security aspects for handling clinical data with AI are insufficiently detailed.",
+      "proposed_revision": "Under 1.2, add one paragraph per pipeline stage naming the identification strategy, the estimators and the validation metrics each DC project will use, with the retrospective cohort it applies to. Prefer a table: stage, method, metric, DC.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-01, page 2, Criterion 1 comment, cluster C1 point 1",
+          "the blind excellence shortcoming cited on this row, resolved against the frozen baseline",
+          "the two 1.2 passages quoted on this row, verified in the candidate"
+        ],
+        "responsible_role": {
+          "role": "the lead participants of WP1-WP4",
+          "source": "implementation_section/3.1",
+          "anchor": "Lead participant",
+          "basis": "each work-package block of the work plan carries a 'Lead participant' line, and the methods, dependencies and deliverables at issue are those packages'"
+        },
+        "requires_confirmation": [
+          "the identification strategy and the estimator each DC project will use",
+          "the validation metric per pipeline stage and the retrospective cohort it applies to"
+        ],
+        "proposal_location": [
+          "excellence_section/1.2, the AI/ML methodology block"
+        ],
+        "commitment_kind": "requires_study_design"
+      }
+    },
+    {
+      "priority": 5,
+      "observation_id": "ESR-E-05",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-method",
+      "kind": "shortcoming",
+      "disposition": "not_assessable_from_this_copy",
+      "historical_finding": "and the number of contributing clinicians to the database is not well-specified.",
+      "proposed_revision": "Where the registry or database is introduced, state the number of contributing clinicians and sites, their roles in data curation, and the governance of contributions. If the database was named in the submission, keep the passage.",
+      "revision_status": "Assumed",
+      "needs_private_network": true,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-05, page 2, Criterion 1 comment, cluster C1 point 4",
+          "fidelity_register#provenance/transformation/identifiers: partner, people and place names generalised",
+          "fidelity_register#provenance/transformation/prose: some passages omitted or rephrased"
+        ],
+        "responsible_role": {
+          "role": "Project Coordinator",
+          "source": "implementation_section/5",
+          "anchor": "Project Coordinator and Management Team",
+          "basis": "the Coordinating Beneficiary is responsible for overall scientific, administrative and financial coordination, and monitors deliverables, milestones, risks and compliance across all work packages"
+        },
+        "requires_confirmation": [
+          "whether the submitted original named the registry or database and its contributing clinicians (PE-09)",
+          "the number of contributing clinicians and sites, and their roles in data curation"
+        ],
+        "proposal_location": [
+          "excellence_section/1.2, where the registry or database is introduced",
+          "excellence_section/1.1"
+        ],
+        "commitment_kind": "requires_original_check"
+      }
+    },
+    {
+      "priority": 6,
+      "observation_id": "ESR-Q-02",
+      "criterion_id": "implementation",
+      "aspect_id": "impl-workplan",
+      "kind": "shortcoming",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "historical_finding": "In addition, the validation strategy for certain deliverables is not fully specified",
+      "proposed_revision": "Add a 'Validation' column to the scientific deliverables table, or one sentence per technical deliverable (D1.x-D4.x) naming the acceptance test, the benchmark or the clinical reviewer that signs it off.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-Q-02, page 4, Criterion 3 comment, cluster C7 point 2",
+          "the two 3.1 passages quoted on this row, from the deliverables table",
+          "adjudication A10: the one blind sentence about this point misattributes a neighbouring artifact's property, so no lane carries it"
+        ],
+        "responsible_role": {
+          "role": "the lead participants of WP1-WP4",
+          "source": "implementation_section/3.1",
+          "anchor": "Lead participant",
+          "basis": "each work-package block of the work plan carries a 'Lead participant' line, and the methods, dependencies and deliverables at issue are those packages'"
+        },
+        "requires_confirmation": [
+          "the acceptance test or benchmark for each technical deliverable",
+          "the clinical reviewer who signs off each clinical deliverable"
+        ],
+        "proposal_location": [
+          "implementation_section/3.1, the scientific deliverables table"
+        ],
+        "commitment_kind": "requires_study_design"
+      }
+    },
+    {
+      "priority": 7,
+      "observation_id": "ESR-Q-03",
+      "criterion_id": "implementation",
+      "aspect_id": "impl-workplan",
+      "kind": "shortcoming",
+      "disposition": "independently_detected",
+      "historical_finding": "and the definitions and timing of some milestones is not well aligned with the overall proposal.",
+      "proposed_revision": "Move M7.3 inside the project window or make it a post-project commitment outside the milestone table. For every milestone, name the deliverable(s) it depends on and check the due month follows them. Define M4.2 against a stated evaluation endpoint rather than 'publications'.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-Q-03, page 4, Criterion 3 comment, cluster C7 point 3",
+          "the surviving audit finding: M7.3 is due M48 and its related WP7 runs M1-M36",
+          "the M7.3 and M4.2 milestone rows quoted on this row",
+          "adjudication A04: the window conflict is a timing misalignment the copy itself declares"
+        ],
+        "responsible_role": {
+          "role": "Project Coordinator",
+          "source": "implementation_section/5",
+          "anchor": "Project Coordinator and Management Team",
+          "basis": "the Coordinating Beneficiary is responsible for overall scientific, administrative and financial coordination, and monitors deliverables, milestones, risks and compliance across all work packages"
+        },
+        "requires_confirmation": [
+          "whether M7.3 moves inside the project window or becomes a post-project commitment",
+          "the deliverable each milestone depends on, and that its due month follows them",
+          "the evaluation endpoint M4.2 is defined against"
+        ],
+        "proposal_location": [
+          "implementation_section/3.1, the milestones table"
+        ],
+        "commitment_kind": "requires_partner_commitment"
+      }
+    },
+    {
+      "priority": 8,
+      "observation_id": "ESR-Q-01",
+      "criterion_id": "implementation",
+      "aspect_id": "impl-workplan",
+      "kind": "shortcoming",
+      "disposition": "partially_observable",
+      "historical_finding": "However, several aspects lack appropriate detail such as the description of dependencies between work packages.",
+      "proposed_revision": "Add a dependency table to 3.1: for each WP, the inputs it needs from other WPs with the deliverable id and month, and the outputs it hands on. Reinstate the Gantt with milestone markers if one existed; a table survives reflow where a figure may not.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-Q-01, page 4, Criterion 3 comment, cluster C7 point 1",
+          "the two remaining blind implementation shortcomings cited on this row",
+          "fidelity_register#derived/figures/images_on_any_page: zero images on any page"
+        ],
+        "responsible_role": {
+          "role": "the lead participants of WP1-WP4",
+          "source": "implementation_section/3.1",
+          "anchor": "Lead participant",
+          "basis": "each work-package block of the work plan carries a 'Lead participant' line, and the methods, dependencies and deliverables at issue are those packages'"
+        },
+        "requires_confirmation": [
+          "for each work package, the inputs it needs from others with the deliverable id and month",
+          "whether the submission carried a Gantt or dependency figure that sanitisation removed (PE-09)"
+        ],
+        "proposal_location": [
+          "implementation_section/3.1, the work-plan block"
+        ],
+        "commitment_kind": "requires_study_design"
+      }
+    },
+    {
+      "priority": 9,
+      "observation_id": "ESR-E-07",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-training",
+      "kind": "minor_shortcoming",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "historical_finding": "While network-wide training overall complements the local training programmes, there is a slight limitation in clarity and depth in systematic description of complementation of local training.",
+      "proposed_revision": "Add a short table under 1.3.4: for each host, the local doctoral-school modules each DC takes, the network-wide event that builds on them, and the ECTS or hours. One row per DC makes the complementation systematic.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-07, page 3, Criterion 1 comment, cluster C3",
+          "the two 1.3 passages quoted on this row, in the network-wide training block",
+          "adjudication A08: a lane read the passage and rated it adequate rather than missing it"
+        ],
+        "responsible_role": {
+          "role": "Supervisory Board (SB)",
+          "source": "implementation_section/5",
+          "anchor": "Monitoring supervision quality and training implementation",
+          "basis": "the Supervisory Board monitors supervision quality and training implementation, including Individual Training Panels, PhD Committees and Personal Career Development Plans"
+        },
+        "requires_confirmation": [
+          "the local doctoral-school modules each host requires of its DC",
+          "the ECTS or hours per local module and per network-wide event"
+        ],
+        "proposal_location": [
+          "excellence_section/1.3, section 1.3.4"
+        ],
+        "commitment_kind": "requires_partner_commitment"
+      }
+    },
+    {
+      "priority": 10,
+      "observation_id": "ESR-E-08",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-training",
+      "kind": "minor_shortcoming",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "historical_finding": "In addition, some details for training are not properly described, for example, the integration of entrepreneurship training lacks clear mechanisms for practical application.",
+      "proposed_revision": "Give TG5 a mechanism: a business-case or R2I-canvas exercise per DC with a deliverable month, a pitch session at a named network event, and a mentor from an industrial partner. Say which deliverable records it.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-08, page 3, Criterion 1 comment, cluster C3",
+          "the 1.3 and 2.2 passages quoted on this row: TG5 and the Research-to-Innovation canvas",
+          "fidelity_register#provenance/transformation/prose"
+        ],
+        "responsible_role": {
+          "role": "Innovation and Sustainability Committee",
+          "source": "implementation_section/5",
+          "anchor": "the Innovation and Sustainability Committee",
+          "basis": "one of the four key bodies of the governance structure"
+        },
+        "requires_confirmation": [
+          "an industrial partner willing to mentor the exercise and host the pitch session",
+          "the deliverable and month that record the business-case exercise"
+        ],
+        "proposal_location": [
+          "excellence_section/1.3, TG5",
+          "impact_section/2.2"
+        ],
+        "commitment_kind": "requires_partner_commitment"
+      }
+    },
+    {
+      "priority": 11,
+      "observation_id": "ESR-E-09",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-supervision",
+      "kind": "minor_shortcoming",
+      "disposition": "not_detected_despite_sufficient_preserved_evidence",
+      "historical_finding": "However, the description remains slightly generic on how the quality of supervisory practices will be measured.",
+      "proposed_revision": "Name the measures: a supervision-quality questionnaire with a stated instrument, its cadence, the indicator thresholds that trigger Supervisory Board action, and the person who reviews the results.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-09, page 3, Criterion 1 comment, cluster C4",
+          "the 1.4 passage quoted on this row",
+          "adjudication A09: a lane read the supervision passage and asked a different question of it"
+        ],
+        "responsible_role": {
+          "role": "Supervisory Board (SB)",
+          "source": "implementation_section/5",
+          "anchor": "Monitoring supervision quality and training implementation",
+          "basis": "the Supervisory Board monitors supervision quality and training implementation, including Individual Training Panels, PhD Committees and Personal Career Development Plans"
+        },
+        "requires_confirmation": [
+          "the supervision-quality instrument and its cadence",
+          "the indicator thresholds that trigger Supervisory Board action",
+          "who reviews the results and when"
+        ],
+        "proposal_location": [
+          "excellence_section/1.4, supervision quality"
+        ],
+        "commitment_kind": "requires_partner_commitment"
+      }
+    },
+    {
+      "priority": 12,
+      "observation_id": "ESR-E-06",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-method",
+      "kind": "minor_shortcoming",
+      "disposition": "independently_detected",
+      "historical_finding": "Gender and other diversity characteristics relevant to this research are mostly appropriately considered in the research methodology as scientific variables (disaggregated data, subgroup calibration, bias mitigation), however, they are not detailed enough regarding their essential role in clinical issues in cardiology.",
+      "proposed_revision": "Add two or three cardiology-specific examples under 'Gender dimension and diversity aspects': sex differences in presentation and outcomes for the TAVI, heart-failure and critical-care cohorts, the variables available in each dataset, and the subgroup analyses planned.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-E-06, page 2, Criterion 2 comment, cluster C2",
+          "the two 1.2 passages quoted on this row, under 'Gender dimension and diversity aspects'",
+          "the blind excellence shortcoming cited on this row"
+        ],
+        "responsible_role": {
+          "role": "the lead participant of WP4",
+          "source": "implementation_section/3.1",
+          "anchor": "WP title: Clinical Adaptation & Case Studies",
+          "basis": "WP4 runs the clinical adaptation and case studies the ESR criticises"
+        },
+        "requires_confirmation": [
+          "which sex- and gender-disaggregated variables each cohort dataset actually carries",
+          "which subgroup analyses are powered in the TAVI, heart-failure and critical-care cohorts"
+        ],
+        "proposal_location": [
+          "excellence_section/1.2, 'Gender dimension and diversity aspects'"
+        ],
+        "commitment_kind": "requires_study_design"
+      }
+    },
+    {
+      "priority": 13,
+      "observation_id": "ESR-I-01",
+      "criterion_id": "impact",
+      "aspect_id": "imp-dissemination",
+      "kind": "minor_shortcoming",
+      "disposition": "independently_detected",
+      "historical_finding": "However, suitable strategies to protect industrial and other relevant outcomes are not convincingly elaborated; this is a minor shortcoming.",
+      "proposed_revision": "Under the IP strategy, list the three or four results most likely to carry industrial value (per WP), the protection route for each (patent, trade secret, open licence), the owner, and the decision point in months. Tie each to its R2I canvas.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-I-01, page 3, Criterion 2 comment, cluster C5",
+          "the two 2.3 passages quoted on this row, under 'Strategy for the management of intellectual property and foreseen protection measures'",
+          "the blind impact shortcoming cited on this row"
+        ],
+        "responsible_role": {
+          "role": "IP and Exploitation Panel",
+          "source": "implementation_section/5",
+          "anchor": "an IP and Exploitation Panel reviews",
+          "basis": "the panel sits within the DEC governance structure and reviews inventions"
+        },
+        "requires_confirmation": [
+          "which results carry industrial value, per work package, and who owns each",
+          "the protection route and the decision month for each result"
+        ],
+        "proposal_location": [
+          "impact_section/2.3, the intellectual-property and protection block"
+        ],
+        "commitment_kind": "requires_partner_commitment"
+      }
+    },
+    {
+      "priority": 14,
+      "observation_id": "ESR-I-02",
+      "criterion_id": "impact",
+      "aspect_id": "imp-magnitude",
+      "kind": "minor_shortcoming",
+      "disposition": "independently_detected",
+      "historical_finding": "Economic and technological impacts, such as validated causal AI and interoperability with European Health Data Space/Fast Healthcare Interoperability Resources (EHDS/FHIR), and human capital development through multi-sector training, are overall valid, especially in a long-term, however, the magnitude in terms of specific measures is insufficiently presented in the proposal.",
+      "proposed_revision": "Under 2.4 economic and technological impact, give one magnitude per pathway: number of hospitals and SMEs adopting the toolkit by M36 and M60, number of trained specialists and their destinations, the EHDS/FHIR-aligned components released, and a baseline for each. Keep the three pathways; add the numbers.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-I-02, page 4, Criterion 2 comment, cluster C6",
+          "the 2.4 passage quoted on this row: three impact pathways, stated without magnitude",
+          "the blind impact shortcoming cited on this row"
+        ],
+        "responsible_role": {
+          "role": "Dissemination, Exploitation and Communication (DEC) Committee",
+          "source": "implementation_section/5",
+          "anchor": "Defining and monitoring key performance indicators",
+          "basis": "the DEC Committee defines and monitors the key performance indicators, including publications, software releases, policy outputs and outreach"
+        },
+        "requires_confirmation": [
+          "the adoption numbers per pathway at M36 and M60, and the baseline for each",
+          "that each number is defensible without a market study the project does not run"
+        ],
+        "proposal_location": [
+          "impact_section/2.4, expected economic and technological impact"
+        ],
+        "commitment_kind": "requires_numerical_target"
+      }
+    },
+    {
+      "priority": 15,
+      "observation_id": "ESR-Q-04",
+      "criterion_id": "implementation",
+      "aspect_id": "impl-workplan",
+      "kind": "minor_shortcoming",
+      "disposition": "independently_detected",
+      "historical_finding": "Risk management is present and generally credible, with several appropriate mitigation measures. However, certain descriptions of risks remain generic and oversimplified, without measurable thresholds for activation of the mitigation.",
+      "proposed_revision": "For each risk give a measurable trigger (a month, a count or a percentage) and the owner who acts on it, as risk 1 already does with its 60% rule. Add two or three technical risks for WP1-WP3 (causal-model validity, federated-learning failure) with the same structure.",
+      "revision_status": "Assumed",
+      "needs_private_network": false,
+      "revision_plan": {
+        "evidence": [
+          "ESR-Q-04, page 4, Criterion 3 comment, cluster C8",
+          "the two 3.1 passages quoted on this row, from the risk table",
+          "the blind implementation shortcoming cited on this row"
+        ],
+        "responsible_role": {
+          "role": "Project Coordinator",
+          "source": "implementation_section/5",
+          "anchor": "Project Coordinator and Management Team",
+          "basis": "the Coordinating Beneficiary is responsible for overall scientific, administrative and financial coordination, and monitors deliverables, milestones, risks and compliance across all work packages"
+        },
+        "requires_confirmation": [
+          "a measurable trigger per risk: a month, a count or a percentage",
+          "the owner who acts on each trigger",
+          "the two or three technical risks WP1-WP3 carry and their triggers"
+        ],
+        "proposal_location": [
+          "implementation_section/3.1, the risk table"
+        ],
+        "commitment_kind": "requires_numerical_target"
+      }
+    }
+  ],
+  "contested_strengths": [
+    {
+      "priority": null,
+      "observation_id": "ESR-E-S03",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-method",
+      "kind": "strength",
+      "disposition": "partially_observable",
+      "historical_finding": "Open science practices, such as preprints, and repositories, are included and adequately described in the proposed methodology.",
+      "proposed_revision": null,
+      "revision_status": null,
+      "needs_private_network": false
+    },
+    {
+      "priority": null,
+      "observation_id": "ESR-E-S05",
+      "criterion_id": "excellence",
+      "aspect_id": "exc-supervision",
+      "kind": "strength",
+      "disposition": "partially_observable",
+      "historical_finding": "The supervisors are experienced and highly qualified in their scientific roles. They demonstrate appropriate international and local experience across all relevant areas and facilitating the adequate and effective completion the individual research projects. The well-structured and multi-layered approach of supervision practices is solid and overall sound. It ensures effective progress monitoring, feedback and support for the fellows; for example, well-defined and reviewed Personal Career Development Plans ensure systematic tracking of training objectives.",
+      "proposed_revision": null,
+      "revision_status": null,
+      "needs_private_network": false
+    },
+    {
+      "priority": null,
+      "observation_id": "ESR-I-S01",
+      "criterion_id": "impact",
+      "aspect_id": "imp-structuring",
+      "kind": "strength",
+      "disposition": "independently_detected",
+      "historical_finding": "Non-academic sector contribution to doctoral training is well described and compelling; they have a meaningful and tangible role through structured secondments in hospitals, SMEs, and regulatory bodies, ensuring hands-on exposure to clinical workflows, compliance, and innovation. Industry and regulatory partners actively co-supervise doctoral candidates (DCs), participate the Individual Training Panels, and the Supervisory Board, and lead network-wide training sessions.",
+      "proposed_revision": null,
+      "revision_status": null,
+      "needs_private_network": false
+    },
+    {
+      "priority": null,
+      "observation_id": "ESR-I-S02",
+      "criterion_id": "impact",
+      "aspect_id": "imp-structuring",
+      "kind": "strength",
+      "disposition": "independently_detected",
+      "historical_finding": "Several elements are convincingly sustained after the project; these include e.g. the development of a virtual knowledge hub. The robust strategies and mechanisms described ensure a sustained long-term collaboration, and foster future international and intersectoral research and cooperation.",
+      "proposed_revision": null,
+      "revision_status": null,
+      "needs_private_network": false
+    },
+    {
+      "priority": null,
+      "observation_id": "ESR-I-S05",
+      "criterion_id": "impact",
+      "aspect_id": "imp-magnitude",
+      "kind": "strength",
+      "disposition": "independently_detected",
+      "historical_finding": "The expected scientific impact is highly credible with clear breakthroughs in causal modelling. For example, the integration of regulatory-grade pipelines aligned with regulatory frameworks adds robustness. Indicators, such as cross-site transportability, make the scientific outcomes measurable and realistic. Societal impact is well-justified: effective and safe integration of AI in healthcare and regulatory frameworks will largely affect the quality of the cardiovascular care provided to patients, and is addressing patient benefit, healthcare-system resilience, and policy uptake.",
+      "proposed_revision": null,
+      "revision_status": null,
+      "needs_private_network": false
+    },
+    {
+      "priority": null,
+      "observation_id": "ESR-I-S04",
+      "criterion_id": "impact",
+      "aspect_id": "imp-dissemination",
+      "kind": "strength",
+      "disposition": "partially_observable",
+      "historical_finding": "The dissemination, exploitation, and communication measures are comprehensive, and well-structured, with clear objectives and monitoring through measurable indicators. The target groups for these measures are clearly identified. The outline of intellectual property management strategy is mostly appropriately addressed.",
+      "proposed_revision": null,
+      "revision_status": null,
+      "needs_private_network": false
+    },
+    {
+      "priority": null,
+      "observation_id": "ESR-Q-S02",
+      "criterion_id": "implementation",
+      "aspect_id": "impl-participants",
+      "kind": "strength",
+      "disposition": "partially_observable",
+      "historical_finding": "The participating organisations have the required high-quality infrastructure and capacity to implement research of high quality and their tasks. The international consortium is well-structured, integrating academic and non-academic partners with expertise, complementary strengths, and interdisciplinary knowledge, matching with the project's objectives, and reinforcing the structural and functional capability of the Doctoral Network.",
+      "proposed_revision": null,
+      "revision_status": null,
+      "needs_private_network": false
+    },
+    {
+      "priority": null,
+      "observation_id": "ESR-Q-S03",
+      "criterion_id": "implementation",
+      "aspect_id": "impl-participants",
+      "kind": "strength",
+      "disposition": "partially_observable",
+      "historical_finding": "Hosting arrangements via accredited doctoral schools and international offices are credible and supportive.",
+      "proposed_revision": null,
+      "revision_status": null,
+      "needs_private_network": false
+    }
+  ],
+  "closed": [],
+  "criteria_order": [
+    "excellence",
+    "impact",
+    "implementation"
+  ],
+  "notes": "Advisory to a human, never run-blocking. Every disposition is declared by the operator; every reference it rests on was resolved against the frozen baseline, the integrity audits, the candidate text or the fidelity register before this report was written. One proposal-ESR pair is a case study, not a validation of scoring accuracy."
+}

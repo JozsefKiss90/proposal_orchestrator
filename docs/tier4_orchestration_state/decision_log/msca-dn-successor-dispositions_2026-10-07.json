@@ -1,0 +1,224 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-successor-dispositions_2026-10-07",
+  "date": "2026-10-07",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket R05 of plans/pe08_review_and_pe09_handoff_tickets.md: generate successor dispositions, a successor comparison and a revision plan, after R01 (the durable declaration input), R02 (the operator review table), R03 (the semantic adjudications) and R04 (the declaration drafts)",
+  "authority": "CLAUDE.md §9.1 (docs/ is the durable record), §9.4 (a decision that affects future interpretation is written here), §9.5 (outputs reproducible from documented inputs), §10.5 (every material claim names its tiered source), §12.1 (an output names its inputs, states its inferences and flags its assumptions), §12.2 (the four statuses), §12.3 (a contradiction is resolved explicitly and the resolution recorded), §13.3 (no invented project fact), §15 (explicit failure over fabricated completion); spec decision 13 (the ESR's own severity wording) and decision 15 (the grounding axis).",
+  "problem": {
+    "declared_status": "Confirmed",
+    "basis": "read in the committed PE-08, R02, R03 and R04 artifacts at 76a794e",
+    "statement": "The PE-08 dispositions are a provisional interpretation that three later tickets reviewed without changing. The reviewed reading existed only across a review table, an adjudication record and a set of declaration drafts, and no artifact carried it as a disposition.",
+    "detail": [
+      "R03 withdrew four citations across three rows and recommended one disposition change, but a recommendation is a question: the predecessor record still cites all of them.",
+      "ESR-Q-03's three audit citations point at integrity_242f1afb02c8_0001.json, the audit R03 superseded; its own surviving finding was never re-filed against the successor audit.",
+      "The proposed revisions were fifteen sentences with a declared status and nothing else: no evidence, no owner, no statement of what a human would have to confirm before writing one, and no distinction between an edit and a commitment.",
+      "harness.esr_comparison verified the quote a miss rests on and accepted any declared evidence_preserved_status, so a row could have claimed Confirmed preservation on a register whose declared half is empty. No committed row did, and nothing stopped one."
+    ]
+  },
+  "decision": {
+    "declared_status": "Confirmed",
+    "basis": "the implementation, the artifacts written, and the verification below",
+    "what_was_produced": "A successor dispositions record (dispositions_f60ae6e0a2a1_r05.json, schema 1.1), the comparison and revision plan written from it (comparison_f60ae6e0a2a1_0002.json and revisions_f60ae6e0a2a1_0002.json), and the predecessor-to-successor review diff (review_diff_b9a6b4bc5302_0001.json and .md). Every PE-08, R02 and R03 artifact is byte-unchanged. Two R04 artifacts were re-rendered, for the reason below.",
+    "why_the_r04_drafts_were_re_rendered": "The R04 declaration drafts enumerate every artifact that names the fidelity register, so that the operator can see what adopting a declaration would cost. R05 added five such artifacts, so draft_resolved_fixes.json and review_checklist.md were re-rendered by their own tool and now list them. That is the coupling R04 documented, not a correction: no drafted declaration, status or basis changed, and 'py -3.10 -m tools.draft_fidelity_declarations --check' exits 0. The successor dispositions cite the draft by path and not by hash, so the two records do not chase each other; the record states that and says why.",
+    "the_successor_is_a_draft_not_a_decision": {
+      "the_record": "review_state 'agent_drafted_pending_operator_review', advisory=true, blocking=false, and a decision_state block stating that no row is operator-approved. Six questions are listed under open_operator_decisions, four of them on rows this record moved, each with its options and the effect of choosing the other one. Two more ask whether a contested strength enters the revision plan.",
+      "every_row": "Each row carries a review_status, and the comparison carries it through. Nineteen of the twenty-nine are 'operator_decision_required' — the union of this record's six questions and every row the R03 review notes still put a question on. Marking only the six would have read as if the other thirteen were settled. No row is 'operator_confirmed'.",
+      "the_comparison": "esr_comparison carries a declared review state into the comparison: the dispositions block records it, and a top-level review_state block states that every count is a count of agent-drafted declarations, names the rows needing a decision, and says that where the report's general note calls the dispositions the operator's, that reading is wrong for this record and the block governs. The terminal rendering prints the state. The predecessor record declares no state, so its comparison is unchanged and still replays byte for byte.",
+      "the_two_unresolved_rows": "ESR-E-04 and ESR-Q-03 declare a disposition status of 'Unresolved', and CLAUDE.md §12.2 says such a status needs resolution before downstream use. A count must count something, so each is counted under the disposition it declares; the summary's declarations_unresolved block names both rows and states that every figure including one is provisional on the operator decision the dispositions record names. The rendering says so too."
+    },
+    "rows_moved": {
+      "ESR-E-04": "partially_observable to not_detected_despite_sufficient_preserved_evidence, per adjudication A06: the one cited blind shortcoming names cohort magnitude (sample size, data-access timelines, power) and the ESR names cohort composition (hospitals, operators, representativeness). Two properties, so the citation is withdrawn and partially_observable loses the finding it requires. Both statuses on the row are Unresolved, because the alternative — not_assessable_from_this_copy — turns on whether the register's record of rephrased prose means the submission carried the counts. That is the operator's to settle.",
+      "ESR-Q-01": "one of three blind citations withdrawn, per adjudication A05: the sentence says no intermediate milestones are shown, and the implementation section that assessor received carries the milestones table with a due month for each of sixteen milestones over ten distinct months. The disposition does not move: the dependency point stands on the two remaining citations and the row is partial because the register measures zero images on any page.",
+      "ESR-Q-03": "three of four citations withdrawn and the fourth re-filed. A03 withdraws the two undeclared_dependency citations — a dependency is not a column of the milestones table, so the finding records an absent column, not a misaligned milestone. A05 withdraws the blind citation. What remains is the M7.3 window finding (due M48, related WP7 runs M1-M36), now cited against integrity_242f1afb02c8_0002.json, whose milestone_dependencies findings are index-for-index those of the audit the predecessor cited. detected_by narrows from both lanes to the integrity audit; declared_status becomes Unresolved because no finding addresses the definitions half of the ESR sentence."
+    },
+    "preservation_is_now_constrained": {
+      "what_the_code_checked_before": "That the preserved passage occurs in the named sub-section of the candidate — a real measurement — and that evidence_preserved_status is one of the four §12.2 words. The sufficiency of the evidence was a bare declaration with no required basis.",
+      "what_it_checks_now": "A Confirmed evidence_preserved_status is refused unless the register's declared half carries a presence statement for every sub-section the preserved passage is quoted from (harness.esr_comparison.check_preservation_claim). The declared half is the only artifact that says anything about the step from the submission to this copy; the derived half measures this PDF's extraction and cannot carry the claim. Inferred, Assumed and Unresolved stand as declared.",
+      "why_that_is_the_whole_fix": "No measurement available in this repository can raise a preservation claim to Confirmed, so the honest change is to refuse the one status that overstates the evidence, not to invent a check for the others. The declared half is empty today, so no row of either record can be Confirmed and the rule is exercised by tests rather than by the live data. That is stated here rather than left to be discovered.",
+      "the_second_rule": "Dispositions schema 1.1 additionally makes every miss name the register entry its preservation claim rests on. The predecessor is schema 1.0 and only one of its six misses named one, so the rule is version-gated: 1.0 behaves exactly as before and the predecessor comparison stays replayable. All seven misses of the successor name two pointers — the derived measurement of the sub-section the passage came from, which is what this copy can show, and the document-wide prose declaration, which is what it cannot."
+    },
+    "the_revision_plans": {
+      "rule": "Ticket R05 item 6. Each of the fifteen proposed revisions now carries a plan: the evidence it rests on, the human role that owns it, what has to be confirmed before it can be written, where in the proposal it goes, and what carrying it out commits someone to. harness.esr_comparison.check_revision_plan refuses an incomplete plan, and refuses a plan that names a commitment and nothing to confirm.",
+      "commitment_kinds": "Six: editorial_change, requires_numerical_target, requires_study_design, requires_data_access, requires_partner_commitment, requires_original_check. The middle four are the four things the ticket keeps as proposals until a human confirms them. On this case: 6 study design, 5 partner commitment, 2 numerical target, 1 data access, 1 original check. None is editorial — not one of the fifteen can be written from what this copy already carries, and the record says so.",
+      "roles_are_quoted_not_invented": "Eight roles, each naming the candidate sub-section that names it and a verbatim anchor from that sub-section's text: Project Coordinator, Supervisory Board (SB), DEC Committee, IP and Exploitation Panel, Innovation and Sustainability Committee (all implementation_section/5), and the lead participants of WP1-WP4, WP2 and WP4 (implementation_section/3.1, the 'Lead participant' line of each work-package block). A role this repository cannot point at would be an invented project fact (§13.3); a test resolves every anchor against the candidate through the comparison's own normaliser."
+    },
+    "retention": "All fifteen ESR shortcomings are open in the successor revision plan, including the seven neither lane detected and the one this copy cannot assess. No row is closed, because no row is 'addressed': the resolved-fixes revision re-typeset page 45 and changed nothing an ESR observation names. The diff measures this and flags a shortcoming that leaves the list any other way.",
+    "counts_recomputed": {
+      "basis": "the successor comparison's own summary, recomputed from its rows",
+      "by_disposition": "15 independently_detected, 6 partially_observable, 7 not detected, 1 not assessable, 0 addressed (predecessor: 15 / 7 / 6 / 1 / 0)",
+      "detection": "of 14 rated shortcomings: 6 detected, 1 partial, 7 not detected. rate_detected 0.43, unchanged; rate_detected_or_partial 0.57 to 0.50. By lane: blind 8 to 6, integrity audit 1, unchanged.",
+      "strengths_kept_apart": "The 15 independently_detected rows are 9 strengths the blind lane praised as the evaluators did and 6 criticisms it caught. 8 strengths carry a blind shortcoming on the praised point, unchanged. No count presents the 15 as criticisms detected.",
+      "scores_untouched": "The score_comparison block of the successor is byte-identical to the predecessor's: 85.8 historical against 74.6 blind median, no deduction attributed to any individual criticism. No assessor ran in R05 and no quota was spent."
+    },
+    "register_effects": {
+      "declared_status": "Confirmed",
+      "statement": "No register changed in R05, so no import manifest, preflight or baseline binding moved. The successor cites the same register bytes as the predecessor (sha256 aafed265f4e9).",
+      "if_the_r04_drafts_are_adopted": "Adopting docs/tier4_orchestration_state/msca_dn/declarations/draft_resolved_fixes.json writes the Tier 3 declaration input and changes the register's bytes. That moves the hash the predecessor comparison, the successor comparison, the R03 adjudication record and the R04 drafts all pin; the drafts' own adoption block enumerates what pins it. The old evidence preflight stays as historical evidence, and a future assessment needs a fresh preflight over the changed active inputs.",
+      "the_manifest_for_a_future_run": "A future import or assessment run must name the revised import manifest explicitly — workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json — and not rely on the resolver's predecessor-manifest default (ticket R05 item 9, carried into R06)."
+    }
+  },
+  "verification": {
+    "declared_status": "Confirmed",
+    "basis": "commands run in this session; results as reported",
+    "replay": {
+      "successor_dispositions": "py -3.10 -m tools.author_successor_dispositions --check  -> 'up to date' (byte-equal replay from the committed predecessor)",
+      "successor_comparison": "py -3.10 -m harness.commands.blind_assessment compare --baseline-dir docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06 --esr docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json --dispositions docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_r05.json --candidate docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded --historical-candidate docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db --register docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json --audit docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json --audit docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json --profile harness/profiles/msca_dn_2026_default.json --out-dir docs/tier4_orchestration_state/msca_dn/comparisons  -> exit 0, no flags",
+      "review_diff": "py -3.10 -m harness.commands.blind_assessment diff --before docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json --after docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0002.json --out-dir docs/tier4_orchestration_state/msca_dn/comparisons  -> exit 0, no flags",
+      "predecessor_replay": "The predecessor comparison re-runs from its own documented inputs and is substantively identical to the committed artifact: the rows, summary, score comparison and every binding match, and only compared_at, writes and revisions_artifact differ. Those three are run metadata."
+    },
+    "tests": {
+      "tests/test_msca_dn_successor_dispositions.py": "34 passed (new)",
+      "tests/harness/test_comparison_diff.py": "20 passed (new)",
+      "tests/harness/test_esr_comparison.py": "68 passed (61 before, 7 added)",
+      "tests/test_msca_dn_fidelity_declarations.py": "51 passed (unchanged)",
+      "tests/test_msca_dn_declaration_drafts.py": "72 passed (unchanged)",
+      "whole_suite": "206 failed, 6705 passed, 77 skipped, 5 errors. None of the failures or errors is in a file this ticket touched. The same run before the R04 drafts were re-rendered showed 207 failed: that one failure was tests/test_msca_dn_declaration_drafts.py::TestDeterminismAndTheCommittedArtifacts::test_the_committed_artifacts_are_reproducible, introduced by this ticket's new artifacts and closed by re-rendering the drafts. The remaining 206 are the branch's standing baseline (the migration line, spec-leanness and purged demo data); none touches esr_comparison, comparison_diff, the dispositions tools or the blind-assessment command.",
+      "what_they_check": [
+        "the successor record is a byte-equal replay and every binding is the hash of the file on disk",
+        "only the three adjudicated rows change what they declare; the fourteen strengths are carried through untouched",
+        "every shortcoming carries a plan, no strength does, no plan is editorial, and every commitment names what has to be confirmed",
+        "every role anchor resolves in the candidate sub-section it names, and every proposal location names a sub-section the candidate has",
+        "no row claims Confirmed preservation while the declared half is empty, and every miss names its register basis",
+        "a Confirmed preservation status is refused without a declared-half presence statement, and accepted with one",
+        "schema 1.1 refuses a miss with no register basis and 1.0 does not, so the predecessor still compares",
+        "the diff refuses two comparisons over a different baseline, ESR record, candidate or observation set, and refuses a moved score comparison",
+        "the committed diff reproduces from the committed pair",
+        "a record that declares no review state is read exactly as before, and an unknown record state or row status is refused",
+        "a declared state reaches the comparison, qualifies the general note and is printed by the rendering",
+        "an Unresolved declaration is counted and named; no Unresolved row means no block",
+        "every successor row carries a review status, none is operator_confirmed, and the nineteen marked are both records' questions",
+        "every hash the decision record pins is the file on disk"
+      ]
+    },
+    "fail_closed_checks_on_the_live_inputs": [
+      "compare with the successor audit withheld: refused, naming the row and the report ('observation ESR-Q-03: audit report ...integrity_242f1afb02c8_0002.json was not given to the command'). Nothing written.",
+      "diff with the predecessor comparison on both sides: refused ('both paths name the same comparison (9732dde50039); there is nothing to diff'). Nothing written.",
+      "A second compare into the same directory takes the next sequence number; neither writer overwrites, and the diff writer refuses a markdown file that already exists."
+    ],
+    "what_was_not_run": [
+      "No assessor call, no new blind baseline, no new freeze, no new preflight. The framework was not tuned toward 85.80 and no criterion score was touched.",
+      "No operator review was rendered over the successor comparison. The review command needs a notes record per comparison, and drafting one would restate the questions the successor dispositions already carry.",
+      "The register's declared half was not adopted, so the new Confirmed-preservation rule is exercised by tests and not by the live data."
+    ]
+  },
+  "consequences": [
+    "The predecessor record and comparison stay the citable provisional interpretation; the successor is the reviewed recommendation. Neither is an operator decision.",
+    "Six operator questions are outstanding. Four of them move a count if answered the other way, and the effect of each is stated in the record rather than left to be recomputed: ruling ESR-E-04 not assessable gives 13 rated, 6 misses and rate_detected 0.46; ruling ESR-Q-03 partial gives 5 detected, 2 partial and rate_detected 0.36.",
+    "Fifteen proposed revisions are now proposals with an owner and a confirmation list. None may be written into a proposal before the named human confirms what the plan names.",
+    "A Confirmed evidence_preserved_status is unreachable until the register's declared half is adopted. That is the intended coupling between R04 and this record.",
+    "Two figures in the successor summary are provisional: every rate that counts ESR-E-04 or ESR-Q-03. The artifact says which and why, so a later reader cannot take 6 detected of 14 rated as settled.",
+    "The diff command is general: any later successor comparison over the same baseline can be diffed against its predecessor the same way.",
+    "R06 inherits the register-adoption effects and the explicit import-manifest requirement recorded here."
+  ],
+  "artifacts": {
+    "written": {
+      "successor_dispositions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_r05.json",
+        "sha256": "fbed6abdb1c7bcf78aed5455b0616dd07bd05a30262c1e5ab8a01e61ae819576"
+      },
+      "successor_comparison": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0002.json",
+        "sha256": "b9a6b4bc5302fc754be5fa9d5ab4fcef6ac25ce583d245f61980b2ad176a45b9"
+      },
+      "successor_revisions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0002.json",
+        "sha256": "eadd7db524130acc7f329c2a450537a8340b6bc85b27ca67592184e38229dba9"
+      },
+      "review_diff_json": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_b9a6b4bc5302_0001.json",
+        "sha256": "369c282f5aecb750fc87d8e499ebbc98cf5ba4793e94ea106a914ddcc5b175b6"
+      },
+      "review_diff_markdown": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_b9a6b4bc5302_0001.md",
+        "sha256": "71a8d89bbe49c44766e69e1450edd6c443065fc0fb05c335ef238af2463c9116"
+      }
+    },
+    "re_rendered_by_their_own_tool": {
+      "declaration_draft": {
+        "path": "docs/tier4_orchestration_state/msca_dn/declarations/draft_resolved_fixes.json",
+        "sha256": "b508a3767406ce174387f7a09cfbc12a69cd6a92ac4f2b534a23dd2c35bbcaea",
+        "why": "its adoption block now enumerates the five R05 artifacts naming the register"
+      },
+      "declaration_review_checklist": {
+        "path": "docs/tier4_orchestration_state/msca_dn/declarations/review_checklist.md",
+        "sha256": "d18837c3caa2dee52473155e0486bea4ab87772862042ea3d3e1bbf841c7e6aa",
+        "why": "rendered from the drafts in the same pass"
+      }
+    },
+    "unchanged_and_still_cited": {
+      "predecessor_dispositions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+        "sha256": "5c0da82c111582d8ad30306a69daad721b4f0ab18d74adfc5fd9c3ca6ab6c0ff"
+      },
+      "predecessor_comparison": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json",
+        "sha256": "9732dde500397981a133461e29d93ae657ba444199a31d84d39731f9c5ec7848"
+      },
+      "predecessor_revisions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0001.json",
+        "sha256": "4068578e48ef676323d6380f746a5b0345f33bd91581b76f95f9eb49cc8ffe00"
+      },
+      "esr_record": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+        "sha256": "2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb"
+      },
+      "review_notes": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json",
+        "sha256": "37c4797249f67ad3d51f39ac03ce22514350faaddb8105edd5accd6929fbb247"
+      },
+      "adjudications": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json",
+        "sha256": "354db83d36727c05c03a348a8040c65bfb721b0f41fa8889ac60fa24a3c7f6af"
+      },
+      "successor_audit": {
+        "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json",
+        "sha256": "ace64d7d4ca37686ec3475a76143799ec4f955370541f3af10569ae76b9a4739"
+      },
+      "first_revision_audit": {
+        "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json",
+        "sha256": "1b66a7cc0823b8e13692ec00aaebe632ad0c3bf775fe9d567c892c97864bff13"
+      },
+      "fidelity_register": {
+        "path": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+        "sha256": "aafed265f4e9b43b9d88d13f394fef2e812cbfa5405d53bb6720cb303c9ecfc1"
+      },
+      "baseline_report": {
+        "path": "docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06/blind_baseline_f60ae6e0a2a1.json",
+        "sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01"
+      }
+    },
+    "code": [
+      "harness/esr_comparison.py (dispositions schema versions; check_preservation_claim; check_revision_plan; the revision plan carried into the revisions artifact only when declared)",
+      "harness/comparison_diff.py (new: the predecessor-to-successor diff)",
+      "harness/commands/blind_assessment.py (the 'diff' sub-command)",
+      "tools/author_successor_dispositions.py (new: the deterministic successor renderer)"
+    ],
+    "tests": [
+      "tests/test_msca_dn_successor_dispositions.py (new)",
+      "tests/harness/test_comparison_diff.py (new)",
+      "tests/harness/test_esr_comparison.py (preservation, schema version, revision plan)"
+    ],
+    "input_inventory_for_the_replay": {
+      "baseline_dir": "docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06",
+      "baseline_report_sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01",
+      "esr_record_sha256": "2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb",
+      "dispositions_sha256": "fbed6abdb1c7bcf78aed5455b0616dd07bd05a30262c1e5ab8a01e61ae819576",
+      "candidate": "docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded (candidate hash sha256:242f1afb02c8a0acd2c6a1d2178a9904ebcbf2b9f332c92672f849f61088dbdc)",
+      "historical_candidate": "docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+      "register_sha256": "aafed265f4e9b43b9d88d13f394fef2e812cbfa5405d53bb6720cb303c9ecfc1",
+      "audits": [
+        {
+          "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json",
+          "sha256": "ace64d7d4ca37686ec3475a76143799ec4f955370541f3af10569ae76b9a4739"
+        },
+        {
+          "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json",
+          "sha256": "1b66a7cc0823b8e13692ec00aaebe632ad0c3bf775fe9d567c892c97864bff13"
+        }
+      ],
+      "profile": "harness/profiles/msca_dn_2026_default.json",
+      "assessor_calls": 0
+    }
+  }
+}

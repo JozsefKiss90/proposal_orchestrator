@@ -138,6 +138,11 @@ class FidelityDeclarationsError(Exception):
     """Refusal: a declaration input is malformed, misfiled, or would be lost."""
 
 
+def file_sha256(path: Path) -> str:
+    """The sha256 of one file, the one spelling the tools that pin artifacts share."""
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
 def declarations_rel(revision_id: str) -> Path:
     """The relative path of *revision_id*'s declaration input."""
     return DECLARATIONS_DIR_REL / f"{revision_id}.json"
@@ -238,7 +243,7 @@ def load_declarations(repo_root: Path, revision_id: str) -> Declarations:
         revision_id=revision_id,
         rows=checked,
         path_rel=rel.as_posix(),
-        sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+        sha256=file_sha256(path),
     )
 
 
