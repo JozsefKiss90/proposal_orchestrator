@@ -1,0 +1,251 @@
+{
+  "record_type": "harness.blind_baseline_freeze",
+  "schema_version": "1.0.0",
+  "advisory": true,
+  "blocking": false,
+  "frozen_at": "2026-10-06T19:04:23.262968+00:00",
+  "report_path": "harness/blind_reports/blind_242f1afb02c8_0001.json",
+  "report_sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01",
+  "report_copy": "blind_baseline_f60ae6e0a2a1.json",
+  "bindings": {
+    "candidate_hash": "sha256:242f1afb02c8a0acd2c6a1d2178a9904ebcbf2b9f332c92672f849f61088dbdc",
+    "candidate_path": "C:/Code/proposal_demo/proposal_orchestrator/harness/blind_reports/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+    "profile_id": "msca_dn_2026_default",
+    "profile_version": "sha256:550f9528736c9857ec3af8ed57267b98769ed9fe89117bc5e786a3e5f0eac479",
+    "assessor_model": "claude-sonnet-5",
+    "assessor_version": "claude-cli-subscription@2026-10-06",
+    "assessor_pin": "claude-sonnet-5@claude-cli-subscription@2026-10-06",
+    "assessor_transport": "claude-cli",
+    "snapshot_id": "sha256:a5176eef3a01f998367b3eaf356b6f84953beb6da8408ad737460b12533ed24c",
+    "package_id": "sha256:1e929eee75bae6955390d96ee586b5f757eec84701f3de52b873e000d7a64b15",
+    "policy_version": "sha256:edb15758d1faf46a9703de75639bbd1a02f2989041ad1db5556dc85d36281338",
+    "evidence_view": "blind_pre_evaluation",
+    "evidence_source": "dev_graph_blind_view",
+    "preflight_pack_set_hash": "sha256:25d8aae9b31c9a06663aa8c64a2c748b02d9cb943529bb73944af45f435b1130",
+    "preflight_report": "harness/blind_reports/preflight_242f1afb02c8_0001.json",
+    "rubric_set_id": "msca_dn_rubrics",
+    "rubric_set_version": "1.0.0",
+    "rubric_set_fingerprint": "sha256:2bbf01bf81fc3658c75e7f71875f7c0dd17ccaaf916587480d6688ac2f47ce7a",
+    "scorecard_id": "msca_dn_evaluation_scorecard",
+    "scorecard_version": "2.2",
+    "include_claims": false,
+    "intake_id": "msca-dn-2025-sanitised-v1",
+    "esr_availability": "available",
+    "assessed_at": "2026-10-06T17:57:36.860994+00:00",
+    "assessor_invocation": {
+      "tools": "",
+      "strict_mcp_config": true,
+      "working_directory": "C:\\Users\\jozse\\AppData\\Local\\Temp\\blind_assessor_66qh0jze",
+      "working_directory_outside_repository": true
+    }
+  },
+  "preflight_report_sha256": "0df468345dee69303821c38b856c41a3a3442ceb512c0821d3cc00cac58900df",
+  "checks_passed": [
+    "record_type",
+    "binding_fields",
+    "evidence_source",
+    "evidence_bindings",
+    "preflight_binding",
+    "preflight_rebound",
+    "assessor_transport",
+    "pin_names_transport",
+    "scope",
+    "cells_present",
+    "cell_spreads",
+    "criterion_scores_present",
+    "criterion_spreads",
+    "criterion_samples",
+    "criterion_total"
+  ],
+  "cells": [
+    {
+      "criterion_id": "excellence",
+      "expectation_key": "exc-obj",
+      "section_id": "excellence_section",
+      "addressal": true,
+      "grounding": "unassessable",
+      "clean_pass": true,
+      "score": 0.7600000000000001,
+      "n": 3,
+      "agreement": 1.0,
+      "score_spread": 0.06
+    },
+    {
+      "criterion_id": "excellence",
+      "expectation_key": "exc-method",
+      "section_id": "excellence_section",
+      "addressal": true,
+      "grounding": "unassessable",
+      "clean_pass": true,
+      "score": 0.7933333333333333,
+      "n": 3,
+      "agreement": 1.0,
+      "score_spread": 0.04
+    },
+    {
+      "criterion_id": "excellence",
+      "expectation_key": "exc-training",
+      "section_id": "excellence_section",
+      "addressal": true,
+      "grounding": "unassessable",
+      "clean_pass": true,
+      "score": 0.7600000000000001,
+      "n": 3,
+      "agreement": 1.0,
+      "score_spread": 0.06
+    },
+    {
+      "criterion_id": "excellence",
+      "expectation_key": "exc-supervision",
+      "section_id": "excellence_section",
+      "addressal": true,
+      "grounding": "unassessable",
+      "clean_pass": true,
+      "score": 0.6733333333333333,
+      "n": 3,
+      "agreement": 0.6666666666666666,
+      "score_spread": 0.2
+    },
+    {
+      "criterion_id": "impact",
+      "expectation_key": "imp-structuring",
+      "section_id": "impact_section",
+      "addressal": true,
+      "grounding": "unassessable",
+      "clean_pass": true,
+      "score": 0.7399999999999999,
+      "n": 3,
+      "agreement": 1.0,
+      "score_spread": 0.06
+    },
+    {
+      "criterion_id": "impact",
+      "expectation_key": "imp-career",
+      "section_id": "impact_section",
+      "addressal": true,
+      "grounding": "unassessable",
+      "clean_pass": true,
+      "score": 0.7799999999999999,
+      "n": 3,
+      "agreement": 1.0,
+      "score_spread": 0.0
+    },
+    {
+      "criterion_id": "impact",
+      "expectation_key": "imp-dissemination",
+      "section_id": "impact_section",
+      "addressal": false,
+      "grounding": "unassessable",
+      "clean_pass": false,
+      "score": 0.5566666666666666,
+      "n": 3,
+      "agreement": 0.6666666666666666,
+      "score_spread": 0.27
+    },
+    {
+      "criterion_id": "impact",
+      "expectation_key": "imp-magnitude",
+      "section_id": "impact_section",
+      "addressal": false,
+      "grounding": "unassessable",
+      "clean_pass": false,
+      "score": 0.48333333333333334,
+      "n": 3,
+      "agreement": 1.0,
+      "score_spread": 0.05
+    },
+    {
+      "criterion_id": "implementation",
+      "expectation_key": "impl-workplan",
+      "section_id": "implementation_section",
+      "addressal": true,
+      "grounding": "unassessable",
+      "clean_pass": true,
+      "score": 0.7799999999999999,
+      "n": 3,
+      "agreement": 1.0,
+      "score_spread": 0.0
+    },
+    {
+      "criterion_id": "implementation",
+      "expectation_key": "impl-participants",
+      "section_id": "implementation_section",
+      "addressal": true,
+      "grounding": "unassessable",
+      "clean_pass": true,
+      "score": 0.73,
+      "n": 3,
+      "agreement": 1.0,
+      "score_spread": 0.03
+    }
+  ],
+  "criterion_scores": [
+    {
+      "criterion_id": "excellence",
+      "score": 4.0,
+      "spread": 0.3,
+      "threshold": 3.0,
+      "threshold_met": true,
+      "weighted_points": 40.0,
+      "input_hash": "sha256:503ade094320d2bea5bec5cb8e0d3cdea51f0642689e9f14fcd2d495d7628079",
+      "shortcomings": null
+    },
+    {
+      "criterion_id": "impact",
+      "score": 3.3,
+      "spread": 0.4,
+      "threshold": 3.0,
+      "threshold_met": true,
+      "weighted_points": 19.8,
+      "input_hash": "sha256:5f0e3c8cebc1052f29183fa6435064083a676d8f7204d6ee769041901325d9ff",
+      "shortcomings": null
+    },
+    {
+      "criterion_id": "implementation",
+      "score": 3.7,
+      "spread": 0.2,
+      "threshold": 3.0,
+      "threshold_met": true,
+      "weighted_points": 14.8,
+      "input_hash": "sha256:4fb56e6f0a5a558d462b7a6a067ee62c2d1a98bab0dc2991432738769ff2f439",
+      "shortcomings": null
+    }
+  ],
+  "criterion_total": {
+    "formula": "S = 10*excellence + 6*impact + 4*implementation",
+    "total": 74.6,
+    "overall_max": 100.0,
+    "overall_threshold": 70.0,
+    "overall_threshold_met": true,
+    "samples_per_criterion": 5
+  },
+  "spread_label": "within-assessor repeatability: the spread of N samples from one pinned assessor over an identical prompt. It measures that assessor's run-to-run variability and nothing else; it cannot decompose the distance from a human evaluation, which would need a second assessor.",
+  "summary": {
+    "scope": "complete",
+    "cells": 10,
+    "covered": 8,
+    "clean_pass": 8,
+    "missing_sections": 0,
+    "criteria": {
+      "excellence": {
+        "cells": 4,
+        "covered": 4,
+        "clean_pass": 4,
+        "mean_score": 0.7466666666666667
+      },
+      "impact": {
+        "cells": 4,
+        "covered": 2,
+        "clean_pass": 2,
+        "mean_score": 0.6399999999999999
+      },
+      "implementation": {
+        "cells": 2,
+        "covered": 2,
+        "clean_pass": 2,
+        "mean_score": 0.7549999999999999
+      }
+    }
+  },
+  "notes": "Frozen blind baseline. Advisory to a human, never run-blocking. Later stages that claim to read the baseline read the report copy named here and check its sha256 against report_sha256; a stage whose snapshot id differs from bindings.snapshot_id has re-derived the baseline and must say so. Spreads are within-assessor repeatability only."
+}
