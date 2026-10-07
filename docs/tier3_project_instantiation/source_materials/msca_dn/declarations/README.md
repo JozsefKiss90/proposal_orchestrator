@@ -1,0 +1,99 @@
+# Fidelity declarations — the operator's half of the register
+
+The MSCA-DN fidelity register has two halves (spec decision 9).
+
+| Half | Owner | Where it comes from |
+|---|---|---|
+| `derived` | the authoring tools | measured from the sanitised PDF by `tools/import_external_proposal.py` |
+| `declared` | the operator | a file in this directory, one per revision |
+
+Both tools rewrite the whole register on every run, so a declaration typed into
+the register itself is lost at the next run. Declare here instead. The tools
+read these files, carry the rows into the register unchanged, order them by the
+derived inventory, and never write them.
+
+## One file per revision
+
+```
+declarations/sanitised_v1.json      the first sanitised derivative
+declarations/resolved_fixes.json    the revised sanitised derivative
+```
+
+The file name and the body's `revision_id` must agree. A revision reads only
+its own file, so one revision's declarations never reach another's register.
+
+## The format
+
+```json
+{
+  "record_type": "fidelity_declarations",
+  "revision_id": "resolved_fixes",
+  "sub_sections": [
+    {
+      "sub_section_id": "2.1",
+      "presence": {
+        "value": "present",
+        "basis": "read at pp. 14-17 of the sanitised copy",
+        "declared_status": "Confirmed"
+      },
+      "transformation": {
+        "value": "partner names generalised; two passages rephrased",
+        "basis": "operator reading against the original, inside the private network",
+        "declared_status": "Assumed"
+      },
+      "declared_by": "operator",
+      "declared_on": "2026-10-07"
+    }
+  ]
+}
+```
+
+`sub_section_id` must name a sub-section of that revision's derived inventory:
+`1.1` to `1.4`, `2.1` to `2.4`, `3.1`, `3.2`, and `4` to `8`.
+
+`presence` and `transformation` are independent. A present but heavily
+sanitised sub-section is not an absent one, and each field needs its own basis.
+Either may be an object or a plain string. Any further field — evidence,
+reviewer, `declared_status` — travels with the row untouched.
+
+A declaration about fidelity to the **original** submission is checkable only
+inside the private network (PE-09). Declare its status accordingly; the tools
+do not upgrade a status and do not infer one.
+
+## The rules the tools enforce
+
+- A missing file means no declarations. The register then carries the empty
+  declared half it has today, byte for byte. That is a valid state.
+- An empty `sub_sections` list in a present file is equally valid.
+- A malformed file is refused by name and nothing is written: bad JSON, a wrong
+  `record_type`, a `revision_id` that disagrees with the file name, a missing
+  `sub_sections` list, a row that is not an object, a blank `sub_section_id`, a
+  missing or empty `presence` or `transformation`, a sub-section declared
+  twice, or a sub-section the revision does not have.
+- A declaration the register holds and the file here does not is refused, not
+  overwritten. The register records the input bytes it was rendered from, so a
+  row you removed from the file here counts as a withdrawal and the write goes
+  ahead; a row typed into the register itself does not.
+- To withdraw every declaration, leave `sub_sections` empty. Do not delete the
+  file: a deleted file cannot be told from a lost one, and the tools refuse.
+
+## After editing a file here
+
+```
+py -3.10 -m tools.author_msca_dn_workspace     # the first revision's register
+py -3.10 -m tools.import_external_proposal     # every revision's register
+py -3.10 -m tools.author_msca_dn_workspace --check
+py -3.10 -m tools.import_external_proposal --check
+```
+
+Both `--check` commands exit 0 straight after the writes. The register records
+the input's path and sha256 under `declared.declaration_input`, so a later edit
+to a file here shows up as a stale register.
+
+`--check` writes nothing, but it can exit 1 with `refused:` instead of a list of
+stale files: a malformed file here, or a declaration only the register holds, is
+a refusal rather than staleness.
+
+The mechanism, the validation and the missing-input rule are
+`tools/fidelity_declarations.py`. The decision record is
+`docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-input_2026-10-07.json`.

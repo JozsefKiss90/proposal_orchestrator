@@ -14,8 +14,8 @@ What it writes
     file, and a sha256 and page count derived here from the stored bytes.
     The ``derived`` half is rendered through
     ``tools.import_external_proposal.derive_register_half`` (PE-03), so the
-    register has one renderer; the ``declared`` sub-section table stays empty
-    until the operator fills it beside the derived half.
+    register has one renderer; the ``declared`` half comes from the operator's
+    declaration input for that revision, and is empty while no input exists.
 
 ``workspaces/msca_dn/``
     The real project's graph root (spec §6). ``build_snapshot`` resolves its
@@ -46,6 +46,23 @@ The hashes, page counts and the page-32 DN-type phrase are checked against the
 stored files and are ``Confirmed`` by re-derivation in ``tests/test_msca_dn_workspace.py``.
 The ESR's content is not copied into Tier 3; it belongs to PE-08's Tier 4 record.
 
+How an operator declares, and how regeneration keeps it (R01)
+-------------------------------------------------------------
+The register's ``declared`` half is the operator's. It is authored in a durable
+input of its own, one file per revision::
+
+    docs/tier3_project_instantiation/source_materials/msca_dn/declarations/<revision_id>.json
+
+Both tools read it, carry its rows into the register unchanged, and never write
+it. So a declaration survives every later authoring run, and both ``--check``
+commands pass immediately after one. Delete a register and it is rebuilt from
+the PDF and that input. No input means no declarations, and the register keeps
+the empty declared half it has today. A malformed input is refused and nothing
+is written, and so is a declaration the register holds and the input does not —
+unless the operator withdrew it by editing the input. The format, the
+validation, the withdrawal rule and the missing-input rule are
+:mod:`tools.fidelity_declarations`.
+
 Run it from the repository root::
 
     py -3.10 -m tools.author_msca_dn_workspace            # write
@@ -70,6 +87,7 @@ from runner.dev_graph.builder import SOURCES_REL
 from runner.dev_graph.intake import INTAKE_REL, normalise_intake, record_esr_intake
 from runner.paths import find_repo_root
 from runner.source_index import read_page_text
+from tools import fidelity_declarations
 
 # --------------------------------------------------------------------------- #
 # Constants: the spec's names
@@ -252,6 +270,38 @@ def _input_rows(repo_root: Path, revision: Any = None) -> list[dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 
 
+def _render_declared_half(
+    repo_root: Path, revision: Any, derived: dict[str, Any]
+) -> dict[str, Any]:
+    """The register's ``declared`` half: the operator's input, or the empty half.
+
+    The rows come from the revision's durable declaration input and are carried
+    through unchanged (:mod:`tools.fidelity_declarations`). With no input the
+    half is the empty one this tool rendered before R01, byte for byte.
+    """
+    rows, block = fidelity_declarations.declared_half(
+        repo_root,
+        revision.revision_id,
+        revision.register_rel,
+        (row["sub_section_id"] for row in derived["sub_sections"]),
+    )
+    half: dict[str, Any] = {
+        "kind": "declared",
+        "fields_per_sub_section": list(fidelity_declarations.REQUIRED_FIELDS),
+        "note": (
+            "Two independent fields per sub-section: a present but heavily sanitised section is "
+            "not an absent one (spec decision 9). Filled by the operator beside PE-03's derived half."
+        ),
+    }
+    # With no input the half keeps the keys it had before R01, in their order,
+    # so the committed registers stay byte-identical and the comparison
+    # artifacts that recorded their hashes stay replayable.
+    if block is not None:
+        half[fidelity_declarations.INPUT_BLOCK_KEY] = block
+    half[fidelity_declarations.SUB_SECTIONS_KEY] = list(rows)
+    return half
+
+
 def render_register(repo_root: Path, revision: Any = None) -> dict[str, Any]:
     """The fidelity register of *revision*, or of the first sanitised derivative.
 
@@ -276,6 +326,7 @@ def render_register(repo_root: Path, revision: Any = None) -> dict[str, Any]:
         )
     if DN_TYPE_MARKER not in read_page_text(repo_root / revision.pdf_rel, DN_TYPE_PAGE):
         raise AuthoringError(f"candidate: {DN_TYPE_MARKER!r} not found on p. {DN_TYPE_PAGE}")
+    declared_half = _render_declared_half(repo_root, revision, derived)
     register: dict[str, Any] = {
         "record_type": REGISTER_RECORD_TYPE,
         "schema_ref": _SCHEMA_REF,
@@ -377,15 +428,7 @@ def render_register(repo_root: Path, revision: Any = None) -> dict[str, Any]:
             "inputs": rows,
         },
         "derived": derived,
-        "declared": {
-            "kind": "declared",
-            "fields_per_sub_section": ["presence", "transformation"],
-            "note": (
-                "Two independent fields per sub-section: a present but heavily sanitised section is "
-                "not an absent one (spec decision 9). Filled by the operator beside PE-03's derived half."
-            ),
-            "sub_sections": [],
-        },
+        "declared": declared_half,
     }
     if is_first:
         return register
@@ -607,7 +650,12 @@ def render_all(repo_root: Path) -> dict[str, bytes]:
 
 
 def check(repo_root: Path) -> list[str]:
-    """Relative paths whose bytes differ from the rendering, or are absent."""
+    """Relative paths whose bytes differ from the rendering, or are absent.
+
+    Read-only, and it may refuse instead of returning: a malformed declaration
+    input or a declaration the register holds alone is a refusal, not a
+    staleness entry (:mod:`tools.fidelity_declarations`).
+    """
     return [
         rel
         for rel, data in render_all(repo_root).items()
@@ -616,7 +664,18 @@ def check(repo_root: Path) -> list[str]:
 
 
 def author(repo_root: Path) -> list[str]:
-    """Write every file; return the relative paths that changed."""
+    """Write every file; return the relative paths that changed.
+
+    The declaration input of the register this tool writes is read before
+    anything is written, so a malformed one is refused with no file touched.
+    """
+    from tools.import_external_proposal import REVISION_ORIGINAL
+
+    # Only the first revision's register: the later revisions' registers are
+    # the importer's, and that tool validates its own.
+    fidelity_declarations.validate_inputs(
+        repo_root, [(REVISION_ORIGINAL.revision_id, REVISION_ORIGINAL.register_rel)]
+    )
     changed: list[str] = []
     intake_rel = (WORKSPACE_REL / INTAKE_REL / f"{INTAKE_ID}.json").as_posix()
     for rel, data in render_all(repo_root).items():
@@ -653,7 +712,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"wrote: {rel}")
         print("no change" if not changed else f"{len(changed)} file(s) written")
         return 0
-    except AuthoringError as exc:
+    except (AuthoringError, fidelity_declarations.FidelityDeclarationsError) as exc:
         print(f"refused: {exc}", file=sys.stderr)
         return 1
 

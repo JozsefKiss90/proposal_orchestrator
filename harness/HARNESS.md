@@ -380,6 +380,22 @@ extractor, normalisation, table-rendering and claim-extraction versions that PE-
 preflight binds. `tests/test_msca_dn_import.py` re-derives the import and checks every
 sub-section verbatim against the PDF under the declared normalisation.
 
+The register has two halves and two owners. The derived half is measured from the
+PDF by the importer; the declared half is the operator's per-sub-section statement
+of `presence` and `transformation`, and both tools render the whole file on every
+run. So the declared half has a durable input of its own, one file per revision,
+`docs/tier3_project_instantiation/source_materials/msca_dn/declarations/<revision_id>.json`
+(`tools/fidelity_declarations.py`, R01). The tools read it, carry its rows into the
+register unchanged, order them by the derived inventory, and never write it. A
+declaration therefore survives every later authoring run and both `--check`
+commands pass straight after one. No input means no declarations and the register
+keeps the empty declared half it has today, byte for byte, so the comparison
+artifacts that recorded its hash stay replayable. A malformed input is refused
+before anything is written. So is a declaration the register holds and the input
+does not, unless the register records older input bytes than the input now has — the
+operator withdrew that row by editing the input, and the input is the newer
+statement. The declarations directory holds a README with the format.
+
 ## Blind assessment (`blind_assessment.py` + `commands/blind_assessment.py`)
 
 The blind pre-evaluation lane assesses one specified candidate against a

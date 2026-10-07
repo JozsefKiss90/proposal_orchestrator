@@ -47,6 +47,11 @@ index, the document record, the manifest and the register's derived half;
 the workspace tool renders the register through :func:`derive_register_half`
 so the two never disagree on its bytes.
 
+The register's ``declared`` half is the operator's, and neither tool authors
+it. Both read it from the revision's declaration input and carry its rows
+through unchanged, so a declaration survives this tool's rewrite of the
+register (:mod:`tools.fidelity_declarations`, R01).
+
 Run it from the repository root::
 
     py -3.10 -m tools.import_external_proposal            # write
@@ -97,6 +102,7 @@ from runner.external_proposal import (
 from runner.paths import find_repo_root
 from runner.source_index import PAGE_TEXT_METHOD, SOURCE_INDEX_RECORD_TYPE
 from tools import author_msca_dn_workspace as ws
+from tools.fidelity_declarations import FidelityDeclarationsError, validate_inputs
 
 # --------------------------------------------------------------------------- #
 # Constants: the spec's names
@@ -1315,7 +1321,12 @@ def render_all(repo_root: Path) -> dict[str, bytes]:
 
 
 def check(repo_root: Path) -> list[str]:
-    """Relative paths whose bytes differ from the rendering, or are absent."""
+    """Relative paths whose bytes differ from the rendering, or are absent.
+
+    Read-only, and it may refuse instead of returning: a malformed declaration
+    input or a declaration a register holds alone is a refusal, not a staleness
+    entry (:mod:`tools.fidelity_declarations`).
+    """
     return [
         rel
         for rel, data in render_all(repo_root).items()
@@ -1327,8 +1338,11 @@ def author(repo_root: Path) -> list[str]:
     """Write every file; return the relative paths that changed.
 
     The source index is written before any document record, because a record
-    whose spans name records the file does not yet carry would not build.
+    whose spans name records the file does not yet carry would not build. The
+    declaration inputs of every register are read first, so a malformed one is
+    refused before the source index is written.
     """
+    validate_inputs(repo_root, [(r.revision_id, r.register_rel) for r in REVISIONS])
     changed: list[str] = []
     sources_rel = (WORKSPACE_REL / SOURCES_REL).as_posix()
     # Bootstrap: the source index is written first and without building the
@@ -1387,7 +1401,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"wrote: {rel}")
         print("no change" if not changed else f"{len(changed)} file(s) written")
         return 0
-    except (ImportRefused, DevGraphError) as exc:
+    except (ImportRefused, DevGraphError, FidelityDeclarationsError) as exc:
         print(f"refused: {exc}", file=sys.stderr)
         return 1
 
