@@ -14,6 +14,9 @@ copies it, with a freeze record, into a durable baseline directory
 (:mod:`harness.blind_baseline`).  A fifth, ``audit``, runs the Claude-free
 integrity audit over the parsed table rows and the claim ledger and binds the
 result to the frozen baseline when one is given (:mod:`harness.integrity_audit`).
+A sixth, ``compare``, resolves the operator's ESR record and dispositions
+against the frozen baseline and writes the comparison and the revision
+priorities (:mod:`harness.esr_comparison`).
 
 Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
 
@@ -23,6 +26,7 @@ Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT)
     py -3.10 -m harness.commands.blind_assessment verify --report <file> --candidate <dir>
     py -3.10 -m harness.commands.blind_assessment freeze --report <file> --candidate <dir> --baseline-dir <dir>
     py -3.10 -m harness.commands.blind_assessment audit --document <id> [--graph-root <repo>] [--baseline-dir <dir>]
+    py -3.10 -m harness.commands.blind_assessment compare --baseline-dir <dir> --esr <file> --dispositions <file> --candidate <dir> --register <file> --out-dir <dir>
 
 ``preflight`` and ``assess`` share every evidence-selecting flag (``--budget``,
 ``--span-fraction``, ``--no-claims``, ``--criterion-budget``, ``--transport``,
@@ -84,8 +88,18 @@ from harness.blind_assessment import (
     render_report,
     write_report,
 )
-from harness.blind_baseline import freeze_baseline, render_freeze
+from harness.blind_baseline import freeze_baseline, load_frozen_baseline, render_freeze
 from harness.integrity_audit import render_audit, run_audit, write_audit
+from harness.esr_comparison import (
+    EsrComparisonError,
+    load_audits,
+    load_dispositions,
+    load_esr_record,
+    load_register,
+    render_comparison,
+    run_comparison,
+    write_comparison,
+)
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
@@ -135,6 +149,7 @@ DEFAULT_CHECKPOINT_DIR: str = ".harness/checkpoints"
 #: Every fail-closed error the command converts to exit code 2.
 _CLI_ERRORS = (
     BlindAssessmentError,
+    EsrComparisonError,
     DevGraphError,
     RubricError,
     ProfileError,
@@ -480,6 +495,32 @@ def _parser() -> argparse.ArgumentParser:
             "that the baseline was re-derived; without it the report says none was consulted"
         ),
     )
+
+    p_cmp = sub.add_parser(
+        "compare",
+        help=(
+            "ESR comparison: one row per historical observation over the frozen blind "
+            "baseline, dispositions declared by the operator and every reference "
+            "resolved; criterion scores compared separately; no assessor call"
+        ),
+    )
+    p_cmp.add_argument("--baseline-dir", required=True,
+                       help="the frozen blind baseline (relative to --repo-root)")
+    p_cmp.add_argument("--esr", required=True, help="the operator-authored ESR record (JSON)")
+    p_cmp.add_argument("--dispositions", required=True,
+                       help="the operator's dispositions, bound to the baseline report's sha256")
+    p_cmp.add_argument("--candidate", required=True,
+                       help="the materialised candidate directory the baseline is bound to")
+    p_cmp.add_argument("--register", required=True,
+                       help="the fidelity register the dispositions' evidence_basis pointers resolve against")
+    p_cmp.add_argument("--historical-candidate", default=None,
+                       help="an earlier materialised copy, for 'addressed' rows and historical quotes")
+    p_cmp.add_argument("--audit", action="append", default=[],
+                       help="an integrity-audit report the dispositions cite (repeatable)")
+    p_cmp.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
+    p_cmp.add_argument("--profile", default=None)
+    p_cmp.add_argument("--out-dir", required=True,
+                       help="directory for the comparison and revisions artifacts (never overwritten)")
     return ap
 
 
@@ -566,6 +607,53 @@ def _audit(
             print(f"snapshot id after the write: {after} (MOVED from {evidence.snapshot_id})")
             flags.append("snapshot id moved during the audit")
     return 1 if flags else 0
+
+
+def _compare(
+    args: argparse.Namespace,
+    bundle: ProfileBundle,
+    repo_root: Path,
+    clock: Callable[[], str] | None,
+) -> int:
+    """The ``compare`` sub-command: load, bind, resolve every declared reference,
+    write the comparison and the revision priorities."""
+    def _under_root(raw: str) -> Path:
+        p = Path(raw)
+        return p if p.is_absolute() else repo_root / p
+
+    baseline_dir = _under_root(args.baseline_dir)
+    frozen = load_frozen_baseline(baseline_dir)
+    esr = load_esr_record(_under_root(args.esr))
+    dispositions = load_dispositions(_under_root(args.dispositions))
+    candidate_dir = _under_root(args.candidate)
+    candidate = load_candidate(candidate_dir, bundle.profile)
+    historical = None
+    historical_path = None
+    if args.historical_candidate:
+        historical_dir = _under_root(args.historical_candidate)
+        historical = load_candidate(historical_dir, bundle.profile)
+        historical_path = _portable(historical_dir, repo_root)
+    register = load_register(_under_root(args.register))
+    audits = load_audits(args.audit, repo_root=repo_root)
+    report = run_comparison(
+        frozen=frozen,
+        esr=esr,
+        dispositions=dispositions,
+        candidate=candidate,
+        candidate_path=_portable(candidate_dir, repo_root),
+        register=register,
+        historical_candidate=historical,
+        historical_candidate_path=historical_path,
+        audits=audits,
+        repo_root=repo_root,
+        clock=clock,
+    )
+    out_dir = _under_root(args.out_dir)
+    path, revisions = write_comparison(report, out_dir)
+    print(render_comparison(report.data))
+    print(f"\ncomparison -> {path}")
+    print(f"revisions  -> {revisions}")
+    return 1 if report.flags else 0
 
 
 def _portable(path: Path, repo_root: Path) -> str:
@@ -921,6 +1009,8 @@ def main(
             print(render_freeze(frozen.record))
             print(f"\nfrozen -> {frozen.freeze_path}")
             return 0
+        if args.command == "compare":
+            return _compare(args, bundle, repo_root, clock)
 
         out_dir = Path(args.out_dir)
         if not out_dir.is_absolute():

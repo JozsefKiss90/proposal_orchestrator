@@ -1,0 +1,91 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-pe08-esr-comparison_2026-10-07",
+  "date": "2026-10-07",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework, ticket PE-08 (ESR comparison and handoff) in plans/msca_dn_pre_evaluation_spec.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (outputs reproducible from documented inputs), §12.1 (an output names its inputs and flags its assumptions), §12.2 (the four status categories), §12.4 (a missing input is a declared failure, not an inferred completion), §13.5 (no decision held only in agent memory); spec decisions 11, 12, 13 and 14; spec section 1 (a difference from 85.80 is not interpretable as model error).",
+  "decision": "The ESR comparison is a Claude-free command over two operator-authored inputs and the frozen baseline. The ESR record transcribes the historical report one observation per labelled point, verbatim, severity from the ESR's own sentence. The dispositions file declares, per observation, one of the ticket's five dispositions and the references it rests on. The command resolves every reference against the artifact it names (the frozen report copy, the integrity audits, the candidate text, the fidelity register) and refuses the comparison on the first one that does not resolve; nothing is written on refusal. The report keeps the qualitative rows, the summary and the criterion-score table apart; no deduction is attributed to any individual criticism; 'not assessable from this copy' is counted separately, never as a model failure and never dropped; the proposed revisions go to a second artifact in a derived order.",
+  "why": "A disposition is a judgment and the harness cannot make it without an assessor call, which would put the ESR in front of the model the blind lane was built to keep it from. Declaring the dispositions and resolving every declared reference is what keeps the row traceable without that call: the operator says 'the blind lane found this', the command quotes what the blind lane said, and a reference that points at nothing is a refusal rather than a row. The same shape as the fidelity register (spec decision 9): a declared half and a derived half, each marked.",
+  "artifacts": {
+    "declared_status": "Confirmed",
+    "basis": "the files on the branch",
+    "new": [
+      "harness/esr_comparison.py",
+      "tests/harness/test_esr_comparison.py",
+      "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+      "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+      "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json",
+      "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0001.json"
+    ],
+    "changed": [
+      "harness/commands/blind_assessment.py (compare sub-command; EsrComparisonError in the fail-closed set)",
+      "harness/HARNESS.md (ESR comparison section)",
+      "docs/tier4_orchestration_state/decision_log/demo-report_2026-10-03.json, docs/tier4_orchestration_state/validation_reports/demo-report_2026-10-03.json, docs/tier4_orchestration_state/validation_reports/demo-candidate-blind-baseline_2026-10-01.json, plans/reports/dev_graph_demo_report_2026-10-03.md (leakage scan count re-derived to 350, as PE-07 did)"
+    ]
+  },
+  "esr_record": {
+    "declared_status": "Confirmed",
+    "basis": "verbatim transcription of docs/tier3_project_instantiation/source_materials/msca_dn/MSCA DN ESR.pdf (sha256 40a885e8aa593367…), extracted with pypdf on 2026-10-07",
+    "observations": 29,
+    "shortcomings": 15,
+    "strengths": 14,
+    "clusters": "The ESR closes eight groups of points with one severity sentence each (two 'shortcoming', six 'minor shortcoming'). Multi-point clusters C1 (four points) and C7 (three points) are transcribed point by point; each point carries the cluster id and the cluster's severity sentence, so no severity is invented per point. The full sentence is quoted on every point that shares one.",
+    "aspect_and_location": "aspect_id and proposal_location are Inferred: the aspect whose verbatim text the ESR paragraph answers, and the Part B sub-section whose heading is that aspect. No page reference, because the copy is a reflow and no page-based judgment is admissible (spec section 8).",
+    "immutability": "Lives under docs/tier4_orchestration_state/msca_dn/esr/, outside the dev-graph root workspaces/msca_dn/, so it is never snapshotted (spec decision 12). The dispositions bind to it by sha256; editing it invalidates every disposition file."
+  },
+  "dispositions": {
+    "declared_status": "Assumed",
+    "basis": "operator judgment drafted in the Claude Code session that implemented the ticket; every row is a declaration for operator review",
+    "bound_to": "baseline report sha256 f60ae6e0a2a1… (docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06), candidate sha256:242f1afb02c8… (MSCA-DN-2025_sanitised_part_b@b51a103520b58ded), ESR record sha256 as written",
+    "counts": {
+      "independently_detected": 15,
+      "partially_observable": 7,
+      "not_assessable_from_this_copy": 1,
+      "not_detected_despite_sufficient_preserved_evidence": 6,
+      "addressed": 0
+    },
+    "detection": "6 detected + 2 partial of 14 rated shortcomings: rate_detected 0.43, rate_detected_or_partial 0.57. Rated = shortcomings and minor shortcomings neither addressed nor not-assessable; partial rows are reported apart because they rest in part on evidence this copy lacks. Strengths are reported, not rated. 8 strengths carry a blind shortcoming on the praised point and are marked contested.",
+    "by_criterion": "excellence 13 assessable, rate_detected 0.25 (with partial 0.38); impact 7 assessable, rate_detected 1.0; implementation 8 assessable, rate_detected 0.5 (with partial 0.75)",
+    "evidence_preserved_status": "Assumed on every 'not detected' row. The fidelity register's declared half (per-sub-section presence and transformation, spec decision 9) is unfilled in both registers; the rows rest on the derived half and the provenance declarations, and say so. Filling the declared half is open operator work and would let the command check preservation instead of recording it as assumed.",
+    "no_addressed_rows": "The resolved-fixes revision re-typeset page 45 and changed nothing an ESR observation names. The historical candidate (@bdb8670f6987e4db) is still given so both copies are bound and the rule is exercised by the tests.",
+    "not_assessable_row": "ESR-E-05 only: the ESR refers to 'the database' and its contributing clinicians; the copy has no such passage, and the register records prose omitted or rephrased and identifiers generalised. Counted separately, listed last among the open shortcomings as needing the private network (PE-09).",
+    "counts_note": "Counts span shortcomings and strengths: 9 strengths are independently_detected and 5 partially_observable. The rated figures below are over shortcomings only.",
+    "historical_evidence_column": "The submitted document is not in this environment, so the 'historical proposal evidence' column holds quotes re-verified against the earlier sanitised copy (@bdb8670f6987e4db), which stands for the submission only as far as the fidelity register says. Rows whose quotes occur in both copies carry them marked same_as_current; no row declares a separate historical quote."
+  },
+  "rules": {
+    "declared_status": "Confirmed",
+    "basis": "harness/esr_comparison.py: check_row_rules, resolve_blind_reference, resolve_audit_reference, verify_evidence, resolve_pointer; each refusal has a test in tests/harness/test_esr_comparison.py",
+    "independently_detected": "at least one blind or audit finding; the row records which lane(s) detected it. The integrity audit counts as a lane because its findings are deterministic over the same candidate and the row says which lane it was.",
+    "partially_observable": "a finding and a register entry. Used where the blind lane found part of a point (E-04: cohort sizes named, the multi-operator design not) and where a strength is contested by findings that may rest on removed evidence (anonymised supervisors, generalised organisations, lost figures). Reported apart from 'independently_detected' in both detection rates; the second meaning is this ticket's reading of the spec's term, recorded here so a reviewer can disagree with it.",
+    "not_assessable_from_this_copy": "a register entry naming what sanitisation removed; never counted in the detection rate and never dropped from the row count.",
+    "not_detected_despite_sufficient_preserved_evidence": "no finding, the preserved passage quoted and verified in the candidate, and a declared evidence_preserved_status; the only disposition counted against the lane.",
+    "addressed": "a verified quote from each copy; refused for a strength.",
+    "scores": "compared in a separate block with the ESR's 4.20/4.50/4.20 = 85.80 against the baseline's 4.0/3.3/3.7 = 74.6 and the within-assessor spreads; the block states that no deduction is attributed to any criticism and that the difference is not interpretable as model error (spec section 1). No row carries a score.",
+    "detection_rates": "rate_detected counts 'independently_detected' only; rate_detected_or_partial adds 'partially_observable'. The spec names no rate; both are reported so neither reading is hidden."
+  },
+  "what_the_comparison_shows": {
+    "declared_status": "Inferred",
+    "basis": "the committed comparison report; a case study of one proposal-ESR pair, not a validation of scoring accuracy (spec section 8)",
+    "detected_in_full": "methodology at pipeline level without named estimators or metrics (E-01); gender and diversity generic for cardiology (E-06); IP protection not elaborated (I-01); magnitude of impact unquantified (I-02); milestone timing (Q-03, by the audit: M7.3 at M48 against WP7's M1-M36); risks without activation thresholds (Q-04). Partly: the TAVI cohort (E-04: sample sizes named, the multihospital multi-operator design not) and work-package dependencies (Q-01: detected, but the figures the submission may have carried are lost).",
+    "not_detected": "security of clinical data (E-02); retrospective-only evaluation with no prospective plan (E-03); complementation of local training (E-07); entrepreneurship mechanisms (E-08); measurement of supervisory quality (E-09); validation strategy for deliverables (Q-02). Each passage is quoted from the copy, so these are the lane's misses on preserved text, under the Assumed preservation status above.",
+    "blind_findings_on_praised_points": "the 80% non-academic secondment target against the DC table's 74% (I-S01); the communication plan without audience KPIs (I-S04, partial: figures lost); generic hosting (Q-S03, partial: section 5 fully sanitised); generic organisation profiles and uneven supervisor records (Q-S02, E-S05, partial: identifiers generalised).",
+    "the_impact_gap": "The impact criterion carries the largest score difference (4.5 vs 3.3) and the highest detection rate (every rated shortcoming detected). The blind lane rated the ESR's two minor impact shortcomings and three contested strengths more heavily than the evaluators did; which of changed wording, removed evidence and assessor judgment accounts for it is not decidable from this copy."
+  },
+  "checks_run": {
+    "new_tests": "tests/harness/test_esr_comparison.py: 46 passed (unit rules, the command end to end on the synthetic world, the committed MSCA-DN artifacts re-resolved).",
+    "neighbouring_tests": "tests/test_msca_dn_workspace.py, tests/test_msca_dn_import.py, tests/harness/test_blind_leakage.py, test_blind_baseline.py, test_integrity_audit.py, test_evidence_preflight.py, test_boundary.py: 311 passed.",
+    "typecheck": "mypy harness/esr_comparison.py: no error in the module (the repository's 136 pre-existing errors in other files unchanged).",
+    "comparison_run": "compare over the committed artifacts: exit 0, no flag, every reference resolved, comparison_f60ae6e0a2a1_0001.json and revisions_f60ae6e0a2a1_0001.json written (regenerated once after review changed E-04 to partially_observable).",
+    "full_suite": "tests/: 206 failed, 6391 passed, 77 skipped, 5 errors on 2026-10-07; 45 failures are OpenAI-compatible transport HTTP 401s and the rest are the documented pre-existing runner/transport failures. The two leakage-count pins (tests/test_demo_report.py, tests/test_demo_candidate_blind_baseline.py) moved to 350 and were amended as PE-07 did; no failure touches the comparison.",
+    "leakage_scan": "py -3.10 -m runner.leakage_scan over 350 files: no new leak, exit 0, the 11 pre-existing hits in the 22 September purge record unchanged."
+  },
+  "not_done": "No assessor run and no quota spent. The fidelity register's declared half stays unfilled, so every 'not detected' row's preservation is Assumed. The dispositions are not yet reviewed by the operator. The historical-evidence column rests on the earlier sanitised copy, not the submission. PE-09 is declared, not built.",
+  "handoff": "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0001.json lists the 15 open shortcomings in priority order with a proposed revision each, the 8 contested strengths, and no closed row. Priority is derived (severity, criterion weight, disposition, ESR order), never declared.",
+  "spec_deviations": {
+    "declared_status": "Confirmed",
+    "output_naming": "Spec section 6 lays out comparisons/<blind report hash>.json. Implemented as comparison_<sha12>_<NNNN>.json plus revisions_<sha12>_<NNNN>.json so nothing is ever overwritten, the convention the blind-report, preflight and audit writers already follow. The spec text is not amended by this ticket.",
+    "audit_as_a_detection_lane": "The ticket names 'corresponding blind finding if any'. The integrity audit (PE-07, Claude-free, over the same candidate) is admitted as a second lane and every row says which lane detected it, so the blind-only reading can be recovered from detected_by.",
+    "extra_fields": "contests_historical_strength, cell and cell_member references, evidence_preserved_status, needs_private_network, the derived priority rule and the refusal of 'addressed' for a strength are this ticket's additions; none changes a disposition's meaning."
+  }
+}

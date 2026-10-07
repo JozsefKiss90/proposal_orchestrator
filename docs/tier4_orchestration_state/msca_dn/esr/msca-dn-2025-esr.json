@@ -1,0 +1,276 @@
+{
+  "record_type": "esr_record",
+  "schema_version": "1.0",
+  "artifact_purpose": "The historical Evaluation Summary Report of the MSCA-DN 2025 submission, transcribed observation by observation. Immutable Tier 4 record. It lives outside the dev-graph root and is never snapshotted (spec decision 12); the blind lane cannot reach it through the package, and the assessor process runs with no tools from a directory outside the repository.",
+  "spec": "plans/msca_dn_pre_evaluation_spec.md",
+  "ticket": "PE-08",
+  "intake_id": "msca-dn-2025-sanitised-v1",
+  "call_id": "HORIZON-MSCA-2025-DN-01",
+  "submission_id": "MSCA-DN-2025-PROPOSAL-NUMBER-WITHHELD",
+  "source": {
+    "path": "docs/tier3_project_instantiation/source_materials/msca_dn/MSCA DN ESR.pdf",
+    "sha256": "40a885e8aa593367446d5890b040c20bb096bab1c64169c26da2d724225f60bc",
+    "pages": 4,
+    "extraction": "pypdf page text, 2026-10-07; typographic apostrophes and the hyphen in 'AI/ML plans-' kept as extracted"
+  },
+  "authored_by": "operator transcription (Claude Code session, 2026-10-07); every 'text' field is verbatim from the ESR, every 'kind' follows the ESR's own severity wording (spec decision 13)",
+  "declared_status": {
+    "text": "Confirmed",
+    "text_basis": "verbatim quotation of the source PDF",
+    "kind": "Confirmed",
+    "kind_basis": "the severity sentence the ESR attaches to the cluster, quoted under severity_wording; a strength carries the ESR's affirming sentence itself",
+    "aspect_id": "Inferred",
+    "aspect_id_basis": "the aspect whose verbatim text (harness/evaluator_scorecard_msca_dn.json) the ESR paragraph answers; the ESR quotes the aspects in order before each criterion comment",
+    "proposal_location": "Inferred",
+    "proposal_location_basis": "the candidate sub-section whose Part B heading is that aspect (spec section 4.1 page map); not a page reference, because the copy is a reflow and no page-based judgment is admissible"
+  },
+  "evaluation_result": {
+    "total": 85.8,
+    "overall_threshold": 70,
+    "overall_max": 100,
+    "result_wording": "Evaluation Result Total score: 85.80 % (Threshold: 70 /100.00)",
+    "criteria": [
+      {"criterion_id": "excellence", "registry_criterion_id": "Excellence", "score": 4.2, "threshold": 3, "weight_pct": 50,
+       "wording": "Criterion 1 - Excellence Score:  4.20 (Threshold: 3 / 5.00 , Weight: 50.00% )"},
+      {"criterion_id": "impact", "registry_criterion_id": "Impact", "score": 4.5, "threshold": 3, "weight_pct": 30,
+       "wording": "Criterion 2 - Impact Score:  4.50 (Threshold: 3 / 5.00 , Weight: 30.00%"},
+      {"criterion_id": "implementation", "registry_criterion_id": "Implementation", "score": 4.2, "threshold": 3, "weight_pct": 20,
+       "wording": "Criterion 3 - implementation Score:  4.20 (Threshold: 3 / 5.00 , Weight: 20.00% )"}
+    ],
+    "arithmetic_check": "10*4.2 + 6*4.5 + 4*4.2 = 42 + 27 + 16.8 = 85.8 (spec section 3.3)"
+  },
+  "clusters": {
+    "note": "The ESR closes each group of related points with one severity sentence. An observation carries the id of its cluster and the cluster's severity sentence, so a multi-point cluster can be compared point by point without inventing a severity per point.",
+    "ESR-C1": {"criterion_id": "excellence", "severity": "shortcoming", "wording": "Together, these constitute a shortcoming."},
+    "ESR-C2": {"criterion_id": "excellence", "severity": "minor_shortcoming", "wording": "This is a minor shortcoming."},
+    "ESR-C3": {"criterion_id": "excellence", "severity": "minor_shortcoming", "wording": "These constitute a minor shortcoming."},
+    "ESR-C4": {"criterion_id": "excellence", "severity": "minor_shortcoming", "wording": "This is minor shortcoming."},
+    "ESR-C5": {"criterion_id": "impact", "severity": "minor_shortcoming", "wording": "this is a minor shortcoming."},
+    "ESR-C6": {"criterion_id": "impact", "severity": "minor_shortcoming", "wording": "This is a minor shortcoming."},
+    "ESR-C7": {"criterion_id": "implementation", "severity": "shortcoming", "wording": "These issues together are a shortcoming."},
+    "ESR-C8": {"criterion_id": "implementation", "severity": "minor_shortcoming", "wording": "This is a minor shortcoming."}
+  },
+  "observations": [
+    {
+      "id": "ESR-E-S01", "criterion_id": "excellence", "aspect_id": "exc-obj", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "The proposal presents clear objectives to develop AI-technologies for cardiovascular healthcare, with concrete measures that make them overall verifiable and achievable within the project's timeframe. The individual projects of the recruited researchers are appropriately articulated and convincingly integrated to support and strengthen the coherent outcomes of the research programme. The project goes beyond the state of the art in cardiovascular care and it is ambitious.",
+      "esr_location": {"page": [1, 2], "block": "Criterion 1 comment, sentences 1-3"},
+      "proposal_location": ["1.1"]
+    },
+    {
+      "id": "ESR-E-S02", "criterion_id": "excellence", "aspect_id": "exc-method", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "Overall, the methodology is clearly described, including the underlying concepts and models are mostly detailed. Several aspects of interdisciplinary approaches are coherent, and well-integrated to carry out the objectives of the proposal.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, sentences 4-5"},
+      "proposal_location": ["1.2"]
+    },
+    {
+      "id": "ESR-E-01", "criterion_id": "excellence", "aspect_id": "exc-method", "kind": "shortcoming", "cluster_id": "ESR-C1",
+      "severity_wording": "Together, these constitute a shortcoming.",
+      "point": "AI/ML conceptual paradigms, methods and validation metrics insufficiently detailed",
+      "text": "However, AI/ML plans- specifically conceptual paradigms, methods, and validation metrics, as well as critical security aspects for handling clinical data with AI are insufficiently detailed.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C1 point 1"},
+      "proposal_location": ["1.2"]
+    },
+    {
+      "id": "ESR-E-02", "criterion_id": "excellence", "aspect_id": "exc-method", "kind": "shortcoming", "cluster_id": "ESR-C1",
+      "severity_wording": "Together, these constitute a shortcoming.",
+      "point": "security aspects for handling clinical data with AI insufficiently detailed",
+      "text": "However, AI/ML plans- specifically conceptual paradigms, methods, and validation metrics, as well as critical security aspects for handling clinical data with AI are insufficiently detailed.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C1 point 1, second clause"},
+      "proposal_location": ["1.2"]
+    },
+    {
+      "id": "ESR-E-03", "criterion_id": "excellence", "aspect_id": "exc-method", "kind": "shortcoming", "cluster_id": "ESR-C1",
+      "severity_wording": "Together, these constitute a shortcoming.",
+      "point": "retrospective-only evaluation; limited prospective validation",
+      "text": "It is also not fully clear how some of the chosen methods will deliver key objectives: cardiovascular AI models are evaluated only retrospectively with limited plans for prospective validation;",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C1 point 2"},
+      "proposal_location": ["1.2", "1.1", "3.1"]
+    },
+    {
+      "id": "ESR-E-04", "criterion_id": "excellence", "aspect_id": "exc-method", "kind": "shortcoming", "cluster_id": "ESR-C1",
+      "severity_wording": "Together, these constitute a shortcoming.",
+      "point": "TAVI cohort not sufficient for a multihospital, multi-operator design",
+      "text": "the cohort is not sufficient concerning the multihospital, multi-operator design needed to reflect contemporary European TAVI practice to capture the diversity;",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C1 point 3"},
+      "proposal_location": ["3.1", "1.2"]
+    },
+    {
+      "id": "ESR-E-05", "criterion_id": "excellence", "aspect_id": "exc-method", "kind": "shortcoming", "cluster_id": "ESR-C1",
+      "severity_wording": "Together, these constitute a shortcoming.",
+      "point": "number of contributing clinicians to the database not well specified",
+      "text": "and the number of contributing clinicians to the database is not well-specified.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C1 point 4"},
+      "proposal_location": ["1.2", "1.1"]
+    },
+    {
+      "id": "ESR-E-06", "criterion_id": "excellence", "aspect_id": "exc-method", "kind": "minor_shortcoming", "cluster_id": "ESR-C2",
+      "severity_wording": "This is a minor shortcoming.",
+      "point": "gender and diversity not detailed enough for their role in cardiology",
+      "text": "Gender and other diversity characteristics relevant to this research are mostly appropriately considered in the research methodology as scientific variables (disaggregated data, subgroup calibration, bias mitigation), however, they are not detailed enough regarding their essential role in clinical issues in cardiology.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C2"},
+      "proposal_location": ["1.2"]
+    },
+    {
+      "id": "ESR-E-S03", "criterion_id": "excellence", "aspect_id": "exc-method", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "Open science practices, such as preprints, and repositories, are included and adequately described in the proposed methodology.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, open science sentence"},
+      "proposal_location": ["1.2"]
+    },
+    {
+      "id": "ESR-E-S04", "criterion_id": "excellence", "aspect_id": "exc-training", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "In general, a solid training framework with meaningful network-wide events - supporting well-structured scientific and transferable training - is described in the proposal. The training programme effectively integrates intersectoral and transferable skills through training schools, courses, conferences and secondments.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, training sentences 1-2"},
+      "proposal_location": ["1.3"]
+    },
+    {
+      "id": "ESR-E-07", "criterion_id": "excellence", "aspect_id": "exc-training", "kind": "minor_shortcoming", "cluster_id": "ESR-C3",
+      "severity_wording": "These constitute a minor shortcoming.",
+      "point": "complementation of local training described with limited clarity and depth",
+      "text": "While network-wide training overall complements the local training programmes, there is a slight limitation in clarity and depth in systematic description of complementation of local training.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C3 point 1"},
+      "proposal_location": ["1.3"]
+    },
+    {
+      "id": "ESR-E-08", "criterion_id": "excellence", "aspect_id": "exc-training", "kind": "minor_shortcoming", "cluster_id": "ESR-C3",
+      "severity_wording": "These constitute a minor shortcoming.",
+      "point": "entrepreneurship training lacks mechanisms for practical application",
+      "text": "In addition, some details for training are not properly described, for example, the integration of entrepreneurship training lacks clear mechanisms for practical application.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C3 point 2"},
+      "proposal_location": ["1.3", "2.2"]
+    },
+    {
+      "id": "ESR-E-S05", "criterion_id": "excellence", "aspect_id": "exc-supervision", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "The supervisors are experienced and highly qualified in their scientific roles. They demonstrate appropriate international and local experience across all relevant areas and facilitating the adequate and effective completion the individual research projects. The well-structured and multi-layered approach of supervision practices is solid and overall sound. It ensures effective progress monitoring, feedback and support for the fellows; for example, well-defined and reviewed Personal Career Development Plans ensure systematic tracking of training objectives.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, supervision sentences 1-4"},
+      "proposal_location": ["1.4"]
+    },
+    {
+      "id": "ESR-E-09", "criterion_id": "excellence", "aspect_id": "exc-supervision", "kind": "minor_shortcoming", "cluster_id": "ESR-C4",
+      "severity_wording": "This is minor shortcoming.",
+      "point": "how supervisory quality will be measured stays generic",
+      "text": "However, the description remains slightly generic on how the quality of supervisory practices will be measured.",
+      "esr_location": {"page": 2, "block": "Criterion 1 comment, cluster C4"},
+      "proposal_location": ["1.4"]
+    },
+    {
+      "id": "ESR-I-S01", "criterion_id": "impact", "aspect_id": "imp-structuring", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "Non-academic sector contribution to doctoral training is well described and compelling; they have a meaningful and tangible role through structured secondments in hospitals, SMEs, and regulatory bodies, ensuring hands-on exposure to clinical workflows, compliance, and innovation. Industry and regulatory partners actively co-supervise doctoral candidates (DCs), participate the Individual Training Panels, and the Supervisory Board, and lead network-wide training sessions.",
+      "esr_location": {"page": 3, "block": "Criterion 2 comment, sentences 1-2"},
+      "proposal_location": ["2.1"]
+    },
+    {
+      "id": "ESR-I-S02", "criterion_id": "impact", "aspect_id": "imp-structuring", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "Several elements are convincingly sustained after the project; these include e.g. the development of a virtual knowledge hub. The robust strategies and mechanisms described ensure a sustained long-term collaboration, and foster future international and intersectoral research and cooperation.",
+      "esr_location": {"page": 3, "block": "Criterion 2 comment, sentences 3-4"},
+      "proposal_location": ["2.1"]
+    },
+    {
+      "id": "ESR-I-S03", "criterion_id": "impact", "aspect_id": "imp-career", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "The project provides a robust and well-structured framework and environment to equip fellows with both technical and transferable skills, significantly enhancing and ensuring the future employability in both academia and industry. Specifically, the profile of fellows in trustworthy AI for clinical issues is highly relevant for hospitals, industry R&D departments, start-ups and research infrastructures. Transferable skills are integrated in the training, and intersectoral secondments and co-supervision expose fellows to hospitals, SMEs, and regulatory bodies, ensuring practical experience and networking. The measures to enhance the career perspectives of fellows are highly relevant and comprehensive and designed to prepare fellows for multidisciplinary careers.",
+      "esr_location": {"page": 3, "block": "Criterion 2 comment, career sentences"},
+      "proposal_location": ["2.2"]
+    },
+    {
+      "id": "ESR-I-S04", "criterion_id": "impact", "aspect_id": "imp-dissemination", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "The dissemination, exploitation, and communication measures are comprehensive, and well-structured, with clear objectives and monitoring through measurable indicators. The target groups for these measures are clearly identified. The outline of intellectual property management strategy is mostly appropriately addressed.",
+      "esr_location": {"page": 3, "block": "Criterion 2 comment, dissemination sentences 1-3"},
+      "proposal_location": ["2.3"]
+    },
+    {
+      "id": "ESR-I-01", "criterion_id": "impact", "aspect_id": "imp-dissemination", "kind": "minor_shortcoming", "cluster_id": "ESR-C5",
+      "severity_wording": "this is a minor shortcoming.",
+      "point": "strategies to protect industrial and other relevant outcomes not convincingly elaborated",
+      "text": "However, suitable strategies to protect industrial and other relevant outcomes are not convincingly elaborated; this is a minor shortcoming.",
+      "esr_location": {"page": 3, "block": "Criterion 2 comment, cluster C5"},
+      "proposal_location": ["2.3"]
+    },
+    {
+      "id": "ESR-I-S05", "criterion_id": "impact", "aspect_id": "imp-magnitude", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "The expected scientific impact is highly credible with clear breakthroughs in causal modelling. For example, the integration of regulatory-grade pipelines aligned with regulatory frameworks adds robustness. Indicators, such as cross-site transportability, make the scientific outcomes measurable and realistic. Societal impact is well-justified: effective and safe integration of AI in healthcare and regulatory frameworks will largely affect the quality of the cardiovascular care provided to patients, and is addressing patient benefit, healthcare-system resilience, and policy uptake.",
+      "esr_location": {"page": 3, "block": "Criterion 2 comment, impact sentences 1-4"},
+      "proposal_location": ["2.4"]
+    },
+    {
+      "id": "ESR-I-02", "criterion_id": "impact", "aspect_id": "imp-magnitude", "kind": "minor_shortcoming", "cluster_id": "ESR-C6",
+      "severity_wording": "This is a minor shortcoming.",
+      "point": "magnitude of economic and technological impact insufficiently presented in specific measures",
+      "text": "Economic and technological impacts, such as validated causal AI and interoperability with European Health Data Space/Fast Healthcare Interoperability Resources (EHDS/FHIR), and human capital development through multi-sector training, are overall valid, especially in a long-term, however, the magnitude in terms of specific measures is insufficiently presented in the proposal.",
+      "esr_location": {"page": [3, 4], "block": "Criterion 2 comment, cluster C6"},
+      "proposal_location": ["2.4"]
+    },
+    {
+      "id": "ESR-Q-S01", "criterion_id": "implementation", "aspect_id": "impl-workplan", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "text": "The work plan is overall of good quality. The work packages (WPs) are clearly aligned with the project objectives, and the allocation of WPs and tasks is coherent. Each WP includes generally well-defined and appropriate deliverables and milestones.",
+      "esr_location": {"page": 4, "block": "Criterion 3 comment, sentences 1-3"},
+      "proposal_location": ["3.1"]
+    },
+    {
+      "id": "ESR-Q-01", "criterion_id": "implementation", "aspect_id": "impl-workplan", "kind": "shortcoming", "cluster_id": "ESR-C7",
+      "severity_wording": "These issues together are a shortcoming.",
+      "point": "dependencies between work packages not described",
+      "text": "However, several aspects lack appropriate detail such as the description of dependencies between work packages.",
+      "esr_location": {"page": 4, "block": "Criterion 3 comment, cluster C7 point 1"},
+      "proposal_location": ["3.1"]
+    },
+    {
+      "id": "ESR-Q-02", "criterion_id": "implementation", "aspect_id": "impl-workplan", "kind": "shortcoming", "cluster_id": "ESR-C7",
+      "severity_wording": "These issues together are a shortcoming.",
+      "point": "validation strategy for certain deliverables not fully specified",
+      "text": "In addition, the validation strategy for certain deliverables is not fully specified",
+      "esr_location": {"page": 4, "block": "Criterion 3 comment, cluster C7 point 2"},
+      "proposal_location": ["3.1"]
+    },
+    {
+      "id": "ESR-Q-03", "criterion_id": "implementation", "aspect_id": "impl-workplan", "kind": "shortcoming", "cluster_id": "ESR-C7",
+      "severity_wording": "These issues together are a shortcoming.",
+      "point": "definitions and timing of some milestones not aligned with the overall proposal",
+      "text": "and the definitions and timing of some milestones is not well aligned with the overall proposal.",
+      "esr_location": {"page": 4, "block": "Criterion 3 comment, cluster C7 point 3"},
+      "proposal_location": ["3.1"]
+    },
+    {
+      "id": "ESR-Q-04", "criterion_id": "implementation", "aspect_id": "impl-workplan", "kind": "minor_shortcoming", "cluster_id": "ESR-C8",
+      "severity_wording": "This is a minor shortcoming.",
+      "point": "some risk descriptions generic, without measurable activation thresholds",
+      "text": "Risk management is present and generally credible, with several appropriate mitigation measures. However, certain descriptions of risks remain generic and oversimplified, without measurable thresholds for activation of the mitigation.",
+      "esr_location": {"page": 4, "block": "Criterion 3 comment, cluster C8"},
+      "proposal_location": ["3.1"]
+    },
+    {
+      "id": "ESR-Q-S02", "criterion_id": "implementation", "aspect_id": "impl-participants", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "point": "capacity, infrastructure and consortium structure",
+      "text": "The participating organisations have the required high-quality infrastructure and capacity to implement research of high quality and their tasks. The international consortium is well-structured, integrating academic and non-academic partners with expertise, complementary strengths, and interdisciplinary knowledge, matching with the project's objectives, and reinforcing the structural and functional capability of the Doctoral Network.",
+      "esr_location": {"page": 4, "block": "Criterion 3 comment, participants sentences 1-2"},
+      "proposal_location": ["3.2", "8"]
+    },
+    {
+      "id": "ESR-Q-S03", "criterion_id": "implementation", "aspect_id": "impl-participants", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "point": "hosting arrangements",
+      "text": "Hosting arrangements via accredited doctoral schools and international offices are credible and supportive.",
+      "esr_location": {"page": 4, "block": "Criterion 3 comment, participants sentence 3"},
+      "proposal_location": ["3.2", "5"]
+    },
+    {
+      "id": "ESR-Q-S04", "criterion_id": "implementation", "aspect_id": "impl-participants", "kind": "strength", "cluster_id": null,
+      "severity_wording": null,
+      "point": "associated partners' roles",
+      "text": "The roles of all associated partners are described in detail",
+      "esr_location": {"page": 4, "block": "Criterion 3 comment, participants sentence 4 (the extracted text ends here)"},
+      "proposal_location": ["3.2", "8"]
+    }
+  ]
+}

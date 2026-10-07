@@ -10,7 +10,7 @@
     "The scope record decision_log/dev-graph-demo-scope_2026-09-29.json supplies the four questions."
   ],
   "question_asked": "Does the demo report answer every scope question from a Tier 4 artifact, list the defects as Milestone 2 candidates, and does the leakage test pass on the whole branch?",
-  "answer": "Three of three. Every one of the four scope questions is answered in the report's first table with the artifact it reads, and tests/test_demo_report.py re-derives the figures. Twenty-six defects are listed as candidates M1 to M26 with their source records. The leakage scan over 338 files (re-derived 2026-10-06 after the MSCA-DN resolved-fixes revision added its fidelity register and decision record to PE-01 to PE-07's fourteen Tier 3/4 records; the 2026-10-05 scan saw 336 and the 2026-10-03 scan saw 322) reports no new leak and 11 recorded pre-existing hits in the 22 September purge record, exit 0.",
+  "answer": "Three of three. Every one of the four scope questions is answered in the report's first table with the artifact it reads, and tests/test_demo_report.py re-derives the figures. Twenty-six defects are listed as candidates M1 to M26 with their source records. The leakage scan over 350 files (re-derived 2026-10-07 after the PE-06 freeze, the PE-07 audit of the resolved-fixes revision and PE-08's five records were added; the 2026-10-06 scan saw 338, the 2026-10-05 scan saw 336 and the 2026-10-03 scan saw 322) reports no new leak and 11 recorded pre-existing hits in the 22 September purge record, exit 0.",
   "what_ran": {
     "leakage_scan": "py -3.10 -m runner.leakage_scan: 336 files (re-derived 2026-10-06 after the MSCA-DN resolved-fixes revision added its fidelity register and decision record to PE-01 to PE-07's fourteen Tier 3/4 records; the 2026-10-05 scan saw 336 and the 2026-10-03 scan saw 322) in Tier 3, Tier 4, Tier 5 and the vault, this ticket's two records included; 0 new leaks; 11 pre-existing hits, all in decision_log/project-purge-clean-engine-base_2026-09-22.json; exit 0.",
     "derivation_checks": "tools.build_demo_dev_graph --check (38 of 38 artifacts up to date); tools.run_demo_change_scenarios --check (7 scenarios OK); tools.derive_dev_graph_run_records --check (17 records unchanged); tools.preserve_run_manifests --check (2 records unchanged); tools.derive_run_phase_costs --check (unchanged). All run 2026-10-03.",
@@ -133,7 +133,7 @@
       ]
     },
     "leakage_scan": {
-      "files_scanned": 338,
+      "files_scanned": 350,
       "new_leaks": 0,
       "pre_existing_hits": 11
     }

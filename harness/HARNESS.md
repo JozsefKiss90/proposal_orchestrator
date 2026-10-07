@@ -390,9 +390,10 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Piece | Where |
 |---|---|
 | Candidate loader, content hash, bound report, writer, loader | `harness/blind_assessment.py` |
-| Module command (`preflight`, `assess`, `verify`, `freeze`, `audit`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Module command (`preflight`, `assess`, `verify`, `freeze`, `audit`, `compare`) | `py -3.10 -m harness.commands.blind_assessment` |
 | Frozen baseline: conditions, byte copy, freeze record, hash-checked loader | `harness/blind_baseline.py`; `--baseline-dir <dir>/blind_baseline_<sha12>.json` + `.freeze.json` |
 | Integrity audit: five consistency checks over parsed rows, grounding axis Unresolved, baseline binding | `harness/integrity_audit.py`; reports `<out-dir>/integrity_<hash12>_<NNNN>.json` |
+| ESR comparison: one row per historical observation, declared dispositions resolved against the frozen baseline, scores compared apart | `harness/esr_comparison.py`; `<out-dir>/comparison_<sha12>_<NNNN>.json` + `revisions_<sha12>_<NNNN>.json` |
 | Evidence preflight: realised pack set, pack-set hash, seven-section report | `harness/evidence_preflight.py`; reports `harness/blind_reports/preflight_<hash12>_<NNNN>.json` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
@@ -655,6 +656,72 @@ hash and snapshot id equal), `re-derived` (same candidate, moved snapshot id;
 flagged), `candidate_differs`, or `snapshot_unknown` (directory route). Without
 it the report says no baseline was consulted. Exit `1` on any flag, `2` when
 the audit could not run (a baseline directory with no readable freeze included).
+
+**ESR comparison (`esr_comparison.py`, spec PE-08).** A Claude-free comparison
+of the frozen blind baseline with the historical Evaluation Summary Report:
+
+    py -3.10 -m harness.commands.blind_assessment compare --baseline-dir <dir> --esr <esr.json>
+        --dispositions <dispositions.json> --candidate <dir> --register <fidelity_register.json>
+        [--historical-candidate <dir>] [--audit <integrity_*.json> ...] --out-dir <dir>
+
+(one command line; wrapped here for width)
+
+Two inputs are operator-authored. The **ESR record** transcribes the report
+one observation per labelled point. The text is verbatim and the severity is
+the ESR's own sentence (spec decision 13); strengths are recorded too. The
+**dispositions** are the declared half. They bind to one baseline by the
+report copy's sha256 and to one ESR record by its sha256. Each row names a
+disposition from the closed set, the blind and audit findings it rests on,
+the candidate passages it quotes, the register entries it relies on, an
+explanation, and a proposed revision.
+
+The command turns declarations into traceable rows by resolving every
+reference. A blind reference (`criterion_shortcoming`, `criterion_strength`,
+`cell`, `cell_member`) is quoted from the frozen report copy. An audit
+reference (`report`, `check`, `index`) is quoted from an audit given on the
+command line, which must be over a candidate in play. A quote must occur in
+the named sub-section's text, ligatures folded and whitespace collapsed. A
+register pointer (`derived/figures/images_on_any_page`, `/`-separated because
+sub-section ids carry dots) is resolved to its value. When a historical copy
+is given and a row declares no historical quote, its current quotes are
+re-verified against that copy and stand for it where they occur. One
+unresolved reference refuses the comparison and nothing is written.
+
+The dispositions are the ticket's five, each with the basis it must carry:
+
+| Disposition | Needs |
+|---|---|
+| `independently_detected` | a blind or audit finding; the row records `detected_by` lane(s) |
+| `partially_observable` | a finding and a register entry naming what the copy preserves only in part |
+| `not_assessable_from_this_copy` | a register entry naming what sanitisation removed |
+| `not_detected_despite_sufficient_preserved_evidence` | the preserved passage quoted and verified, no finding, a declared `evidence_preserved_status` |
+| `addressed` | a verified quote from the historical copy and one from the current copy; never for a strength |
+
+The summary counts every disposition and states `assessable` and the
+`assessable_fraction`. Detection is rated only over shortcomings that are
+neither `addressed` nor `not_assessable`, as two figures: `rate_detected`
+counts only `independently_detected`, and `rate_detected_or_partial` adds the
+partial rows, whose evidence this copy only partly carries. `not_assessable`
+is counted separately, never as a failure, never dropped. A blind shortcoming cited on
+an ESR strength marks the row `contests_historical_strength`. Criterion
+scores are compared in a separate `score_comparison` block (historical score,
+blind median, spread, difference, total) that states no deduction is
+attributed to any individual criticism and that the difference is not
+interpretable as model error. The revisions go to a second artifact in a
+derived order (severity, criterion weight, disposition, ESR order), with
+`addressed` rows listed as closed; an open shortcoming without a proposed
+revision is a flag (exit `1`). Nothing is overwritten: both artifacts take
+the next sequence number for the baseline's hash.
+
+On the MSCA-DN case the committed ESR record carries 29 observations: 15
+shortcomings (8 in the two 'shortcoming' clusters, 7 minor) and 14 strengths.
+Of the 14 rated shortcomings the blind or audit lane detected 6 and partly
+observed 2; 6 were not detected on preserved text and 1 is not assessable
+from this copy. Of the 14 strengths, 9 are matched by blind strengths and 5
+are partly observable, with 8 carrying a blind shortcoming on the praised
+point. No row is `addressed`. The dispositions are declarations for operator
+review; `tests/harness/test_esr_comparison.py` re-resolves them against the
+committed artifacts.
 
 ## Response checkpoint and the bounded re-ask (`response_cache.py`)
 
