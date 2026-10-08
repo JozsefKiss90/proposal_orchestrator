@@ -1,0 +1,240 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-extraction-environment-pin_2026-10-08",
+  "date": "2026-10-08",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation, ticket V01 (Pin the extraction environment and reproduce both sanitised imports) in plans/msca_dn_historical_validation_tickets.md; closes finding F01 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (an output is reproducible from its documented inputs, and where it is not the inputs and parameters are documented so it is auditable), §12.1 (an output names its inputs and flags its assumptions), §12.2 (the four status categories), §15 (a declared gap over a fabricated completion). Ticket V01. Not a constitutional amendment.",
+  "decision": "The extraction library is pinned exactly. requirements.txt reads pymupdf==1.28.2 in place of pymupdf>=1.24.0, and runner/extraction_environment.py holds the pin, measures the running environment and names the difference. Both --check commands report the comparison when they find staleness, so an engineer whose replay fails reads which library they are running rather than only that an unfamiliar hash was expected. No committed artifact changed: both committed document versions reproduce byte-equal under the pin, and the frozen 74.60 baseline and every hash binding of the blind lane are untouched.",
+  "why": "runner/external_proposal.py versions what the importer does to a page. It cannot version what MuPDF does to the page before the importer sees it. The page text, the text blocks and the found tables are MuPDF's, so a MuPDF build that groups glyphs into blocks differently yields a different paragraph stream from the same PDF bytes, and therefore a different document content version. The audit met exactly that and could not name its cause. A lower bound of 1.24.0 is not a replay environment: it admits a release with no pymupdf module at all.",
+  "divergence": {
+    "declared_status": "Confirmed",
+    "basis": "measured on this checkout at 621ec1a, by running tools.author_msca_dn_workspace and tools.import_external_proposal under seven PyMuPDF releases in isolated virtual environments, with the interpreter held at Python 3.10.6 so the library is the only variable",
+    "symptom": "In an off-pin environment tools.import_external_proposal --check exits 1 and tools.author_msca_dn_workspace --check reports the first revision's fidelity register as changed. Neither originally said why.",
+    "cause": {
+      "declared_status": "Confirmed",
+      "statement": "PyMuPDF 1.26.6 through 1.27.2 split the first wrapped line of a numbered list item into a text block of its own. PyMuPDF 1.28.0 and 1.28.2 return the whole list item as one block. The importer makes one paragraph per text block, so the same PDF yields five extra paragraphs in sub-section 1.1 and three in sub-section 1.3 under the earlier builds. No importer rule rejoins them: the page-crossing join of runner.external_proposal.join_segments applies across a page boundary, and every one of these eight splits is inside a single page.",
+      "list_items_that_split": [
+        {
+          "sub_section": "1.1",
+          "page": 1,
+          "item": "1. to replace correlation-centric models with causal objectives and counterfactual | evaluation;"
+        },
+        {
+          "sub_section": "1.1",
+          "page": 1,
+          "item": "4. to execute healthcare-embedded case studies that generate evidence on safety, | adoption and value."
+        },
+        {
+          "sub_section": "1.1",
+          "page": 14,
+          "item": "1. Reference methodologies for causal estimation, explainability, uncertainty | analysis and sensitivity assessment."
+        },
+        {
+          "sub_section": "1.1",
+          "page": 14,
+          "item": "3. A new generation of researchers trained at the intersection of AI, healthcare and | governance."
+        },
+        {
+          "sub_section": "1.1",
+          "page": 14,
+          "item": "4. Demonstrated clinical adaptation workflows supported by implementation and | compliance frameworks."
+        },
+        {
+          "sub_section": "1.3",
+          "page": 22,
+          "item": "1. Individual research and local doctoral training at the host institution, including | enrolment in an accredited PhD programme and discipline-specific coursework;"
+        },
+        {
+          "sub_section": "1.3",
+          "page": 22,
+          "item": "2. Network-wide scientific and transferable skills training, delivered through | dedicated schools, workshops and online modules; and"
+        },
+        {
+          "sub_section": "1.3",
+          "page": 23,
+          "item": "3. Intersectoral and international secondments in hospitals, industry and | regulatory/standardisation bodies, where candidates apply causal AI methods in real-world health settings."
+        }
+      ],
+      "list_items_that_split_note": "The pipe marks where the off-pin build ends one block and opens the next. The text either side is identical; only the block boundary differs.",
+      "character_arithmetic": "The register's characters count the sub-section content, which joins paragraphs with a blank line. Each split loses one character, the single space the whitespace collapse put between the two halves of the one block, and gains a two-character paragraph separator. Five splits in 1.1 therefore move 19,601 to 19,606, and three in 1.3 move 10,010 to 10,013. The extracted text shrinks while the recorded character count grows, which is why the divergence does not read as a loss.",
+      "off_pin_document_version": "MSCA-DN-2025_sanitised_part_b@842a80dea6920270",
+      "off_pin_document_version_note": "All four off-pin builds derive this one identifier, so the divergence is a single stable behavioural difference and not version-to-version noise."
+    },
+    "register_differences": [
+      {
+        "measure": "sub_section_1.1_paragraphs",
+        "committed": 302,
+        "off_pin": 307,
+        "difference": 5
+      },
+      {
+        "measure": "sub_section_1.1_characters",
+        "committed": 19601,
+        "off_pin": 19606,
+        "difference": 5
+      },
+      {
+        "measure": "sub_section_1.3_paragraphs",
+        "committed": 66,
+        "off_pin": 69,
+        "difference": 3
+      },
+      {
+        "measure": "sub_section_1.3_characters",
+        "committed": 10010,
+        "off_pin": 10013,
+        "difference": 3
+      }
+    ],
+    "register_differences_basis": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json derived half as committed, against the same file rendered read-only under PyMuPDF 1.26.6. A field-by-field comparison of the two renderings found these four differences and no others: the audit's four rows are the whole of the register divergence.",
+    "measured_matrix": [
+      {
+        "pymupdf": "1.24.0",
+        "mupdf": null,
+        "reproduces_committed_artifacts": false,
+        "note": "the declared lower bound; the wheel exposes no pymupdf module, so extract_document raises ModuleNotFoundError"
+      },
+      {
+        "pymupdf": "1.26.6",
+        "mupdf": "1.26.11",
+        "reproduces_committed_artifacts": false,
+        "note": "the audit's library; derives @842a80dea6920270"
+      },
+      {
+        "pymupdf": "1.26.7",
+        "mupdf": "1.26.12",
+        "reproduces_committed_artifacts": false,
+        "note": "derives @842a80dea6920270"
+      },
+      {
+        "pymupdf": "1.27.1",
+        "mupdf": "1.27.1",
+        "reproduces_committed_artifacts": false,
+        "note": "derives @842a80dea6920270"
+      },
+      {
+        "pymupdf": "1.27.2.3",
+        "mupdf": "1.27.2",
+        "reproduces_committed_artifacts": false,
+        "note": "derives @842a80dea6920270"
+      },
+      {
+        "pymupdf": "1.28.0",
+        "mupdf": "1.29.0",
+        "reproduces_committed_artifacts": true,
+        "note": "reproduces both committed versions; carries a MuPDF build the pin does not name, so it is off pin by the MuPDF check"
+      },
+      {
+        "pymupdf": "1.28.2",
+        "mupdf": "1.28.2",
+        "reproduces_committed_artifacts": true,
+        "note": "the pin"
+      }
+    ],
+    "measured_matrix_note": "1.27.0 and 1.25.x were not probed. 1.27.0 is not published on PyPI; the 1.25 line sits between a tested failing build and an untestable one and would not move the pin.",
+    "python_sensitivity": {
+      "declared_status": "Confirmed",
+      "statement": "The interpreter is not the variable. Python 3.10.6 and 3.11.9 both reproduce both committed document versions at the pinned library, and Python 3.10.6 reproduces the audit's divergence exactly at the audit's library. The audit ran Python 3.12.14 with PyMuPDF 1.26.6; its failure is attributable to the library alone.",
+      "python_3_12_at_the_pinned_library": {
+        "declared_status": "Unresolved",
+        "statement": "Not measured, because no 3.12 interpreter is installed on this machine. MEASURED_PYTHON therefore names 3.10 and 3.11 only, and an interpreter outside it is reported as unmeasured rather than as known bad. The suite gate does not consult the interpreter at all."
+      }
+    }
+  },
+  "pin": {
+    "declared_status": "Confirmed",
+    "basis": "requirements.txt and runner/extraction_environment.py at this commit",
+    "pymupdf": "1.28.2",
+    "mupdf": "1.28.2",
+    "python_minor_versions_measured": [
+      "3.10",
+      "3.11"
+    ],
+    "held_in": [
+      "requirements.txt: pymupdf==1.28.2",
+      "runner/extraction_environment.py: PINNED_PYMUPDF, PINNED_MUPDF, MEASURED_PYTHON, REPRODUCING_BUILDS"
+    ],
+    "checked_by": [
+      "tests/test_extraction_environment.py: the running build is one measured to reproduce the committed artifacts (the hard assertion), the running environment is on the pin, requirements.txt agrees with the module constant, and this record agrees with both",
+      "tests/test_msca_dn_import.py TestReplay: both --check commands pass and the rendered bytes equal the committed files, which is the reproduction itself rather than a proxy for it",
+      "tools.import_external_proposal --environment and tools.author_msca_dn_workspace --environment: the pin and the reproduction verdict against the running measurement"
+    ],
+    "builds_measured_to_reproduce": [
+      {
+        "pymupdf": "1.28.2",
+        "mupdf": "1.28.2"
+      },
+      {
+        "pymupdf": "1.28.0",
+        "mupdf": "1.29.0"
+      }
+    ],
+    "two_questions_kept_apart": "runner/extraction_environment.py answers two questions with two functions. cannot_reproduce_reason asks whether a build was measured to reproduce the committed artifacts, against builds_measured_to_reproduce above; it is what the test suite asserts, and it does not consult the interpreter. off_pin_reason asks whether the environment is the declared one, against the exact pin and the measured interpreters; it is informational. PyMuPDF 1.28.0 reproduces every committed artifact and is off pin, so a suite that failed on the pin would report a problem not shown to exist.",
+    "why_exact_rather_than_a_range": "1.28.0 reproduces the artifacts and carries MuPDF 1.29.0. A range admitting both would pin two MuPDF builds, and the extraction behaviour belongs to MuPDF. requirements.txt therefore installs one build, and builds_measured_to_reproduce records what the other was measured to do, so a future engineer who has only 1.28.0 can read it rather than guess.",
+    "the_pin_does_not_refuse": "No command refuses on the environment. --check still answers the question it was asked, and its exit status still follows the staleness alone; --environment reports and exits 0. The gate that matters is already the byte comparison. The one hard assertion is in the test suite, and it is on reproduction rather than on the pin, so PyMuPDF 1.28.0 passes it."
+  },
+  "reproduced_document_versions": [
+    "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+    "MSCA-DN-2025_sanitised_part_b@b51a103520b58ded"
+  ],
+  "reproduced_document_versions_basis": "Both reproduce from the stored PDFs under the pin, with no artifact regenerated to match a new extraction: tools.import_external_proposal --check and tools.author_msca_dn_workspace --check both print 'up to date' and exit 0, twice, in separate processes. V01 acceptance criteria 1, 2 and 6.",
+  "no_extraction_upgrade": {
+    "declared_status": "Confirmed",
+    "statement": "V01 acceptance criterion 5 is not engaged. No extraction upgrade proved necessary, so no new document version was created, no hash was rewritten and no successor binding was needed. The two committed versions, their hashes and the frozen 74.60 baseline are as they were."
+  },
+  "open": {
+    "manifest_recording_of_the_runtime_versions": {
+      "declared_status": "Unresolved",
+      "statement": "V01 acceptance criterion 4 asks for the runtime versions to be recorded in the import manifest beside the four existing version strings. That is not done, and is referred to the operator.",
+      "why": "The manifest's versions block is rendered by runner.external_proposal.versions(), which also renders into the source index and both fidelity registers. Adding a runtime block there changes the bytes of every one of those files. harness/blind_reports/preflight_242f1afb02c8_0001.json pins that manifest by sha256 (01ffaa7588eb…) and copies its versions block verbatim, and that preflight is bound into the frozen 74.60 baseline. The hash is referred to by its first twelve characters on purpose: a sixteen-character prefix would make this record a hash dependent of the manifest, which it has no business being. Satisfying the criterion literally would rewrite four artifacts the same ticket lists as immutable historical evidence, break the preflight pin and break the freeze, against V01's own instruction that both --check commands pass with no committed artifact changing and that hashes are reproduced rather than regenerated.",
+      "smallest_change_that_satisfies_both": "The pin is recorded here, in requirements.txt and in runner/extraction_environment.py, which is where a future replay reconstructs it. The manifest embedding costs nothing at the first manifest that is authored rather than reproduced: V07 externalises the document configuration and V08 performs a dry import of the original, and a runtime block added to versions() at that point lands in a new manifest without touching a bound one. Recorded for V07 to carry.",
+      "owner": "operator",
+      "carried_to": [
+        "V07",
+        "V11"
+      ],
+      "carried_to_note": "V07 externalises the document configuration and authors the original's manifest, which is where the runtime block lands at no cost. V11 is the open-deferral register, which is where a criterion no one may satisfy as written has to be visible. V01's own acceptance list is unchanged by this record: an agent does not tick or rewrite a criterion."
+    },
+    "the_interpreter_is_declared_rather_than_packaged": {
+      "declared_status": "Unresolved",
+      "statement": "V01 acceptance criterion 4 asks for the exact Python version to be pinned in the repository. MEASURED_PYTHON declares 3.10 and 3.11, --environment reports the running interpreter against them, and a test holds the declaration to the record. There is no packaging-level pin: requires-python lives in a [project] table, pyproject.toml has none, and adding one would declare this repository an installable distribution that it is not.",
+      "why_an_exact_interpreter_pin_was_not_asserted": "The criterion's premise was measured false. Python 3.10.6 and 3.11.9 both reproduce both committed document versions at the pinned library, and 3.10.6 reproduces the audit's divergence exactly at the audit's library. An exact interpreter pin would assert a dependence this ticket measured not to exist.",
+      "owner": "operator",
+      "carried_to": [
+        "V11"
+      ]
+    },
+    "the_declaration_drafts_adoption_scan_is_stale": {
+      "declared_status": "Unresolved",
+      "statement": "tools.draft_fidelity_declarations check() reports three files stale: both declaration drafts and the review checklist. Its adoption scan lists every artifact naming the register, and the drafts were rendered before two such artifacts existed.",
+      "pre_existing_at_this_commit": "Measured. With this record removed from the tree, check() still reports draft_resolved_fixes.json and review_checklist.md, because 621ec1a added plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md, which names the register path. tests/test_msca_dn_declaration_drafts.py::TestDeterminismAndTheCommittedArtifacts::test_the_committed_artifacts_are_reproducible therefore fails at 621ec1a independently of V01.",
+      "what_v01_adds": "One entry: draft_sanitised_v1.json would gain this record under adoption.referenced_by_path, because the record names the register among its inputs as CLAUDE.md §12.1 requires. No declaration, no hash and no measured value changes. The record refers to the manifest hash by twelve characters so it does not become a hash dependent as well.",
+      "why_v01_did_not_regenerate_them": "The drafts and the checklist are what the operator is reviewing under R04 and R05, approved at PE-08 with deferred rows still open. Re-rendering them would change the document under review and would silently absorb the audit report's entry, which the operator has not seen. The ticket's rule is that new decisions go into successor records.",
+      "owner": "V02a and V03, which classify and green the residual suite failures",
+      "carried_to": [
+        "V02a",
+        "V03"
+      ]
+    }
+  },
+  "inputs": [
+    "plans/msca_dn_historical_validation_tickets.md (V01)",
+    "plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md (F01)",
+    "docs/tier3_project_instantiation/source_materials/msca_dn/sanitized_proposal_final.pdf",
+    "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+    "harness/blind_reports/preflight_242f1afb02c8_0001.json",
+    "requirements.txt",
+    "runner/external_proposal.py"
+  ],
+  "artifacts_written": [
+    "runner/extraction_environment.py",
+    "tests/test_extraction_environment.py",
+    "requirements.txt",
+    "tools/import_external_proposal.py",
+    "tools/author_msca_dn_workspace.py",
+    "docs/tier4_orchestration_state/decision_log/msca-dn-extraction-environment-pin_2026-10-08.json",
+    "plans/reports/v01_extraction_environment_completion_2026-10-08.md"
+  ],
+  "relationship_to_earlier_records": "Follows msca-dn-line-ending-bindings_2026-10-07, which protected the same replay against git's line-ending translation. That record pinned how the bytes are stored; this one pins the library that produces them. Neither changes a committed artifact."
+}

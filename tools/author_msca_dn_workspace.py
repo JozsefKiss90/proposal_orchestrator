@@ -65,8 +65,13 @@ validation, the withdrawal rule and the missing-input rule are
 
 Run it from the repository root::
 
-    py -3.10 -m tools.author_msca_dn_workspace            # write
-    py -3.10 -m tools.author_msca_dn_workspace --check    # exit 1 if any file would change
+    py -3.10 -m tools.author_msca_dn_workspace                  # write
+    py -3.10 -m tools.author_msca_dn_workspace --check          # exit 1 if any file would change
+    py -3.10 -m tools.author_msca_dn_workspace --environment    # the pinned extraction environment
+
+The register's derived half is extracted from the PDF, so it reproduces only
+under the library :mod:`runner.extraction_environment` pins. A ``--check`` run
+that finds staleness reports whether the environment is on that pin (V01).
 
 Constitutional standing: an authoring tool, not a runtime component. It writes
 Tier 3 and workspace artifacts, evaluates no gate and invokes no Claude. It
@@ -85,6 +90,11 @@ from typing import Any, Optional, Sequence
 from runner.atomic_write import atomic_write_text, canonical_json_bytes
 from runner.dev_graph.builder import SOURCES_REL
 from runner.dev_graph.intake import INTAKE_REL, normalise_intake, record_esr_intake
+from runner.extraction_environment import (
+    add_environment_flag,
+    environment_exit_code,
+    staleness_notice,
+)
 from runner.paths import find_repo_root
 from runner.source_index import read_page_text
 from tools import fidelity_declarations
@@ -697,8 +707,12 @@ def author(repo_root: Path) -> list[str]:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="exit 1 if any authored file would change")
+    add_environment_flag(parser)
     parser.add_argument("--repo-root", type=Path, default=None)
     args = parser.parse_args(argv)
+    requested = environment_exit_code(args)
+    if requested is not None:
+        return requested
     repo_root = args.repo_root or find_repo_root()
     try:
         if args.check:
@@ -706,6 +720,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             for rel in stale:
                 print(f"would change: {rel}")
             print("up to date" if not stale else f"{len(stale)} file(s) would change")
+            if stale:
+                print(staleness_notice())
             return 1 if stale else 0
         changed = author(repo_root)
         for rel in changed:

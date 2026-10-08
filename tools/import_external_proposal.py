@@ -54,8 +54,14 @@ register (:mod:`tools.fidelity_declarations`, R01).
 
 Run it from the repository root::
 
-    py -3.10 -m tools.import_external_proposal            # write
-    py -3.10 -m tools.import_external_proposal --check    # exit 1 if any file would change
+    py -3.10 -m tools.import_external_proposal                  # write
+    py -3.10 -m tools.import_external_proposal --check          # exit 1 if any file would change
+    py -3.10 -m tools.import_external_proposal --environment    # the pinned extraction environment
+
+The extraction library is pinned by :mod:`runner.extraction_environment`. A
+``--check`` run that finds staleness also reports whether the environment is on
+that pin, because an off-pin MuPDF build is the one cause of a stale rendering
+that no amount of reading the diff explains (V01).
 
 Constitutional standing: an authoring tool, not a runtime component. It
 writes Tier 3 and Tier 4 artifacts of one workspace, evaluates no gate,
@@ -85,6 +91,11 @@ from runner.dev_graph.documents import (
 )
 from runner.dev_graph.intake import read_esr_intake
 from runner.dev_graph.schema import DevGraphError
+from runner.extraction_environment import (
+    add_environment_flag,
+    environment_exit_code,
+    staleness_notice,
+)
 from runner.external_proposal import (
     PageExtract,
     Paragraph,
@@ -1386,8 +1397,12 @@ def author(repo_root: Path) -> list[str]:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="exit 1 if any file would change")
+    add_environment_flag(parser)
     parser.add_argument("--repo-root", type=Path, default=None)
     args = parser.parse_args(argv)
+    requested = environment_exit_code(args)
+    if requested is not None:
+        return requested
     repo_root = args.repo_root or find_repo_root()
     try:
         if args.check:
@@ -1395,6 +1410,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             for rel in stale:
                 print(f"would change: {rel}")
             print("up to date" if not stale else f"{len(stale)} file(s) would change")
+            if stale:
+                print(staleness_notice())
             return 1 if stale else 0
         changed = author(repo_root)
         for rel in changed:
