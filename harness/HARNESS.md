@@ -648,15 +648,17 @@ the same table; a row that opens no new entry is merged into the previous one)
 and the label-value work-package headers, and runs five checks in spec order:
 work-package block fields and DCs involved against the DC projects of 1.1;
 each deliverable's package and window; each milestone against the
-deliverables it names (naming none is reported as *undeclared*, with the
-related packages' deliverable months as context, never as a failure); the DC
+deliverables it names (naming none is an inventory entry in the check's
+`context`, with the related packages' deliverable months beside it, and not a
+finding — operator decision D11, below); the DC
 table against the 1.1 projects (the recruiting participant against the host
 line is *not comparable* after sanitisation and is reported as such); the
 risk table against mitigations named in prose, and whether any row states a
 threshold. Every finding has a `kind` from a closed set (`inconsistency`,
 `missing_field`, `unparsed_cell`, `undeclared_dependency`, `out_of_window`,
 `not_comparable`, `unlinked_prose`), a subject, the paragraphs it cites, and
-the row text. **No finding is a score**; a test pins that no score-shaped key
+the row text. `undeclared_dependency` is retired as an emitted kind (D11) and
+kept in the vocabulary so the audits that recorded it still load. **No finding is a score**; a test pins that no score-shaped key
 appears in a report, and findings never move the exit code.
 
 **What a check compares, and what it only notes (ticket R03).** Two of those
@@ -671,11 +673,24 @@ work-package window for overlap only: a candidate has to be employed while the
 package they contribute to runs. An appointment that outlasts every package is
 a check note with its months, not a finding, because the recruitment table's
 own duration column is the only bound the candidate states and no source ties
-that period to a package window. A third note says what the milestone check
-rests on: a dependency is not a column of the milestones table, so an
-`undeclared_dependency` finding records an absence rather than a declared
+that period to a package window. A third note said what the milestone check
+rested on: a dependency is not a column of the milestones table, so an
+`undeclared_dependency` finding recorded an absence rather than a declared
 value the candidate contradicts. No `kind` changed, so every reference an
 earlier report recorded still resolves.
+
+**A milestone naming no deliverable is not a finding (operator decision D11,
+2026-10-08).** No source requires a milestone to name a deliverable, so the
+absence is inventoried — `context.milestones_without_a_named_dependency`, one
+entry per milestone with its month, its related packages and their
+deliverables — and the check's note calls it drafting advice a reader may act
+on. No link is assumed. A milestone that does name a deliverable is still
+checked: a name the table does not list, or a deliverable due after the
+milestone, is an `inconsistency`. On the MSCA-DN candidate the sixteen
+`undeclared_dependency` findings of `integrity_242f1afb02c8_0002.json` are gone
+from `integrity_242f1afb02c8_0003.json` and come back as the inventory; the
+one `out_of_window` finding (M7.3) is now the check's first. Both audits stay
+on disk and a test pins the delta.
 
 **The work-package header (`split_header_fields`).** A header field is
 `<label> <value>`, and the labels are looked for in the order the application
@@ -749,7 +764,18 @@ reference (`report`, `check`, `index`) is quoted from an audit given on the
 command line, which must be over a candidate in play. A quote must occur in
 the named sub-section's text, ligatures folded and whitespace collapsed. A
 register pointer (`derived/figures/images_on_any_page`, `/`-separated because
-sub-section ids carry dots) is resolved to its value. When a historical copy
+sub-section ids carry dots) is resolved to its value. Into a list the segment
+is typed (validation correction V02, dispositions schema `1.2`): `#N` is a
+position on any list; a bare segment on a keyed list (elements carrying
+`sub_section_id` or `id`) is an identity and only an identity, so
+`derived/sub_sections/8/characters` names sub-section 8 and never the ninth
+element; a bare digit on a plain list is a position. Schema `1.0` and `1.1`
+recorded their values under the legacy rule — a bare digit within range read
+as a position first — and replay only under it, so `resolve_pointer` keeps
+that rule as an opt-in `legacy_positional`, selected from the record's own
+`schema_version`, never the default. A comparison written under the identity
+rule says so (`fidelity_register.pointer_resolution`); the review re-resolves
+under whichever rule the comparison recorded. When a historical copy
 is given and a row declares no historical quote, its current quotes are
 re-verified against that copy and stand for it where they occur. One
 unresolved reference refuses the comparison and nothing is written.
@@ -761,7 +787,7 @@ The dispositions are the ticket's five, each with the basis it must carry:
 | `independently_detected` | a blind or audit finding; the row records `detected_by` lane(s) |
 | `partially_observable` | a finding and a register entry naming what the copy preserves only in part |
 | `not_assessable_from_this_copy` | a register entry naming what sanitisation removed |
-| `not_detected_despite_sufficient_preserved_evidence` | the preserved passage quoted and verified, no finding, a declared `evidence_preserved_status` |
+| `not_detected_despite_sufficient_preserved_evidence` | the preserved passage quoted and verified, no finding, a declared `evidence_preserved_status`; under schema `1.1`+ a register entry; under `1.2` a `failure_mode` with its basis |
 | `addressed` | a verified quote from the historical copy and one from the current copy; never for a strength |
 
 The summary counts every disposition and states `assessable` and the
@@ -818,6 +844,14 @@ A row that is not "agreed, retain" must name an `operator_decision`: a disputed
 row without a question hands the operator a disagreement and nothing to decide.
 A recommended disposition that differs from the comparison's needs one too, and
 so does an `adjudicated` row — an adjudication is a reading, never an approval.
+A row may instead, or as well, carry a `decision_recorded`: a decision the
+operator has already taken, transcribed under the id the approval record uses,
+with the record's path and the decision text. The notes then name that record
+under `operator_approval` (path and sha256); the report re-hashes it, lists it
+among the inputs, prints the decision on the row as *recorded* and keeps the
+decisions file in two parts, recorded and open. The notes' `review_state` stays
+agent-drafted, because the judgments are; only the transcribed decisions are
+the operator's, and each names its record.
 
 A notes file may also name an `adjudication_record` and a
 `supersession_note`. The record is re-hashed and listed among the report's
@@ -904,17 +938,25 @@ counted under the disposition it declares. The summary's
 including one is provisional on an operator decision. The block is absent when
 no row is Unresolved.
 
-Two rules govern a miss. **What it is held to.**
+Two rules govern a miss. **What it is held to (validation correction V01).**
 The quote is a measurement — `verify_evidence` finds it in the named
 sub-section. The *sufficiency* of that evidence is a claim about the
 submission that nothing here measures, so `evidence_preserved_status` stays a
 declaration; `check_preservation_claim` refuses only the one value that
-overstates it. A `Confirmed` status needs the register's declared half to carry
-a `presence` statement for every sub-section the passage is quoted from, because
-the declared half is the only artifact about the step from the submission to
-this copy. Both declared halves are empty, so no row can be `Confirmed` until
-the R04 drafts are adopted, and the rule is exercised by tests rather than by
-the live data. **Naming the basis.** Dispositions schema `1.1` additionally
+overstates it. A `Confirmed` status needs, for every sub-section the passage is
+quoted from, a declared-half entry that states a `presence` **and** carries
+`fidelity_to_submitted_original` — the per-sub-section judgment on the step
+from the submission to this copy — declared in the scope
+`fidelity_against_the_submitted_original`, `Confirmed`, with a basis, and with
+an `evidence` item naming the observation (source and statement). The row must
+name that entry among its `evidence_basis` pointers. A `presence` alone is an
+extraction claim about this PDF and unlocks nothing; an `Unresolved`
+original-fidelity claim, another scope, a missing basis, a generic basis with
+no evidence for the row, or an entry for another sub-section each refuses. The
+rule is not version-gated: no committed `1.0` or `1.1` row declares
+`Confirmed` (a test pins it), so their replay never exercises it. Both
+declared halves are empty, so no row can be `Confirmed` until the R04 drafts
+are adopted. **Naming the basis.** Dispositions schema `1.1` additionally
 makes every miss name the register entry its preservation claim rests on. The
 PE-08 record is `1.0` and only one of its six misses named one, so the rule is
 version-gated and that record still compares and still replays. An unknown
@@ -936,6 +978,50 @@ keeps its exact shape. On the MSCA-DN case all fifteen ESR shortcomings stay
 open and none of the plans is editorial: not one can be written from what this
 copy already carries.
 
+**The operator approval (2026-10-08).** The operator approved the PE-08
+decision package — fifteen review decisions, two validation corrections, a
+table of original-dependent questions deferred to the private network, and the
+limits of what the approval confers. The record is
+`docs/tier4_orchestration_state/msca_dn/reviews/operator_approval_2026-10-08.md`
+and `tools/author_approved_dispositions.py` carries it into the artifacts:
+
+    py -3.10 -m tools.author_approved_dispositions [--check]
+
+A deterministic transform of the committed R05 record, in that tool's shape,
+writing `dispositions_f60ae6e0a2a1_approved.json` (schema `1.2`,
+`review_state` `operator_reviewed`) and, once a comparison is bound to it,
+`review_notes_f60ae6e0a2a1_approved.json`. Every row's `review_status` says
+what the approval did to it: `operator_confirmed` where a decision settles the
+disposition (the row names its `operator_decision_ids`),
+`operator_decision_required` where the approval deferred the row (the row
+states what the private network has to establish under
+`deferred_to_private_network`), and `agent_recommended_pending_operator_review`
+where the approval said nothing — those rows are not blanket-confirmed. The
+comparison's `review_state` block lists all three sets and the approval. Three
+cells of the approval's deferral table name more than one observation, and the
+operator wrote one disposition for the whole cell. Each row of such a group
+carries the cell verbatim and names the group, so an instruction addressed to
+one observation does not read as addressed to its neighbour. On the MSCA-DN
+case: 9 confirmed, 10 deferred, 10 carried; ESR-Q-01 and ESR-Q-03 are both
+confirmed and deferred. ESR-Q-03 moves to `partially_observable` on the
+integrity audit's one timing finding (D06), re-cited against the post-D11
+audit; no other disposition moves and no status is raised to `Confirmed`.
+Every miss declares a `failure_mode` (`absent_from_recorded_output`,
+`read_and_rated_adequate`, `read_and_misattributed`, `undetermined`) with its
+basis, and the summary reports `misses_by_failure_mode` beside the detection
+figures without folding it in (D03); ESR-E-03's mode describes the recorded
+output and not evidence unread (D02). The summary's `shared_esr_sentences`
+block names ESR-E-01 and ESR-E-02 as clauses of one evaluator sentence (D01).
+A proposed revision may declare a `scope`; one on a strength must be
+`beyond_esr`, and a plan may carry labelled `subtasks`. The revisions artifact
+lists every beyond-ESR item apart under `beyond_esr_improvements`: ESR-I-S02's
+sustainability improvement conditional on the original (D07) and ESR-I-02's
+societal-impact subtask (D08), neither proposing an indicator, a target, a
+funding source or a partner commitment. Two assessor validation cases for
+PE-09 are recorded on the record (D04, D05). The approval adopts no
+declaration (D13) and applies no provenance correction (D14); the seven
+preservation-qualified misses stay provisional.
+
 `comparison_diff.py` measures the rest and declares nothing. It refuses a pair
 that is not two readings of one body of evidence: a different baseline report,
 ESR record, candidate or observation set, or a moved score comparison. It then
@@ -945,7 +1031,11 @@ or the revision moved. Blind and audit citations are reported with what was
 withdrawn and what was added. So is the rank the row holds in each revisions
 artifact, found beside its comparison under the name that comparison recorded.
 Every leaf of the summary is reported before and after, prose included: a
-changed basis sentence changes how a figure reads. One flag: an ESR
+changed basis sentence changes how a figure reads. When the successor was
+written under the identity pointer rule the diff also reports `review_status`,
+`failure_mode`, `deferred_to_private_network`, and `evidence_basis_values` — a
+pointer whose text did not move but whose resolved value did, which is the V02
+case; an older pair keeps the diff shape it was written with. One flag: an ESR
 shortcoming the successor leaves out of the revision list with any disposition
 but `addressed` — the harness missing a point is not a reason to stop
 proposing the fix.

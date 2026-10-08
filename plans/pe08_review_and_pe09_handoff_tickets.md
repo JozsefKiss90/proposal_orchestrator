@@ -5,6 +5,18 @@ Repository: `JozsefKiss90/proposal_orchestrator`
 Branch: `msca-dn-pre-eval`  
 Suggested repository location: `plans/msca_dn_pe08_review_tickets.md`
 
+## Reconciliation (2026-10-08)
+
+The checkboxes below were reconciled against the implementation on 2026-10-08, after the
+operator approved the PE-08 decision package
+(`docs/tier4_orchestration_state/msca_dn/reviews/operator_approval_2026-10-08.md`). A box is
+checked where a committed artifact or test evidences the criterion: R01 at `5159e5a`, R02 at
+`0943b1d`, R03 at `1eddc81`, R04 at `76a794e`, R05 at `047f64d`, R06 by
+`plans/msca_dn_pe09_runbook.md`. A note beside a box says what the approval changed about it.
+Two things stay open by the approval's own terms and are not boxes here: active-register
+adoption of the R04 drafts (D13) and every original-dependent question in the approval
+record's deferred table. PE-09 remains unexecuted in this repository.
+
 ## Starting state
 
 PE-08 was implemented at `67a3174`. The operator reports that line-ending protection is complete at `5b57f09`, with verification recorded at `015d9c0`: a fresh checkout passes all eight binding checks and reproduces the comparison. Treat that work as completed; verify the current checkout before continuing.
@@ -74,13 +86,13 @@ R01 and R02 can be worked on independently. Continue all preparation supported b
 
 ### Acceptance criteria
 
-- [ ] Both tools retain valid operator declarations across repeated regeneration.
-- [ ] Historical and revised declarations remain distinct.
-- [ ] Regeneration is deterministic, and `--check` succeeds immediately afterward.
-- [ ] Malformed declaration input fails without overwriting the register.
-- [ ] Changes to PDF-derived facts are still detected and regenerated.
-- [ ] Rebuild behaviour is documented honestly: if declarations require a durable input, it is included in the documented inputs.
-- [ ] Existing baseline bindings and historical artifact bytes remain intact.
+- [x] Both tools retain valid operator declarations across repeated regeneration.
+- [x] Historical and revised declarations remain distinct.
+- [x] Regeneration is deterministic, and `--check` succeeds immediately afterward.
+- [x] Malformed declaration input fails without overwriting the register.
+- [x] Changes to PDF-derived facts are still detected and regenerated.
+- [x] Rebuild behaviour is documented honestly: if declarations require a durable input, it is included in the documented inputs.
+- [x] Existing baseline bindings and historical artifact bytes remain intact.
 
 ### Verification
 
@@ -113,12 +125,12 @@ Focused tool changes, tests, usage documentation and a decision record explainin
 
 ### Acceptance criteria
 
-- [ ] The observation ID set matches the ESR record, with no duplicates or omissions.
-- [ ] Every quoted reference resolves against its named artifact.
-- [ ] Reference validity and semantic agreement are separate fields.
-- [ ] Counts distinguish strengths from shortcomings; “15 detected” is not presented as 15 criticisms detected.
-- [ ] Every disputed row has a concrete review question.
-- [ ] No existing comparison artifact or ESR record is overwritten.
+- [x] The observation ID set matches the ESR record, with no duplicates or omissions.
+- [x] Every quoted reference resolves against its named artifact.
+- [x] Reference validity and semantic agreement are separate fields.
+- [x] Counts distinguish strengths from shortcomings; “15 detected” is not presented as 15 criticisms detected.
+- [x] Every disputed row has a concrete review question.
+- [x] No existing comparison artifact or ESR record is overwritten.
 
 ### Verification
 
@@ -147,12 +159,12 @@ A new Tier 4 Markdown review report and a concise list of operator decisions nee
 
 ### Acceptance criteria
 
-- [ ] Every disputed relationship has an explicit interpretation or unresolved status.
-- [ ] No timing/assignment value is changed to satisfy the checker.
-- [ ] An audit finding is counted as ESR detection only when the semantic match is supported.
-- [ ] Any rule change applies generally and retains meaningful true-positive checks.
-- [ ] Old audit findings remain available; changed outputs are written as successors.
-- [ ] Claims requiring the original are identified for private-network review, without importing it here.
+- [x] Every disputed relationship has an explicit interpretation or unresolved status.
+- [x] No timing/assignment value is changed to satisfy the checker.
+- [x] An audit finding is counted as ESR detection only when the semantic match is supported. (D06 narrows ESR-Q-03 to provisional partial credit on the timing finding alone)
+- [x] Any rule change applies generally and retains meaningful true-positive checks. (D11 retires the undeclared-dependency finding generally; explicit references are still checked)
+- [x] Old audit findings remain available; changed outputs are written as successors. (`integrity_242f1afb02c8_0001`, `_0002` and `_0003` all on disk)
+- [x] Claims requiring the original are identified for private-network review, without importing it here.
 
 ### Verification
 
@@ -181,12 +193,12 @@ A semantic adjudication record, updated review recommendations, and optional foc
 
 ### Acceptance criteria
 
-- [ ] Both revision drafts cover their actual subsection inventories.
-- [ ] Presence and transformation are independent.
-- [ ] Measured extraction facts do not masquerade as fidelity to the original.
-- [ ] Unverified original-dependent claims remain explicitly uncertain.
-- [ ] Draft declarations survive the supported generation workflow after adoption.
-- [ ] Dependencies on register/manifest hashes are enumerated before adopting changes.
+- [x] Both revision drafts cover their actual subsection inventories.
+- [x] Presence and transformation are independent.
+- [x] Measured extraction facts do not masquerade as fidelity to the original. (V01 now enforces it: a presence declaration unlocks no Confirmed preservation)
+- [x] Unverified original-dependent claims remain explicitly uncertain.
+- [ ] Draft declarations survive the supported generation workflow after adoption. (open: the R01 retention tests and the R04 temporary-checkout exercise show the workflow survives a drafted declaration, but adoption into an active register is deferred by D13, so the criterion's own precondition is unmet and the box stays unchecked)
+- [x] Dependencies on register/manifest hashes are enumerated before adopting changes.
 
 ### Verification
 
@@ -215,13 +227,13 @@ Two revision-specific declaration drafts, a review checklist and an adoption/pro
 
 ### Acceptance criteria
 
-- [ ] Old artifacts remain byte-unchanged and replayable from documented historical inputs.
-- [ ] Every successor observation has a traceable disposition and review status.
-- [ ] References resolve; unavailable confirmation is not presented as certainty.
-- [ ] Summary counts match the successor rows.
-- [ ] Revisions distinguish confirmed actions from proposals requiring human commitment.
-- [ ] The original baseline and criterion scores are preserved; no new assessor call occurs.
-- [ ] Pending review prevents a claim of final operator acceptance, but does not prevent preparation of a labelled draft.
+- [x] Old artifacts remain byte-unchanged and replayable from documented historical inputs. (the legacy pointer rule is kept, version-gated, for that replay)
+- [x] Every successor observation has a traceable disposition and review status.
+- [x] References resolve; unavailable confirmation is not presented as certainty.
+- [x] Summary counts match the successor rows.
+- [x] Revisions distinguish confirmed actions from proposals requiring human commitment.
+- [x] The original baseline and criterion scores are preserved; no new assessor call occurs.
+- [x] Pending review prevents a claim of final operator acceptance, but does not prevent preparation of a labelled draft. (the operator's review is now recorded; see the reconciliation note)
 
 ### Verification
 
@@ -251,13 +263,13 @@ Successor dispositions, comparison and revision plan; original-to-successor revi
 
 ### Acceptance criteria
 
-- [ ] The runbook separates historical validation from final resubmission assessment.
-- [ ] Every documented command uses supported flags or is labelled as future implementation.
-- [ ] Original import has measurable fidelity checks and an explicit manifest binding.
-- [ ] Historical blind assessment is frozen before ESR comparison.
-- [ ] Assessor isolation includes tool/MCP restrictions and an external working directory.
-- [ ] Missing profile authority, grounding integration or operator decisions are named prerequisites.
-- [ ] The handoff states that PE-09 remains unexecuted here.
+- [x] The runbook separates historical validation from final resubmission assessment.
+- [x] Every documented command uses supported flags or is labelled as future implementation.
+- [x] Original import has measurable fidelity checks and an explicit manifest binding. (as prerequisites: the importer's checks exist, the original's revision entry does not)
+- [x] Historical blind assessment is frozen before ESR comparison.
+- [x] Assessor isolation includes tool/MCP restrictions and an external working directory.
+- [x] Missing profile authority, grounding integration or operator decisions are named prerequisites.
+- [x] The handoff states that PE-09 remains unexecuted here.
 
 ### Verification
 

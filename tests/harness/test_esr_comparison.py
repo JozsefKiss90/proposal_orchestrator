@@ -735,16 +735,21 @@ class TestPreservationIsMeasuredNotAsserted:
         assert "'evidence_preserved_status' is 'Confirmed'" in err
         assert "declared half" in err and "S2" in err
 
-    def test_a_declared_entry_carries_confirmed_for_the_quoted_sub_section(self, inputs):
-        _rewrite(inputs, lambda d: _row(d, "OBS-2").update(evidence_preserved_status="Confirmed"))
+    def test_a_presence_only_entry_no_longer_carries_confirmed(self, inputs, capsys):
+        """Before validation correction V01 this entry was enough. A presence
+        is an extraction claim about this PDF; the submission is another step.
+        The accepting case now lives in
+        TestConfirmedPreservationNeedsTheOriginalFidelityClaim."""
+        _rewrite(inputs, lambda d: _row(d, "OBS-2").update(
+            evidence_preserved_status="Confirmed", evidence_basis=["declared/sub_sections/S2"]
+        ))
         _rewrite_register(inputs, lambda d: d["declared"]["sub_sections"].append(
             {"sub_section_id": "S2", "presence": {"value": "present in the submission"},
              "transformation": {"value": "unchanged"}}
         ))
-        code, out = _compare(inputs)
-        assert code == 0
-        row = _row(ec.load_comparison(next(out.glob("comparison_*.json"))), "OBS-2")
-        assert row["evidence_preserved_status"] == "Confirmed"
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "does not unlock 'Confirmed' preservation" in capsys.readouterr().err
 
     def test_a_declared_entry_without_a_presence_value_does_not_carry_confirmed(self, inputs, capsys):
         _rewrite(inputs, lambda d: _row(d, "OBS-2").update(evidence_preserved_status="Confirmed"))
@@ -934,3 +939,250 @@ class TestUnresolvedDeclarations:
         # still counted under the disposition it declares
         assert data["summary"]["by_disposition"]["independently_detected"] == 2
         assert "provisional: 1 row(s)" in ec.render_comparison(data)
+
+
+# --------------------------------------------------------------------------- #
+# V02 — a register pointer into a keyed list names an identity, not a position
+# --------------------------------------------------------------------------- #
+
+
+def _keyed_register() -> dict:
+    """A derived half whose sub-section ids are digits that are not their positions."""
+    return {
+        "derived": {
+            "sub_sections": [
+                {"sub_section_id": "1.1", "characters": 10},
+                {"sub_section_id": "1.2", "characters": 20},
+                {"sub_section_id": "4", "characters": 40},
+                {"sub_section_id": "5", "characters": 50},
+                {"sub_section_id": "6", "characters": 60},
+                {"sub_section_id": "7", "characters": 70},
+                {"sub_section_id": "8", "characters": 80},
+            ],
+            "plain": [100, 200, 300],
+        }
+    }
+
+
+class TestPointerResolution:
+    @pytest.mark.parametrize("sub", ["4", "5", "6", "7", "8"])
+    def test_a_digit_segment_resolves_by_identity(self, sub):
+        value = ec.resolve_pointer(_keyed_register(), f"derived/sub_sections/{sub}/characters")
+        assert value == int(sub) * 10
+
+    def test_a_dotted_id_resolves_by_identity(self):
+        assert ec.resolve_pointer(_keyed_register(), "derived/sub_sections/1.2/characters") == 20
+
+    def test_identity_survives_a_reordered_list(self):
+        data = _keyed_register()
+        data["derived"]["sub_sections"].reverse()
+        assert ec.resolve_pointer(data, "derived/sub_sections/8/characters") == 80
+        assert ec.resolve_pointer(data, "derived/sub_sections/1.1/characters") == 10
+
+    def test_a_missing_id_is_refused_not_read_positionally(self):
+        data = _keyed_register()
+        with pytest.raises(ec.EsrComparisonError, match="no element '3'"):
+            ec.resolve_pointer(data, "derived/sub_sections/3/characters")
+
+    def test_an_explicit_position_is_typed(self):
+        assert ec.resolve_pointer(_keyed_register(), "derived/sub_sections/#2/characters") == 40
+        assert ec.resolve_pointer(_keyed_register(), "derived/sub_sections/#6/characters") == 80
+
+    def test_an_explicit_position_past_the_end_is_refused(self):
+        with pytest.raises(ec.EsrComparisonError, match="#9"):
+            ec.resolve_pointer(_keyed_register(), "derived/sub_sections/#9")
+
+    def test_a_plain_list_is_still_indexed_by_a_bare_digit(self):
+        assert ec.resolve_pointer(_keyed_register(), "derived/plain/1") == 200
+        assert ec.resolve_pointer(_keyed_register(), "derived/plain/#2") == 300
+
+    def test_the_legacy_rule_reads_a_bare_digit_positionally_first(self):
+        """Dispositions schema 1.0 and 1.1 recorded pointers under the old rule,
+        and their comparisons replay only under it. The rule is named, opt-in,
+        and never the default."""
+        data = _keyed_register()
+        # position 4 is sub-section "6", position 5 is sub-section "7"
+        assert ec.resolve_pointer(data, "derived/sub_sections/4/characters", legacy_positional=True) == 60
+        assert ec.resolve_pointer(data, "derived/sub_sections/5/characters", legacy_positional=True) == 70
+        assert ec.resolve_pointer(data, "derived/sub_sections/1.2/characters", legacy_positional=True) == 20
+
+    def test_the_legacy_rule_falls_back_to_identity_past_the_end(self):
+        data = _keyed_register()
+        del data["derived"]["sub_sections"][1:]
+        data["derived"]["sub_sections"].append({"sub_section_id": "8", "characters": 80})
+        assert ec.resolve_pointer(data, "derived/sub_sections/8/characters", legacy_positional=True) == 80
+
+    def test_the_comparison_records_which_rule_resolved_its_pointers(self, inputs):
+        """A 1.2 record resolves by identity and says so; an older record is
+        resolved under the legacy rule and its artifact keeps its old shape."""
+        _rewrite_register(inputs, lambda d: d["derived"]["sub_sections"].append(
+            {"sub_section_id": "4", "characters": 44}
+        ))
+
+        def to_1_2(d):
+            d["schema_version"] = "1.2"
+            _row(d, "OBS-2")["evidence_basis"] = ["derived/sub_sections/4/characters"]
+            _row(d, "OBS-2")["failure_mode"] = "absent_from_recorded_output"
+            _row(d, "OBS-2")["failure_mode_basis"] = "no sample names the start month"
+        _rewrite(inputs, to_1_2)
+        code, out = _compare(inputs)
+        assert code == 0
+        data = ec.load_comparison(next(out.glob("comparison_*.json")))
+        assert data["fidelity_register"]["pointer_resolution"] == ec.POINTER_RESOLUTION_IDENTITY
+        row = _row(data, "OBS-2")
+        assert row["evidence_basis"][0]["value"] == 44
+
+    def test_a_1_0_record_keeps_the_legacy_rule_and_its_artifact_shape(self, inputs):
+        _rewrite_register(inputs, lambda d: d["derived"]["sub_sections"].append(
+            {"sub_section_id": "1", "characters": 11}
+        ))
+        _rewrite(inputs, lambda d: _row(d, "OBS-4").update(
+            evidence_basis=["derived/sub_sections/1/characters"]
+        ))
+        code, out = _compare(inputs)
+        assert code == 0
+        data = ec.load_comparison(next(out.glob("comparison_*.json")))
+        assert "pointer_resolution" not in data["fidelity_register"]
+        # position 1 is S3 (60 characters), not the sub-section whose id is "1"
+        assert _row(data, "OBS-4")["evidence_basis"][0]["value"] == 60
+
+    def test_a_reader_of_a_written_comparison_reads_the_rule_back(self):
+        """One reader of the recorded field, so one polarity: a comparison that
+        does not say 'identity' was written under the legacy rule."""
+        identity = {"fidelity_register": {"pointer_resolution": ec.POINTER_RESOLUTION_IDENTITY}}
+        assert ec.pointer_rule_of(identity) == ec.POINTER_RESOLUTION_IDENTITY
+        for older in ({"fidelity_register": {}}, {}, {"fidelity_register": None}):
+            assert ec.pointer_rule_of(older) == ec.POINTER_RESOLUTION_LEGACY
+
+
+# --------------------------------------------------------------------------- #
+# V01 — Confirmed preservation needs the original-fidelity claim, not presence
+# --------------------------------------------------------------------------- #
+
+
+def _supported_entry(sub: str, observation_id: str = "OBS-2") -> dict:
+    """A declared-half row that carries a Confirmed original-fidelity claim for *sub*."""
+    return {
+        "sub_section_id": sub,
+        "presence": {
+            "value": "present in this revision's extraction",
+            "claim_scope": "extraction_fidelity_against_the_sanitised_pdf",
+            "declared_status": "Confirmed",
+        },
+        "transformation": {"value": "unchanged", "declared_status": "Assumed"},
+        "fidelity_to_submitted_original": {
+            "value": "the passage the ESR rested on is carried unchanged",
+            "claim_scope": "fidelity_against_the_submitted_original",
+            "declared_status": "Confirmed",
+            "basis": "operator reading of S2 against the submitted original, 2026-10-20",
+            "evidence": [
+                {
+                    "observation_ids": [observation_id],
+                    "source": "the submitted original, S2, paragraph 3, read inside the private network",
+                    "statement": "the start-month sentence is the submission's own, word for word",
+                }
+            ],
+        },
+    }
+
+
+def _confirm_obs_2(inputs, *, entry: dict | None, basis: list[str] | None = None) -> None:
+    def mutate(d):
+        row = _row(d, "OBS-2")
+        row["evidence_preserved_status"] = "Confirmed"
+        if basis is not None:
+            row["evidence_basis"] = basis
+    _rewrite(inputs, mutate)
+    if entry is not None:
+        _rewrite_register(inputs, lambda d: d["declared"]["sub_sections"].append(entry))
+
+
+class TestConfirmedPreservationNeedsTheOriginalFidelityClaim:
+    """An extraction-only presence declaration says the PDF was read. It says
+    nothing about the submission, so it must not unlock Confirmed preservation."""
+
+    BASIS = ["declared/sub_sections/S2/fidelity_to_submitted_original"]
+
+    def test_extraction_only_presence_is_refused(self, inputs, capsys):
+        entry = _supported_entry("S2")
+        del entry["fidelity_to_submitted_original"]
+        _confirm_obs_2(inputs, entry=entry, basis=["declared/sub_sections/S2"])
+        code, _ = _compare(inputs)
+        assert code == 2
+        err = capsys.readouterr().err
+        assert "fidelity_to_submitted_original" in err and "S2" in err
+
+    def test_an_unresolved_original_fidelity_is_refused(self, inputs, capsys):
+        entry = _supported_entry("S2")
+        entry["fidelity_to_submitted_original"]["declared_status"] = "Unresolved"
+        _confirm_obs_2(inputs, entry=entry, basis=self.BASIS)
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "'Unresolved'" in capsys.readouterr().err
+
+    def test_a_claim_in_another_scope_is_refused(self, inputs, capsys):
+        entry = _supported_entry("S2")
+        entry["fidelity_to_submitted_original"]["claim_scope"] = "extraction_fidelity_against_the_sanitised_pdf"
+        _confirm_obs_2(inputs, entry=entry, basis=self.BASIS)
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "claim_scope" in capsys.readouterr().err
+
+    def test_a_missing_basis_is_refused(self, inputs, capsys):
+        entry = _supported_entry("S2")
+        entry["fidelity_to_submitted_original"]["basis"] = ""
+        _confirm_obs_2(inputs, entry=entry, basis=self.BASIS)
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "basis" in capsys.readouterr().err
+
+    def test_a_generic_basis_with_no_evidence_for_this_row_is_refused(self, inputs, capsys):
+        entry = _supported_entry("S2", observation_id="OBS-9")
+        _confirm_obs_2(inputs, entry=entry, basis=self.BASIS)
+        code, _ = _compare(inputs)
+        assert code == 2
+        err = capsys.readouterr().err
+        assert "OBS-2" in err and "evidence" in err
+
+    def test_a_declaration_for_another_sub_section_is_refused(self, inputs, capsys):
+        _confirm_obs_2(inputs, entry=_supported_entry("S1"), basis=["declared/sub_sections/S1"])
+        code, _ = _compare(inputs)
+        assert code == 2
+        err = capsys.readouterr().err
+        assert "no entry for sub-section S2" in err
+
+    def test_the_row_must_name_the_declaration_it_rests_on(self, inputs, capsys):
+        _confirm_obs_2(inputs, entry=_supported_entry("S2"), basis=["provenance/transformation/citations"])
+        code, _ = _compare(inputs)
+        assert code == 2
+        assert "evidence_basis" in capsys.readouterr().err
+
+    def test_a_supported_declaration_is_accepted(self, inputs):
+        _confirm_obs_2(inputs, entry=_supported_entry("S2"), basis=self.BASIS)
+        code, out = _compare(inputs)
+        assert code == 0
+        row = _row(ec.load_comparison(next(out.glob("comparison_*.json"))), "OBS-2")
+        assert row["evidence_preserved_status"] == "Confirmed"
+        assert row["evidence_basis"][0]["value"]["declared_status"] == "Confirmed"
+
+    def test_the_rule_applies_to_every_schema_version(self, inputs, capsys):
+        """No committed 1.0 or 1.1 row declares Confirmed, so the stricter rule
+        changes nothing they replay; it is not version-gated."""
+        entry = _supported_entry("S2")
+        del entry["fidelity_to_submitted_original"]
+        _confirm_obs_2(inputs, entry=entry, basis=["declared/sub_sections/S2"])
+        code, _ = _compare(inputs)
+        assert code == 2
+        _rewrite(inputs, lambda d: d.update(schema_version="1.1"))
+        code, _ = _compare(inputs)
+        assert code == 2
+
+    def test_no_committed_record_declares_confirmed_preservation(self):
+        """The historical replay of the 1.0 and 1.1 records does not exercise the
+        rule, and the records say so."""
+        for name in ("dispositions_f60ae6e0a2a1.json", "dispositions_f60ae6e0a2a1_r05.json"):
+            path = DN_DISPOSITIONS.parent / name
+            if not path.is_file():
+                continue
+            rows = json.loads(path.read_text(encoding="utf-8-sig"))["rows"]
+            assert not [r for r in rows if r.get("evidence_preserved_status") == "Confirmed"], name

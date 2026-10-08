@@ -55,12 +55,20 @@ DN_REVIEWS = REPO / "docs/tier4_orchestration_state/msca_dn/reviews"
 
 _GENERATED = re.compile(r"^Generated: .*$", re.MULTILINE)
 _NOTES_ROW = re.compile(r"^\| review notes \| `([^`]+)` \|", re.MULTILINE)
+_COMPARISON_ROW = re.compile(r"^\| comparison report \| `([^`]+)` \|", re.MULTILINE)
 
 
 def _notes_named_by(report: Path) -> Path:
     """The notes record a committed report lists in its own input inventory."""
     match = _NOTES_ROW.search(report.read_text(encoding="utf-8"))
     assert match, f"{report.name} names no review notes in its inputs"
+    return REPO / match.group(1)
+
+
+def _comparison_named_by(report: Path) -> Path:
+    """The comparison a committed report lists in its own input inventory."""
+    match = _COMPARISON_ROW.search(report.read_text(encoding="utf-8"))
+    assert match, f"{report.name} names no comparison in its inputs"
     return REPO / match.group(1)
 
 
@@ -661,9 +669,13 @@ class TestTheRenderedReport:
     not DN_COMPARISON.is_file() or not DN_NOTES.is_file(), reason="MSCA-DN artifacts absent"
 )
 class TestCommittedMscaDn:
-    def _build(self, notes_path: Path | None = None) -> orv.Review:
+    def _build(
+        self, notes_path: Path | None = None, comparison: Path | None = None
+    ) -> orv.Review:
         profile = load_profile_bundle(str(DN_PROFILE), repo_root=REPO)
-        resolved = orv.resolve_inputs(DN_COMPARISON, repo_root=REPO, profile=profile.profile)
+        resolved = orv.resolve_inputs(
+            comparison or DN_COMPARISON, repo_root=REPO, profile=profile.profile
+        )
         notes = orv.load_review_notes(notes_path or DN_NOTES)
         return orv.build_review(resolved, notes, clock=lambda: FROZEN)
 
@@ -717,7 +729,7 @@ class TestCommittedMscaDn:
         assert reports
         for report in reports:
             notes_path = _notes_named_by(report)
-            review = self._build(notes_path)
+            review = self._build(notes_path, _comparison_named_by(report))
             decisions = report.parent / report.name.replace(
                 "operator_review_", "operator_decisions_"
             )
@@ -776,3 +788,96 @@ class TestCommittedMscaDn:
             for p in (report, decisions)
         }
         assert len(stamped) == 1, "the pair was not written by one run"
+
+
+# --------------------------------------------------------------------------- #
+# A recorded operator decision (PE-08 approval, 2026-10-08)
+# --------------------------------------------------------------------------- #
+
+
+def _approval_record(written) -> Path:
+    path = written["world"] / "docs" / "review" / "operator_approval.md"
+    path.write_text("# Approval\n\nApprove this decision package\n", encoding="utf-8")
+    return path
+
+
+def _record_decision(written, oid: str = "OBS-2") -> None:
+    record = _approval_record(written)
+
+    def mutate(d):
+        d["operator_approval"] = {
+            "record": "docs/review/operator_approval.md",
+            "sha256": orv.file_sha256(record),
+        }
+        row = next(r for r in d["rows"] if r["observation_id"] == oid)
+        row.pop("operator_decision", None)
+        row["decision_recorded"] = {
+            "decision_id": "D02",
+            "record": "docs/review/operator_approval.md",
+            "text": "Accept non-detection of the criticism in the recorded output.",
+        }
+    _edit(written["notes"], mutate)
+
+
+class TestRecordedDecisions:
+    def test_a_recorded_decision_stands_in_for_the_open_question(self, written):
+        _record_decision(written)
+        notes = orv.load_review_notes(written["notes"])
+        assert "operator_decision" not in notes.rows["OBS-2"]
+        assert notes.rows["OBS-2"]["decision_recorded"]["decision_id"] == "D02"
+
+    def test_a_recorded_decision_needs_an_id_a_record_and_a_text(self, written):
+        _record_decision(written)
+        _edit(written["notes"], lambda d: next(
+            r for r in d["rows"] if r["observation_id"] == "OBS-2"
+        )["decision_recorded"].pop("text"))
+        with pytest.raises(orv.OperatorReviewError, match="decision_recorded"):
+            orv.load_review_notes(written["notes"])
+
+    def test_a_recorded_decision_must_cite_the_record_the_notes_name(self, written):
+        _record_decision(written)
+        _edit(written["notes"], lambda d: next(
+            r for r in d["rows"] if r["observation_id"] == "OBS-2"
+        )["decision_recorded"].__setitem__("record", "docs/review/elsewhere.md"))
+        with pytest.raises(orv.OperatorReviewError, match="operator_approval"):
+            orv.load_review_notes(written["notes"])
+
+    def test_a_recorded_decision_without_the_approval_block_is_refused(self, written):
+        _record_decision(written)
+        _edit(written["notes"], lambda d: d.pop("operator_approval"))
+        with pytest.raises(orv.OperatorReviewError, match="operator_approval"):
+            orv.load_review_notes(written["notes"])
+
+    def test_the_approval_record_is_rehashed_and_listed_among_the_inputs(self, written):
+        _record_decision(written)
+        text = _report_text(written)
+        assert "| operator approval |" in text
+        assert "operator_approval.md" in text
+
+    def test_an_approval_record_that_moved_is_refused(self, written, capsys):
+        _record_decision(written)
+        _approval_record(written).write_text("changed\n", encoding="utf-8")
+        code, _ = _review(written)
+        assert code == 2
+        assert "operator approval" in capsys.readouterr().err
+
+    def test_the_report_and_the_decisions_file_keep_recorded_and_open_apart(self, written):
+        _record_decision(written)
+        code, reviews = _review(written)
+        assert code == 0
+        decisions = next(reviews.glob("operator_decisions_*.md")).read_text(encoding="utf-8")
+        assert "## Recorded decisions" in decisions
+        assert "D02" in decisions
+        assert "## Open decisions" in decisions
+        report = next(reviews.glob("operator_review_*.md")).read_text(encoding="utf-8")
+        assert "**Operator decision recorded:** D02" in report
+        # the blanket disclaimer no longer applies verbatim
+        assert "nothing here records one" not in report
+
+    def test_the_review_state_stays_agent_drafted(self, written):
+        """The notes are still an agent's; only the transcribed decisions are
+        the operator's, and each names the record it was transcribed from."""
+        _record_decision(written)
+        _edit(written["notes"], lambda d: d.__setitem__("review_state", "operator_reviewed"))
+        with pytest.raises(orv.OperatorReviewError, match="review_state"):
+            orv.load_review_notes(written["notes"])

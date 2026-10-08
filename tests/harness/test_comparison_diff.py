@@ -26,6 +26,7 @@ from tests.harness.test_blind_leakage import FROZEN
 from tests.harness.test_esr_comparison import (  # noqa: F401 - fixtures
     _compare,
     _rewrite,
+    _rewrite_register,
     _row,
     frozen_world,
     inputs,
@@ -298,14 +299,89 @@ class TestCommittedMscaDn:
         }
         assert shortcomings <= set(after.priorities)
 
-    def test_the_committed_diff_reproduces_from_the_committed_pair(self, tmp_path):
+    def test_every_committed_diff_reproduces_from_the_pair_it_names(self, tmp_path):
+        """Each diff is rebuilt from the two comparisons its own bindings name,
+        so a later diff over a later pair leaves the earlier one reproducible."""
         committed = sorted(DN_COMPARISONS.glob("review_diff_*.json"))
         assert committed, "no committed diff"
-        recorded = cd.load_diff(committed[-1])
-        before = cd.load_pair_member(DN_BEFORE, what="predecessor")
-        after = cd.load_pair_member(DN_AFTER, what="successor")
-        fresh = cd.diff_comparisons(before, after, repo_root=REPO, clock=lambda: FROZEN)
-        volatile = {"diffed_at", "writes"}
-        assert {k: v for k, v in fresh.items() if k not in volatile} == {
-            k: v for k, v in recorded.items() if k not in volatile
+        for path in committed:
+            recorded = cd.load_diff(path)
+            before = cd.load_pair_member(
+                REPO / recorded["predecessor"]["comparison"], what="predecessor"
+            )
+            after = cd.load_pair_member(REPO / recorded["successor"]["comparison"], what="successor")
+            fresh = cd.diff_comparisons(before, after, repo_root=REPO, clock=lambda: FROZEN)
+            volatile = {"diffed_at", "writes"}
+            assert {k: v for k, v in fresh.items() if k not in volatile} == {
+                k: v for k, v in recorded.items() if k not in volatile
+            }, path.name
+
+
+# --------------------------------------------------------------------------- #
+# A schema-1.2 successor: the fields the operator approval introduced
+# --------------------------------------------------------------------------- #
+
+
+@pytest.fixture
+def approved_pair(inputs):
+    """A 1.1 predecessor and a 1.2 successor over the same evidence."""
+    _rewrite_register(inputs, lambda d: d["derived"]["sub_sections"].append(
+        {"sub_section_id": "1", "characters": 11}
+    ))
+
+    def to_1_1(data):
+        data["schema_version"] = "1.1"
+        row = _row(data, "OBS-2")
+        row["evidence_basis"] = ["derived/sub_sections/1/characters"]
+        row["review_status"] = "agent_recommended_pending_operator_review"
+    _rewrite(inputs, to_1_1)
+    before = _write_comparison(inputs, "before")
+
+    def to_1_2(data):
+        data["schema_version"] = "1.2"
+        row = _row(data, "OBS-2")
+        row["failure_mode"] = "absent_from_recorded_output"
+        row["failure_mode_basis"] = "no sample names the start month"
+        row["review_status"] = "operator_confirmed"
+        row["deferred_to_private_network"] = "whether the submission carried the month"
+    _rewrite(inputs, to_1_2)
+    after = _write_comparison(inputs, "after")
+    return before, after
+
+
+class TestApprovedSuccessor:
+    def test_the_review_status_and_failure_mode_are_diffed(self, approved_pair):
+        before, after = approved_pair
+        diff = cd.diff_comparisons(
+            cd.load_pair_member(before, what="predecessor"),
+            cd.load_pair_member(after, what="successor"),
+            clock=lambda: FROZEN,
+        )
+        row = next(r for r in diff["rows"] if r["observation_id"] == "OBS-2")
+        assert row["changes"]["review_status"] == {
+            "before": "agent_recommended_pending_operator_review", "after": "operator_confirmed",
         }
+        assert row["changes"]["failure_mode"] == {"before": None, "after": "absent_from_recorded_output"}
+        assert row["changes"]["deferred_to_private_network"]["after"].startswith("whether")
+
+    def test_a_pointer_re_resolved_by_identity_shows_its_value_moving(self, approved_pair):
+        """V02: the pointer text is unchanged, so the citation set does not move;
+        the value it resolves to does, and the diff says so."""
+        before, after = approved_pair
+        diff = cd.diff_comparisons(
+            cd.load_pair_member(before, what="predecessor"),
+            cd.load_pair_member(after, what="successor"),
+            clock=lambda: FROZEN,
+        )
+        row = next(r for r in diff["rows"] if r["observation_id"] == "OBS-2")
+        assert "evidence_basis" not in row["changed"]
+        assert row["changes"]["evidence_basis_values"] == {
+            "derived/sub_sections/1/characters": {"before": 60, "after": 11},
+        }
+
+    def test_an_older_pair_keeps_its_shape(self, loaded):
+        """The committed 0001/0002 diff must still reproduce: none of the new
+        fields is compared unless the successor declares the identity rule."""
+        diff = cd.diff_comparisons(*loaded, clock=lambda: FROZEN)
+        for row in diff["rows"]:
+            assert not {"review_status", "failure_mode", "evidence_basis_values"} & set(row["changed"])

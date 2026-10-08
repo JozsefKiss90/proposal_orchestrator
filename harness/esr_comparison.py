@@ -126,14 +126,69 @@ DECLARED_STATUSES: tuple[str, ...] = ("Confirmed", "Inferred", "Assumed", "Unres
 
 #: Dispositions record versions this module reads. 1.0 is the PE-08 record; 1.1
 #: adds the R05 rule that a miss names the register entry its preservation
-#: claim rests on, and is otherwise identical. An unknown version is refused
-#: rather than read under the rules of a version it does not declare.
-DISPOSITIONS_SCHEMA_VERSIONS: tuple[str, ...] = ("1.0", "1.1")
+#: claim rests on, and is otherwise identical; 1.2 (the PE-08 operator approval
+#: of 2026-10-08) resolves register pointers by identity (V02), makes every
+#: miss declare its failure mode (D03), and reports a shared ESR sentence (D01).
+#: An unknown version is refused rather than read under the rules of a version
+#: it does not declare.
+DISPOSITIONS_SCHEMA_VERSIONS: tuple[str, ...] = ("1.0", "1.1", "1.2")
 
 #: The versions that hold a miss to naming its register basis. 1.0 does not:
 #: the PE-08 record named one on a single row of six, and tightening the rule
 #: under its own version would make that comparison unreplayable.
-VERSIONS_REQUIRING_A_MISS_BASIS: tuple[str, ...] = ("1.1",)
+VERSIONS_REQUIRING_A_MISS_BASIS: tuple[str, ...] = ("1.1", "1.2")
+
+#: The versions whose register pointers resolve a bare segment of a keyed list
+#: by identity only (:func:`resolve_pointer`). Under 1.0 and 1.1 a bare digit
+#: was read as a position first, so ``derived/sub_sections/8/characters``
+#: resolved to the ninth sub-section and not to sub-section 8 (validation
+#: correction V02). Those records recorded their values under that rule and
+#: replay only under it, so the legacy rule stays, named and version-gated.
+VERSIONS_WITH_IDENTITY_POINTERS: tuple[str, ...] = ("1.2",)
+
+#: The versions whose summary reports the ESR sentences that two observations
+#: share (operator decision D01). A separate gate from the pointer rule above:
+#: both arrived with schema 1.2 and neither implies the other.
+VERSIONS_REPORTING_SHARED_SENTENCES: tuple[str, ...] = ("1.2",)
+
+#: How a comparison says it resolved its register pointers. Recorded on the
+#: ``fidelity_register`` block only when the identity rule applied, so an older
+#: comparison keeps the shape it was written with. :func:`pointer_rule_of` reads
+#: it back for a reader that has the comparison and not the dispositions.
+POINTER_RESOLUTION_IDENTITY = "identity"
+POINTER_RESOLUTION_LEGACY = "legacy_positional"
+
+#: The declared-half field that carries the per-sub-section judgment on the step
+#: from the submission to this copy, and the claim scope it must declare. Both
+#: names are the R04 draft's (``tools/draft_fidelity_declarations.py``); a
+#: Confirmed preservation claim on a miss rests on this field and on nothing
+#: else in the register (validation correction V01).
+ORIGINAL_FIDELITY_FIELD = "fidelity_to_submitted_original"
+ORIGINAL_FIDELITY_SCOPE = "fidelity_against_the_submitted_original"
+
+#: Why a lane missed a point, declared per miss under schema 1.2 and reported
+#: as its own breakdown (operator decision D03). None is a verdict on the
+#: model: an absence from the recorded output does not establish that the
+#: evidence was not read (D02), and detection is not an accuracy or
+#: calibration claim.
+FAILURE_MODE_ABSENT = "absent_from_recorded_output"
+FAILURE_MODE_RATED_ADEQUATE = "read_and_rated_adequate"
+FAILURE_MODE_MISATTRIBUTED = "read_and_misattributed"
+FAILURE_MODE_UNDETERMINED = "undetermined"
+MISS_FAILURE_MODES: tuple[str, ...] = (
+    FAILURE_MODE_ABSENT,
+    FAILURE_MODE_RATED_ADEQUATE,
+    FAILURE_MODE_MISATTRIBUTED,
+    FAILURE_MODE_UNDETERMINED,
+)
+VERSIONS_REQUIRING_A_FAILURE_MODE: tuple[str, ...] = ("1.2",)
+
+#: What a proposed revision answers. A revision on a praised point is by
+#: definition work beyond the ESR (operator decisions D07 and D08) and must
+#: say so; a revision on a criticism answers it unless it declares otherwise.
+REVISION_SCOPE_ESR = "esr_response"
+REVISION_SCOPE_BEYOND = "beyond_esr"
+REVISION_SCOPES: tuple[str, ...] = (REVISION_SCOPE_ESR, REVISION_SCOPE_BEYOND)
 
 #: The review state a dispositions record and each of its rows may declare
 #: (ticket R05 item 2 and acceptance criterion 2). A record that declares none
@@ -210,7 +265,10 @@ _REVIEW_STATE_DRAFT = (
 _REVIEW_STATE_REVIEWED = (
     "The dispositions this comparison resolves record an operator review. The "
     "review is of the declarations, not of the measurements: every reference "
-    "was resolved against the artifact it names either way."
+    "was resolved against the artifact it names either way. Which rows the "
+    "review confirmed is stated per row under review_status and listed here; a "
+    "row not marked operator_confirmed carries an agent's declaration, and an "
+    "approved review policy is an authority fact, not Confirmed evidence."
 )
 _NOTE = (
     "Advisory to a human, never run-blocking. Every disposition is declared by "
@@ -592,12 +650,53 @@ def resolve_audit_reference(
     }
 
 
-def resolve_pointer(data: Mapping[str, Any], pointer: str) -> Any:
+def _is_keyed_list(node: list) -> bool:
+    """A list whose elements carry an identity (``sub_section_id`` or ``id``)."""
+    return any(
+        isinstance(x, Mapping) and ("sub_section_id" in x or "id" in x) for x in node
+    )
+
+
+def _by_identity(node: list, seg: str, pointer: str) -> Any:
+    matches = [
+        x for x in node
+        if isinstance(x, Mapping) and str(x.get("sub_section_id", x.get("id"))) == seg
+    ]
+    if not matches:
+        raise EsrComparisonError(f"register pointer {pointer!r}: no element {seg!r}.")
+    return matches[0]
+
+
+def _by_position(node: list, index: str, pointer: str) -> Any:
+    if not index.isdigit() or int(index) >= len(node):
+        raise EsrComparisonError(
+            f"register pointer {pointer!r}: position #{index} is outside a list of {len(node)}."
+        )
+    return node[int(index)]
+
+
+def resolve_pointer(
+    data: Mapping[str, Any], pointer: str, *, legacy_positional: bool = False
+) -> Any:
     """Resolve a ``/``-separated pointer into *data*.
 
-    A segment indexes an object by key, a list by integer, or a list of
-    objects by their ``sub_section_id`` or ``id``. ``/`` rather than ``.``
-    because sub-section ids carry dots.
+    A segment indexes an object by key. Into a list it is typed:
+
+    * ``#N`` is a position, on any list;
+    * a bare segment on a **keyed** list (elements carrying ``sub_section_id``
+      or ``id``) is an identity, and only an identity. ``8`` names the
+      sub-section whose id is ``8``, never the ninth element, whatever its
+      position (validation correction V02);
+    * a bare digit on a plain list is a position, since there is no identity
+      to name.
+
+    ``/`` rather than ``.`` because sub-section ids carry dots.
+
+    *legacy_positional* is the rule dispositions schema 1.0 and 1.1 were
+    recorded under: a bare digit within range is read as a position first and
+    as an identity only past the end. It exists so those comparisons replay
+    from their documented inputs, and :func:`run_comparison` selects it from
+    the record's own ``schema_version``. It is never the default.
     """
     node: Any = data
     for seg in [s for s in pointer.split("/") if s != ""]:
@@ -606,27 +705,41 @@ def resolve_pointer(data: Mapping[str, Any], pointer: str) -> Any:
                 raise EsrComparisonError(f"register pointer {pointer!r}: no key {seg!r}.")
             node = node[seg]
         elif isinstance(node, list):
-            if seg.isdigit() and int(seg) < len(node):
+            if seg.startswith("#"):
+                node = _by_position(node, seg[1:], pointer)
+            elif not _is_keyed_list(node):
+                node = _by_position(node, seg, pointer)
+            elif legacy_positional and seg.isdigit() and int(seg) < len(node):
                 node = node[int(seg)]
-                continue
-            matches = [
-                x for x in node
-                if isinstance(x, Mapping) and str(x.get("sub_section_id", x.get("id"))) == seg
-            ]
-            if not matches:
-                raise EsrComparisonError(f"register pointer {pointer!r}: no element {seg!r}.")
-            node = matches[0]
+            else:
+                node = _by_identity(node, seg, pointer)
         else:
             raise EsrComparisonError(f"register pointer {pointer!r}: {seg!r} indexes a scalar.")
     return node
 
 
-def resolve_register_pointer(register: Mapping[str, Any], pointer: str, *, label: str) -> dict[str, Any]:
+def resolve_register_pointer(
+    register: Mapping[str, Any], pointer: str, *, label: str, legacy_positional: bool = False
+) -> dict[str, Any]:
     try:
-        value = resolve_pointer(register, pointer)
+        value = resolve_pointer(register, pointer, legacy_positional=legacy_positional)
     except EsrComparisonError as exc:
         raise EsrComparisonError(f"{label}: {exc}") from None
     return {"pointer": pointer, "value": value}
+
+
+def pointer_rule_of(comparison: Mapping[str, Any]) -> str:
+    """Which pointer rule a written comparison recorded its values under.
+
+    One reader of the field, so one polarity. A comparison written under the
+    identity rule says so on its ``fidelity_register`` block; one written under
+    schema 1.0 or 1.1 says nothing, and its values are legacy positional.
+    """
+    block = comparison.get("fidelity_register") or {}
+    recorded = str(block.get("pointer_resolution") or "")
+    if recorded == POINTER_RESOLUTION_IDENTITY:
+        return POINTER_RESOLUTION_IDENTITY
+    return POINTER_RESOLUTION_LEGACY
 
 
 # --------------------------------------------------------------------------- #
@@ -675,23 +788,67 @@ def _presence_declared(entry: Mapping[str, Any]) -> bool:
     return False
 
 
+def _names_declared_entry(register_refs: Sequence[Mapping[str, Any]], sub: str) -> bool:
+    """Whether a row's register pointers name the declared-half entry for *sub*."""
+    for ref in register_refs:
+        segs = [s for s in str(ref.get("pointer") or "").split("/") if s != ""]
+        if segs[:3] == ["declared", "sub_sections", sub]:
+            return True
+    return False
+
+
+def _evidence_names_observation(evidence: Any, observation_id: str) -> bool:
+    """Whether a declaration's evidence list carries an item for this row."""
+    if not isinstance(evidence, list):
+        return False
+    for item in evidence:
+        if not isinstance(item, Mapping):
+            continue
+        ids = item.get("observation_ids")
+        if isinstance(ids, str):
+            ids = [ids]
+        if not isinstance(ids, list) or observation_id not in [str(x) for x in ids]:
+            continue
+        if str(item.get("source") or "").strip() and str(item.get("statement") or "").strip():
+            return True
+    return False
+
+
 def check_preservation_claim(
     register: Mapping[str, Any],
     *,
     current: Sequence[Mapping[str, Any]],
     status: str | None,
     label: str,
+    observation_id: str,
+    register_refs: Sequence[Mapping[str, Any]],
 ) -> None:
     """What a declared ``evidence_preserved_status`` is held to.
 
     The quote on a miss is a measurement: ``verify_evidence`` found it in the
     named sub-section of this candidate. The *sufficiency* of that evidence is
     a claim about the submission, which no artifact here measures. So the
-    status stays a declaration, and only a ``Confirmed`` one is constrained:
-    it needs the register's declared half to carry a ``presence`` statement for
-    every sub-section the preserved passage is quoted from. An ``Inferred``,
-    ``Assumed`` or ``Unresolved`` status says the claim rests on reasoning or
-    on nothing, and stands as declared.
+    status stays a declaration, and only a ``Confirmed`` one is constrained
+    (validation correction V01 of the PE-08 operator approval). For every
+    sub-section the preserved passage is quoted from, the register's declared
+    half must carry an entry that:
+
+    * states a ``presence`` (the extraction claim, which on its own says only
+      that this PDF was read and unlocks nothing);
+    * carries :data:`ORIGINAL_FIDELITY_FIELD`, the per-sub-section judgment on
+      the step from the submission to this copy, declared in the scope
+      :data:`ORIGINAL_FIDELITY_SCOPE`, with status ``Confirmed`` and a basis;
+    * supports *this* row: the field's ``evidence`` list carries an item that
+      names the observation, with a source and a statement. A generic basis
+      that names no row is not evidence for the proposition the row makes.
+
+    And the row must name that entry among its ``evidence_basis`` pointers, so
+    the declaration it rests on is the one the comparison resolved and
+    recorded. An ``Inferred``, ``Assumed`` or ``Unresolved`` status says the
+    claim rests on reasoning or on nothing, and stands as declared.
+
+    The rule is not version-gated: no committed 1.0 or 1.1 row declares
+    ``Confirmed``, which a test pins, so their replay does not exercise it.
     """
     if status != "Confirmed":
         return
@@ -709,6 +866,42 @@ def check_preservation_claim(
             raise EsrComparisonError(
                 f"{label}: the register's declared half declares no 'presence' for "
                 f"sub-section {sub}, so 'Confirmed' preservation has no basis."
+            )
+        claim = entry.get(ORIGINAL_FIDELITY_FIELD)
+        if not isinstance(claim, Mapping):
+            raise EsrComparisonError(
+                f"{label}: the declared-half entry for sub-section {sub} carries no "
+                f"'{ORIGINAL_FIDELITY_FIELD}' claim. A 'presence' declaration is an "
+                "extraction claim about this PDF and does not unlock 'Confirmed' "
+                "preservation from the submission."
+            )
+        if claim.get("claim_scope") != ORIGINAL_FIDELITY_SCOPE:
+            raise EsrComparisonError(
+                f"{label}: sub-section {sub}'s '{ORIGINAL_FIDELITY_FIELD}' declares "
+                f"claim_scope {claim.get('claim_scope')!r}; 'Confirmed' preservation needs "
+                f"{ORIGINAL_FIDELITY_SCOPE!r}."
+            )
+        if claim.get("declared_status") != "Confirmed":
+            raise EsrComparisonError(
+                f"{label}: sub-section {sub}'s '{ORIGINAL_FIDELITY_FIELD}' is declared "
+                f"{claim.get('declared_status')!r}, so preservation cannot be 'Confirmed'."
+            )
+        if not str(claim.get("basis") or "").strip():
+            raise EsrComparisonError(
+                f"{label}: sub-section {sub}'s '{ORIGINAL_FIDELITY_FIELD}' is 'Confirmed' "
+                "with no basis."
+            )
+        if not _evidence_names_observation(claim.get("evidence"), observation_id):
+            raise EsrComparisonError(
+                f"{label}: sub-section {sub}'s '{ORIGINAL_FIDELITY_FIELD}' carries no "
+                f"evidence item naming {observation_id} with a source and a statement; a "
+                "basis that supports no particular proposition does not support this one."
+            )
+        if not _names_declared_entry(register_refs, sub):
+            raise EsrComparisonError(
+                f"{label}: 'Confirmed' preservation rests on the declared-half entry for "
+                f"sub-section {sub}, and the row's evidence_basis does not name it "
+                f"(declared/sub_sections/{sub}/...)."
             )
 
 
@@ -762,6 +955,89 @@ def check_revision_plan(revision: Mapping[str, Any], *, label: str) -> None:
             f"{label}: revision_plan commitment_kind is {kind!r} and names nothing to "
             "confirm; a revision that commits a human states what they must confirm."
         )
+    check_subtasks(plan, label=label)
+
+
+def check_failure_mode(row: Mapping[str, Any], *, label: str) -> str:
+    """A miss under schema 1.2 says how the lane missed the point (D03).
+
+    The mode is a declaration drawn from the adjudication record, and the row
+    names its basis. It is reported beside the detection summary and never
+    folded into it: an adequacy disagreement and an unmentioned topic are both
+    misses, counted in one figure, and told apart in another.
+    """
+    mode = row.get("failure_mode")
+    if mode not in MISS_FAILURE_MODES:
+        raise EsrComparisonError(
+            f"{label}: a miss under this schema declares a failure_mode; {mode!r} is not one "
+            f"of {', '.join(MISS_FAILURE_MODES)}."
+        )
+    basis = row.get("failure_mode_basis")
+    if not isinstance(basis, str) or not basis.strip():
+        raise EsrComparisonError(f"{label}: failure_mode {mode!r} needs a failure_mode_basis.")
+    return str(mode)
+
+
+def check_revision_scope(
+    revision: Mapping[str, Any], *, kind: str, label: str
+) -> str:
+    """What a proposed revision answers (operator decisions D07 and D08).
+
+    A revision on a strength is work beyond the ESR and must declare it, so
+    no reading of the revision list can present an improvement as a response
+    to a criticism. A revision on a criticism answers it unless it declares
+    otherwise.
+    """
+    scope = revision.get("scope", REVISION_SCOPE_ESR)
+    if scope not in REVISION_SCOPES:
+        raise EsrComparisonError(
+            f"{label}: scope {scope!r}; one of {', '.join(REVISION_SCOPES)} is required."
+        )
+    if kind == OBSERVATION_KIND_STRENGTH and scope != REVISION_SCOPE_BEYOND:
+        raise EsrComparisonError(
+            f"{label}: a revision on a strength is work beyond the ESR and must declare "
+            f"scope {REVISION_SCOPE_BEYOND!r}."
+        )
+    return str(scope)
+
+
+def check_subtasks(plan: Mapping[str, Any], *, label: str) -> None:
+    """A plan may carry labelled subtasks (D08); each is scoped and confirmable."""
+    subtasks = plan.get("subtasks")
+    if subtasks is None:
+        return
+    if not isinstance(subtasks, list) or not subtasks:
+        raise EsrComparisonError(f"{label}: revision_plan subtasks must be a non-empty list.")
+    seen: set[str] = set()
+    for i, task in enumerate(subtasks):
+        if not isinstance(task, Mapping):
+            raise EsrComparisonError(f"{label}: subtask {i} must be an object.")
+        name = str(task.get("label") or "").strip()
+        if not name:
+            raise EsrComparisonError(f"{label}: subtask {i} needs a label.")
+        if name in seen:
+            raise EsrComparisonError(f"{label}: subtask label {name!r} is used twice.")
+        seen.add(name)
+        if task.get("scope") not in REVISION_SCOPES:
+            raise EsrComparisonError(
+                f"{label}: subtask {name!r} scope {task.get('scope')!r}; one of "
+                f"{', '.join(REVISION_SCOPES)} is required."
+            )
+        if not str(task.get("text") or "").strip():
+            raise EsrComparisonError(f"{label}: subtask {name!r} needs a text.")
+        confirm = task.get("requires_confirmation")
+        if not isinstance(confirm, list) or not confirm or not all(
+            isinstance(v, str) and v.strip() for v in confirm
+        ):
+            raise EsrComparisonError(
+                f"{label}: subtask {name!r} must name what has to be confirmed."
+            )
+        kind = task.get("commitment_kind")
+        if kind is not None and kind not in REVISION_COMMITMENT_KINDS:
+            raise EsrComparisonError(
+                f"{label}: subtask {name!r} commitment_kind {kind!r}; one of "
+                f"{', '.join(REVISION_COMMITMENT_KINDS)} is required when present."
+            )
 
 
 def check_row_rules(
@@ -833,7 +1109,12 @@ def check_row_rules(
                 "fidelity-register entry naming what the copy preserves; the disposition "
                 "claims preservation and the register is what records it."
             )
-        check_preservation_claim(register, current=current, status=status, label=label)
+        check_preservation_claim(
+            register, current=current, status=status, label=label,
+            observation_id=str(observation["id"]), register_refs=register_refs,
+        )
+        if schema_version in VERSIONS_REQUIRING_A_FAILURE_MODE:
+            check_failure_mode(row, label=label)
     elif disposition == DISPOSITION_ADDRESSED:
         if kind == OBSERVATION_KIND_STRENGTH:
             raise EsrComparisonError(f"{label}: a strength cannot be 'addressed'.")
@@ -974,6 +1255,14 @@ def run_comparison(
             f"dispositions name observation(s) the ESR record does not: {', '.join(unknown)}."
         )
 
+    version = dispositions.schema_version
+    identity_pointers = version in VERSIONS_WITH_IDENTITY_POINTERS
+    shared = (
+        _shared_sentences(esr.observations)
+        if version in VERSIONS_REPORTING_SHARED_SENTENCES
+        else {}
+    )
+
     rows: list[dict[str, Any]] = []
     for obs in esr.observations:
         oid = str(obs["id"])
@@ -1017,7 +1306,9 @@ def run_comparison(
                 for ref in current if _occurs(historical_candidate, ref)
             ]
         register_refs = [
-            resolve_register_pointer(register.data, str(ptr), label=label)
+            resolve_register_pointer(
+                register.data, str(ptr), label=label, legacy_positional=not identity_pointers
+            )
             for ptr in row.get("evidence_basis") or []
         ]
         revision = row.get("proposed_revision")
@@ -1025,6 +1316,7 @@ def run_comparison(
             if not isinstance(revision, Mapping) or not str(revision.get("text") or "").strip():
                 raise EsrComparisonError(f"{label}: proposed_revision needs a text.")
             _declared(revision, "declared_status", label=f"{label} (proposed_revision)", required=True)
+            check_revision_scope(revision, kind=obs["kind"], label=f"{label} (proposed_revision)")
             check_revision_plan(revision, label=f"{label} (proposed_revision)")
         _declared(row, "evidence_preserved_status", label=label, required=False)
         review_status = row.get("review_status")
@@ -1032,6 +1324,26 @@ def run_comparison(
             raise EsrComparisonError(
                 f"{label}: review_status {review_status!r}; one of "
                 f"{', '.join(ROW_REVIEW_STATES)} is required when the field is present."
+            )
+        deferred = row.get("deferred_to_private_network")
+        if deferred is not None and (not isinstance(deferred, str) or not deferred.strip()):
+            raise EsrComparisonError(
+                f"{label}: deferred_to_private_network must be text naming what the "
+                "private network has to establish, or absent."
+            )
+        decision_ids = row.get("operator_decision_ids")
+        if decision_ids is not None and (
+            not isinstance(decision_ids, list) or not decision_ids
+            or not all(isinstance(d, str) and d.strip() for d in decision_ids)
+        ):
+            raise EsrComparisonError(
+                f"{label}: operator_decision_ids must be a non-empty list of decision ids "
+                "from the approval record the dispositions name, or absent."
+            )
+        if decision_ids is not None and not dispositions.data.get("operator_approval"):
+            raise EsrComparisonError(
+                f"{label}: operator_decision_ids are declared but the dispositions record "
+                "names no operator_approval record they could be found in."
             )
         check_row_rules(
             obs, disposition,
@@ -1088,10 +1400,22 @@ def run_comparison(
             "proposed_revision": row.get("proposed_revision"),
             # Only a row that declares a review status carries one, so a record
             # that declares none keeps the row shape it had before ticket R05.
+            # The same holds for every field below: each is emitted only when
+            # the record declares it, so an older comparison replays unchanged.
             **({"review_status": review_status} if review_status is not None else {}),
+            **({"failure_mode": row["failure_mode"],
+                "failure_mode_basis": row.get("failure_mode_basis")}
+               if row.get("failure_mode") is not None else {}),
+            **({"shares_esr_sentence_with": shared[oid]} if shared.get(oid) else {}),
+            **({"deferred_to_private_network": deferred} if deferred is not None else {}),
+            **({"operator_decision_ids": list(decision_ids)} if decision_ids is not None else {}),
         })
 
     summary = _summarise(rows, baseline_criteria)
+    if version in VERSIONS_REQUIRING_A_FAILURE_MODE:
+        summary["misses_by_failure_mode"] = _misses_by_failure_mode(rows)
+    if shared:
+        summary["shared_esr_sentences"] = _shared_sentence_report(rows, shared)
     unresolved = [
         r["observation_id"] for r in rows if r.get("disposition_status") == "Unresolved"
     ]
@@ -1164,7 +1488,13 @@ def run_comparison(
             "candidate_hash": historical_hash,
             "document": _document_of(historical_candidate),
         },
-        "fidelity_register": {"path": _portable(register.path, repo_root), "sha256": register.sha256},
+        "fidelity_register": {
+            "path": _portable(register.path, repo_root),
+            "sha256": register.sha256,
+            # Recorded only under the identity rule: an older comparison was
+            # written under the legacy rule and keeps the shape it had.
+            **({"pointer_resolution": POINTER_RESOLUTION_IDENTITY} if identity_pointers else {}),
+        },
         "audits": [
             {"path": a.key, "sha256": a.sha256, "candidate_hash": a.data.get("candidate_hash")}
             for a in audits.values()
@@ -1193,6 +1523,20 @@ def run_comparison(
                 r["observation_id"] for r in rows
                 if r.get("review_status") == "operator_decision_required"
             ],
+            # An operator-reviewed record says which rows the review confirmed
+            # and which it left as an agent's; an agent-drafted record has no
+            # confirmed row and keeps the block it had.
+            **({
+                "rows_operator_confirmed": [
+                    r["observation_id"] for r in rows
+                    if r.get("review_status") == "operator_confirmed"
+                ],
+                "rows_agent_recommended": [
+                    r["observation_id"] for r in rows
+                    if r.get("review_status") == "agent_recommended_pending_operator_review"
+                ],
+                "operator_approval": dispositions.data.get("operator_approval"),
+            } if dispositions.review_state == REVIEW_STATE_OPERATOR_REVIEWED else {}),
         }
     revisions_record = {
         "record_type": REVISIONS_RECORD_TYPE,
@@ -1213,7 +1557,110 @@ def run_comparison(
         **revisions,
         "notes": _NOTE,
     }
+    beyond = _beyond_esr_improvements(rows)
+    if beyond:
+        revisions_record["beyond_esr_improvements"] = beyond
     return ComparisonReport(data=data, revisions=revisions_record, baseline_report_sha256=report_sha)
+
+
+def _shared_sentences(observations: Sequence[Mapping[str, Any]]) -> dict[str, list[str]]:
+    """Observation id -> the other ids transcribed from the same ESR sentence.
+
+    Measured from the ESR record's own text (operator decision D01): the
+    transcription may split one evaluator sentence into clause-level
+    observations, and the comparison must say so rather than present the
+    clauses as separate evaluator sentences.
+    """
+    groups: dict[str, list[str]] = {}
+    for obs in observations:
+        groups.setdefault(normalise_text(str(obs["text"])), []).append(str(obs["id"]))
+    return {
+        oid: [other for other in ids if other != oid]
+        for ids in groups.values() if len(ids) > 1
+        for oid in ids
+    }
+
+
+def _shared_sentence_report(
+    rows: Sequence[Mapping[str, Any]], shared: Mapping[str, Sequence[str]]
+) -> dict[str, Any]:
+    by_id = {r["observation_id"]: r for r in rows}
+    groups: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for oid in [r["observation_id"] for r in rows]:
+        if oid in seen or oid not in shared:
+            continue
+        members = [oid, *shared[oid]]
+        seen.update(members)
+        groups.append({
+            "observation_ids": members,
+            "cluster_id": by_id[oid].get("cluster_id"),
+            "severity_wording": by_id[oid].get("severity_wording"),
+            "dispositions": {m: by_id[m]["disposition"] for m in members},
+            "detected_by": {m: list(by_id[m]["detected_by"]) for m in members},
+        })
+    return {
+        "groups": groups,
+        "statement": (
+            "Each group is one evaluator sentence that the ESR record transcribes as "
+            "clause-level observations. The counts above are per observation, so one "
+            "sentence appears once per clause and is not a separate evaluator sentence, "
+            "an independent deduction, or a cluster-level detection; the cluster and the "
+            "severity wording are the sentence's own."
+        ),
+    }
+
+
+def _misses_by_failure_mode(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    misses = [r for r in rows if r["disposition"] == DISPOSITION_NOT_DETECTED]
+    return {
+        "by_mode": {
+            mode: [r["observation_id"] for r in misses if r.get("failure_mode") == mode]
+            for mode in MISS_FAILURE_MODES
+        },
+        "statement": (
+            "Every miss is counted in the detection figures above whatever its mode "
+            "(operator decision D03). The breakdown here is separate: an adequacy "
+            f"disagreement ('{FAILURE_MODE_RATED_ADEQUATE}') and an unmentioned topic "
+            f"('{FAILURE_MODE_ABSENT}') are different failures of the same count. "
+            f"'{FAILURE_MODE_ABSENT}' describes the recorded output and does not establish "
+            "that the model did not read the evidence (D02). Neither the count nor the "
+            "breakdown is an overall accuracy or calibration claim."
+        ),
+    }
+
+
+def _beyond_esr_improvements(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Every proposed revision or subtask declared beyond the ESR, kept apart."""
+    out: list[dict[str, Any]] = []
+    for r in rows:
+        rev = r.get("proposed_revision") if isinstance(r.get("proposed_revision"), Mapping) else None
+        if rev is None:
+            continue
+        plan = rev.get("revision_plan") if isinstance(rev.get("revision_plan"), Mapping) else {}
+        if rev.get("scope") == REVISION_SCOPE_BEYOND:
+            out.append({
+                "observation_id": r["observation_id"],
+                "kind": r["kind"],
+                "label": rev.get("label"),
+                "proposed_revision": rev.get("text"),
+                "revision_status": rev.get("declared_status"),
+                "commitment_kind": plan.get("commitment_kind"),
+                "requires_confirmation": list(plan.get("requires_confirmation") or []),
+            })
+        for task in plan.get("subtasks") or []:
+            if isinstance(task, Mapping) and task.get("scope") == REVISION_SCOPE_BEYOND:
+                out.append({
+                    "observation_id": r["observation_id"],
+                    "kind": r["kind"],
+                    "label": task.get("label"),
+                    "proposed_revision": task.get("text"),
+                    "revision_status": rev.get("declared_status"),
+                    "commitment_kind": task.get("commitment_kind", plan.get("commitment_kind")),
+                    "requires_confirmation": list(task.get("requires_confirmation") or []),
+                    "within_revision_of": r["observation_id"],
+                })
+    return out
 
 
 def _document_of(candidate: Candidate) -> str | None:
@@ -1462,6 +1909,17 @@ __all__ = [
     "REVIEW_STATE_OPERATOR_REVIEWED",
     "ROW_REVIEW_STATES",
     "VERSIONS_REQUIRING_A_MISS_BASIS",
+    "VERSIONS_REQUIRING_A_FAILURE_MODE",
+    "VERSIONS_WITH_IDENTITY_POINTERS",
+    "VERSIONS_REPORTING_SHARED_SENTENCES",
+    "POINTER_RESOLUTION_IDENTITY",
+    "POINTER_RESOLUTION_LEGACY",
+    "ORIGINAL_FIDELITY_FIELD",
+    "ORIGINAL_FIDELITY_SCOPE",
+    "MISS_FAILURE_MODES",
+    "REVISION_SCOPES",
+    "REVISION_SCOPE_BEYOND",
+    "REVISION_SCOPE_ESR",
     "ComparisonReport",
     "Dispositions",
     "EsrComparisonError",
@@ -1470,6 +1928,9 @@ __all__ = [
     "Register",
     "load_register",
     "check_preservation_claim",
+    "check_failure_mode",
+    "check_revision_scope",
+    "check_subtasks",
     "check_revision_plan",
     "check_row_rules",
     "declared_half_entry",
@@ -1481,6 +1942,7 @@ __all__ = [
     "render_comparison",
     "resolve_audit_reference",
     "resolve_blind_reference",
+    "pointer_rule_of",
     "resolve_pointer",
     "run_comparison",
     "verify_evidence",

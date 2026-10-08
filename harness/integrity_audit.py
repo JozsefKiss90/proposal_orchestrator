@@ -16,8 +16,8 @@ and the label-value work-package headers, and runs five consistency checks:
    package's window.**
 3. **Each milestone's month against the months of the deliverables it depends
    on.** A dependency is a deliverable the milestone row names. A milestone
-   naming none is reported as *undeclared*, with the related packages'
-   deliverable months beside it as context, never as a failure.
+   naming none is inventoried in the check's context, with the related
+   packages' deliverable months beside it, and is not a finding (see below).
 4. **DC table against the individual DC research projects described in
    1.1** — the DC set, each appointment against the windows of the packages
    its project names (see below), and the recruiting participant against the
@@ -52,10 +52,16 @@ appointment that outlasts every package is a check note carrying the months,
 not a finding — the recruitment table's own duration column is the only bound
 the candidate states, and no source ties that period to a package window.
 
-*A milestone naming no deliverable* keeps its ``undeclared_dependency`` kind,
-and a check note says what that kind rests on: a dependency is not a column of
-the milestones table, so the finding records an absence rather than a declared
-value the candidate contradicts.
+*A milestone naming no deliverable* is not a finding. No source requires a
+milestone to name a deliverable — a dependency is not a column of the
+milestones table — so the absence is an inventory entry in the check's
+``context`` and a drafting suggestion in its note, never a defect (operator
+decision D11 of the PE-08 approval, 2026-10-08, retiring the
+``undeclared_dependency`` findings R03 had already marked as resting on no
+declared value). The kind stays in :data:`FINDING_KINDS` so the audits that
+recorded it still load; no check emits it. A milestone that *does* name a
+deliverable is still checked: a name the table does not list, or a deliverable
+due after the milestone, is an inconsistency.
 
 Reading the work-package header
 -------------------------------
@@ -200,6 +206,8 @@ CHECKS: tuple[tuple[str, str], ...] = (
 KIND_INCONSISTENCY: str = "inconsistency"
 KIND_MISSING_FIELD: str = "missing_field"
 KIND_UNPARSED: str = "unparsed_cell"
+#: Retired as an emitted kind by operator decision D11 (2026-10-08); kept in
+#: the vocabulary so historical audits that recorded it still load.
 KIND_UNDECLARED: str = "undeclared_dependency"
 KIND_OUT_OF_WINDOW: str = "out_of_window"
 KIND_NOT_COMPARABLE: str = "not_comparable"
@@ -306,10 +314,14 @@ class CheckResult:
     compared: int
     findings: tuple[Finding, ...]
     notes: tuple[str, ...] = ()
+    #: What the check saw and did not judge, as data: an inventory a reader may
+    #: act on as drafting advice. Emitted only when the check has one, so a
+    #: check that carries none keeps the shape it had.
+    context: Mapping[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         by_kind = {k: sum(1 for f in self.findings if f.kind == k) for k in FINDING_KINDS}
-        return {
+        d: dict[str, Any] = {
             "check_id": self.check_id,
             "title": self.title,
             "compared": self.compared,
@@ -318,6 +330,9 @@ class CheckResult:
             "findings": [f.to_dict() for f in self.findings],
             "notes": list(self.notes),
         }
+        if self.context is not None:
+            d["context"] = dict(self.context)
+        return d
 
 
 # --------------------------------------------------------------------------- #
@@ -1318,6 +1333,7 @@ def _check_deliverables(parsed: ParsedTables) -> CheckResult:
 def _check_milestones(parsed: ParsedTables) -> CheckResult:
     cid, title = CHECKS[2]
     findings: list[Finding] = []
+    inventory: list[dict[str, Any]] = []
     compared = 0
     deliverables = {d["id"]: d for d in _deliverables(parsed)}
     milestones = _milestones(parsed)
@@ -1366,32 +1382,32 @@ def _check_milestones(parsed: ParsedTables) -> CheckResult:
                         {"milestone_month": month, "deliverable_months": list(d["months"])},
                     ))
             continue
-        context = {
+        # No source requires a milestone to name a deliverable (D11): the
+        # absence is inventoried, not found.
+        inventory.append({
+            "id": subject,
+            "month": month,
             "related_wps": list(related),
             "deliverables_of_related_wps": [
                 {"id": d["id"], "months": list(d["months"])}
                 for d in deliverables.values()
                 if d["wps"] and any(w in related for w in d["wps"])
             ],
-        }
-        findings.append(Finding(
-            cid, KIND_UNDECLARED, subject,
-            f"{subject} names no deliverable it depends on; the deliverables of its related "
-            f"package(s) and their months are listed as context, not judged",
-            row.where, (row.text[:160],), context,
-        ))
+        })
     notes: tuple[str, ...] = ()
     if not milestones:
         notes += ("no milestones table found; the check compared nothing",)
-    undeclared = sum(1 for f in findings if f.kind == KIND_UNDECLARED)
-    if undeclared:
+    context: dict[str, Any] | None = None
+    if inventory:
+        context = {"milestones_without_a_named_dependency": inventory}
         notes += (
-            f"{undeclared} of {len(milestones)} milestones name no deliverable they depend on; a "
-            "dependency is not a column of the milestones table, so each of those findings records "
-            "an absence, not a declared value the candidate contradicts. The deliverables of the "
-            "related packages are carried as context and no month was judged against them",
+            f"{len(inventory)} of {len(milestones)} milestones name no deliverable they depend "
+            "on; no source requires one, since a dependency is not a column of the milestones "
+            "table. Each is listed in this check's context with the deliverables of its related "
+            "package(s) and their months, as drafting advice a reader may act on and not a "
+            "finding: no link is assumed and no month was judged against them",
         )
-    return CheckResult(cid, title, compared, tuple(findings), notes)
+    return CheckResult(cid, title, compared, tuple(findings), notes, context)
 
 
 def _check_dcs(parsed: ParsedTables) -> CheckResult:

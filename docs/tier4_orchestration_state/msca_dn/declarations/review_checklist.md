@@ -100,15 +100,15 @@ Steps:
 
 | Sub-section | Presence | Revision difference | Original fidelity | Dependent ESR rows | Decision needed |
 |---|---|---|---|---|---|
-| `1.1` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-03 | confirm presence and transformation; the draft carries an open question on ESR-E-03 |
-| `1.2` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-01, ESR-E-02, ESR-E-06 | confirm presence and transformation; the draft carries an open question on ESR-E-01, ESR-E-02 |
-| `1.3` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-07, ESR-E-08 | confirm presence and transformation; the draft carries an open question on ESR-E-07, ESR-E-08 |
-| `1.4` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-09 | confirm presence and transformation; the draft carries an open question on ESR-E-09 |
+| `1.1` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-03 | confirm presence and transformation |
+| `1.2` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-01, ESR-E-02, ESR-E-06 | confirm presence and transformation; the draft carries an open question on ESR-E-02 |
+| `1.3` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-07, ESR-E-08 | confirm presence and transformation; the draft carries an open question on ESR-E-08 |
+| `1.4` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-09 | confirm presence and transformation |
 | `2.1` | Confirmed | unchanged from sanitised_v1 | Unresolved | — | confirm presence and transformation |
 | `2.2` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-E-08 | confirm presence and transformation; the draft carries an open question on ESR-E-08 |
 | `2.3` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-I-01 | confirm presence and transformation |
 | `2.4` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-I-02 | confirm presence and transformation |
-| `3.1` | Confirmed, 1 caveat(s) | changed from sanitised_v1: re-typeset page(s) 45; paragraphs 145 → 142, characters 27977 → 28087 | Unresolved | ESR-E-03, ESR-E-04, ESR-Q-01, ESR-Q-02, ESR-Q-03, ESR-Q-04 | confirm presence and transformation; the draft carries an open question on ESR-E-03, ESR-E-04, ESR-Q-01, ESR-Q-02, ESR-Q-03 |
+| `3.1` | Confirmed, 1 caveat(s) | changed from sanitised_v1: re-typeset page(s) 45; paragraphs 145 → 142, characters 27977 → 28087 | Unresolved | ESR-E-03, ESR-E-04, ESR-Q-01, ESR-Q-02, ESR-Q-03, ESR-Q-04 | confirm presence and transformation; the draft carries an open question on ESR-E-04, ESR-Q-01, ESR-Q-03 |
 | `3.2` | Confirmed, 1 caveat(s) | unchanged from sanitised_v1 | Unresolved | ESR-Q-01 | confirm presence and transformation; the draft carries an open question on ESR-Q-01 |
 | `4` | Confirmed | unchanged from sanitised_v1 | Unresolved | — | confirm presence and transformation |
 | `5` | Confirmed | unchanged from sanitised_v1 | Unresolved | ESR-Q-S03 | confirm presence and transformation; the draft carries an open question on ESR-Q-S03 |
@@ -140,7 +140,7 @@ The dispositions record names no sub-section for these, so nothing here assigns
 one. Each needs the operator to name it.
 
 - **ESR-I-S01** (independently_detected)
-  - Confirm the appendix secondment months in this copy are the submission's. If they are, decide whether the 80% contradiction enters the R05 revision plan as a correction the ESR did not ask for.
+  - Deferred to the private network by the approval record. Required private evidence: Original secondment rows, host-sector classifications and the denominator for the 80% claim. Current review disposition: Recompute privately before approving a correction. Identify the actual source subsection; do not guess one.
   - Name the sub-section whose declaration this row depends on. Nothing here infers it from the wording.
 
 ### What adoption changes
@@ -152,17 +152,23 @@ bytes has to be re-recorded or explained. Measured, not listed by hand:
 
 | Artifact | Records |
 |---|---|
+| `docs/tier4_orchestration_state/decision_log/msca-dn-operator-approval_2026-10-08.json` | the full sha256 |
 | `docs/tier4_orchestration_state/decision_log/msca-dn-successor-dispositions_2026-10-07.json` | the full sha256 |
 | `docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json` | the full sha256 |
 | `docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0002.json` | the full sha256 |
+| `docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0003.json` | the full sha256 |
+| `docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_14508ee2def5_0001.json` | the full sha256 |
+| `docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_14508ee2def5_0001.md` | the full sha256 |
 | `docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_b9a6b4bc5302_0001.json` | the full sha256 |
 | `docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_b9a6b4bc5302_0001.md` | the full sha256 |
+| `docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json` | the full sha256 |
 | `docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_r05.json` | the full sha256 |
 | `docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json` | the full sha256 |
+| `docs/tier4_orchestration_state/msca_dn/reviews/operator_review_14508ee2def5_0001.md` | the first 16 characters |
 | `docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0001.md` | the first 16 characters |
 | `docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0002.md` | the first 16 characters |
 
-Artifacts that name the register by path, hash or not: `docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-drafts_2026-10-07.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-input_2026-10-07.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-pe03-resolved-fixes-revision_2026-10-06.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-pe07-label-aware-wp-header_2026-10-06.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-semantic-adjudication_2026-10-07.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-successor-dispositions_2026-10-07.json`, `docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json`, `docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0002.json`, `docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json`, `docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_r05.json`, `docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json`, `docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0001.md`, `docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0002.md`, `workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json`.
+Artifacts that name the register by path, hash or not: `docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-drafts_2026-10-07.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-input_2026-10-07.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-operator-approval_2026-10-08.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-pe03-resolved-fixes-revision_2026-10-06.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-pe07-label-aware-wp-header_2026-10-06.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-semantic-adjudication_2026-10-07.json`, `docs/tier4_orchestration_state/decision_log/msca-dn-successor-dispositions_2026-10-07.json`, `docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json`, `docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0002.json`, `docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0003.json`, `docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json`, `docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json`, `docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_r05.json`, `docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json`, `docs/tier4_orchestration_state/msca_dn/reviews/operator_review_14508ee2def5_0001.md`, `docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0001.md`, `docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0002.md`, `workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json`.
 
 The import manifest `workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json` is unaffected. The manifest renders the derived half and the page comparison. Neither reads a declaration, so adoption leaves its bytes as they are. Artifacts pinning its bytes: none.
 

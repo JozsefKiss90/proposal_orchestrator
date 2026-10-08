@@ -56,8 +56,8 @@
     },
     {
       "role": "the active review notes, for each row's recommendation",
-      "path": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json",
-      "sha256": "37c4797249f67ad3d51f39ac03ce22514350faaddb8105edd5accd6929fbb247"
+      "path": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_approved.json",
+      "sha256": "7813fb8b4373cce1bb049a4b3358e851c6f021bc50edaab365530e09c24f4159"
     }
   ],
   "prior_declarations": {
@@ -128,8 +128,8 @@
   "esr_dependencies": {
     "dispositions": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
     "dispositions_sha256": "5c0da82c111582d8ad30306a69daad721b4f0ab18d74adfc5fd9c3ca6ab6c0ff",
-    "review_notes": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json",
-    "review_notes_sha256": "37c4797249f67ad3d51f39ac03ce22514350faaddb8105edd5accd6929fbb247",
+    "review_notes": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_approved.json",
+    "review_notes_sha256": "7813fb8b4373cce1bb049a4b3358e851c6f021bc50edaab365530e09c24f4159",
     "attribution_rule": "A disposition is attached to a sub-section only where the dispositions record names one, in a current_evidence reference or in an evidence_basis pointer into derived/sub_sections/. Nothing is inferred from wording.",
     "by_sub_section": [
       {
@@ -142,7 +142,6 @@
             "declared_status_of_the_disposition": "Inferred",
             "evidence_preserved_status": "Assumed",
             "what_confirmation_would_change": "This disposition asserts the evidence was sufficient and preserved. A declaration that the sub-section is no thinner than the submission's would carry it; a declaration that material was removed would move the row to 'partially_observable' or 'not_assessable_from_this_copy'.",
-            "operator_decision_already_asked": "Confirm that the measurement closes R02's open question and that the row stands as a plain miss, with failure mode evidence_not_read recorded in A07.",
             "dependency": "cited as current evidence in the dispositions record"
           }
         ]
@@ -156,7 +155,6 @@
             "review_recommendation": "retain",
             "declared_status_of_the_disposition": "Inferred",
             "what_confirmation_would_change": "The detection stands on the copy's own text, so a declaration cannot unmake it. A declaration that this sub-section was rewritten would make the detection a result over the derivative alone.",
-            "operator_decision_already_asked": "Confirm that splitting one ESR sentence into ESR-E-01 and ESR-E-02 is intended. It is the only such split, and it puts one sentence on both sides of the detection count.",
             "dependency": "cited as current evidence in the dispositions record"
           },
           {
@@ -166,7 +164,7 @@
             "declared_status_of_the_disposition": "Inferred",
             "evidence_preserved_status": "Assumed",
             "what_confirmation_would_change": "This disposition asserts the evidence was sufficient and preserved. A declaration that the sub-section is no thinner than the submission's would carry it; a declaration that material was removed would move the row to 'partially_observable' or 'not_assessable_from_this_copy'.",
-            "operator_decision_already_asked": "Decide whether a miss may be counted against the lane on Assumed preservation. If the R04 declaration for 1.2 cannot say the security content is no thinner than the submission's, this row belongs in 'partially observable' or 'not assessable'.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original security, hospital/operator diversity and entrepreneurship mechanisms; compare relevant passages with sanitised text. Current review disposition: Preservation is unconfirmed. Withdraw E-04's cohort-size citation now; do not settle miss versus not-assessable from an absence in this copy. This cell of the approval's deferral table covers ESR-E-02, ESR-E-04, ESR-E-08, and its text is the cell's, not one row's alone.",
             "dependency": "cited as current evidence in the dispositions record"
           },
           {
@@ -189,7 +187,6 @@
             "declared_status_of_the_disposition": "Inferred",
             "evidence_preserved_status": "Assumed",
             "what_confirmation_would_change": "This disposition asserts the evidence was sufficient and preserved. A declaration that the sub-section is no thinner than the submission's would carry it; a declaration that material was removed would move the row to 'partially_observable' or 'not_assessable_from_this_copy'.",
-            "operator_decision_already_asked": "Decide whether a passage the lane cited approvingly counts against it in the same detection figure as a point it never reached. ESR-E-09 has the same shape; ESR-Q-02 has a third, recorded in A10.",
             "dependency": "cited as current evidence in the dispositions record"
           },
           {
@@ -199,7 +196,7 @@
             "declared_status_of_the_disposition": "Inferred",
             "evidence_preserved_status": "Assumed",
             "what_confirmation_would_change": "This disposition asserts the evidence was sufficient and preserved. A declaration that the sub-section is no thinner than the submission's would carry it; a declaration that material was removed would move the row to 'partially_observable' or 'not_assessable_from_this_copy'.",
-            "operator_decision_already_asked": "Confirm in the R04 declaration for 1.3 and 2.2 that the entrepreneurship passages are preserved. On that confirmation this row is the cleanest of the six misses.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original security, hospital/operator diversity and entrepreneurship mechanisms; compare relevant passages with sanitised text. Current review disposition: Preservation is unconfirmed. Withdraw E-04's cohort-size citation now; do not settle miss versus not-assessable from an absence in this copy. This cell of the approval's deferral table covers ESR-E-02, ESR-E-04, ESR-E-08, and its text is the cell's, not one row's alone.",
             "dependency": "cited as current evidence in the dispositions record"
           }
         ]
@@ -214,7 +211,6 @@
             "declared_status_of_the_disposition": "Inferred",
             "evidence_preserved_status": "Assumed",
             "what_confirmation_would_change": "This disposition asserts the evidence was sufficient and preserved. A declaration that the sub-section is no thinner than the submission's would carry it; a declaration that material was removed would move the row to 'partially_observable' or 'not_assessable_from_this_copy'.",
-            "operator_decision_already_asked": "Taken with ESR-E-07; one decision covers both.",
             "dependency": "cited as current evidence in the dispositions record"
           }
         ]
@@ -229,7 +225,7 @@
             "declared_status_of_the_disposition": "Inferred",
             "evidence_preserved_status": "Assumed",
             "what_confirmation_would_change": "This disposition asserts the evidence was sufficient and preserved. A declaration that the sub-section is no thinner than the submission's would carry it; a declaration that material was removed would move the row to 'partially_observable' or 'not_assessable_from_this_copy'.",
-            "operator_decision_already_asked": "Confirm in the R04 declaration for 1.3 and 2.2 that the entrepreneurship passages are preserved. On that confirmation this row is the cleanest of the six misses.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original security, hospital/operator diversity and entrepreneurship mechanisms; compare relevant passages with sanitised text. Current review disposition: Preservation is unconfirmed. Withdraw E-04's cohort-size citation now; do not settle miss versus not-assessable from an absence in this copy. This cell of the approval's deferral table covers ESR-E-02, ESR-E-04, ESR-E-08, and its text is the cell's, not one row's alone.",
             "dependency": "cited as current evidence in the dispositions record"
           }
         ]
@@ -270,7 +266,6 @@
             "declared_status_of_the_disposition": "Inferred",
             "evidence_preserved_status": "Assumed",
             "what_confirmation_would_change": "This disposition asserts the evidence was sufficient and preserved. A declaration that the sub-section is no thinner than the submission's would carry it; a declaration that material was removed would move the row to 'partially_observable' or 'not_assessable_from_this_copy'.",
-            "operator_decision_already_asked": "Confirm that the measurement closes R02's open question and that the row stands as a plain miss, with failure mode evidence_not_read recorded in A07.",
             "dependency": "cited as current evidence in the dispositions record"
           },
           {
@@ -279,7 +274,7 @@
             "review_recommendation": "adjudicated",
             "declared_status_of_the_disposition": "Inferred",
             "what_confirmation_would_change": "A declaration narrowing what sanitisation removed from this sub-section would either hold the partial reading or move the row to 'independently_detected' or 'not_detected_despite_sufficient_preserved_evidence'.",
-            "operator_decision_already_asked": "The partial detection rests on no finding and the disposition cannot stay partially_observable. Choose not_detected_despite_sufficient_preserved_evidence, on the ground that the missing site and operator counts are readable from this copy, or not_assessable, on the ground that the register records rephrased prose for Task 4.3.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original security, hospital/operator diversity and entrepreneurship mechanisms; compare relevant passages with sanitised text. Current review disposition: Preservation is unconfirmed. Withdraw E-04's cohort-size citation now; do not settle miss versus not-assessable from an absence in this copy. This cell of the approval's deferral table covers ESR-E-02, ESR-E-04, ESR-E-08, and its text is the cell's, not one row's alone.",
             "dependency": "cited as current evidence in the dispositions record"
           },
           {
@@ -288,7 +283,7 @@
             "review_recommendation": "adjudicated",
             "declared_status_of_the_disposition": "Inferred",
             "what_confirmation_would_change": "A declaration narrowing what sanitisation removed from this sub-section would either hold the partial reading or move the row to 'independently_detected' or 'not_detected_despite_sufficient_preserved_evidence'.",
-            "operator_decision_already_asked": "Confirm the withdrawal of the sample-0 citation. The dependency point stands on the other two findings and the disposition partially_observable does not change.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original dependencies, Gantt and sequencing evidence. Current review disposition: Keep partial classification qualified; absence of embedded images alone does not establish that every figure was lost.",
             "dependency": "cited as current evidence in the dispositions record"
           },
           {
@@ -298,7 +293,6 @@
             "declared_status_of_the_disposition": "Inferred",
             "evidence_preserved_status": "Assumed",
             "what_confirmation_would_change": "This disposition asserts the evidence was sufficient and preserved. A declaration that the sub-section is no thinner than the submission's would carry it; a declaration that material was removed would move the row to 'partially_observable' or 'not_assessable_from_this_copy'.",
-            "operator_decision_already_asked": "Confirm that the misattribution is reported to the assessor's own account in PE-09, with A05, as a lane defect rather than a scoring disagreement.",
             "dependency": "cited as current evidence in the dispositions record"
           },
           {
@@ -307,7 +301,7 @@
             "review_recommendation": "adjudicated",
             "declared_status_of_the_disposition": "Inferred",
             "what_confirmation_would_change": "The detection stands on the copy's own text, so a declaration cannot unmake it. A declaration that this sub-section was rewritten would make the detection a result over the derivative alone.",
-            "operator_decision_already_asked": "Two decisions. First, confirm that detected_by narrows to the integrity audit and the citations narrow from four findings to one, or move the row to partially_observable because no finding addresses the definitions of the milestones. Second, decide whether M7.3 after the work plan ends is a misalignment to correct or an intentional commitment to move out of the milestone table.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Actual project duration, WP scope, funding/activity windows and follow-up intent. Current review disposition: No date or participation changes approved.",
             "dependency": "cited as current evidence in the dispositions record"
           },
           {
@@ -329,7 +323,7 @@
             "review_recommendation": "adjudicated",
             "declared_status_of_the_disposition": "Inferred",
             "what_confirmation_would_change": "A declaration narrowing what sanitisation removed from this sub-section would either hold the partial reading or move the row to 'independently_detected' or 'not_detected_despite_sufficient_preserved_evidence'.",
-            "operator_decision_already_asked": "Confirm the withdrawal of the sample-0 citation. The dependency point stands on the other two findings and the disposition partially_observable does not change.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original dependencies, Gantt and sequencing evidence. Current review disposition: Keep partial classification qualified; absence of embedded images alone does not establish that every figure was lost.",
             "dependency": "cited as current evidence in the dispositions record"
           }
         ]
@@ -343,7 +337,7 @@
             "review_recommendation": "revisit_after_private_network",
             "declared_status_of_the_disposition": "Inferred",
             "what_confirmation_would_change": "A declaration narrowing what sanitisation removed from this sub-section would either hold the partial reading or move the row to 'independently_detected' or 'not_detected_despite_sufficient_preserved_evidence'.",
-            "operator_decision_already_asked": "Confirm what section 5 carried in the submission. Then decide whether four findings against a point the evaluators called credible count as a lane disagreement or as a reading of a shortened section.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original capacity and hosting evidence. Current review disposition: Correct identity references now; original-dependent adequacy remains unresolved. This cell of the approval's deferral table covers ESR-Q-S02, ESR-Q-S03, and its text is the cell's, not one row's alone.",
             "dependency": "named by the evidence_basis pointer 'derived/sub_sections/5/characters'"
           }
         ]
@@ -357,7 +351,7 @@
             "review_recommendation": "revisit_after_private_network",
             "declared_status_of_the_disposition": "Inferred",
             "what_confirmation_would_change": "A declaration narrowing what sanitisation removed from this sub-section would either hold the partial reading or move the row to 'independently_detected' or 'not_detected_despite_sufficient_preserved_evidence'.",
-            "operator_decision_already_asked": "Confirm whether section 8 carried track-record evidence in the submission. If it did, the three contesting findings describe the sanitisation and not the proposal.",
+            "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original capacity and hosting evidence. Current review disposition: Correct identity references now; original-dependent adequacy remains unresolved. This cell of the approval's deferral table covers ESR-Q-S02, ESR-Q-S03, and its text is the cell's, not one row's alone.",
             "dependency": "named by the evidence_basis pointer 'derived/sub_sections/8/characters'"
           }
         ]
@@ -370,7 +364,7 @@
         "review_recommendation": "revisit_after_declaration",
         "declared_status_of_the_disposition": "Inferred",
         "what_confirmation_would_change": "The detection stands on the copy's own text, so a declaration cannot unmake it. A declaration that this sub-section was rewritten would make the detection a result over the derivative alone.",
-        "operator_decision_already_asked": "Confirm the appendix secondment months in this copy are the submission's. If they are, decide whether the 80% contradiction enters the R05 revision plan as a correction the ESR did not ask for.",
+        "operator_decision_already_asked": "Deferred to the private network by the approval record. Required private evidence: Original secondment rows, host-sector classifications and the denominator for the 80% claim. Current review disposition: Recompute privately before approving a correction. Identify the actual source subsection; do not guess one.",
         "dependency": "the review notes recommend revisiting this row after a declaration, and the dispositions record names no sub-section for it",
         "operator_question": "Name the sub-section whose declaration this row depends on. Nothing here infers it from the wording."
       }
@@ -397,6 +391,10 @@
     "register_sha256_before_adoption": "aafed265f4e9b43b9d88d13f394fef2e812cbfa5405d53bb6720cb303c9ecfc1",
     "pinned_by_hash": [
       {
+        "path": "docs/tier4_orchestration_state/decision_log/msca-dn-operator-approval_2026-10-08.json",
+        "records": "the full sha256"
+      },
+      {
         "path": "docs/tier4_orchestration_state/decision_log/msca-dn-successor-dispositions_2026-10-07.json",
         "records": "the full sha256"
       },
@@ -409,11 +407,27 @@
         "records": "the full sha256"
       },
       {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0003.json",
+        "records": "the full sha256"
+      },
+      {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_14508ee2def5_0001.json",
+        "records": "the full sha256"
+      },
+      {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_14508ee2def5_0001.md",
+        "records": "the full sha256"
+      },
+      {
         "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_b9a6b4bc5302_0001.json",
         "records": "the full sha256"
       },
       {
         "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_b9a6b4bc5302_0001.md",
+        "records": "the full sha256"
+      },
+      {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json",
         "records": "the full sha256"
       },
       {
@@ -423,6 +437,10 @@
       {
         "path": "docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json",
         "records": "the full sha256"
+      },
+      {
+        "path": "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_14508ee2def5_0001.md",
+        "records": "the first 16 characters"
       },
       {
         "path": "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0001.md",
@@ -436,15 +454,19 @@
     "referenced_by_path": [
       "docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-drafts_2026-10-07.json",
       "docs/tier4_orchestration_state/decision_log/msca-dn-fidelity-declaration-input_2026-10-07.json",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-operator-approval_2026-10-08.json",
       "docs/tier4_orchestration_state/decision_log/msca-dn-pe03-resolved-fixes-revision_2026-10-06.json",
       "docs/tier4_orchestration_state/decision_log/msca-dn-pe07-label-aware-wp-header_2026-10-06.json",
       "docs/tier4_orchestration_state/decision_log/msca-dn-semantic-adjudication_2026-10-07.json",
       "docs/tier4_orchestration_state/decision_log/msca-dn-successor-dispositions_2026-10-07.json",
       "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json",
       "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0002.json",
+      "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0003.json",
       "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+      "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json",
       "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_r05.json",
       "docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json",
+      "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_14508ee2def5_0001.md",
       "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0001.md",
       "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_9732dde50039_0002.md",
       "workspaces/msca_dn/docs/tier4_orchestration_state/dev_graph/imports/MSCA-DN-2025_sanitised_part_b.resolved_fixes.json"

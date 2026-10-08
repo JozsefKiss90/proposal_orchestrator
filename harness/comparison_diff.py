@@ -58,6 +58,8 @@ from harness.blind_baseline import _portable
 from harness.esr_comparison import (
     DISPOSITION_ADDRESSED,
     OBSERVATION_KIND_STRENGTH,
+    POINTER_RESOLUTION_IDENTITY,
+    pointer_rule_of,
     load_comparison,
 )
 from harness.evidence_preflight import file_sha256
@@ -77,12 +79,23 @@ ROW_FIELDS: tuple[str, ...] = (
     "blind_findings",
     "audit_findings",
     "evidence_basis",
+    "evidence_basis_values",
     "current_proposal_evidence",
     "explanation",
     "proposed_revision",
     "revision_plan",
     "priority",
+    "review_status",
+    "failure_mode",
+    "deferred_to_private_network",
 )
+
+#: The fields a successor written under dispositions schema 1.2 (the PE-08
+#: operator approval) may carry, compared only when the successor declares the
+#: identity pointer rule, so an older pair keeps the diff shape it was written
+#: with. ``evidence_basis_values`` is the V02 case: a pointer whose text did not
+#: move but whose resolved value did.
+_APPROVAL_FIELDS: tuple[str, ...] = ("review_status", "failure_mode", "deferred_to_private_network")
 
 _NOTE = (
     "Advisory to a human, never run-blocking. This artifact declares nothing: "
@@ -260,19 +273,44 @@ def _revision_of(row: Mapping[str, Any]) -> Mapping[str, Any]:
     return rev if isinstance(rev, Mapping) else {}
 
 
+def _register_values(refs: Sequence[Any]) -> dict[str, Any]:
+    return {str(r.get("pointer")): r.get("value") for r in refs or []}
+
+
 def diff_row(
     before: Mapping[str, Any],
     after: Mapping[str, Any],
     *,
     priority_before: int | None,
     priority_after: int | None,
+    extended: bool = False,
 ) -> dict[str, Any]:
-    """One observation's row, before and after, with the fields that moved."""
+    """One observation's row, before and after, with the fields that moved.
+
+    *extended* compares the schema-1.2 fields as well (see
+    :data:`_APPROVAL_FIELDS`); the caller sets it from the successor's own
+    declared pointer rule.
+    """
     rev_b, rev_a = _revision_of(before), _revision_of(after)
     fields: dict[str, Any] = {}
-    for key in ("disposition", "disposition_status", "evidence_preserved_status"):
+    scalar = ("disposition", "disposition_status", "evidence_preserved_status")
+    if extended:
+        scalar += _APPROVAL_FIELDS
+    for key in scalar:
         if before.get(key) != after.get(key):
             fields[key] = {"before": before.get(key), "after": after.get(key)}
+    if extended:
+        vals_b, vals_a = _register_values(before.get("evidence_basis") or []), _register_values(
+            after.get("evidence_basis") or []
+        )
+        moved = {
+            ptr: {"before": vals_b[ptr], "after": vals_a[ptr]}
+            for ptr in vals_b
+            if ptr in vals_a
+            and json.dumps(vals_b[ptr], sort_keys=True) != json.dumps(vals_a[ptr], sort_keys=True)
+        }
+        if moved:
+            fields["evidence_basis_values"] = moved
     citations: tuple[tuple[str, _KeySet], ...] = (
         ("blind_findings", lambda refs: _keys(refs, blind_key)),
         ("audit_findings", lambda refs: _keys(refs, audit_key)),
@@ -387,10 +425,12 @@ def diff_comparisons(
     bindings = _bind(before, after)
     rows_b, rows_a = before.rows, after.rows
     pri_b, pri_a = before.priorities, after.priorities
+    extended = pointer_rule_of(after.data) == POINTER_RESOLUTION_IDENTITY
     rows = [
         diff_row(
             rows_b[oid], rows_a[oid],
             priority_before=pri_b.get(oid), priority_after=pri_a.get(oid),
+            extended=extended,
         )
         for oid in rows_a
     ]

@@ -1,0 +1,278 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-operator-approval_2026-10-08",
+  "date": "2026-10-08",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN assessment framework: the operator's approval of the PE-08 decision package, carried into the repository. Fifteen review decisions (D01-D15), two validation corrections (V01, V02), the eight-item implementation checklist of the approval record, and the start of R06 (the PE-09 runbook).",
+  "authority": "CLAUDE.md §9.1 (docs/ is the durable record), §9.4 (a decision that affects future interpretation is written to the decision log), §9.5 (reproducible from documented inputs), §12.2 (the status vocabulary), §12.3 (a contradiction is resolved explicitly). The operator's in-session instruction 'Approve this decision package' is the authority for the decisions transcribed here. It is an authority fact and it raises no evidence status.",
+  "problem": {
+    "declared_status": "Confirmed",
+    "basis": "read in the approval record and in the committed PE-08, R02, R03, R04 and R05 artifacts at 047f64d",
+    "statement": "The R05 successor dispositions were an agent-drafted recommendation. Nineteen of the twenty-nine rows asked the operator a question. The approval answers some of them, defers others and leaves the rest where they were. The approval also names two defects in the committed code and retires one audit rule.",
+    "detail": [
+      "V01. A 'Confirmed' evidence_preserved_status was unlocked by a declared-half entry that stated a 'presence'. A presence is a claim about the extraction of this PDF, not about the step from the submitted original to this copy, so the check conflated two different claims.",
+      "V02. resolve_pointer read a bare digit on a list as a position before trying it as an identity. The register's sub_sections list is keyed and is not ordered by id, so 'derived/sub_sections/8/characters' resolved to the ninth element (sub-section 3.1, 28,087 characters) and not to sub-section 8 (8,249). ESR-Q-S02 and ESR-Q-S03 cited those values.",
+      "D11 (ticket A03). The milestone check reported a milestone that names no deliverable as an 'undeclared_dependency' finding. No source requires a milestone to name one, so the rule reported an absence as a defect of the candidate. Sixteen of the twenty-nine findings of integrity_242f1afb02c8_0002.json were that rule.",
+      "D01-D10, D12, D15. Reporting corrections: two ESR observations are clauses of one evaluator sentence; a miss describes the recorded output and not evidence left unread; the misses need a failure-mode breakdown beside the count and not inside it; two withdrawn citations are kept as assessor validation cases for PE-09; ESR-Q-03 takes provisional partial credit on the audit's one timing finding; two beyond-ESR improvements are prepared.",
+      "D13, D14. The approval adopts no declaration into an active register and applies no body-point-size provenance correction. Both stay open."
+    ]
+  },
+  "decision": {
+    "declared_status": "Confirmed",
+    "basis": "the implementation, the artifacts written, and the verification below",
+    "what_was_produced": "The approval record at its canonical location; a successor integrity audit; approved successor dispositions (schema 1.2) and their review notes; a successor comparison and revisions artifact; an operator review report and decisions file; a review diff against the R05 comparison; the PE-09 runbook; and a deterministic generator, tools/author_approved_dispositions.py, that renders the dispositions and the notes from the committed R05 record and the approval.",
+    "nothing_was_edited": "Every result is a successor artifact. The frozen baseline, the ESR record, the PDFs, the candidate evidence, the registers, and the PE-08, R03 and R05 dispositions, comparisons, reviews and reports are byte-unchanged. A test pins that.",
+    "the_three_review_statuses": {
+      "rule": "The approval settles some rows and not others, so every row says which. A blanket 'operator reviewed' would read as approval of all twenty-nine.",
+      "operator_confirmed": "Nine rows: ESR-E-01, ESR-E-03, ESR-E-07, ESR-E-09, ESR-I-S02, ESR-I-S05, ESR-Q-01, ESR-Q-02, ESR-Q-03. Each names the decision ids that settle it.",
+      "operator_decision_required": "Ten rows: ESR-E-02, ESR-E-04, ESR-E-05, ESR-E-08, ESR-E-S03, ESR-E-S05, ESR-I-S01, ESR-I-S04, ESR-Q-S02, ESR-Q-S03. Each states what the private network has to establish, under deferred_to_private_network, and the review disposition the approval recorded.",
+      "agent_recommended_pending_operator_review": "Ten rows the approval does not mention: ESR-E-06, ESR-E-S01, ESR-E-S02, ESR-E-S04, ESR-I-01, ESR-I-02, ESR-I-S03, ESR-Q-04, ESR-Q-S01, ESR-Q-S04. They carry the R05 recommendation and nothing more.",
+      "two_rows_are_both": "ESR-Q-01 and ESR-Q-03 are confirmed on one point and deferred on another. The row carries both, because the approval did."
+    },
+    "v01_what_the_code_checks_now": {
+      "rule": "A 'Confirmed' evidence_preserved_status is refused unless, for every sub-section the passage is quoted from, the register's declared half carries an entry that states a 'presence' and also a 'fidelity_to_submitted_original' claim. That claim must declare the scope 'fidelity_against_the_submitted_original', the status 'Confirmed', a non-empty basis, and an evidence item that names the observation with a source and a statement. The row must name that entry among its evidence_basis pointers.",
+      "what_each_refusal_catches": "A presence alone, an Unresolved original-fidelity claim, another scope, a missing basis, generic evidence that names no observation, and an entry for a different sub-section.",
+      "not_version_gated": "No committed row under schema 1.0 or 1.1 declares a Confirmed preservation status, so the stricter rule changes no historical replay. A test pins that, which is what makes the un-gated rule safe.",
+      "still_unreachable": "Both declared halves are empty, so no row can reach Confirmed until a declaration is adopted (D13, open)."
+    },
+    "v02_typed_pointer_segments": {
+      "rule": "On a keyed list, whose elements carry a sub_section_id or an id, a bare segment is an identity and only an identity. '#N' is a position on any list. A bare digit on a plain list stays a position.",
+      "the_legacy_path": "Schema 1.0 and 1.1 recorded their pointer values under the old rule, so they replay only under it. resolve_pointer keeps it as an opt-in legacy_positional, never the default, and the caller selects it from the record's own schema_version. comparison_f60ae6e0a2a1_0001 and _0002 still replay with the values they recorded.",
+      "how_a_reader_tells_them_apart": "A comparison written under the identity rule records fidelity_register.pointer_resolution = 'identity'. The operator review re-resolves every pointer under whichever rule the comparison it reads recorded.",
+      "the_two_rows_re_resolved": "ESR-Q-S02 now cites sub-section 8 (8,249 characters) and ESR-Q-S03 sub-section 5. The predecessor's values are not corrected in place: the successor comparison carries the right ones, and the diff reports both rows under evidence_basis_values, a pointer whose text did not move but whose resolved value did."
+    },
+    "d11_the_retired_rule": "_check_milestones emits no undeclared_dependency finding. The sixteen milestones that name no deliverable are inventoried in the check's new context field, each with its month, its related packages and their deliverable months. The check's note calls that drafting advice a reader may act on. A milestone that does name a deliverable is still checked, and M7.3's out-of-window finding survives as the check's first. KIND_UNDECLARED stays in the vocabulary so the three committed audits still load and the R03 adjudication's citations still resolve. The successor audit integrity_242f1afb02c8_0003.json carries 13 findings where _0002 carried 29.",
+    "what_the_reporting_decisions_changed": {
+      "D01": "summary.shared_esr_sentences names ESR-E-01 and ESR-E-02 as clauses of one evaluator sentence, with each clause's disposition, so a reader sees one sentence on both sides of the detection count.",
+      "D02": "ESR-E-03's failure mode is absent_from_recorded_output. The mode describes the recorded output. It does not establish that the assessor never read the evidence, and the summary says so.",
+      "D03": "summary.misses_by_failure_mode reports the breakdown beside the detection figures and not inside them. Every miss is counted whatever its mode.",
+      "D04_D05": "The two citations R03 withdrew are recorded on the dispositions record as assessor validation cases AVC-01 and AVC-02, for the PE-09 assessor's own account. A withdrawn citation is kept as a case and not deleted.",
+      "D06": "ESR-Q-03 moves from not detected to partially_observable on the integrity audit's one timing finding, re-cited against the post-D11 audit. The credit is provisional and the row says what would withdraw it. No other disposition moves.",
+      "D07_D08": "revisions_f60ae6e0a2a1_0003.json lists the two beyond-ESR items apart, under beyond_esr_improvements: ESR-I-S02's sustainability improvement, conditional on the original, and ESR-I-02's societal-impact subtask. Neither proposes an indicator, a target, a funding source or a partner commitment. A revision on a strength must declare the scope beyond_esr, and the code refuses a strength's revision that does not."
+    },
+    "the_approval_is_not_evidence": "review_state stays agent-drafted in the notes, because the judgments are the agent's. Only the transcribed decisions are the operator's, and each names the record and the decision id it was transcribed from. No status is raised to Confirmed anywhere in this work, and the seven preservation-qualified misses stay provisional.",
+    "counts": {
+      "basis": "the successor comparison's own summary, recomputed from its rows",
+      "by_disposition": "14 independently_detected, 7 partially_observable, 7 not detected, 1 not assessable, 0 addressed.",
+      "detection": "Of 14 rated shortcomings: 5 detected, 2 partial, 7 not detected. rate_detected 0.36, rate_detected_or_partial 0.50. By lane: blind lane 6, integrity audit 1.",
+      "misses_by_failure_mode": "absent_from_recorded_output ESR-E-02, ESR-E-03, ESR-E-04, ESR-E-08; read_and_rated_adequate ESR-E-07, ESR-E-09; read_and_misattributed ESR-Q-02; undetermined none.",
+      "scores_untouched": "The score_comparison block is byte-identical to the predecessor's: 85.8 historical, 74.6 blind median, diff -11.2, and no deduction attributed to any individual criticism."
+    },
+    "the_approval_record_is_pinned_first": "The generator computes the approval record's sha256 and writes it into the dispositions, so the record is finalised before the chain is rendered. The review and diff file names carry the comparison's hash, so any later change to the dispositions means deleting the comparison pair, the notes, the review pair and the diff and regenerating them. The writers never overwrite.",
+    "one_transcription_change": "The approval was given at 10:37:26 with a +02:00 offset, stated in the operator's message as a named time zone. The branch's anonymity rule forbids a place name in Tier 3, Tier 4 and Tier 5, so the record writes the offset. The instant is the same and the approval instruction is verbatim.",
+    "r06_started": "plans/msca_dn_pe09_runbook.md is the PE-09 runbook: the two stages and what separates them, the private prerequisites, the carried deferrals, the profile-authority rule, a controlled import, the preflight and freeze command templates with the isolation rules, the four investigation steps after the freeze, the export rules, and the implementation gaps that are still [future]. PE-09 is unexecuted and the runbook executes nothing."
+  },
+  "verification": {
+    "declared_status": "Confirmed",
+    "basis": "commands run in this session; results as reported",
+    "replay": {
+      "approved_dispositions": "py -3.10 -m tools.author_approved_dispositions --check  -> 'up to date' (byte-equal replay of the dispositions and the notes)",
+      "successor_audit": "py -3.10 -m harness.commands.blind_assessment audit ... --out-dir docs/tier4_orchestration_state/msca_dn/audit  -> exit 0, 13 findings",
+      "successor_comparison": "py -3.10 -m harness.commands.blind_assessment compare --baseline-dir docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06 --esr docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json --dispositions docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json --candidate docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded --historical-candidate docs/tier4_orchestration_state/msca_dn/audit/candidates/MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db --register docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json --audit docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0003.json --audit docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json --profile harness/profiles/msca_dn_2026_default.json --out-dir docs/tier4_orchestration_state/msca_dn/comparisons  -> exit 0, no flags",
+      "operator_review": "py -3.10 -m harness.commands.blind_assessment review --comparison docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0003.json --notes docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_approved.json --out-dir docs/tier4_orchestration_state/msca_dn/reviews  -> exit 0, every reference re-resolved",
+      "review_diff": "py -3.10 -m harness.commands.blind_assessment diff --before docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0002.json --after docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0003.json --out-dir docs/tier4_orchestration_state/msca_dn/comparisons  -> exit 0",
+      "declaration_drafts": "py -3.10 -m tools.draft_fidelity_declarations --check  -> 'up to date' after the re-render",
+      "historical_replay": "The PE-08 and R05 comparisons re-run from their own documented inputs and stay substantively identical, pointer values included, because the legacy positional rule is selected from their own schema_version."
+    },
+    "tests": {
+      "tests/test_msca_dn_approved_dispositions.py": "37 passed (new)",
+      "tests/harness/test_esr_comparison.py": "94 passed (68 before, 26 added for V01, V02 and the pointer-rule reader)",
+      "tests/harness/test_operator_review.py": "81 passed (8 added for the recorded decisions)",
+      "tests/harness/test_comparison_diff.py": "23 passed (3 added for the approved successor)",
+      "tests/harness/test_integrity_audit.py": "95 passed, the milestone tests rewritten for D11, including one that pins the sixteen retired findings",
+      "tests/test_msca_dn_declaration_drafts.py": "73 passed after the re-render",
+      "tests/test_msca_dn_successor_dispositions.py": "34 passed (unchanged)",
+      "tests/test_msca_dn_fidelity_declarations.py": "50 passed (unchanged)",
+      "per_directory_suites": "tests/harness 12 failed, 5 errors, 1286 passed; tests/runner 19 failed, 4301 passed; tests outside both 18 failed, 1349 passed. The failing-id set of each directory is the set a worktree at 047f64d produces, so this work adds none. The sets were compared, not the counts, because the counts are order-dependent: ten of the eighteen fail only in a directory run and pass alone.",
+      "one_failure_this_work_caused_and_fixed": "The leakage scan found two new identity nouns, both written by this work: a time-zone place name in the approval record and a purged prior instance's project name in this record. Both are replaced, and the scan reports no new leak.",
+      "what_they_check": [
+        "the approved dispositions and notes are a byte-equal replay and every binding is the hash of the file on disk",
+        "the approval record the generator transcribes is the one on disk, and every transcribed decision text occurs in it verbatim",
+        "each row's review_status follows the approval record's tables, and only the enumerated rows change what they declare",
+        "every miss declares one of the four failure modes with a basis",
+        "no row is raised to Confirmed by the approval, and the beyond-ESR items commit to nothing",
+        "a presence-only declared entry no longer unlocks a Confirmed preservation claim, and nine further refusals",
+        "a bare segment on a keyed list resolves by identity for ids 4 to 8 and for a dotted id, under reordering, and refuses a missing id",
+        "the legacy positional rule still resolves the predecessors' recorded values",
+        "the successor comparison replays from its documented inputs under the identity rule",
+        "the counts are the rows, and the score block is byte-identical to the predecessor's",
+        "the review report and the decisions file reproduce from the notes each names",
+        "the diff reports the approval fields only when the successor declares identity pointers",
+        "the D11 inventory holds exactly the sixteen findings the R03 audit emitted",
+        "every predecessor artifact is byte-unchanged"
+      ]
+    },
+    "what_was_not_run": [
+      "No assessor call, no new blind baseline, no new freeze, no new preflight. The approval forbids a new assessor run in this workspace.",
+      "No register was written, so no import manifest, preflight or baseline binding moved.",
+      "No proposal text was edited and no revision was written into a deliverable.",
+      "No runner phase was dispatched."
+    ]
+  },
+  "consequences": [
+    "The approved dispositions are the citable reviewed reading. The R05 record stays the agent's recommendation and the PE-08 record the provisional one. Neither is edited.",
+    "Ten rows are deferred to the private network, and each states the evidence that would settle it. None may be closed from an absence in this copy.",
+    "Ten further rows carry an agent recommendation that no operator has seen. A reader must not take the approval as covering them.",
+    "D13 (adopting a declaration into an active register) and D14 (the body-point-size provenance correction) stay open. D14 changes register bytes, so it moves every binding that pins a register.",
+    "A Confirmed preservation claim stays unreachable until a declaration is adopted. That coupling is now two rules deep: the declared half must carry the original-fidelity claim, and the row must cite it.",
+    "Any later change to the approved dispositions requires deleting the comparison pair, the notes, the review pair and the diff first. The file names carry the comparison's hash.",
+    "PE-09 is prepared and unexecuted. The runbook names three pieces that do not exist yet and marks them [future].",
+    "The frozen blind baseline stays 74.60 and the historical total 85.80."
+  ],
+  "artifacts": {
+    "written": {
+      "approval_record": {
+        "path": "docs/tier4_orchestration_state/msca_dn/reviews/operator_approval_2026-10-08.md",
+        "sha256": "405ee5f59747d73788cac15c2e9d9df8b6cfd437066d2c4e4dbb315e2c4f197c"
+      },
+      "successor_audit": {
+        "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0003.json",
+        "sha256": "a295e66fa39dce1857b4e03225de23775a087794dccb0b4407e5e03f9af799a9"
+      },
+      "approved_dispositions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json",
+        "sha256": "90484fcbd26ded9b85364eb86f6069c140a8954a8b2e8a2e655d4a03482ea9ef"
+      },
+      "approved_review_notes": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_approved.json",
+        "sha256": "7813fb8b4373cce1bb049a4b3358e851c6f021bc50edaab365530e09c24f4159"
+      },
+      "successor_comparison": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0003.json",
+        "sha256": "14508ee2def5ebe4887dc7458dc8fe2444cd5d5267a94cf6400e36c5bb518937"
+      },
+      "successor_revisions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0003.json",
+        "sha256": "4c705070b3f1162d6a3f5f3f4eb95bb5b700258475856875785846582cb4588a"
+      },
+      "operator_review": {
+        "path": "docs/tier4_orchestration_state/msca_dn/reviews/operator_review_14508ee2def5_0001.md",
+        "sha256": "e3435c6cfb284721b993f540271a1a6a7d3b0bdb4810477105102ca9cc0a2f46"
+      },
+      "operator_decisions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/reviews/operator_decisions_14508ee2def5_0001.md",
+        "sha256": "bd4f27c47a3cc8428b60990e7bc73f17d9ece12889af0a37bec8794ee6414431"
+      },
+      "review_diff_json": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_14508ee2def5_0001.json",
+        "sha256": "3e9d4ddc9e8bf8ea93412a6b6815c62246c952d65f3279b5d3dfd14ca52241a9"
+      },
+      "review_diff_markdown": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_14508ee2def5_0001.md",
+        "sha256": "132bc5e818c1af809b38b418d964ab702911078ddd5b7be60decaf87a131d319"
+      }
+    },
+    "written_outside_the_byte_exact_trees": {
+      "why_no_hash_is_pinned": ".gitattributes declares the hashed trees '-text' and leaves code and prose on the platform line-ending default. A sha256 recorded here for a file in plans/ or harness/ would not match the file on a fresh checkout under core.autocrlf (decision log msca-dn-line-ending-bindings_2026-10-07). These files are cited by path.",
+      "pe09_runbook": {
+        "path": "plans/msca_dn_pe09_runbook.md",
+        "why": "ticket R06: the PE-09 runbook, written and unexecuted"
+      }
+    },
+    "re_rendered_by_their_own_tool": {
+      "declaration_draft_sanitised_v1": {
+        "path": "docs/tier4_orchestration_state/msca_dn/declarations/draft_sanitised_v1.json",
+        "sha256": "8dbed290674e1610f28d4f623063d492a0e4c6f2991e8f04f5d63b626ed727b5",
+        "why": "it binds the active review notes, which are now the approved ones"
+      },
+      "declaration_draft_resolved_fixes": {
+        "path": "docs/tier4_orchestration_state/msca_dn/declarations/draft_resolved_fixes.json",
+        "sha256": "a86942cc21e878401f07b595699e580d2fe225b578eacbdadc8ac7b03f54f0a5",
+        "why": "the same binding, and each row's open operator question is restated from the approved notes"
+      },
+      "declaration_review_checklist": {
+        "path": "docs/tier4_orchestration_state/msca_dn/declarations/review_checklist.md",
+        "why": "its adoption-cost scan enumerates every artifact that names a fidelity register, and this record names one. The checklist's bytes therefore depend on this file, so no hash is pinned for it here; its own tool verifies it with py -3.10 -m tools.draft_fidelity_declarations --check."
+      }
+    },
+    "amended_in_place": {
+      "why_no_hash_is_pinned": "the same line-ending reason as the group above",
+      "ticket_document": {
+        "path": "plans/pe08_review_and_pe09_handoff_tickets.md",
+        "why": "every acceptance box reconciled with a per-criterion note, and a reconciliation section naming the commit of each ticket"
+      },
+      "harness_guide": {
+        "path": "harness/HARNESS.md",
+        "why": "the audit, pointer, disposition, notes, preservation and diff passages, and a new section on the approval"
+      },
+      "code": {
+        "paths": [
+          "harness/esr_comparison.py",
+          "harness/integrity_audit.py",
+          "harness/operator_review.py",
+          "harness/comparison_diff.py",
+          "tools/author_approved_dispositions.py"
+        ],
+        "why": "V01, V02, D11, dispositions schema 1.2, the transcribed decisions, the extended diff, and the generator"
+      },
+      "tests": {
+        "paths": [
+          "tests/harness/test_esr_comparison.py",
+          "tests/harness/test_integrity_audit.py",
+          "tests/harness/test_operator_review.py",
+          "tests/harness/test_comparison_diff.py",
+          "tests/test_msca_dn_approved_dispositions.py"
+        ],
+        "why": "the checks listed under verification.tests.what_they_check"
+      }
+    },
+    "unchanged_and_still_cited": {
+      "r05_dispositions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_r05.json",
+        "sha256": "fbed6abdb1c7bcf78aed5455b0616dd07bd05a30262c1e5ab8a01e61ae819576"
+      },
+      "pe08_dispositions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1.json",
+        "sha256": "5c0da82c111582d8ad30306a69daad721b4f0ab18d74adfc5fd9c3ca6ab6c0ff"
+      },
+      "r03_review_notes": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/review_notes_f60ae6e0a2a1_r03.json",
+        "sha256": "37c4797249f67ad3d51f39ac03ce22514350faaddb8105edd5accd6929fbb247"
+      },
+      "adjudications": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/semantic_adjudications_f60ae6e0a2a1.json",
+        "sha256": "354db83d36727c05c03a348a8040c65bfb721b0f41fa8889ac60fa24a3c7f6af"
+      },
+      "esr_record": {
+        "path": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+        "sha256": "2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb"
+      },
+      "r05_comparison": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0002.json",
+        "sha256": "b9a6b4bc5302fc754be5fa9d5ab4fcef6ac25ce583d245f61980b2ad176a45b9"
+      },
+      "r05_revisions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0002.json",
+        "sha256": "eadd7db524130acc7f329c2a450537a8340b6bc85b27ca67592184e38229dba9"
+      },
+      "pe08_comparison": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/comparison_f60ae6e0a2a1_0001.json",
+        "sha256": "9732dde500397981a133461e29d93ae657ba444199a31d84d39731f9c5ec7848"
+      },
+      "pe08_revisions": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/revisions_f60ae6e0a2a1_0001.json",
+        "sha256": "4068578e48ef676323d6380f746a5b0345f33bd91581b76f95f9eb49cc8ffe00"
+      },
+      "r05_review_diff": {
+        "path": "docs/tier4_orchestration_state/msca_dn/comparisons/review_diff_b9a6b4bc5302_0001.json",
+        "sha256": "369c282f5aecb750fc87d8e499ebbc98cf5ba4793e94ea106a914ddcc5b175b6"
+      },
+      "predecessor_audit": {
+        "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json",
+        "sha256": "ace64d7d4ca37686ec3475a76143799ec4f955370541f3af10569ae76b9a4739"
+      },
+      "first_revision_audit": {
+        "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json",
+        "sha256": "1b66a7cc0823b8e13692ec00aaebe632ad0c3bf775fe9d567c892c97864bff13"
+      },
+      "fidelity_register": {
+        "path": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register_resolved_fixes.json",
+        "sha256": "aafed265f4e9b43b9d88d13f394fef2e812cbfa5405d53bb6720cb303c9ecfc1"
+      },
+      "baseline_report": {
+        "path": "docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06/blind_baseline_f60ae6e0a2a1.json",
+        "sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01"
+      }
+    }
+  }
+}

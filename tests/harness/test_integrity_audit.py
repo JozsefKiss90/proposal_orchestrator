@@ -527,37 +527,64 @@ class TestCheckMilestones:
         f = _findings(_audit(tmp_path, profile, world), "milestone_dependencies")
         assert [x.detail for x in f] == ["M1.1 names D1.7, which the deliverables table does not list"]
 
-    def test_an_undeclared_dependency_is_context_not_failure(self, tmp_path, profile):
+    def test_a_milestone_naming_no_deliverable_is_not_a_finding(self, tmp_path, profile):
+        """Operator decision D11 (PE-08 approval, 2026-10-08): no source requires a
+        milestone to name a deliverable, so the absence is an inventory entry and
+        a drafting suggestion, never a finding of any kind."""
         world = consistent_world()
         world["S3"] = [p.replace("D1.2 delivered", "Framework in the repository") for p in world["S3"]]
-        f = _findings(_audit(tmp_path, profile, world), "milestone_dependencies")
-        (x,) = f
-        assert x.kind == ia.KIND_UNDECLARED
-        assert x.context == {
-            "related_wps": [1],
-            "deliverables_of_related_wps": [{"id": "D1.1", "months": [12]}, {"id": "D1.2", "months": [24]}],
+        report = _audit(tmp_path, profile, world)
+        assert _findings(report, "milestone_dependencies") == []
+        (check,) = [c for c in report.checks if c.check_id == "milestone_dependencies"]
+        assert check.context == {
+            "milestones_without_a_named_dependency": [
+                {
+                    "id": "M1.1",
+                    "month": 24,
+                    "related_wps": [1],
+                    "deliverables_of_related_wps": [
+                        {"id": "D1.1", "months": [12]}, {"id": "D1.2", "months": [24]},
+                    ],
+                },
+            ],
         }
-        assert "not judged" in x.detail
+
+    def test_no_check_emits_the_retired_kind(self, tmp_path, profile):
+        world = consistent_world()
+        world["S3"] = [p.replace("D1.2 delivered", "Framework in the repository") for p in world["S3"]]
+        report = _audit(tmp_path, profile, world)
+        assert not [f for c in report.checks for f in c.findings if f.kind == ia.KIND_UNDECLARED]
+        assert ia.KIND_UNDECLARED in ia.FINDING_KINDS, "historical audits still carry it"
 
     def test_an_undeclared_dependency_is_noted_as_resting_on_no_declared_value(self, tmp_path, profile):
-        """R03: 16 of the MSCA-DN candidate's 40 findings were of this one kind.
-
-        The milestones table carries no dependency column, so the finding records
-        an absence rather than a declared value the candidate contradicts.  The
-        note says so, beside the count, so the kind is not read as a violation.
-        """
+        """Named by the R03 adjudication record (A03), which stays as written.
+        Under D11 the note also says the absence is advice and not a finding."""
         world = consistent_world()
         world["S3"] = [p.replace("D1.2 delivered", "Framework in the repository") for p in world["S3"]]
         notes = _notes(_audit(tmp_path, profile, world), "milestone_dependencies")
         assert any(
-            "1 of 2 milestones name no deliverable they depend on; a dependency is not a column "
-            "of the milestones table" in n for n in notes
+            "1 of 2 milestones name no deliverable they depend on; no source requires one" in n
+            for n in notes
         )
-        assert any("records an absence, not a declared value the candidate contradicts" in n for n in notes)
+        assert any("drafting advice" in n and "not a finding" in n for n in notes)
 
     def test_the_note_is_absent_when_every_milestone_names_its_deliverable(self, tmp_path, profile):
-        notes = _notes(_audit(tmp_path, profile, consistent_world()), "milestone_dependencies")
+        report = _audit(tmp_path, profile, consistent_world())
+        notes = _notes(report, "milestone_dependencies")
         assert not any("name no deliverable they depend on" in n for n in notes)
+        (check,) = [c for c in report.checks if c.check_id == "milestone_dependencies"]
+        assert check.context is None
+        assert "context" not in check.to_dict()
+
+    def test_an_explicit_reference_is_still_checked(self, tmp_path, profile):
+        """D11 retires the absence, not the check: a named deliverable the table
+        does not list, or one due after the milestone, is still a finding."""
+        world = consistent_world()
+        world["S3"] = [p.replace("D1.2 delivered", "D9.9 delivered") for p in world["S3"]]
+        f = _findings(_audit(tmp_path, profile, world), "milestone_dependencies")
+        assert [(x.kind, x.detail) for x in f] == [
+            (ia.KIND_INCONSISTENCY, "M1.1 names D9.9, which the deliverables table does not list"),
+        ]
 
     def test_a_milestone_outside_its_related_window(self, tmp_path, profile):
         world = consistent_world()
@@ -966,11 +993,11 @@ class TestMscaDnWorkspace:
         assert by_check == {
             "wp_table_vs_prose": {"inconsistency": 3},
             "deliverable_wp_window": {},
-            "milestone_dependencies": {"undeclared_dependency": 16, "out_of_window": 1},
+            "milestone_dependencies": {"out_of_window": 1},
             "dc_table_vs_projects": {"not_comparable": 9},
             "risk_table_vs_prose": {},
         }
-        assert report["findings_total"] == 29
+        assert report["findings_total"] == 13
 
     def test_the_named_findings(self, report):
         details = {f["detail"] for c in report["checks"] for f in c["findings"]}
@@ -1000,12 +1027,20 @@ class TestMscaDnWorkspace:
             "last month any work package runs. The latest ends M40" in n for n in dcs["notes"]
         )
 
-    def test_every_milestone_lacking_a_dependency_is_noted_as_an_absence(self, report):
+    def test_every_milestone_lacking_a_dependency_is_inventoried_not_found(self, report):
+        """D11: the sixteen undeclared_dependency findings of the R03 audit are
+        retired; the inventory carries the same sixteen as context."""
         (ms,) = [c for c in report["checks"] if c["check_id"] == "milestone_dependencies"]
         assert any(
-            "16 of 16 milestones name no deliverable they depend on; a dependency is not a column "
-            "of the milestones table" in n for n in ms["notes"]
+            "16 of 16 milestones name no deliverable they depend on; no source requires one"
+            in n for n in ms["notes"]
         )
+        inventory = ms["context"]["milestones_without_a_named_dependency"]
+        assert len(inventory) == 16
+        assert [m["id"] for m in inventory][:3] == ["M0.1", "M0.2", "M0.3"]
+        assert ms["findings_by_kind"] == {"out_of_window": 1}
+        (m73,) = ms["findings"]
+        assert m73["subject"] == "M7.3" and m73["kind"] == "out_of_window"
 
     def test_the_one_finding_the_revision_adds_is_wp4s_own_dc_set(self, report):
         """Reading WP4's fields does not make its findings disappear: the DC set it
@@ -1038,9 +1073,10 @@ class TestMscaDnWorkspace:
 
     def test_the_r03_corrections_drop_eleven_findings_and_restate_three(self, report):
         """Against the committed PE-08 report, which the dispositions cite: the
-        nine DC appointment overruns and the WP6/WP7 whole-cohort sets are gone,
-        the three remaining WP sets are restated in the direction now compared,
-        and nothing new is claimed."""
+        nine DC appointment overruns and the WP6/WP7 whole-cohort sets are gone
+        (R03), the sixteen undeclared dependencies are gone (D11), the three
+        remaining WP sets are restated in the direction now compared, and
+        nothing new is claimed."""
         old = json.loads(
             (REPO / "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0001.json")
             .read_text(encoding="utf-8")
@@ -1049,17 +1085,43 @@ class TestMscaDnWorkspace:
                   for c in old["checks"] for f in c["findings"]}
         after = {(f["kind"], f["subject"], f["detail"])
                  for c in report["checks"] for f in c["findings"]}
-        assert old["findings_total"] == 40 and report["findings_total"] == 29
+        assert old["findings_total"] == 40 and report["findings_total"] == 13
         gone = sorted(f"{k} {s}" for k, s, _ in before - after)
-        assert gone == [
+        undeclared = sorted(
+            f"undeclared_dependency {s}" for k, s, _ in before if k == ia.KIND_UNDECLARED
+        )
+        assert len(undeclared) == 16
+        assert gone == sorted([
             "inconsistency WP1", "inconsistency WP2", "inconsistency WP4",
             "inconsistency WP6", "inconsistency WP7",
             *[f"out_of_window DC{n}" for n in range(1, 10)],
-        ]
+            *undeclared,
+        ])
         # The three WP sets come back restated; no subject is new.
         assert sorted(f"{k} {s}" for k, s, _ in after - before) == [
             "inconsistency WP1", "inconsistency WP2", "inconsistency WP4",
         ]
+
+    def test_d11_retires_exactly_the_sixteen_undeclared_findings_of_the_r03_audit(self, report):
+        """Against the committed R03 successor audit: only the retired kind is
+        gone, every other finding is unchanged, and the sixteen come back as
+        the inventory."""
+        r03 = json.loads(
+            (REPO / "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0002.json")
+            .read_text(encoding="utf-8")
+        )
+        before = {(f["kind"], f["subject"], f["detail"])
+                  for c in r03["checks"] for f in c["findings"]}
+        after = {(f["kind"], f["subject"], f["detail"])
+                 for c in report["checks"] for f in c["findings"]}
+        assert r03["findings_total"] == 29
+        assert {k for k, _, _ in before - after} == {ia.KIND_UNDECLARED}
+        assert len(before - after) == 16
+        assert not after - before
+        (ms,) = [c for c in report["checks"] if c["check_id"] == "milestone_dependencies"]
+        assert sorted(m["id"] for m in ms["context"]["milestones_without_a_named_dependency"]) == sorted(
+            s for k, s, _ in before - after
+        )
 
     def test_the_committed_pe07_report_over_the_first_copy_is_unchanged(self):
         """The earlier audit is history and stays readable: it names the

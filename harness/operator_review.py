@@ -83,6 +83,8 @@ from harness.esr_comparison import (
     OBSERVATION_KIND_MINOR,
     OBSERVATION_KIND_SHORTCOMING,
     OBSERVATION_KIND_STRENGTH,
+    POINTER_RESOLUTION_IDENTITY,
+    pointer_rule_of,
     EsrComparisonError,
     load_audits,
     load_comparison,
@@ -161,6 +163,19 @@ _PROVISIONAL = (
     "agent-drafted and provisional. None of it is an operator decision, and "
     "nothing here records one."
 )
+_PROVISIONAL_WITH_APPROVAL = (
+    "Every recommendation, uncertainty and proposed revision in this report is "
+    "agent-drafted and provisional. A row marked 'decision recorded' carries an "
+    "operator decision transcribed from the approval record listed among the "
+    "inputs, under the decision id that record uses; no other line here is an "
+    "operator decision, and an approved review policy is not a confirmed fact."
+)
+
+#: What a row may carry instead of an open ``operator_decision``: a decision
+#: the operator has already recorded, transcribed from the approval record the
+#: notes name under ``operator_approval``. Each is identified by the id the
+#: record uses, so a reader can find it there; the review never invents one.
+DECISION_RECORDED_FIELDS: tuple[str, ...] = ("decision_id", "record", "text")
 _ADVISORY = (
     "Advisory to a human, never run-blocking (`harness/HARNESS.md`): this report "
     "evaluates no gate and blocks no phase. Its inputs carry `advisory: true` and "
@@ -232,6 +247,12 @@ class ReviewNotes:
         reader of the second rendering is not left to diff the two.
         """
         return str(self.data.get("supersession_note") or "")
+
+    @property
+    def operator_approval(self) -> Mapping[str, Any] | None:
+        """The approval record the recorded decisions were transcribed from."""
+        value = self.data.get("operator_approval")
+        return value if isinstance(value, Mapping) else None
 
     @property
     def adjudication_record(self) -> str:
@@ -320,6 +341,19 @@ def load_review_notes(path: Path | str) -> ReviewNotes:
         )
     if "supersession_note" in data:
         _text(data, "supersession_note", label=f"review notes {p}", required=True)
+    approval = data.get("operator_approval")
+    if approval is not None:
+        if not isinstance(approval, Mapping) or not str(approval.get("record") or "").strip():
+            raise OperatorReviewError(
+                f"review notes {p}: 'operator_approval' must name the approval record's "
+                "repository path under 'record', or be absent."
+            )
+        if "sha256" in approval and not (
+            isinstance(approval["sha256"], str) and approval["sha256"].strip()
+        ):
+            raise OperatorReviewError(
+                f"review notes {p}: 'operator_approval.sha256' must be a hex digest or absent."
+            )
     rows = data.get("rows")
     if not isinstance(rows, list) or not rows:
         raise OperatorReviewError(f"review notes {p} hold no rows.")
@@ -339,7 +373,28 @@ def load_review_notes(path: Path | str) -> ReviewNotes:
         _text(row, "agreement_basis", label=label, required=True)
         _text(row, "uncertainty", label=label, required=False)
         decision = _text(row, "operator_decision", label=label, required=False)
-        if decision is None and (
+        recorded = row.get("decision_recorded")
+        if recorded is not None:
+            if not isinstance(recorded, Mapping) or any(
+                not str(recorded.get(k) or "").strip() for k in DECISION_RECORDED_FIELDS
+            ):
+                raise OperatorReviewError(
+                    f"{label}: 'decision_recorded' needs "
+                    f"{', '.join(DECISION_RECORDED_FIELDS)}; a decision the review cannot "
+                    "point at in a record is not recorded."
+                )
+            if approval is None:
+                raise OperatorReviewError(
+                    f"{label}: 'decision_recorded' cites {recorded.get('record')!r}, but the "
+                    "notes name no 'operator_approval' record to transcribe from."
+                )
+            if str(recorded.get("record")).strip() != str(approval.get("record")).strip():
+                raise OperatorReviewError(
+                    f"{label}: 'decision_recorded' cites {recorded.get('record')!r}; the notes' "
+                    f"'operator_approval' record is {approval.get('record')!r}. One record "
+                    "per notes file, so every transcription is checkable against one hash."
+                )
+        if decision is None and recorded is None and (
             agreement != AGREEMENT_AGREED or recommendation != RECOMMENDATION_RETAIN
         ):
             raise OperatorReviewError(
@@ -645,9 +700,14 @@ def check_references(row: Mapping[str, Any], inputs: ResolvedInputs) -> Referenc
     target = inputs.historical_candidate or inputs.candidate
     for ref in historical:
         verify_evidence(target, ref, label=label)
+    # The comparison says which pointer rule it resolved under; an older
+    # comparison recorded none and was written under the legacy rule.
+    legacy = pointer_rule_of(inputs.comparison) != POINTER_RESOLUTION_IDENTITY
     for ref in row.get("evidence_basis") or []:
         pointer = str(ref.get("pointer") or "")
-        resolved = resolve_register_pointer(inputs.register, pointer, label=label)
+        resolved = resolve_register_pointer(
+            inputs.register, pointer, label=label, legacy_positional=legacy
+        )
         if json.dumps(resolved.get("value"), sort_keys=True) != json.dumps(
             ref.get("value"), sort_keys=True
         ):
@@ -791,6 +851,12 @@ class ReviewRow:
         value = self.note.get("operator_decision")
         return str(value).strip() if isinstance(value, str) and value.strip() else None
 
+    @property
+    def recorded(self) -> Mapping[str, Any] | None:
+        """The operator decision transcribed on this row, or ``None``."""
+        value = self.note.get("decision_recorded")
+        return value if isinstance(value, Mapping) else None
+
 
 @dataclass(frozen=True)
 class Review:
@@ -803,10 +869,16 @@ class Review:
     generated_at: str
     #: The semantic adjudication record, when the notes name one.
     adjudication: InputRecord | None = None
+    #: The operator approval record, when the notes transcribe decisions from one.
+    approval: InputRecord | None = None
 
     @property
     def decisions(self) -> tuple[ReviewRow, ...]:
         return tuple(r for r in self.rows if r.decision is not None)
+
+    @property
+    def recorded_decisions(self) -> tuple[ReviewRow, ...]:
+        return tuple(r for r in self.rows if r.recorded is not None)
 
 
 def build_review(
@@ -855,7 +927,7 @@ def build_review(
         references = check_references(row, inputs)
         if note.get("recommended_disposition") != row.get("disposition") and not (
             isinstance(note.get("operator_decision"), str) and note["operator_decision"].strip()
-        ):
+        ) and not isinstance(note.get("decision_recorded"), Mapping):
             raise OperatorReviewError(
                 f"review note {oid}: it recommends {note.get('recommended_disposition')!r} "
                 f"where the comparison holds {row.get('disposition')!r}, and names no "
@@ -874,6 +946,35 @@ def build_review(
         counts=counts,
         generated_at=(clock or _utc_now)(),
         adjudication=_adjudication_record(inputs, notes),
+        approval=_approval_record(inputs, notes),
+    )
+
+
+def _approval_record(inputs: ResolvedInputs, notes: ReviewNotes) -> InputRecord | None:
+    """Hash the operator approval record the notes name; refuse one that moved."""
+    approval = notes.operator_approval
+    if approval is None:
+        return None
+    declared = str(approval.get("record"))
+    path = _under(inputs.repo_root, declared)
+    if not path.is_file():
+        raise OperatorReviewError(
+            f"the review notes name operator approval record {declared!r}, which is not a "
+            "file. A decision may not be transcribed from a record the report cannot hash."
+        )
+    actual = file_sha256(path)
+    pinned = approval.get("sha256")
+    if isinstance(pinned, str) and pinned.strip() and actual != pinned.strip():
+        raise OperatorReviewError(
+            f"the operator approval record at {declared} hashes to {actual[:12]}, the notes "
+            f"recorded {pinned[:12]}. The report is refused: the record the decisions were "
+            "transcribed from is not the one on disk."
+        )
+    return InputRecord(
+        role="operator approval",
+        path=_portable(path, inputs.repo_root),
+        sha256=actual,
+        note="the record every 'decision recorded' line on this report was transcribed from",
     )
 
 
@@ -975,7 +1076,7 @@ def render_review(review: Review) -> str:
         add(f"Adjudications: `{_cell(review.adjudication.path)}`  ")
     add("Ticket: R02 of `plans/pe08_review_and_pe09_handoff_tickets.md`")
     add("")
-    add(_PROVISIONAL)
+    add(_PROVISIONAL_WITH_APPROVAL if review.approval is not None else _PROVISIONAL)
     add("")
     if review.notes.supersession_note:
         add(review.notes.supersession_note)
@@ -1001,12 +1102,12 @@ def render_review(review: Review) -> str:
         f"| review notes | `{_cell(_portable(review.notes.path, review.inputs.repo_root))}` "
         f"| `{_cell(review.notes.sha256[:16])}…` | the declared half of this report |"
     )
-    if review.adjudication is not None:
-        a = review.adjudication
-        add(
-            f"| {_cell(a.role)} | `{_cell(a.path)}` | `{_cell((a.sha256 or '')[:16])}…` "
-            f"| {_cell(a.note)} |"
-        )
+    for extra in (review.adjudication, review.approval):
+        if extra is not None:
+            add(
+                f"| {_cell(extra.role)} | `{_cell(extra.path)}` | "
+                f"`{_cell((extra.sha256 or '')[:16])}…` | {_cell(extra.note)} |"
+            )
     add("")
     add(
         "Each hash above was recomputed from the file on disk. A mismatch refuses the "
@@ -1330,6 +1431,11 @@ def _render_row(review: Review, row: ReviewRow) -> list[str]:
             else " (**a change from the comparison**)"
         )
     )
+    if row.recorded is not None:
+        add(
+            f"- **Operator decision recorded:** {_cell(row.recorded.get('decision_id'))} — "
+            f"{_cell(row.recorded.get('text'))} (`{_cell(row.recorded.get('record'))}`)"
+        )
     if row.decision:
         add(f"- **Operator decision required:** {_cell(row.decision)}")
     else:
@@ -1368,11 +1474,31 @@ def render_decisions(review: Review, *, review_name: str | None = None) -> str:
         f"`{_portable(review.inputs.comparison_path, review.inputs.repo_root)}`"
     )
     add("")
-    add(_PROVISIONAL)
+    add(_PROVISIONAL_WITH_APPROVAL if review.approval is not None else _PROVISIONAL)
     add("")
     add(_ADVISORY)
     add("")
     decisions = review.decisions
+    level = "##"
+    if review.approval is not None:
+        recorded = review.recorded_decisions
+        add("## Recorded decisions")
+        add("")
+        add(
+            f"{len(recorded)} row(s) carry a decision transcribed from "
+            f"`{_cell(review.approval.path)}`, under the id that record uses."
+        )
+        add("")
+        for row in recorded:
+            r = row.recorded or {}
+            add(
+                f"- **{row.observation_id}** — {_cell(r.get('decision_id'))}: "
+                f"{_cell(r.get('text'))}"
+            )
+        add("")
+        add("## Open decisions")
+        add("")
+        level = "###"
     if not decisions:
         add("No decision is outstanding.")
         add("")
@@ -1385,7 +1511,7 @@ def render_decisions(review: Review, *, review_name: str | None = None) -> str:
     for number, row in enumerate(decisions, start=1):
         c = row.comparison
         add(
-            f"## {number}. {row.observation_id} — {_cell(c.get('kind'))}, "
+            f"{level} {number}. {row.observation_id} — {_cell(c.get('kind'))}, "
             f"`{_cell(c.get('disposition'))}`"
         )
         add("")
