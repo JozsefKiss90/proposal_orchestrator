@@ -32,11 +32,33 @@ import harness.ledger_granularity as mlg
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
+#: Where the exclusion is recorded when a dataset this suite reads is absent.
+DISPOSITIONS = "harness/DATASET_DISPOSITIONS.md"
+
+
 @pytest.fixture(scope="module")
 def report():
+    """The measurement, or a recorded exclusion naming the missing dataset.
+
+    The drafter-era side of every number here is the E4 golden baselines.  The
+    FIELDWISE purge removed them along with the sections they fingerprinted, so
+    ``build_report`` raised at fixture setup and five checks surfaced as setup
+    errors.  An absent dataset is an exclusion (V02d), never a pass: the reason
+    names the dataset and the document that holds the disposition.
+    """
     sections = REPO_ROOT / "docs" / "tier5_deliverables" / "proposal_sections"
     if not any(sections.glob("*.json")):
-        pytest.skip("no live Tier 5 sections in this checkout (empty project instantiation)")
+        pytest.skip(
+            "no live Tier 5 sections in this checkout (empty project instantiation); "
+            f"excluded, see {DISPOSITIONS}"
+        )
+    goldens = REPO_ROOT / "harness" / "regression_baselines"
+    if not any(goldens.glob("*.golden.json")):
+        pytest.skip(
+            "EXCLUDED (not a pass): no E4 golden baselines, so the drafter-era side "
+            "of this measurement is absent. The measured numbers survive in git "
+            f"history at 32b5606. Disposition: {DISPOSITIONS}"
+        )
     return mlg.build_report(REPO_ROOT)
 
 

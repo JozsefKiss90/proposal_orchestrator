@@ -16,6 +16,7 @@ committed register.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -593,6 +594,66 @@ class TestHashDependencies:
 # --------------------------------------------------------------------------- #
 # Determinism, and the committed artifacts
 # --------------------------------------------------------------------------- #
+
+
+#: The V02a record that states what the last re-render changed, and why.
+RERENDER_RECORD = (
+    "docs/tier4_orchestration_state/decision_log/"
+    "msca-dn-declaration-draft-rerender_2026-10-09.json"
+)
+
+
+class TestTheRerenderRecordAgreesWithTheDrafts:
+    """A record that states a draft's hash must still describe that draft.
+
+    The adoption-cost scan reads each register's path and hash out of every
+    file under ``docs/``, ``workspaces/`` and ``plans/``, so a record that adds
+    a register reference changes the drafts it is explaining, and the hashes it
+    just recorded stop describing the committed bytes.  The V02a record names
+    no register for that reason.  A record *may* name one — the R05 record
+    does — but then its own commit must re-render the drafts afterwards, which
+    is what the first test here measures either way.
+    """
+
+    @pytest.fixture(scope="class")
+    def record(self) -> dict[str, Any]:
+        return json.loads((REPO / RERENDER_RECORD).read_text(encoding="utf-8-sig"))
+
+    def test_the_recorded_hashes_describe_the_committed_drafts(self, record):
+        hashes = {k: v for k, v in record["hashes"].items() if isinstance(v, dict)}
+        assert len(hashes) == len(drafts.render_all(REPO)), (
+            "the record states a hash for a different number of files than the "
+            "tool renders"
+        )
+        for rel, pins in hashes.items():
+            committed = hashlib.sha256((REPO / rel).read_bytes()).hexdigest()
+            assert pins["after"] == committed, (
+                f"{RERENDER_RECORD} states {pins['after'][:16]} for {rel}, "
+                f"which is {committed[:16]} on disk. Re-render, then re-record."
+            )
+            assert pins["before"] != pins["after"], rel
+
+    def test_the_record_adds_no_register_reference(self, record):
+        """So the hashes above stay valid without a further re-render."""
+        text = (REPO / RERENDER_RECORD).read_text(encoding="utf-8-sig")
+        for revision in REVISIONS:
+            register = revision.register_rel.as_posix()
+            assert register not in text, (
+                f"this record names {register}, so the next scan adds it to the "
+                "drafts' dependents and the hashes recorded here go stale. "
+                "Cite the draft by path, or re-render in the same commit."
+            )
+            digest = hashlib.sha256(
+                (REPO / revision.register_rel).read_bytes()
+            ).hexdigest()
+            assert digest not in text and digest[:16] not in text, (
+                f"this record pins the {revision.revision_id} register's hash, "
+                "which the scan reads as a dependency."
+            )
+
+    def test_the_record_cites_the_drafts_by_path(self):
+        text = (REPO / RERENDER_RECORD).read_text(encoding="utf-8-sig")
+        assert drafts.DRAFTS_DIR_REL.as_posix() in text
 
 
 class TestDeterminismAndTheCommittedArtifacts:

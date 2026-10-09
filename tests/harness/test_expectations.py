@@ -387,7 +387,11 @@ class TestCriterionSectionMap:
 
     def test_golden_paths_resolve(self):
         if not any((REPO_ROOT / "harness" / "regression_baselines").glob("*.golden.json")):
-            pytest.skip("no committed E4 goldens in this checkout; refreeze after the next run")
+            pytest.skip(
+                "EXCLUDED (not a pass): no committed E4 goldens in this checkout. "
+                "Disposition and the operator refreeze that would lift it: "
+                "harness/DATASET_DISPOSITIONS.md"
+            )
         for criterion in ("excellence", "impact", "implementation"):
             paths = exp.golden_paths_for(criterion, repo_root=REPO_ROOT, profile=PROFILE)
             assert all(p.is_file() for p in paths)

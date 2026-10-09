@@ -5,8 +5,8 @@ Offline, zero judge, zero DAG runs.  Fixture sections exercise the selection
 grammar (term matching, anchor bonus, document order), the budget contract
 (over-budget exclusions flip the pack to ``insufficient_context`` — an explicit
 outcome, never a silent short pack), and the no-silent-caps record; real-file
-tests assert every pack for the 9 PF rubrics fits one judge call under the
-Groq TPM ceiling.
+tests assert every pack for the rubrics of the profile paired with the
+committed sections fits one judge call under the Groq TPM ceiling.
 """
 
 from __future__ import annotations
@@ -19,11 +19,10 @@ import pytest
 import harness.evidence_pack as ep
 from harness.expectations import section_paths_for
 from harness.judge import DEFAULT_JUDGE_MAX_TOKENS
-from harness.profile import default_profile
+from harness.profile import load_profile
 from harness.rubrics import build_pack_for, load_rubric_set
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PROFILE = default_profile(REPO_ROOT)
 
 
 # --------------------------------------------------------------------------- #
@@ -325,17 +324,56 @@ class TestRenderAndRecord:
 # --------------------------------------------------------------------------- #
 
 
+#: The profile these real-file checks intend, and why it is not the default.
+#:
+#: ``default_profile`` resolves to MSCA-PF, whose rubrics anchor at ``1.1`` to
+#: ``3.2``.  The committed Tier 5 sections are the graph-compiled BIODIV-01 RIA
+#: sections, anchored ``B.1.1`` to ``B.3.2``.  Pairing the default profile with
+#: them made every pack build raise on a missing anchor — the anchor map failing
+#: closed, correctly, on a pairing the test never declared.  The pairing is now
+#: explicit: the RIA profile reads the RIA sections.
+REAL_SECTIONS_PROFILE_PATH = REPO_ROOT / "harness/profiles/ria_default.json"
+
+
 class TestRealSections:
     @pytest.fixture(scope="class")
-    def rubric_set(self):
+    def profile(self):
         live = REPO_ROOT / "docs/tier5_deliverables/proposal_sections"
         if not any(live.glob("*.json")):
             pytest.skip("no live Tier 5 sections in this checkout (empty project instantiation)")
-        return load_rubric_set(profile=PROFILE, repo_root=REPO_ROOT)
+        return load_profile(REAL_SECTIONS_PROFILE_PATH)
 
-    def test_every_rubric_yields_a_bounded_consistent_pack(self, rubric_set):
+    @pytest.fixture(scope="class")
+    def rubric_set(self, profile):
+        return load_rubric_set(profile=profile, repo_root=REPO_ROOT)
+
+    def test_the_declared_profile_and_the_live_sections_are_the_pair(
+        self, profile, rubric_set
+    ):
+        """The pairing itself, asserted rather than assumed.
+
+        Every rubric's anchor sub-sections must exist in the section the
+        profile routes that criterion to.  A mismatch here names the two sides,
+        instead of surfacing as an anchor-map error inside each pack build.
+        """
         for rubric in rubric_set.rubrics:
-            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=PROFILE)
+            (path,) = section_paths_for(
+                rubric.criterion_id, repo_root=REPO_ROOT, profile=profile
+            )
+            present = {
+                s["sub_section_id"]
+                for s in json.loads(path.read_text(encoding="utf-8-sig"))["sub_sections"]
+            }
+            missing = set(rubric.anchor_sub_section_ids) - present
+            assert not missing, (
+                f"{rubric.expectation_key} anchors {sorted(missing)}, which "
+                f"{path.name} does not carry (has {sorted(present)}): "
+                f"{REAL_SECTIONS_PROFILE_PATH.name} is not the profile for these sections"
+            )
+
+    def test_every_rubric_yields_a_bounded_consistent_pack(self, rubric_set, profile):
+        for rubric in rubric_set.rubrics:
+            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=profile)
             pack = build_pack_for(rubric, path)
             assert pack.status in (ep.PACK_COMPLETE, ep.PACK_INSUFFICIENT_CONTEXT)
             assert not pack.is_empty, rubric.expectation_key
@@ -346,11 +384,11 @@ class TestRealSections:
             # Consistency, not content: truncation and status must agree.
             assert bool(over) == (pack.status == ep.PACK_INSUFFICIENT_CONTEXT)
 
-    def test_one_judge_call_fits_the_tpm_ceiling(self, rubric_set):
+    def test_one_judge_call_fits_the_tpm_ceiling(self, rubric_set, profile):
         from harness.rubrics import build_rubric_prompts
 
         for rubric in rubric_set.rubrics:
-            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=PROFILE)
+            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=profile)
             pack = build_pack_for(rubric, path)
             system, user = build_rubric_prompts(rubric, pack)
             call_estimate = (
@@ -360,14 +398,14 @@ class TestRealSections:
             )
             assert call_estimate <= ep.GROQ_TPM_LIMIT, rubric.expectation_key
 
-    def test_rubric_prompt_overhead_fits_the_allowance(self, rubric_set):
+    def test_rubric_prompt_overhead_fits_the_allowance(self, rubric_set, profile):
         """The "fits by construction" guard: every rubric's non-pack prompt
         overhead (system prompt + closing question) must stay under
         RUBRIC_PROMPT_ALLOWANCE, or MAX_PACK_TOKEN_BUDGET's arithmetic is a lie."""
         from harness.rubrics import build_rubric_prompts
 
         for rubric in rubric_set.rubrics:
-            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=PROFILE)
+            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=profile)
             pack = build_pack_for(rubric, path)
             system, user = build_rubric_prompts(rubric, pack)
             question = user[len(pack.render()):]

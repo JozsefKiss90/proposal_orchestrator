@@ -802,15 +802,27 @@ class TestBoundary:
 @pytest.mark.harness_rubric
 class TestStandingLane:
     def test_real_spine_register_loads_and_is_fully_confirmed(self):
-        # The committed 13B state: 9 spine items + 10 project decisions, all
-        # operator-confirmed.  A revert to an open spine (or a vocabulary
-        # drift) fails this advisory lane and surfaces to a human.
+        # Until 2026-10-09 this pinned the FIELDWISE 13B state by count and by
+        # fact id: 9 spine items, 10 project decisions, HOST/FELLOW/SUPERVISOR.
+        # Those are project data, and the FIELDWISE purge removed the Tier-3
+        # instantiation that carried them, leaving the engine at its CLAUDE.md
+        # §2 project-agnostic default.  The contract moved to the engine's own
+        # invariants: a present checklist loads, carries both kinds, speaks the
+        # §12.2 vocabulary and leaves nothing unconfirmed.  An absent checklist
+        # is the honest uninstantiated state, recorded as a skip, never as a
+        # pass.
+        checklist = REPO_ROOT / hr.DEFAULT_CHECKLIST_PATH
+        if not checklist.is_file():
+            pytest.skip(
+                "EXCLUDED (not a pass): no spine confirmation checklist at "
+                f"{hr.DEFAULT_CHECKLIST_PATH} (project-agnostic checkout: no Tier 3 "
+                "instantiation). Disposition: harness/DATASET_DISPOSITIONS.md"
+            )
         reg = hr.load_spine_registry(REPO_ROOT)
         spine = [f for f in reg.facts if f.kind == hr.KIND_SPINE_IDENTITY]
         decisions = [f for f in reg.facts if f.kind == hr.KIND_PROJECT_DECISION]
-        assert len(spine) == 9
-        assert len(decisions) == 10
-        assert {"HOST", "FELLOW", "SUPERVISOR"} <= {f.fact_id for f in spine}
+        assert spine and decisions
+        assert {f.status for f in reg.facts} <= hr.SPINE_STATUSES
         assert reg.unconfirmed() == ()
 
     def test_frozen_report_renders_if_present(self):
@@ -818,7 +830,10 @@ class TestStandingLane:
         # gap by skipping, never by pretending.
         path = REPO_ROOT / hr.DEFAULT_REPORT_PATH
         if not path.is_file():
-            pytest.skip("no frozen rubric report yet (E5f pending)")
+            pytest.skip(
+                "EXCLUDED (not a pass): no frozen rubric report yet (E5f pending). "
+                "Disposition: harness/DATASET_DISPOSITIONS.md"
+            )
         data = json.loads(path.read_text(encoding="utf-8-sig"))
         assert data["record_type"] == hr.RUBRIC_REPORT_RECORD_TYPE
         assert data["advisory"] is True and data["blocking"] is False

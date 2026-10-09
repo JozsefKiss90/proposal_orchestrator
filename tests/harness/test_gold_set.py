@@ -244,7 +244,11 @@ class TestSeededExcellenceTemplate:
 
         path = find_repo_root() / "harness" / "gold_sets" / "faithfulness_gold_excellence_TEMPLATE.jsonl"
         if not path.is_file():
-            pytest.skip("no seeded gold-set template in this checkout; reseed from the next project's sections")
+            pytest.skip(
+                "EXCLUDED (not a pass): no seeded gold-set template in this "
+                "checkout. Disposition and the work that would lift it: "
+                "harness/DATASET_DISPOSITIONS.md"
+            )
         return path
 
     def test_exists_and_loads_as_template(self):

@@ -47,3 +47,9 @@ avoid. Labeling is a human task.
 Re-label and re-run whenever the pinned judge model or version changes — a repin
 re-opens the advisory-only state (`CalibrationReport.applies_to` /
 `graduation_for` enforce this).
+
+## Current status: no labelled gold set exists
+
+This directory holds this README only. Every check that reads a gold set is excluded, and each one is
+named with its reason in [`../DATASET_DISPOSITIONS.md`](../DATASET_DISPOSITIONS.md). Ticket X03 of
+`plans/msca_dn_historical_validation_tickets.md` is the work that lifts those exclusions.

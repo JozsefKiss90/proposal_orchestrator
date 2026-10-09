@@ -16,6 +16,15 @@ freezes the current sections so a prompt/model change cannot silently regress
 them. The remaining metrics (the evaluator G-Evals, the α-block assertion,
 graph-retrieval precision/recall) are later tickets.
 
+## Before you read a green lane as calibration: `DATASET_DISPOSITIONS.md`
+
+`gold_sets/` and `regression_baselines/` hold only READMEs. No expert-labelled
+validation data exists for this harness, and no golden fingerprints are
+committed, so every check that reads either dataset is **excluded** — named,
+with its reason and its lift-work, in
+[`DATASET_DISPOSITIONS.md`](DATASET_DISPOSITIONS.md). A green lane says the code
+behaves as its fixtures specify. It says nothing about calibration.
+
 ## The one load-bearing invariant
 
 **No eval metric wires into the runtime DAG as a fail-closed gate.** An

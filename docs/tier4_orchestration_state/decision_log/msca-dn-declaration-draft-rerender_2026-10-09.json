@@ -1,0 +1,50 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-declaration-draft-rerender_2026-10-09",
+  "date": "2026-10-09",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation, ticket V02a (Restore the document-identity-dependent fixtures) in plans/msca_dn_historical_validation_tickets.md; closes part of finding F08 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §12.1 (an output names its inputs), §12.3 (a contradiction between records is resolved explicitly, with the resolution recorded), §15 (documented state governs). Ticket V02a. Not a constitutional amendment.",
+  "supersedes_a_pin_in": "docs/tier4_orchestration_state/decision_log/msca-dn-operator-approval_2026-10-08.json, group re_rendered_by_their_own_tool, entries declaration_draft_sanitised_v1 and declaration_draft_resolved_fixes. That record is historical evidence and is left exactly as written. This record supersedes the two sha256 values it pins, and nothing else in it.",
+  "decision": "The three declaration drafts under docs/tier4_orchestration_state/msca_dn/declarations/ were re-rendered by their own tool, py -3.10 -m tools.draft_fidelity_declarations. Their bytes changed, and the two sha256 values the 2026-10-08 approval record pinned for the JSON drafts no longer describe the files. The new hashes are recorded below.",
+  "why": "The drafts carry an adoption-cost scan that is deliberately coupled to the repository tree: it measures every committed artifact that would have to be re-recorded or explained if a declaration were adopted. Any new artifact that names a register therefore makes the drafts stale, and their tool's --check exits 1. The 2026-10-08 approval record recognised this for the Markdown checklist and pinned no hash for it, giving the reason in the record. The same reasoning applies to the two JSON drafts, which carry the same scan output under referenced_by_path; pinning their hashes bound a measurement to a tree that was certain to grow.",
+  "what_made_them_stale": {
+    "declared_status": "Confirmed",
+    "basis": "the re-render diff, measured on this checkout",
+    "new_dependents_found": [
+      "plans/reports/v01_extraction_environment_completion_2026-10-08.md (names the sanitised_v1 register; added by ticket V01)",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-extraction-environment-pin_2026-10-08.json (names the sanitised_v1 register; added by ticket V01)",
+      "plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md (names both registers; the audit this ticket ledger answers)"
+    ],
+    "note": "V01 added two of the three and did not re-render. The audit report added the third. No register, no register hash and no committed historical artifact changed."
+  },
+  "hashes": {
+    "algorithm": "sha256 over the file bytes as committed",
+    "docs/tier4_orchestration_state/msca_dn/declarations/draft_sanitised_v1.json": {
+      "before": "8dbed290674e1610f28d4f623063d492a0e4c6f2991e8f04f5d63b626ed727b5",
+      "after": "05e6131c62d7405b94813d396d313c6b4fb8826ae21d1d43fae8157665c287cb"
+    },
+    "docs/tier4_orchestration_state/msca_dn/declarations/draft_resolved_fixes.json": {
+      "before": "a86942cc21e878401f07b595699e580d2fe225b578eacbdadc8ac7b03f54f0a5",
+      "after": "46650d5e83c714566b2293cc08703b54c56686c4a6af9b89548faa3fb04017b2"
+    },
+    "docs/tier4_orchestration_state/msca_dn/declarations/review_checklist.md": {
+      "before": "b192ea8b61c264e2bde76d7015c53470e93d99772009236a927e7271e4703a60",
+      "after": "bc88ea680e0c3c66031473972bcdace1965a04a0fb97163cbc27c1ac24d51e8e",
+      "note": "No record pinned this file. The approval record states why, and that reason is the one this record extends to the other two."
+    }
+  },
+  "unchanged": [
+    "Both fidelity registers, their bytes and their hashes.",
+    "The declaration inputs under docs/tier4_orchestration_state/msca_dn/declarations/ that the operator types, which are the source of every prior declaration.",
+    "Every declared row, its claim set and its status. The re-render changed only the adoption-cost scan's dependent lists.",
+    "The frozen 74.60 baseline, the approved dispositions, the comparison records and the committed integrity audits."
+  ],
+  "the_cycle_and_how_it_is_cut": {
+    "problem": "A record that explains a re-render by naming a register path is itself picked up by the next scan, so writing the explanation makes the drafts stale again.",
+    "rule": "This record cites the drafts by path and names no register path and no register hash, so the hashes it states stay the committed hashes without a further re-render. A record may name a register — the R05 successor-dispositions record does, in a command it quotes — but then its own commit must re-render the drafts afterwards. Either way the invariant is the same: a stated hash describes the committed bytes.",
+    "asserted_by": "tests/test_msca_dn_declaration_drafts.py::TestTheRerenderRecordAgreesWithTheDrafts"
+  },
+  "verification": "py -3.10 -m tools.draft_fidelity_declarations --check exits 0 with the drafts committed here, and tests/test_msca_dn_declaration_drafts.py passes under the V01 environment pin (Python 3.10.6, PyMuPDF 1.28.2).",
+  "does_not_close": "V02a is one of four parts of F08. F08 closes at V03. This record confers no gate closure, and it is not operator approval of the re-rendered drafts: their review_state is unchanged and the operator's open questions stand."
+}

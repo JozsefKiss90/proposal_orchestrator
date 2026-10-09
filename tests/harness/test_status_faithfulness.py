@@ -244,7 +244,11 @@ class TestResolveClaimSourceText:
         root = Path(__file__).resolve().parents[2]
         ref = "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
         if not (root / ref).is_file():
-            pytest.skip("confirmation_checklist.json not present")
+            pytest.skip(
+                "EXCLUDED (not a pass): confirmation_checklist.json not present "
+                "(no Tier 3 instantiation). Disposition: "
+                "harness/DATASET_DISPOSITIONS.md"
+            )
         txt = sf.resolve_claim_source_text(ref, root)
         assert "SOURCE TRUNCATED" not in txt
 

@@ -46,9 +46,31 @@ def _advisory(report: reg.RegressionReport) -> str:
     return "\n".join(lines)
 
 
+#: Where the exclusion is recorded when a dataset this lane reads is absent.
+DISPOSITIONS = "harness/DATASET_DISPOSITIONS.md"
+
+
 def _skip_unless_substrate():
-    if not any(SECTIONS_DIR.glob("*.json")) and not any(GOLDEN_DIR.glob("*.golden.json")):
-        pytest.skip("no live Tier 5 sections in this checkout (empty project instantiation); refreeze goldens after the next run")
+    """Both sides of the diff, or the lane records an exclusion.
+
+    Until 2026-10-09 this skipped only when *neither* side was present, so a
+    checkout with live sections and no committed goldens — the state the
+    FIELDWISE purge left — failed three checks instead of recording that the
+    golden set is missing.  An absent dataset is an exclusion (V02d), never a
+    pass and never a silent skip: the reason names the dataset and the document
+    that holds the disposition.
+    """
+    if not any(SECTIONS_DIR.glob("*.json")):
+        pytest.skip(
+            "no live Tier 5 sections in this checkout (empty project instantiation); "
+            f"excluded, see {DISPOSITIONS}"
+        )
+    if not any(GOLDEN_DIR.glob("*.golden.json")):
+        pytest.skip(
+            f"EXCLUDED (not a pass): no E4 golden baselines in {reg.DEFAULT_GOLDEN_DIR}, "
+            "so no prior section state exists to diff against. Disposition and the "
+            f"operator refreeze that would lift it: {DISPOSITIONS}"
+        )
 
 
 class TestGoldenSetStanding:
@@ -93,7 +115,10 @@ class TestRubricLaneStanding:
     def test_frozen_rubric_baseline_is_self_consistent(self):
         path = REPO_ROOT / reg.DEFAULT_RUBRIC_BASELINE_PATH
         if not path.is_file():
-            pytest.skip("no frozen rubric baseline yet (E5f pending)")
+            pytest.skip(
+                "EXCLUDED (not a pass): no frozen rubric baseline yet (E5f pending). "
+                f"Disposition: {DISPOSITIONS}"
+            )
         baseline = reg.load_rubric_baseline(path)
         comparison = reg.compare_rubric_baseline(baseline, baseline["report"])
         assert comparison.blocking is False

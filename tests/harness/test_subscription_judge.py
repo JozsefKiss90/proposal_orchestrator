@@ -47,6 +47,26 @@ def calls(monkeypatch):
     return seen
 
 
+@pytest.fixture
+def a_repository_with_a_runs_directory(tmp_path):
+    """``(repo_root, repo_root/.claude/runs)`` built under *tmp_path*.
+
+    ``_check_working_dir`` tests existence before containment, so on a fresh
+    checkout — where the real ``.claude/runs`` is untracked and absent — an
+    inside-the-repository path was refused for *being missing*, and a test that
+    named the containment rule silently asserted the existence rule instead.
+
+    The fixture builds both paths rather than assuming either.  ``repo_root`` is
+    injectable, so it builds them under ``tmp_path`` and never creates or
+    removes a directory in the checkout under test: the rule holds on any
+    checkout, on Windows, and a crashed run leaves the working tree alone.
+    """
+    root = tmp_path / "repo"
+    runs = root / ".claude" / "runs"
+    runs.mkdir(parents=True)
+    return root, runs
+
+
 def _backend(**kwargs) -> sj.ClaudeCLIJudgeBackend:
     kwargs.setdefault("model", PIN)
     kwargs.setdefault("max_tokens", 2048)
@@ -85,10 +105,19 @@ class TestTheAssessorIsBlind:
         assert cwd.is_dir()
         assert not cwd.is_relative_to(REPO.resolve())
 
-    def test_a_working_directory_inside_the_repository_is_refused(self):
-        inside = REPO / ".claude" / "runs"
-        with pytest.raises(sj.SubscriptionJudgeError, match="inside the repository"):
-            _backend(working_dir=inside)
+    def test_a_working_directory_inside_the_repository_is_refused(
+        self, a_repository_with_a_runs_directory
+    ):
+        """The containment refusal, and not the existence refusal in its name.
+
+        The directory exists, so ``does not exist`` cannot fire: only the
+        containment branch can produce a refusal here at all."""
+        root, runs = a_repository_with_a_runs_directory
+        assert runs.is_dir()
+        with pytest.raises(sj.SubscriptionJudgeError) as caught:
+            _backend(working_dir=runs, repo_root=root)
+        assert "does not exist" not in str(caught.value)
+        assert "inside the repository" in str(caught.value)
 
     def test_a_missing_working_directory_is_refused(self, tmp_path):
         with pytest.raises(sj.SubscriptionJudgeError, match="does not exist"):

@@ -173,15 +173,18 @@ these modules go green or each residual failure is explained as a real defect wi
 
 ### Acceptance criteria
 
-- [ ] The import, workspace, fidelity-register and adoption fixture failures and setup errors are
+- [x] The import, workspace, fidelity-register and adoption fixture failures and setup errors are
       resolved, and the count is compared against the audit's 29 failures and 43 errors.
 - [ ] The two integrity-audit integration failures pass against the reproduced document identity and
       the V05 provenance-derived wording.
-- [ ] Any residual failure is classified as a real defect with a named cause, not carried as
+- [x] Any residual failure is classified as a real defect with a named cause, not carried as
       pre-existing without evidence.
-- [ ] No fixture is edited to encode a hash the importer no longer produces.
+- [x] No fixture is edited to encode a hash the importer no longer produces.
 
 **Verification.** Run the MSCA-DN integration modules and the integrity-audit tests under the V01 pin.
+
+
+**Status 2026-10-09.** Three of four criteria closed. Criterion 2 stays open: both integrity-audit checks pass against the reproduced document identity, but under the existing wording, because V05 is open and no wording was derived from candidate provenance. It closes with V05. Evidence: `plans/reports/v02_focused_suite_completion_2026-10-09.md`.
 
 ## V02b — Pair the claim-ledger and evidence-pack real-data fixtures
 
@@ -196,14 +199,17 @@ which candidate and which profile the expectation belongs to.
 
 ### Acceptance criteria
 
-- [ ] The authoritative claim-ledger fixture is reconciled against current data, and the expected
+- [x] The authoritative claim-ledger fixture is reconciled against current data, and the expected
       counts are derived from a named candidate version rather than hard-coded from memory.
-- [ ] Each evidence-pack real-data check declares its intended profile and section pairing explicitly.
-- [ ] No production register or committed ledger is mutated to satisfy a test.
-- [ ] Where a count changed legitimately, the completion report states the old value, the new value and
+- [x] Each evidence-pack real-data check declares its intended profile and section pairing explicitly.
+- [x] No production register or committed ledger is mutated to satisfy a test.
+- [x] Where a count changed legitimately, the completion report states the old value, the new value and
       the reason.
 
 **Verification.** Run the claim-ledger and evidence-pack test modules under the V01 pin.
+
+
+**Status 2026-10-09.** Closed, four of four. Evidence: `plans/reports/v02_focused_suite_completion_2026-10-09.md`.
 
 ## V02c — Update the stale synthetic test contracts
 
@@ -222,15 +228,18 @@ fail-closed behaviour preserved rather than relaxed.
 
 - [ ] The rubric-report fixture and the `confirmation_checklist` contract agree, and the change is made
       in one direction with a stated reason.
-- [ ] The T03 scripted backend returns a criterion response that satisfies the current scorer contract,
+- [x] The T03 scripted backend returns a criterion response that satisfies the current scorer contract,
       and a separate test still asserts that a response missing `shortcomings` is refused and
       checkpointed.
-- [ ] The subscription-judge test constructs its own `.claude/runs` fixture and asserts the intended
+- [x] The subscription-judge test constructs its own `.claude/runs` fixture and asserts the intended
       path rule portably, on a fresh checkout and on Windows.
-- [ ] No refusal, isolation or fail-closed behaviour is weakened to make a test pass.
+- [x] No refusal, isolation or fail-closed behaviour is weakened to make a test pass.
 
 **Verification.** Run the three modules on a fresh checkout and confirm the fail-closed assertions
 still fail when the guard is removed.
+
+
+**Status 2026-10-09.** Three of four criteria closed. Criterion 1 stays open: the rubric-report lane's change was made in one direction with a stated reason, but the two sides cannot be made to agree while no Tier 3 confirmation checklist exists. The real-file half is recorded as an exclusion in `harness/DATASET_DISPOSITIONS.md`. Evidence: `plans/reports/v02_focused_suite_completion_2026-10-09.md`.
 
 ## V02d — Dispose of the missing calibration and regression datasets
 
@@ -245,15 +254,18 @@ source, or scoped out with its reason and its replacement evidence recorded.
 
 ### Acceptance criteria
 
-- [ ] Every dataset-dependent failing check is listed with its disposition, restored or scoped out.
-- [ ] A scoped-out check is recorded as excluded with a reason and replacement evidence. It is never
+- [x] Every dataset-dependent failing check is listed with its disposition, restored or scoped out.
+- [x] A scoped-out check is recorded as excluded with a reason and replacement evidence. It is never
       reported as passing, skipped silently, or counted toward suite health.
-- [ ] The absence of expert-labelled DN validation data is stated where a reader of the harness status
+- [x] The absence of expert-labelled DN validation data is stated where a reader of the harness status
       would otherwise infer calibration.
-- [ ] The disposition names X03 as the work that would lift the exclusion.
+- [x] The disposition names X03 as the work that would lift the exclusion.
 
 **Verification.** Run the affected modules and confirm the recorded disposition matches the observed
 result. No new dataset is fabricated.
+
+
+**Status 2026-10-09.** Closed, four of four. Evidence: `plans/reports/v02_focused_suite_completion_2026-10-09.md`.
 
 ## V03 — Name and green the PE-09 acceptance lane
 

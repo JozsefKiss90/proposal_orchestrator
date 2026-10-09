@@ -100,6 +100,11 @@ CONTRACT = {
 }
 
 _THRESHOLD_RE = re.compile(r"at or above ([0-9.]+) corresponds to a pass")
+# The criterion scorer's prompt, and the two numbers it states about the scale.
+_CRITERION_MARKER = "CRITERION UNDER ASSESSMENT:"
+_SCALE_TOP_RE = re.compile(r"from 0 to ([0-9.]+)")
+_WHOLE_NUMBERS = "in whole numbers"
+_STEP_RE = re.compile(r"in steps of ([0-9.]+)")
 
 
 # --------------------------------------------------------------------------- #
@@ -246,18 +251,33 @@ def _profile_b(root: Path) -> Path:
 
 class ScriptedBackend:
     """One fixed score; the verdict is decided by the threshold the prompt
-    states, never by Python. Keeps every prompt it was shown."""
+    states, never by Python. Keeps every prompt it was shown.
+
+    Two prompts reach this backend and they have different response contracts.
+    An **expectation** prompt states a pass threshold and wants a pass/fail
+    verdict. A **criterion** prompt states a scale and wants a holistic score
+    with a named shortcoming, a named strength and a rationale; a response
+    without ``shortcomings`` is refused by the scorer, which is the contract
+    :func:`test_a_criterion_response_without_shortcomings_is_refused` pins.
+    The score is read off the scale the prompt declares, so a profile may
+    change its scale through configuration without touching this backend.
+    """
 
     def __init__(self, score: float = 0.75):
         self.score = score
         self.calls = 0
         self.prompts: list[str] = []
         self.thresholds: set[float] = set()
+        self.criterion_calls = 0
 
     def __call__(self, messages):
         self.calls += 1
         self.prompts.extend(str(m.get("content", "")) for m in messages)
-        match = _THRESHOLD_RE.search(str(messages[0].get("content", "")))
+        system = str(messages[0].get("content", ""))
+        if _CRITERION_MARKER in system:
+            self.criterion_calls += 1
+            return {"content": json.dumps(self._criterion_payload(system))}
+        match = _THRESHOLD_RE.search(system)
         if match:
             threshold = float(match.group(1))
             self.thresholds.add(threshold)
@@ -265,6 +285,43 @@ class ScriptedBackend:
         else:
             passed = True
         return {"content": json.dumps({"passed": passed, "score": self.score, "rationale": "scripted"})}
+
+    def _criterion_payload(self, system: str) -> dict:
+        """``self.score`` as a fraction of the declared scale, on its step.
+
+        The scale is read off the prompt rather than hard-coded, so a profile
+        may change it through configuration.  That couples this backend to the
+        prompt's wording, so a wording change must say so: without the assert,
+        the miss surfaces as ``AttributeError`` on ``None``.
+        """
+        match = _SCALE_TOP_RE.search(system)
+        assert match, (
+            "the criterion prompt no longer states its scale as 'from 0 to <top>'; "
+            "re-read build_criterion_prompts and update _SCALE_TOP_RE"
+        )
+        top = float(match.group(1))
+        value = self.score * top
+        step = 1.0 if _WHOLE_NUMBERS in system else None
+        declared = _STEP_RE.search(system)
+        if declared:
+            step = float(declared.group(1))
+        if step is not None:
+            value = round(value / step) * step
+        return {
+            "score": round(value, 2),
+            "shortcomings": ["the scripted shortcoming"],
+            "strengths": ["the scripted strength"],
+            "rationale": "scripted: one holistic score over the whole section text.",
+        }
+
+
+class NoShortcomingsBackend(ScriptedBackend):
+    """A criterion response missing ``shortcomings`` — the malformed case."""
+
+    def _criterion_payload(self, system: str) -> dict:
+        payload = super()._criterion_payload(system)
+        payload.pop("shortcomings")
+        return payload
 
 
 def _judge(root: Path, backend, tag: str) -> Judge:
@@ -638,6 +695,38 @@ def test_t03_scenario_end_to_end(tmp_path: Path) -> None:
     assert _tree_bytes(root, RUNS_DIR) == runs_before
     assert revision_path.is_file() and comparison_path.is_file() and plan_path.is_file()
     assert plan.plan_id.startswith(HASH_PREFIX)
+
+
+# --------------------------------------------------------------------------- #
+# The refusal the walk used to stand on
+# --------------------------------------------------------------------------- #
+
+
+def test_a_criterion_response_without_shortcomings_is_refused_and_checkpointed(
+    tmp_path: Path,
+) -> None:
+    """The walk's scripted assessor once returned no ``shortcomings`` list, so
+    the walk measured this refusal instead of the path it was written for.  The
+    refusal keeps its own test: the command exits 2, writes no report, and
+    leaves the draws on a checkpoint a resume can read.
+    """
+    root = tmp_path / "repo"
+    shutil.copytree(FIXTURE, root)
+    profile = _profile_a(root)
+    import_document(root, CANDIDATE)
+    record_esr_intake(
+        root, intake_id="INTAKE-1", document_id="CAND-1", submission_id="SUB-1",
+        call_id="SYN-CALL-01", permitted_purpose="blind_pre_evaluation",
+    )
+    backend = NoShortcomingsBackend()
+    out = root / "reports_malformed"
+    code, report = _assess(root, profile, backend, out, "--intake", "INTAKE-1")
+
+    assert code == 2 and report == {}
+    assert backend.criterion_calls >= 1  # the scorer was reached, then refused
+    checkpoints = sorted((root / ".harness" / "checkpoints").glob("checkpoint_*.jsonl"))
+    assert checkpoints, "a refused run must leave its draws on a checkpoint"
+    assert checkpoints[0].read_text(encoding="utf-8").strip()
 
 
 # --------------------------------------------------------------------------- #

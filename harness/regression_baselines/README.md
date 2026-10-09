@@ -43,3 +43,11 @@ The judge half of the golden set (per-claim grounding baselines via E2's
 `freeze_baseline`) is exposed by `freeze_section_grounding` /
 `compare_section_grounding` and runs once the pinned judge is live; the
 fingerprint lane here is fully deterministic and needs no judge.
+
+## Current status: no golden set is committed
+
+This directory holds this README only. The FIELDWISE purge removed the drafter-era sections these
+fingerprints described, and the goldens were not refrozen against the sections that replaced them. The
+standing lane therefore records an exclusion rather than a comparison. Every affected check is named,
+with the operator refreeze that would lift it, in
+[`../DATASET_DISPOSITIONS.md`](../DATASET_DISPOSITIONS.md).

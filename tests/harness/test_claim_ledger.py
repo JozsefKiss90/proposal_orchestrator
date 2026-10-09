@@ -663,10 +663,53 @@ class TestEvaluateLedgerCompleteness:
 # --------------------------------------------------------------------------- #
 
 
+#: The data pair these probes intend, named rather than remembered.
+#:
+#: Until 2026-10-09 the expectations below were the FIELDWISE drafter-era
+#: numbers — 12 sub-sections, a 191-entry excellence ledger, a claim naming
+#: that project's crop, three ``C01`` entries.  None of that data is in the repository: the
+#: FIELDWISE purge removed those sections and the graph compiler wrote the
+#: BIODIV-01 sections now committed, which carry semantic claim ids instead of
+#: per-drafting-block ``C01``-style ones.  The old values were reconciled
+#: against the committed artifacts, not forced back onto the code.
+#:
+#: Counts and ids only, never a byte hash: ``.gitattributes`` protects the
+#: hashed trees, and ``docs/tier5_deliverables/`` is deliberately not among
+#: them, so these files are checked out with platform line endings.
+REAL_SECTIONS_PIN = {
+    "source": "docs/tier5_deliverables/proposal_sections/<slug>_section.json",
+    "provenance": "graph-compiled BIODIV-01 sections; measured 2026-10-09 on msca-dn-pre-eval",
+    "sub_section_ids": {
+        "excellence": ("B.1.1", "B.1.2"),
+        "impact": ("B.2.1", "B.2.2", "B.2.3"),
+        "implementation": ("B.3.1", "B.3.2"),
+    },
+    "ledger_entries": {"excellence": 50, "impact": 68, "implementation": 62},
+    "deduped_records": {"excellence": 49, "impact": 59, "implementation": 57},
+    # Excellence carries no repeated claim id, so the "distinct same-id claims
+    # survive dedup" property is probed where the data actually has one.
+    "ambiguous_id": ("impact", "kpi_targets", 3),
+    # (query, the claim id the lexical shortlist must surface)
+    "shortlist_probe": (
+        "Copernicus and Galileo use is an eligibility condition",
+        "copernicus_eligibility",
+    ),
+}
+
+_REPIN = (
+    "Re-measure and re-pin REAL_SECTIONS_PIN, and state the old value, the new "
+    "value and the reason in the completion report."
+)
+
+
 class TestRealDataProbe:
     """E3 runs against the real Tier-5 artifacts with a stubbed judge —
     exercising prose loading, chunk bounds, ledger dedup, and the shortlist on
-    the real 406-entry ledger.  Zero network, zero DAG runs."""
+    the committed ledger.  Zero network, zero DAG runs.
+
+    Every expectation here is read out of :data:`REAL_SECTIONS_PIN`, so a
+    reader can see which sections and which measurement the numbers belong to.
+    """
 
     SECTIONS = ("excellence", "impact", "implementation")
 
@@ -678,6 +721,27 @@ class TestRealDataProbe:
         if not p.is_file():
             pytest.skip(f"{name}_section.json not present")
         return p
+
+    def test_the_pin_still_describes_the_committed_sections(self):
+        """The drift detector: one test fails when the sections are recompiled."""
+        from harness.status_faithfulness import load_section_claims
+
+        for name in self.SECTIONS:
+            path = self._section_path(name)
+            prose = cl.load_section_prose(path)
+            claims = load_section_claims(path)
+            records = cl.dedup_ledger_claims(claims)
+            assert tuple(s.sub_section_id for s in prose) == REAL_SECTIONS_PIN[
+                "sub_section_ids"
+            ][name], f"{name}: sub-section ids moved. {_REPIN}"
+            assert len(claims) == REAL_SECTIONS_PIN["ledger_entries"][name], (
+                f"{name}: {len(claims)} ledger entries, pinned "
+                f"{REAL_SECTIONS_PIN['ledger_entries'][name]}. {_REPIN}"
+            )
+            assert len(records) == REAL_SECTIONS_PIN["deduped_records"][name], (
+                f"{name}: {len(records)} deduped records, pinned "
+                f"{REAL_SECTIONS_PIN['deduped_records'][name]}. {_REPIN}"
+            )
 
     def test_prose_loads_and_chunks_are_bounded(self):
         total_subs = 0
@@ -691,33 +755,42 @@ class TestRealDataProbe:
                     # bounded unless a single paragraph exceeds the cap
                     if len(c.text) > cl.DEFAULT_MAX_CHUNK_CHARS:
                         assert "\n\n" not in c.text
-        assert total_subs == 12
+        assert total_subs == sum(
+            len(ids) for ids in REAL_SECTIONS_PIN["sub_section_ids"].values()
+        )
 
     def test_ledger_dedup_and_ambiguous_ids_on_real_data(self):
         from harness.status_faithfulness import load_section_claims
 
-        claims = load_section_claims(self._section_path("excellence"))
-        assert len(claims) == 191
+        name, claim_id, expected = REAL_SECTIONS_PIN["ambiguous_id"]
+        claims = load_section_claims(self._section_path(name))
         records = cl.dedup_ledger_claims(claims)
         # true duplicates collapse, but distinct same-id claims survive
-        assert len(records) < 191
-        c01 = [r for r in records if any(k.startswith("C01#") for k in r.entry_keys)]
-        assert len(c01) >= 2  # the three C01 entries are ≥2 distinct claims
+        assert len(records) < len(claims)
+        same_id = [
+            r for r in records if any(k.startswith(f"{claim_id}#") for k in r.entry_keys)
+        ]
+        assert len(same_id) == expected, (
+            f"{name}:{claim_id} resolved to {len(same_id)} distinct claims, "
+            f"pinned {expected}. {_REPIN}"
+        )
 
     def test_shortlist_finds_the_real_claim(self):
         from harness.status_faithfulness import load_section_claims
 
+        query, claim_id = REAL_SECTIONS_PIN["shortlist_probe"]
         claims = load_section_claims(self._section_path("excellence"))
         records = cl.dedup_ledger_claims(claims)
-        out = cl.lexical_shortlist(
-            "tomato was chosen as the crop for the experiment", records, k=8
-        )
-        assert any("tomato" in r.claim_summary.lower() for r in out)
+        out = cl.lexical_shortlist(query, records, k=8)
+        assert any(
+            any(k.startswith(f"{claim_id}#") for k in r.entry_keys) for r in out
+        ), f"{claim_id} not shortlisted for {query!r}. {_REPIN}"
 
     def test_end_to_end_slice_offline(self):
         from harness.status_faithfulness import load_section_claims
 
         path = self._section_path("excellence")
+        anchor = REAL_SECTIONS_PIN["sub_section_ids"]["excellence"][0]
         prose = cl.load_section_prose(path)
         claims = load_section_claims(path)
         judge, backend = make_judge(
@@ -728,7 +801,7 @@ class TestRealDataProbe:
             claims,
             judge,
             section_id="excellence",
-            sub_section_filter=lambda s: s.sub_section_id == "1.1",
+            sub_section_filter=lambda s: s.sub_section_id == anchor,
             decomposer=lambda c: (c.text.split("\n\n")[0][:200],),  # stub: 1st para head
             materiality_classifier=_classifier({}),
         )

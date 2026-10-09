@@ -1,0 +1,76 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-dataset-dispositions_2026-10-09",
+  "date": "2026-10-09",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation, ticket V02d (Dispose of the missing calibration and regression datasets) in plans/msca_dn_historical_validation_tickets.md; closes part of finding F08 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §12.1 (an output names its inputs and flags its assumptions), §12.2 (the four status categories), §12.4 (a missing mandatory input triggers a declared failure, never hallucinated completion), §15 (a declared gap over a fabricated completion). Ticket V02d. Not a constitutional amendment.",
+  "decision": "Every check that reads an absent substrate is recorded as EXCLUDED, not restored. The two harness dataset directories are the subject the ticket names; the review of this work added the absent Tier 3 confirmation checklist and the unfrozen E5f report, so the document now accounts for every skip the focused command reports rather than only the dataset ones. The exclusions are enumerated in harness/DATASET_DISPOSITIONS.md with a dataset, a reason, replacement evidence where any exists, and the work that lifts them. The two affected test modules now skip with a reason that names the dataset and that document; before this record they failed and errored, which read as product defects. tests/harness/test_dataset_dispositions.py keeps the enumeration honest in both directions: an exclusion missing from the table fails, and a row naming a module that does not exist fails. harness/HARNESS.md and both dataset READMEs point at the document, so a reader of harness status cannot reach a green lane without meeting the absence.",
+  "why": "The datasets are absent, and the audit is explicit that missing gold data must stay visible and must not become a claim of successful calibration. A failing check and an excluded check carry different meanings to a reader of release confidence: the first says the code is broken, the second says the evidence does not exist. Eight checks were reporting the first while meaning the second.",
+  "why_not_restored": {
+    "gold_sets": {
+      "declared_status": "Unresolved",
+      "basis": "harness/gold_sets/ holds its README only; the seeded template its README describes is not in the tree",
+      "reason": "A gold set is human ground truth. harness/gold_sets/README.md states the rule this repository adopted: an AI labelling a gold set for an AI judge reintroduces the grader-generator correlation the harness exists to detect. An agent cannot produce this dataset.",
+      "lifted_by": "ticket X03 (Human DN calibration and gold datasets), which closes finding F10"
+    },
+    "regression_baselines": {
+      "declared_status": "Unresolved",
+      "basis": "harness/regression_baselines/ holds its README only; measured on this checkout at 621ec1a",
+      "reason": "A refreeze is technically available and deterministic, but the E4 lane is merge-advisory and human-decided by its own documented contract: the human either refreezes or investigates. Choosing to refreeze is that human decision, and V02d's constraint against an agent-authored draft impersonating operator approval covers it. A refreeze would also replace the drafter-era side of the LG-1 granularity measurement with the graph-sourced side, which the measurement suite's own docstring names as work that must be budgeted with it.",
+      "lifted_by": "an operator refreeze (py -3.10 -m harness.regression freeze) plus re-pointing tests/harness/test_measure_ledger_granularity.py; ticket X03 covers the maintained-dataset half"
+    }
+  },
+  "what_the_purge_removed": {
+    "declared_status": "Confirmed",
+    "basis": "git history on this branch",
+    "drafter_era_sections_and_goldens": "removed by the instance-one purge (decision project-purge-clean-engine-base_2026-09-22); the Tier 5 sections now committed were written by the graph compiler",
+    "lg1_measurement_record": "removed from the working tree by da9f846; every measured number survives in the commit 32b5606 that recorded it",
+    "consequence": "No committed prior section state exists to diff the current sections against, so the standing E4 comparison has nothing to compare."
+  },
+  "excluded_checks": [
+    "tests/harness/test_regression_golden.py::TestGoldenSetStanding::test_golden_baselines_are_committed",
+    "tests/harness/test_regression_golden.py::TestGoldenSetStanding::test_sections_match_golden_set",
+    "tests/harness/test_regression_golden.py::TestGoldenSetStanding::test_drifted_sections_are_surfaced_even_when_not_breaking",
+    "tests/harness/test_regression_golden.py::TestRubricLaneStanding::test_frozen_rubric_baseline_is_self_consistent",
+    "tests/harness/test_measure_ledger_granularity.py::test_report_shape_and_offline",
+    "tests/harness/test_measure_ledger_granularity.py::test_prose_byte_identical_all_sub_sections",
+    "tests/harness/test_measure_ledger_granularity.py::test_cardinality_gap",
+    "tests/harness/test_measure_ledger_granularity.py::test_status_axis_graph_honest_vs_drafter_confirmed_heavy",
+    "tests/harness/test_measure_ledger_granularity.py::test_e4_golden_diff_detects_the_gap",
+    "tests/harness/test_expectations.py::TestRealSubstrate::test_golden_paths_resolve",
+    "tests/harness/test_gold_set.py::TestSeededExcellenceTemplate (4 checks)",
+    "tests/harness/test_rubric_report.py::TestStandingLane::test_real_spine_register_loads_and_is_fully_confirmed",
+    "tests/harness/test_rubric_report.py::TestStandingLane::test_frozen_report_renders_if_present",
+    "tests/harness/test_status_faithfulness.py::TestResolveClaimSourceText::test_real_checklist_blob_not_truncated_at_default_cap"
+  ],
+  "measured_change": {
+    "scope_of_these_counts": "tests/harness/test_regression_golden.py and tests/harness/test_measure_ledger_granularity.py only — the two modules that were red. The other two excluded modules, test_expectations.py and test_gold_set.py, were already skipping; this work only rewrote their skip reasons to name the disposition.",
+    "before": "3 failed and 5 errors across those two modules, measured on this checkout under the V01 environment pin (Python 3.10.6, PyMuPDF 1.28.2)",
+    "after": "0 failed, 0 errors, 9 skipped across those two modules (the 8 that were red, plus the E5f rubric-baseline skip the module already carried), each skip naming its dataset and harness/DATASET_DISPOSITIONS.md",
+    "the_two_counts_that_differ_by_scope": "14 disposition rows covering 17 individual excluded checks, because one row stands for four. Those 17 are every skip the focused acceptance command reports: 13 for the two dataset directories, 2 for the absent Tier 3 confirmation checklist, 2 for the unfrozen E5f artifacts.",
+    "not_claimed": "No check was made to pass. No dataset was created. No calibration was performed or implied."
+  },
+  "inputs": [
+    "plans/msca_dn_historical_validation_tickets.md (V02d, X03)",
+    "plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md (F08, F10)",
+    "harness/gold_sets/README.md",
+    "harness/regression_baselines/README.md",
+    "tests/harness/test_measure_ledger_granularity.py (module docstring, the refreeze coupling note)",
+    "git commits 32b5606 (LG-1 measurement) and da9f846 (purge B)"
+  ],
+  "artifacts": [
+    "harness/DATASET_DISPOSITIONS.md",
+    "tests/harness/test_dataset_dispositions.py",
+    "harness/HARNESS.md (pointer section)",
+    "harness/gold_sets/README.md (status section)",
+    "harness/regression_baselines/README.md (status section)",
+    "tests/harness/test_regression_golden.py (exclusion skip)",
+    "tests/harness/test_measure_ledger_granularity.py (exclusion skip)"
+  ],
+  "does_not_close": "V02d is one of four parts of F08. F08 closes at V03, which names the acceptance lane and records its exception list. This record confers no gate closure.",
+  "open": [
+    "Whether to refreeze the E4 goldens is the operator's decision and is not taken here.",
+    "X03 remains open; no accuracy or comparative-performance claim is supportable until it closes."
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-stale-test-contracts_2026-10-09",
+  "date": "2026-10-09",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation, tickets V02b (Pair the claim-ledger and evidence-pack real-data fixtures) and V02c (Update the stale synthetic test contracts) in plans/msca_dn_historical_validation_tickets.md; closes part of finding F08 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (an output is reproducible from its documented inputs), §10.5 (a material claim names the input it derives from), §12.1 (an output names its inputs and flags its assumptions), §15 (a declared gap over a fabricated completion). Tickets V02b and V02c. Not a constitutional amendment.",
+  "decision": "Five real-data test contracts that described a project this repository no longer holds were re-pointed at the artifacts it does hold, or recorded as excluded where the data is absent. Each expectation now names the data pair it belongs to, so a reader can see which candidate and which profile an expectation describes, and a recompile surfaces as one named drift failure rather than as several unexplained ones. No production module changed; the whole change set is test contracts, documents and this record.",
+  "why": "The expectations were the instance-one drafter-era numbers, carried forward after the purge removed the sections they measured. An expectation that names no source cannot be reconciled when its data changes: the audit's own warning was against forcing the code to reproduce stale counts blindly. Naming the pair converts an unexplainable failure into a re-pin with a stated reason.",
+  "changes": {
+    "claim_ledger_real_data_pin": {
+      "declared_status": "Confirmed",
+      "basis": "measured on this checkout against docs/tier5_deliverables/proposal_sections/*.json",
+      "where": "tests/harness/test_claim_ledger.py, constant REAL_SECTIONS_PIN",
+      "old": "12 sub-sections across the three sections; a 191-entry excellence ledger; three C01 entries as the ambiguous-id probe; a claim naming an instance-one crop as the lexical probe",
+      "new": "7 sub-sections (B.1.1, B.1.2, B.2.1, B.2.2, B.2.3, B.3.1, B.3.2); ledger entries 50 / 68 / 62 and deduped records 49 / 59 / 57 for excellence / impact / implementation; kpi_targets in impact, three distinct claims, as the ambiguous-id probe; copernicus_eligibility as the lexical probe",
+      "reason": "Different sections of a different project. The ambiguous-id probe moved from excellence to impact because the graph compiler writes one semantic claim id per fact, so excellence carries no repeated id and the property is not testable there.",
+      "what_is_pinned_and_what_is_not": "Counts and sub-section ids only, never a byte hash. .gitattributes protects the trees whose bytes are hashed and docs/tier5_deliverables/ is deliberately not among them, so these files are checked out with platform line endings and a byte pin would not be portable.",
+      "drift_behaviour": "One test compares the pin against the files and fails with a message instructing a re-pin that states the old value, the new value and the reason."
+    },
+    "evidence_pack_profile_pairing": {
+      "declared_status": "Confirmed",
+      "basis": "measured: the default profile's rubrics anchor at 1.1 to 3.2; the committed sections carry B.1.1 to B.3.2",
+      "where": "tests/harness/test_evidence_pack.py, class TestRealSections",
+      "old": "the repository default profile (MSCA-PF) against whatever Tier 5 sections were present",
+      "new": "harness/profiles/ria_default.json, declared in a named constant, against the committed RIA sections",
+      "reason": "The pairing was never declared, so the class read an MSCA-PF profile against RIA sections and every pack build raised on a missing anchor. The anchor map was failing closed correctly on a wrong pairing. A new test asserts the pairing itself, so a future mismatch names both sides instead of surfacing inside each pack build."
+    },
+    "rubric_report_standing_lane": {
+      "declared_status": "Confirmed",
+      "basis": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json is absent on this checkout",
+      "where": "tests/harness/test_rubric_report.py, class TestStandingLane",
+      "old": "9 spine identity items, 10 project decisions, and the fact ids HOST, FELLOW and SUPERVISOR",
+      "new": "a present checklist loads, carries both fact kinds, speaks only the §12.2 vocabulary and leaves nothing unconfirmed; an absent checklist is recorded as a skip naming the reason",
+      "reason": "Those counts and ids are project data, and no Tier 3 instantiation is present, so the engine stands at its §2 project-agnostic default. The change moved in one direction, towards what the engine owns.",
+      "this_is_a_narrower_claim": "The lane asserts less than it did. The loader's own contract is unchanged and is still covered by the fixture tests in the same module. Recorded here rather than left implicit, because a reader comparing lanes over time would otherwise see only that the lane is green."
+    },
+    "t03_scripted_assessor": {
+      "declared_status": "Confirmed",
+      "basis": "measured: the command exited 2 and wrote no report, because the scorer refused every draw",
+      "where": "tests/harness/test_dev_graph_t03_end_to_end.py, ScriptedBackend and NoShortcomingsBackend",
+      "old": "one pass/fail verdict for every prompt, so the criterion scorer refused the response and the walk measured a refusal instead of the path it was written for",
+      "new": "the criterion prompt is answered in the shape the scorer parses, with the score read off the scale the prompt declares; the refusal keeps its own test, which asserts exit 2, no report written and the draws left on a checkpoint",
+      "no_guard_was_relaxed": "Verified by mutation: removing required=True from the scorer's shortcomings check makes the refusal test fail. The change was reverted."
+    },
+    "subscription_judge_working_directory": {
+      "declared_status": "Confirmed",
+      "basis": "reproduced on a fresh worktree at 3b4cde8, where the test failed with 'does not exist' instead of 'inside the repository'",
+      "where": "tests/harness/test_subscription_judge.py",
+      "old": "the test passed REPO/.claude/runs, which is untracked, so on a fresh checkout the containment rule was refused for the path being missing and the test asserted the existence rule under the containment rule's name",
+      "new": "a fixture builds the directory and removes only the levels it created, and the assertion requires the containment message and forbids the existence message",
+      "verified": "39 checks pass on a fresh worktree on Windows, and the fixture leaves the tree as it found it. Mutation-verified: disabling the containment branch fails three checks."
+    }
+  },
+  "not_done_here": {
+    "v05": "V02a is declared blocked by V01 and V05. V01 is complete. The two integrity-audit integration failures the audit attributed to regenerated document identity pass under the V01 pin with the audit wording unchanged, so no V02a criterion needed V05's provenance-derived wording. V05 is untouched and remains open: harness/integrity_audit.py still sets the grounding reason from a module constant, which matters for the official original, not for these fixtures.",
+    "gate_closure": "V02b and V02c are two of four parts of F08. F08 closes at V03. This record confers no gate closure."
+  },
+  "inputs": [
+    "plans/msca_dn_historical_validation_tickets.md (V02b, V02c, Shared constraints)",
+    "plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md (section 11, the eight failure families)",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json, impact_section.json, implementation_section.json",
+    "harness/profiles/ria_default.json and the repository default profile",
+    "harness/criterion_scoring.py (the response contract the scripted backend must satisfy)",
+    "harness/commands/_subscription_judge.py (the order of the two working-directory checks)"
+  ],
+  "artifacts": [
+    "tests/harness/test_claim_ledger.py",
+    "tests/harness/test_evidence_pack.py",
+    "tests/harness/test_rubric_report.py",
+    "tests/harness/test_dev_graph_t03_end_to_end.py",
+    "tests/harness/test_subscription_judge.py",
+    "plans/reports/v02_focused_suite_completion_2026-10-09.md"
+  ],
+  "measured_change": {
+    "scope": "the audit's focused command, tests/harness tests/runner/test_dev_graph*.py tests/test_msca_dn*.py, on this checkout under the V01 pin",
+    "before": "13 failed, 5 errors, 1,938 passed, 8 skipped",
+    "after": "0 failed, 0 errors, 1,965 passed, 17 skipped",
+    "whole_repository": "Failing identifier sets compared against a fresh worktree at 3b4cde8: 220 before, 194 after, 0 new, 26 resolved. A whole-run count is not stable here, so the sets are compared rather than the counts.",
+    "not_claimed": "A green suite is not coverage of the acceptance invariants. The audit's observation stands that the passing baseline tests did not catch the defects its freeze probes reproduced, which is V04's work."
+  }
+}
