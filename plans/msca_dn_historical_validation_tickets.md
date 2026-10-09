@@ -64,7 +64,7 @@ reconstruct an identifier from a hash prefix.
 | V02b | Pair the claim-ledger and evidence-pack real-data fixtures | G1 | F08 part | V01 |
 | V02c | Update the stale synthetic test contracts | G1 | F08 part | None |
 | V02d | Dispose of the missing calibration and regression datasets | G1 | F08 part | None |
-| V03 | Name and green the PE-09 acceptance lane | G1 | F08 | V01, V02a, V02b, V02c, V02d |
+| V03 | Name and green the PE-09 acceptance lane | G1 | F08 | V01, V02a (criterion 2 → V05), V02b, V02c (criterion 1 excluded), V02d |
 | V04 | Make the freeze refuse incomplete and inconsistent reports | G4 | F03 | None |
 | V05 | Derive audit grounding and identity wording from candidate provenance | G4 | F06 | None |
 | V06 | Declare the grounding scope in preflight, report and freeze | G4 | F07 required half | V04 |
@@ -176,7 +176,8 @@ these modules go green or each residual failure is explained as a real defect wi
 - [x] The import, workspace, fidelity-register and adoption fixture failures and setup errors are
       resolved, and the count is compared against the audit's 29 failures and 43 errors.
 - [ ] The two integrity-audit integration failures pass against the reproduced document identity and
-      the V05 provenance-derived wording.
+      the V05 provenance-derived wording. **Open; owner V05.** The first half holds. The second half
+      is V05's to close, and V05 carries it as its own sixth criterion.
 - [x] Any residual failure is classified as a real defect with a named cause, not carried as
       pre-existing without evidence.
 - [x] No fixture is edited to encode a hash the importer no longer produces.
@@ -227,7 +228,9 @@ fail-closed behaviour preserved rather than relaxed.
 ### Acceptance criteria
 
 - [ ] The rubric-report fixture and the `confirmation_checklist` contract agree, and the change is made
-      in one direction with a stated reason.
+      in one direction with a stated reason. **Excluded, not passed.** The direction and the reason are
+      recorded. The two sides cannot agree while no Tier 3 checklist exists, so the real-file half is a
+      scoped exclusion in `harness/DATASET_DISPOSITIONS.md` and in the V03 lane declaration.
 - [x] The T03 scripted backend returns a criterion response that satisfies the current scorer contract,
       and a separate test still asserts that a response missing `shortcomings` is refused and
       checkpointed.
@@ -269,7 +272,25 @@ result. No new dataset is fabricated.
 
 ## V03 — Name and green the PE-09 acceptance lane
 
-**Gate:** G1 closure. **Closes:** F08. **Blocked by:** V01, V02a, V02b, V02c, V02d.
+**Gate:** G1 closure. **Closes:** F08. **Blocked by:** V01, V02a, V02b, V02c, V02d — the dependency
+gate as amended below.
+
+### Dependency gate, amended 2026-10-09
+
+V02b and V02d closed in full. V02a and V02c each left one box open, and V03 cannot close a gate that
+rests on an unexplained open box. Neither box is checked. Each one's disposition:
+
+| Open box | Disposition | Owner |
+|---|---|---|
+| **V02a criterion 2** — the integrity-audit checks pass against the V05 provenance-derived wording | **Transferred.** Its first half holds: both checks pass against the reproduced document identity. Its second half needs wording V05 has not yet derived, and the ledger's own dependency table already records V02a as blocked by V05. | V05, which now carries it as its own sixth criterion |
+| **V02c criterion 1** — the rubric-report fixture and the `confirmation_checklist` contract agree | **Excluded, not passed.** The change went in one direction with a stated reason. The two sides cannot agree while the engine stands at its project-agnostic default, because no Tier 3 confirmation checklist exists to agree with. The real-file half is one of the lane's 17 declared exclusions. | No owner; a project instantiation lifts it |
+
+The amendment is to the gate, not to the criteria. V03's gate reads: V02a and V02c are closed for G1
+once their open halves are **owned elsewhere or declared as exclusions**, and V03's own criteria carry
+the evidence. An exclusion is never reported as a pass. `harness/ACCEPTANCE_LANE.md` and
+`harness/DATASET_DISPOSITIONS.md` list the V02c exclusion by node id, the lane command refuses to run
+when its declaration and `harness/DATASET_DISPOSITIONS.md` disagree, and
+`tests/harness/test_acceptance_lane.py` fails if the row leaves either document.
 
 **Problem.** The focused audit command completed with 1,864 passed, 44 failed, 48 errors and 8 skipped
 across 1,964 collected cases. No hosted CI configuration supplies an independent result. Test counts
@@ -281,17 +302,29 @@ with zero unexplained failures and every exception enumerated.
 
 ### Acceptance criteria
 
-- [ ] A named lane covers importer, profile, preflight, freeze, comparison, provenance and isolation
-      checks, and runs under the V01 environment pin.
-- [ ] The lane reports zero unexplained failures. Each exception names its module, its reason and its
-      replacement evidence, and no exception covers a check the historical run depends on.
-- [ ] The result is recorded against the audit's 1,864 / 44 / 48 / 8 baseline so every item is resolved
-      or explicitly scoped.
-- [ ] The lane's own documentation states that passing it is not evidence of calibration, forecast
-      accuracy or grounded evaluation.
+- [x] A named lane covers importer, profile, preflight, freeze, comparison, provenance and isolation
+      checks, and runs under the V01 environment pin. Those seven areas plus five more cover 62 modules;
+      the lane refuses to certify a result on a build not measured to reproduce the imports.
+      `harness/acceptance_lanes/msca_dn_historical.json`, `harness/acceptance_lane.py`,
+      `harness/commands/acceptance_lane.py`.
+- [x] The lane reports zero unexplained failures. Each exception names its module, its reason and its
+      replacement evidence, and no exception covers a check the historical run depends on. All 17 skips
+      are declared exclusions, listed in the completion report and in `harness/DATASET_DISPOSITIONS.md`.
+      The lane fails on an undeclared skip and on a stale exclusion, which is how it found one.
+- [x] The result is recorded against the audit's 1,864 / 44 / 48 / 8 baseline so every item is resolved
+      or explicitly scoped. `plans/reports/v03_acceptance_lane_completion_2026-10-09.md` section 3.
+- [x] The lane's own documentation states that passing it is not evidence of calibration, forecast
+      accuracy or grounded evaluation. `harness/ACCEPTANCE_LANE.md`, asserted by
+      `tests/harness/test_acceptance_lane.py::TestLaneDocumentation`.
 
 **Verification.** Run the lane twice from a clean checkout in the pinned environment. Record both
 results and the exception list.
+
+**Status 2026-10-09.** Closed, four of four, with the dependency gate amended above. F08 closes here.
+V02a criterion 2 is owned by V05 and V02c criterion 1 stays an exclusion; neither is a pass. Evidence:
+`plans/reports/v03_acceptance_lane_completion_2026-10-09.md` and
+`docs/tier4_orchestration_state/decision_log/msca-dn-acceptance-lane_2026-10-09.json`. G1 closure is the
+operator's to accept.
 
 ## V04 — Make the freeze refuse incomplete and inconsistent reports
 
@@ -353,6 +386,11 @@ original carries references and real identities.
       `integrity_13ad3ad81d7e_0001.json`, reproduce byte-equal.
 - [ ] A candidate whose provenance does not state a grounding cause yields an explicit Unresolved
       reason, not a borrowed one.
+- [ ] **Inherited from V02a criterion 2.** The two integrity-audit integration checks pass against the
+      provenance-derived wording, not only against the reproduced document identity. V02a closed its
+      first half on 2026-10-09 and left this half open; V03 transferred it here rather than closing it
+      as a pass. Evidence: `plans/reports/v02_focused_suite_completion_2026-10-09.md` and
+      `plans/reports/v03_acceptance_lane_completion_2026-10-09.md`.
 
 **Verification.** Regenerate both committed audits and diff the bytes. Add a test that a non-sanitised
 candidate configuration produces a different, provenance-derived reason.

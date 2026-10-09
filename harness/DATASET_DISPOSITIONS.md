@@ -44,7 +44,7 @@ for the Tier 3 checklist, two for the unfrozen E5f artifacts.
 | `test_measure_ledger_granularity.py::test_cardinality_gap` | E4 goldens | Excluded | Same | Git history only: `32b5606` |
 | `test_measure_ledger_granularity.py::test_status_axis_graph_honest_vs_drafter_confirmed_heavy` | E4 goldens | Excluded | Same | Git history only: `32b5606` |
 | `test_measure_ledger_granularity.py::test_e4_golden_diff_detects_the_gap` | E4 goldens | Excluded | Same | Git history only: `32b5606` |
-| `test_expectations.py::TestRealSubstrate::test_golden_paths_resolve` | E4 goldens | Excluded | No golden set is committed | Fixture coverage in the same module |
+| `test_expectations.py::TestCriterionSectionMap::test_golden_paths_resolve` | E4 goldens | Excluded | No golden set is committed | Fixture coverage in the same module |
 | `test_gold_set.py::TestSeededExcellenceTemplate` (4 checks) | Gold-set template | Excluded | The seeded template is not in the tree | Fixture coverage in the same module |
 | `test_rubric_report.py::TestStandingLane::test_real_spine_register_loads_and_is_fully_confirmed` | Tier 3 checklist | Excluded | No Tier 3 instantiation, so no spine register exists to load | `test_rubric_report.py::TestSpineRegistry` covers the loader contract on fixtures |
 | `test_status_faithfulness.py::TestResolveClaimSourceText::test_real_checklist_blob_not_truncated_at_default_cap` | Tier 3 checklist | Excluded | The same absence: there is no real blob to resolve | `TestResolveClaimSourceText`'s fixture cases cover the truncation rule |
@@ -76,6 +76,19 @@ graph-sourced one, and a refreeze replaces the drafter-era side with the graph-s
 module docstring names the consequence. The suite must then be re-pointed at the LG-1 measurement
 record recovered from `32b5606`, or re-sourced from git history at the graph-cutover commit. Budget
 that work with the refreeze.
+
+## The acceptance lane reads this list
+
+`harness/ACCEPTANCE_LANE.md` declares the named PE-09 acceptance lane, and
+`harness/acceptance_lanes/msca_dn_historical.json` carries the same fourteen rows as data.
+`py -3.10 -m harness.commands.acceptance_lane` compares that declaration against this table before it
+runs anything, and refuses when a row is in one and not the other. It also fails on a skip no row
+declares and on a row the run never reports. So this table and the declaration cannot drift apart, in
+either direction.
+
+The two Tier 3 checklist rows carry ticket V02c's first acceptance criterion in its real-file half.
+That criterion is recorded in `plans/msca_dn_historical_validation_tickets.md` as **excluded, not
+passed**.
 
 ## What a green harness lane does and does not say
 

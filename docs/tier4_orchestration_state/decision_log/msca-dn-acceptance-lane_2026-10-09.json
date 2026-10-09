@@ -1,0 +1,117 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-acceptance-lane_2026-10-09",
+  "date": "2026-10-09",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation, ticket V03 (Name and green the PE-09 acceptance lane) in plans/msca_dn_historical_validation_tickets.md; closes finding F08 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §9.5 (an output is reproducible from its documented inputs, or at minimum auditable), §12.1 (an output names its inputs and flags its assumptions), §12.2 (the four status categories), §12.4 (a missing mandatory input triggers a declared failure), §15 (a declared gap over a fabricated completion). Ticket V03. Not a constitutional amendment.",
+  "decision": "The acceptance lane is declared as twelve named coverage areas rather than a list of test paths, and one command runs it: py -3.10 -m harness.commands.acceptance_lane. The declaration is data, at harness/acceptance_lanes/msca_dn_historical.json; harness/acceptance_lane.py reads it and carries no instrument name of its own, the same separation harness/profile.py keeps from its profiles. The prose declaration is harness/ACCEPTANCE_LANE.md and the guards are tests/harness/test_acceptance_lane.py. The lane reconciles each run against the declaration in both directions: a skip no exclusion declares fails it as an undeclared skip, and a declared exclusion the run never reports fails it as a stale exclusion. Any failure or setup error fails it. An extraction build not measured to reproduce the committed import artifacts refuses the run, and --allow-unreproducing-build stamps the result NOT CERTIFIED rather than relaxing the check.",
+  "why": "The audit's own finding is that test counts are not coverage of acceptance invariants: 1,864 cases passed at ca0a443 while four reproduced defects stood. A path list cannot answer which invariant covers the importer; named areas can. The two-directional reconciliation is what stops the exclusion list rotting into either an invisible exclusion or a stale claim, which is the specific failure mode the shared constraint against reporting an exclusion as a pass is written to prevent.",
+  "the_lane": {
+    "declared_status": "Confirmed",
+    "basis": "measured on this checkout under the V01 environment pin",
+    "name": "msca-dn-acceptance",
+    "command": "py -3.10 -m harness.commands.acceptance_lane",
+    "areas": 12,
+    "areas_v03_names": [
+      "importer",
+      "profile",
+      "preflight",
+      "freeze",
+      "comparison",
+      "provenance",
+      "isolation"
+    ],
+    "areas_carrying_the_remainder_of_the_audits_command": [
+      "scoring",
+      "ledger",
+      "judge",
+      "graph",
+      "exclusions"
+    ],
+    "modules": 62,
+    "superset_of_the_audits_focused_command": true,
+    "modules_added_beyond_it": {
+      "tests/test_extraction_environment.py": "V01's own environment pin, which the lane runs under (area: importer)",
+      "tests/test_sandbox_hardening.py": "an isolation check the historical run depends on and the focused globs missed (area: isolation)",
+      "tests/test_production_mode.py": "the same (area: isolation)"
+    },
+    "module_considered_and_excluded_from_the_lane": {
+      "tests/test_persistence_policy.py": "one case fails on a missing optional botocore extra, which is an environment dependency unrelated to any acceptance invariant. Admitting it would put an environment failure inside the acceptance result."
+    }
+  },
+  "measured_result": {
+    "declared_status": "Unresolved",
+    "basis": "pending: the two clean-checkout runs this record's verification line describes have not been recorded yet",
+    "environment": "Python 3.10.6, PyMuPDF 1.28.2 over MuPDF 1.28.2 (the V01 pin)",
+    "note": "Filled from plans/reports/v03_acceptance_lane_completion_2026-10-09.md once both runs are recorded. No figure is stated here before its source exists."
+  },
+  "reconciled_against_the_audit": {
+    "declared_status": "Confirmed",
+    "basis": "section 11 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md, measured at ca0a443",
+    "audit": "1,864 passed, 44 failed, 48 errors, 8 skipped over 1,964 collected",
+    "resolution": "The 92 failures and errors are gone. V01's extraction pin closed 79 of them by one cause; V02a to V02d closed the remainder. The 8 skips at ca0a443 are among the 17 now declared: the dataset absences they reported are unchanged, and nine further absences were found and declared rather than left failing.",
+    "collected_counts_are_not_comparable_case_for_case": "V01 and V02a to V02d added cases, and the lane adds three modules the focused command did not run. The comparable measure is the failing set, which is empty."
+  },
+  "dependency_gate_amendment": {
+    "declared_status": "Confirmed",
+    "basis": "the two open boxes measured in the ledger before this work",
+    "what_was_amended": "V03's Blocked by line and a new Dependency gate subsection in plans/msca_dn_historical_validation_tickets.md. The criteria of V02a and V02c were not amended, and neither open box was checked.",
+    "V02a_criterion_2": {
+      "disposition": "Transferred to V05",
+      "reason": "Its first half holds: both integrity-audit integration checks pass against the reproduced document identity. Its second half needs wording derived from candidate provenance, which is V05's subject and which V05 has not yet derived. The ledger already recorded V02a as blocked by V05.",
+      "owner": "V05, which now carries it as its own sixth acceptance criterion",
+      "not_a_pass": true
+    },
+    "V02c_criterion_1": {
+      "disposition": "Excluded, not passed",
+      "reason": "The change went in one direction with a stated reason. The two sides cannot be made to agree while the engine stands at its CLAUDE.md §2 project-agnostic default, because the Tier 3 confirmation checklist the real-file half reads does not exist.",
+      "recorded_as_an_exclusion_in": [
+        "harness/DATASET_DISPOSITIONS.md",
+        "harness/ACCEPTANCE_LANE.md",
+        "harness/acceptance_lanes/msca_dn_historical.json (exclusions)"
+      ],
+      "node_id": "test_rubric_report.py::TestStandingLane::test_real_spine_register_loads_and_is_fully_confirmed",
+      "lifted_by": "a project instantiation, which the project-agnostic default does not ask for",
+      "not_a_pass": true
+    }
+  },
+  "unchanged": [
+    "The frozen 74.60 baseline, its recorded total, its criterion medians and spreads, and all its bindings. The freeze area runs against it and it still passes.",
+    "The committed sanitised PDFs, document records, page sources and import manifests.",
+    "Both fidelity registers and every recorded hash in them.",
+    "The 2026-10-08 operator approval records, left exactly as written.",
+    "The approved dispositions, the comparison records, the revision plan and the committed integrity audits.",
+    "Every gate. This record closes no gate, and no assessor ran."
+  ],
+  "the_declaration_draft_hashes": {
+    "declared_status": "Confirmed",
+    "note": "Two sha256 values the 2026-10-08 approval record pinned were superseded during V02a, after the drafts were re-rendered by their own tool. The successor record is docs/tier4_orchestration_state/decision_log/msca-dn-declaration-draft-rerender_2026-10-09.json, which states both before and after values and the scope of what the approval record still binds. V03 adds nothing to that and changes nothing in it. The approval record itself is untouched, and its remaining 24 of 26 bindings still match the checkout.",
+    "operator_acknowledgement": "still open, as the V02 completion report requested"
+  },
+  "verification": "py -3.10 -m harness.commands.acceptance_lane run twice from a clean checkout under the V01 pin. tests/harness/test_acceptance_lane.py passes, and asserts every claim harness/ACCEPTANCE_LANE.md makes about the areas, the exclusions, the audit baseline and the ledger amendment.",
+  "what_this_does_not_claim": "A green lane is not evidence of calibration, forecast accuracy or grounded evaluation. No expert-labelled validation data exists for this harness, and the 17 skips are 17 absences rather than 17 passes. No private assessment ran, no quota was spent, and the official 2025 baseline is not validated: V05 to V14 stand open, and G6 and G7 are the operator's.",
+  "does_not_close": "F08 closes with this record and the V03 completion report. G1 closure is V03's gate and depends on the amended dependency gate above, not on any box this record checks. No other gate closes, and no finding other than F08 is affected.",
+  "why_the_declaration_is_data": {
+    "declared_status": "Confirmed",
+    "basis": "tests/harness/test_profile.py::TestNoInstrumentLiterals, which the lane's first draft failed",
+    "reason": "A lint over every harness/**/*.py forbids an instrument name outside the profile loader, which is how CLAUDE.md §2 project-agnosticism is held at the code layer. The lane's subject is one instrument's acceptance run, so the first draft carried the instrument name in Python and the lint caught it. Moving the declaration to JSON satisfies the lint by construction rather than by exemption: a second instance declares a second lane and the reader does not change. Weakening the lint to admit the module was considered and rejected."
+  },
+  "what_the_lanes_first_run_found": {
+    "declared_status": "Confirmed",
+    "basis": "the first complete run of the lane on this checkout",
+    "findings": [
+      {
+        "finding": "a stale exclusion row",
+        "detail": "harness/DATASET_DISPOSITIONS.md named test_expectations.py::TestRealSubstrate::test_golden_paths_resolve, and the class had been renamed to TestCriterionSectionMap. The row matched nothing, so the exclusion read as declared while the skip read as undeclared. The lane reported both halves.",
+        "resolution": "The row was corrected in both documents and in the declaration. A new test asserts that every exclusion names a class its module actually defines, which is the check that was missing: tests/harness/test_dataset_dispositions.py verified only that the module existed."
+      },
+      {
+        "finding": "an instrument literal in harness Python",
+        "detail": "The lane's own first draft failed the agnosticism lint described above.",
+        "resolution": "The declaration moved to JSON and the reader became generic."
+      }
+    ],
+    "note": "Both findings are the lane working as V03 intends. A count-only suite would have reported neither: the skip was already skipping and the row was already written."
+  }
+}

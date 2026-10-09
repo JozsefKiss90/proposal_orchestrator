@@ -20,7 +20,12 @@ from harness.commands import faithfulness_calibration as fc
 from harness.commands import freeze_grounding_baselines as fgb
 from runner.transport.errors import ErrorCategory, OpenAICompatTransportError
 
-COMMANDS = ("freeze_grounding_baselines", "faithfulness_calibration", "rubric_grading_run")
+COMMANDS = (
+    "freeze_grounding_baselines",
+    "faithfulness_calibration",
+    "rubric_grading_run",
+    "acceptance_lane",
+)
 
 
 class _Clock:

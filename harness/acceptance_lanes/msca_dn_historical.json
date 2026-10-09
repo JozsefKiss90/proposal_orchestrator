@@ -1,0 +1,319 @@
+{
+  "schema": "acceptance_lane/1",
+  "lane_name": "msca-dn-acceptance",
+  "command": "py -3.10 -m harness.commands.acceptance_lane",
+  "ticket": "V03 of plans/msca_dn_historical_validation_tickets.md",
+  "closes": "finding F08 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+  "documentation": "harness/ACCEPTANCE_LANE.md",
+  "exclusion_document": "harness/DATASET_DISPOSITIONS.md",
+  "declared_skips": 17,
+  "audit_focused_globs": [
+    "tests/harness/test_*.py",
+    "tests/runner/test_dev_graph*.py",
+    "tests/test_msca_dn*.py"
+  ],
+  "modules_added_beyond_the_focused_command": {
+    "tests/test_extraction_environment.py": "V01's own environment pin, which the lane runs under",
+    "tests/test_sandbox_hardening.py": "an isolation check the historical run depends on and the focused globs missed",
+    "tests/test_production_mode.py": "the same"
+  },
+  "modules_considered_and_left_out": {
+    "tests/test_persistence_policy.py": "one case fails on a missing optional botocore extra, an environment dependency unrelated to any acceptance invariant"
+  },
+  "audit_baseline": {
+    "commit": "ca0a443",
+    "passed": 1864,
+    "failed": 44,
+    "errors": 48,
+    "skipped": 8,
+    "collected": 1964
+  },
+  "not_evidence_of": [
+    "not evidence of calibration",
+    "not evidence of forecast accuracy",
+    "not evidence of grounded evaluation"
+  ],
+  "areas": [
+    {
+      "name": "importer",
+      "invariant": "Both sanitised candidate revisions replay byte-equal from the committed PDFs, under the extraction build V01 pinned, and derive the recorded document identity.",
+      "modules": [
+        "tests/test_extraction_environment.py",
+        "tests/test_msca_dn_import.py",
+        "tests/test_msca_dn_workspace.py",
+        "tests/harness/test_blind_document_subsections.py"
+      ],
+      "depended_on": true
+    },
+    {
+      "name": "profile",
+      "invariant": "An instrument profile resolves to its own rubrics, scorecard and criterion routing, and a criterion cannot be scored under a profile that does not declare it.",
+      "modules": [
+        "tests/harness/test_profile.py",
+        "tests/harness/test_msca_dn_profile.py",
+        "tests/harness/test_ria_profile.py",
+        "tests/harness/test_rubrics.py",
+        "tests/harness/test_routing.py"
+      ],
+      "depended_on": true
+    },
+    {
+      "name": "preflight",
+      "invariant": "Evidence selection is pinned before an assessor runs: the pack set hashes, the manifest pin binds, and a pack whose anchors do not resolve fails closed.",
+      "modules": [
+        "tests/harness/test_evidence_preflight.py",
+        "tests/harness/test_evidence_pack.py"
+      ],
+      "depended_on": true
+    },
+    {
+      "name": "freeze",
+      "invariant": "The baseline freeze binds what it froze and refuses what it must, and the frozen 74.60 report still passes the gate it was frozen under.",
+      "modules": [
+        "tests/harness/test_blind_baseline.py",
+        "tests/harness/test_blind_assessment.py"
+      ],
+      "depended_on": true
+    },
+    {
+      "name": "regression",
+      "invariant": "The E4 section golden-set and the E5f rubric lane compare and report as their fixtures specify. Merge-advisory and human-decided by harness/HARNESS.md, so the historical run does not depend on it.",
+      "modules": [
+        "tests/harness/test_regression.py",
+        "tests/harness/test_regression_golden.py"
+      ],
+      "depended_on": false
+    },
+    {
+      "name": "comparison",
+      "invariant": "The ESR comparison replays from the recorded inputs, and a disposition is the operator's decision rather than a measurement the tool makes for them.",
+      "modules": [
+        "tests/harness/test_esr_comparison.py",
+        "tests/harness/test_comparison_diff.py",
+        "tests/harness/test_operator_review.py",
+        "tests/harness/test_semantic_adjudications.py",
+        "tests/test_msca_dn_approved_dispositions.py",
+        "tests/test_msca_dn_successor_dispositions.py"
+      ],
+      "depended_on": true
+    },
+    {
+      "name": "provenance",
+      "invariant": "Every recorded identity, hash binding and declaration describes the committed bytes, and the integrity audit reports what it parsed rather than what it assumed.",
+      "modules": [
+        "tests/harness/test_provenance.py",
+        "tests/harness/test_integrity_audit.py",
+        "tests/test_msca_dn_declaration_drafts.py",
+        "tests/test_msca_dn_fidelity_declarations.py"
+      ],
+      "depended_on": true
+    },
+    {
+      "name": "isolation",
+      "invariant": "The blind lane stays blind: no feedback reaches the assessor, the judge refuses to run inside the repository, and a production run writes no diagnostic copy.",
+      "modules": [
+        "tests/harness/test_blind_leakage.py",
+        "tests/harness/test_subscription_judge.py",
+        "tests/harness/test_boundary.py",
+        "tests/test_sandbox_hardening.py",
+        "tests/test_production_mode.py"
+      ],
+      "depended_on": true
+    },
+    {
+      "name": "scoring",
+      "invariant": "A criterion score is derived from the draws by the declared arithmetic, and a malformed assessor response is refused and checkpointed rather than scored.",
+      "modules": [
+        "tests/harness/test_criterion_scoring.py",
+        "tests/harness/test_verdict.py",
+        "tests/harness/test_report.py",
+        "tests/harness/test_rubric_report.py",
+        "tests/harness/test_rubric_run.py"
+      ],
+      "depended_on": false
+    },
+    {
+      "name": "ledger",
+      "invariant": "Claims are extracted, statused and measured from the committed sections, and a status the sources do not support is Unresolved rather than Confirmed.",
+      "modules": [
+        "tests/harness/test_claim_ledger.py",
+        "tests/harness/test_measure_ledger_granularity.py",
+        "tests/harness/test_faithfulness.py",
+        "tests/harness/test_status_faithfulness.py",
+        "tests/harness/test_status_calibration.py",
+        "tests/harness/test_materiality.py",
+        "tests/harness/test_calibration.py",
+        "tests/harness/test_gold_set.py",
+        "tests/harness/test_expectations.py",
+        "tests/harness/test_expectation_coverage.py",
+        "tests/harness/test_expectation_grounding.py"
+      ],
+      "depended_on": false
+    },
+    {
+      "name": "judge",
+      "invariant": "The judge transport, its response cache and its run log behave offline and deterministically, so a recorded run can be read back.",
+      "modules": [
+        "tests/harness/test_judge.py",
+        "tests/harness/test_response_cache.py",
+        "tests/harness/test_jsonl_log.py",
+        "tests/harness/test_commands.py"
+      ],
+      "depended_on": false
+    },
+    {
+      "name": "graph",
+      "invariant": "The development-graph substrate the workspace and candidate records sit on compiles, projects and replays without drift.",
+      "modules": [
+        "tests/runner/test_dev_graph_documents.py",
+        "tests/runner/test_dev_graph_gate_invariants.py",
+        "tests/runner/test_dev_graph_impact.py",
+        "tests/runner/test_dev_graph_intake.py",
+        "tests/runner/test_dev_graph_packages.py",
+        "tests/runner/test_dev_graph_revisions.py",
+        "tests/runner/test_dev_graph_scenarios.py",
+        "tests/runner/test_dev_graph_shadow.py",
+        "tests/runner/test_dev_graph_snapshot.py",
+        "tests/harness/test_dev_graph_t03_end_to_end.py"
+      ],
+      "depended_on": false
+    },
+    {
+      "name": "exclusions",
+      "invariant": "Every check the harness cannot run is listed with its reason, and neither the disposition table nor this lane can grow an exclusion the other does not know.",
+      "modules": [
+        "tests/harness/test_dataset_dispositions.py",
+        "tests/harness/test_acceptance_lane.py"
+      ],
+      "depended_on": false
+    }
+  ],
+  "exclusions": [
+    {
+      "check": "test_regression_golden.py::TestGoldenSetStanding::test_golden_baselines_are_committed",
+      "substrate": "E4 goldens",
+      "reason": "no golden set is committed",
+      "replacement_evidence": "test_regression.py::TestFreezeFingerprint and TestRoundtrip cover freezing and reloading a baseline on fixtures",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_regression_golden.py::TestGoldenSetStanding::test_sections_match_golden_set",
+      "substrate": "E4 goldens",
+      "reason": "nothing to diff the current sections against",
+      "replacement_evidence": "test_regression.py::TestRegressionReport covers the comparison on fixtures",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_regression_golden.py::TestGoldenSetStanding::test_drifted_sections_are_surfaced_even_when_not_breaking",
+      "substrate": "E4 goldens",
+      "reason": "nothing to diff the current sections against",
+      "replacement_evidence": "test_regression.py::TestRegressionReport covers the report contract on fixtures",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_regression_golden.py::TestRubricLaneStanding::test_frozen_rubric_baseline_is_self_consistent",
+      "substrate": "E5f rubric baseline",
+      "reason": "E5f has frozen no baseline",
+      "replacement_evidence": "test_rubric_run.py::TestFreezeRubricBaseline and TestCompareRubricBaseline cover the same contract on fixtures",
+      "lifted_by": "the first E5f rubric freeze",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_measure_ledger_granularity.py::test_report_shape_and_offline",
+      "substrate": "E4 goldens",
+      "reason": "the measurement's drafter-era side reads the goldens, which are absent",
+      "replacement_evidence": "Git history only: `32b5606` records every measured number",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_measure_ledger_granularity.py::test_prose_byte_identical_all_sub_sections",
+      "substrate": "E4 goldens",
+      "reason": "the measurement's drafter-era side reads the goldens, which are absent",
+      "replacement_evidence": "Git history only: `32b5606` records every measured number",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_measure_ledger_granularity.py::test_cardinality_gap",
+      "substrate": "E4 goldens",
+      "reason": "the measurement's drafter-era side reads the goldens, which are absent",
+      "replacement_evidence": "Git history only: `32b5606` records every measured number",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_measure_ledger_granularity.py::test_status_axis_graph_honest_vs_drafter_confirmed_heavy",
+      "substrate": "E4 goldens",
+      "reason": "the measurement's drafter-era side reads the goldens, which are absent",
+      "replacement_evidence": "Git history only: `32b5606` records every measured number",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_measure_ledger_granularity.py::test_e4_golden_diff_detects_the_gap",
+      "substrate": "E4 goldens",
+      "reason": "the measurement's drafter-era side reads the goldens, which are absent",
+      "replacement_evidence": "Git history only: `32b5606` records every measured number",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_expectations.py::TestCriterionSectionMap::test_golden_paths_resolve",
+      "substrate": "E4 goldens",
+      "reason": "no golden set is committed",
+      "replacement_evidence": "fixture coverage in the same module",
+      "lifted_by": "an operator refreeze, then re-pointing the granularity suite (DATASET_DISPOSITIONS.md)",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_gold_set.py::TestSeededExcellenceTemplate",
+      "substrate": "gold-set template",
+      "reason": "the seeded template is not in the tree; `fd38b0a` removed it as instance-derived data",
+      "replacement_evidence": "fixture coverage in the same module",
+      "lifted_by": "ticket X03, which a human labels",
+      "checks": 4,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_rubric_report.py::TestStandingLane::test_real_spine_register_loads_and_is_fully_confirmed",
+      "substrate": "Tier 3 confirmation checklist",
+      "reason": "no Tier 3 instantiation, so no spine register exists to load",
+      "replacement_evidence": "test_rubric_report.py::TestSpineRegistry covers the loader contract on fixtures",
+      "lifted_by": "a project instantiation, which the project-agnostic default does not ask for",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_status_faithfulness.py::TestResolveClaimSourceText::test_real_checklist_blob_not_truncated_at_default_cap",
+      "substrate": "Tier 3 confirmation checklist",
+      "reason": "the same absence: there is no real blob to resolve",
+      "replacement_evidence": "TestResolveClaimSourceText's fixture cases cover the truncation rule",
+      "lifted_by": "a project instantiation, which the project-agnostic default does not ask for",
+      "checks": 1,
+      "historical_run_depends_on": false
+    },
+    {
+      "check": "test_rubric_report.py::TestStandingLane::test_frozen_report_renders_if_present",
+      "substrate": "E5f rubric report",
+      "reason": "E5f has frozen no report",
+      "replacement_evidence": "test_rubric_report.py::TestRender covers rendering a report on fixtures",
+      "lifted_by": "the first E5f rubric freeze",
+      "checks": 1,
+      "historical_run_depends_on": false
+    }
+  ]
+}

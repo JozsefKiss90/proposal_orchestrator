@@ -25,6 +25,20 @@ with its reason and its lift-work, in
 [`DATASET_DISPOSITIONS.md`](DATASET_DISPOSITIONS.md). A green lane says the code
 behaves as its fixtures specify. It says nothing about calibration.
 
+## The named acceptance lane: `ACCEPTANCE_LANE.md`
+
+One command runs the acceptance suite and reconciles it against its own
+declaration:
+
+```
+py -3.10 -m harness.commands.acceptance_lane
+```
+
+[`ACCEPTANCE_LANE.md`](ACCEPTANCE_LANE.md) names the twelve coverage areas, the
+invariant each one carries, every declared exclusion, and what a green result
+does not say. The lane fails on an undeclared skip and on a declared exclusion
+the run never reports, so the two documents cannot drift apart.
+
 ## The one load-bearing invariant
 
 **No eval metric wires into the runtime DAG as a fail-closed gate.** An
