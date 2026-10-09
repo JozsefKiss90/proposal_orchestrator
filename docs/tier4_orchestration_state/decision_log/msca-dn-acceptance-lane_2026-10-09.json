@@ -12,7 +12,7 @@
     "basis": "measured on this checkout under the V01 environment pin",
     "name": "msca-dn-acceptance",
     "command": "py -3.10 -m harness.commands.acceptance_lane",
-    "areas": 12,
+    "areas": 13,
     "areas_v03_names": [
       "importer",
       "profile",
@@ -23,6 +23,7 @@
       "isolation"
     ],
     "areas_carrying_the_remainder_of_the_audits_command": [
+      "regression",
       "scoring",
       "ledger",
       "judge",
@@ -41,10 +42,23 @@
     }
   },
   "measured_result": {
-    "declared_status": "Unresolved",
-    "basis": "pending: the two clean-checkout runs this record's verification line describes have not been recorded yet",
+    "declared_status": "Confirmed",
+    "basis": "two consecutive runs in a fresh worktree checked out at 4f2c275, recorded in plans/reports/v03_acceptance_lane_completion_2026-10-09.md section 3",
     "environment": "Python 3.10.6, PyMuPDF 1.28.2 over MuPDF 1.28.2 (the V01 pin)",
-    "note": "Filled from plans/reports/v03_acceptance_lane_completion_2026-10-09.md once both runs are recorded. No figure is stated here before its source exists."
+    "passed": 2121,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 17,
+    "collected": 2138,
+    "both_runs_identical": true,
+    "all_17_skips_are_declared_exclusions": true,
+    "unexplained_failures": 0,
+    "undeclared_skips": 0,
+    "stale_exclusions": 0,
+    "durations": [
+      "4 min 30 s",
+      "5 min 07 s"
+    ]
   },
   "reconciled_against_the_audit": {
     "declared_status": "Confirmed",
@@ -82,7 +96,8 @@
     "Both fidelity registers and every recorded hash in them.",
     "The 2026-10-08 operator approval records, left exactly as written.",
     "The approved dispositions, the comparison records, the revision plan and the committed integrity audits.",
-    "Every gate. This record closes no gate, and no assessor ran."
+    "Every gate. This record closes no gate, and no assessor ran.",
+    "The 197 to 201 pre-existing whole-repository failures, which are outside every module this work touched and which no ticket in this ledger claims."
   ],
   "the_declaration_draft_hashes": {
     "declared_status": "Confirmed",
@@ -110,8 +125,37 @@
         "finding": "an instrument literal in harness Python",
         "detail": "The lane's own first draft failed the agnosticism lint described above.",
         "resolution": "The declaration moved to JSON and the reader became generic."
+      },
+      {
+        "finding": "a leaked run record, found by the first clean-worktree comparison",
+        "detail": "tests/test_production_mode.py::TestStartupBackendLogging::test_startup_returns_3_on_production_config_error calls runner.__main__.main with a run id, and the startup path creates .claude/runs/test-00000000-0000-0000-0000-000000000000/ before the transport config fails. The directory outlived the test. Three checks in tests/test_demo_change_scenarios.py and tests/test_preserve_run_manifests.py skip when .claude/runs is absent, which is the CLAUDE.md §9.2 state of a fresh checkout, and fail when a directory is present without the manifest they read. Running the lane and then the whole suite in one tree therefore reported three failures the lane itself had caused. The lane surfaced it because it put tests/test_production_mode.py in its isolation area.",
+        "resolution": "The test class now removes the run directory it created, and only when it created it: a directory that was already there is a developer's run state rather than the test's debris. Measured at four commits and two tree states to establish that the three checks were not V03 regressions."
       }
     ],
     "note": "Both findings are the lane working as V03 intends. A count-only suite would have reported neither: the skip was already skipping and the row was already written."
+  },
+  "whole_repository_comparison": {
+    "declared_status": "Confirmed",
+    "basis": "three whole-suite runs recorded in plans/reports/v03_acceptance_lane_completion_2026-10-09.md section 6",
+    "method": "failing identifier sets, because a whole-run count is not stable across invocations in this repository",
+    "baseline": "fresh worktree at 3b4cde8, the commit before V02a to V02d: 220 failing ids",
+    "after_development_tree": {
+      "failing_ids": 194,
+      "new_failures": 0,
+      "resolved": 26,
+      "note": "V02's method, and its recorded figure reproduces exactly"
+    },
+    "after_fresh_worktree_at_4f2c275": {
+      "failing_ids": 201,
+      "new_failures": 0,
+      "resolved": 19,
+      "note": "the stricter comparison; 7 of the 26 fail on both sides because they read untracked .claude/runs records, so 19 + 7 = 26"
+    },
+    "zero_new_failures_both_ways": true
+  },
+  "side_effects": {
+    "declared_status": "Confirmed",
+    "basis": "measured on this checkout",
+    "removed": "One pre-existing .claude/runs/test-00000000-0000-0000-0000-000000000000/ directory in the development tree, left by an earlier run of the test named above. It is gitignored CLAUDE.md §9.2 runtime state, not constitutional source truth, and the 65 checks in the two dependent modules pass without it. The fix is now conditional, so this cannot recur."
   }
 }

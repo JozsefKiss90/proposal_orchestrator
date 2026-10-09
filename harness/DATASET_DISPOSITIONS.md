@@ -79,12 +79,12 @@ that work with the refreeze.
 
 ## The acceptance lane reads this list
 
-`harness/ACCEPTANCE_LANE.md` declares the named PE-09 acceptance lane, and
-`harness/acceptance_lanes/msca_dn_historical.json` carries the same fourteen rows as data.
-`py -3.10 -m harness.commands.acceptance_lane` compares that declaration against this table before it
-runs anything, and refuses when a row is in one and not the other. It also fails on a skip no row
-declares and on a row the run never reports. So this table and the declaration cannot drift apart, in
-either direction.
+The named PE-09 acceptance lane is declared in `harness/ACCEPTANCE_LANE.md`, and its copy of these
+fourteen rows lives as data in `harness/acceptance_lanes/msca_dn_historical.json`. Running
+`py -3.10 -m harness.commands.acceptance_lane` compares that declaration against this table first, and
+refuses when a row is in one and not the other. The lane also fails on a skip no row declares, and on
+a row the run never reports. So this table and the declaration cannot drift apart, in either
+direction.
 
 The two Tier 3 checklist rows carry ticket V02c's first acceptance criterion in its real-file half.
 That criterion is recorded in `plans/msca_dn_historical_validation_tickets.md` as **excluded, not

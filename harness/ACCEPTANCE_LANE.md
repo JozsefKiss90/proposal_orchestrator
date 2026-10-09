@@ -7,8 +7,8 @@ py -3.10 -m harness.commands.acceptance_lane
 ```
 
 It runs every module the declaration names, then reads the run back against that declaration.
-`--list` prints the declaration and runs nothing. `--area NAME` and `-k EXPR` narrow the run and stamp
-the result PARTIAL, because a narrowed run is a diagnostic.
+Pass `--list` to print the declaration and run nothing. Pass `--area NAME` or `-k EXPR` to narrow the
+run. Both stamp the result PARTIAL, because a narrowed run is a diagnostic.
 
 The declaration is data, not code: `harness/acceptance_lanes/msca_dn_historical.json` holds the areas,
 the exclusions and the audit baseline, and `harness/acceptance_lane.py` reads it. The reader carries no
@@ -55,30 +55,30 @@ measuring a new build, not for accepting one.
 
 ## The thirteen areas
 
-Seven areas carry invariants the historical run depends on. The other six carry the rest of
-the audit's focused command, kept rather than dropped. Every declared exclusion sits in an area
-marked **no**, and the lane refuses to run when one does not — that is how
-*no exception covers a check the historical run depends on* is measured rather than asserted.
+Seven areas carry invariants the historical run depends on. The other six carry the rest of the
+audit's focused command, kept rather than dropped. Every declared exclusion sits in an area marked
+**no**, and the lane refuses to run when one does not. That is how *no exception covers a check the
+historical run depends on* becomes a measurement rather than an assertion.
 
-The E4 golden-set and E5f rubric lanes live in their own **regression** area for exactly this
-reason. `harness/HARNESS.md` makes them merge-advisory and human-decided, so the historical run
-does not depend on them, and four of their checks are excluded.
+The E4 golden-set and E5f rubric lanes have their own **regression** area for that reason. They are
+merge-advisory and human-decided by `harness/HARNESS.md`, so the historical run does not depend on
+them. Four of their checks are excluded.
 
 | Area | Run depends on it | Invariant | Modules |
 |---|---|---|---|
 | **importer** | yes | Both sanitised candidate revisions replay byte-equal from the committed PDFs, under the extraction build V01 pinned, and derive the recorded document identity. | `test_extraction_environment.py`, `test_msca_dn_import.py`, `test_msca_dn_workspace.py`, `test_blind_document_subsections.py` |
-| **profile** | yes | An instrument profile resolves to its own rubrics, scorecard and criterion routing, and a criterion cannot be scored under a profile that does not declare it. | `test_profile.py`, `test_msca_dn_profile.py`, `test_ria_profile.py`, `test_rubrics.py`, `test_routing.py` |
-| **preflight** | yes | Evidence selection is pinned before an assessor runs: the pack set hashes, the manifest pin binds, and a pack whose anchors do not resolve fails closed. | `test_evidence_preflight.py`, `test_evidence_pack.py` |
+| **profile** | yes | An instrument profile resolves to its own rubrics, scorecard and criterion routing. A criterion cannot be scored under a profile that does not declare it. | `test_profile.py`, `test_msca_dn_profile.py`, `test_ria_profile.py`, `test_rubrics.py`, `test_routing.py` |
+| **preflight** | yes | Evidence selection is pinned before an assessor runs. The pack set hashes, the manifest pin binds, and a pack whose anchors do not resolve fails closed. | `test_evidence_preflight.py`, `test_evidence_pack.py` |
 | **freeze** | yes | The baseline freeze binds what it froze and refuses what it must, and the frozen 74.60 report still passes the gate it was frozen under. | `test_blind_baseline.py`, `test_blind_assessment.py` |
-| **regression** | no | The E4 section golden-set and the E5f rubric lane compare and report as their fixtures specify. Merge-advisory and human-decided by harness/HARNESS.md, so the historical run does not depend on it. | `test_regression.py`, `test_regression_golden.py` |
+| **regression** | no | The E4 section golden-set and the E5f rubric lane compare and report as their fixtures specify. Both are merge-advisory and human-decided by harness/HARNESS.md, so the historical run does not depend on them. | `test_regression.py`, `test_regression_golden.py` |
 | **comparison** | yes | The ESR comparison replays from the recorded inputs, and a disposition is the operator's decision rather than a measurement the tool makes for them. | `test_esr_comparison.py`, `test_comparison_diff.py`, `test_operator_review.py`, `test_semantic_adjudications.py`, `test_msca_dn_approved_dispositions.py`, `test_msca_dn_successor_dispositions.py` |
 | **provenance** | yes | Every recorded identity, hash binding and declaration describes the committed bytes, and the integrity audit reports what it parsed rather than what it assumed. | `test_provenance.py`, `test_integrity_audit.py`, `test_msca_dn_declaration_drafts.py`, `test_msca_dn_fidelity_declarations.py` |
-| **isolation** | yes | The blind lane stays blind: no feedback reaches the assessor, the judge refuses to run inside the repository, and a production run writes no diagnostic copy. | `test_blind_leakage.py`, `test_subscription_judge.py`, `test_boundary.py`, `test_sandbox_hardening.py`, `test_production_mode.py` |
+| **isolation** | yes | The blind lane stays blind: no feedback reaches the assessor. The judge refuses to run inside the repository, and a production run writes no diagnostic copy. | `test_blind_leakage.py`, `test_subscription_judge.py`, `test_boundary.py`, `test_sandbox_hardening.py`, `test_production_mode.py` |
 | **scoring** | no | A criterion score is derived from the draws by the declared arithmetic, and a malformed assessor response is refused and checkpointed rather than scored. | `test_criterion_scoring.py`, `test_verdict.py`, `test_report.py`, `test_rubric_report.py`, `test_rubric_run.py` |
 | **ledger** | no | Claims are extracted, statused and measured from the committed sections, and a status the sources do not support is Unresolved rather than Confirmed. | `test_claim_ledger.py`, `test_measure_ledger_granularity.py`, `test_faithfulness.py`, `test_status_faithfulness.py`, `test_status_calibration.py`, `test_materiality.py`, `test_calibration.py`, `test_gold_set.py`, `test_expectations.py`, `test_expectation_coverage.py`, `test_expectation_grounding.py` |
 | **judge** | no | The judge transport, its response cache and its run log behave offline and deterministically, so a recorded run can be read back. | `test_judge.py`, `test_response_cache.py`, `test_jsonl_log.py`, `test_commands.py` |
-| **graph** | no | The development-graph substrate the workspace and candidate records sit on compiles, projects and replays without drift. | `test_dev_graph_documents.py`, `test_dev_graph_gate_invariants.py`, `test_dev_graph_impact.py`, `test_dev_graph_intake.py`, `test_dev_graph_packages.py`, `test_dev_graph_revisions.py`, `test_dev_graph_scenarios.py`, `test_dev_graph_shadow.py`, `test_dev_graph_snapshot.py`, `test_dev_graph_t03_end_to_end.py` |
-| **exclusions** | no | Every check the harness cannot run is listed with its reason, and neither the disposition table nor this lane can grow an exclusion the other does not know. | `test_dataset_dispositions.py`, `test_acceptance_lane.py` |
+| **graph** | no | The development-graph substrate compiles, projects and replays without drift. The workspace and candidate records sit on it. | `test_dev_graph_documents.py`, `test_dev_graph_gate_invariants.py`, `test_dev_graph_impact.py`, `test_dev_graph_intake.py`, `test_dev_graph_packages.py`, `test_dev_graph_revisions.py`, `test_dev_graph_scenarios.py`, `test_dev_graph_shadow.py`, `test_dev_graph_snapshot.py`, `test_dev_graph_t03_end_to_end.py` |
+| **exclusions** | no | Every check the harness cannot run is listed with its reason. Neither the disposition table nor this lane can grow an exclusion the other does not know. | `test_dataset_dispositions.py`, `test_acceptance_lane.py` |
 
 ### What the lane adds to the audit's command
 
@@ -94,14 +94,14 @@ runs all of that and three modules more:
 ## The exclusions
 
 Fourteen rows, seventeen checks: one row stands for four. Every skip a complete run reports is one of
-these. A skip that is not fails the lane as an **undeclared skip**; a row the run never reports fails
-it as a **stale exclusion**. `harness/DATASET_DISPOSITIONS.md` carries the same list for a reader of
-harness status, and the command compares the two before running anything, so a row in one and not the
+these. A skip that is not fails the lane as an **undeclared skip**. A row the run never reports fails it as
+a **stale exclusion**. `harness/DATASET_DISPOSITIONS.md` carries the same list for a reader of
+harness status. The command compares the two before running anything, so a row in one and not the
 other fails the lane.
 
 Every row names replacement evidence, and every row sits in an area the run does not depend on. Each
-reads a substrate that is absent from this checkout: the E4 goldens, the gold-set template, the E5f
-freeze, or a Tier 3 confirmation checklist the project-agnostic default does not create.
+reads a substrate absent from this checkout: the E4 goldens, the gold-set template, the E5f freeze, or
+a Tier 3 confirmation checklist.
 
 | Check | Substrate | Reason | Replacement evidence | Lifted by |
 |---|---|---|---|---|
@@ -135,11 +135,11 @@ measurement is resolved or explicitly scoped. The recorded run is in
 
 | | Audit at `ca0a443` | The lane, 2026-10-09 |
 |---|---:|---:|
-| Passed | 1,864 | PASSED_1 |
+| Passed | 1,864 | 2,121 |
 | Failed | 44 | 0 |
 | Errors | 48 | 0 |
 | Skipped | 8 | 17, every one declared above |
-| Collected | 1,964 | COLLECTED_1 |
+| Collected | 1,964 | 2,138 |
 
 The two collected counts are not comparable case for case. V01 and V02a–V02d added cases, and the lane
 adds three modules the focused command did not run. What is comparable is the failing set: the audit's
@@ -156,6 +156,6 @@ It says the code behaves as its fixtures specify. Read nothing else into it.
 - A green lane is **not evidence of grounded evaluation**. The sanitised candidate's supporting sources
   are removed, the blind lane runs `--no-claims`, and grounding is unassessable by design.
 
-Seventeen skips are seventeen absences. They are not seventeen passes, and the lane prints them as
-exclusions every time it runs. `harness/DATASET_DISPOSITIONS.md` holds the same list with the work that
-would lift each one.
+Seventeen skips are seventeen absences, not seventeen passes. The lane prints them as exclusions
+every time it runs. `harness/DATASET_DISPOSITIONS.md` holds the same list with the work that would
+lift each one.

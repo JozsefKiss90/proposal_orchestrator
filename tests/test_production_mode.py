@@ -347,6 +347,37 @@ class TestFailClosedBehavior:
 class TestStartupBackendLogging:
     """Verify __main__.py startup backend logging."""
 
+    #: The run id the startup check below is given. ``main`` creates the run
+    #: directory before the transport config fails, so the directory outlives
+    #: the test unless it is removed.
+    RUN_ID = "test-00000000-0000-0000-0000-000000000000"
+
+    @pytest.fixture(autouse=True)
+    def _no_leaked_run_record(self):
+        """Remove the run directory the startup path creates, if it created it.
+
+        Left behind, it changes what *other* modules measure. Three checks in
+        ``tests/test_demo_change_scenarios.py`` and
+        ``tests/test_preserve_run_manifests.py`` skip when ``.claude/runs`` is
+        absent, as §9.2 runtime state is on a fresh checkout, and fail when a
+        directory is there without the manifest they read. A later whole-suite
+        run in the same tree then reports three failures this test caused,
+        which is how the acceptance lane found it.
+
+        Conditional on purpose: a directory that was already there is a
+        developer's run state, not this test's debris, and removing it would
+        trade one side effect for another.
+        """
+        import shutil
+
+        from runner.paths import find_repo_root
+
+        record = find_repo_root() / ".claude" / "runs" / self.RUN_ID
+        existed = record.exists()
+        yield
+        if not existed and record.is_dir():
+            shutil.rmtree(record, ignore_errors=True)
+
     def test_startup_returns_3_on_production_config_error(self):
         """DAG startup returns exit code 3 when production config fails."""
         from runner.__main__ import main
@@ -354,7 +385,5 @@ class TestStartupBackendLogging:
         env = _env(ORCHESTRATOR_PRODUCTION_MODE="true")
         with mock.patch.dict(os.environ, env, clear=True):
             # Provide required args but let transport config fail
-            exit_code = main([
-                "--run-id", "test-00000000-0000-0000-0000-000000000000",
-            ])
+            exit_code = main(["--run-id", self.RUN_ID])
             assert exit_code == 3

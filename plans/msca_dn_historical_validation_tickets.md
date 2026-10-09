@@ -288,9 +288,9 @@ rests on an unexplained open box. Neither box is checked. Each one's disposition
 The amendment is to the gate, not to the criteria. V03's gate reads: V02a and V02c are closed for G1
 once their open halves are **owned elsewhere or declared as exclusions**, and V03's own criteria carry
 the evidence. An exclusion is never reported as a pass. `harness/ACCEPTANCE_LANE.md` and
-`harness/DATASET_DISPOSITIONS.md` list the V02c exclusion by node id, the lane command refuses to run
-when its declaration and `harness/DATASET_DISPOSITIONS.md` disagree, and
-`tests/harness/test_acceptance_lane.py` fails if the row leaves either document.
+`harness/DATASET_DISPOSITIONS.md` list the V02c exclusion by node id. The lane command refuses to run
+when its declaration and the disposition table disagree, and `tests/harness/test_acceptance_lane.py`
+fails if the row leaves either document.
 
 **Problem.** The focused audit command completed with 1,864 passed, 44 failed, 48 errors and 8 skipped
 across 1,964 collected cases. No hosted CI configuration supplies an independent result. Test counts

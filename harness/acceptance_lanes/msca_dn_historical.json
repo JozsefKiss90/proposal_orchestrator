@@ -47,7 +47,7 @@
     },
     {
       "name": "profile",
-      "invariant": "An instrument profile resolves to its own rubrics, scorecard and criterion routing, and a criterion cannot be scored under a profile that does not declare it.",
+      "invariant": "An instrument profile resolves to its own rubrics, scorecard and criterion routing. A criterion cannot be scored under a profile that does not declare it.",
       "modules": [
         "tests/harness/test_profile.py",
         "tests/harness/test_msca_dn_profile.py",
@@ -59,7 +59,7 @@
     },
     {
       "name": "preflight",
-      "invariant": "Evidence selection is pinned before an assessor runs: the pack set hashes, the manifest pin binds, and a pack whose anchors do not resolve fails closed.",
+      "invariant": "Evidence selection is pinned before an assessor runs. The pack set hashes, the manifest pin binds, and a pack whose anchors do not resolve fails closed.",
       "modules": [
         "tests/harness/test_evidence_preflight.py",
         "tests/harness/test_evidence_pack.py"
@@ -77,7 +77,7 @@
     },
     {
       "name": "regression",
-      "invariant": "The E4 section golden-set and the E5f rubric lane compare and report as their fixtures specify. Merge-advisory and human-decided by harness/HARNESS.md, so the historical run does not depend on it.",
+      "invariant": "The E4 section golden-set and the E5f rubric lane compare and report as their fixtures specify. Both are merge-advisory and human-decided by harness/HARNESS.md, so the historical run does not depend on them.",
       "modules": [
         "tests/harness/test_regression.py",
         "tests/harness/test_regression_golden.py"
@@ -110,7 +110,7 @@
     },
     {
       "name": "isolation",
-      "invariant": "The blind lane stays blind: no feedback reaches the assessor, the judge refuses to run inside the repository, and a production run writes no diagnostic copy.",
+      "invariant": "The blind lane stays blind: no feedback reaches the assessor. The judge refuses to run inside the repository, and a production run writes no diagnostic copy.",
       "modules": [
         "tests/harness/test_blind_leakage.py",
         "tests/harness/test_subscription_judge.py",
@@ -163,7 +163,7 @@
     },
     {
       "name": "graph",
-      "invariant": "The development-graph substrate the workspace and candidate records sit on compiles, projects and replays without drift.",
+      "invariant": "The development-graph substrate compiles, projects and replays without drift. The workspace and candidate records sit on it.",
       "modules": [
         "tests/runner/test_dev_graph_documents.py",
         "tests/runner/test_dev_graph_gate_invariants.py",
@@ -180,7 +180,7 @@
     },
     {
       "name": "exclusions",
-      "invariant": "Every check the harness cannot run is listed with its reason, and neither the disposition table nor this lane can grow an exclusion the other does not know.",
+      "invariant": "Every check the harness cannot run is listed with its reason. Neither the disposition table nor this lane can grow an exclusion the other does not know.",
       "modules": [
         "tests/harness/test_dataset_dispositions.py",
         "tests/harness/test_acceptance_lane.py"
