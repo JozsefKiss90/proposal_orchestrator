@@ -21,8 +21,10 @@ and the label-value work-package headers, and runs five consistency checks:
 4. **DC table against the individual DC research projects described in
    1.1** — the DC set, each appointment against the windows of the packages
    its project names (see below), and the recruiting participant against the
-   project's host line, which the sanitisation made *not comparable* and which
-   is reported as such.
+   project's host line, which is compared only when the candidate's recorded
+   provenance says the identifiers are the submitted document's own and is
+   otherwise reported *not comparable* for the reason that provenance states
+   (:mod:`harness.candidate_provenance`, ticket V05).
 5. **Risk table against the mitigations named in prose, and whether any
    threshold is stated.**
 
@@ -98,18 +100,28 @@ The grounding axis
 ------------------
 Per spec decision 15 the audit enumerates the import's claim ledger
 (``validation_status.claim_statuses`` of each section artifact, the same file
-the pack builder reads) and reports **every claim Unresolved** with the reason
-:data:`GROUNDING_REASON`. A claim extracted from the proposal is trivially
-entailed by the proposal, so no judge runs here and none could say more. The
-axis is wired to the E2 vocabulary (:data:`~harness.status_faithfulness.SEVERITY_UNRESOLVED`)
-so a later stage with sources can replace the rows without changing the
-shape. An empty ledger makes the axis vacuous and is flagged, never silently
-reported as zero findings. A claim whose ledger entry declares a status other
-than ``unresolved`` contradicts the import contract (spec PE-03) and is flagged
-with its declaration visible; it is still reported Unresolved, because a
-declaration is not evidence. The ledger's ``source_ref`` is the claim's own
-verified span into the proposal's page sources: a location, carried as
-``assertion_location``, never a source.
+the pack builder reads) and reports **every claim Unresolved**. A claim
+extracted from the proposal is trivially entailed by the proposal, so no judge
+runs here and none could say more. The axis is wired to the E2 vocabulary
+(:data:`~harness.status_faithfulness.SEVERITY_UNRESOLVED`) so a later stage
+with sources can replace the rows without changing the shape. An empty ledger
+makes the axis vacuous and is flagged, never silently reported as zero
+findings. The ledger's ``source_ref`` is the claim's own verified span into the
+proposal's page sources: a location, carried as ``assertion_location``, never a
+source.
+
+*Why* corroboration is missing is a fact about the imported document, not about
+the audit, so the reason every row carries is derived per candidate from the
+records the import wrote (:mod:`harness.candidate_provenance`, ticket V05): a
+sanitised derivative lost its citations, a document that still cites its
+sources did not, and a candidate whose provenance states no cause gets an
+explicitly Unresolved reason rather than another document's. The status a
+ledger entry is expected to declare comes from the same place — the manifest's
+own declaration about its ledger — so an entry that contradicts the import
+contract (spec PE-03) is flagged against a contract that was read, with its
+declaration visible, and is still reported Unresolved, because a declaration is
+not evidence. Without a manifest there is no declared expectation, and the
+audit flags that rather than assuming one.
 
 The baseline
 ------------
@@ -149,6 +161,7 @@ from harness.blind_assessment import (
     next_report_path,
 )
 from harness.blind_baseline import BlindBaselineError, FrozenBaseline, load_frozen_baseline
+from harness.candidate_provenance import UNSTATED_PROVENANCE, CandidateProvenance
 from harness.evidence_pack import split_paragraphs
 from harness.status_faithfulness import (
     SEVERITY_UNRESOLVED,
@@ -161,7 +174,6 @@ __all__ = [
     "AUDIT_RECORD_TYPE",
     "AUDIT_METRIC",
     "AUDIT_SCHEMA_VERSION",
-    "GROUNDING_REASON",
     "GROUNDING_STATUS",
     "CHECKS",
     "FINDING_KINDS",
@@ -186,12 +198,10 @@ AUDIT_RECORD_TYPE: str = "integrity_audit_report"
 AUDIT_METRIC: str = "integrity_audit"
 AUDIT_SCHEMA_VERSION: str = "1.0.0"
 
-#: Spec decision 15, verbatim: the one reason every ledger claim carries.
-GROUNDING_REASON: str = "supporting sources removed by sanitisation"
-#: CLAUDE.md §12.2 status the grounding axis reports for every claim.
+#: CLAUDE.md §12.2 status the grounding axis reports for every claim.  The
+#: status is the same for every candidate; the *reason* is not, and comes from
+#: :class:`~harness.candidate_provenance.CandidateProvenance`.
 GROUNDING_STATUS: str = "Unresolved"
-#: The ledger status the import contract fixes (spec PE-03); anything else is flagged.
-_LEDGER_EXPECTED_STATUS: str = "unresolved"
 
 #: The five checks, in the order the spec lists them and the report runs them.
 CHECKS: tuple[tuple[str, str], ...] = (
@@ -1410,7 +1420,24 @@ def _check_milestones(parsed: ParsedTables) -> CheckResult:
     return CheckResult(cid, title, compared, tuple(findings), notes, context)
 
 
-def _check_dcs(parsed: ParsedTables) -> CheckResult:
+def _same_participant(a: str, b: str) -> bool:
+    """Whether two names of a participant are the same name.
+
+    Both sides go through :func:`_norm`, the module's one normaliser — folded,
+    lower-cased, whitespace removed — and agree when either reads inside the
+    other. A host line names the institution and often adds a country or an
+    abbreviation the recruitment table omits, so containment is the comparison
+    the sources support and equality is not. Used only where the candidate's
+    provenance says the identifiers are the submitted document's own; an empty
+    name on either side agrees with nothing.
+    """
+    x, y = _norm(a), _norm(b)
+    if not x or not y:
+        return False
+    return x in y or y in x
+
+
+def _check_dcs(parsed: ParsedTables, provenance: CandidateProvenance) -> CheckResult:
     cid, title = CHECKS[3]
     findings: list[Finding] = []
     compared = 0
@@ -1420,6 +1447,7 @@ def _check_dcs(parsed: ParsedTables) -> CheckResult:
     wp_ends = [b.window[1] for b in parsed.wp_blocks if b.window is not None]
     latest_wp_end = max(wp_ends) if wp_ends else None
     appointments_read = 0
+    identities_compared = 0
     outlasting: list[tuple[str, int]] = []
     if table or projects:
         compared += 1
@@ -1439,15 +1467,26 @@ def _check_dcs(parsed: ParsedTables) -> CheckResult:
         if p.host is None:
             findings.append(Finding(cid, KIND_MISSING_FIELD, subject, f"{subject}: the 1.1 project has no Host line",
                                     (p.where,)))
-        else:
+        elif not provenance.identities_are_comparable:
+            # The reason the two cannot be compared is the imported document's,
+            # not the audit's: V05 derives it from the candidate's provenance.
             findings.append(Finding(
                 cid, KIND_NOT_COMPARABLE, subject,
                 f"{subject}: the table names recruiting participant {d['recruiting']!r}; the 1.1 project "
-                f"describes its host as {p.host!r}. The identifiers were removed by sanitisation, so the "
-                f"two cannot be compared",
+                f"describes its host as {p.host!r}. {provenance.identity_statement}",
                 row.where + (p.where,), (row.text[:160],),
                 {"recruiting_participant": d["recruiting"], "host_line": p.host},
             ))
+        else:
+            identities_compared += 1
+            if not _same_participant(d["recruiting"], p.host):
+                findings.append(Finding(
+                    cid, KIND_INCONSISTENCY, subject,
+                    f"{subject}: the table names recruiting participant {d['recruiting']!r}; the 1.1 "
+                    f"project describes its host as {p.host!r}, and neither name reads inside the other",
+                    row.where + (p.where,), (row.text[:160],),
+                    {"recruiting_participant": d["recruiting"], "host_line": p.host},
+                ))
         if d["start"] is None or d["duration"] is None:
             findings.append(Finding(cid, KIND_UNPARSED, subject,
                                     f"{subject}: start month or duration not parsable", row.where, (row.text[:160],)))
@@ -1493,6 +1532,13 @@ def _check_dcs(parsed: ParsedTables) -> CheckResult:
         notes += ("no DC table found; the check compared nothing",)
     if not projects:
         notes += ("no DC project blocks found in prose; the check compared nothing",)
+    if identities_compared:
+        notes += (
+            f"the candidate's recorded provenance says the identifiers are the submitted "
+            f"document's own, so {identities_compared} recruiting participant(s) were compared "
+            f"with the host line of their project in 1.1; a name reading inside the other is "
+            f"agreement, and nothing else about either name was judged",
+        )
     if outlasting:
         notes += (
             f"{len(outlasting)} of the {appointments_read} appointments with a readable start "
@@ -1572,13 +1618,21 @@ def _check_risks(parsed: ParsedTables) -> CheckResult:
     return CheckResult(cid, title, compared, tuple(findings), notes)
 
 
-def run_checks(parsed: ParsedTables) -> tuple[CheckResult, ...]:
-    """The five checks, in spec order, over one parse."""
+def run_checks(
+    parsed: ParsedTables, *, provenance: CandidateProvenance = UNSTATED_PROVENANCE
+) -> tuple[CheckResult, ...]:
+    """The five checks, in spec order, over one parse.
+
+    *provenance* decides one comparison only: whether the recruiting
+    participant may be compared with the host line, and what the audit says
+    when it may not. The default states that nothing was resolved, which is
+    the fail-closed reading — never another candidate's reason.
+    """
     return (
         _check_wp(parsed),
         _check_deliverables(parsed),
         _check_milestones(parsed),
-        _check_dcs(parsed),
+        _check_dcs(parsed, provenance),
         _check_risks(parsed),
     )
 
@@ -1588,15 +1642,22 @@ def run_checks(parsed: ParsedTables) -> tuple[CheckResult, ...]:
 # --------------------------------------------------------------------------- #
 
 
-def enumerate_grounding(candidate: Candidate) -> dict[str, Any]:
-    """Every ledger claim, reported Unresolved with :data:`GROUNDING_REASON`.
+def enumerate_grounding(
+    candidate: Candidate, *, provenance: CandidateProvenance = UNSTATED_PROVENANCE
+) -> dict[str, Any]:
+    """Every ledger claim, reported Unresolved for the reason *provenance* states.
 
     Reads each section artifact's ``validation_status.claim_statuses`` through
     the same loader the pack builder uses. No judge runs. Flags a vacuous
-    ledger and any entry whose declaration contradicts the import contract.
+    ledger and any entry whose declaration contradicts the status the
+    candidate's own import manifest declares its ledger carries. When no
+    manifest declared one, the audit has no contract to check against and says
+    so, rather than assuming every ledger must read ``unresolved``.
     """
     rows: list[dict[str, Any]] = []
     flags: list[str] = []
+    expected = provenance.expected_ledger_status
+    declared_statuses: set[str] = set()
     for sid in sorted(candidate.sections):
         try:
             claims: tuple[SectionClaim, ...] = load_section_claims(candidate.sections[sid])
@@ -1605,9 +1666,14 @@ def enumerate_grounding(candidate: Candidate) -> dict[str, Any]:
             continue
         for c in claims:
             declared = c.status
-            if declared != _LEDGER_EXPECTED_STATUS:
+            declared_statuses.add(declared)
+            # Both sides lower-cased: the expectation comes from the manifest in
+            # lower case, and a ledger spelling ``Unresolved`` declares the same
+            # status as ``unresolved``. A flag is for a real contradiction, not
+            # for a capital letter.
+            if expected is not None and declared.strip().lower() != expected:
                 flags.append(
-                    f"{sid}/{c.entry_key} declares status {declared!r}, not {_LEDGER_EXPECTED_STATUS!r}; "
+                    f"{sid}/{c.entry_key} declares status {declared!r}, not {expected!r}; "
                     "the declaration is not evidence and the claim is still reported Unresolved"
                 )
             rows.append({
@@ -1621,15 +1687,21 @@ def enumerate_grounding(candidate: Candidate) -> dict[str, Any]:
                 "assertion_location": c.source_ref,
                 "status": GROUNDING_STATUS,
                 "severity": SEVERITY_UNRESOLVED,
-                "reason": GROUNDING_REASON,
+                "reason": provenance.grounding_reason,
             })
     vacuous = not rows
     if vacuous:
         flags.append("grounding axis is vacuous: the ledger holds no claims to enumerate (spec PE-07)")
+    if rows and expected is None:
+        flags.append(
+            "no recorded provenance declares the status this candidate's claim ledger carries, so "
+            f"no entry was checked against one; the ledger declares {sorted(declared_statuses)} "
+            "and every claim is still reported Unresolved"
+        )
     return {
         "axis": "grounding",
         "judge": None,
-        "reason": GROUNDING_REASON,
+        "reason": provenance.grounding_reason,
         "assertion_location_note": (
             "assertion_location is the claim's verified span into the proposal's own page "
             "sources (spec PE-03): it locates the assertion and is not evidence for it"
@@ -1778,16 +1850,25 @@ def run_audit(
     baseline_dir: Path | str | None = None,
     out_dir: Path | str | None = None,
     graph_root: Path | str | None = None,
+    provenance: CandidateProvenance | None = None,
     clock: Clock | None = None,
 ) -> IntegrityAuditReport:
-    """Parse, check, enumerate and bind — one report, nothing written."""
+    """Parse, check, enumerate and bind — one report, nothing written.
+
+    *provenance* is the candidate's own, resolved by the caller from the
+    records its import wrote (:func:`harness.candidate_provenance.resolve_provenance`).
+    It supplies the grounding reason, the expected ledger status and the
+    identity wording. ``None`` means none was resolved, and every wording then
+    says so.
+    """
+    prov = provenance if provenance is not None else UNSTATED_PROVENANCE
     parsed = parse_candidate(candidate)
-    checks = run_checks(parsed)
-    grounding = enumerate_grounding(candidate)
+    checks = run_checks(parsed, provenance=prov)
+    grounding = enumerate_grounding(candidate, provenance=prov)
     digest = candidate_hash(candidate)
     snapshot_id = evidence.snapshot_id if evidence is not None else ""
     baseline = bind_baseline(baseline_dir, candidate_digest=digest, snapshot_id=snapshot_id)
-    flags: list[str] = list(grounding["flags"])
+    flags: list[str] = list(prov.flags) + list(grounding["flags"])
     if baseline["status"] in (BASELINE_REDERIVED, BASELINE_OTHER_CANDIDATE):
         flags.append(f"baseline: {baseline['statement']}")
     writes: list[str] = []

@@ -450,6 +450,7 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Module command (`preflight`, `assess`, `verify`, `freeze`, `audit`, `compare`, `review`, `diff`) | `py -3.10 -m harness.commands.blind_assessment` |
 | Frozen baseline: conditions, byte copy, freeze record, hash-checked loader | `harness/blind_baseline.py`; `--baseline-dir <dir>/blind_baseline_<sha12>.json` + `.freeze.json` |
 | Integrity audit: five consistency checks over parsed rows, grounding axis Unresolved, baseline binding | `harness/integrity_audit.py`; reports `<out-dir>/integrity_<hash12>_<NNNN>.json` |
+| Candidate provenance: the grounding cause, the identity scope and the expected ledger status one candidate's own import records state | `harness/candidate_provenance.py`; reads the import manifest and the fidelity register it names |
 | ESR comparison: one row per historical observation, declared dispositions resolved against the frozen baseline, scores compared apart | `harness/esr_comparison.py`; `<out-dir>/comparison_<sha12>_<NNNN>.json` + `revisions_<sha12>_<NNNN>.json` |
 | Operator review: a written comparison rendered for a human, every reference re-resolved, counts recomputed, agreement declared | `harness/operator_review.py`; `<out-dir>/operator_review_<sha12>_<NNNN>.md` + `operator_decisions_<sha12>_<NNNN>.md` |
 | Comparison diff: what moved between a comparison and its successor — dispositions, citations, counts, priorities | `harness/comparison_diff.py`; `<out-dir>/review_diff_<sha12>_<NNNN>.json` + `.md` |
@@ -675,7 +676,9 @@ deliverables it names (naming none is an inventory entry in the check's
 `context`, with the related packages' deliverable months beside it, and not a
 finding — operator decision D11, below); the DC
 table against the 1.1 projects (the recruiting participant against the host
-line is *not comparable* after sanitisation and is reported as such); the
+line is compared only when the candidate's own records say the identifiers are
+the submitted document's own, and is otherwise *not comparable* for the reason
+those records state — ticket V05, below); the
 risk table against mitigations named in prose, and whether any row states a
 threshold. Every finding has a `kind` from a closed set (`inconsistency`,
 `missing_field`, `unparsed_cell`, `undeclared_dependency`, `out_of_window`,
@@ -747,12 +750,37 @@ finding says. Original text, source offsets, assertion locations and candidate
 hashes are untouched.
 
 The grounding axis enumerates the ledger (`validation_status.claim_statuses`)
-and reports every claim `Unresolved` with the reason *supporting sources
-removed by sanitisation* (spec decision 15). No judge runs. A vacuous ledger
-is flagged; a ledger entry declaring a status other than `unresolved` is
-flagged with its declaration visible and still reported Unresolved. The
-ledger's `source_ref` is the claim's own verified span into the proposal's
-page sources, carried as `assertion_location`, never treated as a source.
+and reports every claim `Unresolved` (spec decision 15). No judge runs. A
+vacuous ledger is flagged. The ledger's `source_ref` is the claim's own
+verified span into the proposal's page sources, carried as
+`assertion_location`, never treated as a source.
+
+**The reason is the candidate's, not the audit's (ticket V05).**
+`candidate_provenance.py` derives it from the records that candidate's import
+wrote: the import manifest under
+`<graph-root>/docs/tier4_orchestration_state/dev_graph/imports/`, matched by
+the node id being audited, and the fidelity register it names. Three
+statements must agree before the audit may say *supporting sources removed by
+sanitisation*: the register declares the citations removed, the importer
+measured no citation marker in the bytes, and the register declares the file is
+not the submitted document. A measured marker count above zero gives the
+sources-present reason instead — the candidate cites its sources and nothing
+here resolves them. Anything else, a missing manifest included, gives an
+explicitly Unresolved reason and a flag; no other document's explanation is
+borrowed. A declared value is read by its leading word against a closed
+vocabulary, so a phrasing the vocabulary does not hold produces a stated gap
+rather than a guess. The same records supply the identity scope (whether the
+host line may be compared with the recruitment table at all) and the status the
+ledger is expected to declare: an entry contradicting it is flagged with its
+declaration visible and still reported Unresolved, and without a manifest there
+is no expectation to contradict, which is itself flagged. `--candidate-provenance`
+names the manifest for the directory route; a named path that does not resolve
+is a refusal. The reason the two committed sanitised audits carry is what their
+own records derive: a test re-derives the grounding axis and every identity
+finding of both, byte-equal, and the whole check payload of the current
+revision's audit. The first copy's other findings are from before D11 and R03
+and do not reproduce under the current checks; the same test enumerates the
+twenty-seven they retired.
 
 The audit writes only its report, and the command rebuilds the snapshot after
 the write to show the id did not move. With `--baseline-dir` it loads the

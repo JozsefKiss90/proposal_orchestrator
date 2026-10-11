@@ -455,16 +455,48 @@ class TestTheDependencyGate:
         assert "V02c criterion 1" in amendment
         assert "xclu" in amendment, "the scoped exclusion is not named as one"
 
-    def test_neither_reconciled_criterion_is_checked(self, ledger: str) -> None:
-        """A shared constraint: a scoped exception is not a pass, and a box is
-        checked only when its closure evidence exists."""
-        for ticket, fragment in (
-            ("## V02a ", "the V05 provenance-derived wording"),
-            ("## V02c ", "the `confirmation_checklist` contract agree"),
-        ):
-            items = [i for i in _checkbox_items(_section(ledger, ticket)) if fragment in i]
-            assert items, (ticket, fragment)
-            assert items[0].startswith("- [ ]"), items[0]
+    def test_a_criterion_conceding_partial_reproduction_is_never_checked(self, ledger: str) -> None:
+        """The same shared constraint, in the place V05 could have broken it.
+        V05's reproduction criterion is met for everything its own derivation
+        produces and not met for the first copy's pre-D11/R03 findings. A box
+        that has to explain what does not reproduce is not a pass, so it stays
+        open and says who could close it."""
+        fragment = "reproduce byte-equal"
+        items = [i for i in _checkbox_items(_section(ledger, "## V05 ")) if fragment in i]
+        assert items, fragment
+        assert items[0].startswith("- [ ]"), items[0]
+        assert "not V05's to close" in items[0], "an open box must say whose it is"
+
+    def test_the_excluded_v02c_criterion_is_never_checked(self, ledger: str) -> None:
+        """A shared constraint: a scoped exception is not a pass. V02c's
+        real-file half has no dataset to agree with, so its box stays open for
+        as long as the exclusion stands."""
+        fragment = "the `confirmation_checklist` contract agree"
+        items = [i for i in _checkbox_items(_section(ledger, "## V02c ")) if fragment in i]
+        assert items, fragment
+        assert items[0].startswith("- [ ]"), items[0]
+
+    def test_the_transferred_v02a_criterion_is_checked_with_its_closure_evidence(
+        self, ledger: str
+    ) -> None:
+        """The other shared constraint: a box is checked only when its closure
+        evidence exists. V05 derived the wording on 2026-10-12 and closed this
+        criterion, so both the transferring and the receiving box are checked
+        and both name the report that closed them."""
+        report = "plans/reports/v05_audit_grounding_provenance_2026-10-12.md"
+        assert (REPO_ROOT / report).is_file(), f"the closure evidence is not committed: {report}"
+        transferred = [
+            i for i in _checkbox_items(_section(ledger, "## V02a "))
+            if "the V05 provenance-derived wording" in i
+        ]
+        assert transferred and transferred[0].startswith("- [x]"), transferred
+        assert "v05_audit_grounding_provenance" in transferred[0]
+        received = [
+            i for i in _checkbox_items(_section(ledger, "## V05 "))
+            if "Inherited from V02a criterion 2" in i
+        ]
+        assert received and received[0].startswith("- [x]"), received
+        assert "Closed 2026-10-12" in received[0]
 
     def test_the_excluded_v02c_criterion_is_traceable_to_a_lane_exclusion(
         self, lane: lanes.Lane, dispositions: str

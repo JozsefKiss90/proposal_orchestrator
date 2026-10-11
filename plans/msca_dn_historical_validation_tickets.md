@@ -175,9 +175,10 @@ these modules go green or each residual failure is explained as a real defect wi
 
 - [x] The import, workspace, fidelity-register and adoption fixture failures and setup errors are
       resolved, and the count is compared against the audit's 29 failures and 43 errors.
-- [ ] The two integrity-audit integration failures pass against the reproduced document identity and
-      the V05 provenance-derived wording. **Open; owner V05.** The first half holds. The second half
-      is V05's to close, and V05 carries it as its own sixth criterion.
+- [x] The two integrity-audit integration failures pass against the reproduced document identity and
+      the V05 provenance-derived wording. **Closed by V05 on 2026-10-12.** The first half held from
+      2026-10-09. V05 carried the second half as its own sixth criterion and closed it; evidence
+      `plans/reports/v05_audit_grounding_provenance_2026-10-12.md` section 4.
 - [x] Any residual failure is classified as a real defect with a named cause, not carried as
       pre-existing without evidence.
 - [x] No fixture is edited to encode a hash the importer no longer produces.
@@ -186,6 +187,9 @@ these modules go green or each residual failure is explained as a real defect wi
 
 
 **Status 2026-10-09.** Three of four criteria closed. Criterion 2 stays open: both integrity-audit checks pass against the reproduced document identity, but under the existing wording, because V05 is open and no wording was derived from candidate provenance. It closes with V05. Evidence: `plans/reports/v02_focused_suite_completion_2026-10-09.md`.
+
+**Status 2026-10-12.** Four of four criteria closed. V05 landed and criterion 2 closed with it, so V02a
+is complete. Evidence: `plans/reports/v05_audit_grounding_provenance_2026-10-12.md`.
 
 ## V02b — Pair the claim-ledger and evidence-pack real-data fixtures
 
@@ -376,24 +380,49 @@ original carries references and real identities.
 
 ### Acceptance criteria
 
-- [ ] The grounding reason and the host-identity explanations derive from the imported candidate's
+- [x] The grounding reason and the host-identity explanations derive from the imported candidate's
       recorded provenance and capabilities, not from a constant applied to every document.
-- [ ] Expected claim status comes from the candidate's own ledger rather than a hard-coded `unresolved`
-      assumption.
-- [ ] Table schema and identity comparisons are revalidated for a document carrying references and real
+- [x] Expected claim status comes from the candidate's own ledger rather than a hard-coded `unresolved`
+      assumption. **Source substitution, declared.** The expectation is read from the candidate's own
+      import manifest (`claims.declared_status`), which is the import's declaration *about* that
+      ledger, not from the ledger array itself. Reading the ledger as its own expectation is circular:
+      every entry would then agree with itself and no contradiction could ever be reported. Without a
+      manifest there is no expectation and the audit says so. Report section 3.
+- [x] Table schema and identity comparisons are revalidated for a document carrying references and real
       identities. An anonymised-host assumption is never applied as an original-document rule.
 - [ ] Both committed sanitised audits, `integrity_242f1afb02c8_0003.json` and
-      `integrity_13ad3ad81d7e_0001.json`, reproduce byte-equal.
-- [ ] A candidate whose provenance does not state a grounding cause yields an explicit Unresolved
+      `integrity_13ad3ad81d7e_0001.json`, reproduce byte-equal. **Open, and not V05's to close.**
+      Everything V05's derivation produces reproduces byte-equal for both: the whole grounding axis,
+      and every identity finding. The current revision's audit also reproduces its whole five-check
+      payload. The first copy's audit does not reproduce in full, and did not before V05 either — it
+      predates operator decision D11 and ticket R03, which retired twenty-seven of its findings. The
+      twenty-seven are enumerated by name in
+      `tests/harness/test_integrity_audit.py::TestTheCommittedAudits::test_the_first_copys_payload_differs_only_by_the_retired_rules`,
+      so the divergence is measured, not asserted. Closing the box needs either a successor audit over
+      the first copy under the current rules, which is a new artifact and the operator's decision, or
+      an amendment to this criterion. Neither is V05's. Both files are unedited and pinned by sha256.
+      Report section 5.
+- [x] A candidate whose provenance does not state a grounding cause yields an explicit Unresolved
       reason, not a borrowed one.
-- [ ] **Inherited from V02a criterion 2.** The two integrity-audit integration checks pass against the
+- [x] **Inherited from V02a criterion 2.** The two integrity-audit integration checks pass against the
       provenance-derived wording, not only against the reproduced document identity. V02a closed its
       first half on 2026-10-09 and left this half open; V03 transferred it here rather than closing it
       as a pass. Evidence: `plans/reports/v02_focused_suite_completion_2026-10-09.md` and
-      `plans/reports/v03_acceptance_lane_completion_2026-10-09.md`.
+      `plans/reports/v03_acceptance_lane_completion_2026-10-09.md`. **Closed 2026-10-12.** No earlier
+      record resolves "the two checks" to test identifiers, so report section 4 names the two
+      integration checks that depend on both the identity and the wording, and binds both committed
+      audits byte-equal besides.
 
 **Verification.** Regenerate both committed audits and diff the bytes. Add a test that a non-sanitised
 candidate configuration produces a different, provenance-derived reason.
+
+**Status 2026-10-12.** Five of six criteria closed. `harness/candidate_provenance.py` derives the
+grounding cause, the identity scope and the expected ledger status from each candidate's own import
+manifest and fidelity register. The persisted report gained no key, which is what keeps the committed
+audits reproducible. Criterion 4 stays open for the reason written in its own box, and it is not read
+as a pass anywhere. F06 closes: the wording no longer comes from a constant. G4 does not close — V06 is
+still open. Evidence: `plans/reports/v05_audit_grounding_provenance_2026-10-12.md`; decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-audit-grounding-provenance_2026-10-12.json`.
 
 ## V06 — Declare the grounding scope in preflight, report and freeze
 

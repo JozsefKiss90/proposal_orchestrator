@@ -1,0 +1,80 @@
+{
+ "record_type": "decision",
+ "id": "msca-dn-audit-grounding-provenance_2026-10-12",
+ "date": "2026-10-12",
+ "branch": "msca-dn-pre-eval",
+ "ticket": "V05 of plans/msca_dn_historical_validation_tickets.md",
+ "closes": "finding F06 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md, and criterion 2 of V02a, transferred to V05 by plans/reports/v03_acceptance_lane_completion_2026-10-09.md",
+ "milestone": "MSCA-DN historical validation, gate G4: the integrity audit states the true reason for whichever candidate it reads, so the same code can describe the official original without misstating why corroboration is missing",
+ "authority": "CLAUDE.md §9.4 (a decision affecting future interpretation is written down), §9.5 (an output is reproducible from its documented inputs), §12.1 (an output names its inputs by file), §12.2 (Confirmed, Inferred, Assumed, Unresolved), §12.4 (a missing input is a declared gap, never a papered-over completion), §15 (an explicit failure beats a fabricated completion); harness/HARNESS.md (out-of-band QA, never a runtime gate); spec decision 15 of plans/msca_dn_pre_evaluation_spec.md, which the wording of the grounding axis implements.",
+ "problem": {
+  "declared_status": "Confirmed",
+  "basis": "read at 0b281a4 in harness/integrity_audit.py before the change: GROUNDING_REASON, _LEDGER_EXPECTED_STATUS, and the not_comparable detail string of _check_dcs",
+  "statement": "Three statements the audit made about every candidate were module constants rather than facts about the document it read.",
+  "constants": {
+   "grounding_reason": "GROUNDING_REASON = 'supporting sources removed by sanitisation', written into the axis and into all 45 rows",
+   "expected_ledger_status": "_LEDGER_EXPECTED_STATUS = 'unresolved'; any other declaration was flagged as contradicting the import contract",
+   "identity_explanation": "'The identifiers were removed by sanitisation, so the two cannot be compared', appended to every DC host finding"
+  },
+  "why_it_matters": "Applied unchanged to the official original, which carries its references and its real identities, all three would be false: the sources were never removed, the ledger's declared status is the original import's to state, and the host line would in fact be comparable with the recruitment table. A false reason in an audit is worse than no audit."
+ },
+ "decision": {
+  "declared_status": "Confirmed",
+  "basis": "implemented in harness/candidate_provenance.py and harness/integrity_audit.py; 174 checks in tests/harness/test_candidate_provenance.py (48) and tests/harness/test_integrity_audit.py (126)",
+  "statement": "The grounding reason, the identity scope and the expected ledger status are derived per candidate from the records that candidate's own import wrote, and a candidate whose records state no cause gets an explicitly Unresolved reason rather than another document's.",
+  "records_read": [
+   "the import manifest under <graph root>/docs/tier4_orchestration_state/dev_graph/imports/, matched by document.node_id so one revision's manifest is never read for another's",
+   "the fidelity register that manifest names in candidate.fidelity_register: its provenance.transformation half (the operator's declaration) and its derived half (the importer's measurement over the stored bytes)"
+  ],
+  "grounding_causes": {
+   "supporting_sources_removed_by_sanitisation": "the register declares the citations removed, the importer measured no citation marker, and the register declares the file is not the submitted document. Reason: 'supporting sources removed by sanitisation' — byte-identical to the wording both committed sanitised audits carry.",
+   "supporting_sources_present_and_unresolved": "a measured citation-marker count above zero. Reason: the candidate carries source markers and no imported-claim route resolves them. The X01 route the ledger defers is what would change this.",
+   "unstated": "anything else, a missing manifest included. Reason: the cause is Unresolved. No other candidate's explanation is borrowed, and the gap is flagged, which moves the command's exit code to 1."
+  },
+  "a_measurement_governs_a_declaration": "The declared transformation and the importer's own counts are different kinds of evidence. Where they disagree the measurement decides the cause and the disagreement is flagged, never silently resolved (CLAUDE.md §12.3).",
+  "reading_a_declared_value": "A declared transformation field is prose. Only its leading word is read, against a closed vocabulary, after an optional leading 'all'. A phrasing the vocabulary does not hold yields an explicit gap and a flag, not a guess. The rule is deliberately narrow: it can fail to recognise, and it cannot invent.",
+  "identity_comparison": "identifiers_as_submitted is the only scope under which the recruiting participant may be compared with the host line of its project in 1.1. The comparison is folded, case-insensitive and containment-based, because a host line names the institution and often adds a country or an abbreviation the recruitment table omits; a disagreement is an inconsistency naming both values, and agreement is recorded in the check's notes. identifiers_generalised and identifiers_unstated both report not_comparable, each with its own reason.",
+  "wordings_are_derived_not_stored": "CandidateProvenance stores the cause and the scope; the reason and the identity statement are properties over GROUNDING_REASONS and IDENTITY_STATEMENTS. A record carrying one cause and another cause's reason cannot be constructed at all, which is a stronger guarantee than rejecting one in __post_init__."
+ },
+ "report_schema": {
+  "declared_status": "Confirmed",
+  "basis": "AUDIT_SCHEMA_VERSION is unchanged at 1.0.0 and the regenerated payloads are byte-equal to the committed ones",
+  "statement": "No key was added to the persisted audit report, so the two committed sanitised audits stay reproducible byte for byte.",
+  "where_the_derivation_is_visible": "the command prints the cause, the records read and the basis lines beside the rendered report; the records themselves are committed, so the reason in any report can be re-derived from them."
+ },
+ "reproduction": {
+  "declared_status": "Confirmed",
+  "basis": "tests/harness/test_integrity_audit.py::TestTheCommittedAudits, run under the V01 environment pin",
+  "integrity_242f1afb02c8_0003.json": "grounding axis and the whole five-check payload reproduce byte-equal from the candidate it describes, with the wording derived from that candidate's own records",
+  "integrity_13ad3ad81d7e_0001.json": "grounding axis and every identity finding reproduce byte-equal. Its other findings do not, and are not claimed to: that audit predates operator decision D11 and ticket R03, which retired the sixteen undeclared_dependency findings, the nine appointment overruns and the two whole-cohort package sets. The difference is enumerated in the test and is not V05's.",
+  "committed_bytes": "both files are pinned by sha256 in the test, so an edit to either historical audit fails a check rather than passing quietly",
+  "criterion_4_stays_open": "The ticket's criterion 4 asks that both committed audits reproduce byte-equal. It is met for everything this derivation produces and not met for the first copy's pre-D11/R03 findings, so the box stays open and names what does not reproduce. A box that has to explain its own exception is not a pass (the ledger's shared constraint, and CLAUDE.md 13.7 and 15). Closing it needs a successor audit over the first copy under the current rules, which is a new artifact and the operator's decision, or an amendment to the criterion. tests/harness/test_acceptance_lane.py::TestTheDependencyGate::test_a_criterion_conceding_partial_reproduction_is_never_checked fails if it is ever checked while it still explains what does not reproduce."
+ },
+ "inherited_criterion": {
+  "declared_status": "Confirmed",
+  "basis": "plans/reports/v05_audit_grounding_provenance_2026-10-12.md section 4",
+  "statement": "V02a criterion 2 is closed here. Neither the ledger, the V02 report nor the readiness audit resolves 'the two integrity-audit integration checks' to test identifiers, so the two checks that depend on both the document identity and the wording are named in the report, and both committed audits are additionally bound byte-equal, which is stronger than the criterion asks."
+ },
+ "not_evidence_of": [
+  "that the official original has been imported, audited or validated. V07 and V08 externalise the document configuration; V09 is the operator's.",
+  "that any claim in any candidate is corroborated. Every claim stays Unresolved; only the stated reason changed.",
+  "a grounding scope declaration in the preflight, report and freeze. That is V06, still open.",
+  "a new assessor run. No quota was spent and the 74.60 baseline is untouched.",
+  "a closed criterion 4, or a closed gate G4. Five of the six V05 criteria are closed; criterion 4 stays open per reproduction.criterion_4_stays_open, and G4 additionally waits on V06.",
+  "an exercised identity comparison over real data. No committed candidate declares its identifiers as submitted, so that branch is exercised by fixtures only."
+ ],
+ "impacted_components": [
+  "harness/candidate_provenance.py (new)",
+  "harness/integrity_audit.py (run_checks, enumerate_grounding, run_audit, _check_dcs; GROUNDING_REASON and _LEDGER_EXPECTED_STATUS removed)",
+  "harness/commands/blind_assessment.py (--candidate-provenance, provenance resolution and rendering, CandidateProvenanceError in the fail-closed error set)",
+  "harness/HARNESS.md, harness/ACCEPTANCE_LANE.md, harness/acceptance_lanes/msca_dn_historical.json",
+  "tests/harness/test_candidate_provenance.py (new), tests/harness/test_integrity_audit.py"
+ ],
+ "declared_deviations": {
+  "declared_status": "Confirmed",
+  "basis": "named in the ticket boxes and in plans/reports/v05_audit_grounding_provenance_2026-10-12.md section 3",
+  "expected_ledger_status_source": "Criterion 2 says the expected claim status comes from 'the candidate's own ledger'. The implementation reads it from the candidate's own import manifest (claims.declared_status), which is the import's declaration ABOUT that ledger, not from the ledger array (validation_status.claim_statuses). Reading the ledger as its own expectation is circular: every entry would agree with itself and no contradiction could ever be reported. The substitution is recorded in the ticket box rather than left implicit.",
+  "identity_containment_rule": "Criterion 3 forbids applying an anonymised-host assumption as an original-document rule, so under identifiers_as_submitted the audit must actually compare the two names rather than only re-word its refusal. How to compare is a judgment the criterion does not fix. Containment over the module's own normaliser (_norm: folded, lower-cased, whitespace removed) was chosen over equality because a host line names the institution and often adds a country or an abbreviation the recruitment table omits; equality would report a finding on every row of the original. The rule judges nothing else about either name. No committed candidate declares its identifiers as submitted, so the branch is exercised by fixtures only.",
+  "render_provenance": "Not asked for by the ticket. The persisted report deliberately gained no key, which is what keeps the committed audits reproducible, so the derivation would otherwise be invisible to a reader of a new audit. render_provenance prints the cause, the records read and one basis line per statement beside the rendered report, which is the CLAUDE.md 12.1 trail for the reason the report carries. It writes nothing."
+ }
+}

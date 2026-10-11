@@ -64,8 +64,10 @@ truncated pack, an incomplete package, a leak); ``2`` could not run.
 ``freeze``: ``0`` frozen; ``2`` refused, naming every failed condition,
 nothing written.  ``audit``: ``0`` written with no flag; ``1`` written with
 flags the operator should read (a vacuous ledger, a ledger entry contradicting
-the import contract, a re-derived baseline, a parse failure); ``2`` could not
-run.  Findings never move the exit code: they are the product, not a verdict.
+the status its import records declare, no provenance record for the candidate
+at all, a re-derived baseline, a parse failure); ``2`` could not run — a
+``--candidate-provenance`` path that does not resolve included.  Findings never
+move the exit code: they are the product, not a verdict.
 ``review``: ``0`` both artifacts written; ``2`` refused — an input that moved
 under the comparison, a reference that no longer resolves, a count that
 disagrees with the comparison's summary, or a disputed row with no question
@@ -104,6 +106,15 @@ from harness.blind_assessment import (
     write_report,
 )
 from harness.blind_baseline import freeze_baseline, load_frozen_baseline, render_freeze
+from harness.candidate_provenance import (
+    IMPORT_MANIFESTS_REL as CANDIDATE_IMPORT_MANIFESTS_REL,
+)
+from harness.candidate_provenance import (
+    CandidateProvenance,
+    CandidateProvenanceError,
+    render_provenance,
+    resolve_provenance,
+)
 from harness.integrity_audit import render_audit, run_audit, write_audit
 from harness.esr_comparison import (
     EsrComparisonError,
@@ -193,6 +204,7 @@ _CLI_ERRORS = (
     JudgeError,
     LeakageScanError,
     ResponseCacheError,
+    CandidateProvenanceError,
     OSError,
 )
 
@@ -520,6 +532,17 @@ def _parser() -> argparse.ArgumentParser:
     p_audit.add_argument("--out-dir", default=str(DEFAULT_REPORTS_DIR),
                          help="directory for the new audit report (never overwritten)")
     p_audit.add_argument(
+        "--candidate-provenance", default=None,
+        help=(
+            "the candidate's import manifest, from which the grounding reason, the expected "
+            "ledger status and the identity wording are derived (relative to --repo-root; "
+            "default: the manifest under <graph-root>/"
+            f"{CANDIDATE_IMPORT_MANIFESTS_REL} whose document.node_id is the audited "
+            "document). Without one the report states that the cause is Unresolved and "
+            "borrows no other document's reason"
+        ),
+    )
+    p_audit.add_argument(
         "--baseline-dir", default=None,
         help=(
             "the frozen blind baseline to bind to (relative to --repo-root). The report "
@@ -633,6 +656,39 @@ def _build_evidence(
     )
 
 
+def _audit_provenance(
+    args: argparse.Namespace,
+    evidence: BlindEvidence | None,
+    graph_root: Path,
+    repo_root: Path,
+) -> CandidateProvenance:
+    """The audited candidate's own provenance, or an explicitly unstated one.
+
+    ``--candidate-provenance`` names a manifest, and a path that does not
+    resolve is a refusal. Otherwise the document route looks the manifest up by
+    the node id it is auditing, and the directory route by the document id when
+    exactly one revision's manifest is present. Nothing found: the report says
+    the cause is Unresolved and derives no wording from a record it did not
+    read.
+    """
+    manifest = None
+    if args.candidate_provenance:
+        manifest = Path(args.candidate_provenance)
+        if not manifest.is_absolute():
+            manifest = repo_root / manifest
+    document_id = evidence.document_id if evidence is not None else ""
+    node_id = evidence.document if evidence is not None else ""
+    if node_id == document_id:
+        node_id = ""
+    return resolve_provenance(
+        repo_root=repo_root,
+        manifest_path=manifest,
+        graph_root=graph_root,
+        node_id=node_id,
+        document_id=document_id,
+    )
+
+
 def _audit(
     args: argparse.Namespace,
     bundle: ProfileBundle,
@@ -648,6 +704,7 @@ def _audit(
     evidence = _build_evidence(args, bundle, graph_root, out_dir)
     candidate_dir = evidence.candidate_dir if evidence is not None else Path(args.candidate)
     candidate = load_candidate(candidate_dir, bundle.profile)
+    provenance = _audit_provenance(args, evidence, graph_root, repo_root)
     baseline_dir = None
     if args.baseline_dir:
         baseline_dir = Path(args.baseline_dir)
@@ -662,10 +719,13 @@ def _audit(
         baseline_dir=baseline_dir,
         out_dir=out_dir,
         graph_root=graph_root if evidence is not None else None,
+        provenance=provenance,
         clock=clock,
     )
     path = write_audit(report, out_dir)
     print(render_audit(report.to_dict()))
+    print()
+    print(render_provenance(provenance))
     print(f"\naudit -> {path}")
     flags = list(report.flags)
     if evidence is not None:

@@ -26,6 +26,7 @@ from pathlib import Path
 
 import pytest
 
+import harness.candidate_provenance as cp
 import harness.commands.blind_assessment as cmd
 import harness.integrity_audit as ia
 from harness.blind_assessment import load_candidate
@@ -33,8 +34,9 @@ from harness.blind_baseline import (
     BASELINE_FREEZE_RECORD_TYPE,
     BASELINE_FREEZE_SCHEMA_VERSION,
 )
+from harness.evidence_preflight import file_sha256
 from harness.rubrics import load_profile_bundle
-from runner.atomic_write import atomic_write_json
+from runner.atomic_write import atomic_write_json, canonical_json_bytes
 from runner.dev_graph import build_snapshot, import_document
 from runner.paths import find_repo_root
 from tests.harness.test_blind_leakage import CANDIDATE, ESR_DOC, FIXTURE, FROZEN, _graph_profile
@@ -48,6 +50,23 @@ if DN_WORKSPACE.is_dir():  # the revision table names the PDFs and registers
 
 DN_MATERIALISED = REPO / "docs" / "tier4_orchestration_state" / "msca_dn" / "audit" / "candidates"
 
+#: What a sanitised derivative's own records derive (ticket V05).  Built here
+#: rather than read from files; the derivation from the records is
+#: ``tests/harness/test_candidate_provenance.py``, and the real committed
+#: records are exercised by :class:`TestTheCommittedAudits` below.
+SANITISED = cp.CandidateProvenance(
+    grounding_cause=cp.CAUSE_SANITISATION,
+    identity_scope=cp.IDENTITY_GENERALISED,
+    expected_ledger_status="unresolved",
+)
+
+#: What a document carrying its references and its real identities derives.
+REFERENCED = cp.CandidateProvenance(
+    grounding_cause=cp.CAUSE_SOURCES_PRESENT,
+    identity_scope=cp.IDENTITY_AS_SUBMITTED,
+    expected_ledger_status="unresolved",
+)
+
 
 def _dn_findings(revision) -> set[tuple[str, str, str]]:
     """Every finding the current rules give over one materialised DN candidate.
@@ -57,12 +76,14 @@ def _dn_findings(revision) -> set[tuple[str, str, str]]:
     """
     from harness.profile import load_profile
 
-    directory = DN_MATERIALISED / ie.node_id_of(REPO, revision)
+    node_id = ie.node_id_of(REPO, revision)
+    directory = DN_MATERIALISED / node_id
     assert directory.is_dir(), f"the materialised candidate is not committed: {directory}"
     candidate = load_candidate(directory, load_profile(DN_PROFILE))
+    provenance = cp.resolve_provenance(repo_root=REPO, graph_root=DN_WORKSPACE, node_id=node_id)
     return {
         (f.kind, f.subject, f.detail)
-        for c in ia.run_checks(ia.parse_candidate(candidate))
+        for c in ia.run_checks(ia.parse_candidate(candidate), provenance=provenance)
         for f in c.findings
     }
 
@@ -111,10 +132,10 @@ def _wp_block_combined(
     ]
 
 
-def _dc_project(n: int, title: str, wps: str, secondments: int = 2) -> list[str]:
+def _dc_project(n: int, title: str, wps: str, secondments: int = 2, host: str = "") -> list[str]:
     return [
         f"DC{n} – {title}",
-        f"Host: A university with expertise ({wps})",
+        f"Host: {host or 'A university with expertise'} ({wps})",
         "Objectives",
         "• Do things.",
         "Key Secondments",
@@ -658,10 +679,129 @@ class TestCheckDcs:
         ]
 
     def test_the_host_is_reported_not_comparable_with_both_values(self, tmp_path, profile):
-        f = _findings(_audit(tmp_path, profile, consistent_world()), "dc_table_vs_projects")
+        f = _findings(_audit(tmp_path, profile, consistent_world(), provenance=SANITISED),
+                      "dc_table_vs_projects")
         (x,) = [x for x in f if x.subject == "DC1" and x.kind == ia.KIND_NOT_COMPARABLE]
         assert x.context == {"recruiting_participant": "Beneficiary A",
                              "host_line": "A university with expertise (WP1, WP2)"}
+
+
+# --------------------------------------------------------------------------- #
+# The identity comparison (ticket V05)
+# --------------------------------------------------------------------------- #
+
+
+def _named_hosts_world() -> dict[str, list[str]]:
+    """The consistent world with each DC project's host line naming the
+    participant its recruitment row names."""
+    world = consistent_world()
+    world["S1"] = [
+        "Intro paragraph with no claim.",
+        *_dc_project(1, "First project", "WP1, WP2", host="Beneficiary A, a university"),
+        *_dc_project(2, "Second project", "WP2", host="Beneficiary B, a university"),
+        "Pertinence of the programme",
+    ]
+    return world
+
+
+class TestIdentityComparison:
+    """V05 criterion 3: an anonymised-host assumption is never applied as an
+    original document's rule. The comparison the audit may make depends on what
+    the candidate's provenance says about its identifiers, and on nothing else."""
+
+    def test_generalised_identifiers_are_not_comparable_for_that_reason(self, tmp_path, profile):
+        f = _findings(_audit(tmp_path, profile, _named_hosts_world(), provenance=SANITISED),
+                      "dc_table_vs_projects")
+        details = [x.detail for x in f if x.kind == ia.KIND_NOT_COMPARABLE]
+        assert len(details) == 2
+        assert all(d.endswith(cp.STATEMENT_GENERALISED) for d in details)
+
+    def test_unstated_identifiers_say_so_and_borrow_no_reason(self, tmp_path, profile):
+        f = _findings(_audit(tmp_path, profile, _named_hosts_world()), "dc_table_vs_projects")
+        details = [x.detail for x in f if x.kind == ia.KIND_NOT_COMPARABLE]
+        assert len(details) == 2
+        assert all(d.endswith(cp.STATEMENT_UNSTATED) for d in details)
+        assert not any("sanitis" in d for d in details)
+
+    def test_identifiers_as_submitted_are_compared_and_agree(self, tmp_path, profile):
+        report = _audit(tmp_path, profile, _named_hosts_world(), provenance=REFERENCED)
+        f = _findings(report, "dc_table_vs_projects")
+        assert not [x for x in f if x.kind == ia.KIND_NOT_COMPARABLE]
+        assert not [x for x in f if x.subject in ("DC1", "DC2") and x.kind == ia.KIND_INCONSISTENCY]
+        assert any(
+            "2 recruiting participant(s) were compared with the host line" in n
+            for n in _notes(report, "dc_table_vs_projects")
+        )
+
+    def test_a_disagreement_between_two_real_names_is_an_inconsistency(self, tmp_path, profile):
+        world = _named_hosts_world()
+        world["S1"] = [p.replace("Host: Beneficiary A, a university", "Host: Beneficiary C, a university")
+                       for p in world["S1"]]
+        f = _findings(_audit(tmp_path, profile, world, provenance=REFERENCED), "dc_table_vs_projects")
+        (x,) = [x for x in f if x.subject == "DC1" and x.kind == ia.KIND_INCONSISTENCY]
+        assert x.detail == (
+            "DC1: the table names recruiting participant 'Beneficiary A'; the 1.1 project "
+            "describes its host as 'Beneficiary C, a university (WP1, WP2)', and neither name "
+            "reads inside the other"
+        )
+        assert x.context == {"recruiting_participant": "Beneficiary A",
+                             "host_line": "Beneficiary C, a university (WP1, WP2)"}
+
+    def test_a_missing_host_line_is_still_a_missing_field_under_every_scope(self, tmp_path, profile):
+        world = _named_hosts_world()
+        world["S1"] = [p for p in world["S1"] if not p.startswith("Host: Beneficiary A")]
+        for provenance in (SANITISED, REFERENCED, cp.UNSTATED_PROVENANCE):
+            f = _findings(_audit(tmp_path, profile, world, provenance=provenance),
+                          "dc_table_vs_projects")
+            assert [x.detail for x in f if x.kind == ia.KIND_MISSING_FIELD] == [
+                "DC1: the 1.1 project has no Host line"
+            ]
+
+    def test_references_in_the_prose_do_not_change_what_the_tables_parse(self, tmp_path, profile):
+        """The other half of criterion 3: the table schema is revalidated for a
+        document that carries its citations. Bracketed markers, a DOI, a URL and
+        a reference list are prose; the rows, the header fields and the DC
+        projects parse exactly as they do without them."""
+        plain = _audit(tmp_path / "plain", profile, _named_hosts_world(), provenance=REFERENCED)
+        world = _named_hosts_world()
+        world["S1"] = [
+            p.replace("Provides a foundation.",
+                      "Provides a foundation [12], building on prior work [3, 4] "
+                      "(doi:10.1000/xyz123, https://example.org/paper).")
+            for p in world["S1"]
+        ] + [
+            "References",
+            "[3] An author and another. A title. A journal, 2024. doi:10.1000/abc",
+            "[12] A third author. Another title. https://example.org/other",
+        ]
+        cited = _audit(tmp_path / "cited", profile, world, provenance=REFERENCED)
+        assert cited.parse["tables"] == plain.parse["tables"]
+        assert (cited.parse["rows_rendered"], cited.parse["rows_parsed"], cited.parse["rows_merged"]) == (
+            plain.parse["rows_rendered"], plain.parse["rows_parsed"], plain.parse["rows_merged"]
+        )
+        assert cited.parse["wp_blocks"] == plain.parse["wp_blocks"]
+        assert cited.parse["dc_projects"] == plain.parse["dc_projects"]
+        assert cited.parse["unparsed"] == [] == plain.parse["unparsed"]
+        assert {(f.kind, f.subject) for f in cited.findings} == {
+            (f.kind, f.subject) for f in plain.findings
+        }
+        assert "sanitis" not in json.dumps(cited.to_dict())
+
+    @pytest.mark.parametrize(
+        "table_name,host_name,same",
+        [
+            ("Beneficiary A", "Beneficiary A", True),
+            ("Beneficiary A", "Beneficiary A, a university (WP1)", True),
+            ("University of Bene" + chr(0xFB01) + "t", "university of benefit, a place", True),
+            ("Beneficiary A", "Beneficiary B", False),
+            ("Beneficiary A", "", False),
+            ("", "Beneficiary A", False),
+        ],
+    )
+    def test_the_name_comparison_folds_cases_ligatures_and_containment(
+        self, table_name, host_name, same
+    ):
+        assert ia._same_participant(table_name, host_name) is same
 
 
 class TestCheckRisks:
@@ -727,27 +867,88 @@ class TestNoScore:
 
 
 class TestGrounding:
-    def test_every_claim_is_unresolved_for_the_one_reason(self, tmp_path, profile):
-        g = _audit(tmp_path, profile, consistent_world()).grounding
+    def test_every_claim_is_unresolved_for_the_candidates_own_reason(self, tmp_path, profile):
+        g = _audit(tmp_path, profile, consistent_world(), provenance=SANITISED).grounding
         assert g["claims_total"] == 6 and g["unresolved"] == 6 and g["vacuous"] is False
         assert g["judge"] is None and g["flags"] == []
         assert {r["status"] for r in g["rows"]} == {ia.GROUNDING_STATUS}
         assert {r["severity"] for r in g["rows"]} == {"unresolved"}
-        assert {r["reason"] for r in g["rows"]} == {ia.GROUNDING_REASON}
-        assert ia.GROUNDING_REASON == "supporting sources removed by sanitisation"
+        assert {r["reason"] for r in g["rows"]} == {"supporting sources removed by sanitisation"}
+        assert g["reason"] == "supporting sources removed by sanitisation"
+
+    def test_a_referenced_candidate_gets_its_own_reason(self, tmp_path, profile):
+        """V05 criterion 1: the reason states why *this* candidate's claims are
+        unresolved, and the sanitisation reason is not applied to a document
+        that lost nothing."""
+        g = _audit(tmp_path, profile, consistent_world(), provenance=REFERENCED).grounding
+        assert g["reason"] == cp.REASON_SOURCES_PRESENT
+        assert {r["reason"] for r in g["rows"]} == {cp.REASON_SOURCES_PRESENT}
+        assert "sanitis" not in json.dumps(g)
+        assert {r["status"] for r in g["rows"]} == {"Unresolved"}
+
+    def test_an_unstated_cause_is_reported_unresolved_not_borrowed(self, tmp_path, profile):
+        """V05 criterion 5."""
+        report = _audit(tmp_path, profile, consistent_world())
+        g = report.grounding
+        assert g["reason"] == cp.REASON_UNSTATED and "Unresolved" in g["reason"]
+        assert "sanitis" not in json.dumps(g)
+        assert {r["reason"] for r in g["rows"]} == {cp.REASON_UNSTATED}
+
+    def test_an_unresolved_provenance_still_reports_every_claim(self, tmp_path, profile):
+        g = _audit(tmp_path, profile, consistent_world()).grounding
+        assert g["claims_total"] == 6 and g["unresolved"] == 6 and g["vacuous"] is False
 
     def test_a_vacuous_ledger_is_flagged(self, tmp_path, profile):
         report = _audit(tmp_path, profile, consistent_world(), claims={"S1": [], "S2": [], "S3": []})
         assert report.grounding["vacuous"] is True and report.grounding["claims_total"] == 0
         assert any("vacuous" in f for f in report.flags)
 
-    def test_a_declaration_other_than_unresolved_is_flagged_and_still_unresolved(self, tmp_path, profile):
-        report = _audit(tmp_path, profile, consistent_world(),
+    def test_a_declaration_against_the_recorded_contract_is_flagged_and_still_unresolved(
+        self, tmp_path, profile
+    ):
+        report = _audit(tmp_path, profile, consistent_world(), provenance=SANITISED,
                         claims={"S1": _claims("S1", 1, status="confirmed", source_ref="docs/x.json")})
         (row,) = [r for r in report.grounding["rows"] if r["section_id"] == "S1"]
         assert row["declared_status"] == "confirmed" and row["status"] == "Unresolved"
         assert row["assertion_location"] == "docs/x.json"
-        assert [f for f in report.flags if "declares status 'confirmed'" in f]
+        assert [f for f in report.flags if "declares status 'confirmed', not 'unresolved'" in f]
+
+    def test_the_expected_status_is_the_one_the_candidates_provenance_records(
+        self, tmp_path, profile
+    ):
+        """V05 criterion 2: a ledger whose recorded contract is ``confirmed``
+        makes an ``unresolved`` entry the anomaly. The expectation is the
+        candidate's, so it cannot be a module constant."""
+        grounded = cp.CandidateProvenance(
+            grounding_cause=cp.CAUSE_SOURCES_PRESENT,
+            identity_scope=cp.IDENTITY_AS_SUBMITTED,
+            expected_ledger_status="confirmed",
+        )
+        report = _audit(tmp_path, profile, consistent_world(), provenance=grounded,
+                        claims={"S1": _claims("S1", 1, status="unresolved")})
+        assert [f for f in report.flags if "declares status 'unresolved', not 'confirmed'" in f]
+        assert {r["status"] for r in report.grounding["rows"]} == {"Unresolved"}
+
+    def test_a_capital_letter_is_not_a_contradiction(self, tmp_path, profile):
+        """Both sides of the comparison are lower case: the claim loader
+        lower-cases the ledger's status (``status_faithfulness`` line 271) and
+        the expectation arrives lower-cased from the manifest. A ledger
+        spelling ``Unresolved`` therefore declares the same status as
+        ``unresolved`` and raises no flag."""
+        report = _audit(tmp_path, profile, consistent_world(), provenance=SANITISED,
+                        claims={"S1": _claims("S1", 1, status="Unresolved")})
+        assert not [f for f in report.flags if "declares status" in f]
+        (row,) = [r for r in report.grounding["rows"] if r["section_id"] == "S1"]
+        assert row["declared_status"] == "unresolved"
+
+    def test_without_a_recorded_contract_no_entry_is_checked_against_one(self, tmp_path, profile):
+        report = _audit(tmp_path, profile, consistent_world(),
+                        claims={"S1": _claims("S1", 1, status="confirmed")})
+        assert not [f for f in report.flags if "not 'unresolved'" in f]
+        assert [
+            f for f in report.flags
+            if "no recorded provenance declares the status" in f and "'confirmed'" in f
+        ]
 
     def test_a_section_without_a_ledger_array_is_a_flag_not_a_crash(self, tmp_path, profile):
         cand = write_candidate(tmp_path, consistent_world())
@@ -826,12 +1027,46 @@ class TestBaseline:
 # --------------------------------------------------------------------------- #
 
 
+#: The register half of a sanitised candidate's import records: citations
+#: declared removed, none measured, identifiers generalised, not the submitted
+#: document. The three statements V05 needs before the audit may name
+#: sanitisation (``harness/candidate_provenance.py``).
+SANITISED_REGISTER = {
+    "record_type": "fidelity_register",
+    "provenance": {
+        "current_assessment_artifact": {"is_submitted_document": False},
+        "transformation": {
+            "citations": "all removed; no bracketed numbers, DOIs, URLs or reference list",
+            "identifiers": "generalised (acronym, partner names, people, places)",
+        },
+    },
+    "derived": {"citation_marker_counts": {"bracketed_numbers": 0, "doi": 0, "url": 0}},
+}
+
+
+def write_import_records(root: Path, *, document_id: str = "CAND-1", register: dict | None = None,
+                         declared_status: str = "Unresolved") -> Path:
+    """The import manifest and fidelity register the audit derives its wording
+    from, written under *root* as both the repo root and the graph root."""
+    register_rel = "docs/tier3_project_instantiation/source_materials/register.json"
+    atomic_write_json(register if register is not None else SANITISED_REGISTER, root / register_rel)
+    manifest = root / cp.IMPORT_MANIFESTS_REL / f"{document_id}.json"
+    atomic_write_json({
+        "record_type": "external_proposal_import_manifest",
+        "candidate": {"fidelity_register": register_rel},
+        "claims": {"declared_status": declared_status},
+        "document": {"document_id": document_id},
+    }, manifest)
+    return manifest
+
+
 @pytest.fixture
 def world(tmp_path: Path) -> Path:
     root = tmp_path / "repo"
     shutil.copytree(FIXTURE, root)
     import_document(root, CANDIDATE)
     import_document(root, ESR_DOC, state="submitted")
+    write_import_records(root)
     return root
 
 
@@ -915,6 +1150,49 @@ class TestCommand:
         for d in (d1, d2):
             d.pop("writes"), d.pop("candidate_path")
         assert d1 == d2
+
+    def test_the_report_carries_the_reason_the_candidates_records_derive(self, world, bundle, capsys):
+        _, _, data = _run(world, bundle)
+        assert data["grounding"]["reason"] == "supporting sources removed by sanitisation"
+        out = capsys.readouterr().out
+        assert f"grounding cause {cp.CAUSE_SANITISATION}" in out
+        assert "read: docs/tier4_orchestration_state/dev_graph/imports/CAND-1.json" in out
+        assert "basis: the register declares citations" in out
+
+    def test_without_import_records_the_reason_is_unresolved_and_flagged(self, world, bundle):
+        (world / cp.IMPORT_MANIFESTS_REL / "CAND-1.json").unlink()
+        code, _, data = _run(world, bundle)
+        assert code == 1
+        assert data["grounding"]["reason"] == cp.REASON_UNSTATED
+        assert any("no import manifest was found for CAND-1" in f for f in data["flags"])
+        assert not any("sanitis" in f for f in data["flags"])
+        # The contract flags are gone with the contract: nothing was checked
+        # against an expectation no record declares.
+        assert not any("not 'unresolved'" in f for f in data["flags"])
+        assert any("no recorded provenance declares the status" in f for f in data["flags"])
+
+    def test_a_named_manifest_carrying_references_changes_the_reason(self, world, bundle):
+        register = copy.deepcopy(SANITISED_REGISTER)
+        register["provenance"]["transformation"] = {
+            "citations": "retained", "identifiers": "unchanged",
+        }
+        register["provenance"]["current_assessment_artifact"] = {"is_submitted_document": True}
+        register["derived"]["citation_marker_counts"] = {"bracketed_numbers": 61, "doi": 4}
+        manifest = write_import_records(world, document_id="REFERENCED", register=register)
+        code, _, data = _run(world, bundle, "--candidate-provenance", str(manifest))
+        assert data["grounding"]["reason"] == cp.REASON_SOURCES_PRESENT
+        assert "sanitis" not in json.dumps(data)
+
+    def test_a_named_manifest_that_is_absent_fails_closed(self, world, bundle, capsys):
+        out = world.parent / "a"
+        code = cmd.main(
+            ["audit", "--document", "CAND-1", "--graph-root", str(world), "--out-dir", str(out),
+             "--repo-root", str(world), "--profile", str(bundle.profile.source_path),
+             "--candidate-provenance", "nowhere/manifest.json"],
+            clock=lambda: FROZEN,
+        )
+        assert code == 2 and not list(out.glob("integrity_*.json"))
+        assert "import manifest not found" in capsys.readouterr().err
 
     def test_the_loader_refuses_a_report_that_is_not_advisory(self, world, bundle):
         _, path, data = _run(world, bundle)
@@ -1139,11 +1417,125 @@ class TestMscaDnWorkspace:
         }
 
     def test_grounding_axis(self, report):
+        """The reason is derived from the candidate's own records (V05), and
+        what it derives is the wording the committed audits carry."""
         g = report["grounding"]
         assert g["claims_total"] == 45 and g["unresolved"] == 45 and g["vacuous"] is False
         assert {r["status"] for r in g["rows"]} == {"Unresolved"}
         assert {r["reason"] for r in g["rows"]} == {"supporting sources removed by sanitisation"}
         assert all(r["declared_status"] == "unresolved" for r in g["rows"])
+        assert report["flags"] == []
+
+    def test_the_hosts_are_not_comparable_for_the_reason_the_records_state(self, report):
+        (dcs,) = [c for c in report["checks"] if c["check_id"] == "dc_table_vs_projects"]
+        details = [f["detail"] for f in dcs["findings"] if f["kind"] == ia.KIND_NOT_COMPARABLE]
+        assert len(details) == 9
+        assert all(d.endswith(cp.STATEMENT_GENERALISED) for d in details)
+        # The comparison was not made, so nothing claims it was.
+        assert not any("were compared with the host line" in n for n in dcs["notes"])
 
     def test_no_baseline_yet_is_said(self, report):
         assert report["baseline"]["status"] == ia.BASELINE_NONE
+
+
+# --------------------------------------------------------------------------- #
+# The committed sanitised audits (ticket V05, criteria 4 and 6)
+# --------------------------------------------------------------------------- #
+
+
+#: The two committed sanitised audits, each with the materialised candidate it
+#: describes and the sha256 of its bytes.  Both are historical evidence: the
+#: hash is pinned so an edit to either fails here (the ledger's immutable-artifact
+#: constraint; ``.gitattributes`` keeps these trees byte-for-byte on checkout).
+COMMITTED_AUDITS = (
+    (
+        "integrity_242f1afb02c8_0003.json",
+        "MSCA-DN-2025_sanitised_part_b@b51a103520b58ded",
+        "a295e66fa39dce1857b4e03225de23775a087794dccb0b4407e5e03f9af799a9",
+    ),
+    (
+        "integrity_13ad3ad81d7e_0001.json",
+        "MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db",
+        "1b66a7cc0823b8e13692ec00aaebe632ad0c3bf775fe9d567c892c97864bff13",
+    ),
+)
+
+DN_AUDIT_DIR = REPO / "docs" / "tier4_orchestration_state" / "msca_dn" / "audit"
+
+
+def _regenerate(node_id: str) -> tuple[dict, tuple[dict, ...]]:
+    """The grounding axis and the five checks, re-derived over one committed
+    candidate with the provenance its own import records state."""
+    from harness.profile import load_profile
+
+    candidate = load_candidate(DN_MATERIALISED / node_id, load_profile(DN_PROFILE))
+    provenance = cp.resolve_provenance(repo_root=REPO, graph_root=DN_WORKSPACE, node_id=node_id)
+    assert provenance.grounding_cause == cp.CAUSE_SANITISATION
+    return (
+        ia.enumerate_grounding(candidate, provenance=provenance),
+        tuple(c.to_dict() for c in ia.run_checks(ia.parse_candidate(candidate), provenance=provenance)),
+    )
+
+
+@pytest.mark.skipif(not DN_WORKSPACE.is_dir(), reason="MSCA-DN workspace not on this branch")
+class TestTheCommittedAudits:
+    """V05 criterion 4, and criterion 6 inherited from V02a.
+
+    Both committed sanitised audits are reproduced from the candidate each
+    describes, with the wording derived from that candidate's own import
+    manifest and fidelity register rather than from a module constant. The
+    grounding axis of both, and every identity finding of both, come back
+    byte-equal. The whole check payload of the current revision's audit comes
+    back byte-equal too; the first copy's other findings are from before
+    decision D11 and ticket R03 changed what the checks emit, which
+    :meth:`TestMscaDnWorkspace.test_d11_retires_exactly_the_sixteen_undeclared_findings_of_the_r03_audit`
+    and its two neighbours pin, and which no V05 change touches.
+    """
+
+    @pytest.mark.parametrize("name,node_id,digest", COMMITTED_AUDITS)
+    def test_the_committed_bytes_are_untouched(self, name, node_id, digest):
+        assert file_sha256(DN_AUDIT_DIR / name) == digest
+
+    @pytest.mark.parametrize("name,node_id,digest", COMMITTED_AUDITS)
+    def test_the_grounding_axis_reproduces_byte_equal(self, name, node_id, digest):
+        committed = json.loads((DN_AUDIT_DIR / name).read_text(encoding="utf-8"))
+        grounding, _ = _regenerate(node_id)
+        assert canonical_json_bytes(grounding) == canonical_json_bytes(committed["grounding"])
+        assert grounding["reason"] == "supporting sources removed by sanitisation"
+
+    @pytest.mark.parametrize("name,node_id,digest", COMMITTED_AUDITS)
+    def test_every_identity_finding_reproduces_byte_equal(self, name, node_id, digest):
+        committed = json.loads((DN_AUDIT_DIR / name).read_text(encoding="utf-8"))
+        _, checks = _regenerate(node_id)
+        before = [f for c in committed["checks"] for f in c["findings"]
+                  if f["kind"] == ia.KIND_NOT_COMPARABLE]
+        after = [f for c in checks for f in c["findings"] if f["kind"] == ia.KIND_NOT_COMPARABLE]
+        assert len(before) == 9
+        assert canonical_json_bytes(after) == canonical_json_bytes(before)
+
+    def test_the_current_revisions_whole_check_payload_reproduces_byte_equal(self):
+        name, node_id, _ = COMMITTED_AUDITS[0]
+        committed = json.loads((DN_AUDIT_DIR / name).read_text(encoding="utf-8"))
+        _, checks = _regenerate(node_id)
+        assert canonical_json_bytes(checks) == canonical_json_bytes(committed["checks"])
+
+    def test_the_first_copys_payload_differs_only_by_the_retired_rules(self):
+        """Named rather than asserted as a pass: the first copy's audit predates
+        D11 and R03, so its other findings are not reproducible under the
+        current checks, and V05 is not what changed them."""
+        name, node_id, _ = COMMITTED_AUDITS[1]
+        committed = json.loads((DN_AUDIT_DIR / name).read_text(encoding="utf-8"))
+        _, checks = _regenerate(node_id)
+        before = {(f["kind"], f["subject"]) for c in committed["checks"] for f in c["findings"]}
+        after = {(f["kind"], f["subject"]) for c in checks for f in c["findings"]}
+        assert sorted(f"{k} {s}" for k, s in before - after) == sorted([
+            # R03: the whole-cohort package sets, compared in one direction now.
+            "inconsistency WP6", "inconsistency WP7",
+            # R03: an appointment period against a package window, now a note.
+            *[f"out_of_window DC{n}" for n in range(1, 10)],
+            # D11: a milestone naming no deliverable, now an inventory entry.
+            *[f"undeclared_dependency {m}" for m in (
+                "M0.1", "M0.2", "M0.3", "M1.1", "M1.2", "M2.1", "M2.2", "M3.1",
+                "M4.1", "M4.2", "M6.1", "M6.2", "M6.3", "M7.1", "M7.2", "M7.3")],
+        ])
+        assert not after - before
