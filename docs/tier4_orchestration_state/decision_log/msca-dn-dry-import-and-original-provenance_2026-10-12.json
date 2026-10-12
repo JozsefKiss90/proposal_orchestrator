@@ -1,0 +1,113 @@
+{
+ "record_type": "decision",
+ "id": "msca-dn-dry-import-and-original-provenance_2026-10-12",
+ "date": "2026-10-12",
+ "branch": "msca-dn-pre-eval",
+ "ticket": "V08 of plans/msca_dn_historical_validation_tickets.md",
+ "closes": "the review half of finding F02 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md. With V07's code half, F02 closes.",
+ "milestone": "MSCA-DN historical validation, gate G2: the official original is measured before it is imported, by an operator, against the PDF. Extraction accounting is recorded as accounting and never as fidelity, and the two zeros an extraction most readily produces are refused as proof of preservation.",
+ "authority": "CLAUDE.md §9.4 (a decision affecting future interpretation is written down), §9.5 (an output is reproducible from its documented inputs), §10.5 (a material claim names its source), §12.1 (an output names its inputs and flags its assumptions), §12.2 (Confirmed, Inferred, Assumed, Unresolved), §12.4 (a missing input is a declared gap, not a filled one), §13.3 (no project fact is invented), §15 (an explicit refusal beats a fabricated completion); finding F02 of the readiness audit.",
+ "problem": {
+  "declared_status": "Confirmed",
+  "basis": "measured against the fixture in tests/runner/test_dry_import.py, and against the committed derived half of the sanitised copy",
+  "statement": "Extraction accounting is not semantic fidelity. A balanced non-whitespace character count says that the importer dropped no character of the text it could see. It proves nothing about reading order, cell association, mathematical meaning, image content or figure completeness, and a deficit on one page can offset a surplus on another inside a total.",
+  "measured": "The V08 fixture carries a Gantt-shaped vector figure and a vector table. It measures zero embedded images on every page and zero character loss on every page, and it holds graphical evidence on both counts. A document whose figures were stripped measures the same two zeros.",
+  "why_it_matters": "The sanitised copy's derived half records 'images_on_any_page: 0' and a balanced accounting. The copy's figures really are gone, but that was established by the operator's PE-01 declaration, not by either zero. Reading a zero as preservation would turn a measurement that cannot discriminate into evidence that it did."
+ },
+ "decision": {
+  "declared_status": "Confirmed",
+  "basis": "runner/dry_import.py, tools/dry_import_original.py and their 109 tests",
+  "statement": "A document is measured before it is imported. runner.dry_import.measure takes a PDF and nothing else: no page map, no page count, no graph root, no declared body size. It returns the inventory and writes nothing.",
+  "weaker_than_an_import_on_purpose": "An import needs a declared page map. A dry import is how one is arrived at, so it must not need one. DRY_IMPORT_REQUIRED_FIELDS asks for the ten identity and provenance fields alone, and DocumentConfig.require_dry_importable() refuses naming what is missing. official_original satisfies that set and not REQUIRED_DOCUMENT_FIELDS, so it can be measured and not imported, which is exactly the state V07 left it in.",
+  "the_page_map_is_offered_not_inferred": "heading_candidates() lists every prose block that opens with a number and a full stop, with its marker, its pages and its text. Each is a candidate and none is a declaration: section_map.declared is false, and the operator declares the map from the reconciliation. Inferring a page map from the candidates would be the project fact §13.3 forbids.",
+  "the_graphical_census_opens_the_pdf_directly": "Images, vector drawings, annotations, links, fonts and embedded files are read from the PDF by graphical_census(), not from a PageExtract. A vector drawing is not text and the extraction substrate has no reason to carry it, and adding a field to PageExtract would have touched every byte-bound import artifact. Both committed manifests, both fidelity registers and the source index are untouched.",
+  "the_point_size_is_not_named_the_body_size": "point_size_inventory() reports body_point_size_declared: null and names the largest share as the largest share. Calling the largest share the body size would be the declaration the measurement exists to inform."
+ },
+ "zero_is_not_proof": {
+  "declared_status": "Confirmed",
+  "basis": "runner.dry_import.MEASUREMENT_ONLY_BASES and check_acceptance, with tests/runner/test_dry_import.py::TestTheAcceptanceCheck",
+  "statement": "Criterion 4 is enforced, not stated. MEASUREMENT_ONLY_BASES names five measurement bases, zero_character_loss and zero_embedded_images among them, and check_acceptance reports measurement_basis_not_proof when one stands behind a 'preserved' or 'partly_lost' verdict.",
+  "the_asymmetry_is_deliberate": "A measurement may stand behind a 'lost' verdict. An absence can be measured. Presence has to be looked at, page by page, against the PDF. Refusing a measurement for both verdicts would refuse the one inference it does support.",
+  "the_statement_travels_with_the_records": "GRAPHICAL_PROOF_STATEMENT appears in the inventory's figure block, in the acceptance record's rule, in the limitations record and in the worksheet beside the two zeros it is about. A rule stated only in a report is a rule nobody reads beside the number.",
+  "the_basis_vocabulary_is_closed": "ACCEPTANCE_BASES is the closed set of bases an item may name, and a basis outside it is an unknown_basis finding. A set-membership test on MEASUREMENT_ONLY_BASES alone would admit a measurement written as free text: a basis of 'no characters were lost' is the finding criterion 4 exists to raise and would have passed. The admissible half, OPERATOR_BASES, is four bases each of which rests on something a measurement cannot supply.",
+  "the_rule_is_reachable": "py -3.10 -m tools.dry_import_original --check-acceptance <record> prints every finding and exits 1 on any, and it needs no PDF. The operator fills the record in by hand, and a rule reachable only by pasting a Python expression is a rule nobody runs."
+ },
+ "two_records_not_one": {
+  "declared_status": "Confirmed",
+  "basis": "build_intake and build_provenance, with tests/test_msca_dn_dry_import.py::TestTheProvenanceRecords",
+  "statement": "The intake record holds what is known about the submission: its id, its call, whether a prior submission exists, ESR availability and the purpose an ESR may serve. The provenance record holds the document's own provenance: which file, which authenticated bytes, which extraction environment, and where the document is kept.",
+  "why_the_separation_is_named": "The sanitised copy's intake record carries its sanitisation provenance inside esr_reference, so one field answers two questions. The original's pair does not, and the provenance record says so in a 'separation' field rather than leaving a reader to notice.",
+  "the_intake_record_keeps_its_schema": "build_intake returns normalise_intake(...).to_dict(), so the record is an orch.dev_graph.esr_intake.v1 record and the schema authority stays in runner.dev_graph.intake. No schema_id is coined for the other three records (CLAUDE.md §16.3).",
+  "the_hash_is_authenticated_and_not_merely_computed": "--expect-sha256 is the hash the operator took from the authoritative source. The tool refuses unless the file it was given hashes to it, and nothing is written on a mismatch. A hash the tool computed from an unauthenticated file would say only that some file was read.",
+  "the_provenance_binds_the_other_three_records": "Each of the inventory, the acceptance record and the limitations record is bound by the sha256 of its canonical bytes, so the provenance record and the records it points at cannot drift apart silently.",
+  "the_declared_document_id": "DocumentConfig gains document_id, declared on both documents, because a dry import must author the intake record of a document that has none yet. The intake record stays authoritative: _document_id() reads it from there and refuses a drift between the declaration and the record, and a test holds the copy's declaration equal to its recorded id."
+ },
+ "nothing_private_reaches_this_repository": {
+  "declared_status": "Confirmed",
+  "basis": "the path refusal and tests/test_msca_dn_dry_import.py::TestNothingPrivateIsCommitted",
+  "statement": "For a document declared as the submitted text, the tool refuses a PDF path or an output path that resolves inside this repository, and writes nothing.",
+  "what_is_committed": "The machinery, its tests, the operator procedure and this record. No original PDF, no page text, no span, no extracted sub-section, no intake record and no document record for the original.",
+  "the_graph_root_stays_undeclared": "official_original.workspace_rel is still None. The dry import writes flat files into a directory the operator names, so it needs no graph root, and declaring one here would invite the commit criterion 6 forbids.",
+  "no_graph_state_is_written": "The run produces no document record, no source index, no snapshot and no intake directory. Recording the intake inside the private graph root is a separate operator step through runner.dev_graph.intake.record_esr_intake, and the provenance record names it.",
+  "the_procedure_carries_no_secret": "plans/msca_dn_v08_original_dry_import_procedure.md uses placeholders. A test asserts it carries no 64-digit hex string and that its paths are placeholders.",
+  "the_storage_flags_are_measured": "The provenance record's pdf_stored_in_this_repository and derived_text_stored_in_this_repository are measured from the paths the run was given through inside_repo(), not declared from the document's role. For the submitted text both are false because the run refuses otherwise, and for any other document they say where its bytes actually are.",
+  "the_root_is_not_an_argument": "THIS_REPOSITORY resolves from the module's own location, and no flag moves it. A caller-supplied root would let an operator point the check at an empty directory, write the derived text here anyway, and have the provenance record state under a 'measured' basis that nothing was stored here. The working directory is not the answer either: the tool runs from the private network, where there is no repository to walk up to."
+ },
+ "what_the_operator_still_does": {
+  "declared_status": "Confirmed",
+  "basis": "the ticket's own verification clause",
+  "the_real_dry_import": "The ticket leaves it to the operator, inside the private network. Nothing here has been run against the real original.",
+  "the_reconciliation": "The worksheet is reconciled against the PDF page by page. Every acceptance item starts unreconciled and only the operator moves it.",
+  "the_page_map": "Declared on official_original from what the reconciliation establishes. Until then the import refuses and names each missing field.",
+  "the_intake_record": "Recorded in the private graph root, once, through record_esr_intake."
+ },
+ "not_evidence_of": [
+  "an imported, assessed or frozen original. No original PDF is stored here, no page map for it is declared, and its intake record does not exist.",
+  "a measured original. The fixture is a two-page PDF this test suite wrote. Every number in it is the fixture's.",
+  "a reconciled fidelity acceptance. Every item of every record this tool writes starts unreconciled, and the record refuses to call itself complete while one is.",
+  "a resolved extraction limitation. The limitations record holds six rows, every one Unresolved, and listing one resolves nothing.",
+  "an assessor run. No assessor was invoked and no quota was spent.",
+  "a validated 2025 baseline. V09 and V10 own the 2025 sources and the historical profile, and a result over the original scored under the 2026 profile would score a historical submission by a later year's configuration.",
+  "a corrected PE-09 runbook. V12 owns that and stays blocked by V10 as well.",
+  "a closed V01 criterion 4. The runtime-environment block still reaches no committed manifest."
+ ],
+ "impacted_components": [
+  "runner/dry_import.py (new: measure, graphical_census, heading_candidates, table_inventory, figure_inventory, point_size_inventory, character_accounting, limitation_inventory, citation_inventory, build_acceptance, check_acceptance, build_unresolved_limitations, ACCEPTANCE_ITEMS, MEASUREMENT_ONLY_BASES, GRAPHICAL_PROOF_STATEMENT, SPAN_LOCATES_STATEMENT, DryImportRefused)",
+  "tools/dry_import_original.py (new: the CLI, Declarations, build_intake, build_provenance, render_worksheet, dry_import, the path and hash refusals)",
+  "tools/import_external_proposal.py (DocumentConfig.document_id; DRY_IMPORT_REQUIRED_FIELDS, dry_import_missing_fields(), require_dry_importable(); document_id added to REQUIRED_DOCUMENT_FIELDS, to the registry's collision check and to identity(); _document_id() refuses a drift between the declaration and the intake record)",
+  "plans/msca_dn_v08_original_dry_import_procedure.md (new: the operator procedure)",
+  "tests/runner/test_dry_import.py and tests/test_msca_dn_dry_import.py (new: 92 tests, grouped by acceptance criterion)",
+  "harness/HARNESS.md (the dry-import section) and workspaces/msca_dn/README.md (three lines through render_readme, naming V08_PROCEDURE_REL; tools/author_msca_dn_workspace.py carries that constant). Both author_msca_dn_workspace --check and import_external_proposal --check exit 0 after.",
+  "harness/acceptance_lanes/msca_dn_historical.json and harness/ACCEPTANCE_LANE.md (a new 'dry_import' area over tests/runner/test_dry_import.py and tests/test_msca_dn_dry_import.py, the first of them registered as a module added beyond the audit's focused command). The area is depended_on: false — Stage A reads the sanitised copy, and V08 gates the original's import and V13's receipt. V03's own check required it: a module inside the focused command and outside every area fails the lane."
+ ],
+ "remaining_uncertainties": {
+  "the_candidate_heading_rule_is_a_numbering_convention": "heading_candidates() matches a leading '<digits>.' with optional dotted parts. A sub-section the original opens without a number, as sub-sections 1.1 and 8 of the copy do, is not a candidate and the operator finds it by reading. The rule is reported as a candidate list and never as a map, so a missed candidate costs reading and not a wrong boundary.",
+  "the_acceptance_catalogue_is_fixed_at_seven_items": "The seven classes are the ticket's. A document carrying a class none of them names needs a catalogue entry, which is a code change and a test. A free-text item would let an operator rename a class and lose the check that every named class is present.",
+  "supporting_part_b_material_cannot_be_measured_for_absence": "The inventory measures the pages it was given. A page nobody supplied is not reported missing, because the measurement has no count to compare against. The item carries that as its 'measurement is not proof' text and stays the operator's.",
+  "the_graphical_census_depends_on_the_pymupdf_build": "get_drawings() and get_images() are MuPDF's. The inventory records the measured build and the pin, and whether the build is on it, so a count is read with its environment. No count is bound by hash anywhere, so an off-pin build costs a different number and not a broken replay.",
+  "the_fixture_cannot_carry_a_ligature": "Base-14 Helvetica cannot encode U+FB01, so the fixture PDF holds no ligature and the inventory reports none. The ligature counting is exercised against a PageExtract the test wrote instead.",
+  "the_declared_document_id_is_double_entry": "The intake record owns the document id for an imported document, and the configuration declares it too so a dry import can author an intake record. _document_id() refuses a drift and a test holds the copy's two values equal, which is what keeps the duplication safe.",
+  "nothing_consumes_the_acceptance_record_yet": "check_acceptance is its only reader and the operator calls it. The record lives in the private network, and the consumer that should gate on it, the import of the original, cannot run until a page map is declared. So an inadmissible 'preserved' verdict is reported and blocks nothing. Owner: whoever imports the original, which is after V08."
+ },
+ "declared_deviations": {
+  "declared_status": "Confirmed",
+  "basis": "a comparison of the ticket's wording with what was built",
+  "the_records_are_written_outside_this_repository": "Criterion 2 says the intake and provenance records exist. They do not exist here, and the reason is not that criterion 6 forbids them: a sha256 and an intake record are neither the original PDF nor text derived from it, and this repository already commits PDF hashes elsewhere. The reason is that the document they describe is not here, and the authenticated hash is the operator's, from the authoritative source; authoring either record now would mean inventing it (CLAUDE.md §13.3). The ticket's own verification assigns the real run to the operator, so what is committed is the deterministic builder of each record, exercised against a fixture, plus the procedure.",
+  "a_fourth_record_was_added": "The ticket names the inventory, the intake, the provenance and the acceptance records. A fifth file, the reconciliation worksheet, renders the inventory as tables to work through against the PDF, because criterion 1's inventory is 'to reconcile against the PDF' and JSON is not what a reconciliation is done against.",
+  "the_limitations_are_their_own_record": "Criterion 5 asks that unresolved limitations be recorded before assessment. They are, in unresolved_extraction_limitations.json, rather than as a block inside the provenance record, so a later reader of a span finds the span statement in the record that is about limitations.",
+  "the_path_refusal_is_scoped_to_the_submitted_document": "Criterion 6 is about the private original. The refusal fires when config.is_submitted_document is true, so a dry import of the committed sanitised copy is not refused for being in the repository. Refusing every in-repository path would refuse a harmless run for a rule that is not about it.",
+  "the_two_refusal_types_are_kept_apart": "A missing identity field raises ImportRefused, the importer's refusal, because the document configuration is the importer's. Everything else the dry import refuses raises DryImportRefused. main() catches both and both print 'refused:'.",
+  "inventory_only_is_an_addition": "The ticket names one dry-import mode. --inventory-only writes the inventory and the worksheet and no provenance record, so a document can be measured before its submission identifiers are settled.",
+  "the_importers_field_count_moved": "DocumentConfig gains document_id, so it carries 27 fields where V07's accepted status paragraph says 26. The required count is unchanged at 15: an import still reads the document id from the intake record, which is authoritative, so the declaration is required for a dry import alone (DRY_IMPORT_REQUIRED_FIELDS). No word of V07's accepted text was changed."
+ },
+ "checks_run": {
+  "declared_status": "Confirmed",
+  "basis": "the runs recorded in plans/reports/v08_dry_import_and_original_provenance_2026-10-12.md",
+  "focused_suites": "474 passed across tests/test_msca_dn_import.py, test_msca_dn_workspace.py, test_msca_dn_fidelity_declarations.py, test_msca_dn_declaration_drafts.py, test_extraction_environment.py, tests/runner/test_agnosticism_lint.py and tests/harness/test_integrity_audit.py. V08's own two modules add 109.",
+  "byte_equality": "py -3.10 -m tools.import_external_proposal --check and py -3.10 -m tools.author_msca_dn_workspace --check both exit 0: both sanitised revisions still reproduce byte-equal, and no committed import artifact changed.",
+  "acceptance_lane": "py -3.10 -m harness.commands.acceptance_lane reports GREEN: 2,570 passed, 0 failed, 0 errors, 17 declared exclusions, on the pinned extraction build.",
+  "mypy": "9 errors, all in runner/source_index.py and runner/dev_graph/documents.py, neither touched here; the same 9 V07 recorded.",
+  "full_suite_against_a_baseline": "The repository suite is not green on this branch and was not green before. HEAD measured in a git worktree with the gitignored .env copied in: 205 failed, 7,199 passed, 107 skipped. This change: 194 failed, 7,340 passed, 86 skipped. Set comparison of the two failure lists: no test fails here that passes at HEAD. Eleven fail at HEAD and pass here, all byte-binding checks in the demo and deferral-register modules, which a fresh worktree checkout renders differently.",
+  "one_regression_fixed_mid_change": "test_acceptance_lane.py::TestAreas::test_the_lane_covers_every_module_of_the_audits_focused_command, V03's own guard against a focused-command module nobody assigned to an area. The lane now declares a dry_import area."
+ }
+}

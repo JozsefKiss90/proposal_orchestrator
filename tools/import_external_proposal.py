@@ -47,6 +47,11 @@ A configuration missing a required field refuses the import and names the
 field, so an undeclared assumption can never be silently filled with the
 copy's.
 
+A **dry import** (V08) asks for less: the identity fields alone, because the
+page map, the page count and the body point size are what it exists to
+establish. ``tools/dry_import_original.py`` measures a document under that
+weaker set and writes nothing here.
+
 What is declared and what is derived
 ------------------------------------
 Declared: the configuration's page map, heading markers, declared titles,
@@ -312,6 +317,26 @@ REQUIRED_DOCUMENT_FIELDS: tuple[str, ...] = (
     "revisions",
 )
 
+#: Required fields of a **dry import** (V08): the measurement that precedes the
+#: import and produces the page map the import needs. It asks for the
+#: document's identity and nothing about its shape, because a page map, a page
+#: count and a body point size are what the dry import exists to establish. A
+#: document that satisfies this set and not
+#: :data:`REQUIRED_DOCUMENT_FIELDS` can be measured and not imported, which is
+#: exactly the state the official original is in.
+DRY_IMPORT_REQUIRED_FIELDS: tuple[str, ...] = (
+    "intake_id",
+    "document_id",
+    "title",
+    "role",
+    "short_name",
+    "page_statement",
+    "page_map_declared_from",
+    "reader_caveat_key",
+    "reader_caveat",
+    "status_note",
+)
+
 
 @dataclass(frozen=True)
 class DocumentConfig:
@@ -351,6 +376,14 @@ class DocumentConfig:
     is_submitted_document: bool
     """``True`` only for the text that was actually submitted."""
     intake_id: Optional[str] = None
+    document_id: Optional[str] = None
+    """The dev-graph document id every revision of this document shares.
+
+    The intake record owns it for an imported document, and :func:`_document_id`
+    still reads it from there. It is declared here as well so that a dry import
+    (V08) can author the intake record of a document that has none yet; a test
+    holds the two equal, so a drift fails rather than importing one document
+    under another's id."""
     title: Optional[str] = None
     role: Optional[str] = None
     workspace_rel: Optional[Path] = None
@@ -554,15 +587,20 @@ class DocumentConfig:
 
     # -- refusals -- #
 
-    def missing_fields(self) -> tuple[str, ...]:
-        """Required fields this configuration does not declare, in field order.
+    def _undeclared(self, required: tuple[str, ...]) -> tuple[str, ...]:
+        """Which of *required* this configuration does not declare, in order.
 
-        A falsy value counts as undeclared. Every required field is a path, a
-        non-empty name, a non-empty tuple or a positive page count, so there is
-        no legitimate falsy declaration among them; ``__post_init__`` refuses a
-        zero or negative ``expected_pages`` separately.
+        A falsy value counts as undeclared. Every required field of either set
+        is a path, a non-empty name, a non-empty tuple or a positive page
+        count, so there is no legitimate falsy declaration among them;
+        ``__post_init__`` refuses a zero or negative ``expected_pages``
+        separately.
         """
-        missing = [name for name in REQUIRED_DOCUMENT_FIELDS if not getattr(self, name)]
+        return tuple(name for name in required if not getattr(self, name))
+
+    def missing_fields(self) -> tuple[str, ...]:
+        """Required fields of an import this configuration does not declare."""
+        missing = list(self._undeclared(REQUIRED_DOCUMENT_FIELDS))
         if any(needs_form_title(spec) for spec in self.sub_sections) and self.scorecard_rel is None:
             missing.append("scorecard_rel")
         return tuple(missing)
@@ -575,6 +613,26 @@ class DocumentConfig:
                 f"document {self.config_id!r} cannot be imported: "
                 f"{', '.join(missing)} not declared. Nothing is inherited from another "
                 f"document's configuration, so each is declared from this document itself."
+            )
+
+    def dry_import_missing_fields(self) -> tuple[str, ...]:
+        """Required fields of a dry import this configuration does not declare.
+
+        A weaker set than :meth:`missing_fields` (V08): a dry import measures
+        the document and declares nothing about its shape, so it asks for the
+        identity and provenance fields alone. ``()`` means the document can be
+        measured, which says nothing about whether it can be imported.
+        """
+        return self._undeclared(DRY_IMPORT_REQUIRED_FIELDS)
+
+    def require_dry_importable(self) -> None:
+        """Refuse unless this document can be measured, naming what is missing."""
+        missing = self.dry_import_missing_fields()
+        if missing:
+            raise ImportRefused(
+                f"document {self.config_id!r} cannot be measured: "
+                f"{', '.join(missing)} not declared. A dry import needs the document's own "
+                f"identity; nothing is inherited from another document's configuration."
             )
 
     def require_workspace(self) -> Path:
@@ -617,12 +675,15 @@ class DocumentConfig:
             "role": self.role,
             "is_submitted_document": self.is_submitted_document,
             "intake_id": self.intake_id,
+            "document_id": self.document_id,
             "workspace_rel": None if self.workspace_rel is None else self.workspace_rel.as_posix(),
             "expected_pages": self.expected_pages,
             "sub_sections_declared": len(self.sub_sections),
             "revisions": [r.revision_id for r in self.revisions],
             "missing_required_fields": list(missing),
             "importable": not missing,
+            "missing_dry_import_fields": list(self.dry_import_missing_fields()),
+            "measurable": not self.dry_import_missing_fields(),
             "declared_status": self.declared_status,
             "status_note": self.status_note,
             "summary": self.summary,
@@ -715,6 +776,7 @@ SANITISED_DERIVATIVE = DocumentConfig(
     config_id="sanitised_derivative",
     is_submitted_document=False,
     intake_id=ws.INTAKE_ID,
+    document_id=ws.DOCUMENT_ID,
     title="Sanitised derivative of the MSCA-DN 2025 Part B (PROJECT-X)",
     role=_SANITISED_ROLE,
     workspace_rel=ws.WORKSPACE_REL,
@@ -782,6 +844,7 @@ OFFICIAL_ORIGINAL = DocumentConfig(
     config_id="official_original",
     is_submitted_document=True,
     intake_id="msca-dn-2025-original",
+    document_id="MSCA-DN-2025_part_b_as_submitted",
     title="MSCA-DN 2025 Part B, as submitted",
     role=(
         "Current assessment artifact: the Part B of the 2025 MSCA Doctoral Networks "
@@ -833,7 +896,7 @@ def _index_documents() -> dict[str, DocumentConfig]:
     revision: a revision resolves to exactly one document, and a shared intake
     or graph root would make one document's page texts resolvable as another's.
     """
-    for field in ("config_id", "intake_id", "workspace_rel"):
+    for field in ("config_id", "intake_id", "document_id", "workspace_rel"):
         values = [str(getattr(doc, field)) for doc in DOCUMENTS if getattr(doc, field) is not None]
         if len(set(values)) != len(values):
             raise ImportRefused(f"two documents share a {field}")
@@ -1139,9 +1202,24 @@ def _form_heading(repo_root: Path, config: DocumentConfig, anchor: str) -> str:
 
 
 def _document_id(repo_root: Path, config: DocumentConfig) -> str:
+    """The document id of *config*, read from its intake record.
+
+    The intake record is authoritative. The configuration declares the id too
+    (V08, so a dry import can author an intake record for a document that has
+    none), and a drift between the two would import one document under
+    another's id, so it is refused here rather than discovered later.
+    """
     config.require_provenance(repo_root)
     world = repo_root / config.require_workspace()
-    return read_esr_intake(world, config.require_intake_id()).document_id
+    recorded = read_esr_intake(world, config.require_intake_id()).document_id
+    if config.document_id is not None and config.document_id != recorded:
+        raise ImportRefused(
+            f"document {config.config_id!r}: the configuration declares document id "
+            f"{config.document_id!r} and its intake record {config.intake_rel().as_posix()} "
+            f"holds {recorded!r}. The intake record is authoritative; the declaration exists "
+            f"only so a dry import can author one, and it must agree."
+        )
+    return recorded
 
 
 def node_id_of(repo_root: Path, revision: Revision) -> str:

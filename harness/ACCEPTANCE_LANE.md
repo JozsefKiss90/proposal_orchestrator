@@ -53,9 +53,9 @@ identity, so a green importer area under it would certify a replay of a differen
 `--allow-unreproducing-build` runs anyway and stamps the result NOT CERTIFIED. It is for an engineer
 measuring a new build, not for accepting one.
 
-## The fourteen areas
+## The fifteen areas
 
-Seven areas carry invariants the historical run depends on. The other seven carry the rest of
+Seven areas carry invariants the historical run depends on. The other eight carry the rest of
 the audit's focused command, kept rather than dropped. Every declared exclusion sits in an area marked
 **no**, and the lane refuses to run when one does not. That is how *no exception covers a check the
 historical run depends on* becomes a measurement rather than an assertion.
@@ -66,6 +66,7 @@ them. Four of their checks are excluded.
 
 | Area | Run depends on it | Invariant | Modules |
 |---|---|---|---|
+| **dry_import** | no | A document is measured before it is imported. The measurement declares no page map and writes no graph state. A 'preserved' fidelity verdict may not rest on a measurement that is equally true of a document whose graphical evidence is gone. The submitted original and its derived text stay outside this repository. The historical run does not depend on this invariant. Stage A reads the sanitised copy, and V08 gates the original's import and V13's readiness receipt. | `test_dry_import.py`, `test_msca_dn_dry_import.py` |
 | **importer** | yes | Both sanitised candidate revisions replay byte-equal from the committed PDFs, under the extraction build V01 pinned, and derive the recorded document identity. | `test_extraction_environment.py`, `test_msca_dn_import.py`, `test_msca_dn_workspace.py`, `test_blind_document_subsections.py` |
 | **profile** | yes | An instrument profile resolves to its own rubrics, scorecard and criterion routing. A criterion cannot be scored under a profile that does not declare it. | `test_profile.py`, `test_msca_dn_profile.py`, `test_ria_profile.py`, `test_rubrics.py`, `test_routing.py` |
 | **preflight** | yes | Evidence selection is pinned before an assessor runs. The pack set hashes, the manifest pin binds, and a pack whose anchors do not resolve fails closed. | `test_evidence_preflight.py`, `test_evidence_pack.py` |
@@ -84,13 +85,14 @@ them. Four of their checks are excluded.
 ### What the lane adds to the audit's command
 
 The audit ran `tests/harness`, `tests/runner/test_dev_graph*.py` and `tests/test_msca_dn*.py`. The lane
-runs all of that and three modules more:
+runs all of that and four modules more:
 
 | Module | Area | Why |
 |---|---|---|
 | `tests/test_extraction_environment.py` | importer | V01's own pin, which the lane runs under |
 | `tests/test_sandbox_hardening.py` | isolation | an isolation check the historical run depends on |
 | `tests/test_production_mode.py` | isolation | the same |
+| `tests/runner/test_dry_import.py` | dry_import | V08's measurement seam, which the focused globs reach only through its MSCA-DN caller |
 
 ## The exclusions
 

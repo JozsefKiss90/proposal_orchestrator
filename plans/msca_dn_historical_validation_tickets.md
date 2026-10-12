@@ -656,20 +656,67 @@ against the PDF, plus the records that hold the result.
 
 ### Acceptance criteria
 
-- [ ] A dry-import mode reports measured section, table and figure inventory, page count and extraction
-      limitations without writing graph state.
-- [ ] Separate intake and original-document provenance records exist, including the authenticated input
-      hash of the original PDF.
-- [ ] A fidelity acceptance record covers Gantt, diagrams, embedded images, footnotes, table headers,
-      bibliographic references and any supporting Part B material explicitly.
-- [ ] Neither zero character loss nor zero embedded images is accepted as proof that graphical evidence
-      was preserved.
-- [ ] Unresolved extraction limitations are recorded before assessment, and the record states that a
-      page or source span locates an assertion without corroborating it.
-- [ ] The private original PDF and its derived text are not committed to this repository.
+- [x] A dry-import mode reports measured section, table and figure inventory, page count and extraction
+      limitations without writing graph state. `runner.dry_import.measure` takes a PDF and nothing
+      else: no page map, no page count, no graph root, no declared body size. It reports the per-page
+      accounting, every table with its header row, the graphical census, the candidate section headings
+      and the limitations, and it writes no file. `tools/dry_import_original.py` writes six flat files
+      into a directory the operator names — no document record, no source index, no snapshot and no
+      intake directory. A weaker precondition than an import: `DRY_IMPORT_REQUIRED_FIELDS` asks for the
+      ten identity fields alone, so `official_original` is measurable while still refusing an import.
+- [x] Separate intake and original-document provenance records exist, including the authenticated input
+      hash of the original PDF. Two records, and the provenance record names the separation: the intake
+      holds what is known about the submission, the provenance record holds which file, which bytes and
+      which environment. The intake is built through `normalise_intake`, so it keeps its schema. The
+      hash is authenticated and not merely computed: `--expect-sha256` is the operator's hash from the
+      authoritative source, and the run refuses and writes nothing unless the file matches it. The
+      provenance record binds the other three records by the hash of their canonical bytes.
+      **Not committed here.** The hash is the operator's, from a document this repository does not
+      hold, so authoring either record now would mean inventing it. What is committed is the
+      deterministic builder of each record, exercised against a fixture, plus the procedure. The
+      ticket's own verification assigns the real run to the operator.
+- [x] A fidelity acceptance record covers Gantt, diagrams, embedded images, footnotes, table headers,
+      bibliographic references and any supporting Part B material explicitly. Seven items, each with
+      what must be reconciled, the measurement that bears on it and why that measurement does not
+      settle it. Every item starts `unreconciled`, and `check_acceptance` reports `item_missing` for a
+      class the record does not name.
+- [x] Neither zero character loss nor zero embedded images is accepted as proof that graphical evidence
+      was preserved. Enforced, not stated: `MEASUREMENT_ONLY_BASES` names five measurement bases and
+      `check_acceptance` reports `measurement_basis_not_proof` when one stands behind a `preserved` or
+      `partly_lost` verdict. A measurement may stand behind `lost`, because an absence can be measured.
+      The basis vocabulary is closed, so a measurement cannot enter as free text under a wording of its
+      own; a basis outside it is an `unknown_basis` finding. The fixture makes the case concrete — a vector Gantt figure, zero embedded images and zero
+      character loss on every page.
+- [x] Unresolved extraction limitations are recorded before assessment, and the record states that a
+      page or source span locates an assertion without corroborating it. Six rows, every one
+      `Unresolved`, in a record of their own written by the dry import, which precedes the import and
+      therefore every result. `SPAN_LOCATES_STATEMENT` is carried verbatim in the record.
+- [x] The private original PDF and its derived text are not committed to this repository. The tool
+      refuses a PDF path or an output path that resolves inside the repository for a document declared
+      as the submitted text, and writes nothing. What counts as inside is resolved from the module's own
+      location and no argument moves it. `official_original.workspace_rel` stays undeclared. Tests
+      assert that no intake record and no document record for the original is committed, and that the
+      operator procedure carries no hash and no private path.
 
 **Verification.** Run the dry import on a non-sensitive fixture document in the test suite, and document
 the operator procedure for the real original. The operator performs the real dry import.
+
+**Status 2026-10-12.** Six of six criteria closed. F02 closes with V07's code half. The dry import ran
+against a two-page fixture this test suite writes, in a temporary directory outside the repository. It
+has not been run against the real original: no original PDF is stored here, no page map for it is
+declared, and its intake record does not exist. No assessor ran and no quota was spent.
+
+Seven residual items are recorded in report section *What is unresolved*, and seven declared deviations
+in the section after it. The largest deviation is where the records live. The real original's records
+cannot be authored here, because the document they describe is not here and its authenticated hash is
+the operator's. What is committed is the deterministic builder of each record, plus the procedure.
+
+**V01's criterion 4 stays open.** The runtime-environment block still reaches no committed manifest.
+V08 did not change its shape.
+
+Evidence: `plans/reports/v08_dry_import_and_original_provenance_2026-10-12.md`; procedure
+`plans/msca_dn_v08_original_dry_import_procedure.md`; decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-dry-import-and-original-provenance_2026-10-12.json`.
 
 ## V09 — Pin the 2025 authority documents and build the equivalence matrix
 

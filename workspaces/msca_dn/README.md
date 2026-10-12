@@ -30,3 +30,7 @@ derived half). Each tool's `--check` exits 1 if any file it owns would change.
 
 This graph root holds one document, the sanitised copy. The importer selects it by default;
 `--document` names another and `--describe` prints what that one is (V07).
+
+The submitted original is not here and has no graph root. It is measured privately by
+`py -3.10 -m tools.dry_import_original`, which writes its inventory and provenance records
+outside this repository (V08, `plans/msca_dn_v08_original_dry_import_procedure.md`).

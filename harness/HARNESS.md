@@ -487,6 +487,33 @@ no 84-page count and no derivative description. It is not a revision of the copy
 a revision may only supersede a revision of the same document. The original declares
 none of its shape yet, so selecting it refuses and names every missing field.
 
+A **dry import** is how that shape is arrived at (V08). The measurement is
+`runner/dry_import.py`, and it takes a PDF and nothing else. No page map, no page count,
+no graph root, no declared body size. It reports the per-page accounting, every table with
+its header and the graphical census. It reports the candidate section headings and the
+extraction limitations. It writes no file.
+
+The operator's run is `tools/dry_import_original.py`. It refuses a hash the bytes do not
+match. For a document declared as the submitted text, it refuses any path inside this
+repository.
+
+It writes six flat files into a private directory. The inventory, a worksheet and the
+document's own intake record. Its provenance record, a fidelity acceptance record and the
+unresolved extraction limitations. The provenance record carries the authenticated input
+hash.
+
+No document record, no source index and no snapshot. Nothing the run writes can be read as
+an imported document.
+
+Zero is not proof. A Gantt chart drawn as vector paths is no embedded image and carries no
+characters. So both counts stay at zero whether the figure survived or not. The acceptance
+check therefore refuses a `preserved` verdict that rests on either count. It admits a
+measurement behind a `lost` one, because an absence can be measured and presence has to be
+looked at.
+
+The operator procedure is `plans/msca_dn_v08_original_dry_import_procedure.md`, and it has
+not been run against the real original in this repository.
+
 The register has two halves and two owners. The derived half is measured from the
 PDF by the importer; the declared half is the operator's per-sub-section statement
 of `presence` and `transformation`, and both tools render the whole file on every

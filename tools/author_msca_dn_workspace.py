@@ -125,6 +125,10 @@ HISTORICAL_CALL_ID = "HORIZON-MSCA-2025-DN-01"
 DN_TYPE_PAGE = 32
 DN_TYPE_MARKER = "standard Doctoral Network"
 
+#: The V08 operator procedure for the submitted original, named by the README
+#: so a reader of this graph root finds it without reading the harness guide.
+V08_PROCEDURE_REL = "plans/msca_dn_v08_original_dry_import_procedure.md"
+
 DECLARED_ON = "2026-10-04"
 DECLARED_BY = "operator"
 
@@ -671,6 +675,10 @@ def render_readme() -> str:
         "\n"
         f"This graph root holds one document, {config.short_name}. The importer selects it by default;\n"
         "`--document` names another and `--describe` prints what that one is (V07).\n"
+        "\n"
+        "The submitted original is not here and has no graph root. It is measured privately by\n"
+        "`py -3.10 -m tools.dry_import_original`, which writes its inventory and provenance records\n"
+        f"outside this repository (V08, `{V08_PROCEDURE_REL}`).\n"
     )
 
 

@@ -15,7 +15,8 @@
   "modules_added_beyond_the_focused_command": {
     "tests/test_extraction_environment.py": "V01's own environment pin, which the lane runs under",
     "tests/test_sandbox_hardening.py": "an isolation check the historical run depends on and the focused globs missed",
-    "tests/test_production_mode.py": "the same"
+    "tests/test_production_mode.py": "the same",
+    "tests/runner/test_dry_import.py": "V08's measurement seam, which the focused globs reach only through its MSCA-DN caller"
   },
   "modules_considered_and_left_out": {
     "tests/test_persistence_policy.py": "one case fails on a missing optional botocore extra, an environment dependency unrelated to any acceptance invariant"
@@ -34,6 +35,15 @@
     "not evidence of grounded evaluation"
   ],
   "areas": [
+    {
+      "name": "dry_import",
+      "invariant": "A document is measured before it is imported. The measurement declares no page map and writes no graph state. A 'preserved' fidelity verdict may not rest on a measurement that is equally true of a document whose graphical evidence is gone. The submitted original and its derived text stay outside this repository. The historical run does not depend on this invariant. Stage A reads the sanitised copy, and V08 gates the original's import and V13's readiness receipt.",
+      "modules": [
+        "tests/runner/test_dry_import.py",
+        "tests/test_msca_dn_dry_import.py"
+      ],
+      "depended_on": false
+    },
     {
       "name": "importer",
       "invariant": "Both sanitised candidate revisions replay byte-equal from the committed PDFs, under the extraction build V01 pinned, and derive the recorded document identity.",
