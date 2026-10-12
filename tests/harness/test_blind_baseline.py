@@ -2,10 +2,19 @@
 The frozen blind baseline (spec PE-06) and the tests that make blindness a
 measured property rather than an asserted one.
 
-Three groups:
+Six groups:
 
-* ``check_baseline_report`` over report dicts: every condition the freeze
+* ``run_baseline_checks`` over report dicts: every condition the freeze
   requires, each refused by name when absent.
+* The identity sets (V04): the cells are the profile's grid and the criterion
+  scores its criteria — a report missing one, or carrying one twice, is
+  refused. This is the group that notices a *deleted* record, which the
+  per-entry checks cannot.
+* The arithmetic (V04): the panel mean, agreement and majority call, each
+  criterion's median and spread, and the weighted total all recompute from
+  the draws the report carries, or the freeze refuses the report.
+* The invocation and isolation evidence (V04): what the report's transport
+  owes, and what it is recorded as not owing.
 * The ``freeze`` command end to end on the synthetic dev-graph world: the
   record binds candidate hash, profile version, assessor pin, snapshot id,
   package id and the preflight pack-set hash; the pin names the transport;
@@ -13,6 +22,11 @@ Three groups:
   the same directory is refused; an edited copy is refused on load.
 * Condition 2 of the ticket: a unique marker planted in the historical
   evaluation artifact and in a Tier 5 draft reaches no rendered prompt.
+
+A seventh group runs the real ``freeze_baseline`` path over the committed
+MSCA-DN baseline: the control still freezes at 74.6 and reproduces the
+committed bindings, and each of the readiness audit's four reproduced probes
+is refused by name with nothing written.
 
 Conditions 1 and 3 (the argv-level empty tool list and the external working
 directory) live in ``tests/harness/test_subscription_judge.py``.
@@ -34,6 +48,7 @@ from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
 from harness.rubrics import load_profile_bundle
 from runner.dev_graph import build_snapshot, import_document
+from runner.paths import find_repo_root
 from tests.harness._preflight import preflighted
 from tests.harness.test_blind_leakage import (
     CANDIDATE,
@@ -102,11 +117,10 @@ def bundle(world: Path):
 # --------------------------------------------------------------------------- #
 
 
-class _RecordingBackendWithInvocation(RecordingBackend):
-    """A backend that, like the subscription one, says what its child could reach."""
+class _BackendWithoutInvocation(RecordingBackend):
+    """A backend that keeps no account of its invocation, as the API one does not."""
 
-    def invocation_record(self):
-        return {"tools": "", "strict_mcp_config": True, "working_directory_outside_repository": True}
+    invocation_record = None
 
 
 class TestTheReportNamesItsTransport:
@@ -124,15 +138,38 @@ class TestTheReportNamesItsTransport:
 
         assert TRANSPORT_TAG == cmd.TRANSPORT_CLAUDE_CLI
 
+    def test_the_transports_the_freeze_knows_are_the_transports_the_command_offers(self):
+        """``blind_baseline`` cannot import the command it is called by, so the
+        transport vocabulary is kept in step here."""
+        assert set(bb.TRANSPORT_ISOLATION_EVIDENCE) == {
+            cmd.TRANSPORT_CLAUDE_CLI,
+            cmd.TRANSPORT_OPENAI,
+        }
+
+    def test_the_isolation_the_freeze_requires_is_what_the_backend_declares(self, tmp_path):
+        """The required declarations must be ones the subscription backend
+        actually makes, or no real baseline could satisfy the check."""
+        from harness.commands import _subscription_judge as sj
+
+        _judge, backend = sj.build_subscription_judge(
+            JudgeConfig(model="claude-sonnet-5", version=VERSION),
+            prov_path=tmp_path / "prov.jsonl",
+            repo_root=find_repo_root(),
+            log=lambda _m: None,
+        )
+        record = backend.invocation_record()
+        required = bb.TRANSPORT_ISOLATION_EVIDENCE[cmd.TRANSPORT_CLAUDE_CLI]
+        assert {key: record[key] for key in required} == dict(required)
+
     def test_the_command_stamps_the_backends_invocation_record(self, world, bundle):
         """Condition 1 is then recorded by the run, not only proven by tests."""
-        _code, path = _assess(world, bundle, _RecordingBackendWithInvocation())
+        _code, path = _assess(world, bundle, RecordingBackend())
         data = json.loads(path.read_text(encoding="utf-8"))
         assert data["assessor_invocation"]["tools"] == ""
         assert data["assessor_invocation"]["strict_mcp_config"] is True
 
     def test_a_backend_without_a_record_leaves_the_invocation_empty(self, world, bundle):
-        _code, path = _assess(world, bundle, RecordingBackend())
+        _code, path = _assess(world, bundle, _BackendWithoutInvocation())
         data = json.loads(path.read_text(encoding="utf-8"))
         assert data["assessor_invocation"] == {}
 
@@ -147,9 +184,18 @@ def _frozen_ready(world: Path, bundle) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _failures(report: dict, bundle, **kwargs) -> tuple[tuple[str, str], ...]:
+    """The failures of a check run, which is what most of these cases assert on."""
+    return bb.run_baseline_checks(report, bundle, **kwargs).failures
+
+
+def _names(report: dict, bundle, **kwargs) -> set[str]:
+    return {name for name, _ in _failures(report, bundle, **kwargs)}
+
+
 class TestTheConditions:
     def test_a_complete_dev_graph_report_passes_every_check(self, world, bundle):
-        assert bb.check_baseline_report(_frozen_ready(world, bundle)) == ()
+        assert _failures(_frozen_ready(world, bundle), bundle) == ()
 
     def test_every_name_a_check_can_emit_is_enumerated(self, world, bundle):
         """``checks_passed`` is derived from this tuple, so a check the function
@@ -157,13 +203,13 @@ class TestTheConditions:
         report = _frozen_ready(world, bundle)
         report.update(snapshot_id="", preflight_report="", assessor_transport="", scope="partial",
                       cells=[], criterion_scoring=None, evidence_source="directory")
-        names = {name for name, _ in bb.check_baseline_report(report)}
+        names = {name for name, _ in _failures(report, bundle)}
         assert names <= set(bb.BASELINE_CHECKS)
 
     def test_a_preflight_file_that_is_gone_is_refused(self, world, bundle):
         report = _frozen_ready(world, bundle)
         Path(report["preflight_report"]).unlink()
-        names = {name for name, _ in bb.check_baseline_report(report, repo_root=world)}
+        names = {name for name, _ in _failures(report, bundle, repo_root=world)}
         assert "preflight_rebound" in names
 
     def test_a_preflight_file_whose_hash_moved_is_refused(self, world, bundle):
@@ -172,7 +218,7 @@ class TestTheConditions:
         data = json.loads(pre.read_text(encoding="utf-8"))
         data["pack_set_hash"] = "sha256:" + "0" * 64
         _write_json(pre, data)
-        names = {name for name, _ in bb.check_baseline_report(report, repo_root=world)}
+        names = {name for name, _ in _failures(report, bundle, repo_root=world)}
         assert "preflight_rebound" in names
 
     def test_a_criterion_panel_below_five_is_refused(self, world, bundle):
@@ -180,7 +226,7 @@ class TestTheConditions:
         _code, path = _assess(world, bundle, RecordingBackend(), "--criterion-n", "3")
         data = json.loads(path.read_text(encoding="utf-8"))
         assert data["criterion_scoring"]["samples_per_criterion"] == 3
-        names = {name for name, _ in bb.check_baseline_report(data)}
+        names = {name for name, _ in _failures(data, bundle)}
         assert "criterion_samples" in names
 
     @pytest.mark.parametrize(
@@ -201,19 +247,19 @@ class TestTheConditions:
     def test_each_missing_binding_is_refused_by_name(self, world, bundle, mutate, check):
         report = _frozen_ready(world, bundle)
         mutate(report)
-        names = {name for name, _reason in bb.check_baseline_report(report)}
+        names = {name for name, _reason in _failures(report, bundle)}
         assert check in names
 
     def test_a_cell_without_a_panel_spread_is_refused(self, world, bundle):
         report = _frozen_ready(world, bundle)
         report["cells"][0]["coverage"]["verdict"]["agreement"] = None
-        names = {name for name, _ in bb.check_baseline_report(report)}
+        names = {name for name, _ in _failures(report, bundle)}
         assert "cell_spreads" in names
 
     def test_a_cell_with_a_panel_below_three_is_refused(self, world, bundle):
         report = _frozen_ready(world, bundle)
         report["cells"][0]["coverage"]["verdict"]["n"] = 2
-        names = {name for name, _ in bb.check_baseline_report(report)}
+        names = {name for name, _ in _failures(report, bundle)}
         assert "cell_spreads" in names
 
     def test_an_unscored_criterion_is_refused(self, world, bundle):
@@ -223,15 +269,255 @@ class TestTheConditions:
         score["spread"] = None
         report["criterion_scoring"]["unscored_criteria"] = [score["criterion_id"]]
         report["criterion_scoring"]["total"] = None
-        names = {name for name, _ in bb.check_baseline_report(report)}
+        names = {name for name, _ in _failures(report, bundle)}
         assert {"criterion_spreads", "criterion_scores_present", "criterion_total"} <= names
 
     def test_the_cells_only_run_cannot_be_frozen(self, world, bundle):
         code, path = _assess(world, bundle, RecordingBackend(), "--skip-criterion-scores")
         assert code == 0
         data = json.loads(path.read_text(encoding="utf-8"))
-        names = {name for name, _ in bb.check_baseline_report(data)}
+        names = {name for name, _ in _failures(data, bundle)}
         assert "criterion_scores_present" in names
+
+
+# --------------------------------------------------------------------------- #
+# What is absent: the identity sets the profile declares (V04)
+# --------------------------------------------------------------------------- #
+
+
+class TestTheIdentitySets:
+    """Removing records is the failure mode the per-entry checks cannot see:
+    the loops that bind and range-check entries run over what is left, so a
+    report with one of its cells kept satisfies all of them.  The identity
+    sets are what notices."""
+
+    def test_the_grid_is_the_rubric_set_crossed_with_the_profiles_sections(self, bundle):
+        assert ba.expected_cells(bundle) == tuple(
+            (r.criterion_id, r.expectation_key, s)
+            for r in bundle.rubric_set.rubrics
+            for s in bundle.profile.section_ids_for(r.criterion_id)
+        )
+
+    def test_a_report_missing_a_cell_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        dropped = report["cells"].pop()
+        failures = _failures(report, bundle)
+        assert {name for name, _ in failures} == {"cell_identity"}
+        ((_name, reason),) = failures
+        assert dropped["expectation_key"] in reason
+
+    def test_a_report_with_one_cell_of_the_grid_is_refused(self, world, bundle):
+        """The audit's second probe, in the shape it was reproduced."""
+        report = _frozen_ready(world, bundle)
+        report["cells"] = report["cells"][:1]
+        assert "cell_identity" in _names(report, bundle)
+
+    def test_a_duplicated_cell_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["cells"].append(copy.deepcopy(report["cells"][0]))
+        ((name, reason),) = _failures(report, bundle)
+        assert name == "cell_identity"
+        assert "more than once" in reason
+
+    def test_a_cell_the_profile_does_not_grade_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["cells"][0]["expectation_key"] = "invented-expectation"
+        ((name, reason),) = _failures(report, bundle)
+        assert name == "cell_identity"
+        assert "invented-expectation" in reason
+
+    def test_a_report_missing_a_criterion_score_is_refused(self, world, bundle):
+        """The audit's third probe: one of three criterion scores kept."""
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["scores"] = report["criterion_scoring"]["scores"][:1]
+        names = _names(report, bundle)
+        assert "criterion_identity" in names
+        # And the total cannot be recomputed from one score of three.
+        assert "total_recomputed" in names
+
+    def test_a_duplicated_criterion_score_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        scores = report["criterion_scoring"]["scores"]
+        scores.append(copy.deepcopy(scores[0]))
+        ((name, reason),) = _failures(report, bundle)
+        assert name == "criterion_identity"
+        assert "more than once" in reason
+
+
+# --------------------------------------------------------------------------- #
+# What does not reproduce: the arithmetic the report declares (V04)
+# --------------------------------------------------------------------------- #
+
+
+class TestTheArithmeticReproduces:
+    def test_a_panel_short_of_its_declared_members_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["cells"][0]["coverage"]["verdict"]["members"].pop()
+        reasons = [r for n, r in _failures(report, bundle) if n == "cell_members"]
+        assert any("carries 2 member(s)" in r for r in reasons)
+
+    def test_a_member_score_off_the_unit_interval_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["cells"][0]["coverage"]["verdict"]["members"][0]["score"] = 1.5
+        assert "cell_members" in _names(report, bundle)
+
+    def test_a_panel_mean_that_does_not_reproduce_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["cells"][0]["coverage"]["verdict"]["score"] = 0.42
+        assert "cell_members" in _names(report, bundle)
+
+    def test_an_agreement_that_does_not_reproduce_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["cells"][0]["coverage"]["verdict"]["agreement"] = 0.5
+        assert "cell_members" in _names(report, bundle)
+
+    def test_a_majority_call_the_members_do_not_support_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["cells"][0]["coverage"]["verdict"]["passed"] = False
+        assert "cell_members" in _names(report, bundle)
+
+    def test_a_panel_of_members_about_different_properties_is_refused(self, world, bundle):
+        """The vote is the producer's own ``majority_vote``, so the panel has
+        to satisfy it: members of one vote concern one property."""
+        report = _frozen_ready(world, bundle)
+        report["cells"][0]["coverage"]["verdict"]["members"][0]["property_key"] = "elsewhere"
+        reasons = [r for n, r in _failures(report, bundle) if n == "cell_members"]
+        assert any("will not re-vote" in r for r in reasons)
+
+    def test_a_criterion_the_scorecard_does_not_weight_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["scores"][0]["criterion_id"] = "invented"
+        names = _names(report, bundle)
+        assert "criterion_identity" in names
+        assert "criterion_arithmetic" in names
+
+    def test_a_criterion_median_that_does_not_reproduce_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["scores"][0]["score"] = 4.9
+        names = _names(report, bundle)
+        assert "criterion_arithmetic" in names
+        assert "total_recomputed" in names
+
+    def test_a_criterion_spread_that_does_not_reproduce_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["scores"][0]["spread"] = 2.5
+        assert "criterion_arithmetic" in _names(report, bundle)
+
+    def test_a_sample_off_the_scorecards_scale_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["scores"][0]["samples"][0]["score"] = 9.0
+        assert "criterion_arithmetic" in _names(report, bundle)
+
+    def test_a_declared_sample_count_the_samples_do_not_match_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["samples_per_criterion"] = 7
+        assert "criterion_arithmetic" in _names(report, bundle)
+
+    def test_a_criterion_scored_with_no_samples_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["scores"][0]["samples"] = []
+        assert "criterion_arithmetic" in _names(report, bundle)
+
+    def test_weighted_points_that_do_not_reproduce_are_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["scores"][0]["weighted_points"] = 99.0
+        assert "criterion_arithmetic" in _names(report, bundle)
+
+    def test_a_total_the_criterion_scores_do_not_give_is_refused(self, world, bundle):
+        """The audit's fifth probe: the total replaced with another number."""
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["total"] = 99.9
+        ((name, reason),) = _failures(report, bundle)
+        assert name == "total_recomputed"
+        assert "99.9" in reason
+
+    def test_a_threshold_verdict_the_total_does_not_support_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        met = report["criterion_scoring"]["overall_threshold_met"]
+        report["criterion_scoring"]["overall_threshold_met"] = not met
+        assert "total_recomputed" in _names(report, bundle)
+
+    def test_an_overall_maximum_the_scorecard_does_not_declare_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["criterion_scoring"]["overall_max"] = 1000.0
+        assert "total_recomputed" in _names(report, bundle)
+
+
+# --------------------------------------------------------------------------- #
+# The invocation and isolation evidence the transport owes (V04)
+# --------------------------------------------------------------------------- #
+
+
+class TestTheInvocationEvidence:
+    def test_a_report_without_an_invocation_record_is_refused(self, world, bundle):
+        """The audit's fourth probe: ``assessor_invocation`` removed."""
+        report = _frozen_ready(world, bundle)
+        report.pop("assessor_invocation")
+        ((name, reason),) = _failures(report, bundle)
+        assert name == "invocation_evidence"
+        assert TRANSPORT in reason
+
+    def test_an_empty_invocation_record_is_refused(self, world, bundle):
+        _code, path = _assess(world, bundle, _BackendWithoutInvocation())
+        report = json.loads(path.read_text(encoding="utf-8"))
+        assert "invocation_evidence" in _names(report, bundle)
+
+    def test_an_assessor_that_ran_inside_the_repository_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["assessor_invocation"]["working_directory_outside_repository"] = False
+        ((name, reason),) = _failures(report, bundle)
+        assert name == "invocation_evidence"
+        assert "working_directory_outside_repository" in reason
+
+    def test_an_assessor_that_could_reach_tools_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["assessor_invocation"]["tools"] = "Read,Glob"
+        assert "invocation_evidence" in _names(report, bundle)
+
+    def test_a_missing_declaration_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["assessor_invocation"].pop("strict_mcp_config")
+        ((name, reason),) = _failures(report, bundle)
+        assert name == "invocation_evidence"
+        assert "strict_mcp_config" in reason
+
+    def test_a_working_directory_inside_the_repository_is_refused(self, world, bundle):
+        """The declaration is measured, not read: a record claiming its
+        assessor ran outside the repository while naming a directory inside it
+        is refused on the path, whatever it declares."""
+        report = _frozen_ready(world, bundle)
+        report["assessor_invocation"]["working_directory"] = str(world / "harness")
+        assert report["assessor_invocation"]["working_directory_outside_repository"] is True
+        ((name, reason),) = _failures(report, bundle, repo_root=world)
+        assert name == "invocation_evidence"
+        assert "lies under the repository root" in reason
+
+    def test_an_unnamed_working_directory_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report["assessor_invocation"].pop("working_directory")
+        ((name, reason),) = _failures(report, bundle, repo_root=world)
+        assert name == "invocation_evidence"
+        assert "cannot be measured" in reason
+
+    def test_a_transport_the_freeze_does_not_know_is_refused(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        report.update(assessor_transport="carrier-pigeon", assessor_version="carrier-pigeon-1")
+        assert "invocation_evidence" in _names(report, bundle)
+
+    def test_a_transport_with_no_child_process_is_recorded_not_applicable(self, world, bundle):
+        """An API transport declares no isolation of its own.  The check is
+        then not claimed as passed — which is what ``checks_passed`` means."""
+        report = _frozen_ready(world, bundle)
+        report.update(
+            assessor_transport=cmd.TRANSPORT_OPENAI,
+            assessor_version=f"{cmd.TRANSPORT_OPENAI}-test@2026-10-05",
+            assessor_invocation={},
+        )
+        run = bb.run_baseline_checks(report, bundle)
+        assert run.failures == ()
+        assert [name for name, _ in run.not_applicable] == ["invocation_evidence"]
+        assert "invocation_evidence" not in run.passed
+        assert set(run.passed) == set(bb.BASELINE_CHECKS) - {"invocation_evidence"}
 
 
 # --------------------------------------------------------------------------- #
@@ -275,6 +561,7 @@ class TestFreeze:
         printed = capsys.readouterr().out
         assert "FROZEN BLIND BASELINE" in printed
         assert TRANSPORT in printed
+        assert f"{len(bb.BASELINE_CHECKS)} of {len(bb.BASELINE_CHECKS)} passed" in printed
 
     def test_cells_and_criterion_scores_are_present_with_spreads(self, world, bundle):
         _code, report = _assess(world, bundle, RecordingBackend())
@@ -333,6 +620,24 @@ class TestFreeze:
         )
         with pytest.raises(bb.BlindBaselineError, match="edited after"):
             bb.load_frozen_baseline(baseline)
+
+    def test_a_check_that_did_not_apply_is_not_recorded_as_passed(self, world, bundle):
+        """``checks_passed`` lists what ran and held.  An API-transport report
+        owes no child-process isolation, so the record says the check did not
+        apply rather than listing it among the passes."""
+        version = f"{cmd.TRANSPORT_OPENAI}-test@2026-10-05"
+        _code, report = _assess(
+            world, bundle, RecordingBackend(), "--transport", cmd.TRANSPORT_OPENAI,
+            version=version,
+        )
+        baseline = world / "baseline"
+        assert _freeze(world, bundle, report, baseline) == 0
+        record = bb.load_frozen_baseline(baseline).record
+        assert "invocation_evidence" not in record["checks_passed"]
+        assert [row["check"] for row in record["checks_not_applicable"]] == [
+            "invocation_evidence"
+        ]
+        assert record["checks_not_applicable"][0]["reason"]
 
     def test_an_empty_directory_holds_no_baseline(self, tmp_path):
         with pytest.raises(bb.BlindBaselineError, match="no frozen baseline"):
@@ -409,3 +714,115 @@ class TestPlantedMarkers:
         candidate = json.loads((root / CANDIDATE).read_text(encoding="utf-8"))
         first_words = candidate["sections"][0]["content"].split(".")[0]
         assert any(first_words in p for p in backend.prompts)
+
+
+# --------------------------------------------------------------------------- #
+# The committed MSCA-DN baseline: the control still freezes, the audit's four
+# reproduced probes do not (V04)
+# --------------------------------------------------------------------------- #
+
+REPO = find_repo_root()
+DN_BASELINE_DIR = REPO / "docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06"
+DN_REPORT = DN_BASELINE_DIR / "blind_baseline_f60ae6e0a2a1.json"
+DN_FREEZE = DN_BASELINE_DIR / "blind_baseline_f60ae6e0a2a1.freeze.json"
+DN_CANDIDATE = (
+    REPO / "harness/blind_reports/candidates/MSCA-DN-2025_sanitised_part_b@b51a103520b58ded"
+)
+DN_PROFILE = REPO / "harness/profiles/msca_dn_2026_default.json"
+
+#: The audit's probes, each built from a copy of the committed report by
+#: changing only what the row names (readiness audit F03, section 8).
+AUDIT_PROBES = [
+    pytest.param(
+        lambda r: r.__setitem__("cells", r["cells"][:1]),
+        "cell_identity",
+        id="one-of-ten-cells",
+    ),
+    pytest.param(
+        lambda r: r["criterion_scoring"].__setitem__(
+            "scores", r["criterion_scoring"]["scores"][:1]
+        ),
+        "criterion_identity",
+        id="one-of-three-criterion-scores",
+    ),
+    pytest.param(
+        lambda r: r.pop("assessor_invocation"),
+        "invocation_evidence",
+        id="assessor-invocation-removed",
+    ),
+    pytest.param(
+        lambda r: r["criterion_scoring"].__setitem__("total", 99.9),
+        "total_recomputed",
+        id="total-replaced-with-99.9",
+    ),
+]
+
+
+@pytest.mark.skipif(
+    not DN_REPORT.is_file() or not DN_CANDIDATE.is_dir(),
+    reason="MSCA-DN baseline or candidate absent",
+)
+class TestTheCommittedMscaDnBaseline:
+    """The real `freeze_baseline` path, on the real candidate and the loaded
+    profile bundle, as the audit exercised it.  Every case works on its own
+    copy under ``tmp_path`` and writes nowhere else."""
+
+    @pytest.fixture
+    def dn_bundle(self):
+        return load_profile_bundle(DN_PROFILE, repo_root=REPO)
+
+    def _copy(self, tmp_path: Path, mutate=None) -> Path:
+        copy_path = tmp_path / "report.json"
+        if mutate is None:
+            shutil.copyfile(DN_REPORT, copy_path)
+            return copy_path
+        data = json.loads(DN_REPORT.read_text(encoding="utf-8"))
+        mutate(data)
+        return _write_json(copy_path, data)
+
+    def _freeze_copy(self, tmp_path: Path, dn_bundle, report: Path) -> bb.FrozenBaseline:
+        return bb.freeze_baseline(
+            report,
+            DN_CANDIDATE,
+            dn_bundle,
+            baseline_dir=tmp_path / "baseline",
+            repo_root=REPO,
+            clock=lambda: FROZEN,
+        )
+
+    def test_the_unmodified_control_still_freezes_at_74_6(self, tmp_path, dn_bundle):
+        frozen = self._freeze_copy(tmp_path, dn_bundle, self._copy(tmp_path))
+        assert frozen.record["criterion_total"]["total"] == 74.6
+        assert frozen.record["checks_passed"] == list(bb.BASELINE_CHECKS)
+        assert frozen.record["checks_not_applicable"] == []
+        assert len(frozen.record["cells"]) == 10
+        assert len(frozen.record["criterion_scores"]) == 3
+
+    def test_the_control_reproduces_the_committed_identity(self, tmp_path, dn_bundle):
+        """The hardened gate re-derives the bindings the committed freeze
+        recorded: same report bytes, same hash, same copy name."""
+        frozen = self._freeze_copy(tmp_path, dn_bundle, self._copy(tmp_path))
+        committed = json.loads(DN_FREEZE.read_text(encoding="utf-8"))
+        assert frozen.record["report_sha256"] == committed["report_sha256"]
+        assert frozen.copy_path.name == committed["report_copy"]
+        assert frozen.copy_path.read_bytes() == DN_REPORT.read_bytes()
+        assert frozen.record["bindings"] == committed["bindings"]
+
+    def test_the_committed_report_passes_every_check_by_name(self, dn_bundle):
+        run = bb.run_baseline_checks(
+            json.loads(DN_REPORT.read_text(encoding="utf-8")), dn_bundle, repo_root=REPO
+        )
+        assert run.failures == ()
+        assert run.not_applicable == ()
+        assert run.passed == bb.BASELINE_CHECKS
+
+    @pytest.mark.parametrize("mutate, check", AUDIT_PROBES)
+    def test_each_reproduced_probe_is_refused_with_a_check_and_a_reason(
+        self, tmp_path, dn_bundle, mutate, check
+    ):
+        report = self._copy(tmp_path, mutate)
+        with pytest.raises(bb.BlindBaselineError) as caught:
+            self._freeze_copy(tmp_path, dn_bundle, report)
+        message = str(caught.value)
+        assert f"{check}: " in message
+        assert not (tmp_path / "baseline").exists()

@@ -599,29 +599,56 @@ blocking=False` at construction and on load.
     py -3.10 -m harness.commands.blind_assessment freeze --report <file> --candidate <dir> --baseline-dir <dir>
 
 The command re-binds the report to the candidate, then checks the baseline
-conditions by name (`BASELINE_CHECKS`). The conditions are:
+conditions by name (`BASELINE_CHECKS`) against the **loaded profile bundle** —
+the rubric set, criterion map and scorecard are the authority for what a
+complete report holds, which is why `freeze_baseline` takes the bundle rather
+than the profile. The conditions are:
 
 - dev-graph evidence: snapshot id, package id and policy version present;
 - the preflight pack-set hash and report present, the preflight file readable,
   and its `pack_set_hash` equal to the report's;
 - candidate hash, profile version and assessor pin present;
-- an `assessor_transport` that the version tag names;
+- an `assessor_transport` that the version tag names, and the invocation and
+  isolation evidence that transport owes
+  (`TRANSPORT_ISOLATION_EVIDENCE`): the subscription transport must carry
+  `assessor_invocation` declaring `tools: ""`, `strict_mcp_config: true` and a
+  working directory outside the repository. That last one is measured, not
+  read: the record also names the directory, and the freeze refuses a path
+  that lies under `--repo-root` however the record describes it. An API
+  transport runs no child process, and its check is recorded **not
+  applicable** rather than passed;
 - complete scope;
-- every cell with an N>=3 panel and an agreement value;
-- a median and a spread for every criterion, from a panel of at least five,
-  and a determined total.
+- cells that are exactly the profile's cell grid (`expected_cells`) — none
+  missing, none extra, none twice — every one with an N>=3 panel, as many
+  members as the panel declares, member scores on the unit interval, and a
+  mean, agreement and majority call that come back the same when the members
+  are put back through `verdict.majority_vote`;
+- criterion scores that are exactly the profile's criteria, each one's median
+  and spread recomputing from its own samples, every sample on the scorecard's
+  scale, as many samples as the report declares, and that count at least five;
+- a determined total that recomputes from the criterion scores under the
+  scorecard's own weighting, with the declared maximum, threshold and
+  threshold verdict the scorecard gives.
+
+The identity sets are what notices a *deleted* record: the per-entry loops bind
+and range-check the entries that are present, so a report with nine of its ten
+cells removed satisfies every one of them. Every recomputation calls the
+function that produced the number — `verdict.majority_vote` for a panel,
+`criterion_scoring.median_score` / `score_spread` / `weighted_points_for` for a
+criterion, `weighted_total` for the aggregate — so the checker cannot drift from
+the producer. A figure that does not reproduce is a refusal, never a
+correction.
 
 Any failing condition is named and nothing is written (exit 2). On success the
 report is copied byte for byte to `<baseline-dir>/blind_baseline_<sha12>.json`.
 A `harness.blind_baseline_freeze` record is written beside it. The record
 carries every binding, the per-cell `n`, agreement and score spread, the
 per-criterion score and spread, the total, and the report's own spread label
-(within-assessor repeatability). `checks_passed` is derived from the check
-list, never declared. A baseline directory holds one freeze; a second is
-refused. Later stages read it through `load_frozen_baseline`, which re-hashes
-the copy and refuses an edited one. The report carries `assessor_transport`
-(the command's `--transport` choice) and `assessor_invocation` (the backend's
-own account of what its child could reach), so both conditions are structural.
+(within-assessor repeatability). `checks_passed` is derived from the checks that
+ran, never declared, and a check that did not apply is listed in
+`checks_not_applicable` with its reason instead. A baseline directory holds one
+freeze; a second is refused. Later stages read it through
+`load_frozen_baseline`, which re-hashes the copy and refuses an edited one.
 
 **The bound bytes are protected from line-ending translation.** Every
 binding above is a sha256 of file bytes: the frozen copy, the preflight

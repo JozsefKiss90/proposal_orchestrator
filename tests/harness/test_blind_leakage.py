@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -149,6 +150,22 @@ class RecordingBackend:
         if "CRITERION UNDER ASSESSMENT" in system:
             return {"content": CRITERION_JSON}
         return {"content": PASS_JSON}
+
+    def invocation_record(self):
+        """The isolation the subscription backend declares, so a synthetic
+        report can be frozen: a baseline requires its transport's evidence
+        (``harness.blind_baseline.TRANSPORT_ISOLATION_EVIDENCE``).
+
+        The scripted backend starts no child process, so the directory it
+        names is the system temporary one — which genuinely lies outside any
+        repository root a test builds under ``tmp_path``, and which the freeze
+        measures rather than takes on trust."""
+        return {
+            "tools": "",
+            "strict_mcp_config": True,
+            "working_directory": tempfile.gettempdir(),
+            "working_directory_outside_repository": True,
+        }
 
 
 @pytest.fixture

@@ -347,24 +347,60 @@ internally inconsistent, while the committed baseline still freezes unchanged.
 
 ### Acceptance criteria
 
-- [ ] Freeze enforces the profile's exact expected cell and criterion identity sets and their
-      cardinalities, and rejects duplicate cell or criterion entries.
-- [ ] Freeze verifies member counts, score ranges, medians, spreads and the declared sample count
-      against the entries actually present.
-- [ ] Freeze recomputes the weighted total from the criterion scores under the profile's
-      `10E + 6I + 4Q` and refuses an inconsistent aggregate.
-- [ ] Freeze requires transport-appropriate invocation and isolation evidence; a report with
-      `assessor_invocation` removed is refused.
-- [ ] All four reproduced negative probes are refused with a check name and a reason, and focused
-      negative tests cover each.
-- [ ] The unmodified control still passes, and the committed `blind_baseline_f60ae6e0a2a1.json` still
-      validates with its recorded total of 74.6.
-- [ ] `checks_passed` remains derived from checks that actually ran. Immutable report copies and
-      one-freeze-per-directory behaviour are preserved.
+- [x] Freeze enforces the profile's exact expected cell and criterion identity sets and their
+      cardinalities, and rejects duplicate cell or criterion entries. `cell_identity` compares the
+      report's cells with `harness.blind_assessment.expected_cells` — the rubric set crossed with the
+      profile's criterion-to-section map — and `criterion_identity` compares its scores with
+      `profile.criterion_ids`. Both compare multisets, so a repeated entry is refused by name.
+      `assess_candidate` was additionally pointed at the same grid so the expected set and the
+      produced set cannot drift; that refactor is a declared deviation, not a requirement of this
+      criterion.
+- [x] Freeze verifies member counts, score ranges, medians, spreads and the declared sample count
+      against the entries actually present. `cell_members`: as many members as the panel declares,
+      member scores on the unit interval, and the mean, agreement and majority call that
+      `verdict.majority_vote` gives when the members are put back through it. `criterion_arithmetic`:
+      as many samples as the report declares, every sample on the scorecard's scale, and the median,
+      spread, weight, factor and weighted points from the grader's own
+      `median_score` / `score_spread` / `weighted_points_for`.
+- [x] Freeze recomputes the weighted total from the criterion scores under the profile's
+      `10E + 6I + 4Q` and refuses an inconsistent aggregate. `total_recomputed` calls
+      `harness.criterion_scoring.weighted_total` over the scores the report carries — the same
+      function that formed the total — and also re-derives the declared maximum, threshold and
+      threshold verdict.
+- [x] Freeze requires transport-appropriate invocation and isolation evidence; a report with
+      `assessor_invocation` removed is refused. `TRANSPORT_ISOLATION_EVIDENCE` names what each
+      transport owes: the subscription transport must declare `tools: ""`, `strict_mcp_config: true`
+      and a working directory outside the repository, and must name that directory. The last
+      declaration is measured rather than read — a path under `--repo-root` is refused whatever the
+      record claims — while the first two remain the backend's word (see the report's uncertainties).
+      An unknown transport is refused. An API transport runs no child process and is recorded not
+      applicable, never passed.
+- [x] All four reproduced negative probes are refused with a check name and a reason, and focused
+      negative tests cover each. `tests/harness/test_blind_baseline.py::TestTheCommittedMscaDnBaseline`
+      runs all four through the real `freeze_baseline` on copies of the committed report under
+      `tmp_path`; `TestTheIdentitySets`, `TestTheArithmeticReproduces` and `TestTheInvocationEvidence`
+      add 32 focused cases on the synthetic world.
+- [x] The unmodified control still passes, and the committed `blind_baseline_f60ae6e0a2a1.json` still
+      validates with its recorded total of 74.6. The control freezes with 21 of 21 checks passed and
+      reproduces the committed freeze's `report_sha256`, copy name and every binding.
+- [x] `checks_passed` remains derived from checks that actually ran. Immutable report copies and
+      one-freeze-per-directory behaviour are preserved. `BaselineCheckRun.passed` is the checks that
+      ran minus the failures, and a check that did not apply is listed in the new
+      `checks_not_applicable` with its reason (freeze schema 1.0.0 → 1.1.0). `render_freeze` prints
+      the count and names any exception, so the screen and the record agree; that line and the
+      removal of the redundant `profile_version` parameter are declared deviations.
 
 **Verification.** Exercise the real `freeze_baseline` path on isolated copies with the real candidate
 and loaded profile bundle, as the audit did. Write only to a temporary directory. Do not rerun the whole
 repository in place of focused negative tests.
+
+**Status 2026-10-12.** Closed, seven of seven. F03 closes here. G4 does not: V06 is still open.
+`freeze_baseline` now takes the loaded `ProfileBundle` rather than the profile, because the rubric set
+and scorecard are what say whether a report is complete. Three changes outside the seven criteria are
+declared in section 8 of the completion report rather than presented as required. The acceptance lane
+is green: 2,244 passed, 0 failed, 0 errors, 17 declared exclusions. No assessor ran and the 74.60
+baseline is untouched. Evidence: `plans/reports/v04_freeze_refuses_incomplete_reports_2026-10-12.md`
+and `docs/tier4_orchestration_state/decision_log/msca-dn-freeze-completeness_2026-10-12.json`.
 
 ## V05 — Derive audit grounding and identity wording from candidate provenance
 

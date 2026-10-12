@@ -1,0 +1,121 @@
+{
+ "record_type": "decision",
+ "id": "msca-dn-freeze-completeness_2026-10-12",
+ "date": "2026-10-12",
+ "branch": "msca-dn-pre-eval",
+ "ticket": "V04 of plans/msca_dn_historical_validation_tickets.md",
+ "closes": "finding F03 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+ "milestone": "MSCA-DN historical validation, gate G4: the baseline freeze refuses a report that is incomplete, duplicated, out of range or internally inconsistent, so what later stages read as the frozen baseline is a whole report rather than whatever survived an edit",
+ "authority": "CLAUDE.md §9.4 (a decision affecting future interpretation is written down), §9.5 (an output is reproducible from its documented inputs), §12.1 (an output names its inputs by file), §12.4 (a missing input is a declared gap, never a papered-over completion), §13.7 (a gate condition is never weakened to let work through), §15 (an explicit failure beats a fabricated completion); harness/HARNESS.md (out-of-band QA, never a runtime gate); spec decisions 10 and 11 of plans/msca_dn_pre_evaluation_spec.md, which the transport declaration and the N=5 criterion panel implement.",
+ "problem": {
+  "declared_status": "Confirmed",
+  "basis": "reproduced by the readiness audit at ca0a443 (its section 8, finding F03) and again at 437ca89 before this change, by calling the complete freeze_baseline path on copies of docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06/blind_baseline_f60ae6e0a2a1.json with the real candidate and the loaded profile bundle",
+  "statement": "The freeze accepted four invalid variants of the committed report, each with 15 checks passed.",
+  "probes_accepted": [
+   "one of ten cells kept",
+   "one of three criterion scores kept",
+   "assessor_invocation removed",
+   "the total 74.6 replaced with 99.9"
+  ],
+  "cause": "Every check that walked the report's entries walked the entries that were present: it bound them to the report, required a panel and a spread on each, and required a non-null total. Deleting records left those loops nothing to refuse. No check compared the report with what a complete report holds, and no check re-derived a recorded number from the draws beneath it.",
+  "not_a_claim_about_the_baseline": "This is an acceptance-validation defect. The committed report has ten cells, three criterion scores and the consistent total 74.6, and its approval hashes all match. V04 is the ticket that measures that rather than the one that risks it."
+ },
+ "decision": {
+  "declared_status": "Confirmed",
+  "basis": "implemented in harness/blind_baseline.py, harness/blind_assessment.py and harness/criterion_scoring.py; 75 checks in tests/harness/test_blind_baseline.py, of which 35 are new negative probes and 7 run the real freeze over the committed baseline",
+  "statement": "The freeze checks a report against the loaded profile bundle: the cells and criterion scores must be exactly the sets the bundle declares, and every recorded panel value, median, spread and total must re-derive from the draws the report carries.",
+  "checks_added": {
+   "invocation_evidence": "the invocation and isolation evidence the report's transport owes",
+   "cell_identity": "the cells are exactly the profile's grid - none absent, none unexpected, none repeated",
+   "cell_members": "as many members as the panel declares, member scores on the unit interval, and the mean, agreement and majority call that verdict.majority_vote gives when those members are put back through it",
+   "criterion_identity": "the criterion scores are exactly the profile's criteria, each once",
+   "criterion_arithmetic": "as many samples as the report declares, every sample on the scorecard's scale, and the median, spread, weight, factor and weighted points recomputed from the samples",
+   "total_recomputed": "the total recomputed from the criterion scores through harness.criterion_scoring.weighted_total, plus the declared maximum, threshold and threshold verdict"
+  },
+  "check_count": "BASELINE_CHECKS is 15 names at 437ca89 and 21 now, in the order run_baseline_checks runs them.",
+  "the_bundle_is_the_authority": "freeze_baseline took a PreEvaluationProfile and now takes the loaded ProfileBundle. A profile alone cannot say which cells a complete report holds - that is the rubric set crossed with the criterion-to-section map - nor what scale and weighting its scores must satisfy. The redundant profile_version parameter is removed with it, so a caller can no longer pass a version its bundle contradicts.",
+  "one_definition_of_the_cell_grid": "harness.blind_assessment.cell_grid returns every (rubric, section_id) pair an assessment grades and expected_cells names the same pairs by identity. assess_candidate walks the first and the freeze compares against the second, so the expected set cannot drift from the produced set.",
+  "recomputation_re_derives_never_substitutes": "Each arithmetic check calls the function that produced the number, rather than re-stating its rule: verdict.majority_vote over a cell's rebuilt panel members, criterion_scoring.median_score / score_spread / weighted_points_for for a criterion, weighted_total for the aggregate. Those four criterion-scoring helpers were extracted from grade_criterion and _parse_sample in this change so the grader and the checker share one statement of each; re-stating them in the checker would let the two drift silently, which is the defect's own shape. A figure that does not reproduce is a refusal naming both values, and a panel that will not re-vote at all is refused with majority_vote's own reason. Nothing is corrected and no number of the freeze's own enters the record.",
+  "one_scale_rule_two_readers": "off_scale_reason is factored out of harness/criterion_scoring.py's sample parser. The parser rejects a draw the assessor cannot have meant; the freeze re-checks every recorded score against the same rule."
+ },
+ "transport_evidence": {
+  "declared_status": "Confirmed",
+  "basis": "TRANSPORT_ISOLATION_EVIDENCE in harness/blind_baseline.py, bound to the command's choices and to the real backend by tests/harness/test_blind_baseline.py::TestTheReportNamesItsTransport",
+  "statement": "What counts as invocation and isolation evidence depends on the transport, so the requirement is a table rather than one rule.",
+  "claude-cli": "assessor_invocation must declare tools: \"\", strict_mcp_config: true and working_directory_outside_repository: true - the three the subscription backend records - and must name the working directory itself. A missing record, a missing declaration or a declaration with another value is refused by name.",
+  "openai-compatible": "Nothing. The backend runs no child process and declares no isolation of its own, so the check is recorded not applicable.",
+  "unknown_transport": "Refused. The freeze cannot say what evidence would be appropriate for a transport it does not know.",
+  "kept_in_step": "blind_baseline cannot import the command it is called by, so the transport names are a second literal. One test asserts the table's keys are the command's two --transport choices; another builds a real subscription backend and asserts the declarations the table requires are the declarations that backend makes.",
+  "the_measured_declaration": "working_directory_outside_repository is measured, not read. The record names the directory, so the freeze compares that path with the repository root it was given and refuses a path lying under it whatever the declaration says; a record claiming the property and naming no directory is refused as unmeasurable. Where the caller gave no repository root there is nothing to measure against and the declaration stands alone, which the freeze command never does. The other two declarations remain the backend's word: the audit's F04 point about declared identifiers rather than runtime attestation still applies to them, and closing that is the operator's isolation receipt (V13), not a freeze check."
+ },
+ "checks_passed_stays_derived": {
+  "declared_status": "Confirmed",
+  "basis": "BaselineCheckRun in harness/blind_baseline.py; tests/harness/test_blind_baseline.py::TestFreeze::test_a_check_that_did_not_apply_is_not_recorded_as_passed",
+  "statement": "A conditional check introduces a third outcome, so the record distinguishes it from a pass rather than flattening it into one.",
+  "rule": "BaselineCheckRun.passed is the checks that ran minus the failures. A check that did not apply is listed in the new checks_not_applicable with its reason, and never in checks_passed.",
+  "schema": "BASELINE_FREEZE_SCHEMA_VERSION moves 1.0.0 to 1.1.0 for the added key. Nothing consumes checks_passed, and load_frozen_baseline does not read the schema version, so the committed 1.0.0 freeze record stays readable and is not rewritten.",
+  "rendered": "render_freeze prints the count of checks passed and one line per exception, so an operator reading the screen sees 20 of 21 rather than assuming 21."
+ },
+ "the_control_still_freezes": {
+  "declared_status": "Confirmed",
+  "basis": "tests/harness/test_blind_baseline.py::TestTheCommittedMscaDnBaseline, run under the V01 environment pin",
+  "statement": "The hardened gate still accepts the committed baseline and re-derives the identity the committed freeze recorded.",
+  "control": "The committed report freezes with 21 of 21 checks passed, no check not applicable, 10 cells, 3 criterion scores and the total 74.6.",
+  "identity_reproduced": "The new freeze record carries the committed freeze's report_sha256 and report_copy name and every one of its bindings, and the copy is byte-identical to the committed report.",
+  "probes_refused": "Each of the audit's four probes raises BlindBaselineError naming its check and its reason, and the baseline directory is never created.",
+  "isolation": "Every case works on its own copy under tmp_path. Nothing under docs/ is written. The committed baseline, its freeze record, both fidelity registers, the approval records and the committed audits are untouched."
+ },
+ "lane": {
+  "declared_status": "Confirmed",
+  "basis": "py -3.10 -m harness.commands.acceptance_lane, run after the last change in this ticket; the result is in plans/reports/v04_freeze_refuses_incomplete_reports_2026-10-12.md section 6",
+  "statement": "The lane is green, and its freeze area carries the invariant this ticket strengthens.",
+  "measured": {
+   "passed": 2244,
+   "failed": 0,
+   "errors": 0,
+   "skipped_declared_exclusions": 17,
+   "collected": 2261,
+   "exit_code": 0
+  },
+  "audit_baseline_for_comparison": {
+   "commit": "ca0a443",
+   "passed": 1864,
+   "failed": 44,
+   "errors": 48,
+   "skipped": 8,
+   "collected": 1964
+  },
+  "skips": "17 declared exclusions, unchanged. No new skip was introduced, so the declaration still reconciles."
+ },
+ "not_evidence_of": [
+  "a closed gate G4. V06 - the grounding scope in preflight, report and freeze - is open.",
+  "that the official 2025 original has been imported, assessed or frozen. V07 to V09 are open and V09 is the operator's.",
+  "that the 74.60 result is correct, calibrated or predictive. The freeze checks that a report is complete and internally consistent. It judges no score.",
+  "a corrected runbook. plans/msca_dn_pe09_runbook.md still describes fifteen freeze checks and still claims the planted-marker test is one of them. Both are V12's to correct and neither is corrected here.",
+  "a new assessor run. No quota was spent.",
+  "an exercised API-transport baseline. The openai-compatible branch is covered by the synthetic world and by a mutated copy of the committed report, not by a real API-transport run."
+ ],
+ "impacted_components": [
+  "harness/blind_baseline.py (six checks added; BaselineCheckRun and run_baseline_checks; TRANSPORT_ISOLATION_EVIDENCE; freeze_baseline takes the bundle and drops profile_version; checks_not_applicable; schema 1.1.0)",
+  "harness/blind_assessment.py (cell_grid and expected_cells; assess_candidate walks the grid)",
+  "harness/criterion_scoring.py (off_scale_reason factored out of _parse_sample)",
+  "harness/commands/blind_assessment.py (the freeze call site passes the bundle)",
+  "harness/HARNESS.md",
+  "tests/harness/test_blind_baseline.py, tests/harness/test_blind_leakage.py (RecordingBackend declares its invocation record)",
+  "plans/msca_dn_historical_validation_tickets.md (V04 boxes and status)"
+ ],
+ "remaining_uncertainties": {
+  "unit_interval_bound": "The unit-interval bound on member scores is the harness's own convention - grade_expectation normalises a coverage verdict to [0, 1] - not a scorecard declaration. A rubric set scoring cells on another scale would need cell_members amended.",
+  "identity_not_content": "The identity checks compare cell and criterion ids. A cell carrying the right triple and a rationale about something else is not refused here; the rubric fingerprint the report binds is what covers that, and it is not re-derived at freeze time.",
+  "member_vote_requirement": "A baseline now requires every panel member to declare both a score and a pass/fail. majority_vote itself permits either to be absent, so a hypothetical report with a partial panel would be refused by the freeze though the vote that produced it was valid. The stricter rule is deliberate: without it, nulling one member would silence the recomputation.",
+  "declared_isolation_is_partly_unmeasured": "tools and strict_mcp_config are read from the invocation record, not measured. Only the working directory is checked against the repository root.",
+  "cell_identity_is_a_bare_triple": "A cell's identity travels as tuple[str, str, str] through expected_cells, both counters and the failure labels. A named type would read better; a tuple is what a Counter key wants."
+ },
+ "declared_deviations": {
+  "declared_status": "Confirmed",
+  "basis": "named in plans/reports/v04_freeze_refuses_incomplete_reports_2026-10-12.md section 8; none of the three is in V04's seven acceptance criteria",
+  "cell_grid_in_assess_candidate": "assess_candidate now walks blind_assessment.cell_grid rather than its own nested loop. Criterion 1 asks the freeze to enforce the profile's exact expected cell set; a second definition of that set would be a second thing to keep in step. Iteration order is preserved and the committed report's ten cells reproduce, but this does edit the path that will produce the next real assessment.",
+  "criterion_scoring_extractions": "off_scale_reason, median_score, score_spread and weighted_points_for are extracted from grade_criterion and _parse_sample so the checker calls the producer. The functions are moved, not changed, and the sample parser's messages are byte-identical.",
+  "signature_and_rendering": "freeze_baseline's profile_version parameter is removed as redundant once the bundle is the argument, and render_freeze gained a line counting the checks passed and naming any exception. Criterion 7 mentions only the added checks_not_applicable key; neither of these is asked for, and both exist so the printed and stored records agree about the third outcome."
+ }
+}

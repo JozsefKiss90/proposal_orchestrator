@@ -1170,9 +1170,8 @@ def main(
             frozen = freeze_baseline(
                 args.report,
                 args.candidate,
-                bundle.profile,
+                bundle,
                 baseline_dir=baseline_dir,
-                profile_version=bundle.version,
                 repo_root=repo_root,
                 clock=clock,
             )

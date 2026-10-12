@@ -82,7 +82,11 @@ __all__ = [
     "build_criterion_input",
     "build_criterion_prompts",
     "grade_criterion",
+    "median_score",
+    "off_scale_reason",
     "score_factor",
+    "score_spread",
+    "weighted_points_for",
     "weighted_total",
     "total_formula",
     "combine_criterion_scores",
@@ -622,6 +626,39 @@ def _draw_sample(
     )
 
 
+def median_score(values: Sequence[float]) -> float:
+    """The criterion score a panel awards: the median of its draws, to 2 dp."""
+    return round(float(statistics.median(values)), 2)
+
+
+def score_spread(values: Sequence[float]) -> float:
+    """The spread of a panel: its widest draw minus its narrowest, to 2 dp."""
+    return round(max(values) - min(values), 2)
+
+
+def weighted_points_for(score: float, factor: float) -> float:
+    """The points *score* contributes to the total at *factor* per unit, to 4 dp."""
+    return round(score * factor, 4)
+
+
+def off_scale_reason(value: float, scoring: Scoring) -> str | None:
+    """Why *value* is not a score this scorecard can award, or ``None``.
+
+    One rule, two readers: the sample parser rejects a draw the assessor
+    cannot have meant, and the frozen baseline re-checks every recorded score
+    against the same scale.  The step is checked only when the scorecard
+    declares a resolution; one that declares none gets a bounded, unstepped
+    score.
+    """
+    if not 0.0 <= value <= scoring.scale_max:
+        return f"{value} lies outside the scale 0-{_fmt_number(scoring.scale_max)}"
+    if scoring.score_resolution is not None:
+        steps = value / scoring.score_resolution
+        if abs(steps - round(steps)) > 1e-6:
+            return f"{value} is not awarded {_fmt_step(scoring.score_resolution)}"
+    return None
+
+
 def _parse_sample(raw: str, scoring: Scoring, index: int) -> CriterionSample:
     """Parse one response strictly; never repair (CLAUDE.md §17.5.4 in spirit).
 
@@ -639,16 +676,9 @@ def _parse_sample(raw: str, scoring: Scoring, index: int) -> CriterionSample:
     if isinstance(score, bool) or not isinstance(score, (int, float)):
         raise JudgeResponseError(f"criterion score response: 'score' must be a number; got {score!r}.")
     value = float(score)
-    if not 0.0 <= value <= scoring.scale_max:
-        raise JudgeResponseError(
-            f"criterion score {value} lies outside the scale 0-{_fmt_number(scoring.scale_max)}."
-        )
-    if scoring.score_resolution is not None:
-        steps = value / scoring.score_resolution
-        if abs(steps - round(steps)) > 1e-6:
-            raise JudgeResponseError(
-                f"criterion score {value} is not awarded {_fmt_step(scoring.score_resolution)}."
-            )
+    off_scale = off_scale_reason(value, scoring)
+    if off_scale is not None:
+        raise JudgeResponseError(f"criterion score {off_scale}.")
     shortcomings = _str_list(payload, "shortcomings", required=True)
     strengths = _str_list(payload, "strengths", required=False)
     rationale = str(payload.get("rationale", "")).strip()
@@ -764,8 +794,8 @@ def grade_criterion(
         samples.append(sample)
         records.append(record)
     values = [s.score for s in samples]
-    median = round(float(statistics.median(values)), 2)
-    spread = round(max(values) - min(values), 2)
+    median = median_score(values)
+    spread = score_spread(values)
     threshold = scoring.individual_threshold
     return CriterionScore(
         status=SCORED,
@@ -777,7 +807,7 @@ def grade_criterion(
         routing=routing,
         prompt_hash=digest,
         threshold_met=(median >= threshold) if threshold is not None else None,
-        weighted_points=round(median * factor, 4),
+        weighted_points=weighted_points_for(median, factor),
         **common,
     )
 

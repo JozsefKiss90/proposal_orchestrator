@@ -99,7 +99,7 @@ from harness.criterion_scoring import (
 from harness.expectation_coverage import CoverageGrade, grade_expectation
 from harness.judge import Judge
 from harness.profile import PreEvaluationProfile, canonical_hash
-from harness.rubrics import ProfileBundle
+from harness.rubrics import ProfileBundle, Rubric
 from harness.verdict import MIN_MAJORITY_SAMPLES
 
 __all__ = [
@@ -131,6 +131,8 @@ __all__ = [
     "MissingSection",
     "Candidate",
     "required_sections",
+    "cell_grid",
+    "expected_cells",
     "load_candidate",
     "candidate_hash",
     "assessor_pin",
@@ -505,6 +507,28 @@ def required_sections(profile: PreEvaluationProfile) -> tuple[tuple[str, str], .
     """Every ``(criterion_id, section_id)`` the profile grades, in profile order."""
     return tuple(
         (spec.id, sid) for spec in profile.criteria for sid in spec.section_ids
+    )
+
+
+def cell_grid(bundle: ProfileBundle) -> tuple[tuple[Rubric, str], ...]:
+    """Every ``(rubric, section_id)`` pair a complete assessment grades, in order.
+
+    The one definition of the cell grid: :func:`assess_candidate` walks it to
+    produce the cells, and :func:`expected_cells` names the same pairs by
+    identity so the frozen baseline can require exactly that set.
+    """
+    return tuple(
+        (rubric, section_id)
+        for rubric in bundle.rubric_set.rubrics
+        for section_id in bundle.profile.section_ids_for(rubric.criterion_id)
+    )
+
+
+def expected_cells(bundle: ProfileBundle) -> tuple[tuple[str, str, str], ...]:
+    """The ``(criterion_id, expectation_key, section_id)`` of every cell in the grid."""
+    return tuple(
+        (rubric.criterion_id, rubric.expectation_key, section_id)
+        for rubric, section_id in cell_grid(bundle)
     )
 
 
@@ -911,32 +935,31 @@ def assess_candidate(
     digest = candidate_hash(candidate)
     pin = assessor_pin(judge)
     cells: list[BlindCell] = []
-    for rubric in bundle.rubric_set.rubrics:
-        for section_id in bundle.profile.section_ids_for(rubric.criterion_id):
-            path = candidate.sections.get(section_id)
-            if path is None:
-                continue
-            coverage = grade_expectation(
-                judge,
-                rubric,
-                path,
-                token_budget=token_budget,
-                span_budget_fraction=span_budget_fraction,
-                max_token_budget=max_token_budget,
-                n=n,
-                include_claims=include_claims,
+    for rubric, section_id in cell_grid(bundle):
+        path = candidate.sections.get(section_id)
+        if path is None:
+            continue
+        coverage = grade_expectation(
+            judge,
+            rubric,
+            path,
+            token_budget=token_budget,
+            span_budget_fraction=span_budget_fraction,
+            max_token_budget=max_token_budget,
+            n=n,
+            include_claims=include_claims,
+        )
+        cells.append(
+            BlindCell(
+                criterion_id=rubric.criterion_id,
+                expectation_key=rubric.expectation_key,
+                section_id=section_id,
+                candidate_hash=digest,
+                profile_version=bundle.version,
+                assessor_pin=pin,
+                coverage=coverage,
             )
-            cells.append(
-                BlindCell(
-                    criterion_id=rubric.criterion_id,
-                    expectation_key=rubric.expectation_key,
-                    section_id=section_id,
-                    candidate_hash=digest,
-                    profile_version=bundle.version,
-                    assessor_pin=pin,
-                    coverage=coverage,
-                )
-            )
+        )
     criterion_scoring: CriterionScoring | None = None
     if criterion_samples is not None:
         scores = []
