@@ -27,3 +27,6 @@ No result over it is a result over that submission.
 Authored by `py -3.10 -m tools.author_msca_dn_workspace` (skeleton, intake, register) and
 `py -3.10 -m tools.import_external_proposal` (sources, document record, manifest, the register's
 derived half). Each tool's `--check` exits 1 if any file it owns would change.
+
+This graph root holds one document, the sanitised copy. The importer selects it by default;
+`--document` names another and `--describe` prints what that one is (V07).

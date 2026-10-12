@@ -102,7 +102,15 @@ from typing import Any, Mapping, Optional, Sequence
 from runner.atomic_write import atomic_write_text, canonical_json_bytes
 from runner.paths import find_repo_root
 from tools import fidelity_declarations as fd
-from tools.import_external_proposal import REVISIONS, ImportRefused, Revision, revision_by_id
+from tools.import_external_proposal import (
+    DEFAULT_DOCUMENT,
+    ImportRefused,
+    Revision,
+    revision_by_id,
+)
+
+#: Every revision of the document the importer selects by default (V07).
+REVISIONS = DEFAULT_DOCUMENT.revisions
 
 #: Where the drafts and the checklist are written. Tier 4: a draft is a review
 #: artifact, not a declaration.

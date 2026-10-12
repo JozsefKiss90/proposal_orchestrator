@@ -1,9 +1,9 @@
-"""Import the sanitised MSCA-DN Part B into the pre-evaluation graph root (PE-03).
+"""Import an MSCA-DN Part B into a pre-evaluation graph root (PE-03, V07).
 
 Ticket PE-03 of ``plans/msca_dn_pre_evaluation_spec.md``: external proposal
-import. Seven things, all derived from the stored PDF and the constants below,
-so that the import replays byte-equal and nothing is typed where it could be
-derived:
+import. Seven things, all derived from the stored PDF and the selected document
+configuration, so that the import replays byte-equal and nothing is typed where
+it could be derived:
 
 1. Extract text per page (:mod:`runner.external_proposal`).
 2. Write the 84 page sources, ``SRC-DN-P01`` to ``SRC-DN-P84``, each holding
@@ -31,13 +31,29 @@ Plus an import manifest under the workspace's ``dev_graph/imports/`` carrying
 the extractor, normalisation, table-rendering and claim-extraction versions
 (spec PE-05: a hash of an output cannot name the process that produced it).
 
+Which document, and what it may assume (V07)
+--------------------------------------------
+Every assumption about the document — its graph root, intake, title, role,
+submitted-document flag, page count, section and sub-section maps, criterion
+heading anchors, beneficiary marker, work-package table layout, body point
+size and source-id spelling — is a field of :class:`DocumentConfig`. Two are
+declared: ``SANITISED_DERIVATIVE``, the copy PE-03 imported, and
+``OFFICIAL_ORIGINAL``, the submitted text. Select one with ``--document``.
+
+A configuration is selected, never merged. The original inherits no page map,
+no 84-page count and no derivative description, and it is not a revision of
+the derivative: a revision may only supersede a revision of the same document.
+A configuration missing a required field refuses the import and names the
+field, so an undeclared assumption can never be silently filled with the
+copy's.
+
 What is declared and what is derived
 ------------------------------------
-Declared: the §4.1 page map, the heading markers, the two titles of the
-unlabelled sub-sections, the §4.2 grouping, the document title. Derived:
-every text, every count, every offset, every hash, the heading texts, the
-start page of each sub-section, and the one place the derived start page
-differs from the declared one (``8`` begins on the last line of p. 75).
+Declared: the configuration's page map, heading markers, declared titles,
+section grouping, title and role. Derived: every text, every count, every
+offset, every hash, the heading texts, the start page of each sub-section, and
+the one place the derived start page differs from the declared one (``8``
+begins on the last line of p. 75 of the sanitised copy).
 
 Ownership
 ---------
@@ -57,6 +73,7 @@ Run it from the repository root::
     py -3.10 -m tools.import_external_proposal                  # write
     py -3.10 -m tools.import_external_proposal --check          # exit 1 if any file would change
     py -3.10 -m tools.import_external_proposal --environment    # the pinned extraction environment
+    py -3.10 -m tools.import_external_proposal --document official_original --describe
 
 The extraction library is pinned by :mod:`runner.extraction_environment`. A
 ``--check`` run that finds staleness also reports whether the environment is on
@@ -89,9 +106,15 @@ from runner.dev_graph.documents import (
     import_candidate,
     render_record,
 )
-from runner.dev_graph.intake import read_esr_intake
+from runner.dev_graph.intake import INTAKE_REL, read_esr_intake
 from runner.dev_graph.schema import DevGraphError
 from runner.extraction_environment import (
+    DECISION_REL as EXTRACTION_DECISION_REL,
+)
+from runner.extraction_environment import (
+    MEASURED_PYTHON,
+    PINNED_MUPDF,
+    PINNED_PYMUPDF,
     add_environment_flag,
     environment_exit_code,
     staleness_notice,
@@ -120,39 +143,110 @@ from tools.fidelity_declarations import FidelityDeclarationsError, validate_inpu
 # --------------------------------------------------------------------------- #
 
 SPEC_REL = ws.SPEC_REL
-WORKSPACE_REL = ws.WORKSPACE_REL
 SOURCE_DIR_REL = ws.SOURCE_DIR_REL
 CANDIDATE_PDF_REL = ws.CANDIDATE_PDF_REL
-REGISTER_REL = ws.REGISTER_REL
-INTAKE_ID = ws.INTAKE_ID
-SCORECARD_REL = Path("harness/evaluator_scorecard_msca_dn.json")
 
 #: Workspace-relative directory of import manifests, beside ``documents/``.
 IMPORTS_REL = Path("docs/tier4_orchestration_state/dev_graph/imports")
 MANIFEST_RECORD_TYPE = "external_proposal_import_manifest"
 
-SOURCE_ID_FORMAT = "SRC-DN-P{page:02d}"
-DOCUMENT_TITLE = "Sanitised derivative of the MSCA-DN 2025 Part B (PROJECT-X)"
-#: The copy's own acronym for the project; the real one stays with the original.
-EXPECTED_PAGES = 84
+#: How a page source id is spelled from a revision's prefix. A document
+#: configuration may declare its own; both sanitised revisions use this one.
+SOURCE_ID_TEMPLATE = "{prefix}-P{page:02d}"
+
+#: Keyword counts the register's derived half records (spec §2.7), measured
+#: case-insensitively over the collapsed text of every page. A measurement rule
+#: over any Part B, not an assumption about one document.
+DEPENDENCY_KEYWORDS: tuple[tuple[str, str], ...] = (
+    ("dependenc", r"dependenc"),
+    ("interdepend", r"interdepend"),
+    ("Gantt", r"gantt"),
+    ("critical path", r"critical path"),
+    ("in WP<n>", r"\bin WP ?\d"),
+    ("build(s/ing) (up)on", r"\bbuild(?:s|ing)? (?:up)?on\b"),
+)
+#: Citation markers the derived half counts (spec §2.8). Zero in the sanitised
+#: copy; a count, not an expectation.
+CITATION_MARKERS: tuple[tuple[str, str], ...] = (
+    ("bracketed_numbers", r"\[\d+(?:\s*[,–-]\s*\d+)*\]"),
+    ("doi", r"\b10\.\d{4,}/"),
+    ("url", r"https?://|\bwww\."),
+    ("author_year", r"\([A-Z][A-Za-z-]+(?: et al\.)?,? (?:19|20)\d{2}[a-z]?\)"),
+)
+
+_NUMBERING = re.compile(r"^\d+(?:\.\d+)*\.\s+")
+
+_SCHEMA_REF = (
+    "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml "
+    "carries no schema for an import manifest, and no schema_id is coined for it (CLAUDE.md §16.3). "
+    "The shape is fixed by tools/import_external_proposal.py and checked by tests/test_msca_dn_import.py."
+)
+
+
+class ImportRefused(RuntimeError):
+    """Refusal: an input is missing, or a document does not have its declared shape."""
 
 
 # --------------------------------------------------------------------------- #
-# Revisions of the sanitised derivative
+# The document and its revisions: every assumption, declared (V07)
 # --------------------------------------------------------------------------- #
 
 
 @dataclass(frozen=True)
-class Revision:
-    """One revision of the sanitised derivative, and everything that is keyed
-    by it.
+class SubSectionSpec:
+    """One sub-section of a document's section map (spec §4.1 and §4.2)."""
 
-    A revision is a new sanitised PDF of the same historical submission, so
-    every revision shares the ``document_id`` and the intake, and differs in
-    its bytes, its page texts and therefore its content version. Nothing is
-    shared that a span could resolve through: each revision owns its
+    sub_section_id: str
+    section_id: str
+    declared_pages: tuple[int, int]
+    """Pages per the document's own page map, declared."""
+    marker: Optional[str]
+    """The block prefix (``1.2.``) or exact block (``Beneficiary A``) that opens it;
+    ``None`` when it opens the document."""
+    declared_title: Optional[str] = None
+    """A title for an unlabelled sub-section; ``None`` means the heading supplies it."""
+    exact_marker: bool = False
+    """The marker is the whole block, not a prefix."""
+
+
+@dataclass(frozen=True)
+class WorkPackageLayout:
+    """How a document lays out its work-package table.
+
+    The three values are useless apart: the measurement reads the labels inside
+    the sub-section and reports the consequence of a collapsed header, so a
+    document declares all three or none.
+    """
+
+    sub_section_id: str
+    """The sub-section whose prose carries the work-package table."""
+    header_labels: tuple[str, ...]
+    """The label-value lines a header was flattened to, the one a header block
+    opens with first. A reader that splits a work package into fields expects
+    each label to open its own block."""
+    consequence: str
+    """What a collapsed header costs a reader of this document."""
+    register_declared_labels: tuple[str, ...] = ()
+    """The subset of the labels the fidelity register's provenance header names
+    as the ones the table was flattened to (PE-01, spec decision 9). The
+    register's derived half counts these and reports whether the declaration
+    holds, so the subset is fixed by that header and not by this tool."""
+
+
+@dataclass(frozen=True)
+class Revision:
+    """One revision of one document, and everything that is keyed by it.
+
+    A revision is a new PDF of the same submission, so every revision of a
+    document shares the ``document_id`` and the intake, and differs in its
+    bytes, its page texts and therefore its content version. Nothing is shared
+    that a span could resolve through: each revision owns its
     ``source_id_prefix``, so a ``verified_span`` of one revision can never
     resolve into another revision's page text.
+
+    What is document-wide rather than per-revision — the title, the page map,
+    the page count, the source-id spelling, the intake and the graph root —
+    belongs to :class:`DocumentConfig`, not here.
     """
 
     revision_id: str
@@ -164,138 +258,394 @@ class Revision:
     """File name of the import manifest. The first revision keeps the name it
     was committed under; a later one is suffixed."""
     register_rel: Path
-    expected_pages: int
     candidate_role: str
     """The fidelity register's input-table ``role`` for this PDF."""
     candidate_version: str
     """The fidelity register's input-table ``version`` for this PDF."""
+    expected_pages: Optional[int] = None
+    """Page count of this PDF when it differs from the document's; ``None``
+    means the document's declared count. A revision that reflowed to a
+    different length must declare it, not have it discovered downstream."""
     supersedes: Optional[str] = None
-    """``revision_id`` of the revision this one supersedes, or ``None``."""
+    """``revision_id`` of the revision this one supersedes, or ``None``. It must
+    name a revision of the same document."""
     change_id: Optional[str] = None
     """Plain identifier naming the revision in the document provenance."""
     summary: str = ""
     """What this revision is, in one sentence, for the manifest and register."""
 
-    @property
-    def source_id_format(self) -> str:
-        return self.source_id_prefix + "-P{page:02d}"
 
-    def source_id(self, page: int) -> str:
-        return self.source_id_format.format(page=page)
+def needs_form_title(spec: SubSectionSpec) -> bool:
+    """Whether *spec*'s title has to come from the application form.
+
+    True when the document carries no heading block for it and declares no
+    title: either it opens the document, or its marker is the whole block. One
+    predicate, because :meth:`DocumentConfig.missing_fields` and
+    :func:`build_import` must agree on which sub-sections need a scorecard.
+    """
+    return (spec.marker is None or spec.exact_marker) and spec.declared_title is None
 
 
-_ORIGINAL_ROLE = (
-    "Current assessment artifact: a sanitised derivative of the historical submission, "
-    "reflowed from 34 to 84 pages. Not the submitted text."
+#: Required fields of a document configuration: a configuration missing any of
+#: them cannot be imported, and the refusal names the ones that are missing.
+#: ``scorecard_rel`` is required conditionally — only when a declared
+#: sub-section has neither a marker nor a declared title, and so takes its
+#: title from the application form. ``source_id_template`` is absent because
+#: the spelling of a page id is generic rather than a fact about one document;
+#: it carries :data:`SOURCE_ID_TEMPLATE` as its default and is still
+#: overridable per document.
+REQUIRED_DOCUMENT_FIELDS: tuple[str, ...] = (
+    "workspace_rel",
+    "intake_id",
+    "title",
+    "role",
+    "sections",
+    "sub_sections",
+    "expected_pages",
+    "body_point_size",
+    "short_name",
+    "page_statement",
+    "page_map_declared_from",
+    "reader_caveat_key",
+    "reader_caveat",
+    "first_revision_key",
+    "revisions",
 )
-
-REVISION_ORIGINAL = Revision(
-    revision_id="sanitised_v1",
-    pdf_rel=SOURCE_DIR_REL / "sanitized_proposal_final.pdf",
-    source_id_prefix="SRC-DN",
-    manifest_name="MSCA-DN-2025_sanitised_part_b.json",
-    register_rel=SOURCE_DIR_REL / "fidelity_register.json",
-    expected_pages=84,
-    candidate_role=_ORIGINAL_ROLE,
-    candidate_version="sanitised derivative, 84 pages (reflow of a 34-page original)",
-    summary=(
-        "The first sanitised derivative imported at PE-03. Retained unchanged so its "
-        "document record, its page texts and every span into them stay reproducible."
-    ),
-)
-
-REVISION_RESOLVED_FIXES = Revision(
-    revision_id="resolved_fixes",
-    pdf_rel=SOURCE_DIR_REL / "sanitized_proposal_resolved_fixes.pdf",
-    source_id_prefix="SRC-DN-RF",
-    manifest_name="MSCA-DN-2025_sanitised_part_b.resolved_fixes.json",
-    register_rel=SOURCE_DIR_REL / "fidelity_register_resolved_fixes.json",
-    expected_pages=84,
-    candidate_role=(
-        "Current assessment artifact: a revised sanitised derivative of the same historical "
-        "submission, reflowed from 34 to 84 pages. Not the submitted text, and not the first "
-        "sanitised derivative either."
-    ),
-    candidate_version=(
-        "revised sanitised derivative, 84 pages (reflow of a 34-page original); supersedes the "
-        "first sanitised derivative"
-    ),
-    supersedes="sanitised_v1",
-    change_id="msca-dn-2025-sanitised-resolved-fixes",
-    summary=(
-        "A revised sanitised derivative of the same submission. The page count, the section "
-        "boundaries and 83 of the 84 page texts are unchanged; page 45 was re-typeset."
-    ),
-)
-
-#: Every revision, oldest first. ``render_all`` writes all of them, so a
-#: revision never silently drops the page texts an earlier span resolves into.
-REVISIONS: tuple[Revision, ...] = (REVISION_ORIGINAL, REVISION_RESOLVED_FIXES)
-
-#: The revision a new assessment reads: the newest, and the one no other
-#: revision supersedes.
-ACTIVE_REVISION: Revision = REVISION_RESOLVED_FIXES
-
-
-def revision_by_id(revision_id: str) -> Revision:
-    for rev in REVISIONS:
-        if rev.revision_id == revision_id:
-            return rev
-    raise ImportRefused(
-        f"unknown revision {revision_id!r}; known: {[r.revision_id for r in REVISIONS]}"
-    )
-
-#: Keyword counts the register's derived half records (spec §2.7), measured
-#: case-insensitively over the collapsed text of every page.
-DEPENDENCY_KEYWORDS: tuple[tuple[str, str], ...] = (
-    ("dependenc", r"dependenc"),
-    ("interdepend", r"interdepend"),
-    ("Gantt", r"gantt"),
-    ("critical path", r"critical path"),
-    ("in WP<n>", r"\bin WP ?\d"),
-    ("build(s/ing) (up)on", r"\bbuild(?:s|ing)? (?:up)?on\b"),
-)
-#: Citation markers the derived half counts (spec §2.8), all expected zero.
-CITATION_MARKERS: tuple[tuple[str, str], ...] = (
-    ("bracketed_numbers", r"\[\d+(?:\s*[,–-]\s*\d+)*\]"),
-    ("doi", r"\b10\.\d{4,}/"),
-    ("url", r"https?://|\bwww\."),
-    ("author_year", r"\([A-Z][A-Za-z-]+(?: et al\.)?,? (?:19|20)\d{2}[a-z]?\)"),
-)
-#: The declared body point size (spec §2.11); every other size is reported with its text.
-BODY_POINT_SIZE = "12.0"
-
-_NUMBERING = re.compile(r"^\d+(?:\.\d+)*\.\s+")
 
 
 @dataclass(frozen=True)
-class SubSectionSpec:
-    """One sub-section of spec §4.1 and §4.2."""
+class DocumentConfig:
+    """One document this tool can import, and every assumption it may make
+    about it.
 
-    sub_section_id: str
-    section_id: str
-    declared_pages: tuple[int, int]
-    """Pages per spec §4.1, declared."""
-    marker: Optional[str]
-    """The block prefix (``1.2.``) or exact block (``Beneficiary A``) that opens it;
-    ``None`` when it opens the document."""
-    declared_title: Optional[str] = None
-    """A title for an unlabelled sub-section; ``None`` means the heading supplies it."""
-    exact_marker: bool = False
-    """The marker is the whole block, not a prefix."""
+    Before V07 the assumptions below were module constants of the importer, so
+    the tool could import exactly one document: a sanitised derivative of 84
+    pages, with that copy's page map, that copy's source-id prefix, that copy's
+    intake and that copy's description. The official original is a different
+    document. It has its own identity, its own role, its own page count, its
+    own section boundaries, its own table layout and its own source
+    identifiers, and it must establish all of them itself.
+
+    A configuration is selected, never merged. Nothing is inherited from
+    another configuration, so an undeclared field is missing rather than
+    defaulted to the sanitised copy's value, and :meth:`require_complete`
+    refuses the import naming it.
+
+    Two kinds of field live here:
+
+    * **Identity and provenance** — ``workspace_rel`` (the graph root),
+      ``intake_id``, ``title``, ``role`` and ``is_submitted_document``. The
+      flag is the one that decides whether a result over this document is a
+      result over the submission, so no renderer types it.
+    * **Shape** — ``sections``, ``sub_sections`` (the page map, markers and
+      declared titles included), ``criterion_heading_markers``,
+      ``marker_page_tolerance``, ``expected_pages``, ``body_point_size``, the
+      work-package table fields, ``scorecard_rel`` and ``source_id_template``.
+
+    ``revisions`` holds the document's own PDFs, oldest first. A revision may
+    only supersede a revision of the same document, which is what stops a new
+    document from being hung off another document's version chain to reuse it.
+    """
+
+    config_id: str
+    is_submitted_document: bool
+    """``True`` only for the text that was actually submitted."""
+    intake_id: Optional[str] = None
+    title: Optional[str] = None
+    role: Optional[str] = None
+    workspace_rel: Optional[Path] = None
+    """The document's graph root. ``None`` when it is not a location in this
+    repository; the configuration then refuses until an operator declares one."""
+    sections: tuple[tuple[str, str], ...] = ()
+    """``(section_id, title)`` per criterion section, in document order."""
+    sub_sections: tuple[SubSectionSpec, ...] = ()
+    """The page map: one entry per sub-section, in document order."""
+    criterion_heading_markers: tuple[tuple[str, str, int], ...] = ()
+    """``(section_id, marker, page)`` per criterion-level heading the document
+    carries as its section's own content. Not required: a document that carries
+    none declares the empty tuple, and none is a valid answer."""
+    marker_page_tolerance: int = 0
+    """How many pages before its declared start page a marker may be found on.
+    Zero is the default because zero assumes nothing: a marker must be on the
+    page the document's own page map declares."""
+    expected_pages: Optional[int] = None
+    body_point_size: Optional[str] = None
+    """The declared body point size; every other size is reported with its text."""
+    work_package_layout: Optional[WorkPackageLayout] = None
+    """How the document lays out its work-package table, or ``None`` when it
+    carries no such table."""
+    scorecard_rel: Optional[Path] = None
+    """The evaluator scorecard supplying the title of a sub-section the document
+    leaves unlabelled."""
+    short_name: str = ""
+    """How a source record names this document in a phrase: *sub-section 3.1 of
+    the sanitised copy*."""
+    page_statement: str = ""
+    """What one page of this document holds, with a ``{page}`` placeholder. It
+    is the sentence a reader of a source record sees, so a derivative says it
+    is a derivative here and the submitted text says it is the submitted text."""
+    page_map_declared_from: str = ""
+    """Where this document's page map was declared from."""
+    source_id_template: str = SOURCE_ID_TEMPLATE
+    reader_caveat_key: str = ""
+    reader_caveat: str = ""
+    """What a reader of this document's extracted text must not assume, under
+    its own key. Both are required and neither defaults: the derivative's
+    caveat is not the original's, and the key that carries it is the
+    document's own."""
+    first_revision_key: str = ""
+    """The manifest key stating that a revision is the document's first. The
+    key itself is the document's, because the committed manifests are bound by
+    hash into the frozen baseline and cannot be renamed, and because no other
+    document may be described in the derivative's vocabulary."""
+    declared_status: str = "Assumed"
+    """CLAUDE.md §12.2 status of the values declared here. Assumed by default:
+    a title, a role and a page map are operator statements. What the importer
+    checks against the stored bytes carries its own Confirmed status where it
+    stands, which is why ``status_note`` says which values those are."""
+    status_note: str = ""
+    revisions: tuple[Revision, ...] = ()
+    manifest_records_runtime_environment: bool = False
+    """Whether the import manifest carries the pinned extraction environment.
+    ``False`` for every manifest already bound by a hash into a frozen
+    baseline, which is why V01 could not add the block to them; ``True`` for a
+    manifest authored for the first time."""
+    summary: str = ""
+
+    # -- declared consistency, checked at construction -- #
+
+    def __post_init__(self) -> None:
+        if "{prefix}" not in self.source_id_template or "{page" not in self.source_id_template:
+            raise ImportRefused(
+                f"document {self.config_id!r}: source_id_template must carry a prefix and a page "
+                f"placeholder, found {self.source_id_template!r}"
+            )
+        ids = self.section_ids
+        if len(set(ids)) != len(ids):
+            raise ImportRefused(f"document {self.config_id!r}: duplicate section id")
+        for spec in self.sub_sections:
+            if spec.section_id not in ids:
+                raise ImportRefused(
+                    f"document {self.config_id!r}: sub-section {spec.sub_section_id} names "
+                    f"section {spec.section_id!r}, which the configuration does not declare"
+                )
+        subs = [spec.sub_section_id for spec in self.sub_sections]
+        if len(set(subs)) != len(subs):
+            raise ImportRefused(f"document {self.config_id!r}: duplicate sub-section id")
+        for section_id, _marker, _page in self.criterion_heading_markers:
+            if section_id not in ids:
+                raise ImportRefused(
+                    f"document {self.config_id!r}: a criterion heading names section "
+                    f"{section_id!r}, which the configuration does not declare"
+                )
+        layout = self.work_package_layout
+        if layout is not None:
+            if self.sub_sections and layout.sub_section_id not in subs:
+                raise ImportRefused(
+                    f"document {self.config_id!r}: the work-package sub-section "
+                    f"{layout.sub_section_id!r} is not in the page map"
+                )
+            if not layout.header_labels:
+                raise ImportRefused(
+                    f"document {self.config_id!r}: the work-package layout declares no "
+                    f"header labels"
+                )
+            unknown = [
+                label for label in layout.register_declared_labels
+                if label not in layout.header_labels
+            ]
+            if unknown:
+                raise ImportRefused(
+                    f"document {self.config_id!r}: the register declares the work-package "
+                    f"label(s) {unknown}, which the layout does not carry"
+                )
+        if self.expected_pages is not None and self.expected_pages <= 0:
+            raise ImportRefused(f"document {self.config_id!r}: expected_pages must be positive")
+        known = {rev.revision_id for rev in self.revisions}
+        if len(known) != len(self.revisions):
+            raise ImportRefused(f"document {self.config_id!r}: duplicate revision id")
+        for field, values in (
+            ("source_id_prefix", [r.source_id_prefix for r in self.revisions]),
+            ("manifest_name", [r.manifest_name for r in self.revisions]),
+            ("pdf_rel", [r.pdf_rel.as_posix() for r in self.revisions]),
+            ("register_rel", [r.register_rel.as_posix() for r in self.revisions]),
+        ):
+            if len(set(values)) != len(values):
+                raise ImportRefused(f"document {self.config_id!r}: two revisions share a {field}")
+        for rev in self.revisions:
+            if rev.supersedes is not None and rev.supersedes not in known:
+                raise ImportRefused(
+                    f"document {self.config_id!r}: revision {rev.revision_id!r} supersedes "
+                    f"{rev.supersedes!r}, which is not a revision of this document. A document is "
+                    f"not hung off another document's version chain."
+                )
+
+    # -- the shape, resolved -- #
+
+    @property
+    def section_ids(self) -> tuple[str, ...]:
+        return tuple(section_id for section_id, _title in self.sections)
+
+    def criterion_heading(self, section_id: str) -> Optional[tuple[str, int]]:
+        """``(marker, page)`` of *section_id*'s criterion-level heading, or ``None``."""
+        for sid, marker, page in self.criterion_heading_markers:
+            if sid == section_id:
+                return marker, page
+        return None
+
+    def source_id_format(self, revision: Revision) -> str:
+        return self.source_id_template.replace("{prefix}", revision.source_id_prefix)
+
+    def source_id(self, revision: Revision, page: int) -> str:
+        return self.source_id_format(revision).format(page=page)
+
+    def expected_pages_of(self, revision: Revision) -> int:
+        """*revision*'s declared page count, or the document's."""
+        pages = revision.expected_pages
+        pages = pages if pages is not None else self.expected_pages
+        if pages is None:
+            raise ImportRefused(
+                f"document {self.config_id!r}: neither the document nor revision "
+                f"{revision.revision_id!r} declares expected_pages"
+            )
+        return pages
+
+    # -- the revisions -- #
+
+    def revision_by_id(self, revision_id: str) -> Revision:
+        for rev in self.revisions:
+            if rev.revision_id == revision_id:
+                return rev
+        raise ImportRefused(
+            f"unknown revision {revision_id!r} for document {self.config_id!r}; "
+            f"known: {[r.revision_id for r in self.revisions]}"
+        )
+
+    @property
+    def active_revision(self) -> Revision:
+        """The revision a new assessment reads: the one no other supersedes."""
+        superseded = {r.supersedes for r in self.revisions if r.supersedes is not None}
+        current = [r for r in self.revisions if r.revision_id not in superseded]
+        if len(current) != 1:
+            raise ImportRefused(
+                f"document {self.config_id!r}: expected exactly one current revision, found "
+                f"{[r.revision_id for r in current]}"
+            )
+        return current[0]
+
+    # -- paths -- #
+
+    def manifest_rel(self, revision: Revision) -> Path:
+        """Repo-relative path of *revision*'s import manifest."""
+        return self.require_workspace() / IMPORTS_REL / revision.manifest_name
+
+    def require_intake_id(self) -> str:
+        """This document's intake id, or refuse."""
+        if self.intake_id is None:
+            raise ImportRefused(
+                f"document {self.config_id!r} cannot be imported: intake_id not declared, so it "
+                f"has no document id of its own."
+            )
+        return self.intake_id
+
+    def intake_rel(self) -> Path:
+        """Repo-relative path of the intake record this document's id comes from."""
+        return self.require_workspace() / INTAKE_REL / f"{self.require_intake_id()}.json"
+
+    # -- refusals -- #
+
+    def missing_fields(self) -> tuple[str, ...]:
+        """Required fields this configuration does not declare, in field order.
+
+        A falsy value counts as undeclared. Every required field is a path, a
+        non-empty name, a non-empty tuple or a positive page count, so there is
+        no legitimate falsy declaration among them; ``__post_init__`` refuses a
+        zero or negative ``expected_pages`` separately.
+        """
+        missing = [name for name in REQUIRED_DOCUMENT_FIELDS if not getattr(self, name)]
+        if any(needs_form_title(spec) for spec in self.sub_sections) and self.scorecard_rel is None:
+            missing.append("scorecard_rel")
+        return tuple(missing)
+
+    def require_complete(self) -> None:
+        """Refuse unless every required field is declared, naming the missing ones."""
+        missing = self.missing_fields()
+        if missing:
+            raise ImportRefused(
+                f"document {self.config_id!r} cannot be imported: "
+                f"{', '.join(missing)} not declared. Nothing is inherited from another "
+                f"document's configuration, so each is declared from this document itself."
+            )
+
+    def require_workspace(self) -> Path:
+        """This document's graph root, or refuse."""
+        if self.workspace_rel is None:
+            raise ImportRefused(
+                f"document {self.config_id!r} cannot be imported: workspace_rel not declared, "
+                f"so it has no graph root to write to."
+            )
+        return self.workspace_rel
+
+    def require_provenance(self, repo_root: Path) -> None:
+        """Refuse unless the intake record this document's id comes from exists.
+
+        The refusal names that record in both cases, including when there is no
+        graph root to read it from: what is missing is the document's
+        provenance, and saying only that a path field is undeclared would not
+        say so.
+        """
+        intake_id = self.require_intake_id()
+        if self.workspace_rel is None:
+            raise ImportRefused(
+                f"document {self.config_id!r} has no provenance of its own: its intake record "
+                f"{intake_id}.json has no graph root to be read from, because workspace_rel is "
+                f"not declared."
+            )
+        intake = self.intake_rel()
+        if not (repo_root / intake).is_file():
+            raise ImportRefused(
+                f"document {self.config_id!r} has no provenance of its own: its intake record "
+                f"{intake.as_posix()} does not exist, so it has no document id either."
+            )
+
+    def identity(self) -> dict[str, Any]:
+        """What this document is, for an operator selecting it."""
+        missing = self.missing_fields()
+        return {
+            "config_id": self.config_id,
+            "title": self.title,
+            "role": self.role,
+            "is_submitted_document": self.is_submitted_document,
+            "intake_id": self.intake_id,
+            "workspace_rel": None if self.workspace_rel is None else self.workspace_rel.as_posix(),
+            "expected_pages": self.expected_pages,
+            "sub_sections_declared": len(self.sub_sections),
+            "revisions": [r.revision_id for r in self.revisions],
+            "missing_required_fields": list(missing),
+            "importable": not missing,
+            "declared_status": self.declared_status,
+            "status_note": self.status_note,
+            "summary": self.summary,
+        }
 
 
-SECTIONS: tuple[tuple[str, str], ...] = (
+# --------------------------------------------------------------------------- #
+# The documents
+# --------------------------------------------------------------------------- #
+
+#: The three criterion sections of an MSCA-DN Part B. They come from the
+#: application form (Tier 2A), not from any one document, so both
+#: configurations declare the same three; nothing else is shared.
+MSCA_DN_PART_B_SECTIONS: tuple[tuple[str, str], ...] = (
     ("excellence_section", "Excellence"),
     ("impact_section", "Impact"),
     ("implementation_section", "Quality and Efficiency of the Implementation"),
 )
 
-#: The one criterion-level heading the copy carries; it is the section's own
-#: content and must be followed immediately by the first sub-section heading.
-CRITERION_HEADING_MARKERS: dict[str, tuple[str, int]] = {"implementation_section": ("3.", 41)}
-
-SUB_SECTIONS: tuple[SubSectionSpec, ...] = (
+#: The sanitised copy's page map (spec §4.1 and §4.2). Its last entry carries
+#: the beneficiary marker: sub-section 8 is unlabelled in the copy and opens
+#: with the first participating organisation's own heading block.
+_SANITISED_SUB_SECTIONS: tuple[SubSectionSpec, ...] = (
     SubSectionSpec("1.1", "excellence_section", (1, 13), None, declared_title=None),
     SubSectionSpec("1.2", "excellence_section", (14, 21), "1.2."),
     SubSectionSpec("1.3", "excellence_section", (22, 26), "1.3."),
@@ -315,19 +665,233 @@ SUB_SECTIONS: tuple[SubSectionSpec, ...] = (
         declared_title="Participating Organisations", exact_marker=True,
     ),
 )
-#: A marker is searched on its declared start page and the page before it:
-#: ``8``'s opening block is the last line of p. 75 while §4.1 says 76.
-MARKER_PAGE_TOLERANCE = 1
 
-_SCHEMA_REF = (
-    "No declared schema. .claude/workflows/system_orchestration/artifact_schema_specification.yaml "
-    "carries no schema for an import manifest, and no schema_id is coined for it (CLAUDE.md §16.3). "
-    "The shape is fixed by tools/import_external_proposal.py and checked by tests/test_msca_dn_import.py."
+_SANITISED_ROLE = (
+    "Current assessment artifact: a sanitised derivative of the historical submission, "
+    "reflowed from 34 to 84 pages. Not the submitted text."
 )
 
+REVISION_ORIGINAL = Revision(
+    revision_id="sanitised_v1",
+    pdf_rel=SOURCE_DIR_REL / "sanitized_proposal_final.pdf",
+    source_id_prefix="SRC-DN",
+    manifest_name="MSCA-DN-2025_sanitised_part_b.json",
+    register_rel=SOURCE_DIR_REL / "fidelity_register.json",
+    candidate_role=_SANITISED_ROLE,
+    candidate_version="sanitised derivative, 84 pages (reflow of a 34-page original)",
+    summary=(
+        "The first sanitised derivative imported at PE-03. Retained unchanged so its "
+        "document record, its page texts and every span into them stay reproducible."
+    ),
+)
 
-class ImportRefused(RuntimeError):
-    """Refusal: an input is missing or the copy does not have the declared shape."""
+REVISION_RESOLVED_FIXES = Revision(
+    revision_id="resolved_fixes",
+    pdf_rel=SOURCE_DIR_REL / "sanitized_proposal_resolved_fixes.pdf",
+    source_id_prefix="SRC-DN-RF",
+    manifest_name="MSCA-DN-2025_sanitised_part_b.resolved_fixes.json",
+    register_rel=SOURCE_DIR_REL / "fidelity_register_resolved_fixes.json",
+    candidate_role=(
+        "Current assessment artifact: a revised sanitised derivative of the same historical "
+        "submission, reflowed from 34 to 84 pages. Not the submitted text, and not the first "
+        "sanitised derivative either."
+    ),
+    candidate_version=(
+        "revised sanitised derivative, 84 pages (reflow of a 34-page original); supersedes the "
+        "first sanitised derivative"
+    ),
+    supersedes="sanitised_v1",
+    change_id="msca-dn-2025-sanitised-resolved-fixes",
+    summary=(
+        "A revised sanitised derivative of the same submission. The page count, the section "
+        "boundaries and 83 of the 84 page texts are unchanged; page 45 was re-typeset."
+    ),
+)
+
+#: The sanitised derivative of the 2025 MSCA-DN submission: the document PE-03
+#: imported, with both of its revisions. Every value here was a constant of
+#: this module before V07.
+SANITISED_DERIVATIVE = DocumentConfig(
+    config_id="sanitised_derivative",
+    is_submitted_document=False,
+    intake_id=ws.INTAKE_ID,
+    title="Sanitised derivative of the MSCA-DN 2025 Part B (PROJECT-X)",
+    role=_SANITISED_ROLE,
+    workspace_rel=ws.WORKSPACE_REL,
+    sections=MSCA_DN_PART_B_SECTIONS,
+    sub_sections=_SANITISED_SUB_SECTIONS,
+    # The one criterion-level heading the copy carries; it is the section's own
+    # content and must be followed immediately by the first sub-section heading.
+    criterion_heading_markers=(("implementation_section", "3.", 41),),
+    # A marker is searched on its declared start page and the page before it:
+    # 8's opening block is the last line of p. 75 while §4.1 says 76.
+    marker_page_tolerance=1,
+    expected_pages=84,
+    body_point_size="12.0",
+    work_package_layout=WorkPackageLayout(
+        sub_section_id="3.1",
+        header_labels=(
+            "WP Number:", "WP title:", "Start month", "Lead participant", "Participants",
+            "DCs involved",
+        ),
+        register_declared_labels=("WP Number:", "WP title:", "Lead participant"),
+        consequence=(
+            "A work package whose labels ran into its 'WP Number:' block has no separate "
+            "'WP title:', 'Lead participant', 'Participants' or 'DCs involved' block. The text is "
+            "all there; a reader that splits a work package by its label blocks alone does not see "
+            "that work package's fields and may report it as undescribed."
+        ),
+    ),
+    scorecard_rel=Path("harness/evaluator_scorecard_msca_dn.json"),
+    short_name="the sanitised copy",
+    page_map_declared_from=f"{ws.SPEC_REL} §4.1",
+    page_statement=(
+        "Page {page} of the sanitised derivative stored in this repository. "
+        "Not the submitted text (fidelity register, provenance)."
+    ),
+    reader_caveat_key="not_the_submitted_text",
+    reader_caveat=(
+        "This is a sanitised derivative. Figures are absent and citations were removed, so no "
+        "judgment of evidence base, length or page-limit compliance is admissible from it."
+    ),
+    first_revision_key="is_the_first_sanitised_derivative",
+    declared_status="Assumed",
+    status_note=(
+        "The title, role, short name, page statement, reader caveat and page map are operator "
+        "declarations (spec PE-01, decision 18). The page count, the body point size, the "
+        "work-package layout and every start page are re-derived from the stored PDF by the "
+        "importer and re-derived again by tests/test_msca_dn_import.py, so each stands Confirmed "
+        "where it is measured. The register records both halves side by side."
+    ),
+    revisions=(REVISION_ORIGINAL, REVISION_RESOLVED_FIXES),
+    manifest_records_runtime_environment=False,
+    summary=(
+        "The copy PROJECT-X's acronym stands in for the real one. Two revisions, both 84 pages; "
+        "the second re-typeset page 45. Both manifests are bound by hash into the frozen 74.60 "
+        "baseline, so neither may gain a field."
+    ),
+)
+
+#: The official 2025 submission. Declared so that it can never be imported
+#: under the sanitised copy's page map, page count, body size or description:
+#: it inherits none of them, and selecting it refuses until an operator
+#: declares each from the original itself (V08). Its graph root is deliberately
+#: undeclared — the original and the text extracted from it stay in the private
+#: network and are not committed to this repository.
+OFFICIAL_ORIGINAL = DocumentConfig(
+    config_id="official_original",
+    is_submitted_document=True,
+    intake_id="msca-dn-2025-original",
+    title="MSCA-DN 2025 Part B, as submitted",
+    role=(
+        "Current assessment artifact: the Part B of the 2025 MSCA Doctoral Networks "
+        "submission, as submitted. The submitted text itself."
+    ),
+    workspace_rel=None,
+    sections=MSCA_DN_PART_B_SECTIONS,
+    short_name="the Part B as submitted",
+    page_map_declared_from=(
+        "the V08 dry-import reconciliation against the PDF, page by page. No page map is "
+        "declared here yet, which is why selecting this document refuses."
+    ),
+    first_revision_key="is_the_first_version_of_the_original",
+    declared_status="Assumed",
+    status_note=(
+        "Every value here is an operator declaration about a document this repository does not "
+        "hold. Nothing has been derived from the original, so no value is Confirmed and none can "
+        "be until V08's dry import measures it."
+    ),
+    page_statement=(
+        "Page {page} of the Part B submitted to the 2025 MSCA Doctoral Networks call. The "
+        "submitted text itself, held in the private network and not in this repository."
+    ),
+    reader_caveat_key="the_submitted_text_itself",
+    reader_caveat=(
+        "This is the submitted text. What its extraction loses is therefore unknown until the "
+        "V08 dry import has been reconciled against the PDF page by page, and nothing here "
+        "declares that reconciliation done."
+    ),
+    manifest_records_runtime_environment=True,
+    summary=(
+        "Not imported. Its page map, page count, body point size, work-package layout, graph "
+        "root and revisions are undeclared, and no value is taken from the sanitised copy. It is "
+        "a document of its own and not a descendant of the derivative: its intake id differs, "
+        "and a revision of one document may not supersede a revision of another."
+    ),
+)
+
+#: Every document this tool can be pointed at.
+DOCUMENTS: tuple[DocumentConfig, ...] = (SANITISED_DERIVATIVE, OFFICIAL_ORIGINAL)
+#: The document selected when none is named: the one PE-03 imported.
+DEFAULT_DOCUMENT: DocumentConfig = SANITISED_DERIVATIVE
+
+
+def _index_documents() -> dict[str, DocumentConfig]:
+    """``revision_id`` to document, refusing any collision between documents.
+
+    Two documents may not share a config id, an intake id, a graph root or a
+    revision: a revision resolves to exactly one document, and a shared intake
+    or graph root would make one document's page texts resolvable as another's.
+    """
+    for field in ("config_id", "intake_id", "workspace_rel"):
+        values = [str(getattr(doc, field)) for doc in DOCUMENTS if getattr(doc, field) is not None]
+        if len(set(values)) != len(values):
+            raise ImportRefused(f"two documents share a {field}")
+    by_revision: dict[str, DocumentConfig] = {}
+    for doc in DOCUMENTS:
+        for rev in doc.revisions:
+            if rev.revision_id in by_revision:
+                raise ImportRefused(
+                    f"revision {rev.revision_id!r} belongs to two documents: "
+                    f"{by_revision[rev.revision_id].config_id!r} and {doc.config_id!r}"
+                )
+            by_revision[rev.revision_id] = doc
+    return by_revision
+
+
+_DOCUMENT_BY_REVISION: dict[str, DocumentConfig] = _index_documents()
+
+
+def document_by_id(config_id: str) -> DocumentConfig:
+    for doc in DOCUMENTS:
+        if doc.config_id == config_id:
+            return doc
+    raise ImportRefused(
+        f"unknown document {config_id!r}; known: {[d.config_id for d in DOCUMENTS]}"
+    )
+
+
+def config_for(revision: Revision) -> DocumentConfig:
+    """The document *revision* belongs to.
+
+    A pure lookup over :data:`DOCUMENTS`. A revision is never interpreted
+    against a document that does not declare it, so a page map, a page count or
+    a title cannot be borrowed across documents.
+    """
+    doc = _DOCUMENT_BY_REVISION.get(revision.revision_id)
+    if doc is None:
+        raise ImportRefused(
+            f"revision {revision.revision_id!r} belongs to no declared document; "
+            f"known: {sorted(_DOCUMENT_BY_REVISION)}"
+        )
+    return doc
+
+
+def revision_by_id(revision_id: str) -> Revision:
+    """The revision *revision_id* of whichever document declares it."""
+    doc = _DOCUMENT_BY_REVISION.get(revision_id)
+    if doc is None:
+        raise ImportRefused(
+            f"unknown revision {revision_id!r}; known: {sorted(_DOCUMENT_BY_REVISION)}"
+        )
+    return doc.revision_by_id(revision_id)
+
+
+# No module-level name holds one document's workspace, intake, title, page
+# count, registers or revisions any more: each is read from the selected
+# configuration, and :data:`DEFAULT_DOCUMENT` is the one a caller gets when it
+# names none. ``render_all`` writes every revision of the selected document, so
+# a revision never silently drops the page texts an earlier span resolves into.
 
 
 # --------------------------------------------------------------------------- #
@@ -347,19 +911,20 @@ def _extract(pdf: str, sha256: str) -> tuple[PageExtract, ...]:
 def extract(repo_root: Path, revision: Revision = REVISION_ORIGINAL) -> tuple[PageExtract, ...]:
     """Every page of *revision*'s PDF, or refuse.
 
-    The page count is checked against the revision's declared one rather than
-    assumed: a revision that reflowed to a different length must be declared,
-    not discovered downstream.
+    The page count is checked against the count the revision or its document
+    declares, rather than assumed: a revision that reflowed to a different
+    length must be declared, not discovered downstream.
     """
+    expected = config_for(revision).expected_pages_of(revision)
     pdf = repo_root / revision.pdf_rel
     if not pdf.is_file():
         raise ImportRefused(
             f"candidate missing for revision {revision.revision_id}: {revision.pdf_rel.as_posix()}"
         )
     pages = _extract(str(pdf), _sha256(pdf))
-    if len(pages) != revision.expected_pages:
+    if len(pages) != expected:
         raise ImportRefused(
-            f"candidate {revision.pdf_rel.as_posix()}: expected {revision.expected_pages} pages, "
+            f"candidate {revision.pdf_rel.as_posix()}: expected {expected} pages, "
             f"found {len(pages)}"
         )
     return pages
@@ -391,8 +956,10 @@ def _is_marker(p: Paragraph, spec: SubSectionSpec) -> bool:
     return p.text == spec.marker if spec.exact_marker else p.text.startswith(spec.marker + " ")
 
 
-def _find_heading(paragraphs: Sequence[Paragraph], spec: SubSectionSpec, start_from: int) -> int:
-    lo = spec.declared_pages[0] - MARKER_PAGE_TOLERANCE
+def _find_heading(
+    paragraphs: Sequence[Paragraph], spec: SubSectionSpec, start_from: int, tolerance: int
+) -> int:
+    lo = spec.declared_pages[0] - tolerance
     hi = spec.declared_pages[0]
     for i in range(start_from, len(paragraphs)):
         p = paragraphs[i]
@@ -409,20 +976,23 @@ def _title_of(spec: SubSectionSpec, heading: Optional[str]) -> str:
     if spec.declared_title is not None:
         return spec.declared_title
     if heading is None:
-        return ""  # 1.1: filled from the AF V6.0 heading by build_import
+        return ""  # unlabelled: filled from the application form by build_import
     return _NUMBERING.sub("", heading, count=1)
 
 
-def map_sub_sections(paragraphs: Sequence[Paragraph]) -> tuple[tuple[SubSection, ...], dict[str, str]]:
-    """Cut the paragraph stream at the headings. Returns the sub-sections and
-    the criterion-heading content per section (``{section_id: heading}``)."""
+def map_sub_sections(
+    paragraphs: Sequence[Paragraph], config: DocumentConfig = DEFAULT_DOCUMENT
+) -> tuple[tuple[SubSection, ...], dict[str, str]]:
+    """Cut the paragraph stream at the headings *config* declares. Returns the
+    sub-sections and the criterion-heading content per section
+    (``{section_id: heading}``)."""
     cuts: list[tuple[SubSectionSpec, int, Optional[str]]] = []
     cursor = 0
-    for spec in SUB_SECTIONS:
+    for spec in config.sub_sections:
         if spec.marker is None:
             cuts.append((spec, 0, None))
             continue
-        i = _find_heading(paragraphs, spec, cursor)
+        i = _find_heading(paragraphs, spec, cursor, config.marker_page_tolerance)
         heading = None if spec.exact_marker else paragraphs[i].text
         cuts.append((spec, i, heading))
         cursor = i + 1
@@ -435,8 +1005,9 @@ def map_sub_sections(paragraphs: Sequence[Paragraph]) -> tuple[tuple[SubSection,
         # A criterion-level heading sits at the end of the previous
         # sub-section's range; it belongs to its section, not to that prose.
         nxt = cuts[n + 1][0] if n + 1 < len(cuts) else None
-        if nxt is not None and nxt.section_id in CRITERION_HEADING_MARKERS and nxt.section_id != spec.section_id:
-            marker, page = CRITERION_HEADING_MARKERS[nxt.section_id]
+        criterion = None if nxt is None else config.criterion_heading(nxt.section_id)
+        if nxt is not None and criterion is not None and nxt.section_id != spec.section_id:
+            marker, page = criterion
             if not body or body[-1].kind != "prose" or not body[-1].text.startswith(marker + " ") \
                     or body[-1].pages[0] != page:
                 raise ImportRefused(
@@ -469,6 +1040,7 @@ def extract_claims(
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """The audit claim ledger: one claim per rule-selected sentence, first
     occurrence of a sentence text wins, each with a span into its page."""
+    config = config_for(revision)
     by_page = {p.page: p.text for p in pages}
     claims: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -497,7 +1069,11 @@ def extract_claims(
                 for page in para.pages:
                     hit = locate(by_page[page], sentence)
                     if hit is not None:
-                        span = {"source_id": revision.source_id(page), "start": hit[0], "end": hit[1]}
+                        span = {
+                            "source_id": config.source_id(revision, page),
+                            "start": hit[0],
+                            "end": hit[1],
+                        }
                         break
                 claim_id = f"{sub.spec.sub_section_id}-c{n:03d}"
                 if span is None:
@@ -536,18 +1112,36 @@ class Import:
     record_rel: str
     """Workspace-relative path of the document record."""
 
+    @property
+    def config(self) -> DocumentConfig:
+        """The document this import is of."""
+        return config_for(self.revision)
 
-def _af_v6_heading(repo_root: Path, anchor: str) -> str:
-    sc = json.loads((repo_root / SCORECARD_REL).read_text(encoding="utf-8-sig"))
+
+def _form_heading(repo_root: Path, config: DocumentConfig, anchor: str) -> str:
+    """The application-form heading of *anchor*, from *config*'s scorecard.
+
+    The title of a sub-section the document leaves unlabelled comes from the
+    form rather than from the copy, so it is never invented here.
+    """
+    scorecard = config.scorecard_rel
+    if scorecard is None:
+        raise ImportRefused(
+            f"document {config.config_id!r}: sub-section {anchor} is unlabelled and carries no "
+            f"declared title, and the configuration declares no scorecard_rel to take one from"
+        )
+    sc = json.loads((repo_root / scorecard).read_text(encoding="utf-8-sig"))
     for crit in sc["criteria"]:
         for aspect in crit["aspects"]:
             if aspect.get("anchor") == anchor:
                 return str(aspect["af_v6_heading"])
-    raise ImportRefused(f"{SCORECARD_REL.as_posix()}: no aspect anchored {anchor}")
+    raise ImportRefused(f"{scorecard.as_posix()}: no aspect anchored {anchor}")
 
 
-def _document_id(repo_root: Path) -> str:
-    return read_esr_intake(repo_root / WORKSPACE_REL, INTAKE_ID).document_id
+def _document_id(repo_root: Path, config: DocumentConfig) -> str:
+    config.require_provenance(repo_root)
+    world = repo_root / config.require_workspace()
+    return read_esr_intake(world, config.require_intake_id()).document_id
 
 
 def node_id_of(repo_root: Path, revision: Revision) -> str:
@@ -583,9 +1177,10 @@ def build_document_provenance(repo_root: Path, revision: Revision) -> Optional[d
     from runner.dev_graph.builder import build_snapshot
     from runner.dev_graph.revisions import build_provenance
 
-    predecessor = revision_by_id(revision.supersedes)
+    config = config_for(revision)
+    predecessor = config.revision_by_id(revision.supersedes)
     previous_node = node_id_of(repo_root, predecessor)
-    snapshot = build_snapshot(repo_root / WORKSPACE_REL)
+    snapshot = build_snapshot(repo_root / config.require_workspace())
     return build_provenance(
         snapshot,
         supersedes=previous_node,
@@ -605,18 +1200,24 @@ def build_import(
     is not part of the content version and no source record depends on it, so
     the two renderings agree on everything the index carries.
     """
+    config = config_for(revision)
+    config.require_complete()
     pages = extract(repo_root, revision)
     paragraphs = join_segments(pages)
-    subs, criterion_content = map_sub_sections(paragraphs)
-    title_1_1 = _af_v6_heading(repo_root, "1.1")
+    subs, criterion_content = map_sub_sections(paragraphs, config)
+    # A sub-section the document carries no heading block for, and declares no
+    # title for, takes the application form's heading for its anchor.
     subs = tuple(
-        SubSection(s.spec, s.heading, title_1_1, s.paragraphs, s.start_page, s.end_page)
-        if s.spec.sub_section_id == "1.1" and s.spec.declared_title is None else s
+        SubSection(
+            s.spec, s.heading, _form_heading(repo_root, config, s.spec.sub_section_id),
+            s.paragraphs, s.start_page, s.end_page,
+        )
+        if needs_form_title(s.spec) else s
         for s in subs
     )
     claims, stats = extract_claims(subs, pages, revision)
     sections = []
-    for section_id, section_title in SECTIONS:
+    for section_id, section_title in config.sections:
         sections.append(
             {
                 "section_id": section_id,
@@ -631,8 +1232,8 @@ def build_import(
             }
         )
     candidate = {
-        "document_id": _document_id(repo_root),
-        "title": DOCUMENT_TITLE,
+        "document_id": _document_id(repo_root, config),
+        "title": config.title,
         "sections": sections,
         "claims": claims,
         "commitments": [],
@@ -658,6 +1259,8 @@ def _pages_of(sub: SubSection) -> set[int]:
 def render_source_records(repo_root: Path, imp: Import) -> list[dict[str, Any]]:
     """One ``source`` record per page of *imp*'s revision, in page order."""
     revision = imp.revision
+    config = imp.config
+    title = config.title
     sha = _sha256(repo_root / revision.pdf_rel)
     claims_by_page: dict[int, list[str]] = {}
     for c in imp.candidate["claims"]:
@@ -674,8 +1277,8 @@ def render_source_records(repo_root: Path, imp: Import) -> list[dict[str, Any]]:
         carries = subs_by_page.get(p.page, [])
         sources.append(
             {
-                "source_id": revision.source_id(p.page),
-                "title": f"{DOCUMENT_TITLE}, page {p.page} of {len(imp.pages)}",
+                "source_id": config.source_id(revision, p.page),
+                "title": f"{title}, page {p.page} of {len(imp.pages)}",
                 "kind": "call_document_page",
                 "kind_note": (
                     "runner.source_index's closed transcription vocabulary has two kinds; this is the "
@@ -684,10 +1287,11 @@ def render_source_records(repo_root: Path, imp: Import) -> list[dict[str, Any]]:
                 ),
                 "status": "Confirmed",
                 "what_the_page_carries": (
-                    f"sub-section(s) {', '.join(carries)} of the sanitised copy" if carries else "no mapped sub-section"
+                    f"sub-section(s) {', '.join(carries)} of {config.short_name}"
+                    if carries else "no mapped sub-section"
                 ),
                 "citation": {
-                    "cited_as": f"{DOCUMENT_TITLE}, page {p.page}.",
+                    "cited_as": f"{title}, page {p.page}.",
                     "document_id": imp.candidate["document_id"],
                     "page": p.page,
                 },
@@ -698,10 +1302,7 @@ def render_source_records(repo_root: Path, imp: Import) -> list[dict[str, Any]]:
                     "sha256": sha,
                     "document_id": imp.candidate["document_id"],
                     "page": p.page,
-                    "what_it_holds": (
-                        f"Page {p.page} of the sanitised derivative stored in this repository. "
-                        "Not the submitted text (fidelity register, provenance)."
-                    ),
+                    "what_it_holds": config.page_statement.format(page=p.page),
                 },
                 "transcription": {
                     "state": "transcribed",
@@ -727,7 +1328,11 @@ def render_source_records(repo_root: Path, imp: Import) -> list[dict[str, Any]]:
     return sources
 
 
-def render_sources(repo_root: Path, imps: Optional[Sequence[Import]] = None) -> dict[str, Any]:
+def render_sources(
+    repo_root: Path,
+    imps: Optional[Sequence[Import]] = None,
+    config: DocumentConfig = DEFAULT_DOCUMENT,
+) -> dict[str, Any]:
     """The graph root's whole source index: every revision's pages, oldest first.
 
     One file holds every revision because the dev-graph builder reads exactly
@@ -735,8 +1340,24 @@ def render_sources(repo_root: Path, imps: Optional[Sequence[Import]] = None) -> 
     in it is what lets the earlier document record keep resolving its spans,
     so a superseded candidate stays reproducible rather than becoming a
     dangling reference.
+
+    One graph root holds one document, so *config* is taken from the imports
+    when any are given and every import must be of that document.
     """
-    imps = list(imps if imps is not None else build_imports(repo_root, with_provenance=False))
+    imps = list(
+        imps if imps is not None
+        else build_imports(repo_root, with_provenance=False, config=config)
+    )
+    documents = {imp.config.config_id for imp in imps}
+    if len(documents) > 1:
+        raise ImportRefused(
+            f"one source index holds one document; given revisions of {sorted(documents)}"
+        )
+    if documents and documents != {config.config_id}:
+        raise ImportRefused(
+            f"the imports are of document {documents.pop()!r} and the index was asked for "
+            f"{config.config_id!r}; the two must be the same document"
+        )
     sources: list[dict[str, Any]] = []
     candidates: list[dict[str, Any]] = []
     for imp in imps:
@@ -747,7 +1368,7 @@ def render_sources(repo_root: Path, imps: Optional[Sequence[Import]] = None) -> 
                 "path": imp.revision.pdf_rel.as_posix(),
                 "sha256": _sha256(repo_root / imp.revision.pdf_rel),
                 "pages": len(imp.pages),
-                "source_id_format": imp.revision.source_id_format,
+                "source_id_format": imp.config.source_id_format(imp.revision),
                 "supersedes_revision": imp.revision.supersedes,
             }
         )
@@ -768,7 +1389,7 @@ def render_sources(repo_root: Path, imps: Optional[Sequence[Import]] = None) -> 
         "provenance_class": "derived",
         "artifact_purpose": (
             "The Tier 3 source index of the MSCA-DN pre-evaluation graph root: one source per page of "
-            "each revision of the sanitised copy, each holding that page's extracted text, so a "
+            f"each revision of {config.short_name}, each holding that page's extracted text, so a "
             "verified_span resolves to a page and an offset (spec §6). Written by PE-03."
         ),
         "spec": SPEC_REL,
@@ -896,16 +1517,17 @@ def _citation_counts(imp: Import) -> dict[str, int]:
 
 
 def _point_sizes(imp: Import) -> dict[str, Any]:
+    body = imp.config.body_point_size
     dist: dict[str, int] = {}
     other_text: dict[str, set[str]] = {}
     for p in imp.pages:
         for size, n in p.chars_by_point_size.items():
             dist[size] = dist.get(size, 0) + n
         for size, text in p.text_by_point_size.items():
-            if size != BODY_POINT_SIZE:
+            if size != body:
                 other_text.setdefault(size, set()).update(text)
     return {
-        "body_point_size": BODY_POINT_SIZE,
+        "body_point_size": body,
         "distribution": dict(sorted(dist.items(), key=lambda kv: -kv[1])),
         "other_sizes_character_sets": {k: "".join(sorted(v)) for k, v in sorted(other_text.items())},
         "other_sizes_are_bullets_and_spaces_only": all(v <= {"•", " "} for v in other_text.values()),
@@ -915,12 +1537,13 @@ def _point_sizes(imp: Import) -> dict[str, Any]:
 def derive_register_half(repo_root: Path, revision: Revision = REVISION_ORIGINAL) -> dict[str, Any]:
     """The fidelity register's ``derived`` half (spec decision 9), from the PDF alone."""
     imp = build_import(repo_root, revision)
-    labels = ("WP Number:", "WP title:", "Lead participant")
+    layout = imp.config.work_package_layout
+    labels = () if layout is None else layout.register_declared_labels
     label_counts = {
         label: sum(1 for s in imp.sub_sections for p in s.paragraphs if p.kind == "prose" and p.text.startswith(label))
         for label in labels
     }
-    wp_blocks = label_counts["WP Number:"]
+    wp_blocks = 0 if not labels else label_counts[labels[0]]
     return {
         "kind": "derived",
         "status": "written",
@@ -1009,34 +1632,42 @@ def _page_comparison(repo_root: Path, imp: Import, predecessor: Revision) -> dic
 #: for the unligatured spelling misses them, so their presence is recorded.
 LIGATURES: str = "ﬀﬁﬂﬃﬄﬅﬆ"
 
-#: The label-value lines Table 3.1 a was flattened to. A reader that splits a
-#: work package into fields expects each of these to open its own prose block.
-WP_HEADER_LABELS: tuple[str, ...] = (
-    "WP Number:", "WP title:", "Start month", "Lead participant", "Participants", "DCs involved",
-)
-_WP_NUMBER = re.compile(r"^WP Number:\s*(\d+)(?!\d)")
-
 
 def _work_package_header_blocks(imp: Import) -> dict[str, Any]:
     """Which work-package headers survived the flattening as separate blocks.
 
-    A header whose labels all ran into the ``WP Number:`` block is still
-    present as text, but a reader that splits a work package by its labels
-    cannot see its fields. Measured, because a revision can break this without
-    changing a single word.
+    A header whose labels all ran into the first label's block is still present
+    as text, but a reader that splits a work package by its labels cannot see
+    its fields. Measured, because a revision can break this without changing a
+    single word. The sub-section, the labels and the consequence are the
+    document's own (V07); nothing here assumes a layout.
     """
-    sub = next(
-        (s for s in imp.sub_sections if s.spec.sub_section_id == "3.1"), None
-    )
+    layout = imp.config.work_package_layout
+    if layout is None:
+        return {
+            "wp_number_blocks": [],
+            "headers_collapsed_into_one_block": [],
+            "label_blocks": {},
+            "consequence": (
+                "The document configuration declares no work-package layout, so no header "
+                "layout was measured."
+            ),
+            "read_by": "nothing; there is no measurement to read",
+        }
+    labels = layout.header_labels
+    anchor = layout.sub_section_id
+    first = labels[0]
+    number = re.compile("^" + re.escape(first) + r"\s*(\d+)(?!\d)")
+    sub = next((s for s in imp.sub_sections if s.spec.sub_section_id == anchor), None)
     blocks = [] if sub is None else [p.text for p in sub.paragraphs if p.kind == "prose"]
     collapsed: list[dict[str, Any]] = []
     numbers: list[int] = []
     for text in blocks:
-        m = _WP_NUMBER.match(text)
+        m = number.match(text)
         if m is None:
             continue
         numbers.append(int(m.group(1)))
-        inline = [lab for lab in WP_HEADER_LABELS if lab != "WP Number:" and lab in text]
+        inline = [lab for lab in labels if lab != first and lab in text]
         if inline:
             collapsed.append(
                 {"work_package": int(m.group(1)), "labels_run_into_the_block": inline}
@@ -1045,14 +1676,9 @@ def _work_package_header_blocks(imp: Import) -> dict[str, Any]:
         "wp_number_blocks": sorted(numbers),
         "headers_collapsed_into_one_block": collapsed,
         "label_blocks": {
-            lab: sum(1 for t in blocks if t.startswith(lab)) for lab in WP_HEADER_LABELS
+            lab: sum(1 for t in blocks if t.startswith(lab)) for lab in labels
         },
-        "consequence": (
-            "A work package whose labels ran into its 'WP Number:' block has no separate "
-            "'WP title:', 'Lead participant', 'Participants' or 'DCs involved' block. The text is "
-            "all there; a reader that splits a work package by its label blocks alone does not see "
-            "that work package's fields and may report it as undescribed."
-        ),
+        "consequence": layout.consequence,
         "read_by": (
             "The integrity audit (PE-07) reads both layouts: harness/integrity_audit."
             "split_header_fields treats a header field as '<label> <value>' and looks for each "
@@ -1137,28 +1763,26 @@ def extraction_limitations(repo_root: Path, revision: Revision) -> dict[str, Any
         },
         "work_package_header_blocks": _work_package_header_blocks(imp),
         "page_map_discrepancies": _discrepancies(imp),
-        "not_the_submitted_text": (
-            "This is a sanitised derivative. Figures are absent and citations were removed, so no "
-            "judgment of evidence base, length or page-limit compliance is admissible from it."
-        ),
+        imp.config.reader_caveat_key: imp.config.reader_caveat,
     }
 
 
 def _revision_block(repo_root: Path, imp: Import) -> dict[str, Any]:
     """What this revision is and what it supersedes. Declared and derived, marked."""
     revision = imp.revision
+    config = imp.config
     out: dict[str, Any] = {
         "revision_id": revision.revision_id,
         "summary": revision.summary,
         "source_id_prefix": revision.source_id_prefix,
-        "is_submitted_document": False,
-        "is_the_first_sanitised_derivative": revision.supersedes is None,
-        "all_revisions": [r.revision_id for r in REVISIONS],
+        "is_submitted_document": config.is_submitted_document,
+        config.first_revision_key: revision.supersedes is None,
+        "all_revisions": [r.revision_id for r in config.revisions],
     }
     if revision.supersedes is None:
         out["supersedes"] = None
         return out
-    predecessor = revision_by_id(revision.supersedes)
+    predecessor = config.revision_by_id(revision.supersedes)
     provenance = imp.record.get("provenance") or {}
     out["supersedes"] = {
         "revision_id": predecessor.revision_id,
@@ -1191,7 +1815,46 @@ def _revision_block(repo_root: Path, imp: Import) -> dict[str, Any]:
 
 def manifest_rel(revision: Revision) -> Path:
     """Repo-relative path of *revision*'s import manifest."""
-    return WORKSPACE_REL / IMPORTS_REL / revision.manifest_name
+    return config_for(revision).manifest_rel(revision)
+
+
+def _criterion_heading_note(config: DocumentConfig) -> str:
+    """How the manifest's normalisation block describes the criterion headings."""
+    markers = [marker for _section, marker, _page in config.criterion_heading_markers]
+    if not markers:
+        return "the document carries no criterion-level heading of its own"
+    if len(markers) == 1:
+        return f"the one criterion-level heading ({markers[0]!r}) is its section's own content"
+    listed = ", ".join(repr(m) for m in markers)
+    return f"the criterion-level headings ({listed}) are their sections' own content"
+
+
+def _runtime_environment_block(config: DocumentConfig) -> dict[str, Any]:
+    """The pinned extraction environment, for a manifest that may carry it.
+
+    Empty for a manifest already bound by hash into a frozen baseline: V01
+    found that adding the block there would rewrite four artifacts the
+    historical-validation milestone holds immutable. A manifest authored for
+    the first time carries it, so the pin travels with the artifact rather
+    than only in ``requirements.txt`` and the decision record. The values are
+    the declared pin, never a measurement, so the manifest stays replayable on
+    any machine that is on the pin.
+    """
+    if not config.manifest_records_runtime_environment:
+        return {}
+    return {
+        "runtime_environment": {
+            "pymupdf": PINNED_PYMUPDF,
+            "mupdf": PINNED_MUPDF,
+            "measured_python": list(MEASURED_PYTHON),
+            "basis": (
+                "declared: the pin of runner.extraction_environment, not a measurement of the "
+                "machine that wrote this manifest. An off-pin build does not reproduce these "
+                "bytes; --environment reports whether the running one is on the pin."
+            ),
+            "decision_record": EXTRACTION_DECISION_REL,
+        }
+    }
 
 
 def render_manifest(
@@ -1199,8 +1862,9 @@ def render_manifest(
 ) -> dict[str, Any]:
     imp = imp or build_import(repo_root)
     revision = imp.revision
+    config = imp.config
     records = render_source_records(repo_root, imp)
-    sources_bytes = canonical_json_bytes(render_sources(repo_root, imps))
+    sources_bytes = canonical_json_bytes(render_sources(repo_root, imps, config))
     doc_id = imp.candidate["document_id"]
     return {
         "record_type": MANIFEST_RECORD_TYPE,
@@ -1212,7 +1876,7 @@ def render_manifest(
             "path": revision.pdf_rel.as_posix(),
             "sha256": _sha256(repo_root / revision.pdf_rel),
             "pages": len(imp.pages),
-            "is_submitted_document": False,
+            "is_submitted_document": config.is_submitted_document,
             "fidelity_register": revision.register_rel.as_posix(),
         },
         "revision": _revision_block(repo_root, imp),
@@ -1233,7 +1897,7 @@ def render_manifest(
         "sources": {
             "path": SOURCES_REL.as_posix(),
             "count": len(imp.pages),
-            "source_id_format": revision.source_id_format,
+            "source_id_format": config.source_id_format(revision),
             "sha256": hashlib.sha256(sources_bytes).hexdigest(),
             "sha256_covers": (
                 "the whole source index of the graph root, every revision's records included; one "
@@ -1241,10 +1905,10 @@ def render_manifest(
             ),
             "records_sha256": hashlib.sha256(canonical_json_bytes(records)).hexdigest(),
             "records_sha256_covers": "only this revision's own source records, in page order",
-            "revisions_in_the_file": [r.revision_id for r in REVISIONS],
+            "revisions_in_the_file": [r.revision_id for r in config.revisions],
         },
         "page_map": {
-            "declared_from": f"{SPEC_REL} §4.1",
+            "declared_from": config.page_map_declared_from,
             "sub_sections": _sub_section_rows(imp),
             "discrepancies": _discrepancies(imp),
         },
@@ -1256,7 +1920,7 @@ def render_manifest(
                 "terminal punctuation and the next starts in lower case, or when it ends with a hyphen"
             ),
             "headings": "the heading block of a numbered sub-section is its title (numbering stripped), not its content",
-            "criterion_heading": "the one criterion-level heading ('3.') is its section's own content",
+            "criterion_heading": _criterion_heading_note(config),
             "tables": "one pipe-delimited paragraph per table row, cells collapsed; a pipe inside a cell is refused",
             "hyphenation": "line-end hyphens are kept as the source carries them",
         },
@@ -1280,6 +1944,7 @@ def render_manifest(
             ),
         },
         "extraction_losses": _losses(imp),
+        **_runtime_environment_block(config),
         # This revision's own register, never the first revision's: each revision
         # owns the register whose derived half was measured from its extraction.
         "fidelity_register_derived_half": f"{revision.register_rel.as_posix()}#derived",
@@ -1291,38 +1956,46 @@ def render_manifest(
 # --------------------------------------------------------------------------- #
 
 
-def build_imports(repo_root: Path, *, with_provenance: bool = True) -> list[Import]:
-    """Every revision's import, oldest first."""
+def build_imports(
+    repo_root: Path, *, with_provenance: bool = True, config: DocumentConfig = DEFAULT_DOCUMENT
+) -> list[Import]:
+    """Every revision of *config*, oldest first."""
+    config.require_complete()
     return [
         build_import(repo_root, revision, with_provenance=with_provenance)
-        for revision in REVISIONS
+        for revision in config.revisions
     ]
 
 
-def render_sources_bytes(repo_root: Path) -> bytes:
+def render_sources_bytes(repo_root: Path, config: DocumentConfig = DEFAULT_DOCUMENT) -> bytes:
     """The source index alone, without resolving any provenance.
 
     The one artifact an empty graph root can be bootstrapped from: a document
     record's provenance is resolved against the built graph, and the graph
     cannot be built until every span has a source to resolve into.
     """
-    return canonical_json_bytes(render_sources(repo_root, build_imports(repo_root, with_provenance=False)))
+    imps = build_imports(repo_root, with_provenance=False, config=config)
+    return canonical_json_bytes(render_sources(repo_root, imps, config))
 
 
-def render_all(repo_root: Path) -> dict[str, bytes]:
-    """Every file PE-03 authors, as the bytes it should hold on disk.
+def render_all(repo_root: Path, config: DocumentConfig = DEFAULT_DOCUMENT) -> dict[str, bytes]:
+    """Every file PE-03 authors for *config*, as the bytes it should hold on disk.
 
     Every revision is rendered, not only the active one: the source index is
     one file per graph root, and a revision that stopped writing the earlier
     revision's page records would break the earlier record's spans.
     """
-    imps = build_imports(repo_root)
+    config.require_complete()
+    workspace = config.require_workspace()
+    imps = build_imports(repo_root, config=config)
     out: dict[str, bytes] = {
-        (WORKSPACE_REL / SOURCES_REL).as_posix(): canonical_json_bytes(render_sources(repo_root, imps)),
+        (workspace / SOURCES_REL).as_posix(): canonical_json_bytes(
+            render_sources(repo_root, imps, config)
+        ),
     }
     for imp in imps:
-        out[(WORKSPACE_REL / imp.record_rel).as_posix()] = canonical_json_bytes(imp.record)
-        out[manifest_rel(imp.revision).as_posix()] = canonical_json_bytes(
+        out[(workspace / imp.record_rel).as_posix()] = canonical_json_bytes(imp.record)
+        out[config.manifest_rel(imp.revision).as_posix()] = canonical_json_bytes(
             render_manifest(repo_root, imp, imps)
         )
         out[imp.revision.register_rel.as_posix()] = canonical_json_bytes(
@@ -1331,7 +2004,7 @@ def render_all(repo_root: Path) -> dict[str, bytes]:
     return out
 
 
-def check(repo_root: Path) -> list[str]:
+def check(repo_root: Path, config: DocumentConfig = DEFAULT_DOCUMENT) -> list[str]:
     """Relative paths whose bytes differ from the rendering, or are absent.
 
     Read-only, and it may refuse instead of returning: a malformed declaration
@@ -1340,38 +2013,40 @@ def check(repo_root: Path) -> list[str]:
     """
     return [
         rel
-        for rel, data in render_all(repo_root).items()
+        for rel, data in render_all(repo_root, config).items()
         if not (repo_root / rel).is_file() or (repo_root / rel).read_bytes() != data
     ]
 
 
-def author(repo_root: Path) -> list[str]:
-    """Write every file; return the relative paths that changed.
+def author(repo_root: Path, config: DocumentConfig = DEFAULT_DOCUMENT) -> list[str]:
+    """Write every file of *config*; return the relative paths that changed.
 
     The source index is written before any document record, because a record
     whose spans name records the file does not yet carry would not build. The
     declaration inputs of every register are read first, so a malformed one is
     refused before the source index is written.
     """
-    validate_inputs(repo_root, [(r.revision_id, r.register_rel) for r in REVISIONS])
+    config.require_complete()
+    workspace = config.require_workspace()
+    validate_inputs(repo_root, [(r.revision_id, r.register_rel) for r in config.revisions])
     changed: list[str] = []
-    sources_rel = (WORKSPACE_REL / SOURCES_REL).as_posix()
+    sources_rel = (workspace / SOURCES_REL).as_posix()
     # Bootstrap: the source index is written first and without building the
     # graph, because the provenance of every later record is resolved against a
     # graph that cannot be built until the spans have sources to resolve into.
-    sources_bytes = render_sources_bytes(repo_root)
+    sources_bytes = render_sources_bytes(repo_root, config)
     sources_target = repo_root / sources_rel
     if not sources_target.is_file() or sources_target.read_bytes() != sources_bytes:
         atomic_write_text(sources_bytes.decode("utf-8"), sources_target)
         changed.append(sources_rel)
-    imps = build_imports(repo_root)
-    rendered = render_all(repo_root)
+    imps = build_imports(repo_root, config=config)
+    rendered = render_all(repo_root, config)
     if rendered[sources_rel] != sources_bytes:  # pragma: no cover - guards the bootstrap
         raise ImportRefused(
             "the source index rendered with and without provenance differ; provenance must not "
             "reach the source index"
         )
-    by_record = {(WORKSPACE_REL / imp.record_rel).as_posix(): imp for imp in imps}
+    by_record = {(workspace / imp.record_rel).as_posix(): imp for imp in imps}
     order = [rel for rel in rendered if rel != sources_rel]
     for rel in order:
         data = rendered[rel]
@@ -1382,7 +2057,7 @@ def author(repo_root: Path) -> list[str]:
         if imp is not None:
             # The engine's writer owns immutability: a changed record is a new version.
             import_candidate(
-                repo_root / WORKSPACE_REL,
+                repo_root / workspace,
                 imp.candidate,
                 where="tools/import_external_proposal.py candidate",
                 provenance=imp.record.get("provenance"),
@@ -1397,6 +2072,17 @@ def author(repo_root: Path) -> list[str]:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="exit 1 if any file would change")
+    parser.add_argument(
+        "--document",
+        default=DEFAULT_DOCUMENT.config_id,
+        choices=[doc.config_id for doc in DOCUMENTS],
+        help="which document to import; the default is the one PE-03 imported",
+    )
+    parser.add_argument(
+        "--describe",
+        action="store_true",
+        help="print the selected document's identity and what it still needs, and write nothing",
+    )
     add_environment_flag(parser)
     parser.add_argument("--repo-root", type=Path, default=None)
     args = parser.parse_args(argv)
@@ -1405,15 +2091,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return requested
     repo_root = args.repo_root or find_repo_root()
     try:
+        config = document_by_id(args.document)
+        if args.describe:
+            print(json.dumps(config.identity(), indent=2, ensure_ascii=False))
+            return 0
         if args.check:
-            stale = check(repo_root)
+            stale = check(repo_root, config)
             for rel in stale:
                 print(f"would change: {rel}")
             print("up to date" if not stale else f"{len(stale)} file(s) would change")
             if stale:
                 print(staleness_notice())
             return 1 if stale else 0
-        changed = author(repo_root)
+        changed = author(repo_root, config)
         for rel in changed:
             print(f"wrote: {rel}")
         print("no change" if not changed else f"{len(changed)} file(s) written")

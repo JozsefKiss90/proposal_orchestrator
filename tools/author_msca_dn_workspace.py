@@ -320,18 +320,35 @@ def render_register(repo_root: Path, revision: Any = None) -> dict[str, Any]:
     evidence for the document record that was imported from it.
     """
     # PE-03 owns the derived half; imported here so the register has one renderer.
-    from tools.import_external_proposal import REVISION_ORIGINAL, derive_register_half
+    from tools.import_external_proposal import (
+        REVISION_ORIGINAL,
+        config_for,
+        derive_register_half,
+    )
 
     revision = revision if revision is not None else REVISION_ORIGINAL
+    config = config_for(revision)
+    if config.is_submitted_document:
+        # Every declaration in the header below describes a sanitised
+        # derivative of a submission. Rendering it for the submitted text
+        # itself would label the original with the copy's transformation,
+        # reflow and sanitisation statements. The original's own register is
+        # V08's.
+        raise AuthoringError(
+            f"document {config.config_id!r} is the submitted text; this register header declares a "
+            f"sanitised derivative and is not applicable to it (V08 authors the original's own "
+            f"provenance records)"
+        )
+    expected_pages = config.expected_pages_of(revision)
     is_first = revision.supersedes is None
     derived = derive_register_half(repo_root, revision)
     rows = _input_rows(repo_root, None if is_first else revision)
     by_key = {r["role_key"]: r for r in rows}
     candidate = by_key["candidate"]
     esr = by_key["esr"]
-    if candidate["pages"] != revision.expected_pages:
+    if candidate["pages"] != expected_pages:
         raise AuthoringError(
-            f"candidate: expected the {revision.expected_pages}-page sanitised copy, "
+            f"candidate: expected the {expected_pages}-page sanitised copy, "
             f"found {candidate['pages']} pages"
         )
     if DN_TYPE_MARKER not in read_page_text(repo_root / revision.pdf_rel, DN_TYPE_PAGE):
@@ -387,7 +404,7 @@ def render_register(repo_root: Path, revision: Any = None) -> dict[str, Any]:
                 "sha256": candidate["sha256"],
                 "pages": candidate["pages"],
                 "kind": "sanitised derivative of the historical submission",
-                "is_submitted_document": False,
+                "is_submitted_document": config.is_submitted_document,
                 "statement": (
                     "This file is not the text the ESR evaluated. It is a derivative produced by "
                     "sanitisation after evaluation, and no result over it is a result over the submission."
@@ -609,6 +626,17 @@ def _esr_reference(repo_root: Path, register_rel: str) -> str:
 
 
 def render_readme() -> str:
+    """The graph root's README, in the document's own names (V07).
+
+    The copy's short name and the span of its page ids come from the document
+    configuration the importer selects, so this file cannot describe a document
+    the importer does not import.
+    """
+    from tools.import_external_proposal import DEFAULT_DOCUMENT
+
+    config = DEFAULT_DOCUMENT
+    first = config.revisions[0]
+    pages = config.expected_pages_of(first)
     return (
         "# MSCA-DN pre-evaluation graph root\n"
         "\n"
@@ -618,8 +646,9 @@ def render_readme() -> str:
         "\n"
         "What lives here:\n"
         "\n"
-        f"- `{SOURCES_REL.as_posix()}`: the source index, one source per page of the sanitised copy\n"
-        "  (`SRC-DN-P01` to `SRC-DN-P84`), each holding that page's text, written by PE-03.\n"
+        f"- `{SOURCES_REL.as_posix()}`: the source index, one source per page of {config.short_name}\n"
+        f"  (`{config.source_id(first, 1)}` to `{config.source_id(first, pages)}`), each holding that "
+        "page's text, written by PE-03.\n"
         f"- `{_DEV_GRAPH_REL.as_posix()}/intake/{INTAKE_ID}.json`: the ESR intake, whose `call_id` is the\n"
         "  call the ESR evaluated.\n"
         "- The baseline's target call belongs to the profile, the run label and the report, never to the intake.\n"
@@ -639,6 +668,9 @@ def render_readme() -> str:
         "Authored by `py -3.10 -m tools.author_msca_dn_workspace` (skeleton, intake, register) and\n"
         "`py -3.10 -m tools.import_external_proposal` (sources, document record, manifest, the register's\n"
         "derived half). Each tool's `--check` exits 1 if any file it owns would change.\n"
+        "\n"
+        f"This graph root holds one document, {config.short_name}. The importer selects it by default;\n"
+        "`--document` names another and `--describe` prints what that one is (V07).\n"
     )
 
 

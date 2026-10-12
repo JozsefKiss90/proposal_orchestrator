@@ -1,0 +1,89 @@
+{
+ "record_type": "decision",
+ "id": "msca-dn-document-configuration_2026-10-12",
+ "date": "2026-10-12",
+ "branch": "msca-dn-pre-eval",
+ "ticket": "V07 of plans/msca_dn_historical_validation_tickets.md",
+ "closes": "the code half of finding F02 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md. The review half is V08 and is open.",
+ "milestone": "MSCA-DN historical validation, gate G2: the importer's application layer is a selected document configuration rather than one document's constants, so the official original can be declared as a document of its own and can never be imported under the sanitised copy's page map, page count or description.",
+ "authority": "CLAUDE.md §9.4 (a decision affecting future interpretation is written down), §9.5 (an output is reproducible from its documented inputs), §10.5 (a material claim names its source), §12.1 (an output names its inputs and flags its assumptions), §12.2 (Confirmed, Inferred, Assumed, Unresolved), §12.4 (a missing input is a declared gap, not a filled one), §13.3 (no project fact is invented), §15 (an explicit refusal beats a fabricated completion); finding F02 of the readiness audit.",
+ "problem": {
+  "declared_status": "Confirmed",
+  "basis": "measured at 4001dfa: the nine module constants named below, and the committed artifacts that carry their values",
+  "statement": "The generic extraction substrate is sound, but the import wrapper's application layer was configured for two sanitised revisions of one document. Importing a second document meant editing those constants, which would have silently reinterpreted the committed copy.",
+  "measured": "Nine module constants carried document assumptions: DOCUMENT_TITLE, EXPECTED_PAGES, SOURCE_ID_FORMAT, SECTIONS, SUB_SECTIONS, CRITERION_HEADING_MARKERS, MARKER_PAGE_TOLERANCE, BODY_POINT_SIZE and WP_HEADER_LABELS. The workspace location, the intake id and is_submitted_document: false were typed at their use sites: three in tools/import_external_proposal.py and one in tools/author_msca_dn_workspace.py.",
+  "why_it_matters": "The original establishes its own identity, role, page count, section boundaries, table interpretation and source identifiers. Any of those inherited from the copy would be a project fact that no source supports (CLAUDE.md §13.3), and a page map inherited from an 84-page reflow of a 34-page original would locate every span wrongly."
+ },
+ "decision": {
+  "declared_status": "Confirmed",
+  "basis": "the implementation and tests/test_msca_dn_import.py::TestDocumentConfiguration",
+  "statement": "A document is a selected DocumentConfig. It carries 26 fields, 15 of them required, one of which is a four-field WorkPackageLayout, and it sits above the existing Revision record, which keeps only what is per-PDF.",
+  "what_moved": "Graph root, intake id, title, role, submitted-document flag, section map, sub-section page map with its markers and declared titles, criterion heading anchors, marker page tolerance, expected page count, body point size, work-package layout (its sub-section, its header labels, the three labels the register's provenance header declares, and the consequence of a collapsed header), evaluator scorecard, short name, page statement, page-map source, source-id template, reader caveat and its key, first-revision key, the declared status and its note, revisions, the runtime-environment flag and a summary. Six module aliases that bound one document's workspace, intake, register, scorecard and revisions to module scope are deleted with them; every caller reads the selected configuration.",
+  "selected_never_merged": "Nothing is inherited from another document's configuration. A required field that is not declared is missing, not defaulted to the copy's value, and require_complete() refuses the import naming every missing field. No required field carries a copy-flavoured default: the two manifest key names and the reader caveat default to the empty string and are required, and marker_page_tolerance defaults to zero, which assumes nothing. Two fields are deliberately not required and are declared in the deviations below.",
+  "a_revision_resolves_to_one_document": "config_for(revision) is a pure lookup over DOCUMENTS, built once and refusing any collision of config id, intake id, graph root or revision id. A revision is never interpreted against a document that does not declare it.",
+  "the_beneficiary_marker": "Sub-section 8 of the copy is unlabelled and opens on 'Beneficiary A'. The marker is an entry of the copy's page map, which is a configuration field, so it travels with that page map and with no other.",
+  "one_predicate_for_the_form_title": "needs_form_title(spec) decides which sub-sections take their title from the application form, and both missing_fields() and build_import call it. The two used to disagree: an exact-marker sub-section with no declared title passed require_complete() and refused later, inside the heading lookup, which is not 'fails closed naming the field'."
+ },
+ "the_original_is_a_document_of_its_own": {
+  "declared_status": "Confirmed",
+  "basis": "the OFFICIAL_ORIGINAL configuration and its tests",
+  "statement": "official_original is declared with its own config id, title, role, intake id, short name, page statement, reader caveat and manifest vocabulary, and renders is_submitted_document: true.",
+  "it_inherits_nothing_of_the_copys_shape": "Its page map, page count, body point size, work-package layout, graph root and revisions are undeclared. A test asserts that the words 'sanitised', 'derivative' and '84' appear in none of its identity or description fields.",
+  "not_a_descendant": "Its intake id differs, so its document id does. Its graph root differs, so its page texts are not resolvable as the copy's. DocumentConfig.__post_init__ refuses a revision whose supersedes names a revision of another document, so the original cannot be hung off the copy's version chain to reuse it.",
+  "its_graph_root_is_deliberately_undeclared": "The original and the text extracted from it stay in the private network and are not committed to this repository (V08). Declaring an in-repository graph root here would invite exactly that commit, so workspace_rel is left undeclared and named in the refusal.",
+  "selecting_it_refuses": "py -3.10 -m tools.import_external_proposal --document official_original --check exits 1 and names workspace_rel, sub_sections, expected_pages, body_point_size and revisions. require_provenance() refuses separately and names the intake record rather than the undeclared path field, because what is missing is the document's provenance: 'its intake record msca-dn-2025-original.json has no graph root to be read from, because workspace_rel is not declared'. --describe prints its identity and writes nothing.",
+  "its_declared_values_say_they_are_declarations": "declared_status is Assumed on both documents and status_note says which values a measurement settles. For the copy it names the page count, the body point size, the work-package layout and every start page, each re-derived from the stored PDF. For the original it names none, because nothing has been derived from it (CLAUDE.md §12.2)."
+ },
+ "the_committed_copy_is_unchanged": {
+  "declared_status": "Confirmed",
+  "basis": "both --check commands, and a byte comparison of every rendered file",
+  "statement": "Both sanitised revisions reproduce byte-equal. The externalisation moved the values without changing one of them.",
+  "measured": {
+   "import_check": "py -3.10 -m tools.import_external_proposal --check exits 0",
+   "workspace_check": "py -3.10 -m tools.author_msca_dn_workspace --check exits 0",
+   "rendered_equals_committed": "render_all(REPO, SANITISED_DERIVATIVE) equals render_all(REPO) and every one of its files equals the committed bytes",
+   "no_manifest_gained_a_field": "neither committed manifest carries a runtime_environment block, and both keep the keys they were bound under",
+   "focused_suite": "tests/test_msca_dn_import.py, test_msca_dn_workspace.py, test_msca_dn_fidelity_declarations.py, test_msca_dn_declaration_drafts.py, test_extraction_environment.py and tests/harness/test_integrity_audit.py all pass; 401 passed before the change, 447 after, the 46 new ones being V07's",
+   "full_suite_against_a_baseline": "The repository suite is not green on this branch and was not green before. HEAD measured in a git worktree with the gitignored .env copied in: 205 failed, 7,153 passed, 107 skipped. This change: 194 failed, 7,231 passed, 86 skipped. Set comparison of the two failure lists: no test fails here that passes at HEAD. Eleven fail at HEAD and pass here, all byte-binding checks in the demo and deferral-register modules, which a fresh worktree checkout renders differently; that accounts for the difference in both counts. The failures are concentrated in tests/runner/ and tests/test_transport_*, and none touches the importer, the workspace tool or the MSCA-DN records."
+  },
+  "the_only_changed_artifact": "workspaces/msca_dn/README.md gains two sentences, written through its renderer. Its page-id span is now derived from the configuration and reproduces the committed line byte for byte. Nothing under a byte-hashed tree changed otherwise."
+ },
+ "the_v01_carry": {
+  "declared_status": "Confirmed",
+  "basis": "docs/tier4_orchestration_state/decision_log/msca-dn-extraction-environment-pin_2026-10-08.json, which recorded the carry to V07",
+  "statement": "V01 could not record the extraction pin in the import manifests: both are bound by hash into the frozen 74.60 baseline, so adding a field would break four artifacts the milestone holds immutable. V07 makes the block a configuration flag.",
+  "what_v07_does": "manifest_records_runtime_environment is false for the sanitised copy and true for the original. _runtime_environment_block() returns an empty mapping for the first, so no bound manifest changes, and the declared pin for the second: PINNED_PYMUPDF, PINNED_MUPDF, MEASURED_PYTHON and the decision record. The values are the declaration, never a measurement of the writing machine, so the manifest stays replayable.",
+  "what_is_still_open": "The flag is true only on a configuration require_complete() refuses, so the block reaches no manifest and is exercised by a unit call alone. It also fixes a shape V08 may want to change. V01's criterion 4 stays open and is the operator's; this record ticks nothing of V01's, and the carry is answered in code rather than discharged in an artifact."
+ },
+ "not_evidence_of": [
+  "a closed finding F02. V07 closes its code half. The review half is V08: a dry import, an inventory reconciled against the PDF by the operator, and the original's own intake and provenance records.",
+  "an imported, assessed or frozen original. No original PDF is stored here, no page map for it is declared, and its intake record does not exist.",
+  "a page map for the original. The configuration refuses precisely because none is declared; the ticket's verification is that refusal, not a map.",
+  "an assessor run. No assessor was invoked and no quota was spent.",
+  "a corrected PE-09 runbook. V12 owns that and stays blocked by V10 as well."
+ ],
+ "impacted_components": [
+  "tools/import_external_proposal.py (new DocumentConfig, WorkPackageLayout, REQUIRED_DOCUMENT_FIELDS, needs_form_title, DOCUMENTS, DEFAULT_DOCUMENT, SANITISED_DERIVATIVE, OFFICIAL_ORIGINAL, document_by_id, config_for, MSCA_DN_PART_B_SECTIONS, _runtime_environment_block, _criterion_heading_note; nine module constants and six single-document aliases retired; Revision.source_id and .source_id_format removed; --document and --describe; render_sources, build_imports, render_sources_bytes, render_all, check and author take a configuration)",
+  "tools/author_msca_dn_workspace.py (render_register reads the submitted-document flag and the page count from the configuration and refuses a submitted document; render_readme derives the copy's short name and page-id span from it)",
+  "tools/draft_fidelity_declarations.py (reads DEFAULT_DOCUMENT.revisions)",
+  "tests/test_msca_dn_import.py (TestDocumentConfiguration, 46 tests over the five acceptance criteria), tests/test_extraction_environment.py and tests/harness/test_integrity_audit.py (the retired aliases)",
+  "harness/HARNESS.md and workspaces/msca_dn/README.md (the selection is documented)"
+ ],
+ "remaining_uncertainties": {
+  "two_manifest_key_names_are_configuration_rather_than_renamed": "'not_the_submitted_text' and 'is_the_first_sanitised_derivative' carry the derivative's vocabulary. Both appear in manifests bound by hash, so neither can be renamed. Each is a required configuration field instead, declaring nothing by default, and the original declares 'the_submitted_text_itself' and 'is_the_first_version_of_the_original'. A reader of the copy's manifests still sees the old names, which is what keeps them replayable.",
+  "the_registers_header_is_still_the_copys": "The fidelity register's provenance header declares a sanitisation, a transformation and a reflow. Those are the copy's facts. render_register now refuses a submitted document rather than labelling the original with them, so the original has no register renderer. V08 owns its provenance records.",
+  "the_candidate_role_sentence_is_declared_twice": "tools/author_msca_dn_workspace.INPUTS holds the candidate row's role and the configuration holds the document's. The workspace tool cannot import the configuration at module scope, since the importer imports it. A test holds the two equal, so a drift fails rather than producing a register that describes a document the importer does not import.",
+  "nothing_about_the_original_is_confirmed": "Its title, role, short name, page statement and reader caveat are operator declarations about a document this repository does not hold. The configuration declares them Assumed and says why; none can be Confirmed until V08's dry import measures it.",
+  "the_runtime_environment_block_reaches_no_file": "See the_v01_carry.what_is_still_open.",
+  "26_fields_is_a_wide_record": "Every field was an assumption the wrapper held. Narrowing the record would mean either leaving an assumption hard-coded or defaulting it to the copy's value, and the second is what this ticket forbids. The work-package triple was bundled into WorkPackageLayout rather than left as three fields that always travel together."
+ },
+ "declared_deviations": {
+  "declared_status": "Confirmed",
+  "basis": "a comparison of the ticket's wording with what was built",
+  "the_scorecard_requirement_is_conditional": "The ticket lists the criterion and page anchors among the fields that must move. scorecard_rel moved with them but is required only when a sub-section the document carries no heading block for, and declares no title for, takes its title from the application form. needs_form_title() decides that in one place.",
+  "two_fields_are_not_required": "source_id_template keeps a module default, because the spelling of a page id is generic rather than a fact about one document, and stays overridable per document. criterion_heading_markers is not required, because a document may carry no criterion-level heading and the empty tuple is then a declaration.",
+  "four_assumptions_beyond_the_tickets_list": "The body point size, the work-package table layout, the three labels the register's provenance header declares, and the two sentences a source record uses to describe the document and its pages. All were module constants or typed strings describing the copy, and the ticket's own problem statement names table interpretation and figure coverage.",
+  "one_blank_line_in_an_accepted_status_paragraph": "A blank line was inserted into V04's accepted Status paragraph in the ticket ledger, to split a seven-sentence paragraph the prose linter rejects. No word of that accepted text changed.",
+  "the_residuals_are_not_rows_in_the_open_deferral_register": "That register's declared scope is the deferrals of the operator approval of 2026-10-08, and its own rule is that a correction to it is a successor register, never an edit. V07's residuals arose after it. They live in this record and in the completion report, and whether they join a successor register is the operator's call."
+ }
+}

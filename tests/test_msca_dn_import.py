@@ -24,10 +24,13 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from dataclasses import replace
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
+from runner import extraction_environment
 from runner.dev_graph import DOCUMENT_SCHEMA_ID_V2, build_snapshot, read_esr_intake
 from runner.dev_graph.builder import SOURCES_REL
 from runner.dev_graph.documents import DOCUMENTS_REL
@@ -38,12 +41,14 @@ from tools import author_msca_dn_workspace as ws
 from tools import import_external_proposal as ie
 
 REPO = find_repo_root()
-WORKSPACE = REPO / ie.WORKSPACE_REL
+#: The document the importer selects when a caller names none (V07).
+DOCUMENT = ie.DEFAULT_DOCUMENT
+WORKSPACE = REPO / DOCUMENT.workspace_rel
 
 #: Every revision of the sanitised derivative. The structural acceptance below
 #: runs against each of them, so a revision cannot quietly import under a page
 #: map or a ledger contract that was only ever checked against the first copy.
-REVISIONS = ie.REVISIONS
+REVISIONS = DOCUMENT.revisions
 REVISION_IDS = [r.revision_id for r in REVISIONS]
 
 #: U+FB01, the one ligature the revised copy carries.
@@ -178,7 +183,7 @@ class TestReplay:
     def test_the_two_tools_render_the_same_register(self) -> None:
         from runner.atomic_write import canonical_json_bytes
 
-        assert ie.render_all(REPO)[ie.REGISTER_REL.as_posix()] == canonical_json_bytes(ws.render_register(REPO))
+        assert ie.render_all(REPO)[ws.REGISTER_REL.as_posix()] == canonical_json_bytes(ws.render_register(REPO))
 
     def test_no_wall_clock_field_anywhere(self) -> None:
         for rel in ie.render_all(REPO):
@@ -307,7 +312,7 @@ class TestShape:
         subs = _sub_sections(record)
         assert subs["8"]["title"] == "Participating Organisations"
         assert subs["8"]["content"].startswith("Beneficiary A")
-        scorecard = json.loads((REPO / ie.SCORECARD_REL).read_text(encoding="utf-8"))
+        scorecard = json.loads((REPO / DOCUMENT.scorecard_rel).read_text(encoding="utf-8"))
         heading_1_1 = next(a["af_v6_heading"] for c in scorecard["criteria"] for a in c["aspects"] if a["anchor"] == "1.1")
         assert subs["1.1"]["title"] == heading_1_1
         assert subs["1.1"]["content"].startswith("Introduction, objectives and overview")
@@ -322,7 +327,7 @@ class TestShape:
         assert not any(re.match(r"^\d", ss["title"]) for ss in subs.values())
 
     def test_document_id_is_the_intakes(self, record) -> None:
-        intake = read_esr_intake(WORKSPACE, ie.INTAKE_ID)
+        intake = read_esr_intake(WORKSPACE, DOCUMENT.intake_id)
         assert record["document_id"] == intake.document_id
 
     def test_the_candidate_is_nowhere_called_the_submitted_version(self, manifest, sources) -> None:
@@ -449,7 +454,8 @@ class TestLedger:
 class TestSources:
     def test_84_page_sources_in_order(self, revision_sources, revision) -> None:
         ids = [s["source_id"] for s in revision_sources]
-        assert ids == [revision.source_id(p) for p in range(1, SPEC_PAGES + 1)]
+        expected = [DOCUMENT.source_id(revision, p) for p in range(1, SPEC_PAGES + 1)]
+        assert ids == expected
 
     def test_every_page_text_replays_byte_equal(self, revision_sources, page_texts, revision) -> None:
         for s in revision_sources:
@@ -580,7 +586,7 @@ class TestRevisions:
     def test_exactly_one_revision_is_superseded_by_nobody(self) -> None:
         superseded = {r.supersedes for r in REVISIONS if r.supersedes is not None}
         current = [r for r in REVISIONS if r.revision_id not in superseded]
-        assert [r.revision_id for r in current] == [ie.ACTIVE_REVISION.revision_id]
+        assert [r.revision_id for r in current] == [DOCUMENT.active_revision.revision_id]
 
     def test_every_revision_has_its_own_source_prefix_pdf_manifest_and_register(self) -> None:
         for field in ("source_id_prefix", "pdf_rel", "manifest_name", "register_rel"):
@@ -613,7 +619,7 @@ class TestRevisions:
                 assert register["provenance"]["revision"]["revision_id"] == revision.revision_id
 
     def test_the_record_of_the_active_revision_names_its_predecessor(self) -> None:
-        active = ie.ACTIVE_REVISION
+        active = DOCUMENT.active_revision
         predecessor = ie.revision_by_id(active.supersedes)
         record = json.loads(
             (WORKSPACE / ie.build_import(REPO, active).record_rel).read_text(encoding="utf-8")
@@ -641,8 +647,8 @@ class TestRevisions:
             for e in snap.edges
             if e["predicate"] == "supersedes"
         ]
-        active = ie.node_id_of(REPO, ie.ACTIVE_REVISION)
-        previous = ie.node_id_of(REPO, ie.revision_by_id(ie.ACTIVE_REVISION.supersedes))
+        active = ie.node_id_of(REPO, DOCUMENT.active_revision)
+        previous = ie.node_id_of(REPO, ie.revision_by_id(DOCUMENT.active_revision.supersedes))
         assert edges == [(active, previous)]
 
     def test_the_graph_validates_with_no_dangling_reference(self) -> None:
@@ -657,8 +663,8 @@ class TestRevisions:
         from harness.blind_assessment import resolve_document
 
         snap = build_snapshot(WORKSPACE)
-        active = ie.node_id_of(REPO, ie.ACTIVE_REVISION)
-        intake = read_esr_intake(WORKSPACE, ie.INTAKE_ID)
+        active = ie.node_id_of(REPO, DOCUMENT.active_revision)
+        intake = read_esr_intake(WORKSPACE, DOCUMENT.intake_id)
         assert resolve_document(snap, intake.document_id)["id"] == active
         assert resolve_document(snap, active)["id"] == active
 
@@ -666,14 +672,14 @@ class TestRevisions:
         from harness.blind_assessment import BlindAssessmentError, resolve_document
 
         snap = build_snapshot(WORKSPACE)
-        previous = ie.node_id_of(REPO, ie.revision_by_id(ie.ACTIVE_REVISION.supersedes))
+        previous = ie.node_id_of(REPO, ie.revision_by_id(DOCUMENT.active_revision.supersedes))
         with pytest.raises(BlindAssessmentError, match="superseded"):
             resolve_document(snap, previous)
 
     def test_one_intake_serves_every_revision_and_keeps_the_historical_call(self) -> None:
         """A revision is a new derivative of the same submission, so the intake
         is unchanged: same document id, same call binding."""
-        intake = read_esr_intake(WORKSPACE, ie.INTAKE_ID)
+        intake = read_esr_intake(WORKSPACE, DOCUMENT.intake_id)
         assert intake.call_id == ws.HISTORICAL_CALL_ID
         assert intake.submission_id == ws.SUBMISSION_ID
         assert intake.prior_submission is True
@@ -706,7 +712,7 @@ class TestRevisions:
         ]
 
     def test_the_revision_manifest_measures_what_changed(self) -> None:
-        active = ie.ACTIVE_REVISION
+        active = DOCUMENT.active_revision
         manifest = json.loads((REPO / ie.manifest_rel(active)).read_text(encoding="utf-8"))
         cmp_ = manifest["revision"]["comparison_with_predecessor"]
         assert cmp_["pages_before"] == cmp_["pages_after"] == SPEC_PAGES
@@ -742,7 +748,7 @@ class TestRevisions:
                 assert c["approval"] == "not_applicable", (r.revision_id, c["claim_id"])
 
     def test_the_revision_register_rechecks_every_carried_declaration(self) -> None:
-        active = ie.ACTIVE_REVISION
+        active = DOCUMENT.active_revision
         register = json.loads((REPO / active.register_rel).read_text(encoding="utf-8"))
         rc = register["provenance"]["transformation"]["rechecked_for_this_revision"]
         for name, _ in ws._RECHECKED_DECLARATIONS:
@@ -755,7 +761,7 @@ class TestRevisions:
         assert rc["citations"]["holds"] is True
 
     def test_the_revision_register_names_it_a_revised_derivative(self) -> None:
-        active = ie.ACTIVE_REVISION
+        active = DOCUMENT.active_revision
         register = json.loads((REPO / active.register_rel).read_text(encoding="utf-8"))
         prov = register["provenance"]
         assert prov["current_assessment_artifact"]["kind"].startswith("revised sanitised derivative")
@@ -765,7 +771,7 @@ class TestRevisions:
         assert prov["revision"]["supersedes"]["sha256"].startswith(SPEC_HASH_PREFIXES["sanitised_v1"])
 
     def test_the_revision_register_records_the_ligature_limitation(self) -> None:
-        active = ie.ACTIVE_REVISION
+        active = DOCUMENT.active_revision
         register = json.loads((REPO / active.register_rel).read_text(encoding="utf-8"))
         lim = register["provenance"]["known_extraction_limitations"]
         assert lim["ligatures"]["present"] == PER_REVISION["resolved_fixes"]["ligatures"]
@@ -777,13 +783,13 @@ class TestRevisions:
         graph, and the graph cannot be built until every span has a source.
         The source index must therefore render without provenance, and render
         the same bytes either way."""
-        with_prov = ie.render_all(REPO)[(ie.WORKSPACE_REL / SOURCES_REL).as_posix()]
+        with_prov = ie.render_all(REPO)[(DOCUMENT.workspace_rel / SOURCES_REL).as_posix()]
         assert ie.render_sources_bytes(REPO) == with_prov
 
     def test_provenance_does_not_move_the_content_version(self) -> None:
         """The record path is derived from the candidate content alone, so
         adding provenance supersedes a version without renaming the new one."""
-        active = ie.ACTIVE_REVISION
+        active = DOCUMENT.active_revision
         bare = ie.build_import(REPO, active, with_provenance=False)
         full = ie.build_import(REPO, active)
         assert bare.record["content_version"] == full.record["content_version"]
@@ -795,6 +801,430 @@ class TestRevisions:
         measurements."""
         rendered = ie.render_all(REPO)
         first = ie.revision_by_id("sanitised_v1")
-        record_rel = (ie.WORKSPACE_REL / ie.build_import(REPO, first).record_rel).as_posix()
+        record_rel = (DOCUMENT.workspace_rel / ie.build_import(REPO, first).record_rel).as_posix()
         for rel in (first.register_rel.as_posix(), record_rel):
             assert (REPO / rel).read_bytes() == rendered[rel], rel
+
+
+# --------------------------------------------------------------------------- #
+# V07 — the document configuration
+# --------------------------------------------------------------------------- #
+
+
+#: The assumptions the importer carried as module constants before V07. Each is
+#: now a field of the selected document configuration, so a second document
+#: cannot inherit the sanitised copy's value by omission.
+RETIRED_CONSTANTS = (
+    "DOCUMENT_TITLE",
+    "EXPECTED_PAGES",
+    "SOURCE_ID_FORMAT",
+    "SECTIONS",
+    "SUB_SECTIONS",
+    "CRITERION_HEADING_MARKERS",
+    "MARKER_PAGE_TOLERANCE",
+    "BODY_POINT_SIZE",
+    "WP_HEADER_LABELS",
+    # Aliases of one document's workspace, intake, register, scorecard and
+    # revisions. They survived the first cut of V07 for the callers PE-03
+    # shipped with; every caller now reads the selected configuration.
+    "WORKSPACE_REL",
+    "INTAKE_ID",
+    "REGISTER_REL",
+    "SCORECARD_REL",
+    "REVISIONS",
+    "ACTIVE_REVISION",
+)
+
+#: The sanitised copy's values, typed here on purpose: the externalisation must
+#: move them, not change them.
+SANITISED_VALUES = {
+    "title": "Sanitised derivative of the MSCA-DN 2025 Part B (PROJECT-X)",
+    "expected_pages": 84,
+    "body_point_size": "12.0",
+    "marker_page_tolerance": 1,
+    "source_id_template": "{prefix}-P{page:02d}",
+    "criterion_heading_markers": (("implementation_section", "3.", 41),),
+    "is_submitted_document": False,
+}
+
+
+class TestDocumentConfiguration:
+    """V07 — every assumption about the document is a selectable configuration.
+
+    Acceptance, from ``plans/msca_dn_historical_validation_tickets.md`` V07:
+    the workspace, title, page count, section and sub-section maps, criterion
+    anchors, beneficiary marker, source-id format, intake id and
+    submitted-document flag are all configuration; a configuration for the
+    official original exists with its own identity and role and inherits
+    nothing from the copy; the original is not a descendant of the copy; both
+    sanitised configurations still reproduce byte-equal; and a configuration
+    missing a required field fails closed naming it.
+    """
+
+    # -- criterion 1: the assumptions moved -- #
+
+    @pytest.mark.parametrize("name", RETIRED_CONSTANTS)
+    def test_the_importer_carries_no_document_constant_any_more(self, name: str) -> None:
+        assert not hasattr(ie, name), f"{name} is still a module constant"
+
+    def test_the_selected_configuration_carries_the_copys_own_values(self) -> None:
+        config = ie.SANITISED_DERIVATIVE
+        for field, value in SANITISED_VALUES.items():
+            assert getattr(config, field) == value, field
+        assert config.workspace_rel == ws.WORKSPACE_REL
+        assert config.intake_id == ws.INTAKE_ID
+        assert config.scorecard_rel == Path("harness/evaluator_scorecard_msca_dn.json")
+        assert config.work_package_layout is not None
+        assert config.work_package_layout.sub_section_id == "3.1"
+
+    def test_one_role_sentence_stands_behind_the_register_and_the_configuration(self) -> None:
+        """The candidate's role is declared in three places and must agree in
+        all three, or a register would describe a document the configuration
+        does not."""
+        config = ie.SANITISED_DERIVATIVE
+        assert config.role == ie.REVISION_ORIGINAL.candidate_role
+        candidate_row = next(spec for spec in ws.INPUTS if spec.role_key == "candidate")
+        assert candidate_row.role == config.role
+
+    def test_the_page_map_and_its_grouping_are_configuration(self) -> None:
+        config = ie.SANITISED_DERIVATIVE
+        assert {s: [ss for ss in SPEC_SHAPE[s]] for s in SPEC_SHAPE} == {
+            section_id: [
+                spec.sub_section_id
+                for spec in config.sub_sections
+                if spec.section_id == section_id
+            ]
+            for section_id, _title in config.sections
+        }
+        assert {
+            spec.sub_section_id: spec.declared_pages[0] for spec in config.sub_sections
+        } == SPEC_START_PAGES
+
+    def test_the_beneficiary_marker_is_configuration(self) -> None:
+        """Sub-section 8 is unlabelled in the copy and opens on a beneficiary
+        heading. The marker is the copy's, so it lives in the copy's page map."""
+        last = ie.SANITISED_DERIVATIVE.sub_sections[-1]
+        assert (last.sub_section_id, last.marker, last.exact_marker) == ("8", "Beneficiary A", True)
+        assert all(
+            spec.marker != "Beneficiary A" for spec in ie.OFFICIAL_ORIGINAL.sub_sections
+        )
+
+    def test_the_source_id_spelling_comes_from_the_configuration(self) -> None:
+        """The revision owns its prefix; the document owns the spelling. A
+        revision answers nothing about its own source ids, so it cannot answer
+        it against a document that does not declare it."""
+        config = ie.SANITISED_DERIVATIVE
+        for revision in REVISIONS:
+            assert config.source_id(revision, 7) == f"{revision.source_id_prefix}-P07"
+            assert not hasattr(revision, "source_id")
+            assert not hasattr(revision, "source_id_format")
+
+    def test_the_page_count_is_the_documents_unless_a_revision_declares_its_own(self) -> None:
+        config = ie.SANITISED_DERIVATIVE
+        assert [r.expected_pages for r in config.revisions] == [None, None]
+        assert all(config.expected_pages_of(r) == SPEC_PAGES for r in config.revisions)
+
+    def test_the_committed_artifacts_read_the_flag_and_title_from_the_configuration(self) -> None:
+        """Nothing types ``is_submitted_document`` or the title: the committed
+        manifests, source index and registers hold the configuration's values."""
+        config = ie.SANITISED_DERIVATIVE
+        sources = json.loads(
+            (WORKSPACE / SOURCES_REL).read_text(encoding="utf-8")
+        )
+        for src in sources["sources"]:
+            assert src["title"].startswith(f"{config.title}, page ")
+            assert src["citation"]["cited_as"].startswith(f"{config.title}, page ")
+        for revision in REVISIONS:
+            manifest = json.loads(
+                (REPO / ie.manifest_rel(revision)).read_text(encoding="utf-8")
+            )
+            assert manifest["candidate"]["is_submitted_document"] is config.is_submitted_document
+            assert manifest["revision"]["is_submitted_document"] is config.is_submitted_document
+            assert config.first_revision_key in manifest["revision"]
+            register = json.loads((REPO / revision.register_rel).read_text(encoding="utf-8"))
+            artifact = register["provenance"]["current_assessment_artifact"]
+            assert artifact["is_submitted_document"] is config.is_submitted_document
+
+
+    def test_no_required_field_defaults_to_the_copys_value(self) -> None:
+        """A third document must declare its own vocabulary. A default of the
+        copy's key or the copy's tolerance would be inheritance by omission,
+        which the configuration's own rule forbids."""
+        bare = ie.DocumentConfig(config_id="bare", is_submitted_document=False)
+        for field in ("reader_caveat_key", "reader_caveat", "first_revision_key"):
+            assert getattr(bare, field) == ""
+            assert field in bare.missing_fields()
+        assert "page_map_declared_from" in bare.missing_fields()
+        assert bare.marker_page_tolerance == 0
+        assert ie.SANITISED_DERIVATIVE.marker_page_tolerance == 1
+
+    def test_one_predicate_decides_which_sub_section_needs_the_form(self) -> None:
+        """`missing_fields` and `build_import` must agree. An exact-marker
+        sub-section carries no heading block, so it needs a declared title or a
+        scorecard; the two used to disagree about that shape."""
+        exact = replace(ie.SANITISED_DERIVATIVE.sub_sections[-1], declared_title=None)
+        assert exact.exact_marker is True and exact.marker is not None
+        assert ie.needs_form_title(exact) is True
+        config = ie.DocumentConfig(
+            config_id="exact_marker_without_a_title",
+            is_submitted_document=False,
+            sections=ie.MSCA_DN_PART_B_SECTIONS,
+            sub_sections=(exact,),
+        )
+        assert "scorecard_rel" in config.missing_fields()
+        for spec in ie.SANITISED_DERIVATIVE.sub_sections:
+            needed = ie.needs_form_title(spec)
+            assert needed == (spec.sub_section_id == "1.1"), spec.sub_section_id
+
+    def test_the_provenance_refusal_names_the_intake_record(self) -> None:
+        """The original's missing provenance is its intake record. A refusal
+        that named only the undeclared path field would not say so."""
+        with pytest.raises(ie.ImportRefused) as exc:
+            ie.OFFICIAL_ORIGINAL.require_provenance(REPO)
+        message = str(exc.value)
+        assert "no provenance of its own" in message
+        assert "msca-dn-2025-original.json" in message
+        assert "workspace_rel is not declared" in message
+
+    def test_a_source_index_is_refused_for_the_wrong_document(self) -> None:
+        imps = ie.build_imports(REPO, with_provenance=False)
+        with pytest.raises(ie.ImportRefused) as exc:
+            ie.render_sources(REPO, imps, ie.OFFICIAL_ORIGINAL)
+        assert "must be the same document" in str(exc.value)
+
+    def test_both_configurations_declare_the_status_of_what_they_hold(self) -> None:
+        """CLAUDE.md §12.2: a title, a role and a page map are operator
+        statements. The configuration says so where it declares them."""
+        for config in ie.DOCUMENTS:
+            assert config.declared_status == "Assumed"
+            assert config.status_note
+            assert config.identity()["declared_status"] == "Assumed"
+        assert "Confirmed" in ie.SANITISED_DERIVATIVE.status_note
+        assert "no value is Confirmed" in ie.OFFICIAL_ORIGINAL.status_note
+
+    def test_the_registers_work_package_labels_come_from_the_layout(self) -> None:
+        """The register's derived half counts the three labels its provenance
+        header declares. Those three are a field of the layout, and the layout
+        must carry each of them."""
+        layout = ie.SANITISED_DERIVATIVE.work_package_layout
+        assert layout is not None
+        assert layout.register_declared_labels == (
+            "WP Number:", "WP title:", "Lead participant",
+        )
+        for label in layout.register_declared_labels:
+            assert label in layout.header_labels
+        register = json.loads((REPO / ws.REGISTER_REL).read_text(encoding="utf-8"))
+        counted = register["derived"]["table_3_1a"]["label_block_counts"]
+        assert tuple(counted) == layout.register_declared_labels
+
+    def test_a_register_label_the_layout_does_not_carry_is_refused(self) -> None:
+        layout = ie.SANITISED_DERIVATIVE.work_package_layout
+        assert layout is not None
+        with pytest.raises(ie.ImportRefused) as exc:
+            ie.DocumentConfig(
+                config_id="stray_register_label",
+                is_submitted_document=False,
+                sections=ie.MSCA_DN_PART_B_SECTIONS,
+                sub_sections=ie.SANITISED_DERIVATIVE.sub_sections,
+                work_package_layout=replace(
+                    layout, register_declared_labels=("Deliverables:",)
+                ),
+            )
+        assert "Deliverables:" in str(exc.value)
+
+    # -- criterion 2: the original has its own identity and role -- #
+
+    def test_the_original_is_declared_with_its_own_identity_and_role(self) -> None:
+        original, copy = ie.OFFICIAL_ORIGINAL, ie.SANITISED_DERIVATIVE
+        assert original.is_submitted_document is True
+        identity = original.identity()
+        assert identity["is_submitted_document"] is True
+        assert identity["config_id"] == "official_original"
+        for field in ("config_id", "title", "role", "intake_id"):
+            assert getattr(original, field) and getattr(original, field) != getattr(copy, field)
+
+    def test_the_original_inherits_no_page_map_no_page_count_and_no_description(self) -> None:
+        original, copy = ie.OFFICIAL_ORIGINAL, ie.SANITISED_DERIVATIVE
+        assert original.sub_sections == ()
+        assert original.expected_pages is None
+        assert original.body_point_size is None
+        assert original.work_package_layout is None
+        assert original.revisions == ()
+        assert original.workspace_rel is None
+        assert original.work_package_layout is None
+        for field in (
+            "short_name", "page_statement", "page_map_declared_from", "reader_caveat",
+            "reader_caveat_key", "first_revision_key", "summary", "status_note",
+        ):
+            assert getattr(original, field) != getattr(copy, field), field
+        joined = " ".join(
+            str(getattr(original, field))
+            for field in ("title", "role", "short_name", "page_statement", "reader_caveat")
+        )
+        for word in ("sanitised", "derivative", "84"):
+            assert word not in joined.lower(), word
+
+    def test_the_original_declares_the_sections_of_the_form_and_nothing_else(self) -> None:
+        """The three criterion sections come from the application form, not from
+        either document, so both declare them; no other shape is shared."""
+        assert ie.OFFICIAL_ORIGINAL.sections == ie.MSCA_DN_PART_B_SECTIONS
+        assert ie.SANITISED_DERIVATIVE.sections == ie.MSCA_DN_PART_B_SECTIONS
+        assert [s for s, _t in ie.MSCA_DN_PART_B_SECTIONS] == list(SPEC_SHAPE)
+
+    # -- criterion 3: not a descendant of the copy -- #
+
+    def test_the_original_is_not_hung_off_the_copys_version_chain(self) -> None:
+        original = ie.OFFICIAL_ORIGINAL
+        assert original.intake_id != ie.SANITISED_DERIVATIVE.intake_id
+        assert all(r.supersedes is None for r in original.revisions)
+        assert original.workspace_rel != ie.SANITISED_DERIVATIVE.workspace_rel
+
+    def test_a_revision_may_not_supersede_another_documents_revision(self) -> None:
+        borrowed = ie.Revision(
+            revision_id="borrowed",
+            pdf_rel=Path("private/original.pdf"),
+            source_id_prefix="SRC-ORIG",
+            manifest_name="original.json",
+            register_rel=Path("private/register.json"),
+            candidate_role="the submitted text",
+            candidate_version="as submitted",
+            supersedes="sanitised_v1",
+        )
+        with pytest.raises(ie.ImportRefused) as exc:
+            ie.DocumentConfig(
+                config_id="borrower", is_submitted_document=True, revisions=(borrowed,)
+            )
+        assert "sanitised_v1" in str(exc.value)
+        assert "not a revision of this document" in str(exc.value)
+
+    def test_two_documents_share_no_identifier_intake_or_graph_root(self) -> None:
+        for field in ("config_id", "intake_id", "workspace_rel"):
+            values = [
+                str(getattr(doc, field))
+                for doc in ie.DOCUMENTS
+                if getattr(doc, field) is not None
+            ]
+            assert len(set(values)) == len(values), field
+        ids = [r.revision_id for doc in ie.DOCUMENTS for r in doc.revisions]
+        assert len(set(ids)) == len(ids)
+
+    def test_a_revision_of_no_declared_document_is_refused(self) -> None:
+        stray = ie.Revision(
+            revision_id="stray",
+            pdf_rel=Path("private/stray.pdf"),
+            source_id_prefix="SRC-STRAY",
+            manifest_name="stray.json",
+            register_rel=Path("private/stray_register.json"),
+            candidate_role="none",
+            candidate_version="none",
+        )
+        with pytest.raises(ie.ImportRefused) as exc:
+            ie.config_for(stray)
+        assert "belongs to no declared document" in str(exc.value)
+        with pytest.raises(ie.ImportRefused):
+            ie.document_by_id("no_such_document")
+
+    # -- criterion 4: both sanitised configurations still reproduce -- #
+
+    def test_selecting_the_default_document_explicitly_renders_the_same_bytes(self) -> None:
+        assert ie.render_all(REPO, ie.SANITISED_DERIVATIVE) == ie.render_all(REPO)
+
+    def test_the_committed_tree_is_byte_equal_under_the_selected_configuration(self) -> None:
+        rendered = ie.render_all(REPO, ie.SANITISED_DERIVATIVE)
+        for rel, data in rendered.items():
+            assert (REPO / rel).read_bytes() == data, rel
+        assert ie.check(REPO, ie.SANITISED_DERIVATIVE) == []
+
+    def test_no_bound_manifest_gains_a_runtime_environment_block(self) -> None:
+        """V01 could not record the extraction pin in these manifests: both are
+        bound by hash into the frozen baseline. A manifest authored for the
+        first time carries it instead."""
+        assert ie.SANITISED_DERIVATIVE.manifest_records_runtime_environment is False
+        assert ie._runtime_environment_block(ie.SANITISED_DERIVATIVE) == {}
+        for revision in REVISIONS:
+            manifest = json.loads(
+                (REPO / ie.manifest_rel(revision)).read_text(encoding="utf-8")
+            )
+            assert "runtime_environment" not in manifest
+
+    def test_the_originals_manifest_would_carry_the_declared_extraction_pin(self) -> None:
+        assert ie.OFFICIAL_ORIGINAL.manifest_records_runtime_environment is True
+        block = ie._runtime_environment_block(ie.OFFICIAL_ORIGINAL)["runtime_environment"]
+        assert block["pymupdf"] == extraction_environment.PINNED_PYMUPDF
+        assert block["mupdf"] == extraction_environment.PINNED_MUPDF
+        assert block["measured_python"] == list(extraction_environment.MEASURED_PYTHON)
+        assert block["decision_record"] == extraction_environment.DECISION_REL
+        assert "declared" in block["basis"]
+
+    # -- criterion 5: a missing field fails closed, naming it -- #
+
+    def test_a_configuration_missing_a_required_field_names_it(self) -> None:
+        bare = ie.DocumentConfig(config_id="bare", is_submitted_document=False)
+        missing = bare.missing_fields()
+        assert set(missing) == set(ie.REQUIRED_DOCUMENT_FIELDS)
+        with pytest.raises(ie.ImportRefused) as exc:
+            bare.require_complete()
+        for field in ie.REQUIRED_DOCUMENT_FIELDS:
+            assert field in str(exc.value), field
+
+    def test_the_scorecard_is_required_only_when_a_sub_section_is_unlabelled(self) -> None:
+        unlabelled = ie.SANITISED_DERIVATIVE.sub_sections[0]
+        assert unlabelled.marker is None and unlabelled.declared_title is None
+        without = ie.DocumentConfig(
+            config_id="without_scorecard",
+            is_submitted_document=False,
+            sections=ie.MSCA_DN_PART_B_SECTIONS,
+            sub_sections=(unlabelled,),
+        )
+        assert "scorecard_rel" in without.missing_fields()
+        labelled = ie.DocumentConfig(
+            config_id="labelled_only",
+            is_submitted_document=False,
+            sections=ie.MSCA_DN_PART_B_SECTIONS,
+            sub_sections=(ie.SANITISED_DERIVATIVE.sub_sections[1],),
+        )
+        assert "scorecard_rel" not in labelled.missing_fields()
+
+    def test_selecting_the_original_refuses_and_names_its_page_map(self, capsys) -> None:
+        assert ie.main(["--document", "official_original", "--check"]) == 1
+        message = capsys.readouterr().err
+        assert "refused" in message
+        for field in ("workspace_rel", "sub_sections", "expected_pages", "revisions"):
+            assert field in message, field
+
+    def test_the_original_has_no_provenance_record_of_its_own_yet(self) -> None:
+        """Its intake id is declared and no intake record stands behind it, so
+        the import refuses on provenance as well as on the page map. The
+        refusal names that record whether or not a graph root is declared."""
+        declared_root = replace(ie.OFFICIAL_ORIGINAL, workspace_rel=Path("workspaces/elsewhere"))
+        with pytest.raises(ie.ImportRefused) as exc:
+            declared_root.require_provenance(REPO)
+        message = str(exc.value)
+        assert "msca-dn-2025-original.json" in message
+        assert "no provenance of its own" in message
+        assert "does not exist" in message
+
+    def test_describe_prints_the_identity_and_writes_nothing(self, capsys) -> None:
+        before = {
+            rel: (REPO / rel).read_bytes() for rel in ie.render_all(REPO, ie.SANITISED_DERIVATIVE)
+        }
+        assert ie.main(["--document", "official_original", "--describe"]) == 0
+        identity = json.loads(capsys.readouterr().out)
+        assert identity["is_submitted_document"] is True
+        assert identity["importable"] is False
+        assert identity["missing_required_fields"]
+        for rel, data in before.items():
+            assert (REPO / rel).read_bytes() == data, rel
+
+    def test_the_workspace_tool_refuses_to_register_a_submitted_document(self) -> None:
+        """The register's header declares a sanitised derivative. Rendering it
+        for the submitted text would label the original with the copy's
+        transformation and reflow statements."""
+        submitted = replace(
+            ie.SANITISED_DERIVATIVE, config_id="submitted_copy", is_submitted_document=True
+        )
+        revision = submitted.revisions[0]
+        with mock.patch.object(ie, "config_for", return_value=submitted):
+            with pytest.raises(ws.AuthoringError) as exc:
+                ws.render_register(REPO, revision)
+        assert "submitted text" in str(exc.value)

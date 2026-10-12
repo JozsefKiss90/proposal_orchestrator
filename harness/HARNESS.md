@@ -474,6 +474,19 @@ extractor, normalisation, table-rendering and claim-extraction versions that PE-
 preflight binds. `tests/test_msca_dn_import.py` re-derives the import and checks every
 sub-section verbatim against the PDF under the declared normalisation.
 
+Which document the importer imports is a selected configuration (V07). `DocumentConfig`
+carries the graph root, intake id, title, role and submitted-document flag. It carries the
+page count, the section and sub-section maps and the criterion heading anchors. It carries
+the beneficiary marker, the work-package table layout, the body point size and the
+source-id spelling. Two are declared: `sanitised_derivative`, the copy PE-03 imported, and
+`official_original`, the submitted text. `--document` selects one and `--describe` prints
+its identity without writing.
+
+A configuration is selected, never merged. The original therefore inherits no page map,
+no 84-page count and no derivative description. It is not a revision of the copy either:
+a revision may only supersede a revision of the same document. The original declares
+none of its shape yet, so selecting it refuses and names every missing field.
+
 The register has two halves and two owners. The derived half is measured from the
 PDF by the importer; the declared half is the operator's per-sub-section statement
 of `presence` and `transformation`, and both tools render the whole file on every

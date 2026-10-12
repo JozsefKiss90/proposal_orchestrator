@@ -400,6 +400,7 @@ repository in place of focused negative tests.
 **Status 2026-10-12.** Closed, seven of seven. F03 closes here. G4 did not close on this ticket:
 V06 was still open. The operator accepted V04 with V05 and V06 on 2026-10-12 — see the G4 acceptance
 section below.
+
 `freeze_baseline` now takes the loaded `ProfileBundle` rather than the profile, because the rubric set
 and scorecard are what say whether a report is complete. Three changes outside the seven criteria are
 declared in section 8 of the completion report rather than presented as required. The acceptance lane
@@ -595,19 +596,51 @@ every assumption the wrapper now hard-codes.
 
 ### Acceptance criteria
 
-- [ ] Workspace location, title, expected page count, section and subsection maps, criterion heading
+- [x] Workspace location, title, expected page count, section and subsection maps, criterion heading
       and page anchors, beneficiary marker, source-id format, intake id and the submitted-document flag
-      all move into a selectable document configuration.
-- [ ] A configuration for the official original exists with its own identity and role, renders
+      all move into a selectable document configuration. `DocumentConfig` carries 26 fields, 15 of them
+      required, one being a four-field `WorkPackageLayout`. The nine module constants are retired, and
+      so are the six aliases that bound one document's workspace, intake, register, scorecard and
+      revisions to module scope. A test asserts the module carries none of the fifteen names. Four
+      assumptions beyond this list moved too: the body point size, the work-package table layout, the
+      three labels the register's provenance header declares, and the two sentences a source record
+      uses to describe the document and its pages.
+- [x] A configuration for the official original exists with its own identity and role, renders
       `is_submitted_document: true`, and inherits no sanitised page map, 84-page assumption or
-      derivative description.
-- [ ] The original is not made a descendant of the sanitised version to reuse its version chain.
-- [ ] Both existing sanitised configurations reproduce byte-equal under the V01 pin, and both `--check`
-      commands still pass.
-- [ ] A configuration missing a required field fails closed, naming the field.
+      derivative description. `official_original` declares its own config id, title, role, intake id,
+      short name, page statement, reader caveat and manifest key vocabulary. A test asserts that
+      *sanitised*, *derivative* and *84* appear in none of its identity or description fields. No
+      required field defaults to the copy's value. Its graph root is deliberately undeclared: the
+      original and its extracted text stay in the private network.
+- [x] The original is not made a descendant of the sanitised version to reuse its version chain. Its
+      intake id and graph root differ, and `__post_init__` refuses a revision whose `supersedes` names a
+      revision of another document. The registry refuses any shared config id, intake id, graph root or
+      revision id.
+- [x] Both existing sanitised configurations reproduce byte-equal under the V01 pin, and both `--check`
+      commands still pass. Both exit 0, every rendered file equals the committed bytes, and neither
+      hash-bound manifest gained a field.
+- [x] A configuration missing a required field fails closed, naming the field. `require_complete()` names
+      every missing field; selecting the original names `workspace_rel`, `sub_sections`,
+      `expected_pages`, `body_point_size` and `revisions`. One predicate decides which sub-sections need
+      a scorecard, so no shape passes the check and refuses later. `require_provenance()` refuses
+      separately and names the intake record rather than the undeclared path field.
 
 **Verification.** Reproduce both sanitised configurations byte-equal, then select the original
 configuration and confirm it refuses to run without its own page map and provenance.
+
+**Status 2026-10-12.** Five of five criteria closed. The code half of F02 closes; its review half is
+V08 and is open. No original PDF is stored here, no page map for it is declared and its intake record
+does not exist, so the original is declared and not imported. No assessor ran and no quota was spent.
+
+**V01's criterion 4 stays open.** Its carry is answered in code and not in an artifact. The
+runtime-environment block is a configuration flag, empty for the two hash-bound manifests. It is true
+only for a configuration `require_complete()` refuses, so the block reaches no file and V08 may still
+change its shape. Five residual items are recorded in report section *What is unresolved*, and five declared
+deviations in the section after it. The full suite is not green on this branch and was not green before:
+HEAD measures 205 failed and 7,153 passed in a worktree, and no test fails here that passes at HEAD.
+
+Evidence: `plans/reports/v07_document_configuration_2026-10-12.md`; decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-document-configuration_2026-10-12.json`.
 
 ## V08 — Dry-import inventory and original-provenance records
 

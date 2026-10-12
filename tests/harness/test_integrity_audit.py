@@ -1245,7 +1245,7 @@ class TestMscaDnWorkspace:
                 "DCs involved", "Objectives"],
         }
         limitations = json.loads(
-            (REPO / ie.ACTIVE_REVISION.register_rel).read_text(encoding="utf-8")
+            (REPO / ie.DEFAULT_DOCUMENT.active_revision.register_rel).read_text(encoding="utf-8")
         )["provenance"]["known_extraction_limitations"]["work_package_header_blocks"]
         assert limitations["wp_number_blocks"] == [1, 2, 3, 4, 5, 6, 7]
         assert [c["work_package"] for c in limitations["headers_collapsed_into_one_block"]] == [4]

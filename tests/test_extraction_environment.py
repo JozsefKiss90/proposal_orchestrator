@@ -205,7 +205,9 @@ class TestDecisionRecord:
     def test_the_committed_versions_it_names_are_the_ones_on_disk(self, decision: dict) -> None:
         from runner.dev_graph.documents import DOCUMENTS_REL
 
-        from tools.import_external_proposal import WORKSPACE_REL
+        from tools.import_external_proposal import DEFAULT_DOCUMENT
+
+        WORKSPACE_REL = DEFAULT_DOCUMENT.workspace_rel
 
         held = {
             p.stem[:16]
