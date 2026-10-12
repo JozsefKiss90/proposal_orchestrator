@@ -394,7 +394,9 @@ internally inconsistent, while the committed baseline still freezes unchanged.
 and loaded profile bundle, as the audit did. Write only to a temporary directory. Do not rerun the whole
 repository in place of focused negative tests.
 
-**Status 2026-10-12.** Closed, seven of seven. F03 closes here. G4 does not: V06 is still open.
+**Status 2026-10-12.** Closed, seven of seven. F03 closes here. G4 did not close on this ticket:
+V06 was still open. The operator accepted V04 with V05 and V06 on 2026-10-12 — see the G4 acceptance
+section below.
 `freeze_baseline` now takes the loaded `ProfileBundle` rather than the profile, because the rubric set
 and scorecard are what say whether a report is complete. Three changes outside the seven criteria are
 declared in section 8 of the completion report rather than presented as required. The acceptance lane
@@ -426,18 +428,33 @@ original carries references and real identities.
       manifest there is no expectation and the audit says so. Report section 3.
 - [x] Table schema and identity comparisons are revalidated for a document carrying references and real
       identities. An anonymised-host assumption is never applied as an original-document rule.
-- [ ] Both committed sanitised audits, `integrity_242f1afb02c8_0003.json` and
-      `integrity_13ad3ad81d7e_0001.json`, reproduce byte-equal. **Open, and not V05's to close.**
-      Everything V05's derivation produces reproduces byte-equal for both: the whole grounding axis,
-      and every identity finding. The current revision's audit also reproduces its whole five-check
-      payload. The first copy's audit does not reproduce in full, and did not before V05 either — it
-      predates operator decision D11 and ticket R03, which retired twenty-seven of its findings. The
-      twenty-seven are enumerated by name in
-      `tests/harness/test_integrity_audit.py::TestTheCommittedAudits::test_the_first_copys_payload_differs_only_by_the_retired_rules`,
-      so the divergence is measured, not asserted. Closing the box needs either a successor audit over
-      the first copy under the current rules, which is a new artifact and the operator's decision, or
-      an amendment to this criterion. Neither is V05's. Both files are unedited and pinned by sha256.
-      Report section 5.
+- [x] **Amended and closed 2026-10-12 on operator instruction.** The amendment requires four
+      conditions in place of whole-file reproduction, and all four are verified against the committed
+      evidence:
+      (1) both committed sanitised audits, `integrity_242f1afb02c8_0003.json` and
+      `integrity_13ad3ad81d7e_0001.json`, are byte-unchanged and verify against their recorded
+      sha256;
+      (2) the grounding axis and all nine identity findings reproduce for both sanitised revisions;
+      (3) the current revision's whole five-check payload reproduces, 13 findings for 13;
+      (4) the older revision's differences are exactly the twenty-seven findings that operator
+      decision D11 and ticket R03 retired — sixteen `undeclared_dependency`, nine `out_of_window`
+      appointments, and the two whole-cohort package sets WP6 and WP7 — leaving 15 findings where the
+      committed file carries 42, with nothing new.
+      **The older revision's audit still does not reproduce in full under the current rules.** The
+      amendment does not say otherwise. That file predates D11 and R03, which changed what the checks
+      emit, and a successor audit over that candidate remains unwritten and remains the operator's to
+      commission.
+      Evidence: `tests/harness/test_integrity_audit.py::TestTheCommittedAudits`, eight cases passing,
+      including `test_the_first_copys_payload_differs_only_by_the_retired_rules`, which enumerates the
+      twenty-seven by name, and V05's report section 5. Acceptance record
+      `docs/tier4_orchestration_state/msca_dn/reviews/operator_acceptance_g4_2026-10-12.md`; amendment
+      record `docs/tier4_orchestration_state/decision_log/msca-dn-g4-acceptance_2026-10-12.json`.
+      **Original wording, superseded and kept for the record.** "Both committed sanitised audits,
+      `integrity_242f1afb02c8_0003.json` and `integrity_13ad3ad81d7e_0001.json`, reproduce
+      byte-equal." That box stood open, annotated "Open, and not V05's to close", because whole-file
+      reproduction could not hold for the older copy without a successor audit over it. The operator
+      chose the amendment over that audit. V05's implementation did not change; what changed is what
+      this criterion asks of it.
 - [x] A candidate whose provenance does not state a grounding cause yields an explicit Unresolved
       reason, not a borrowed one.
 - [x] **Inherited from V02a criterion 2.** The two integrity-audit integration checks pass against the
@@ -452,13 +469,20 @@ original carries references and real identities.
 **Verification.** Regenerate both committed audits and diff the bytes. Add a test that a non-sanitised
 candidate configuration produces a different, provenance-derived reason.
 
-**Status 2026-10-12.** Five of six criteria closed. `harness/candidate_provenance.py` derives the
-grounding cause, the identity scope and the expected ledger status from each candidate's own import
-manifest and fidelity register. The persisted report gained no key, which is what keeps the committed
-audits reproducible. Criterion 4 stays open for the reason written in its own box, and it is not read
-as a pass anywhere. F06 closes: the wording no longer comes from a constant. G4 does not close — V06 is
-still open. Evidence: `plans/reports/v05_audit_grounding_provenance_2026-10-12.md`; decision record
+**Status 2026-10-12, as implemented.** Five of six criteria closed. `harness/candidate_provenance.py`
+derives the grounding cause, the identity scope and the expected ledger status from each candidate's own
+import manifest and fidelity register. The persisted report gained no key, which is what keeps the
+committed audits reproducible. Criterion 4 stayed open for the reason written in its own box, and it was
+not read as a pass anywhere. F06 closes: the wording no longer comes from a constant. G4 did not close
+on this ticket — V06 was still open. Evidence:
+`plans/reports/v05_audit_grounding_provenance_2026-10-12.md`; decision record
 `docs/tier4_orchestration_state/decision_log/msca-dn-audit-grounding-provenance_2026-10-12.json`.
+
+**Status 2026-10-12, after the amendment.** Six of six. The operator amended criterion 4 to four
+enumerated reproduction conditions and they verify against the committed evidence. No code moved, no
+committed audit was edited, and the older revision's audit still does not reproduce in full. V05 is
+accepted as part of the G4 acceptance below. Amendment evidence:
+`plans/reports/g4_acceptance_and_v05_criterion4_amendment_2026-10-12.md`.
 
 ## V06 — Declare the grounding scope in preflight, report and freeze
 
@@ -509,10 +533,49 @@ carries the declaration and the second is refused.
 half is X01 and is not implemented. The committed 74.60 report still freezes, 21 of 22 checks passed
 with `grounding_scope` not applicable, and its 25 bindings and `report_sha256` reproduce. Two V04
 assertions were widened rather than satisfied, and both are named in report section 6. No assessor ran
-and no quota was spent, and G4 is now the operator's call over V04, V05 and V06 together.
+and no quota was spent, and G4 was then the operator's call over V04, V05 and V06 together. The
+operator accepted all three on 2026-10-12 — see the G4 acceptance section below.
 
 Evidence: `plans/reports/v06_grounding_scope_declared_2026-10-12.md`; decision record
 `docs/tier4_orchestration_state/decision_log/msca-dn-grounding-scope_2026-10-12.json`.
+
+## G4 — operator acceptance, 2026-10-12
+
+**Status: closed for infrastructure readiness.** The operator accepted V04, V05 and V06 together, in
+session, on 2026-10-12. That instruction is the authority for this section. The ledger itself confers
+no authority to close a gate.
+
+### What the acceptance covers
+
+| Ticket | Commit | Completion record | Decision record |
+|---|---|---|---|
+| V04 — the freeze refuses incomplete and inconsistent reports | `82fa9b4` | `plans/reports/v04_freeze_refuses_incomplete_reports_2026-10-12.md` | `docs/tier4_orchestration_state/decision_log/msca-dn-freeze-completeness_2026-10-12.json` |
+| V05 — provenance-derived audit grounding and identity wording | `437ca89` | `plans/reports/v05_audit_grounding_provenance_2026-10-12.md` | `docs/tier4_orchestration_state/decision_log/msca-dn-audit-grounding-provenance_2026-10-12.json` |
+| V06 — declared grounding scope in preflight, report and freeze | `aa0d464` | `plans/reports/v06_grounding_scope_declared_2026-10-12.md` | `docs/tier4_orchestration_state/decision_log/msca-dn-grounding-scope_2026-10-12.json` |
+
+The acceptance also carries the amendment to V05 criterion 4 and its verification. Evidence:
+`plans/reports/g4_acceptance_and_v05_criterion4_amendment_2026-10-12.md`, acceptance record
+`docs/tier4_orchestration_state/msca_dn/reviews/operator_acceptance_g4_2026-10-12.md`, decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-g4-acceptance_2026-10-12.json`.
+
+F03, F06 and the required half of F07 close with their tickets.
+
+### What stays open
+
+- **V12 — the PE-09 runbook.** Its substantive corrections stay open, and this acceptance closes none
+  of them. V12 is blocked by V07 and V10 besides. G4's documentation share therefore remains to be
+  done, and the gate's closure here is read as infrastructure readiness only.
+- **X01 — the imported-source grounding route.** Mandatory for any source-grounded assessment. Until
+  X01 is implemented and validated, a `source_grounded` declaration stays refused at V06 and V15.
+- **The legacy 74.60 baseline keeps its undeclared grounding scope.** Its `grounding_scope` freeze
+  check stays recorded not applicable, with the reason V06 declared. That outcome is retained
+  deliberately. It is not a defect to repair and the committed report is not to be re-declared.
+
+### What the acceptance does not authorise
+
+It does not authorise the private assessment, and the audit's NO-GO on running and freezing the
+official assessment stands. It does not validate the official 2025 baseline. It adopts no fidelity
+declaration — D13 stays open. It approves no proposal change. G1, G2, G3, G5, G6 and G7 are untouched.
 
 ## V07 — Externalise the document configuration
 
@@ -669,6 +732,10 @@ and temperature strings as if they were transmitted and attested.
 
 **What to build.** A runbook that describes only what the code does, with every operational claim
 traceable to a check that actually runs.
+
+**Still open after the G4 acceptance of 2026-10-12.** That acceptance closed G4 for infrastructure
+readiness over V04, V05 and V06. It closed none of the corrections below, and F04 and F12 stay open.
+V12 remains blocked by V07 and V10.
 
 ### Acceptance criteria
 

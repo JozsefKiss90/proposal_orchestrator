@@ -455,17 +455,29 @@ class TestTheDependencyGate:
         assert "V02c criterion 1" in amendment
         assert "xclu" in amendment, "the scoped exclusion is not named as one"
 
-    def test_a_criterion_conceding_partial_reproduction_is_never_checked(self, ledger: str) -> None:
-        """The same shared constraint, in the place V05 could have broken it.
-        V05's reproduction criterion is met for everything its own derivation
-        produces and not met for the first copy's pre-D11/R03 findings. A box
-        that has to explain what does not reproduce is not a pass, so it stays
-        open and says who could close it."""
-        fragment = "reproduce byte-equal"
-        items = [i for i in _checkbox_items(_section(ledger, "## V05 ")) if fragment in i]
-        assert items, fragment
-        assert items[0].startswith("- [ ]"), items[0]
-        assert "not V05's to close" in items[0], "an open box must say whose it is"
+    def test_the_reproduction_criterion_is_checked_only_as_amended(self, ledger: str) -> None:
+        """Retires the pre-amendment guard, which held that a box conceding
+        partial reproduction is never checked.
+
+        That guard was right for the criterion as written: whole-file
+        reproduction of the first copy's audit cannot hold, and V05 could not
+        close it. On 2026-10-12 the operator amended the criterion to four
+        enumerated conditions instead. The box is now checked, so what has to be
+        guarded is the amendment itself — that it says it is one, that it carries
+        all four conditions, and that it names the evidence they were verified
+        against."""
+        item = _the_reproduction_criterion(ledger)
+        assert item.startswith("- [x]"), item
+        assert "Amended and closed 2026-10-12 on operator instruction" in item
+        for condition in (
+            "byte-unchanged",
+            "nine identity findings reproduce",
+            "five-check payload reproduces",
+            "twenty-seven findings that operator",
+        ):
+            assert condition in item, condition
+        assert "TestTheCommittedAudits" in item, "the amended box must name its evidence"
+        assert "operator_acceptance_g4_2026-10-12.md" in item
 
     def test_the_excluded_v02c_criterion_is_never_checked(self, ledger: str) -> None:
         """A shared constraint: a scoped exception is not a pass. V02c's
@@ -498,6 +510,112 @@ class TestTheDependencyGate:
         assert received and received[0].startswith("- [x]"), received
         assert "Closed 2026-10-12" in received[0]
 
+    def test_the_amendment_keeps_the_original_wording_and_its_history(self, ledger: str) -> None:
+        """A criterion may be amended. Its history may not be overwritten: the
+        superseded wording and the reason it could not close stay readable."""
+        item = _the_reproduction_criterion(ledger)
+        assert "Original wording, superseded and kept for the record" in item
+        assert "reproduce\n      byte-equal" in item or "reproduce byte-equal" in item
+        assert "Open, and not V05's to close" in item, "the prior annotation is the history"
+
+    def test_the_amendment_never_claims_the_older_audit_fully_reproduces(
+        self, ledger: str
+    ) -> None:
+        """The operator's condition on the amendment. The older sanitised audit
+        predates D11 and R03 and does not reproduce in full under the current
+        rules. The ledger says so in the amended box itself."""
+        item = _the_reproduction_criterion(ledger)
+        assert "still does not reproduce in full under the current rules" in item
+        assert "remains unwritten" in item, "the successor audit is the operator's to commission"
+
+
+# --------------------------------------------------------------------------- #
+# The G4 acceptance
+# --------------------------------------------------------------------------- #
+
+
+class TestTheG4Acceptance:
+    """The operator accepted V04, V05 and V06 together on 2026-10-12 and closed
+    G4 for infrastructure readiness. The ledger's own rule is that it confers no
+    authority to close a gate, so the closure has to cite the instruction, the
+    three tickets' evidence, and the limits the operator retained."""
+
+    @pytest.fixture(scope="class")
+    def acceptance(self, ledger: str) -> str:
+        return _section(ledger, "## G4 — operator acceptance")
+
+    def test_the_section_names_its_authority_and_its_scope(self, acceptance: str) -> None:
+        assert "closed for infrastructure readiness" in acceptance.lower()
+        assert "The operator accepted V04, V05 and V06 together" in acceptance
+        assert "no authority to close a gate" in acceptance
+
+    @pytest.mark.parametrize(
+        "ticket,commit,report",
+        [
+            ("V04", "82fa9b4", "plans/reports/v04_freeze_refuses_incomplete_reports_2026-10-12.md"),
+            ("V05", "437ca89", "plans/reports/v05_audit_grounding_provenance_2026-10-12.md"),
+            ("V06", "aa0d464", "plans/reports/v06_grounding_scope_declared_2026-10-12.md"),
+        ],
+    )
+    def test_each_accepted_ticket_is_cited_with_committed_evidence(
+        self, acceptance: str, ticket: str, commit: str, report: str
+    ) -> None:
+        assert commit in acceptance, f"{ticket} is accepted without its commit"
+        assert report in acceptance, f"{ticket} is accepted without its completion record"
+        assert (REPO_ROOT / report).is_file(), f"the completion record is not committed: {report}"
+
+    @pytest.mark.parametrize(
+        "record",
+        [
+            "docs/tier4_orchestration_state/msca_dn/reviews/operator_acceptance_g4_2026-10-12.md",
+            "docs/tier4_orchestration_state/decision_log/msca-dn-g4-acceptance_2026-10-12.json",
+            "plans/reports/g4_acceptance_and_v05_criterion4_amendment_2026-10-12.md",
+        ],
+    )
+    def test_the_acceptance_evidence_is_committed_where_the_ledger_cites_it(
+        self, acceptance: str, record: str
+    ) -> None:
+        assert record in acceptance, f"the ledger does not cite {record}"
+        assert (REPO_ROOT / record).is_file(), f"cited but not committed: {record}"
+
+    def test_the_decision_record_states_the_amendment_and_its_limits(self) -> None:
+        """§9.4: the durable decision is the one in docs/, not the ledger note."""
+        record = json.loads(
+            (
+                REPO_ROOT
+                / "docs/tier4_orchestration_state/decision_log/msca-dn-g4-acceptance_2026-10-12.json"
+            ).read_text(encoding="utf-8")
+        )
+        amendment = record["decision"]["the_amendment"]
+        assert "reproduce byte-equal" in amendment["prior_rule"]
+        assert "twenty-seven" in amendment["new_rule"]
+        assert "fully reproducing" in amendment["what_is_preserved"]
+        acceptance = record["decision"]["the_acceptance"]
+        assert "infrastructure readiness" in acceptance["gate_g4"]
+        assert "V12" in acceptance["g4_documentation_share_is_not_closed"]
+        assert "does not authorise the private assessment" in acceptance["scope_limit"]
+
+    def test_the_three_retained_limits_are_recorded(self, acceptance: str) -> None:
+        """The operator retained three things against a later reader: V12 stays
+        open, X01 stays mandatory for a grounded claim, and the legacy baseline
+        keeps its undeclared scope and its not-applicable outcome."""
+        assert "V12" in acceptance and "stay open" in acceptance
+        assert "X01" in acceptance and "source_grounded" in acceptance
+        assert "not applicable" in acceptance
+        assert "74.60" in acceptance
+
+    def test_v12_still_carries_its_own_open_statement(self, ledger: str) -> None:
+        """Read from V12's side too: a reader who opens the ticket must not take
+        the G4 closure as closing it."""
+        v12 = _section(ledger, "## V12 ")
+        assert "Still open after the G4 acceptance" in v12
+        assert "F04 and F12 stay open" in v12
+        assert not any(i.startswith("- [x]") for i in _checkbox_items(v12)), v12
+
+    def test_the_acceptance_closes_no_other_gate(self, acceptance: str) -> None:
+        assert "G1, G2, G3, G5, G6 and G7 are untouched" in acceptance
+
+
     def test_the_excluded_v02c_criterion_is_traceable_to_a_lane_exclusion(
         self, lane: lanes.Lane, dispositions: str
     ) -> None:
@@ -509,6 +627,17 @@ class TestTheDependencyGate:
         )
         assert any(e.check == check for e in lane.exclusions)
         assert check in dispositions
+
+
+def _the_reproduction_criterion(ledger: str) -> str:
+    """V05's reproduction criterion, amended on 2026-10-12."""
+    items = [
+        i
+        for i in _checkbox_items(_section(ledger, "## V05 "))
+        if "reproduce byte-equal" in i or "reproduction conditions" in i
+    ]
+    assert items, "V05 carries no reproduction criterion"
+    return items[0]
 
 
 def _section(text: str, heading: str) -> str:

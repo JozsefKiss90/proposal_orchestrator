@@ -1,0 +1,125 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-g4-acceptance_2026-10-12",
+  "date": "2026-10-12",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation: the operator's acceptance of V04, V05 and V06 together, the amendment of V05 criterion 4 to four enumerated reproduction conditions, and the closure of gate G4 for infrastructure readiness.",
+  "authority": "CLAUDE.md §9.1 (docs/ is the durable record), §9.4 (a decision affecting future interpretation is written to the decision log), §12.2 (the status vocabulary), §12.4 (a gate failure is a valid output and is not papered over). The operator's in-session instruction of 2026-10-12 approving the V05 criterion 4 replay amendment, the closure of G4 for infrastructure readiness, and the joint acceptance of V04, V05 and V06 is the authority for this record. It is an authority fact and it raises no evidence status.",
+  "problem": {
+    "declared_status": "Confirmed",
+    "basis": "read in plans/msca_dn_historical_validation_tickets.md and the three completion reports at aa0d464",
+    "statement": "V04, V05 and V06 were implemented and reported, and G4 was left as the operator's call over the three together. V05 criterion 4 stood open because it required both committed sanitised integrity audits to reproduce byte-equal, which cannot hold for the older copy.",
+    "why_the_criterion_could_not_close_as_written": "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json predates operator decision D11 and ticket R03. Those two retired twenty-seven of its findings, so the current checks cannot emit the payload that file carries. V05 changed none of that. Closing the box needed a successor audit over that candidate, which is a new artifact and the operator's decision, or an amendment to the criterion."
+  },
+  "decision": {
+    "declared_status": "Confirmed",
+    "basis": "the operator's instruction, the amendment written to the ledger, and the verification below",
+    "the_amendment": {
+      "section_amended": "V05 criterion 4 of plans/msca_dn_historical_validation_tickets.md",
+      "prior_rule": "Both committed sanitised audits, integrity_242f1afb02c8_0003.json and integrity_13ad3ad81d7e_0001.json, reproduce byte-equal. Open, annotated \"Open, and not V05's to close\".",
+      "new_rule": "Four conditions replace whole-file reproduction: (1) historical audit artifacts remain byte-unchanged and hash-verifiable; (2) grounding and identity outputs reproduce for both sanitised revisions; (3) the current revision's complete check payload reproduces; (4) the older revision's differences match exactly the twenty-seven findings retired by D11 and R03.",
+      "reason": "Whole-file reproduction of the older copy is unreachable without a successor audit the operator has not commissioned. The four conditions state what the derivation actually guarantees and pin the divergence by enumeration, so the criterion measures V05's work rather than D11's and R03's rule changes.",
+      "what_is_preserved": "The original wording and the amendment history stay in the criterion's own box. The criterion is marked amended and dated, and the older revision's audit is never described as fully reproducing under the current rules.",
+      "what_did_not_change": "No code moved for this amendment. No committed audit, register, baseline, disposition, comparison or report was edited. No successor audit was written."
+    },
+    "the_acceptance": {
+      "covers": "V04 (82fa9b4), V05 (437ca89) and V06 (aa0d464), accepted together.",
+      "closes": "F03 with V04, F06 with V05, the required half of F07 with V06.",
+      "gate_g4": "Closed for infrastructure readiness. The freeze refuses incomplete, duplicated, out-of-range and internally inconsistent reports; the integrity audit derives its grounding and identity wording from each candidate's own provenance; and every preflight, report and freeze carries a declared grounding scope that the freeze binds.",
+      "g4_documentation_share_is_not_closed": "V12's substantive runbook corrections stay open and this acceptance closes none of them. F04 and F12 stay open, and V12 remains blocked by V07 and V10.",
+      "scope_limit": "Infrastructure readiness only. The acceptance does not authorise the private assessment, does not validate the official 2025 baseline, adopts no fidelity declaration, and approves no proposal change. The readiness audit's NO-GO on running and freezing the official assessment stands. No gate other than G4 moved."
+    },
+    "retained_limits": {
+      "the_legacy_74_60_baseline": "Its undeclared grounding scope and its not-applicable grounding_scope freeze outcome are retained deliberately, with the reason V06 declared: the report predates the declaration and derivation over its unanimously unassessable cells can only ever read unassessable. It is not a defect to repair and the committed report is not re-declared.",
+      "x01": "Mandatory for any source-grounded assessment. Until the imported-source grounding route is implemented and validated, a source_grounded declaration stays refused at V06 and V15.",
+      "totals": "The frozen blind total stays 74.60 and the historical total 85.80."
+    }
+  },
+  "verification": {
+    "declared_status": "Confirmed",
+    "basis": "commands run in this session at the checkout of aa0d464; results as reported",
+    "the_four_conditions": {
+      "condition_1_bytes_unchanged": "tests/harness/test_integrity_audit.py::TestTheCommittedAudits::test_the_committed_bytes_are_untouched, both audits: each file verifies against its recorded sha256.",
+      "condition_2_grounding_and_identity": "test_the_grounding_axis_reproduces_byte_equal and test_every_identity_finding_reproduces_byte_equal, both audits: byte-equal; nine identity findings each; the grounding reason 'supporting sources removed by sanitisation' is derived from each candidate's own provenance, not from a module constant.",
+      "condition_3_current_payload": "test_the_current_revisions_whole_check_payload_reproduces_byte_equal: byte-equal over five checks and 13 findings.",
+      "condition_4_enumerated_differences": "test_the_first_copys_payload_differs_only_by_the_retired_rules: the difference set is exactly the twenty-seven retired findings — sixteen undeclared_dependency milestones (D11), nine out_of_window appointments (R03), and the whole-cohort package sets WP6 and WP7 (R03) — and no finding is new. Regenerating the older candidate's audit yields 15 findings where the committed file carries 42."
+    },
+    "commands": {
+      "tests/harness/test_integrity_audit.py::TestTheCommittedAudits": "8 passed",
+      "py -3.10 -m tools.draft_fidelity_declarations --check": "up to date, before and after this work",
+      "acceptance_lane": "py -3.10 -m harness.commands.acceptance_lane ran once during this work, before the completion report file existed: 2,320 passed, 1 failed, 17 declared exclusions. The one failure was the check that requires that report to be committed, which it now is, and the module carrying it passes 68 of 68. Two whole-lane reruns after the file was written were killed by host memory pressure before collection finished, so no post-fix whole-lane figure was measured. The rerun is the operator's command.",
+      "tests/harness/test_integrity_audit.py": "126 passed",
+      "tests/harness/test_blind_baseline.py": "88 passed",
+      "tests/harness/test_acceptance_lane.py": "68 passed, the 14 cases this work added included",
+      "tests/runner/test_leakage_scan.py": "47 passed; the new Tier 4 artifact introduces no new identity noun"
+    },
+    "what_the_new_tests_check": [
+      "the amended criterion is checked only while it names all four conditions and its verification evidence",
+      "the amended criterion still carries its original wording and its amendment date",
+      "the ledger never describes the older revision's audit as fully reproducing under the current rules",
+      "the G4 section names the three accepted tickets with their commits and completion records, and names the acceptance and decision records",
+      "the G4 section records that V12's runbook corrections, X01's conditionality and the legacy baseline's not-applicable grounding outcome all stand",
+      "the acceptance record and this decision record are committed where the ledger cites them"
+    ],
+    "what_was_not_run": [
+      "No assessor call, no new preflight, no new freeze, no new baseline. No quota was spent.",
+      "No successor integrity audit over the older candidate.",
+      "No runner phase was dispatched.",
+      "No post-fix whole-lane acceptance run. Two attempts were killed by host memory pressure, and the result is recorded as not measured rather than as a pass."
+    ]
+  },
+  "consequences": [
+    "G4 is closed for infrastructure readiness. A later reader must not read it as closing G4's documentation share, which V12 owns.",
+    "V05 criterion 4 is complete under the amended wording only. Whole-file reproduction of the older sanitised audit was never achieved and is not claimed.",
+    "A successor audit over MSCA-DN-2025_sanitised_part_b@bdb8670f6987e4db remains available to the operator. It would be a new artifact and would not change the committed file.",
+    "The legacy 74.60 report keeps its not-applicable grounding outcome. Any later attempt to re-declare its scope contradicts this record.",
+    "A source_grounded declaration stays refused until X01 closes.",
+    "V14 and V15 stay the operator's decisions. This record authorises neither."
+  ],
+  "artifacts": {
+    "written": {
+      "acceptance_record": {
+        "path": "docs/tier4_orchestration_state/msca_dn/reviews/operator_acceptance_g4_2026-10-12.md",
+        "sha256": "791d0e5ef4e7a5d00ee9c108424b20a2b20024a5b2cb05ac0954852935f0ca8b"
+      }
+    },
+    "written_outside_the_byte_exact_trees": {
+      "why_no_hash_is_pinned": ".gitattributes declares the hashed trees '-text' and leaves code and prose on the platform line-ending default. A sha256 recorded here for a file in plans/ or tests/ would not match a fresh checkout under core.autocrlf (decision log msca-dn-line-ending-bindings_2026-10-07). These files are cited by path.",
+      "completion_report": {
+        "path": "plans/reports/g4_acceptance_and_v05_criterion4_amendment_2026-10-12.md",
+        "why": "the completion report for the amendment and the acceptance"
+      }
+    },
+    "amended_in_place": {
+      "why_no_hash_is_pinned": "the same line-ending reason as the group above",
+      "ticket_document": {
+        "path": "plans/msca_dn_historical_validation_tickets.md",
+        "why": "V05 criterion 4 amended, checked and dated with its original wording kept; V05's status split into the as-implemented and post-amendment readings; a G4 acceptance section; and pointers from V04, V06 and V12"
+      },
+      "tests": {
+        "paths": [
+          "tests/harness/test_acceptance_lane.py"
+        ],
+        "why": "the retired partial-reproduction guard is replaced by guards over the amended criterion and the G4 acceptance section"
+      }
+    },
+    "unchanged_and_still_cited": {
+      "current_revision_audit": {
+        "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_242f1afb02c8_0003.json",
+        "sha256": "a295e66fa39dce1857b4e03225de23775a087794dccb0b4407e5e03f9af799a9"
+      },
+      "older_revision_audit": {
+        "path": "docs/tier4_orchestration_state/msca_dn/audit/integrity_13ad3ad81d7e_0001.json",
+        "sha256": "1b66a7cc0823b8e13692ec00aaebe632ad0c3bf775fe9d567c892c97864bff13"
+      },
+      "baseline_report": {
+        "path": "docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06/blind_baseline_f60ae6e0a2a1.json",
+        "sha256": "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01"
+      },
+      "operator_approval_2026_10_08": {
+        "path": "docs/tier4_orchestration_state/msca_dn/reviews/operator_approval_2026-10-08.md",
+        "sha256": "405ee5f59747d73788cac15c2e9d9df8b6cfd437066d2c4e4dbb315e2c4f197c"
+      }
+    }
+  }
+}
