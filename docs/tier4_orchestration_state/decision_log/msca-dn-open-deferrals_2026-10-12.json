@@ -1,0 +1,92 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-open-deferrals_2026-10-12",
+  "date": "2026-10-12",
+  "branch": "msca-dn-pre-eval",
+  "ticket": "V11 of plans/msca_dn_historical_validation_tickets.md",
+  "closes": "finding F11 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+  "milestone": "MSCA-DN historical validation, prerequisite of gate G7: every item the operator approval of 2026-10-08 left open is held in one register with its owner and its closure evidence, so the milestone that accepts that package cannot inherit a deferral as settled.",
+  "authority": "CLAUDE.md §9.4 (a decision affecting future interpretation is written down), §10.5 (a material claim names its source), §12.1 (an output names its inputs and flags its assumptions), §12.2 (Confirmed, Inferred, Assumed, Unresolved), §12.3 (a contradiction is resolved explicitly, never by the convenient source), §15 (an explicit failure beats a fabricated completion); harness/HARNESS.md (out-of-band QA, never a runtime gate); the ledger's own constraint that no agent-authored draft impersonates operator approval and no box is checked without its closure evidence.",
+  "problem": {
+    "declared_status": "Confirmed",
+    "basis": "measured on docs/tier4_orchestration_state/msca_dn/reviews/operator_approval_2026-10-08.md and docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json as committed",
+    "statement": "The approval's own terms leave matters open in four different records, and no artifact held them together.",
+    "measured": "The approved dispositions carry 9 operator_confirmed, 10 operator_decision_required and 10 agent_recommended_pending_operator_review rows over 29 observations, 12 open_operator_decisions, 2 assessor_validation_cases and one row declared Unresolved. The approval prose carries a separate 8-row original-dependent table. The predecessor ledger carries one unchecked R04 criterion whose precondition D13 defers. 34 open items in total, in four records, with no single reading.",
+    "why_it_matters": "An inherited deferral has no owner, no closure evidence and no record that it is still open. A ticket checkbox cannot hold one: a checkbox has no room for the evidence that would close it. A milestone accepting the package would therefore close 34 items by silence."
+  },
+  "decision": {
+    "declared_status": "Confirmed",
+    "basis": "implemented in the new harness/deferral_register.py and harness/commands/deferral_register.py, authored by the new tools/author_deferral_register.py; 59 checks in tests/harness/test_deferral_register.py and 35 in tests/test_msca_dn_deferral_register.py",
+    "statement": "One register holds every open item. Each row names what is open, who closes it, the evidence that would close it, and whether that evidence requires the submitted original. A row marked closed with no closure evidence fails the check.",
+    "the_rows_are_derived_not_typed": "The ten deferred rows and the ten agent-recommended rows are the approved dispositions' own decision_state lists. The two qualified interpretations are the intersection of rows_operator_confirmed with open_operator_decisions, computed - ESR-Q-01 and ESR-Q-03. The unresolved marker is every row whose declared_status is Unresolved, computed - ESR-E-04. The two validation cases are the record's own, and each one's original_required is read off its recorded limit. The eight original-dependent questions are parsed from the approval's own table. The ticket criterion is read from the ledger, which the tool refuses to render against if the box has since been checked. Adding a row therefore means a record changed.",
+    "the_closure_rule": "harness.deferral_register.check reports closed_without_evidence, and also a closure with no date and closure evidence filed against a row still open. All three are ways a row could read as finished without being finished.",
+    "the_register_binds_what_it_reads": "Each of the eight records is bound by sha256 under one of two roles. immutable_evidence: its bytes moving is an edit, reported as one. tracked_input, for the ticket ledger: its bytes moving means the register is stale. Both fail the check, as separate findings, because an edited historical record and a stale register are different defects with different fixes.",
+    "the_statements_are_measured": "S1 - the 40 to 29 to 13 finding sequence is three readings of one unchanged candidate, and D11 and R03 retired 27 findings as rules rather than repairs - is measured by nine measurements over the three audits' own findings_total, candidate_hash and document_id. S2 - all 15 evaluation-summary criticisms still have open revision work - is measured against the approved revision plan's 15 open and 0 closed rows and the 29-observation evaluation summary. A statement with no measurement fails the check, and the tool refuses to reprint either claim once a record stops supporting it.",
+    "the_overlap_is_shown_rather_than_hidden": "32 of the 34 rows name 23 distinct observations between them. ESR-E-04 is open three times for three reasons and ESR-Q-01 three times. The reading cross-references them, so 34 rows cannot be read as 34 independent items or, worse, as 34 repairs.",
+    "the_register_declares_its_own_standing": "The ledger's shared constraints require every new artifact to identify its inputs, its review state, its uncertainties and its relationship to earlier versions. The register declares all four and the loader requires all four: review_state is agent_drafted_pending_operator_review, declared_status is Inferred, supersedes states that this is the first register of these deferrals, and uncertainties travel in the record rather than only in the report. Inferred and not Confirmed because a row's existence is read off a committed record, which is evidence, while a row still being open is read off the absence of a closing decision, and an absence is not a confirmation.",
+    "the_check_reports_thirteen_findings": "Nine of the thirteen serve the ticket's criteria 2, 4 and 5 rather than exceeding them. The four that go beyond it are closed_without_date, open_rows_carrying_closure, rows_whose_pointer_does_not_resolve and duplicate_row_ids. The full table is in section 7 of the completion report. stale_tracked_inputs carries a cost the ticket did not ask for: any edit to the bound ticket ledger turns the deferrals lane area red until the register is re-derived. The alternative was the R04 row pointing at a record nothing pins."
+  },
+  "the_author_does_not_judge_its_own_output": {
+    "declared_status": "Confirmed",
+    "basis": "tests/harness/test_boundary.py::TestOneWayDependency::test_tools_and_scripts_do_not_import_harness_into_runtime, which failed on the first implementation and passes now",
+    "statement": "The authoring tool sits in tools/ and may not import harness/, so the reader, the check and the rendering all live on the harness side.",
+    "what_it_cost": "The schema string exists twice - tools.author_deferral_register.SCHEMA and harness.deferral_register.SCHEMA. Deliberate double entry, asserted equal by tests/test_msca_dn_deferral_register.py::TestTheRenderer::test_the_authoring_tool_and_the_reader_declare_one_schema. The sha256 helper comes from tools.fidelity_declarations, the spelling the tools that pin artifacts already share.",
+    "why_it_is_right_anyway": "A tool that both wrote a record and certified it would be judging its own output. The two commands split cleanly: the tool writes the register and replays it byte-equal, and harness.commands.deferral_register reads it, writes the Markdown reading beside it, and is the command that can fail."
+  },
+  "lane": {
+    "declared_status": "Unresolved",
+    "basis": "four attempts, all killed by the host for low memory: three runs of py -3.10 -m harness.commands.acceptance_lane at three different points, and one attempt that ran the same 66 modules as eight smaller pytest processes. The host reported 377 MB free of 15.7 GB while all 365 processes together held 4 GB.",
+    "statement": "The lane gains a deferrals area holding the two new modules, declared not depended on. Its single-process result after the code-review fixes is NOT measured, and no figure for passed, failed, errors, skipped or collected is recorded anywhere in this change.",
+    "what_was_measured_instead": {
+      "the_declaration_reconciles": "py -3.10 -m harness.commands.acceptance_lane --list exits 0. It runs no test. It proves the declaration loads, every declared module is in the tree, no module belongs to two areas, and every declared exclusion sits in an area the run does not depend on.",
+      "the_declarations_own_invariants": "tests/harness/test_acceptance_lane.py, 68 passed, including that the new area's modules are assigned and that harness/ACCEPTANCE_LANE.md carries the new area's invariant verbatim.",
+      "the_modules_this_change_touches": "tests/harness/test_deferral_register.py 59 passed, tests/test_msca_dn_deferral_register.py 35 passed, tests/harness/test_boundary.py 13 passed, tests/harness/test_profile.py 23 passed. Each in its own process, so no cross-module interaction is covered.",
+      "the_byte_bindings": "tools.import_external_proposal --check and tools.author_msca_dn_workspace --check both report 'up to date' and exit 0, re-measured after the final fix."
+    },
+    "what_would_close_it": "py -3.10 -m harness.commands.acceptance_lane, run to completion on a machine with memory to spare, recorded against the audit's 1,864 / 44 / 48 / 8 baseline at ca0a443. An earlier run on this branch completed in 685 s before the code-review fixes, so the obstruction is the machine's state rather than the lane.",
+    "why_this_is_Unresolved_and_not_a_pass": "harness/ACCEPTANCE_LANE.md's whole claim is that a green lane is a measurement rather than an assertion, and the ledger's shared constraints forbid reporting an unassessable axis as a passing test. A lane result inferred from per-module runs would be exactly that. CLAUDE.md section 15: an explicit failure beats a fabricated completion.",
+    "why_not_depended_on": "V03's first acceptance criterion names seven depended-on areas, and tests/harness/test_acceptance_lane.py::TestAreas::test_exactly_the_areas_v03_names_are_the_depended_on_ones asserts exactly those seven. The register gates the milestone's acceptance - V11 blocks V14 - not the correctness of a Stage A reading, so an eighth depended-on area would have amended an accepted measurement for nothing."
+  },
+  "not_evidence_of": [
+    "a closed deferral. Every one of the 34 rows is open, and the register closes none.",
+    "operator approval of anything. The register is a successor artifact that transcribes and points; the approval of 2026-10-08 stands as written and was not edited.",
+    "a resolved ESR-E-04, ESR-Q-01 or ESR-Q-03. Their rows record what is open about them and what would settle it.",
+    "a closed gate G7. V11 is a prerequisite. G7 follows G6, which needs V14, which the operator performs.",
+    "27 repaired proposal defects. S1 exists precisely to stop that reading of the finding sequence.",
+    "a new assessor run. No quota was spent and no assessor was called."
+  ],
+  "impacted_components": [
+    "harness/deferral_register.py (new: SCHEMA, KINDS, STATES, SOURCE_ROLES, REVIEW_STATES, STATUSES, Source, Row, Measurement, Statement, Register, load_register, resolve_field, RegisterCheck, check, render_report)",
+    "harness/commands/deferral_register.py (new: --register, --check, --no-render; writes the Markdown reading and exits 1 on any finding)",
+    "tools/author_deferral_register.py (new: derives the 34 rows and the two statements from eight committed records; --check is a byte-equal replay)",
+    "docs/tier4_orchestration_state/msca_dn/deferrals/open_deferral_register_2026-10-12.json and .md (new)",
+    "harness/acceptance_lanes/msca_dn_historical.json and harness/ACCEPTANCE_LANE.md (the deferrals area; thirteen areas became fourteen, and the not-depended-on count was corrected from six to seven)",
+    "harness/HARNESS.md (a section on the register; the stale twelve-area count corrected to fourteen)",
+    "plans/msca_dn_historical_validation_tickets.md (V11's five criteria and its status note; V03's area and module counts recounted)",
+    "No change to the frozen baseline, the approval record, the dispositions, the revision plan, the evaluation summary, the integrity audits or any gate."
+  ],
+  "remaining_uncertainties": {
+    "the_ledger_is_a_tracked_input_and_will_move": "plans/pe08_review_and_pe09_handoff_tickets.md is bound as tracked_input because a ticket is allowed to change. Any edit to it - including one unrelated to R04 - makes the register stale and the check fail until it is re-derived. That is the intended cost of binding it; the alternative was a row pointing at a record nothing pins.",
+    "the_r04_row_closes_on_a_decision_this_repository_cannot_make": "Its closure needs adoption into an active register once D13's deferral lifts. The tool refuses to re-derive the row as open once the ledger checks the box, which forces a human to supply the closure evidence rather than letting the row vanish.",
+    "the_eight_deferred_questions_overlap_the_disposition_rows": "DQ-01 names ESR-E-02, ESR-E-04 and ESR-E-08, which also carry their own ODR rows. The overlap is real and recorded rather than de-duplicated: the approval's table and the dispositions' review status are two different records, each open on its own terms. The cross-reference table is what keeps a reader from double-counting.",
+    "no_row_has_ever_been_closed": "The closure path - closed_by plus closed_on, checked - is covered by synthetic cases only. No committed row exercises it, because closing one needs evidence this repository does not hold.",
+    "dq_08_names_no_observation": "'M7.3 and appointments' is a milestone and a schedule question, not an evaluation summary observation. The normaliser leaves it out of the cross-reference rather than coercing it to an id, so DQ-08 and the ticket criterion are the two rows that name no observation."
+  },
+  "declared_deviations": {
+    "declared_status": "Confirmed",
+    "basis": "named in plans/reports/v11_open_deferral_register_2026-10-12.md section 7",
+    "the_register_is_json_and_the_reading_is_rendered": "The ticket says 'one register'. It is one record - the JSON - with a Markdown reading rendered from it by a second command. The reading carries no fact the JSON does not, and --check proves it reproduces.",
+    "the_schema_string_exists_twice": "Forced by the one-way import boundary, guarded by an equality assertion. See the_author_does_not_judge_its_own_output.",
+    "four_findings_beyond_the_asked_rule": "Superseded by the_check_reports_thirteen_findings above. The earlier wording declared four deviations where the check has thirteen findings, nine of which serve criteria 2, 4 and 5. The completion report carries the full table.",
+    "the_lane_gained_an_area": "Two new test modules fall inside the audit's focused globs, so the lane refused to run until they belonged to an area. Declared not depended on - see lane."
+  },
+  "the_code_review_findings_that_were_fixed": {
+    "declared_status": "Confirmed",
+    "basis": "two parallel review agents over the uncommitted change, one on documented standards and one on the ticket; each finding below was reproduced before it was fixed",
+    "the_agnosticism_lint_failed": "A comment added late to harness/deferral_register.py named the register's own test module, whose filename carries an instrument name. tests/harness/test_profile.py::TestNoInstrumentLiterals scans every line of every harness module, comments included, so the lint went red after it had been measured green. The comment now names no module. This is the second-order lesson of the agnosticism rule: a reference to an instrument-specific file is itself an instrument literal.",
+    "two_documents_had_drifted": "harness/ACCEPTANCE_LANE.md still read 'the other six carry the rest' with seven areas now not depended on, and harness/HARNESS.md still named twelve coverage areas when there were already thirteen. Both corrected. HARNESS.md also gained a section on the register, following the V06 precedent for a new harness module.",
+    "v03s_recorded_area_and_module_counts_were_recounted": "V03's first acceptance criterion read 'those seven areas plus five more cover 62 modules'. It is now seven plus seven over 66, with the recount dated and its causes named (V06's grounding-scope module and V11's deferrals area). The seven depended-on areas the criterion names are unchanged and the recount re-accepts nothing.",
+    "a_malformed_record_was_misreported": "_check_statements cached an unparseable record as UNRESOLVED and then reported '<field> does not resolve', which sends a reader to look for a moved field rather than a broken file. A record that cannot be parsed is now reported as unreadable JSON, with the exception type.",
+    "the_commands_two_flags_overlapped": "--no-render with --check returned 1 on a stale reading while suppressing the line that said why. --no-render now takes the reading out of the result entirely, so the exit code is the register's own check."
+  }
+}

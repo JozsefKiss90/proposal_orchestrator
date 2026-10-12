@@ -307,8 +307,11 @@ with zero unexplained failures and every exception enumerated.
 ### Acceptance criteria
 
 - [x] A named lane covers importer, profile, preflight, freeze, comparison, provenance and isolation
-      checks, and runs under the V01 environment pin. Those seven areas plus five more cover 62 modules;
-      the lane refuses to certify a result on a build not measured to reproduce the imports.
+      checks, and runs under the V01 environment pin. Those seven areas plus seven more cover 66
+      modules; the lane refuses to certify a result on a build not measured to reproduce the imports.
+      (Recounted 2026-10-12: the figures read five more areas and 62 modules when V03 was accepted.
+      V06 added `test_grounding_scope.py` and V11 added a `deferrals` area with two modules. The seven
+      depended-on areas this criterion names are unchanged, and the recount re-accepts nothing.)
       `harness/acceptance_lanes/msca_dn_historical.json`, `harness/acceptance_lane.py`,
       `harness/commands/acceptance_lane.py`.
 - [x] The lane reports zero unexplained failures. Each exception names its module, its reason and its
@@ -703,20 +706,44 @@ these.
 
 ### Acceptance criteria
 
-- [ ] The register carries the unchecked R04 criterion with its D13 precondition, all 10
+- [x] The register carries the unchecked R04 criterion with its D13 precondition, all 10
       `operator_decision_required` and 10 `agent_recommended_pending_operator_review` rows, Q01, Q03,
       AVC-01, AVC-02, the single unresolved disposition marker `ESR-E-04`, and the approval record's
-      original-dependent deferred table.
-- [ ] Each row names its owner, the evidence that would close it, and whether the original is required.
-- [ ] A check fails when a row is marked closed without its closure evidence.
-- [ ] The committed approval record and dispositions are not edited. The register is a successor
-      artifact that points at them.
-- [ ] The register states that the recorded 40 to 29 to 13 finding sequence reflects changed
+      original-dependent deferred table. **34 rows in seven groups, each group derived from the
+      record it comes from rather than typed.** Evidence:
+      `tests/test_msca_dn_deferral_register.py::TestTheRows`.
+- [x] Each row names its owner, the evidence that would close it, and whether the original is required.
+      22 of the 34 need the submitted original. `original_required` is a required boolean the loader
+      refuses to default, and the two validation-case rows read it off their own recorded limit.
+- [x] A check fails when a row is marked closed without its closure evidence.
+      `harness.deferral_register.check` reports `closed_without_evidence`, and also a closure with no
+      date and evidence filed against an open row. Evidence:
+      `tests/harness/test_deferral_register.py::TestTheClosureRule`.
+- [x] The committed approval record and dispositions are not edited. The register is a successor
+      artifact that points at them. Both are bound as `immutable_evidence`, so a later edit fails the
+      check; the approval record still carries the sha256 the approved dispositions pinned on
+      2026-10-08.
+- [x] The register states that the recorded 40 to 29 to 13 finding sequence reflects changed
       interpretation and audit rules, not 27 repaired proposal defects, and that all 15 ESR criticisms
-      still have open revision work.
+      still have open revision work. Both statements are measured: S1 against the three audits' own
+      totals, candidate hashes and document ids; S2 against the approved revision plan's 15 open and
+      0 closed rows. A statement with no measurement fails the check.
 
 **Verification.** Add a test that a closed row without evidence fails the check. Confirm the register
 row count against the approved dispositions and the approval record.
+
+**Status 2026-10-12.** Five of five criteria closed. F11 closes. Evidence:
+`plans/reports/v11_open_deferral_register_2026-10-12.md`; decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-open-deferrals_2026-10-12.json`. The register is
+`docs/tier4_orchestration_state/msca_dn/deferrals/open_deferral_register_2026-10-12.json` with its
+rendered reading beside it. No row is closed, no quota was spent, and the frozen 74.60 baseline is
+untouched. V11 no longer blocks V14.
+
+One check did not run: the acceptance lane was killed by the host for low memory on four attempts, so
+its single-process result is unmeasured and the decision record declares that `Unresolved`. The
+declaration reconciles (`--list`, exit 0) and all five affected test modules pass individually; no lane
+figure is stated anywhere in the change. An operator run of
+`py -3.10 -m harness.commands.acceptance_lane` closes it.
 
 ## V12 — Correct the PE-09 runbook
 

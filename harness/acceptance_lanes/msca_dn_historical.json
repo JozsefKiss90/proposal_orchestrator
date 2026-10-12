@@ -99,6 +99,15 @@
       "depended_on": true
     },
     {
+      "name": "deferrals",
+      "invariant": "Every item the operator approval of 2026-10-08 left open is registered with its owner, the evidence that would close it and whether the submitted original is needed, and a row marked closed without that evidence fails the register's check. Nothing closes by inheritance. The historical run does not depend on this invariant: the register gates the milestone's acceptance (V11 blocks V14), not the correctness of a Stage A reading.",
+      "modules": [
+        "tests/harness/test_deferral_register.py",
+        "tests/test_msca_dn_deferral_register.py"
+      ],
+      "depended_on": false
+    },
+    {
       "name": "provenance",
       "invariant": "Every recorded identity, hash binding and declaration describes the committed bytes, and the integrity audit reports what it parsed rather than what it assumed.",
       "modules": [

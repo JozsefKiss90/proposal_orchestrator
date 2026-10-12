@@ -34,7 +34,7 @@ declaration:
 py -3.10 -m harness.commands.acceptance_lane
 ```
 
-[`ACCEPTANCE_LANE.md`](ACCEPTANCE_LANE.md) names the twelve coverage areas, the
+[`ACCEPTANCE_LANE.md`](ACCEPTANCE_LANE.md) names the fourteen coverage areas, the
 invariant each one carries, every declared exclusion, and what a green result
 does not say. The lane fails on an undeclared skip and on a declared exclusion
 the run never reports, so the two documents cannot drift apart.
@@ -77,6 +77,77 @@ unbiased grader of its own pipeline).
 | Pin + determinism | `judge.py` — model + version pinned, temperature forced to 0; both recorded on every provenance record |
 | No silent repair | `judge.py` — a malformed/empty judge response raises `JudgeResponseError`; the judge never guesses a verdict |
 | Provenance for every verdict | `judge.py` builds a `ProvenanceRecord` for every `Verdict` and appends it to the attached `ProvenanceLog` before returning |
+
+## Open-deferral register (`deferral_register.py` + `commands/deferral_register.py`)
+
+An approval settles some things and defers others. The deferred ones then sit in several records at
+once: a disposition row the private network has to establish, a table in the approval prose, a
+validation case kept for a later run, a ticket criterion whose own precondition is unmet. Each is open
+for its own reason, and none of them is closed by the package that contains it being approved.
+
+A register holds them all in one record. The failure it exists to prevent is inheritance: a milestone
+that accepts a package inherits its deferrals, and an inherited deferral has no owner, no closure
+evidence and no record that it is still open. A ticket checkbox cannot hold one, because a checkbox has
+no room for the evidence that would close it.
+
+### What a row names
+
+| Field | Why it is required |
+|---|---|
+| `subject` | what is open, in a sentence |
+| `owner` | who closes it. A role, never a name this repository does not hold |
+| `closure_evidence` | the evidence that would close it. A row without one is an item nobody can finish |
+| `original_required` | whether that evidence needs a document this repository does not hold |
+| `source` | `path#pointer` into a record the register binds by sha256 |
+| `kind` | one of `KINDS`, closed so a new category is a decision rather than a typo |
+| `state` | `open` or `closed`. There is no third: a row half-closed is open |
+
+`closed_by` and `closed_on` are required only when `state` is `closed`, and that is the rule the whole
+module exists for — `check` fails a row marked closed with no closure evidence.
+
+### What the check reports
+
+Thirteen finding categories, all of them empty for a green register. The load-bearing one is
+`closed_without_evidence`. The rest keep the register readable: a closure with no date, evidence filed
+against an open row, an empty required field, a duplicate row id, a row or measurement citing a record
+the register has not bound, a pointer that no longer resolves, an absent bound record, an edited
+historical record, a stale tracked input, a statement with no measurement, and a measurement the
+records contradict.
+
+Two source roles separate two different defects. `immutable_evidence` is a historical record, and its
+bytes moving is an edit. `tracked_input` is a record allowed to move, such as a ticket ledger, and its
+bytes moving means the register is stale. Both fail; they are reported separately because the fixes
+differ.
+
+### Statements are measured, not asserted
+
+A register carries the sentences a reader needs in order to not misread the numbers around them. Each
+declares at least one measurement: a field of a bound record and the value it must hold. A statement
+with no measurement fails the check, and so does a measurement the records contradict. That is the rule
+V05 established for the integrity audit's grounding wording, applied to a register's prose.
+
+The measurement grammar is deliberately small: a `/`-separated key path into objects, `#N` for a
+position in a list, and either `expected` or `expected_length`. It is **not** the register-pointer
+dialect of `esr_comparison.resolve_pointer`, which resolves a bare segment on a keyed list by identity.
+Nothing here resolves by identity.
+
+### Who writes it, and who checks it
+
+The split follows the one-way boundary above. A register is authored by a deterministic tool in
+`tools/`, which may not import `harness`, so the tool carries its own copy of the schema string and a
+register's test module asserts the two agree. This module holds the reader, the check and the Markdown
+rendering; `commands/deferral_register.py --register PATH` writes that rendering and exits 1 on any
+finding.
+
+The split is also right on its own terms. A tool that both wrote a record and certified it would be
+judging its own output.
+
+### What a green register is not evidence of
+
+A closed deferral, an operator decision, or a resolved observation. The register records what is open
+and what would close it. `review_state` says who has reviewed it and `declared_status` says how good
+its own reading is — `Inferred` where a row's openness is read off the absence of a closing decision,
+because an absence is not a confirmation.
 
 ## Deterministic-first routing
 

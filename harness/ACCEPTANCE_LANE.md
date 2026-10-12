@@ -53,10 +53,10 @@ identity, so a green importer area under it would certify a replay of a differen
 `--allow-unreproducing-build` runs anyway and stamps the result NOT CERTIFIED. It is for an engineer
 measuring a new build, not for accepting one.
 
-## The thirteen areas
+## The fourteen areas
 
-Seven areas carry invariants the historical run depends on. The other six carry the rest of the
-audit's focused command, kept rather than dropped. Every declared exclusion sits in an area marked
+Seven areas carry invariants the historical run depends on. The other seven carry the rest of
+the audit's focused command, kept rather than dropped. Every declared exclusion sits in an area marked
 **no**, and the lane refuses to run when one does not. That is how *no exception covers a check the
 historical run depends on* becomes a measurement rather than an assertion.
 
@@ -72,6 +72,7 @@ them. Four of their checks are excluded.
 | **freeze** | yes | The baseline freeze binds what it froze and refuses what it must. The frozen 74.60 report still passes the gate it was frozen under. Every preflight, report and freeze declares its grounding scope beside the measurement of what the run could judge. | `test_blind_baseline.py`, `test_blind_assessment.py`, `test_grounding_scope.py` |
 | **regression** | no | The E4 section golden-set and the E5f rubric lane compare and report as their fixtures specify. Both are merge-advisory and human-decided by harness/HARNESS.md, so the historical run does not depend on them. | `test_regression.py`, `test_regression_golden.py` |
 | **comparison** | yes | The ESR comparison replays from the recorded inputs, and a disposition is the operator's decision rather than a measurement the tool makes for them. | `test_esr_comparison.py`, `test_comparison_diff.py`, `test_operator_review.py`, `test_semantic_adjudications.py`, `test_msca_dn_approved_dispositions.py`, `test_msca_dn_successor_dispositions.py` |
+| **deferrals** | no | Every item the operator approval of 2026-10-08 left open is registered with its owner, the evidence that would close it and whether the submitted original is needed, and a row marked closed without that evidence fails the register's check. Nothing closes by inheritance. The historical run does not depend on this invariant: the register gates the milestone's acceptance (V11 blocks V14), not the correctness of a Stage A reading. | `test_deferral_register.py`, `test_msca_dn_deferral_register.py` |
 | **provenance** | yes | Every recorded identity, hash binding and declaration describes the committed bytes, and the integrity audit reports what it parsed rather than what it assumed. | `test_provenance.py`, `test_candidate_provenance.py`, `test_integrity_audit.py`, `test_msca_dn_declaration_drafts.py`, `test_msca_dn_fidelity_declarations.py` |
 | **isolation** | yes | The blind lane stays blind: no feedback reaches the assessor. The judge refuses to run inside the repository, and a production run writes no diagnostic copy. | `test_blind_leakage.py`, `test_subscription_judge.py`, `test_boundary.py`, `test_sandbox_hardening.py`, `test_production_mode.py` |
 | **scoring** | no | A criterion score is derived from the draws by the declared arithmetic, and a malformed assessor response is refused and checkpointed rather than scored. | `test_criterion_scoring.py`, `test_verdict.py`, `test_report.py`, `test_rubric_report.py`, `test_rubric_run.py` |
