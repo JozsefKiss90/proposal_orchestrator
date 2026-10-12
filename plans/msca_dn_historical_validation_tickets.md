@@ -475,18 +475,44 @@ unassessable run says so where a reader cannot miss it.
 
 ### Acceptance criteria
 
-- [ ] Preflight, report and freeze each record a declared grounding scope.
-- [ ] A `--no-claims` run reports grounding as **unassessable** prominently, rather than as absent or as
-      zero findings.
-- [ ] The freeze binds the declared scope, so a later stage cannot present an unassessable run as
-      source-grounded.
-- [ ] The acceptance-record template states which of the audit's two scope choices was performed:
+- [x] Preflight, report and freeze each record a declared grounding scope. `--grounding-scope` is
+      **required** on `preflight`, `assess` and `salvage`, and each of the three records carries a
+      `grounding_scope` block holding the declaration, its source, the measurement, the counts and a
+      derived reason.
+- [x] A `--no-claims` run reports grounding as **unassessable** prominently, rather than as absent or as
+      zero findings. All three renderers print the same derived headline and reason, and the report
+      prints it above the cell table. A record carrying no block still gets one, measured from its own
+      cells, so the line is never absent.
+- [x] The freeze binds the declared scope, so a later stage cannot present an unassessable run as
+      source-grounded. `BASELINE_CHECKS` gained `grounding_scope` (21 names → 22) and the freeze record
+      gained a top-level block (schema 1.1.0 → 1.2.0). **One non-applicability, declared.** A report
+      that declares nothing and whose cells are unanimously unassessable records the check *not
+      applicable* with its reason, and the freeze records the measurement instead. The committed 74.60
+      report is that case: it predates the declaration, and derivation can only ever read
+      `unassessable`, never `source_grounded`. An undeclared report that grounded a cell is refused, so
+      omitting the declaration is not a route past the check. Report section 5.
+- [x] The acceptance-record template states which of the audit's two scope choices was performed:
       content-focused with grounding unassessable, or source-grounded.
-- [ ] A source-grounded declaration is refused unless the X01 imported-claim route is implemented and
-      validated.
+      `docs/tier4_orchestration_state/msca_dn/reviews/acceptance_record_template.md`, unsigned and
+      every value blank. It carries the audit's whole decision-text field set so V15 fills one record
+      rather than two; V15 owns signing it.
+- [x] A source-grounded declaration is refused unless the X01 imported-claim route is implemented and
+      validated. One flag, `IMPORTED_CLAIM_ROUTE_IMPLEMENTED`, read by the command (at parse time,
+      before any evidence or quota), the preflight, the report and the freeze. A second rule outlives
+      X01: `source_grounded` over a run that did not assess every unit is refused on the measurement.
+      Report section 4.
 
 **Verification.** Freeze an unassessable run and a scope-mismatched run on copies; confirm the first
 carries the declaration and the second is refused.
+
+**Status 2026-10-12.** Five of five criteria closed. The required half of F07 closes; its conditional
+half is X01 and is not implemented. The committed 74.60 report still freezes, 21 of 22 checks passed
+with `grounding_scope` not applicable, and its 25 bindings and `report_sha256` reproduce. Two V04
+assertions were widened rather than satisfied, and both are named in report section 6. No assessor ran
+and no quota was spent, and G4 is now the operator's call over V04, V05 and V06 together.
+
+Evidence: `plans/reports/v06_grounding_scope_declared_2026-10-12.md`; decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-grounding-scope_2026-10-12.json`.
 
 ## V07 — Externalise the document configuration
 

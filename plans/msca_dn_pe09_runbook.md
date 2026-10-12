@@ -143,13 +143,18 @@ The import manifest is named explicitly. The resolver's predecessor-manifest def
 relied on (R05 item 9).
 
 ```
-py -3.10 -m harness.commands.blind_assessment preflight --document <original document id> --graph-root <private graph root> --profile <historical profile> --transport claude-cli --no-claims --import-manifest <private manifest path> --out-dir <private reports dir>
+py -3.10 -m harness.commands.blind_assessment preflight --document <original document id> --graph-root <private graph root> --profile <historical profile> --transport claude-cli --no-claims --grounding-scope content_focused --import-manifest <private manifest path> --out-dir <private reports dir>
 ```
 
-Read the preflight report: the pack-set hash, the seven sections, the manifest pin. Then:
+This lane declares `--grounding-scope content_focused`. The `--no-claims` flag withholds the claim
+ledger, so grounding is unassessable, and all three records say so. A `source_grounded` declaration
+is refused until ticket X01 lands.
+
+Read the preflight report: the pack-set hash, the seven sections, the manifest pin, the declared
+grounding scope. Then:
 
 ```
-py -3.10 -m harness.commands.blind_assessment assess --document <original document id> --graph-root <private graph root> --profile <historical profile> --transport claude-cli --no-claims --import-manifest <private manifest path> --preflight <preflight report> --intake <intake id> --assessor-model <pin> --assessor-version <claude-cli version tag> --out-dir <private reports dir>
+py -3.10 -m harness.commands.blind_assessment assess --document <original document id> --graph-root <private graph root> --profile <historical profile> --transport claude-cli --no-claims --grounding-scope content_focused --import-manifest <private manifest path> --preflight <preflight report> --intake <intake id> --assessor-model <pin> --assessor-version <claude-cli version tag> --out-dir <private reports dir>
 ```
 
 Isolation, enforced by the transport and verified before the run:

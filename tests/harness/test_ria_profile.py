@@ -31,6 +31,7 @@ import pytest
 
 import harness.blind_assessment as ba
 import harness.commands.blind_assessment as command
+import harness.grounding_scope as gs
 from harness.expectations import ExpectationError, load_expectation_substrate
 from harness.judge import Judge, JudgeConfig
 from harness.profile import DEFAULT_PROFILE_PATH, ProfileError, load_profile, parse_profile
@@ -508,6 +509,8 @@ class TestDryRun:
                 str(REPO_ROOT),
                 "--out-dir",
                 str(out_dir),
+                "--grounding-scope",
+                gs.SCOPE_CONTENT_FOCUSED,
                 "--provenance",
                 str(tmp_path / "provenance.jsonl"),
                 # This case assesses against the real repository root, so the

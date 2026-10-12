@@ -455,6 +455,7 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Operator review: a written comparison rendered for a human, every reference re-resolved, counts recomputed, agreement declared | `harness/operator_review.py`; `<out-dir>/operator_review_<sha12>_<NNNN>.md` + `operator_decisions_<sha12>_<NNNN>.md` |
 | Comparison diff: what moved between a comparison and its successor — dispositions, citations, counts, priorities | `harness/comparison_diff.py`; `<out-dir>/review_diff_<sha12>_<NNNN>.json` + `.md` |
 | Evidence preflight: realised pack set, pack-set hash, seven-section report | `harness/evidence_preflight.py`; reports `harness/blind_reports/preflight_<hash12>_<NNNN>.json` |
+| Declared grounding scope: two scope choices, the measurement beside the declaration, the X01 flag | `harness/grounding_scope.py` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
 | Document route (`--document`) | evidence via `runner.dev_graph.build_package` under the `blind_pre_evaluation` view; materialised under `<out-dir>/candidates/<document node id>/` |
@@ -510,6 +511,50 @@ unassessable. The report records `include_claims`. An imported proposal whose
 ledger is not trustworthy for grounding is assessed this way; the integrity
 audit owns that axis.
 
+**The declared grounding scope (`grounding_scope.py`, ticket V06).** Ten graded
+cells, a total and no grounding findings do not tell a reader whether grounding
+was assessed and clean or never judged at all. So `--grounding-scope` is
+**required** on `preflight`, `assess` and `salvage`, and the preflight, the
+report and the freeze each carry a `grounding_scope` block. It holds two
+different things:
+
+- the **declared** scope, one of the audit's two choices and no third.
+  `content_focused` assesses proposal content and credibility with grounding
+  reported unassessable and a human reviewing the sources. `source_grounded`
+  claims the proposal has been source-grounded, and is **refused** —
+  `check_declarable` at parse time, before any evidence or quota — while
+  `IMPORTED_CLAIM_ROUTE_IMPLEMENTED` is `False`. Ticket X01 implements the
+  three missing integrations and flips that one flag; the command, the report
+  and the freeze all read it.
+- the **measured** grounding: `unassessable`, `partly_assessed` or `assessed`,
+  counted from the packs the preflight realised or the cells the report graded.
+  The measurement cannot be overstated, and `reason` is a derived property, so
+  the sentence beside the numbers cannot drift from them.
+
+A `source_grounded` declaration over a run that did not assess every unit is
+refused on the measurement, and that rule outlives X01.
+
+`check_preflight` compares the declared scope, but the scope is deliberately
+**outside** the pack-set hash. Declaring a scope selects no evidence, so it
+cannot move a hash that binds what the assessor reads. It still has to match:
+the preflight is the record the operator reviewed before spending quota.
+
+A run that declares nothing — a library caller, or a report frozen before V06 —
+records the measurement with `declared: null`. Derivation produces a
+measurement, never a claim, so such a record can only read `unassessable` or
+weaker than a declaration would.
+
+All three renderers print the same two lines, through
+`grounding_scope.scope_lines`. Both are **re-derived from the record's counts**,
+never read from its file. So a stored sentence can never be printed beside
+numbers it contradicts. A recorded `measured` the counts do not give is refused
+rather than shown.
+
+A record carrying no block at all still gets a line, measured from its own
+graded units. The committed preflight and the committed 1.0.0 freeze record both
+render one. A record whose counts cannot be measured prints
+`GROUNDING [NOT MEASURABLE]` and the reason.
+
 **Criterion scores (`criterion_scoring.py`).** A separate stage after the
 cells produces the holistic 0–5 score per criterion, because scores are
 awarded for criteria and not for aspects (General Annexes Part 15). The scorer
@@ -539,10 +584,10 @@ before any quota is spent:
 
     py -3.10 -m harness.commands.blind_assessment preflight --document <id> --graph-root <repo> [...]
 
-It takes the same evidence-selecting flags as `assess` (`--budget`,
+It takes the same evidence-selecting flags as `assess`: `--budget`,
 `--span-fraction`, `--no-claims`, `--criterion-budget`, `--transport`,
-`--package-budget`, `--import-manifest`), realises every pack and criterion
-input exactly as `assess` would, and writes
+`--package-budget`, `--import-manifest` and `--grounding-scope`. It realises
+every pack and criterion input exactly as `assess` would, and writes
 `preflight_<hash12>_<NNNN>.json` beside the blind reports (never overwritten).
 The report carries seven things:
 
@@ -618,6 +663,15 @@ than the profile. The conditions are:
   transport runs no child process, and its check is recorded **not
   applicable** rather than passed;
 - complete scope;
+- a grounding scope the report's own cells support (V06). A declared scope is
+  re-derived from the cells and refused when they contradict it. A
+  `source_grounded` declaration is refused under the same capability flag the
+  command refuses it under. A report that declares nothing but *did* ground a
+  cell is refused, because a baseline carrying a grounding result must say which
+  scope produced it. A report that declares nothing and whose cells are
+  unanimously unassessable records the check **not applicable** and the
+  measurement beside it. Reports frozen before V06 are that case, and the
+  derivation can never read `source_grounded`;
 - cells that are exactly the profile's cell grid (`expected_cells`) — none
   missing, none extra, none twice — every one with an N>=3 panel, as many
   members as the panel declares, member scores on the unit interval, and a
@@ -641,8 +695,8 @@ correction.
 
 Any failing condition is named and nothing is written (exit 2). On success the
 report is copied byte for byte to `<baseline-dir>/blind_baseline_<sha12>.json`.
-A `harness.blind_baseline_freeze` record is written beside it. The record
-carries every binding, the per-cell `n`, agreement and score spread, the
+A `harness.blind_baseline_freeze` record is written beside it, carrying every
+binding, the grounding scope, the per-cell `n`, agreement and score spread, the
 per-criterion score and spread, the total, and the report's own spread label
 (within-assessor repeatability). `checks_passed` is derived from the checks that
 ran, never declared, and a check that did not apply is listed in

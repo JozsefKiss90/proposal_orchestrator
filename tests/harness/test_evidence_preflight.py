@@ -23,6 +23,7 @@ import pytest
 import harness.blind_assessment as ba
 import harness.commands.blind_assessment as cmd
 import harness.evidence_preflight as pf
+import harness.grounding_scope as gs
 from harness.evidence_pack import (
     EXCLUDED_NOT_RELEVANT,
     EXCLUDED_OVER_BUDGET,
@@ -565,7 +566,8 @@ def _judge(tmp_path: Path) -> Judge:
 def _evidence_args(world, candidate: Path, out: Path) -> list[str]:
     root, bundle = world
     return ["--candidate", str(candidate), "--out-dir", str(out),
-            "--repo-root", str(root), "--profile", str(bundle.profile.source_path)]
+            "--repo-root", str(root), "--profile", str(bundle.profile.source_path),
+            "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED]
 
 
 class TestCommand:
@@ -669,6 +671,66 @@ class TestCommand:
                         judge=_judge(tmp_path), clock=lambda: FROZEN)
         assert code == 2
         assert "profile_version" in capsys.readouterr().err
+
+    def test_the_preflight_records_the_declared_scope_and_the_measurement(self, world, tmp_path):
+        root, _ = world
+        out = tmp_path / "reports"
+        assert cmd.main(["preflight", *_evidence_args(world, _candidate(root), out)],
+                        clock=lambda: FROZEN) == 0
+        (path,) = list(out.iterdir())
+        scope = json.loads(path.read_text(encoding="utf-8"))["grounding_scope"]
+        assert scope["declared"] == gs.SCOPE_CONTENT_FOCUSED
+        assert scope["declaration_source"] == gs.DECLARED_BY_THE_RUN
+        assert scope["unit"] == gs.UNIT_PACK
+        assert scope["measured"] in gs.GROUNDING_MEASUREMENTS
+
+    def test_the_rendered_preflight_states_the_grounding(self, world, tmp_path, capsys):
+        root, _ = world
+        out = tmp_path / "reports"
+        cmd.main(["preflight", *_evidence_args(world, _candidate(root), out)], clock=lambda: FROZEN)
+        screen = capsys.readouterr().out
+        assert "GROUNDING  [" in screen
+        assert gs.SCOPE_CONTENT_FOCUSED in screen
+
+    def test_a_scope_the_preflight_did_not_declare_is_refused_at_assess(
+        self, world, tmp_path, capsys, monkeypatch
+    ):
+        """The preflight is the record the operator reviewed; a run under
+        another declared scope is not the run they reviewed."""
+        monkeypatch.setattr(gs, "IMPORTED_CLAIM_ROUTE_IMPLEMENTED", True)
+        root, _ = world
+        out = tmp_path / "reports"
+        args = _evidence_args(world, _candidate(root), out)
+        assert cmd.main(["preflight", *args], clock=lambda: FROZEN) == 0
+        (preflight_path,) = list(out.iterdir())
+        moved = [gs.SCOPE_SOURCE_GROUNDED if a == gs.SCOPE_CONTENT_FOCUSED else a for a in args]
+        code = cmd.main(["assess", *moved, "--preflight", str(preflight_path)],
+                        judge=_judge(tmp_path), clock=lambda: FROZEN)
+        assert code == 2
+        err = capsys.readouterr().err
+        assert "grounding_scope.declared" in err
+        assert not [p for p in out.iterdir() if p.name.startswith("blind_")]
+
+    def test_the_pack_set_hash_does_not_move_with_the_declared_scope(self, world, tmp_path):
+        """A declaration selects no evidence, so it must not move the hash that
+        binds what the assessor reads."""
+        root, bundle = world
+        params = pf.PackParams(
+            token_budget=3000, span_budget_fraction=0.6, max_token_budget=None,
+            include_claims=True, criterion_token_budget=32768,
+        )
+        declared = pf.run_preflight(
+            bundle, candidate_dir=_candidate(root), params=params,
+            repo_root=root, grounding_scope=gs.SCOPE_CONTENT_FOCUSED, clock=lambda: FROZEN,
+        )
+        undeclared = pf.run_preflight(
+            bundle, candidate_dir=_candidate(root), params=params,
+            repo_root=root, clock=lambda: FROZEN,
+        )
+        assert declared.pack_set_hash == undeclared.pack_set_hash
+        assert declared.grounding_scope.declared == gs.SCOPE_CONTENT_FOCUSED
+        assert undeclared.grounding_scope.declared is None
+        assert declared.grounding_scope.measured == undeclared.grounding_scope.measured
 
     def test_the_library_default_still_takes_no_preflight(self, world, tmp_path):
         root, bundle = world

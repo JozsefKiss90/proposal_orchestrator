@@ -97,6 +97,19 @@ from harness.criterion_scoring import (
     grade_criterion,
 )
 from harness.expectation_coverage import CoverageGrade, grade_expectation
+from harness.grounding_scope import (
+    GROUNDING_IN_VERDICT,
+    GROUNDING_UNASSESSABLE,
+    SCOPE_CONTENT_FOCUSED,
+    SCOPE_SOURCE_GROUNDED,
+    UNIT_CELL,
+    GroundingScope,
+    GroundingScopeError,
+    count_grounded,
+    measured_only,
+    scope_for,
+    scope_lines,
+)
 from harness.judge import Judge
 from harness.profile import PreEvaluationProfile, canonical_hash
 from harness.rubrics import ProfileBundle, Rubric
@@ -119,6 +132,10 @@ __all__ = [
     "EVIDENCE_SOURCE_DIRECTORY",
     "GROUNDING_IN_VERDICT",
     "GROUNDING_UNASSESSABLE",
+    "SCOPE_CONTENT_FOCUSED",
+    "SCOPE_SOURCE_GROUNDED",
+    "GroundingScope",
+    "GroundingScopeError",
     "BlindAssessmentError",
     "CandidateHashMismatch",
     "LeakageError",
@@ -200,13 +217,10 @@ DEFAULT_PACKAGE_BUDGET: int = 200_000
 #: Where the document route materialises candidates, under the reports dir.
 _CANDIDATES_SUBDIR: str = "candidates"
 
-#: The cell's second value (spec decision 4).  ``in_verdict``: the pack carried
-#: claim-ledger entries, so the coverage verdict judged addressal and grounding
-#: together.  ``unassessable``: the pack carried no ledger — withheld
-#: (``include_claims=False``) or empty — so grounding is neither passed nor
-#: failed, and the addressal value must not be read as a clean score of both.
-GROUNDING_IN_VERDICT: str = "in_verdict"
-GROUNDING_UNASSESSABLE: str = "unassessable"
+# The cell's second value (spec decision 4) and the run-level scope beside it
+# both live in :mod:`harness.grounding_scope`, imported above and re-exported
+# here: one statement of the grounding vocabulary, read by the preflight, the
+# report and the freeze (ticket V06).
 
 Clock = Callable[[], str]
 
@@ -684,6 +698,11 @@ class BlindAssessmentReport:
     evidence_source: str = EVIDENCE_SOURCE_DIRECTORY
     #: Whether the cells' packs carried the claim ledger (spec decision 6).
     include_claims: bool = True
+    #: The declared grounding scope beside the measurement of what this run
+    #: could judge (ticket V06).  ``None`` only on a report built before the
+    #: declaration existed, or by a library caller that passed no cells;
+    #: ``assess_candidate`` always produces one.
+    grounding_scope: GroundingScope | None = None
     #: The criterion-scoring stage (spec PE-04), when it ran.
     criterion_scoring: CriterionScoring | None = None
     #: The evidence preflight this assessment was bound to (spec PE-05): the
@@ -752,11 +771,38 @@ class BlindAssessmentReport:
             _check_binding(
                 cell.__dict__, self.__dict__, f"cell {cell.expectation_key}/{cell.section_id}", ValueError
             )
+        self._check_grounding_scope()
         if self.criterion_scoring is not None:
             for score in self.criterion_scoring.scores:
                 _check_binding(
                     score.__dict__, self.__dict__, f"criterion score {score.criterion_id}", ValueError
                 )
+
+    def _check_grounding_scope(self) -> None:
+        """A declared scope must describe this report's own cells.
+
+        The scope carries counts and a measurement; the cells carry the
+        grounding values those counts are of.  Comparing them at construction
+        is what stops a report declaring one thing and grading another.
+        """
+        scope = self.grounding_scope
+        if scope is None:
+            return
+        with_claims, total = count_grounded({"grounding": c.grounding} for c in self.cells)
+        mismatch = [
+            f"{field}: scope {then!r}, cells {now!r}"
+            for field, then, now in (
+                ("with_claims", scope.with_claims, with_claims),
+                ("total", scope.total, total),
+                ("include_claims", scope.include_claims, self.include_claims),
+            )
+            if then != now
+        ]
+        if mismatch:
+            raise ValueError(
+                "the declared grounding scope does not describe this report's cells; "
+                + "; ".join(mismatch)
+            )
 
     @property
     def summary(self) -> dict[str, Any]:
@@ -818,6 +864,9 @@ class BlindAssessmentReport:
             "evidence_view": self.evidence_view,
             "evidence_source": self.evidence_source,
             "include_claims": self.include_claims,
+            "grounding_scope": (
+                self.grounding_scope.to_dict() if self.grounding_scope is not None else None
+            ),
             "preflight_pack_set_hash": self.preflight_pack_set_hash,
             "preflight_report": self.preflight_report,
             "assessor_transport": self.assessor_transport,
@@ -878,6 +927,7 @@ def assess_candidate(
     preflight_report: str = "",
     assessor_transport: str = "",
     assessor_invocation: Mapping[str, Any] | None = None,
+    grounding_scope: str | None = None,
 ) -> BlindAssessmentReport:
     """Assess one candidate against *bundle* with *judge*; return the bound report.
 
@@ -916,6 +966,13 @@ def assess_candidate(
     frozen baseline can check that the assessor pin names it.
     *assessor_invocation* is the backend's own account of what its child
     process could reach, when the backend gives one.
+
+    *grounding_scope* is the operator's declared scope — one of
+    :data:`~harness.grounding_scope.GROUNDING_SCOPES` — and is refused here,
+    before the report is built, when the run cannot support it
+    (:func:`~harness.grounding_scope.declare_scope`).  A library caller that
+    declares none still gets the measurement, with no declaration beside it;
+    the module command always declares one.
     """
     if n < MIN_MAJORITY_SAMPLES:
         raise BlindAssessmentError(
@@ -989,6 +1046,14 @@ def assess_candidate(
     # without passing it twice.
     cache = getattr(judge, "response_cache", None)
     cache_stats = cache.stats() if cache is not None else {}
+    with_claims, graded = count_grounded({"grounding": c.grounding} for c in cells)
+    scope = scope_for(
+        grounding_scope,
+        include_claims=include_claims,
+        with_claims=with_claims,
+        total=graded,
+        unit=UNIT_CELL,
+    )
     return BlindAssessmentReport(
         candidate_hash=digest,
         candidate_path=candidate.root.as_posix(),
@@ -998,6 +1063,7 @@ def assess_candidate(
         assessor_version=judge.config.version,
         assessor_pin=pin,
         scope=candidate.scope,
+        grounding_scope=scope,
         partial_coverage=candidate.missing,
         cells=tuple(cells),
         assessed_at=(clock or _utc_now)(),
@@ -1167,6 +1233,17 @@ def _render_table(rows: list[tuple[str, ...]]) -> list[str]:
     return lines
 
 
+def _measured_from_cells(report: Mapping[str, Any], cells: list[Any]) -> GroundingScope:
+    """The grounding a report's own cells give, for a report that declared none."""
+    with_claims, total = count_grounded(cells)
+    return measured_only(
+        include_claims=bool(report.get("include_claims", True)),
+        with_claims=with_claims,
+        total=total,
+        unit=UNIT_CELL,
+    )
+
+
 def render_report(report: Mapping[str, Any]) -> str:
     """Render a report dict (fresh ``to_dict()`` or a loaded file) as text."""
     cells = report.get("cells", [])
@@ -1183,6 +1260,8 @@ def render_report(report: Mapping[str, Any]) -> str:
         f"advisory={report.get('advisory')} blocking={report.get('blocking')}\n"
     )
     lines = [header]
+    lines.extend(scope_lines(report, lambda: _measured_from_cells(report, cells)))
+    lines.append("")
     if report.get("package_id"):
         lines.append(
             f"evidence:  source={report.get('evidence_source', '-')} view={report.get('evidence_view', '-')} "

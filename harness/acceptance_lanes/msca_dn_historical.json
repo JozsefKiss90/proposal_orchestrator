@@ -68,10 +68,11 @@
     },
     {
       "name": "freeze",
-      "invariant": "The baseline freeze binds what it froze and refuses what it must, and the frozen 74.60 report still passes the gate it was frozen under.",
+      "invariant": "The baseline freeze binds what it froze and refuses what it must. The frozen 74.60 report still passes the gate it was frozen under. Every preflight, report and freeze declares its grounding scope beside the measurement of what the run could judge.",
       "modules": [
         "tests/harness/test_blind_baseline.py",
-        "tests/harness/test_blind_assessment.py"
+        "tests/harness/test_blind_assessment.py",
+        "tests/harness/test_grounding_scope.py"
       ],
       "depended_on": true
     },

@@ -37,6 +37,7 @@ import pytest
 
 import harness.blind_assessment as ba
 import harness.commands.blind_assessment as cmd
+import harness.grounding_scope as gs
 from tests.harness._preflight import preflighted
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
@@ -338,7 +339,8 @@ def _assess(root: Path, profile: Path, backend, out: Path, *extra: str) -> tuple
     before = {p.name for p in out.iterdir() if p.is_file()} if out.exists() else set()
     code = cmd.main(
         preflighted(["assess", "--document", "CAND-1", "--graph-root", str(root), "--out-dir", str(out),
-         "--repo-root", str(root), "--profile", str(profile), *extra]),
+         "--repo-root", str(root), "--profile", str(profile),
+         "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED, *extra]),
         judge=_judge(root, backend, out.name),
         clock=lambda: FROZEN,
     )

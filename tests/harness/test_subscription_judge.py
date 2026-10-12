@@ -19,6 +19,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+import harness.grounding_scope as gs
 from harness.commands import _subscription_judge as sj
 from harness.judge import JudgeConfig, JudgeIndependenceError
 from runner.claude_transport import (
@@ -28,6 +29,9 @@ from runner.claude_transport import (
     ClaudeTransportError,
 )
 from runner.paths import find_repo_root
+
+#: The declared grounding scope every assess command line must carry (V06).
+CONTENT_FOCUSED = gs.SCOPE_CONTENT_FOCUSED
 
 PIN = "claude-sonnet-5"
 VERSION = "claude-cli-subscription@2026-10-02"
@@ -377,7 +381,7 @@ class TestCommandWiring:
     def test_the_default_transport_is_still_the_independent_one(self):
         from harness.commands.blind_assessment import TRANSPORT_OPENAI, _parser
 
-        args = _parser().parse_args(["assess", "--candidate", "x", "--preflight", "x"])
+        args = _parser().parse_args(["assess", "--candidate", "x", "--preflight", "x", "--grounding-scope", CONTENT_FOCUSED])
         assert args.transport == TRANSPORT_OPENAI
 
     def test_the_pin_flags_beat_the_harness_env_file(self, monkeypatch, tmp_path):
@@ -395,7 +399,7 @@ class TestCommandWiring:
         monkeypatch.setenv("HARNESS_JUDGE_VERSION", "groq-pin@2026-08-03")
         args = cmd._parser().parse_args(
             [
-                "assess", "--candidate", "x", "--preflight", "x",
+                "assess", "--candidate", "x", "--preflight", "x", "--grounding-scope", CONTENT_FOCUSED,
                 "--transport", cmd.TRANSPORT_CLAUDE_CLI,
                 "--assessor-model", PIN,
                 "--assessor-version", VERSION,
@@ -414,7 +418,7 @@ class TestCommandWiring:
         monkeypatch.setattr(_common, "load_harness_env", lambda: None)
         args = cmd._parser().parse_args(
             [
-                "assess", "--candidate", "x", "--preflight", "x",
+                "assess", "--candidate", "x", "--preflight", "x", "--grounding-scope", CONTENT_FOCUSED,
                 "--transport", cmd.TRANSPORT_CLAUDE_CLI,
                 "--assessor-model", SKILL_MODEL,
                 "--assessor-version", VERSION,
@@ -433,7 +437,7 @@ class TestCommandWiring:
         assert UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET > DEFAULT_PACK_TOKEN_BUDGET
         # Resolved from the transport after parsing, so the flag default is None.
         args = cmd._parser().parse_args(
-            ["assess", "--candidate", "x", "--preflight", "x", "--transport", cmd.TRANSPORT_CLAUDE_CLI]
+            ["assess", "--candidate", "x", "--preflight", "x", "--grounding-scope", CONTENT_FOCUSED, "--transport", cmd.TRANSPORT_CLAUDE_CLI]
         )
         assert args.budget is None
 
@@ -448,7 +452,7 @@ class TestCommandWiring:
             hj, "resolve_judge_config", lambda: JudgeConfig(model=PIN, version=VERSION)
         )
         args = ba._parser().parse_args(
-            ["assess", "--candidate", "x", "--preflight", "x", "--transport", ba.TRANSPORT_CLAUDE_CLI]
+            ["assess", "--candidate", "x", "--preflight", "x", "--grounding-scope", CONTENT_FOCUSED, "--transport", ba.TRANSPORT_CLAUDE_CLI]
         )
         judge = ba._live_judge(args, tmp_path)
         assert isinstance(judge._backend, sj.ClaudeCLIJudgeBackend)

@@ -84,6 +84,13 @@ from harness.blind_assessment import (
     next_report_path,
 )
 from harness.criterion_scoring import CriterionInput, build_criterion_input
+from harness.grounding_scope import (
+    UNIT_PACK,
+    GroundingScope,
+    declared_scope_of,
+    scope_for,
+    scope_lines,
+)
 from harness.evidence_pack import (
     EXCLUDED_NOT_RELEVANT,
     EXCLUDED_OVER_BUDGET,
@@ -107,6 +114,7 @@ __all__ = [
     "RealisedPack",
     "RealisedPackSet",
     "realise_pack_set",
+    "count_packs_with_claims",
     "PreflightReport",
     "run_preflight",
     "write_preflight",
@@ -582,6 +590,26 @@ def resolve_import_manifest(
 # --------------------------------------------------------------------------- #
 
 
+def count_packs_with_claims(packs: Any) -> tuple[int, int]:
+    """How many of *packs* would carry a claim ledger, and how many there are.
+
+    Reads each pack's selection record as :meth:`RealisedPack.to_dict` writes
+    it, so a fresh realisation and a persisted preflight are counted by one
+    statement rather than two.
+
+    The total is every pack the preflight realised, a pack it could not build
+    included: such a pack carries no ledger, which is what the count says.
+    The assessor grades cells rather than packs, so the report's own count
+    governs at assess time; this one says what the selection would offer.
+    """
+    with_claims = total = 0
+    for pack in packs:
+        total += 1
+        if isinstance(pack, Mapping) and (pack.get("included") or {}).get("claims"):
+            with_claims += 1
+    return with_claims, total
+
+
 @dataclass(frozen=True)
 class PreflightReport:
     """The preflight of one candidate under one parameter set — bound, advisory."""
@@ -610,6 +638,10 @@ class PreflightReport:
     leakage: Mapping[str, Any] | str
     import_manifest: Mapping[str, Any] | None
     flags: tuple[str, ...]
+    #: The declared grounding scope beside the measurement of what the packs
+    #: would offer (ticket V06).  ``None`` only when a library caller declared
+    #: none and the measurement was not taken; ``run_preflight`` always sets it.
+    grounding_scope: GroundingScope | None = None
     document: str = ""
     document_id: str = ""
     snapshot_id: str = ""
@@ -657,6 +689,9 @@ class PreflightReport:
             "scorecard_hash": self.scorecard_hash,
             "appendix_mapping": dict(self.appendix_mapping) if self.appendix_mapping else None,
             "params": self.params.to_dict(),
+            "grounding_scope": (
+                self.grounding_scope.to_dict() if self.grounding_scope is not None else None
+            ),
             "pack_set_hash": self.pack_set_hash,
             "import_manifest": manifest,
             "anchors": dict(self.anchors),
@@ -692,8 +727,16 @@ def _flags(
     tables: Mapping[str, Any],
     package: Mapping[str, Any] | str,
     leakage: Mapping[str, Any] | str,
+    scope: GroundingScope,
 ) -> tuple[str, ...]:
     flags: list[str] = []
+    # A withheld ledger is the declared lane and not a surprise.  A ledger the
+    # operator asked for and no pack carried is: the run would grade addressal
+    # alone, and this is the only place that says so before quota is spent.
+    if scope.include_claims and not scope.assessable:
+        flags.append(
+            f"grounding would be {scope.measured}: {scope.reason}"
+        )
     if candidate.missing:
         flags.append(
             f"{len(candidate.missing)} required section(s) missing from the candidate: "
@@ -745,6 +788,7 @@ def run_preflight(
     graph_root: Path | str | None = None,
     repo_root: Path | str | None = None,
     import_manifest: Path | str | None = None,
+    grounding_scope: str | None = None,
     clock: Clock | None = None,
 ) -> PreflightReport:
     """Realise the pack set and report the seven things; run no assessor.
@@ -754,6 +798,10 @@ def run_preflight(
     and *graph_root*; without a package they read :data:`NOT_APPLICABLE`.
     The import manifest is pinned when given, or found at
     ``<graph_root>/<IMPORT_MANIFESTS_REL>/<document_id>.json``.
+
+    *grounding_scope* is the operator's declared scope (ticket V06), refused
+    here when the packs cannot support it.  A caller that declares none gets
+    the measurement with no declaration beside it.
     """
     if evidence is not None and candidate_dir is None:
         source: Path | str = evidence.candidate_dir
@@ -779,6 +827,15 @@ def run_preflight(
         leakage = _leakage_section(evidence, groot, rroot)
     mapping = bundle.appendix_mapping
     rubric_set = bundle.rubric_set
+    pack_records = tuple(p.to_dict() for p in realised.packs)
+    with_claims, packs_realised = count_packs_with_claims(pack_records)
+    scope = scope_for(
+        grounding_scope,
+        include_claims=params.include_claims,
+        with_claims=with_claims,
+        total=packs_realised,
+        unit=UNIT_PACK,
+    )
     return PreflightReport(
         candidate_hash=candidate_hash(candidate),
         candidate_path=candidate.root.as_posix(),
@@ -797,17 +854,18 @@ def run_preflight(
             else None
         ),
         params=params,
+        grounding_scope=scope,
         pack_set_hash=realised.hash,
         preflight_at=(clock or _utc_now)(),
         anchors=_anchors_section(bundle, realised),
-        packs=tuple(p.to_dict() for p in realised.packs),
+        packs=pack_records,
         exclusions=_exclusion_totals(realised),
         criterion_inputs=tuple(_criterion_record(c) for c in realised.criterion_inputs),
         tables=tables,
         package=package,
         leakage=leakage,
         import_manifest=manifest_pin,
-        flags=_flags(realised, candidate, tables, package, leakage),
+        flags=_flags(realised, candidate, tables, package, leakage, scope),
         document=evidence.document if evidence is not None else "",
         document_id=evidence.document_id if evidence is not None else "",
         snapshot_id=evidence.snapshot_id if evidence is not None else "",
@@ -859,6 +917,7 @@ def check_preflight(
     params: PackParams,
     import_manifest_sha256: str | None = None,
     evidence: BlindEvidence | None = None,
+    grounding_scope: str | None = None,
 ) -> str:
     """Re-bind a loaded preflight to what is about to be assessed.
 
@@ -867,6 +926,13 @@ def check_preflight(
     import manifest, when the preflight pinned one, and the same snapshot, package
     and policy, when *evidence* is given).  Otherwise raises
     :class:`PreflightMismatch` naming **every** field that moved, pack by pack.
+
+    The declared grounding scope is compared too, and it is deliberately not
+    inside the pack-set hash: declaring a scope changes no evidence, so it
+    cannot move a hash that binds what the assessor reads.  It still has to
+    match, because the preflight is the record the operator reviewed before
+    spending quota, and a run under another declared scope is not the run they
+    reviewed.
     """
     moved: list[str] = []
 
@@ -886,6 +952,7 @@ def check_preflight(
         _cmp("snapshot_id", data.get("snapshot_id"), evidence.snapshot_id)
         _cmp("package_id", data.get("package_id"), evidence.package.package_id)
         _cmp("policy_version", data.get("policy_version"), str(evidence.package.manifest.get("policy_version", "")))
+    _cmp("grounding_scope.declared", declared_scope_of(data), grounding_scope)
     pinned = data.get("import_manifest")
     if isinstance(pinned, Mapping) and pinned.get("sha256"):
         _cmp("import_manifest.sha256", pinned.get("sha256"), import_manifest_sha256)
@@ -929,6 +996,20 @@ def _table(rows: list[tuple[str, ...]]) -> list[str]:
     return lines
 
 
+def _measured_from_packs(
+    report: Mapping[str, Any], params: Mapping[str, Any]
+) -> GroundingScope:
+    """The grounding a preflight's own pack records give, when it declared none."""
+    with_claims, total = count_packs_with_claims(report.get("packs") or [])
+    return scope_for(
+        None,
+        include_claims=bool(params.get("include_claims", True)),
+        with_claims=with_claims,
+        total=total,
+        unit=UNIT_PACK,
+    )
+
+
 def render_preflight(report: Mapping[str, Any]) -> str:
     """Render a preflight dict (fresh ``to_dict()`` or a loaded file) as text."""
     flags = list(report.get("flags") or [])
@@ -948,6 +1029,8 @@ def render_preflight(report: Mapping[str, Any]) -> str:
         )
     else:
         lines.append(f"evidence:  source={report.get('evidence_source')} (no dev-graph package)")
+    lines.append("")
+    lines.extend(scope_lines(report, lambda: _measured_from_packs(report, params)))
     manifest = report.get("import_manifest")
     if isinstance(manifest, Mapping):
         versions = "  ".join(f"{k}={v}" for k, v in (manifest.get("versions") or {}).items())

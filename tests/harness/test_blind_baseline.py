@@ -44,6 +44,7 @@ import pytest
 import harness.blind_assessment as ba
 import harness.blind_baseline as bb
 import harness.commands.blind_assessment as cmd
+import harness.grounding_scope as gs
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
 from harness.rubrics import load_profile_bundle
@@ -78,14 +79,23 @@ def _judge(root: Path, backend, *, version: str = VERSION) -> Judge:
     )
 
 
-def _assess(world: Path, bundle, backend, *extra: str, version: str = VERSION) -> tuple[int, Path]:
-    out = world / "reports"
+def _assess(
+    world: Path,
+    bundle,
+    backend,
+    *extra: str,
+    version: str = VERSION,
+    replace: dict[str, str] | None = None,
+) -> tuple[int, Path]:
+    argv = [
+        "assess", "--document", "CAND-1", "--graph-root", str(world), "--out-dir", str(out := world / "reports"),
+        "--repo-root", str(world), "--profile", str(bundle.profile.source_path),
+        "--transport", TRANSPORT, "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED, *extra,
+    ]
+    for flag, value in (replace or {}).items():
+        argv[argv.index(flag) + 1] = value
     code = cmd.main(
-        preflighted([
-            "assess", "--document", "CAND-1", "--graph-root", str(world), "--out-dir", str(out),
-            "--repo-root", str(world), "--profile", str(bundle.profile.source_path),
-            "--transport", TRANSPORT, *extra,
-        ]),
+        preflighted(argv),
         judge=_judge(world, backend, version=version),
         clock=lambda: FROZEN,
     )
@@ -299,12 +309,16 @@ class TestTheIdentitySets:
         )
 
     def test_a_report_missing_a_cell_is_refused(self, world, bundle):
+        """Two independent witnesses to a deleted cell: the identity set, and
+        the recorded grounding scope, whose counts no longer describe the
+        cells that remain (V06)."""
         report = _frozen_ready(world, bundle)
         dropped = report["cells"].pop()
         failures = _failures(report, bundle)
-        assert {name for name, _ in failures} == {"cell_identity"}
-        ((_name, reason),) = failures
+        assert {name for name, _ in failures} == {"cell_identity", "grounding_scope"}
+        reason = dict(failures)["cell_identity"]
         assert dropped["expectation_key"] in reason
+        assert "total: report 3, cells 2" in dict(failures)["grounding_scope"]
 
     def test_a_report_with_one_cell_of_the_grid_is_refused(self, world, bundle):
         """The audit's second probe, in the shape it was reproduced."""
@@ -315,9 +329,10 @@ class TestTheIdentitySets:
     def test_a_duplicated_cell_is_refused(self, world, bundle):
         report = _frozen_ready(world, bundle)
         report["cells"].append(copy.deepcopy(report["cells"][0]))
-        ((name, reason),) = _failures(report, bundle)
-        assert name == "cell_identity"
-        assert "more than once" in reason
+        failures = dict(_failures(report, bundle))
+        assert "more than once" in failures["cell_identity"]
+        # The duplicate is a fourth cell the recorded scope counted three of.
+        assert "total: report 3, cells 4" in failures["grounding_scope"]
 
     def test_a_cell_the_profile_does_not_grade_is_refused(self, world, bundle):
         report = _frozen_ready(world, bundle)
@@ -762,6 +777,71 @@ AUDIT_PROBES = [
     not DN_REPORT.is_file() or not DN_CANDIDATE.is_dir(),
     reason="MSCA-DN baseline or candidate absent",
 )
+class TestTheDeclaredGroundingScope:
+    """V06, on the synthetic world: a run that declares its scope has it
+    checked rather than skipped, the freeze binds it, and the two refusals
+    criterion 5 asks for hold at the command and at the freeze."""
+
+    def test_a_declared_run_has_the_check_run_and_passed(self, world, bundle):
+        run = bb.run_baseline_checks(_frozen_ready(world, bundle), bundle)
+        assert run.failures == ()
+        assert run.not_applicable == ()
+        assert "grounding_scope" in run.passed
+
+    def test_the_report_records_the_declaration_beside_the_measurement(self, world, bundle):
+        report = _frozen_ready(world, bundle)
+        scope = report["grounding_scope"]
+        assert scope["declared"] == gs.SCOPE_CONTENT_FOCUSED
+        assert scope["declaration_source"] == gs.DECLARED_BY_THE_RUN
+        assert scope["measured"] == gs.GROUNDING_ASSESSED
+        assert (scope["with_claims"], scope["total"]) == (3, 3)
+
+    def test_the_freeze_binds_the_declaration_the_report_made(self, world, bundle, tmp_path):
+        _code, path = _assess(world, bundle, RecordingBackend())
+        frozen = bb.freeze_baseline(
+            path, _candidate_dir(world), bundle,
+            baseline_dir=tmp_path / "baseline", repo_root=world, clock=lambda: FROZEN,
+        )
+        assert frozen.record["grounding_scope"]["declared"] == gs.SCOPE_CONTENT_FOCUSED
+        assert frozen.record["schema_version"] == "1.2.0"
+        assert gs.SCOPE_CONTENT_FOCUSED in bb.render_freeze(frozen.record)
+
+    def test_the_command_refuses_a_source_grounded_run_before_any_assessor_call(
+        self, world, bundle
+    ):
+        """Criterion 5 at the command: refused while X01 is open, with no
+        quota spent — the backend is never called."""
+        backend = RecordingBackend()
+        out = world / "reports"
+        code = cmd.main(
+            [
+                "preflight", "--document", "CAND-1", "--graph-root", str(world),
+                "--out-dir", str(out), "--repo-root", str(world),
+                "--profile", str(bundle.profile.source_path),
+                "--transport", TRANSPORT,
+                "--grounding-scope", gs.SCOPE_SOURCE_GROUNDED,
+            ],
+            judge=_judge(world, backend),
+            clock=lambda: FROZEN,
+        )
+        assert code == 2
+        assert backend.calls == 0
+
+    def test_with_the_route_implemented_a_fully_grounded_run_may_declare_it(
+        self, world, bundle, monkeypatch
+    ):
+        """The refusal is the capability flag, not a hardcoded no: the same
+        world declares the scope once X01 would have landed."""
+        monkeypatch.setattr(gs, "IMPORTED_CLAIM_ROUTE_IMPLEMENTED", True)
+        _code, path = _assess(
+            world, bundle, RecordingBackend(),
+            replace={"--grounding-scope": gs.SCOPE_SOURCE_GROUNDED},
+        )
+        report = json.loads(path.read_text(encoding="utf-8"))
+        assert report["grounding_scope"]["declared"] == gs.SCOPE_SOURCE_GROUNDED
+        assert bb.run_baseline_checks(report, bundle).failures == ()
+
+
 class TestTheCommittedMscaDnBaseline:
     """The real `freeze_baseline` path, on the real candidate and the loaded
     profile bundle, as the audit exercised it.  Every case works on its own
@@ -791,12 +871,130 @@ class TestTheCommittedMscaDnBaseline:
         )
 
     def test_the_unmodified_control_still_freezes_at_74_6(self, tmp_path, dn_bundle):
+        """V06 added `grounding_scope`, and this report predates the
+        declaration.  Its cells are unanimously unassessable, so the check is
+        recorded not applicable and the freeze records the measurement; every
+        other check still passes and the total is still 74.6."""
         frozen = self._freeze_copy(tmp_path, dn_bundle, self._copy(tmp_path))
         assert frozen.record["criterion_total"]["total"] == 74.6
-        assert frozen.record["checks_passed"] == list(bb.BASELINE_CHECKS)
-        assert frozen.record["checks_not_applicable"] == []
+        assert frozen.record["checks_passed"] == [
+            name for name in bb.BASELINE_CHECKS if name != "grounding_scope"
+        ]
+        ((check, _reason),) = [
+            (row["check"], row["reason"]) for row in frozen.record["checks_not_applicable"]
+        ]
+        assert check == "grounding_scope"
         assert len(frozen.record["cells"]) == 10
         assert len(frozen.record["criterion_scores"]) == 3
+
+    def test_the_freeze_records_the_measured_grounding_of_the_undeclared_run(
+        self, tmp_path, dn_bundle
+    ):
+        """Criterion 3: a later stage reading this freeze cannot present the
+        run as source-grounded, because the record says unassessable and
+        carries no declaration to misread."""
+        frozen = self._freeze_copy(tmp_path, dn_bundle, self._copy(tmp_path))
+        scope = frozen.record["grounding_scope"]
+        assert scope["declared"] is None
+        assert scope["declaration_source"] == gs.MEASURED_HERE
+        assert scope["measured"] == gs.GROUNDING_UNASSESSABLE
+        assert (scope["with_claims"], scope["total"]) == (0, 10)
+        assert scope["include_claims"] is False
+        assert "withheld" in scope["reason"]
+        assert gs.SCOPE_SOURCE_GROUNDED not in json.dumps(scope)
+
+    def test_the_rendered_freeze_states_the_grounding_prominently(self, tmp_path, dn_bundle):
+        frozen = self._freeze_copy(tmp_path, dn_bundle, self._copy(tmp_path))
+        screen = bb.render_freeze(frozen.record)
+        assert f"GROUNDING  [{gs.GROUNDING_UNASSESSABLE.upper()}]" in screen
+        assert "none declared" in screen
+        assert "withheld" in screen
+
+    def test_the_three_renderers_print_the_same_derived_line(self, tmp_path, dn_bundle):
+        """One statement of the headline and the reason, three readers."""
+        report = json.loads(DN_REPORT.read_text(encoding="utf-8"))
+        frozen = self._freeze_copy(tmp_path, dn_bundle, self._copy(tmp_path))
+        scope = gs.measured_only(
+            include_claims=False, with_claims=0, total=10, unit=gs.UNIT_CELL
+        )
+        for screen in (ba.render_report(report), bb.render_freeze(frozen.record)):
+            assert scope.headline in screen
+            assert scope.reason in screen
+
+    def test_a_freeze_record_written_before_the_block_still_renders_grounding(
+        self, tmp_path, dn_bundle
+    ):
+        """The committed 1.0.0 record carries no block; its cell summaries and
+        its bindings are enough to measure one."""
+        frozen = self._freeze_copy(tmp_path, dn_bundle, self._copy(tmp_path))
+        legacy = {k: v for k, v in frozen.record.items() if k != "grounding_scope"}
+        screen = bb.render_freeze(legacy)
+        assert f"GROUNDING  [{gs.GROUNDING_UNASSESSABLE.upper()}]" in screen
+        assert "none declared" in screen
+
+    def test_a_freeze_record_whose_counts_cannot_be_measured_says_so(self, tmp_path, dn_bundle):
+        frozen = self._freeze_copy(tmp_path, dn_bundle, self._copy(tmp_path))
+        record = dict(frozen.record)
+        record["grounding_scope"] = {**record["grounding_scope"], "with_claims": 11}
+        assert "GROUNDING  [NOT MEASURABLE]" in bb.render_freeze(record)
+
+    def test_a_source_grounded_declaration_on_the_committed_report_is_refused(
+        self, tmp_path, dn_bundle
+    ):
+        """Criterion 5, at the freeze: the declaration is refused while X01 is
+        open, and refused again on the measurement if the flag is ever set."""
+        def declare(data):
+            data["grounding_scope"] = {
+                "declared": gs.SCOPE_SOURCE_GROUNDED,
+                "declaration_source": gs.DECLARED_BY_THE_RUN,
+                "measured": gs.GROUNDING_UNASSESSABLE,
+                "include_claims": False,
+                "unit": gs.UNIT_CELL,
+                "with_claims": 0,
+                "total": 10,
+                "reason": "asserted",
+            }
+
+        report = self._copy(tmp_path, declare)
+        with pytest.raises(bb.BlindBaselineError) as caught:
+            self._freeze_copy(tmp_path, dn_bundle, report)
+        assert "grounding_scope: " in str(caught.value)
+        assert "X01" in str(caught.value)
+        assert not (tmp_path / "baseline").exists()
+
+    def test_a_declared_scope_the_cells_contradict_is_refused(self, tmp_path, dn_bundle):
+        def overstate(data):
+            data["grounding_scope"] = {
+                "declared": gs.SCOPE_CONTENT_FOCUSED,
+                "declaration_source": gs.DECLARED_BY_THE_RUN,
+                "measured": gs.GROUNDING_ASSESSED,
+                "include_claims": False,
+                "unit": gs.UNIT_CELL,
+                "with_claims": 10,
+                "total": 10,
+                "reason": "asserted",
+            }
+
+        report = self._copy(tmp_path, overstate)
+        with pytest.raises(bb.BlindBaselineError) as caught:
+            self._freeze_copy(tmp_path, dn_bundle, report)
+        assert "grounding_scope: " in str(caught.value)
+
+    def test_a_report_that_declares_nothing_and_grounded_a_cell_is_refused(
+        self, tmp_path, dn_bundle
+    ):
+        """The one undeclared case that is not derivable: there is a grounding
+        result, so the baseline must say which scope produced it."""
+        def ground_one(data):
+            data["include_claims"] = True
+            data["cells"][0]["grounding"] = gs.GROUNDING_IN_VERDICT
+
+        report = self._copy(tmp_path, ground_one)
+        with pytest.raises(bb.BlindBaselineError) as caught:
+            self._freeze_copy(tmp_path, dn_bundle, report)
+        message = str(caught.value)
+        assert "grounding_scope: " in message
+        assert "must declare which scope produced it" in message
 
     def test_the_control_reproduces_the_committed_identity(self, tmp_path, dn_bundle):
         """The hardened gate re-derives the bindings the committed freeze
@@ -813,8 +1011,10 @@ class TestTheCommittedMscaDnBaseline:
             json.loads(DN_REPORT.read_text(encoding="utf-8")), dn_bundle, repo_root=REPO
         )
         assert run.failures == ()
-        assert run.not_applicable == ()
-        assert run.passed == bb.BASELINE_CHECKS
+        assert [name for name, _ in run.not_applicable] == ["grounding_scope"]
+        assert run.passed == tuple(
+            name for name in bb.BASELINE_CHECKS if name != "grounding_scope"
+        )
 
     @pytest.mark.parametrize("mutate, check", AUDIT_PROBES)
     def test_each_reproduced_probe_is_refused_with_a_check_and_a_reason(

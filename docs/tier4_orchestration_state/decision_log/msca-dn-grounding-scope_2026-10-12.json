@@ -1,0 +1,123 @@
+{
+ "record_type": "decision",
+ "id": "msca-dn-grounding-scope_2026-10-12",
+ "date": "2026-10-12",
+ "branch": "msca-dn-pre-eval",
+ "ticket": "V06 of plans/msca_dn_historical_validation_tickets.md",
+ "closes": "the required half of finding F07 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+ "milestone": "MSCA-DN historical validation, gate G4: every preflight, report and freeze declares which of the audit's two grounding scopes was performed, beside the measurement of what the run could actually judge, so a later reader cannot mistake an unassessable run for an assessed one.",
+ "authority": "CLAUDE.md §9.4 (a decision affecting future interpretation is written down), §10.5 (a material claim names its source), §12.1 (an output names its inputs and flags its assumptions), §12.2 (Confirmed, Inferred, Assumed, Unresolved), §12.4 (a missing input is a declared gap), §13.7 (a gate condition is never weakened), §15 (an explicit failure beats a fabricated completion); harness/HARNESS.md (out-of-band QA, never a runtime gate); finding F07's two scope choices in the readiness audit.",
+ "problem": {
+  "declared_status": "Confirmed",
+  "basis": "measured on the committed baseline docs/tier4_orchestration_state/msca_dn/baselines/resolved_fixes_2026-10-06/blind_baseline_f60ae6e0a2a1.json and its preflight harness/blind_reports/preflight_242f1afb02c8_0001.json",
+  "statement": "The blind lane runs --no-claims, so every cell's grounding is unassessable by construction, and no record said so.",
+  "measured": "The committed report records include_claims=false and ten cells each carrying grounding=unassessable. Neither it, its preflight nor its freeze record carried any run-level statement of that, and the rendered screens printed none.",
+  "why_it_matters": "Proposal-internal coherence, scientific plausibility, fidelity to the submitted text and independent factual support are four different claims. Ten graded cells, a total and no grounding findings read the same as an assessed run with nothing to report, which invites the strongest claim to be read off the weakest evidence."
+ },
+ "decision": {
+  "declared_status": "Confirmed",
+  "basis": "implemented in the new harness/grounding_scope.py and wired into harness/evidence_preflight.py, harness/blind_assessment.py, harness/blind_baseline.py and harness/commands/blind_assessment.py; 41 checks in tests/harness/test_grounding_scope.py plus new groups in tests/harness/test_blind_assessment.py, tests/harness/test_evidence_preflight.py and tests/harness/test_blind_baseline.py",
+  "statement": "A grounding scope is two things recorded side by side: a declaration the operator makes and a measurement the run cannot overstate.",
+  "the_declaration": "--grounding-scope is required on preflight, assess and salvage, and takes the audit's two choices and no third. content_focused assesses proposal content and credibility with grounding reported unassessable. source_grounded claims the proposal has been source-grounded.",
+  "the_measurement": "unassessable, partly_assessed or assessed, counted from the packs the preflight realised or the cells the report graded. GroundingScope.reason is a derived property rather than a stored sentence, so the wording cannot drift from the numbers beside it - the same rule V05 applied to the audit's grounding wording.",
+  "recorded_in_three_places": "The preflight report, the blind report and the freeze record each carry a grounding_scope block with the declaration, its source, the measurement, the counts and the derived reason. All three renderers print the same two lines through one function, grounding_scope.scope_lines, and both lines are re-derived from the record's counts rather than read from the file - so a stored sentence cannot be printed beside numbers it contradicts, and a recorded measured the counts do not give is refused rather than shown. A record carrying no block at all still gets a line, measured from its own graded units; the committed report, preflight and 1.0.0 freeze record all render one.",
+  "one_producer_for_the_scope": "scope_for is the single entry point every producer uses - the preflight, the report and the freeze - so 'a declaration when there is one, a measurement when there is not' is written once rather than three times.",
+  "one_statement_of_the_vocabulary": "GROUNDING_IN_VERDICT and GROUNDING_UNASSESSABLE moved out of harness/blind_assessment.py into harness/grounding_scope.py and are re-exported there, so the cell value and the run-level measurement have one definition and no importer changed."
+ },
+ "the_source_grounded_refusal": {
+  "declared_status": "Confirmed",
+  "basis": "IMPORTED_CLAIM_ROUTE_IMPLEMENTED in harness/grounding_scope.py; tests/harness/test_grounding_scope.py::TestTheDeclaration and tests/harness/test_blind_baseline.py::TestTheDeclaredGroundingScope",
+  "statement": "A source_grounded declaration is refused everywhere by one capability flag, and refused again on the measurement by a rule that outlives ticket X01.",
+  "the_capability_flag": "IMPORTED_CLAIM_ROUTE_IMPLEMENTED is False. The refusal names the three integrations X01 owes: imported-section claims loading with resolvable sources, supported claim statuses backed by evidence, and E2 grounding running over that ledger. X01 flips the one flag; the command, the report and the freeze all read it.",
+  "refused_before_quota": "check_declarable runs at the command's parse time, before the snapshot, the packs or the assessor exist. A refused declaration costs no assessor call, which a test measures by asserting the backend recorded none.",
+  "the_rule_that_survives_x01": "declare_scope also refuses source_grounded over a run whose grounding did not measure assessed. With the flag patched on, a run with one ungrounded cell is still refused, and a fully grounded one is accepted - so the refusal is the capability, not a hardcoded no.",
+  "derivation_can_never_claim_it": "measured_only produces a measurement and leaves declared null. source_grounded is a declaration and never a measurement, so no derivation can reach it."
+ },
+ "the_freeze_binds_it": {
+  "declared_status": "Confirmed",
+  "basis": "the grounding_scope check in harness/blind_baseline.py; BASELINE_CHECKS is 21 names at 82fa9b4 and 22 now; tests/harness/test_blind_baseline.py",
+  "statement": "The freeze is where a later stage would read 'this run was source-grounded', so the declaration has to be in the record and has to survive comparison with the cells.",
+  "three_refusals": {
+   "contradicted_declaration": "A recorded measurement the cells' own grounding values do not give, or a source_grounded declaration over a run that did not assess every cell.",
+   "the_capability": "A source_grounded declaration while IMPORTED_CLAIM_ROUTE_IMPLEMENTED is False, under the same flag the command refuses it under.",
+   "an_undeclared_grounding_result": "A report that declares nothing and whose cells are not unanimously unassessable: there is a grounding result, and a baseline carrying one must say which scope produced it."
+  },
+  "one_non_applicability": "A report that declares nothing and whose cells are unanimously unassessable records the check not applicable with its reason, and the freeze records the measurement instead. Reports frozen before this ticket are that case, the derivation can only ever read unassessable, and the record therefore states what the run could judge and claims nothing.",
+  "schema": "BASELINE_FREEZE_SCHEMA_VERSION moves 1.1.0 to 1.2.0 for the added grounding_scope key. The block is top-level rather than inside bindings, so the committed freeze's bindings still reproduce exactly and are not rewritten."
+ },
+ "the_declaration_is_outside_the_pack_set_hash": {
+  "declared_status": "Confirmed",
+  "basis": "check_preflight in harness/evidence_preflight.py; tests/harness/test_evidence_preflight.py::TestCommand::test_the_pack_set_hash_does_not_move_with_the_declared_scope",
+  "statement": "Declaring a scope selects no evidence, so it must not move the hash that binds what the assessor reads.",
+  "measured": "run_preflight over the same candidate and parameters yields one pack_set_hash whether a scope is declared or not. The committed preflight's recorded hash sha256:25d8aae9b31c... is therefore unchanged, and the freeze's preflight_rebound check still passes against it.",
+  "but_it_still_has_to_match": "check_preflight compares grounding_scope.declared as its own field. The preflight is the record the operator reviewed before spending quota, and a run under another declared scope is not the run they reviewed."
+ },
+ "the_control_still_freezes": {
+  "declared_status": "Confirmed",
+  "basis": "tests/harness/test_blind_baseline.py::TestTheCommittedMscaDnBaseline, run under the V01 environment pin",
+  "statement": "The committed 74.60 report still passes the gate, now with one check recorded not applicable rather than claimed as a pass.",
+  "control": "21 of 22 checks passed, grounding_scope not applicable, 10 cells, 3 criterion scores, total 74.6. The freeze record reproduces the committed freeze's report_sha256, its report_copy name and all 25 of its bindings, and the copy is byte-identical to the committed report.",
+  "what_changed_in_the_control_assertions": "Two V04 assertions were updated rather than satisfied: checks_passed is now BASELINE_CHECKS minus grounding_scope, and not_applicable holds one row. This is the third outcome V04's BaselineCheckRun was built for - a check the report cannot answer is recorded, never claimed - applied to a report that predates the declaration.",
+  "a_deleted_cell_now_has_two_witnesses": "Dropping or duplicating a cell also moves the recorded counts, so cell_identity and grounding_scope both refuse it. Two identity-set tests were updated to expect both names.",
+  "isolation": "Every case works on its own copy under tmp_path. Nothing under docs/ was written by any test. The committed baseline, its freeze record, its preflight, both fidelity registers, the approval records and the committed audits are untouched."
+ },
+ "lane": {
+  "declared_status": "Confirmed",
+  "basis": "py -3.10 -m harness.commands.acceptance_lane, run after the last code change in this ticket; the result is in plans/reports/v06_grounding_scope_declared_2026-10-12.md section 7.1",
+  "statement": "The lane is green, and its freeze area carries the invariant this ticket adds.",
+  "measured": {
+   "passed": 2308,
+   "failed": 0,
+   "errors": 0,
+   "skipped_declared_exclusions": 17,
+   "collected": 2325,
+   "exit_code": 0
+  },
+  "audit_baseline_for_comparison": {
+   "commit": "ca0a443",
+   "passed": 1864,
+   "failed": 44,
+   "errors": 48,
+   "skipped": 8,
+   "collected": 1964
+  },
+  "skips": "17 declared exclusions, unchanged. No new skip was introduced, so the declaration still reconciles.",
+  "byte_bindings": "tools.import_external_proposal --check and tools.author_msca_dn_workspace --check both report 'up to date' and exit 0 after this change."
+ },
+ "not_evidence_of": [
+  "a closed finding F07. V06 closes its required half. The conditional half is X01, which is not implemented, and until it is, every source_grounded declaration is refused.",
+  "grounded evaluation of anything. The declaration records that grounding was not judged; it does not judge it.",
+  "a closed gate G4 on its own. G4 also needs the V04 and V05 work, which is landed, and G4's own closure is the operator's call against the audit's evidence requirement.",
+  "that the official 2025 original has been imported, assessed or frozen. V07 to V10 are open.",
+  "a corrected runbook. The two command lines this change would otherwise have broken now carry --grounding-scope, because a required flag is a break this ticket caused rather than a defect V12 inherited. Nothing else in plans/msca_dn_pe09_runbook.md was touched: it still describes fifteen freeze checks, still claims the planted-marker test is one of them, still proposes historical defaulting, and still lists a cross-baseline diff guaranteed to refuse. All four are V12's.",
+  "a new assessor run. No quota was spent and no assessor was called."
+ ],
+ "impacted_components": [
+  "harness/grounding_scope.py (new: the two scope choices, the three measurements, GroundingScope, measure, count_grounded, check_declarable, declare_scope, measured_only, scope_from_record, declared_scope_of, IMPORTED_CLAIM_ROUTE_IMPLEMENTED)",
+  "harness/blind_assessment.py (grounding vocabulary moved out and re-exported; BlindAssessmentReport.grounding_scope and its construction-time check against the cells; assess_candidate takes grounding_scope; render_report prints the block)",
+  "harness/evidence_preflight.py (count_packs_with_claims; PreflightReport.grounding_scope; run_preflight takes grounding_scope; check_preflight compares the declaration; a flag when an offered ledger reached no pack; render_preflight prints the block)",
+  "harness/blind_baseline.py (the grounding_scope check; BaselineCheckRun carries the scope; the freeze record's top-level block; schema 1.2.0; render_freeze prints it)",
+  "harness/commands/blind_assessment.py (--grounding-scope required on preflight, assess and salvage; check_declarable before any evidence; GroundingScopeError in _CLI_ERRORS)",
+  "docs/tier4_orchestration_state/msca_dn/reviews/acceptance_record_template.md (new, unsigned)",
+  "plans/msca_dn_pe09_runbook.md (the two command lines the required flag would otherwise have broken)",
+  "harness/HARNESS.md, harness/ACCEPTANCE_LANE.md, harness/acceptance_lanes/msca_dn_historical.json (the freeze area's invariant and module list)",
+  "tests/harness/test_grounding_scope.py (new), test_blind_assessment.py, test_evidence_preflight.py, test_blind_baseline.py, test_blind_leakage.py, test_dev_graph_t03_end_to_end.py, test_response_cache.py, test_ria_profile.py, test_subscription_judge.py (the required flag)",
+  "plans/msca_dn_historical_validation_tickets.md (V06 boxes and status)"
+ ],
+ "remaining_uncertainties": {
+  "the_preflight_counts_packs_the_report_counts_cells": "A preflight pack it could not build counts in its total and carries no ledger, while assess skips the missing section and grades no cell for it. The two counts can therefore differ on a partial candidate, which is why check_preflight compares the declaration and not the counts, and why the unit travels in the record.",
+  "a_library_caller_may_still_declare_nothing": "assess_candidate and run_preflight take grounding_scope=None and then record the measurement alone. The command always declares. Requiring it in the dataclass would have refused every report written before this ticket, including the committed baseline.",
+  "partly_assessed_has_no_committed_instance": "No real run has produced it. It is covered by the synthetic world and by unit cases, not by a committed artifact.",
+  "the_capability_flag_is_a_declaration": "IMPORTED_CLAIM_ROUTE_IMPLEMENTED is a constant, not a measurement of the route. A test asserts it is False while X01 is open; flipping it without building the route would be a false declaration that no check here could catch. X01 owns both halves.",
+  "the_four_counts_travel_as_four_arguments": "include_claims, with_claims, total and unit pass together through measure, scope_for, declare_scope, measured_only and GroundingScope. A GroundingCounts type would name the clump, but its only job would be to be unpacked into GroundingScope, which already holds the four fields. scope_for removes the duplication that mattered, which was the declared-else-measured branch written out at all three producers."
+ },
+ "declared_deviations": {
+  "declared_status": "Confirmed",
+  "basis": "named in plans/reports/v06_grounding_scope_declared_2026-10-12.md section 8; none is in V06's five acceptance criteria",
+  "the_required_flag": "--grounding-scope is required rather than defaulted. A default would let the record say an operator declared content_focused when nobody chose it, which is the class of false provenance V04 and V05 closed. The cost is that nine test modules and two runbook command lines must name the flag. All were updated.",
+  "the_runbook_command_lines": "plans/msca_dn_pe09_runbook.md is V12's ticket, and V12 is blocked by this one. Its preflight and assess lines are edited here anyway, because a required flag is a break this change caused: an operator following them before V12 would hit a hard refusal. V12's four substantive corrections are untouched.",
+  "the_vocabulary_moved": "GROUNDING_IN_VERDICT and GROUNDING_UNASSESSABLE moved from harness/blind_assessment.py to the new module and are re-exported. Two definitions of unassessable in two modules would be two things to keep in step.",
+  "the_preflight_flag": "run_preflight raises a flag, and so exit 1, when the claim ledger was offered and no pack carried an entry. A withheld ledger is the declared lane and raises nothing. The ticket asks for the declaration, not for a flag; this one exists because an offered ledger that reached no pack is a surprise worth reading before quota.",
+  "the_acceptance_record_template": "Criterion 4 asks the template to state which scope was performed, and no template existed. The authored file carries the audit's whole decision-text field set so it can serve as V15's skeleton, not only its scope section. V15 fills it in and the operator signs it; it is marked 'Not an approval'."
+ }
+}

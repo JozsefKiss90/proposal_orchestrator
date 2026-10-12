@@ -10,6 +10,7 @@ tests never read a real proposal or the default profile.
 
 from __future__ import annotations
 
+import dataclasses
 import json
 from pathlib import Path
 
@@ -17,6 +18,7 @@ import pytest
 
 import harness.blind_assessment as ba
 import harness.commands.blind_assessment as cmd
+import harness.grounding_scope as gs
 from tests.harness._preflight import preflighted
 from harness.judge import Judge, JudgeConfig, JudgeResponseError
 from harness.provenance import ProvenanceLog
@@ -318,7 +320,8 @@ class TestAssessor:
         code = cmd.main(
             preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
-             "--profile", str(bundle.profile.source_path)]),
+             "--profile", str(bundle.profile.source_path),
+             "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED]),
             judge=judge,
             clock=lambda: FROZEN,
         )
@@ -412,7 +415,8 @@ class TestCommand:
         code = cmd.main(
             preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
-             "--profile", str(bundle.profile.source_path)]),
+             "--profile", str(bundle.profile.source_path),
+             "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED]),
             judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
@@ -438,7 +442,8 @@ class TestCommand:
         cmd.main(
             preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
-             "--profile", str(bundle.profile.source_path)]),
+             "--profile", str(bundle.profile.source_path),
+             "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED]),
             judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
@@ -460,7 +465,8 @@ class TestCommand:
         code = cmd.main(
             preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(tmp_path / "r"),
              "--repo-root", str(bundle.profile.source_path.parents[1]),
-             "--profile", str(bundle.profile.source_path)]),
+             "--profile", str(bundle.profile.source_path),
+             "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED]),
             judge=_judge(tmp_path, DualBackend()),
             clock=lambda: FROZEN,
         )
@@ -608,11 +614,82 @@ class TestCriterionScoringInReport:
         assert report.to_dict()["include_claims"] is False
 
 
+class TestTheReportDeclaresItsGroundingScope:
+    """V06 at the report: the declaration travels with the cells it describes,
+    and a report cannot be built declaring one thing and grading another."""
+
+    def test_a_library_run_records_the_measurement_with_no_declaration(self, tmp_path, bundle):
+        report = ba.assess_candidate(
+            _judge(tmp_path, ScriptedBackend()), bundle, _candidate(tmp_path, bundle),
+            clock=lambda: FROZEN, include_claims=False,
+        )
+        scope = report.to_dict()["grounding_scope"]
+        assert scope["declared"] is None
+        assert scope["declaration_source"] == gs.MEASURED_HERE
+        assert scope["measured"] == gs.GROUNDING_UNASSESSABLE
+        assert scope["total"] == len(report.cells)
+
+    def test_a_declared_run_records_the_declaration(self, tmp_path, bundle):
+        report = ba.assess_candidate(
+            _judge(tmp_path, ScriptedBackend()), bundle, _candidate(tmp_path, bundle),
+            clock=lambda: FROZEN, include_claims=False,
+            grounding_scope=gs.SCOPE_CONTENT_FOCUSED,
+        )
+        assert report.grounding_scope.declared == gs.SCOPE_CONTENT_FOCUSED
+        assert report.grounding_scope.measured == gs.GROUNDING_UNASSESSABLE
+
+    def test_a_source_grounded_declaration_is_refused_and_nothing_is_written(
+        self, tmp_path, bundle
+    ):
+        with pytest.raises(gs.GroundingScopeError, match="X01"):
+            ba.assess_candidate(
+                _judge(tmp_path, ScriptedBackend()), bundle, _candidate(tmp_path, bundle),
+                clock=lambda: FROZEN, grounding_scope=gs.SCOPE_SOURCE_GROUNDED,
+            )
+
+    def test_a_scope_that_does_not_describe_the_cells_cannot_be_constructed(
+        self, tmp_path, bundle
+    ):
+        report = ba.assess_candidate(
+            _judge(tmp_path, ScriptedBackend()), bundle, _candidate(tmp_path, bundle),
+            clock=lambda: FROZEN, include_claims=False,
+            grounding_scope=gs.SCOPE_CONTENT_FOCUSED,
+        )
+        with pytest.raises(ValueError, match="does not describe this report's cells"):
+            dataclasses.replace(report, cells=report.cells[:1])
+
+    def test_the_rendered_report_states_the_grounding_prominently(self, tmp_path, bundle):
+        report = ba.assess_candidate(
+            _judge(tmp_path, ScriptedBackend()), bundle, _candidate(tmp_path, bundle),
+            clock=lambda: FROZEN, include_claims=False,
+            grounding_scope=gs.SCOPE_CONTENT_FOCUSED,
+        )
+        screen = ba.render_report(report.to_dict())
+        assert f"GROUNDING  [{gs.GROUNDING_UNASSESSABLE.upper()}]" in screen
+        assert "withheld" in screen
+        # Above the cell table, where a reader cannot miss it.
+        assert screen.index("GROUNDING") < screen.index("criterion")
+
+    def test_a_report_with_no_scope_block_still_renders_the_measurement(self, tmp_path, bundle):
+        """A report frozen before V06 reads unassessable from its own cells
+        rather than silently printing nothing."""
+        report = ba.assess_candidate(
+            _judge(tmp_path, ScriptedBackend()), bundle, _candidate(tmp_path, bundle),
+            clock=lambda: FROZEN, include_claims=False,
+        )
+        data = report.to_dict()
+        data.pop("grounding_scope")
+        screen = ba.render_report(data)
+        assert f"GROUNDING  [{gs.GROUNDING_UNASSESSABLE.upper()}]" in screen
+        assert "none declared" in screen
+
+
 class TestCommandCriterionScoring:
     def _args(self, bundle, candidate, out):
         return ["assess", "--candidate", str(candidate), "--out-dir", str(out),
                 "--repo-root", str(bundle.profile.source_path.parents[1]),
-                "--profile", str(bundle.profile.source_path)]
+                "--profile", str(bundle.profile.source_path),
+                "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED]
 
     def test_assess_scores_criteria_by_default_with_five_samples(self, tmp_path, bundle):
         backend = DualBackend()

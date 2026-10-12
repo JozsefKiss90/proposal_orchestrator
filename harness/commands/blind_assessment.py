@@ -115,6 +115,13 @@ from harness.candidate_provenance import (
     render_provenance,
     resolve_provenance,
 )
+from harness.grounding_scope import (
+    GROUNDING_SCOPES,
+    SCOPE_CONTENT_FOCUSED,
+    SCOPE_SOURCE_GROUNDED,
+    GroundingScopeError,
+    check_declarable,
+)
 from harness.integrity_audit import render_audit, run_audit, write_audit
 from harness.esr_comparison import (
     EsrComparisonError,
@@ -190,6 +197,7 @@ DEFAULT_CHECKPOINT_DIR: str = ".harness/checkpoints"
 #: Every fail-closed error the command converts to exit code 2.
 _CLI_ERRORS = (
     BlindAssessmentError,
+    GroundingScopeError,
     EsrComparisonError,
     OperatorReviewError,
     ComparisonDiffError,
@@ -345,6 +353,19 @@ def _add_evidence_args(p: argparse.ArgumentParser) -> None:
             "independence; HARNESS_JUDGE_MODEL must then be a Claude pin and "
             "HARNESS_JUDGE_VERSION should name the transport. The transport also "
             "decides the pack ceiling, so give the preflight the one you will assess with"
+        ),
+    )
+    p.add_argument(
+        "--grounding-scope", required=True, choices=list(GROUNDING_SCOPES),
+        help=(
+            "declare what this run assesses (ticket V06). "
+            f"'{SCOPE_CONTENT_FOCUSED}': proposal content and credibility, with "
+            "grounding reported unassessable and the sources reviewed by a human. "
+            f"'{SCOPE_SOURCE_GROUNDED}': a claim that the proposal has been "
+            "source-grounded, which needs the imported-claim route and is refused "
+            "until ticket X01 implements and validates it. The declaration is "
+            "recorded in the preflight, the report and the freeze, beside the "
+            "measurement of what the run could actually judge"
         ),
     )
     p.add_argument(
@@ -1192,6 +1213,9 @@ def main(
         if args.command == "audit":
             return _audit(args, bundle, graph_root, out_dir, repo_root, clock)
         params = _pack_params(args)
+        # Before the snapshot, the packs or the assessor: a scope nothing could
+        # make true costs no work and no quota to refuse.
+        check_declarable(args.grounding_scope)
         evidence = _build_evidence(args, bundle, graph_root, out_dir)
 
         if args.command == "preflight":
@@ -1203,6 +1227,7 @@ def main(
                 graph_root=graph_root if evidence is not None else None,
                 repo_root=repo_root,
                 import_manifest=args.import_manifest,
+                grounding_scope=args.grounding_scope,
                 clock=clock,
             )
             path = write_preflight(preflight, out_dir)
@@ -1228,6 +1253,7 @@ def main(
             params=params,
             import_manifest_sha256=file_sha256(manifest[0]) if manifest is not None else None,
             evidence=evidence,
+            grounding_scope=args.grounding_scope,
         )
         if args.command == "salvage":
             return _salvage(
@@ -1275,6 +1301,7 @@ def main(
             preflight_report=Path(args.preflight).as_posix(),
             assessor_transport=args.transport,
             assessor_invocation=_invocation_record(assessor),
+            grounding_scope=args.grounding_scope,
         )
         path = write_report(report, out_dir)
         data = report.to_dict()

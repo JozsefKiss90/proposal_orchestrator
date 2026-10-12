@@ -92,6 +92,16 @@ from harness.criterion_scoring import (
     weighted_total,
 )
 from harness.evidence_preflight import file_sha256, load_preflight
+from harness.grounding_scope import (
+    SCOPE_SOURCE_GROUNDED,
+    UNIT_CELL,
+    GroundingScope,
+    GroundingScopeError,
+    count_grounded,
+    scope_for,
+    scope_from_record,
+    scope_lines,
+)
 from harness.rubrics import ProfileBundle
 from harness.verdict import MIN_MAJORITY_SAMPLES, Verdict, majority_vote
 
@@ -111,7 +121,7 @@ __all__ = [
 
 BASELINE_FREEZE_RECORD_TYPE: str = "harness.blind_baseline_freeze"
 #: 1.1.0 adds ``checks_not_applicable`` beside ``checks_passed``.
-BASELINE_FREEZE_SCHEMA_VERSION: str = "1.1.0"
+BASELINE_FREEZE_SCHEMA_VERSION: str = "1.2.0"
 
 #: Every named condition, in the order :func:`run_baseline_checks` runs them.
 #: The freeze record's ``checks_passed`` is derived as the checks that ran
@@ -127,6 +137,7 @@ BASELINE_CHECKS: tuple[str, ...] = (
     "pin_names_transport",
     "invocation_evidence",
     "scope",
+    "grounding_scope",
     "cells_present",
     "cell_identity",
     "cell_spreads",
@@ -219,10 +230,16 @@ class BaselineCheckRun:
     ``passed`` is derived — a check is listed only because it ran and did not
     fail — so a conditional check the report's transport cannot answer is
     never claimed as a pass.
+
+    ``grounding_scope`` is the scope the checks established for the report
+    (ticket V06): the one it declared, or the measurement alone when it
+    declared none.  ``None`` only when neither could be derived, and
+    ``grounding_scope`` has then failed.
     """
 
     failures: tuple[tuple[str, str], ...] = ()
     not_applicable: tuple[tuple[str, str], ...] = ()
+    grounding_scope: GroundingScope | None = None
 
     @property
     def ran(self) -> tuple[str, ...]:
@@ -260,8 +277,10 @@ class _Checks:
         assert name in BASELINE_CHECKS, name
         self._not_applicable.append((name, reason))
 
-    def result(self) -> BaselineCheckRun:
-        return BaselineCheckRun(tuple(self._failures), tuple(self._not_applicable))
+    def result(self, grounding_scope: GroundingScope | None = None) -> BaselineCheckRun:
+        return BaselineCheckRun(
+            tuple(self._failures), tuple(self._not_applicable), grounding_scope
+        )
 
 
 def _identical(value: Any, required: Any) -> bool:
@@ -371,6 +390,8 @@ def run_baseline_checks(
     if report.get("scope") != SCOPE_COMPLETE:
         fail("scope", f"scope is {report.get('scope')!r}; a partial candidate is not a baseline")
 
+    grounding = _check_grounding_scope(report, checks)
+
     cells = report.get("cells")
     if not isinstance(cells, list) or not cells:
         fail("cells_present", "the report carries no cells")
@@ -422,7 +443,94 @@ def run_baseline_checks(
         if scoring.get("total") is None:
             fail("criterion_total", "the total is undetermined")
         _check_total(scoring, bundle, checks)
-    return checks.result()
+    return checks.result(grounding)
+
+
+def _check_grounding_scope(
+    report: Mapping[str, Any], checks: _Checks
+) -> GroundingScope | None:
+    """The scope the baseline binds, so no later stage can overstate it.
+
+    The freeze is where "this run was source-grounded" would be read from, so
+    the declaration has to be in the record and has to survive comparison with
+    the cells.  Three refusals and one non-applicability:
+
+    * A declared scope the cells contradict — a recorded measurement its own
+      grounding values do not give, or a ``source_grounded`` declaration over a
+      run that did not assess every cell — fails.
+    * A ``source_grounded`` declaration fails while the imported-claim route is
+      unimplemented, by the same flag the command refuses it under (X01).
+    * A report that declares nothing and whose cells are *not* unanimously
+      unassessable fails: there is a grounding result, and a baseline that
+      carries one must say which scope produced it.
+    * A report that declares nothing and whose cells are unanimously
+      unassessable records *not applicable*.  Reports frozen before the
+      declaration existed are this case, and the measurement derivation can
+      only ever produce the conservative value, so the record states
+      unassessable and claims nothing.
+    """
+    cells = report.get("cells")
+    try:
+        with_claims, total = count_grounded(cells if isinstance(cells, list) else [])
+        recorded = scope_from_record(report)
+    except GroundingScopeError as exc:
+        checks.fail("grounding_scope", str(exc))
+        return None
+    declared = recorded.declared if recorded is not None else None
+    include_claims = report.get("include_claims")
+    if not isinstance(include_claims, bool):
+        checks.fail(
+            "grounding_scope",
+            f"the report records include_claims={include_claims!r}; the grounding scope "
+            "cannot be checked against a report that does not say whether the ledger was offered",
+        )
+        return None
+    counted = {
+        "include_claims": include_claims,
+        "with_claims": with_claims,
+        "total": total,
+        "unit": UNIT_CELL,
+    }
+    if declared is None:
+        scope = scope_for(None, **counted)
+        if total == 0:
+            checks.fail(
+                "grounding_scope",
+                "the report declares no grounding scope and carries no cell to measure one from",
+            )
+        elif scope.assessable:
+            checks.fail(
+                "grounding_scope",
+                f"the report declares no grounding scope and {scope.reason}; a baseline "
+                "that carries a grounding result must declare which scope produced it",
+            )
+        else:
+            checks.skip(
+                "grounding_scope",
+                f"the report declares no grounding scope, and {scope.reason}; the freeze "
+                "records the measurement instead, which can only read "
+                f"{scope.measured!r} and never {SCOPE_SOURCE_GROUNDED!r}",
+            )
+        return scope
+    try:
+        scope = scope_for(declared, **counted)
+    except GroundingScopeError as exc:
+        checks.fail("grounding_scope", str(exc))
+        return recorded
+    # A declared scope can only have come from a block, so recorded is set.
+    then_block, now_block = recorded.to_dict(), scope.to_dict()
+    differ = [
+        f"{key}: report {then_block.get(key)!r}, cells {now_block[key]!r}"
+        for key in sorted(now_block)
+        if then_block.get(key) != now_block[key]
+    ]
+    if differ:
+        checks.fail(
+            "grounding_scope",
+            "the recorded grounding scope does not describe the report's own cells; "
+            + "; ".join(differ),
+        )
+    return scope
 
 
 def _check_invocation_evidence(
@@ -909,6 +1017,12 @@ def _build_record(
         # and a check the report's transport could not answer is listed as not
         # applicable rather than passed.
         "checks_passed": list(checks.passed),
+        # The scope the checks established, bound here rather than under
+        # ``bindings``: a later stage reads it to learn what this baseline
+        # assessed, and a run that declared none still records what it measured.
+        "grounding_scope": (
+            checks.grounding_scope.to_dict() if checks.grounding_scope is not None else None
+        ),
         "checks_not_applicable": [
             {"check": name, "reason": reason} for name, reason in checks.not_applicable
         ],
@@ -1043,6 +1157,24 @@ def load_frozen_baseline(baseline_dir: Path | str) -> FrozenBaseline:
 # --------------------------------------------------------------------------- #
 
 
+def _measured_from_freeze(record: Mapping[str, Any]) -> GroundingScope:
+    """The grounding a freeze record's own cell summaries give.
+
+    Reached only by a freeze record written before the scope block existed:
+    the summaries carry each cell's grounding value and the bindings carry
+    ``include_claims``, so the measurement is derivable and the rendered
+    screen never goes silent on grounding.
+    """
+    with_claims, total = count_grounded(record.get("cells") or [])
+    return scope_for(
+        None,
+        include_claims=bool((record.get("bindings") or {}).get("include_claims", True)),
+        with_claims=with_claims,
+        total=total,
+        unit=UNIT_CELL,
+    )
+
+
 def render_freeze(record: Mapping[str, Any]) -> str:
     """One screen of text: what was frozen and what it is bound to."""
     b = record.get("bindings") or {}
@@ -1067,6 +1199,7 @@ def render_freeze(record: Mapping[str, Any]) -> str:
         lines.append(
             f"  - {s.get('criterion_id')}: {s.get('score')} (spread {s.get('spread')})"
         )
+    lines.extend(scope_lines(record, lambda: _measured_from_freeze(record)))
     lines.append(f"spread label:  {record.get('spread_label')}")
     passed = record.get("checks_passed") or []
     skipped = record.get("checks_not_applicable") or []

@@ -31,6 +31,7 @@ from pathlib import Path
 import pytest
 
 import harness.criterion_scoring as cs
+import harness.grounding_scope as gs
 from harness.judge import Judge, JudgeConfig, JudgeError, JudgeResponseError
 from harness.provenance import ProvenanceLog, prompt_hash
 from harness.response_cache import (
@@ -397,6 +398,7 @@ class TestTheCommandResumes:
             "--out-dir", str(out),
             "--repo-root", str(repo),
             "--profile", str(bundle.profile.source_path),
+            "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED,
         ]
 
     def test_the_run_resumes_and_spends_quota_only_on_what_failed(self, tmp_path):
@@ -569,6 +571,7 @@ class TestSalvage:
                 "--out-dir", str(out),
                 "--repo-root", str(repo),
                 "--profile", str(bundle.profile.source_path),
+                "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED,
             ],
             clock=lambda: FROZEN,
         )

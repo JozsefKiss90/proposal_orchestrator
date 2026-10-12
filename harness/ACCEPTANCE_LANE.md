@@ -69,7 +69,7 @@ them. Four of their checks are excluded.
 | **importer** | yes | Both sanitised candidate revisions replay byte-equal from the committed PDFs, under the extraction build V01 pinned, and derive the recorded document identity. | `test_extraction_environment.py`, `test_msca_dn_import.py`, `test_msca_dn_workspace.py`, `test_blind_document_subsections.py` |
 | **profile** | yes | An instrument profile resolves to its own rubrics, scorecard and criterion routing. A criterion cannot be scored under a profile that does not declare it. | `test_profile.py`, `test_msca_dn_profile.py`, `test_ria_profile.py`, `test_rubrics.py`, `test_routing.py` |
 | **preflight** | yes | Evidence selection is pinned before an assessor runs. The pack set hashes, the manifest pin binds, and a pack whose anchors do not resolve fails closed. | `test_evidence_preflight.py`, `test_evidence_pack.py` |
-| **freeze** | yes | The baseline freeze binds what it froze and refuses what it must, and the frozen 74.60 report still passes the gate it was frozen under. | `test_blind_baseline.py`, `test_blind_assessment.py` |
+| **freeze** | yes | The baseline freeze binds what it froze and refuses what it must. The frozen 74.60 report still passes the gate it was frozen under. Every preflight, report and freeze declares its grounding scope beside the measurement of what the run could judge. | `test_blind_baseline.py`, `test_blind_assessment.py`, `test_grounding_scope.py` |
 | **regression** | no | The E4 section golden-set and the E5f rubric lane compare and report as their fixtures specify. Both are merge-advisory and human-decided by harness/HARNESS.md, so the historical run does not depend on them. | `test_regression.py`, `test_regression_golden.py` |
 | **comparison** | yes | The ESR comparison replays from the recorded inputs, and a disposition is the operator's decision rather than a measurement the tool makes for them. | `test_esr_comparison.py`, `test_comparison_diff.py`, `test_operator_review.py`, `test_semantic_adjudications.py`, `test_msca_dn_approved_dispositions.py`, `test_msca_dn_successor_dispositions.py` |
 | **provenance** | yes | Every recorded identity, hash binding and declaration describes the committed bytes, and the integrity audit reports what it parsed rather than what it assumed. | `test_provenance.py`, `test_candidate_provenance.py`, `test_integrity_audit.py`, `test_msca_dn_declaration_drafts.py`, `test_msca_dn_fidelity_declarations.py` |
@@ -154,7 +154,9 @@ It says the code behaves as its fixtures specify. Read nothing else into it.
 - A green lane is **not evidence of forecast accuracy**. No result here predicts what an evaluator
   would score. Five draws from one assessor are five draws from one assessor.
 - A green lane is **not evidence of grounded evaluation**. The sanitised candidate's supporting sources
-  are removed, the blind lane runs `--no-claims`, and grounding is unassessable by design.
+  are removed, the blind lane runs `--no-claims`, and grounding is unassessable by design. Since V06
+  every preflight, report and freeze says so in its own `grounding_scope` block, and a
+  `source_grounded` declaration is refused until ticket X01 lands.
 
 Seventeen skips are seventeen absences, not seventeen passes. The lane prints them as exclusions
 every time it runs. `harness/DATASET_DISPOSITIONS.md` holds the same list with the work that would
