@@ -597,10 +597,28 @@ class TestHashDependencies:
 
 
 #: The V02a record that states what the last re-render changed, and why.
-RERENDER_RECORD = (
-    "docs/tier4_orchestration_state/decision_log/"
-    "msca-dn-declaration-draft-rerender_2026-10-09.json"
+DECISION_LOG_REL = Path("docs/tier4_orchestration_state/decision_log")
+
+#: Every re-render record, oldest first. The adoption-cost scan is coupled to
+#: the tree on purpose, so the drafts are re-rendered more than once over the
+#: milestone and each re-render records the bytes it moved. A record states
+#: only the files it moved; the newest statement of a file is the one that has
+#: to describe the committed bytes.
+RERENDER_RECORDS: tuple[str, ...] = tuple(
+    (DECISION_LOG_REL / path.name).as_posix()
+    for path in sorted((REPO / DECISION_LOG_REL).glob("msca-dn-declaration-draft-rerender_*.json"))
 )
+
+
+def _latest_pins() -> dict[str, tuple[str, dict[str, str]]]:
+    """Each draft mapped to the newest record stating its hash, and that statement."""
+    latest: dict[str, tuple[str, dict[str, str]]] = {}
+    for rel_record in RERENDER_RECORDS:
+        record = json.loads((REPO / rel_record).read_text(encoding="utf-8-sig"))
+        for rel, pins in record["hashes"].items():
+            if isinstance(pins, dict):
+                latest[rel] = (rel_record, pins)
+    return latest
 
 
 class TestTheRerenderRecordAgreesWithTheDrafts:
@@ -610,49 +628,56 @@ class TestTheRerenderRecordAgreesWithTheDrafts:
     file under ``docs/``, ``workspaces/`` and ``plans/``, so a record that adds
     a register reference changes the drafts it is explaining, and the hashes it
     just recorded stop describing the committed bytes.  The V02a record names
-    no register for that reason.  A record *may* name one — the R05 record
-    does — but then its own commit must re-render the drafts afterwards, which
-    is what the first test here measures either way.
+    no register for that reason, and neither does the V09 one.  A record *may*
+    name one — the R05 record does — but then its own commit must re-render the
+    drafts afterwards, which is what the first test here measures either way.
+
+    The records form a series rather than a single file: the drafts are
+    re-rendered whenever a ticket commits an artifact naming a register, and
+    each record states the hashes of the files that re-render moved.  A file
+    nobody re-rendered keeps the hash the older record gave it.
     """
 
-    @pytest.fixture(scope="class")
-    def record(self) -> dict[str, Any]:
-        return json.loads((REPO / RERENDER_RECORD).read_text(encoding="utf-8-sig"))
+    def test_there_is_at_least_one_record(self):
+        assert RERENDER_RECORDS
 
-    def test_the_recorded_hashes_describe_the_committed_drafts(self, record):
-        hashes = {k: v for k, v in record["hashes"].items() if isinstance(v, dict)}
-        assert len(hashes) == len(drafts.render_all(REPO)), (
-            "the record states a hash for a different number of files than the "
-            "tool renders"
+    def test_every_rendered_draft_is_covered_by_a_record(self):
+        assert set(_latest_pins()) == set(drafts.render_all(REPO)), (
+            "a file the tool renders is stated by no re-render record, or a "
+            "record states a file the tool does not render"
         )
-        for rel, pins in hashes.items():
+
+    def test_the_recorded_hashes_describe_the_committed_drafts(self):
+        for rel, (rel_record, pins) in _latest_pins().items():
             committed = hashlib.sha256((REPO / rel).read_bytes()).hexdigest()
             assert pins["after"] == committed, (
-                f"{RERENDER_RECORD} states {pins['after'][:16]} for {rel}, "
-                f"which is {committed[:16]} on disk. Re-render, then re-record."
+                f"{rel_record} states {pins['after'][:16]} for {rel}, "
+                f"which is {committed[:16]} on disk. Re-render, then record it."
             )
             assert pins["before"] != pins["after"], rel
 
-    def test_the_record_adds_no_register_reference(self, record):
-        """So the hashes above stay valid without a further re-render."""
-        text = (REPO / RERENDER_RECORD).read_text(encoding="utf-8-sig")
+    @pytest.mark.parametrize("rel_record", RERENDER_RECORDS)
+    def test_no_record_adds_a_register_reference(self, rel_record):
+        """So the hashes each record states stay valid without a further re-render."""
+        text = (REPO / rel_record).read_text(encoding="utf-8-sig")
         for revision in REVISIONS:
             register = revision.register_rel.as_posix()
             assert register not in text, (
-                f"this record names {register}, so the next scan adds it to the "
-                "drafts' dependents and the hashes recorded here go stale. "
-                "Cite the draft by path, or re-render in the same commit."
+                f"{rel_record} names {register}, so the next scan adds it to "
+                "the drafts' dependents and the hashes recorded there go "
+                "stale. Cite the draft by path, or re-render in the same commit."
             )
             digest = hashlib.sha256(
                 (REPO / revision.register_rel).read_bytes()
             ).hexdigest()
             assert digest not in text and digest[:16] not in text, (
-                f"this record pins the {revision.revision_id} register's hash, "
-                "which the scan reads as a dependency."
+                f"{rel_record} pins the {revision.revision_id} register's "
+                "hash, which the scan reads as a dependency."
             )
 
-    def test_the_record_cites_the_drafts_by_path(self):
-        text = (REPO / RERENDER_RECORD).read_text(encoding="utf-8-sig")
+    @pytest.mark.parametrize("rel_record", RERENDER_RECORDS)
+    def test_every_record_cites_the_drafts_by_path(self, rel_record):
+        text = (REPO / rel_record).read_text(encoding="utf-8-sig")
         assert drafts.DRAFTS_DIR_REL.as_posix() in text
 
 

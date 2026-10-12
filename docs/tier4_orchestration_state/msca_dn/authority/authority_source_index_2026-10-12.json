@@ -1,0 +1,214 @@
+{
+  "schema": "authority_source_index/1",
+  "record_type": "authority_source_index",
+  "index_name": "msca_dn_authority_sources_2026-10-12",
+  "subject": "the authority documents of the 2025 MSCA Doctoral Networks call and of the 2026 call the current profile was written for",
+  "authored_on": "2026-10-12",
+  "ticket": "V09 of plans/msca_dn_historical_validation_tickets.md",
+  "advisory": true,
+  "blocking": false,
+  "historical_label": "2025",
+  "current_label": "2026",
+  "purpose": "Every document a matrix row may cite, pinned by sha256, with the era whose rules it states, the class of authority it is and how its bytes are vouched for. The four 2025 documents this repository does not hold are entries too, so a row cannot rest on one by assuming what it would say.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "declared_status": "Inferred",
+  "declared_status_note": "Inferred, not Confirmed. Each hash is computed from the bytes in this tree, which is evidence of what is here. That those bytes are the document the issuing body published is not established for any entry: nothing in this repository records where a stored PDF was downloaded from. Only an operator-supplied hash from the issuing body would move this.",
+  "supersedes": "nothing. This is the first authority source index on this branch. The 2026-only pinning the specification's decision 3 recorded stands as the state it replaces, and a correction to this index is a successor index, never an edit.",
+  "uncertainties": [
+    "No entry is authenticated by a hash from its issuing body, so no matrix row may declare Confirmed and none does.",
+    "The four unobtained documents cannot be fetched until the 2025 call identifier is settled, which row CI-01 records as unresolved.",
+    "The stored evaluation form declares a version date later than the 2025 call's own year, and whether it was in force for that call is row EI-02's open question.",
+    "Four entries are tracked inputs: the scorecard, the 2026 profile, the appendix mapping and the specification. Any edit to one makes the matrix stale until it is re-derived."
+  ],
+  "authority_note": "This index confers no authority. It records what is held and what is missing. Pinning a document is not authenticating it, and recording a destination for an absent document asserts nothing about a file there.",
+  "written_by": "tools/author_msca_dn_authority_matrix.py",
+  "sources": [
+    {
+      "path": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+      "class": "instrument_application_form",
+      "era": "historical",
+      "authentication": "computed_only",
+      "role": "immutable_evidence",
+      "sha256": "b77f148e8875359a64594889c3c4580d10d4024aaf23d949ac67b2b6dcbf03f7",
+      "states": "the MSCA Doctoral Networks application form of the 2025 call, Part B template included",
+      "version": "5.0",
+      "pages": 56
+    },
+    {
+      "path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+      "class": "instrument_application_form",
+      "era": "current",
+      "authentication": "computed_only",
+      "role": "immutable_evidence",
+      "sha256": "f19042696e492ce4a0686b8c20dc0633a12cf7eb2bb8461b3dfc41eb57d4d3bd",
+      "states": "the Part B template of the 2026 call",
+      "version": "6.0",
+      "pages": 34
+    },
+    {
+      "path": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+      "class": "instrument_evaluation_form",
+      "era": "current",
+      "authentication": "computed_only",
+      "role": "immutable_evidence",
+      "sha256": "f7478ef7f1eac4c327c62489b66f0c8531ee890917671442846027f329bfbd2c",
+      "states": "the evaluation form the 2026 scorecard is derived from",
+      "version": "2.2",
+      "pages": 10
+    },
+    {
+      "path": "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "class": "programme_guidance",
+      "era": "current",
+      "authentication": "computed_only",
+      "role": "immutable_evidence",
+      "sha256": "ea3180318de7041569dc0dd5adf4ff5db0540f5bc99f0fac4942f3d05026f9d8",
+      "states": "the General Annexes of the 2026-2027 work programme",
+      "pages": 46
+    },
+    {
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf",
+      "class": "work_programme",
+      "era": "current",
+      "authentication": "computed_only",
+      "role": "immutable_evidence",
+      "sha256": "8577ee9cd0bc506b28dbcb9b86bb2016745b75fbd6fb8a254b76597cbd3ef24b",
+      "states": "the MSCA part of the 2026-2027 work programme",
+      "pages": 112
+    },
+    {
+      "path": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+      "class": "evaluation_output",
+      "era": "historical",
+      "authentication": "operator_supplied",
+      "role": "immutable_evidence",
+      "sha256": "2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb",
+      "states": "the 2025 evaluation's own recorded result, criterion by criterion",
+      "authentication_basis": "an operator transcription of the 2025 report, dated 2026-10-07, stated in the record's own `authored_by` field; no hash from an issuing body"
+    },
+    {
+      "path": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+      "class": "submission_record",
+      "era": "historical",
+      "authentication": "operator_supplied",
+      "role": "immutable_evidence",
+      "sha256": "5c9ce4e34af8c120ce266effba7ee7719e92cff91671de1be1f3bcb3e205e4e9",
+      "states": "the fidelity register over the sanitised copy, with the submission's declared facts",
+      "authentication_basis": "the operator, named in the register's own `provenance/declared_by` field; no hash from an issuing body"
+    },
+    {
+      "path": "docs/tier4_orchestration_state/decision_log/msca-dn-pe01-workspace_2026-10-04.json",
+      "class": "repository_decision",
+      "era": "cross_era",
+      "authentication": "computed_only",
+      "role": "immutable_evidence",
+      "sha256": "e410da1c249b9d0288d1dd4a77fa56841138bb1dbf8f20ac9432ce1ac683e79a",
+      "states": "the PE-01 decision, which declares the 2025 call identifier Assumed"
+    },
+    {
+      "path": "harness/evaluator_scorecard_msca_dn.json",
+      "class": "derived_configuration",
+      "era": "current",
+      "authentication": "computed_only",
+      "role": "tracked_input",
+      "sha256": "f0e16bf2c85657cef2969c5db94fe48d2ef097acd4617f2369fda3c9c0cb41b0",
+      "states": "the scoring contract derived from the 2026 evaluation form",
+      "version": "2.2",
+      "scope_restrictions": [
+        {
+          "field_prefix": "provenance/v5_equivalence",
+          "settles_areas": [
+            "section_mapping"
+          ],
+          "measured": "the ten numbered aspect headings, Tables 3.1 a to 3.1 e, the 34-page Part B1 cap with sections 1 to 3 at 30, and Part B2 sections 4 to 10 — structure, and nothing about a scoring rule, a weight, a threshold or an evaluator instruction"
+        }
+      ]
+    },
+    {
+      "path": "harness/profiles/msca_dn_2026_default.json",
+      "class": "derived_configuration",
+      "era": "current",
+      "authentication": "computed_only",
+      "role": "tracked_input",
+      "sha256": "308a955dada102e92212f87c43cdf28576b49f1cb2a6894acb64c2ac87a3fee2",
+      "states": "the 2026 pre-evaluation profile the matrix compares against"
+    },
+    {
+      "path": "harness/criterion_appendix_mapping_msca_dn.json",
+      "class": "derived_configuration",
+      "era": "current",
+      "authentication": "computed_only",
+      "role": "tracked_input",
+      "sha256": "36530cb0090fdf9ae36792b0e2361f282cde5015a4f8a188e1dd05b54cf59a08",
+      "states": "the criterion-to-table routing derived from the 2026 form"
+    },
+    {
+      "path": "plans/msca_dn_pre_evaluation_spec.md",
+      "class": "repository_decision",
+      "era": "cross_era",
+      "authentication": "computed_only",
+      "role": "tracked_input",
+      "sha256": "e1d1abed60a444a421248ee2086b4fbc26e2402bb2bb2f28601f87ad7524e7ea",
+      "states": "the pre-evaluation specification, which fixes the harness's own scoring method"
+    },
+    {
+      "path": "docs/tier2b_topic_and_call_sources/work_programmes/msca/historical_work_programme.pdf",
+      "class": "work_programme",
+      "era": "historical",
+      "authentication": "not_obtained",
+      "role": "immutable_evidence",
+      "states": "the MSCA part of the work programme in force for the 2025 call",
+      "required": true,
+      "would_settle": [
+        "CI-01"
+      ],
+      "path_note": "A destination, not a document. This is where the file is filed when the operator supplies it."
+    },
+    {
+      "path": "docs/tier1_normative_framework/programme_guidance/historical_general_annexes.pdf",
+      "class": "programme_guidance",
+      "era": "historical",
+      "authentication": "not_obtained",
+      "role": "immutable_evidence",
+      "states": "the General Annexes in force for the 2025 call",
+      "required": true,
+      "would_settle": [
+        "TH-03"
+      ],
+      "path_note": "A destination, not a document. This is where the file is filed when the operator supplies it."
+    },
+    {
+      "path": "docs/tier2b_topic_and_call_sources/call_extracts/historical_dn_call_conditions.pdf",
+      "class": "call_document",
+      "era": "historical",
+      "authentication": "not_obtained",
+      "role": "immutable_evidence",
+      "states": "the conditions and topic text of the 2025 Doctoral Networks call",
+      "required": true,
+      "would_settle": [
+        "CI-01",
+        "EI-02"
+      ],
+      "path_note": "A destination, not a document. This is where the file is filed when the operator supplies it."
+    },
+    {
+      "path": "docs/tier2a_instrument_schemas/evaluation_forms/msca/historical_evaluation_form.pdf",
+      "class": "instrument_evaluation_form",
+      "era": "historical",
+      "authentication": "not_obtained",
+      "role": "immutable_evidence",
+      "states": "the version of the evaluation form in force for the 2025 call",
+      "required": true,
+      "would_settle": [
+        "CR-02",
+        "EI-01",
+        "EI-02",
+        "EI-04",
+        "TH-03",
+        "TH-05",
+        "WT-02"
+      ],
+      "path_note": "A destination, not a document. This is where the file is filed when the operator supplies it."
+    }
+  ]
+}

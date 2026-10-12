@@ -733,17 +733,103 @@ scoring-relevant rule is either sourced or declared unresolved.
 ### Acceptance criteria
 
 - [ ] The 2025 call and work-programme documents are obtained, authenticated and pinned by hash in a
-      source index.
-- [ ] A matrix covers criteria, weights, thresholds, evaluator instructions, DN variant, section and
-      appendix mapping, and every scoring assumption that affects interpretation or a number.
-- [ ] Each row cites a pinned source for equivalence or difference, or is marked an explicit unresolved
-      limitation.
-- [ ] No row is marked equivalent because no difference was found. Defaulting is recorded as defaulting,
-      with the rule it affects named.
-- [ ] Form-equivalence records are not treated as equivalence of every historical call rule.
+      source index. **Half closed, and the open half is the operator's.** The index exists and pins 12
+      documents by sha256, each declaring the era whose rules it states, its class of authority and how
+      its bytes are vouched for. Four required 2025 documents are not in this repository — the work
+      programme, the General Annexes, the call conditions and the evaluation form version in force —
+      and each is an entry with `authentication: not_obtained` and the destination it will be filed at.
+      A citation of one fails the check, so no row rests on a document nobody has. The authentication
+      contract is V08's: an operator's expected hash from the authoritative source, matched before
+      anything is written. Nothing here fetches a document, and the ticket's own verification sentence
+      assigns the obtaining to the operator. No entry is yet authenticated by an issuing body, which is
+      why no row is Confirmed.
+- [x] A matrix covers criteria, weights, thresholds, evaluator instructions, DN variant, section and
+      appendix mapping, and every scoring assumption that affects interpretation or a number. All eight
+      areas are `required_areas` in the declaration, asserted against this ticket by test, and
+      `areas_required_but_not_covered` reports any the rows leave empty. 23 rows, and a ninth area the
+      ticket does not name: `call_identity`, because which call the 2025 submission was evaluated under
+      is the prerequisite for addressing the index at all. Three rows carry the harness's own scoring
+      assumptions — the sample count and statistic, the unassessable grounding axis, and the assessed
+      text being a sanitised derivative — as `era_neutral`, each declaring why no call document of
+      either year states it.
+- [x] Each row cites a pinned source for equivalence or difference, or is marked an explicit unresolved
+      limitation. 67 citations, each declaring exactly one locator: a pointer into a JSON source, or a
+      page of a pinned document with the verbatim quote found there. A page number alone locates
+      nothing a reader can check, so `document_citations_without_a_quote` reports one. All 34 document
+      quotes are re-derived from their pages by test, through the extraction route the evaluation
+      bundle used. The two unresolved rows carry their limitation, and an unresolved row without one
+      fails.
+- [x] No row is marked equivalent because no difference was found. Defaulting is recorded as defaulting,
+      with the rule it affects named. Enforced, not stated: the verdict vocabulary has no term meaning
+      *no difference was found*, and `equivalence_without_historical_evidence` reports a row marked
+      equivalent or differs with no citation into an **obtained historical** source. A `defaulted` row
+      names the source it is carried from, the rule its defaulting affects and the risk, and
+      `defaulting_without_an_affected_rule` reports one that does not. Five rows are defaulted and two
+      unresolved; six of the seven trace to the 2025 evaluation form alone.
+- [x] Form-equivalence records are not treated as equivalence of every historical call rule. The index
+      entry for the record carries a `scope_restrictions` block: the passage
+      `provenance/v5_equivalence`, the one area it settles (`section_mapping`), and what it measured.
+      A citation of it from any other area is `citations_outside_their_declared_scope`. It is cited
+      once, from inside that area, over a row the 2025 form's own two sentences settle anyway. The
+      appendix-mapping row, which could have leaned on it, carries eleven located passages of its own
+      instead. A second species of the same overreach is enforced too: an evaluation output or a record
+      over the submission evidences what was applied to *that* submission, so
+      `call_wide_claims_on_submission_evidence` reports a call-wide conclusion resting only on one.
 
 **Verification.** Every matrix row resolves to a pinned document and a located passage, or to a recorded
 Unresolved status. The operator supplies the source documents.
+
+**Status 2026-10-12.** Four of five criteria closed; criterion 1 half closed, with the obtaining
+assigned to the operator. The source half of F05 closes. V09 no longer blocks V10 on anything but the
+four absent documents — V10 can author the historical profile from this matrix now, and its defaulted
+rules will be defaulted in the profile too.
+
+One 2025-era call document turned out to be in the tree already: the V5.0 application form, which the
+form-equivalence record cited and nothing had read as an authority in its own right. It carries five
+rows. The 2025 evaluation's own record carries seven more. One of those is evidenced by arithmetic:
+the weighted-total formula applied to its recorded criterion scores reproduces its recorded total,
+and the deriver refuses to render if it stops doing so.
+
+The one difference found is SM-03. The 2026 form adds a Part B2 section 11 the 2025 form does not have,
+so the appendix mapping's rule excluding it has no subject under the 2025 form. The historical profile
+keeps the rule and records that it is vacuous.
+
+26 rows: 12 equivalent, 1 differs, 6 defaulted, 2 unresolved and 5 era_neutral. Eighteen are
+`Inferred`, seven `Assumed` and one `Unresolved`.
+
+**Review changed five rows and added two.** The first draft carried the defect criterion 4 names. One
+row called the score resolution equivalent on three recorded scores that happen to end in zero, which
+is the absence of a visible difference read as agreement. The resolution is now TH-05, defaulted, with
+the rule it affects and the document that would settle it; the maximum of 5.00, which the 2025 record
+does print, stays TH-04.
+
+SM-01's claim of a set equality is now measured in both directions and the deriver refuses if the
+anchor sets part. AM-01 states that its claim is an inclusion, and the matrix carries the unmeasured
+direction as an uncertainty. SA-05 and SA-06 were added for two harness assumptions that affect a
+number. Both `operator_supplied` entries now name the field recording that provenance, and the check
+reports a vouched rank with no basis.
+
+No assessor ran, no quota was spent, and the 74.60 baseline is untouched. Both declarations are
+`agent_drafted_pending_operator_review` and no row is Confirmed.
+
+**The lane's own result is unmeasured.** The lane gains an `authority` area, declared not depended on.
+Its declaration is reconciled and `tests/harness/` passes whole, but the lane was not run to completion
+in this change and no lane figure is stated. The decision record declares it `Unresolved`.
+
+**One side effect on another ticket's artifact.** The R04 declaration drafts carry an adoption-cost
+scan coupled to the tree, so the authority index pinning the sanitised revision's register made the
+sanitised draft and the shared checklist stale. Both were re-rendered, which is the response the scan's
+own documentation states, and a successor re-render record states the hashes of the two files that
+moved. The resolved-fixes draft is untouched and its older record is unedited. The re-render test now
+reads the series of records rather than one named record; the invariant it enforces is unchanged.
+
+The whole suite is 7,479 passed, 194 failed, 86 skipped. The baseline at `ab0fd35`, run in a separate
+worktree, gives 205 failed. Every one of the 194 failing node ids appears in that 205, so this change
+introduces no failure.
+
+Evidence: `plans/reports/v09_authority_matrix_2026-10-12.md`; decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-authority-matrix_2026-10-12.json`; artifacts
+`docs/tier4_orchestration_state/msca_dn/authority/`.
 
 ## V10 — Author the historical 2025 profile from the matrix
 

@@ -38,7 +38,10 @@ each by sha256, under one of two roles:
   :attr:`RegisterCheck.stale_tracked_inputs` reports separately.
 
 Both fail the check. They are separate findings because an edited historical
-record and a stale register are different defects with different fixes.
+record and a stale register are different defects with different fixes. The two
+roles, the hash and the comparison itself live in
+:mod:`harness.record_binding`, shared with the other successor records that bind
+what they read.
 
 Every :class:`Row` cites one of those declared sources as ``path#pointer``, so
 no row points at a record the register has not bound. The pointer has to resolve
@@ -55,8 +58,9 @@ statement with no measurement fails the check, and a measurement the records
 contradict fails it too. So the register's prose cannot drift away from the
 records it describes, which is the rule V05 established for audit wording.
 
-The measurement grammar is deliberately small: a ``/``-separated key path into
-objects, with ``#N`` for a position in a list, and either ``expected`` or
+The measurement grammar is deliberately small: the shared pointer grammar of
+:func:`harness.record_pointer.resolve_field` — a ``/``-separated key path into
+objects, with ``#N`` for a position in a list — plus either ``expected`` or
 ``expected_length``. It is **not** the register-pointer dialect of
 :func:`harness.esr_comparison.resolve_pointer`, which resolves a bare segment on
 a keyed list by identity. Nothing here resolves by identity, and a reader should
@@ -77,13 +81,22 @@ own.
 
 from __future__ import annotations
 
-import hashlib
 import json
-import textwrap
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from harness.record_pointer import UNRESOLVED, resolve_field
+from harness.record_binding import (
+    REVIEW_STATES,
+    SOURCE_ROLES,
+    STATUSES,
+    check_bindings,
+    file_sha256,
+)
+from harness.record_binding import Unreadable as _Unreadable
+from harness.record_binding import one_line as _one_line
+from harness.record_binding import wrap as _wrap
 from runner.paths import find_repo_root
 
 #: The declaration schema this reader understands. An authoring tool carries its
@@ -120,22 +133,6 @@ KINDS: tuple[str, ...] = (
 #: A row is open or closed. There is no third state: a row half-closed is open,
 #: and its progress belongs in its subject rather than in a status word.
 STATES: tuple[str, ...] = ("open", "closed")
-
-#: How a bound record is treated when its bytes move.
-SOURCE_ROLES: tuple[str, ...] = ("immutable_evidence", "tracked_input")
-
-#: Who has reviewed the register. The vocabulary the sibling Tier 4 records use,
-#: so a reader does not meet a third spelling of the same fact.
-REVIEW_STATES: tuple[str, ...] = ("agent_drafted_pending_operator_review", "operator_reviewed")
-
-#: The four evidence statuses CLAUDE.md section 12.2 defines.
-STATUSES: tuple[str, ...] = ("Confirmed", "Inferred", "Assumed", "Unresolved")
-
-
-def file_sha256(path: Path) -> str:
-    """The sha256 of *path*'s bytes, hex, no prefix."""
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
 
 # --------------------------------------------------------------------------- #
 # The declaration
@@ -422,46 +419,10 @@ def load_register(path: Path, repo_root: Path | None = None) -> Register:
 # --------------------------------------------------------------------------- #
 # Resolving a measurement
 # --------------------------------------------------------------------------- #
-
-
-class _Unresolved:
-    """The field did not resolve. Distinct from a resolved ``None``."""
-
-
-UNRESOLVED = _Unresolved()
-
-
-@dataclass(frozen=True)
-class _Unreadable:
-    """A bound record that could not be parsed, and why."""
-
-    why: str
-
-
-def resolve_field(data: Any, field: str) -> Any:
-    """Resolve *field* into *data*, or :data:`UNRESOLVED`.
-
-    A segment indexes an object by key. ``#N`` indexes a list by position.
-    Nothing resolves by identity — see this module's docstring on why that rule
-    is deliberately absent.
-    """
-    node: Any = data
-    for seg in [s for s in field.split("/") if s != ""]:
-        if isinstance(node, Mapping):
-            if seg not in node:
-                return UNRESOLVED
-            node = node[seg]
-        elif isinstance(node, list) and seg.startswith("#"):
-            index = seg[1:]
-            if not index.lstrip("-").isdigit():
-                return UNRESOLVED
-            try:
-                node = node[int(index)]
-            except IndexError:
-                return UNRESOLVED
-        else:
-            return UNRESOLVED
-    return node
+#
+# The pointer grammar itself lives in :mod:`harness.record_pointer`, shared with
+# the other records that cite each other by pointer. It is re-exported here so a
+# reader of a register's measurement does not have to go looking for it.
 
 
 # --------------------------------------------------------------------------- #
@@ -584,23 +545,11 @@ def _check_rows(
 
 
 def _check_sources(register: Register, repo_root: Path) -> dict[str, tuple[str, ...]]:
-    missing: list[str] = []
-    edited: list[str] = []
-    stale: list[str] = []
-    for source in register.sources:
-        path = repo_root / source.path
-        if not path.is_file():
-            missing.append(source.path)
-            continue
-        if file_sha256(path) != source.sha256:
-            if source.role == "immutable_evidence":
-                edited.append(source.path)
-            else:
-                stale.append(source.path)
+    bindings = check_bindings(register.sources, repo_root)
     return {
-        "missing_sources": tuple(missing),
-        "edited_immutable_sources": tuple(edited),
-        "stale_tracked_inputs": tuple(stale),
+        "missing_sources": bindings.missing,
+        "edited_immutable_sources": bindings.edited_immutable,
+        "stale_tracked_inputs": bindings.stale_tracked,
     }
 
 
@@ -675,16 +624,6 @@ def check(register: Register, repo_root: Path | None = None) -> RegisterCheck:
 # --------------------------------------------------------------------------- #
 # Rendering
 # --------------------------------------------------------------------------- #
-
-
-def _one_line(text: str) -> str:
-    """*text* with its newlines collapsed, for a table cell."""
-    return " ".join(str(text).split())
-
-
-def _wrap(text: str) -> str:
-    """*text* hard-wrapped, the width the repository's rendered reports use."""
-    return "\n".join(textwrap.wrap(_one_line(text), width=98))
 
 
 def _kind_heading(kind: str) -> str:

@@ -56,6 +56,15 @@
       "depended_on": true
     },
     {
+      "name": "authority",
+      "invariant": "A rule the historical submission is scored under is either sourced to a document of its own call, or recorded as defaulted or unresolved. No row is marked equivalent because no difference was found. A defaulting names the rule it affects. A form-equivalence record settles only the structure it measured. The historical run does not depend on this invariant directly. The matrix is what V10's historical profile is authored from, and the profile area checks the profile the run loads.",
+      "modules": [
+        "tests/harness/test_authority_matrix.py",
+        "tests/test_msca_dn_authority_matrix.py"
+      ],
+      "depended_on": false
+    },
+    {
       "name": "profile",
       "invariant": "An instrument profile resolves to its own rubrics, scorecard and criterion routing. A criterion cannot be scored under a profile that does not declare it.",
       "modules": [

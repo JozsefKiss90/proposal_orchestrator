@@ -34,7 +34,7 @@ declaration:
 py -3.10 -m harness.commands.acceptance_lane
 ```
 
-[`ACCEPTANCE_LANE.md`](ACCEPTANCE_LANE.md) names the fourteen coverage areas, the
+[`ACCEPTANCE_LANE.md`](ACCEPTANCE_LANE.md) names the sixteen coverage areas, the
 invariant each one carries, every declared exclusion, and what a green result
 does not say. The lane fails on an undeclared skip and on a declared exclusion
 the run never reports, so the two documents cannot drift apart.
@@ -148,6 +148,74 @@ A closed deferral, an operator decision, or a resolved observation. The register
 and what would close it. `review_state` says who has reviewed it and `declared_status` says how good
 its own reading is — `Inferred` where a row's openness is read off the absence of a closing decision,
 because an absence is not a confirmation.
+
+## Rule-equivalence matrix (`authority_matrix.py` + `commands/authority_matrix.py`)
+
+A proposal submitted under one year's call gets assessed by a profile written for another year's.
+Copying the profile and leaving a rule unchanged wherever no source states a difference is a
+**defaulting policy**. It is not evidence that the rule applied in the historical year. A record that
+calls it equivalence has turned an absence of evidence into a sourced fact.
+
+Two artifacts answer it. A **source index** is the authority documents, each pinned by sha256. Each
+entry declares the era whose rules it states, the class of authority it is, and how its bytes are
+vouched for. A **matrix** is the rows, and it binds its index by hash. An index edit therefore makes
+the matrix stale rather than silently changing what a row rests on. A required document that has not
+been obtained is an index entry too, with `authentication: not_obtained` and the destination it will
+be filed at.
+
+### The verdicts
+
+| Verdict | What it means |
+|---|---|
+| `equivalent` | a historical source states the rule, and it is the rule the current profile holds |
+| `differs` | a historical source states a different rule |
+| `defaulted` | the current rule is carried forward because no historical source states it — **not** equivalence |
+| `unresolved` | no source states the rule, and the limitation is recorded |
+| `era_neutral` | the rule is the assessing harness's own, and no call document of either year states it |
+
+There is no verdict meaning *no difference was found*. `check` reports a row marked `equivalent` or
+`differs` with no citation into an obtained historical source. It also reports a `defaulted` row that
+does not name the rule its defaulting affects.
+
+### Three ways a citation can overreach
+
+Each is a finding, not a sentence in a report:
+
+- **Beyond a record's measured scope.** A source entry may carry `scope_restrictions`: a field prefix
+  and the row areas a passage under it settles. A form-equivalence record that measured section
+  structure settles section structure; a row about thresholds citing it is reported.
+- **Submission evidence read as a call rule.** An evaluation output or a record over the submission
+  itself evidences what was applied to *that* submission. A `call_wide` row resting only on one is
+  reported.
+- **Confirmed on unvouched bytes.** A row may declare `Confirmed` only when a citation behind it rests
+  on a source whose hash came from the issuing body. A document sitting in a repository with no
+  recorded download provenance is pinned, not authenticated.
+
+An authentication rank is itself evidence, so it carries one too. An entry claiming a rank above
+`computed_only` must name where that provenance is recorded, and `check` reports one that does not.
+The rank would otherwise rest on the index author's word, which is the thing the rank improves on.
+
+### Locating a passage
+
+A citation declares exactly one locator. A `field` resolves by pointer into a JSON source, and as text
+into a source that is neither JSON nor paginated. A `page` must be within the pinned document's
+recorded page count. It must also come with the verbatim `quote` found there, because a page number
+alone locates nothing a reader can check. The quote is re-derived from the document by the matrix's
+own test module, through `runner.source_index.read_page_text`. The pointer grammar is the shared
+`record_pointer.resolve_field`.
+
+### Who writes it, and who checks it
+
+The same split as the register above, for the same two reasons. A matrix is authored by a deterministic
+tool in `tools/`, which carries its own copies of the two schema strings. This module holds the reader,
+the check and both Markdown renderings. `commands/authority_matrix.py --matrix PATH` writes the
+renderings and exits 1 on any finding.
+
+### What a green matrix is not evidence of
+
+That the historical rules are known. A green matrix says every row is either sourced or declared
+unsourced. A `defaulted` row declares that a rule is unsourced. It is neither a finding that the rule
+is wrong nor permission to read a number as if it were established.
 
 ## Deterministic-first routing
 
@@ -567,6 +635,7 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Comparison diff: what moved between a comparison and its successor — dispositions, citations, counts, priorities | `harness/comparison_diff.py`; `<out-dir>/review_diff_<sha12>_<NNNN>.json` + `.md` |
 | Evidence preflight: realised pack set, pack-set hash, seven-section report | `harness/evidence_preflight.py`; reports `harness/blind_reports/preflight_<hash12>_<NNNN>.json` |
 | Declared grounding scope: two scope choices, the measurement beside the declaration, the X01 flag | `harness/grounding_scope.py` |
+| Rule-equivalence matrix: authority documents pinned by era and authentication, every scoring rule sourced, defaulted or unresolved | `harness/authority_matrix.py`; `py -3.10 -m harness.commands.authority_matrix --matrix PATH` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
 | Document route (`--document`) | evidence via `runner.dev_graph.build_package` under the `blind_pre_evaluation` view; materialised under `<out-dir>/candidates/<document node id>/` |

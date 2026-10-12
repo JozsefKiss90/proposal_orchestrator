@@ -53,9 +53,9 @@ identity, so a green importer area under it would certify a replay of a differen
 `--allow-unreproducing-build` runs anyway and stamps the result NOT CERTIFIED. It is for an engineer
 measuring a new build, not for accepting one.
 
-## The fifteen areas
+## The sixteen areas
 
-Seven areas carry invariants the historical run depends on. The other eight carry the rest of
+Seven areas carry invariants the historical run depends on. The other nine carry the rest of
 the audit's focused command, kept rather than dropped. Every declared exclusion sits in an area marked
 **no**, and the lane refuses to run when one does not. That is how *no exception covers a check the
 historical run depends on* becomes a measurement rather than an assertion.
@@ -68,6 +68,7 @@ them. Four of their checks are excluded.
 |---|---|---|---|
 | **dry_import** | no | A document is measured before it is imported. The measurement declares no page map and writes no graph state. A 'preserved' fidelity verdict may not rest on a measurement that is equally true of a document whose graphical evidence is gone. The submitted original and its derived text stay outside this repository. The historical run does not depend on this invariant. Stage A reads the sanitised copy, and V08 gates the original's import and V13's readiness receipt. | `test_dry_import.py`, `test_msca_dn_dry_import.py` |
 | **importer** | yes | Both sanitised candidate revisions replay byte-equal from the committed PDFs, under the extraction build V01 pinned, and derive the recorded document identity. | `test_extraction_environment.py`, `test_msca_dn_import.py`, `test_msca_dn_workspace.py`, `test_blind_document_subsections.py` |
+| **authority** | no | A rule the historical submission is scored under is either sourced to a document of its own call, or recorded as defaulted or unresolved. No row is marked equivalent because no difference was found. A defaulting names the rule it affects. A form-equivalence record settles only the structure it measured. The historical run does not depend on this invariant directly. The matrix is what V10's historical profile is authored from, and the profile area checks the profile the run loads. | `test_authority_matrix.py`, `test_msca_dn_authority_matrix.py` |
 | **profile** | yes | An instrument profile resolves to its own rubrics, scorecard and criterion routing. A criterion cannot be scored under a profile that does not declare it. | `test_profile.py`, `test_msca_dn_profile.py`, `test_ria_profile.py`, `test_rubrics.py`, `test_routing.py` |
 | **preflight** | yes | Evidence selection is pinned before an assessor runs. The pack set hashes, the manifest pin binds, and a pack whose anchors do not resolve fails closed. | `test_evidence_preflight.py`, `test_evidence_pack.py` |
 | **freeze** | yes | The baseline freeze binds what it froze and refuses what it must. The frozen 74.60 report still passes the gate it was frozen under. Every preflight, report and freeze declares its grounding scope beside the measurement of what the run could judge. | `test_blind_baseline.py`, `test_blind_assessment.py`, `test_grounding_scope.py` |

@@ -1,0 +1,177 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-authority-matrix_2026-10-12",
+  "date": "2026-10-12",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation",
+  "ticket": "V09 of plans/msca_dn_historical_validation_tickets.md",
+  "gate": "G3",
+  "closes": "the source half of finding F05 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md",
+  "authority": "Agent-authored under CLAUDE.md. Advisory, out-of-band QA. Closes no gate and confers no authority. The operator's review is what moves review_state.",
+  "decision": "Replace the runbook's defaulting policy with a record. Two artifacts: an authority source index pinning every document a rule may be cited to, with the era whose rules it states and how its bytes are vouched for; and an equivalence matrix in which every scoring-relevant rule is sourced to a 2025 document, or recorded as defaulted with the rule its defaulting affects, or recorded as an unresolved limitation. The vocabulary has no verdict meaning that no difference was found.",
+  "artifacts": {
+    "source_index": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-12.json",
+    "source_index_reading": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-12.md",
+    "matrix": "docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-12.json",
+    "matrix_reading": "docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-12.md",
+    "reader": "harness/authority_matrix.py",
+    "command": "harness/commands/authority_matrix.py",
+    "author": "tools/author_msca_dn_authority_matrix.py",
+    "shared_pointer_grammar": "harness/record_pointer.py",
+    "tests": [
+      "tests/harness/test_authority_matrix.py",
+      "tests/test_msca_dn_authority_matrix.py"
+    ],
+    "report": "plans/reports/v09_authority_matrix_2026-10-12.md",
+    "shared_binding_check": "harness/record_binding.py"
+  },
+  "declared_values": {
+    "rows": {
+      "value": 26,
+      "distribution": {
+        "equivalent": 12,
+        "differs": 1,
+        "defaulted": 6,
+        "unresolved": 2,
+        "era_neutral": 5
+      },
+      "declared_status": "Inferred",
+      "reason": "Each verdict is read off the sources the row cites. No source is authenticated by a hash from its issuing body, so no row may declare Confirmed and none does.",
+      "status_distribution": {
+        "Inferred": 18,
+        "Assumed": 7,
+        "Unresolved": 1
+      }
+    },
+    "areas": {
+      "required": [
+        "criteria",
+        "weights",
+        "thresholds",
+        "evaluator_instructions",
+        "variant",
+        "section_mapping",
+        "appendix_mapping",
+        "scoring_assumption"
+      ],
+      "beyond_the_required_set": [
+        "call_identity"
+      ],
+      "declared_status": "Confirmed",
+      "reason": "The eight are ticket V09's own list, asserted against it by test. The ninth is the prerequisite the ticket does not name: which call the 2025 submission was evaluated under."
+    },
+    "documents_obtained": {
+      "value": 12,
+      "of": 16,
+      "declared_status": "Confirmed",
+      "reason": "Derived from the tree by the authoring tool and re-derived by the test; every hash is the sha256 of the file on disk."
+    },
+    "documents_not_obtained": {
+      "value": 4,
+      "which": [
+        "the MSCA part of the work programme in force for the 2025 call",
+        "the General Annexes in force for the 2025 call",
+        "the conditions and topic text of the 2025 Doctoral Networks call",
+        "the version of the evaluation form in force for the 2025 call"
+      ],
+      "declared_status": "Confirmed",
+      "reason": "No file sits at any of the four destinations, which a test asserts and the authoring tool refuses to render against."
+    },
+    "the_2025_call_identifier": {
+      "value": "HORIZON-MSCA-2025-DN-01",
+      "declared_status": "Assumed",
+      "reason": "Row CI-01. The PE-01 decision and the fidelity register both declare it the operator's declaration, and the authoring tool refuses to render if either stops declaring it Assumed. The four unobtained documents cannot be fetched until it is settled."
+    },
+    "the_one_difference": {
+      "value": "the 2026 form adds a Part B2 section 11 the 2025 form does not have",
+      "row": "SM-03",
+      "declared_status": "Inferred",
+      "reason": "Both quotes are located and verified on the pages they cite. The appendix mapping's rule excluding section 11 therefore has no subject under the 2025 form."
+    },
+    "the_largest_unsourced_input": {
+      "value": "the six score-level descriptions, 0 to 5",
+      "row": "EI-01",
+      "declared_status": "Assumed",
+      "reason": "Only the 2026 evaluation form states them. A changed level sentence changes every grade, so a numerical comparison with the 2025 total rests on this defaulting."
+    },
+    "the_score_resolution": {
+      "value": "one decimal place, carried from the 2026 evaluation form",
+      "row": "TH-05",
+      "declared_status": "Assumed",
+      "reason": "The 2025 evaluation prints 4.20, 4.50 and 4.20, to two decimals, and states no resolution rule. All three happen to end in zero, which is consistent with a one-decimal rule and is not evidence of one. The maximum of 5.00, which the record does print, stays row TH-04 and stays equivalent."
+    },
+    "the_vouched_authentications": {
+      "value": 2,
+      "which": [
+        "the 2025 evaluation's own record, basis: an operator transcription dated 2026-10-07, stated in its authored_by field",
+        "the fidelity register over the sanitised copy, basis: the operator, named in its provenance/declared_by field"
+      ],
+      "declared_status": "Confirmed",
+      "reason": "Each basis is resolved out of the record by the authoring tool, which refuses if the pointer stops resolving or the record stops saying it, and re-resolved by the test. harness.authority_matrix.check reports any entry claiming a rank above computed_only with no basis recorded.",
+      "paths": "Both entries are listed by path in the source index this record names under artifacts. They are not restated here: the R04 declaration drafts carry an adoption-cost scan that reads every committed file for a fidelity register's path, and a record naming one makes those drafts stale again. The side_effect block below states that coupling."
+    }
+  },
+  "verification": {
+    "byte_equal_replay": "py -3.10 -m tools.author_msca_dn_authority_matrix --check — up to date, exit 0",
+    "matrix_check": "py -3.10 -m harness.commands.authority_matrix --matrix docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-12.json — green, exit 0",
+    "tests": "tests/harness/test_authority_matrix.py 68 passed; tests/test_msca_dn_authority_matrix.py 63 passed",
+    "quotes_re_derived": "35 document citations, each quote re-extracted from the page it cites through runner.source_index.read_page_text",
+    "lane": {
+      "declared_status": "Unresolved",
+      "reason": "The lane gains an authority area, declared not depended on. tests/harness/test_acceptance_lane.py passes and --list is reconciled, but the lane's own single-process result was not measured in this change. The operator's py -3.10 -m harness.commands.acceptance_lane is what closes it. No lane figure is stated anywhere in this change."
+    },
+    "quota": "No assessor ran. No quota was spent. The frozen 74.60 baseline is untouched.",
+    "whole_suite": "py -3.10 -m pytest tests/ — 7,479 passed, 194 failed, 86 skipped. Measured against a baseline: ab0fd35 in a separate worktree with the gitignored .env copied in gives 205 failed, 7,308 passed, 107 skipped. The two sets of failing node ids were compared with comm: every one of the 194 appears in the baseline's 205 and the difference set is empty, so this change introduces no failure. The baseline's extra failures and skips come from artifacts a fresh worktree does not carry, which is why the comparison is of node ids and not of counts.",
+    "anchor_sets_measured": "The aspect anchors printed across each form's criteria table are read out and compared, with the page either side of the table required to carry none. Both sets are exactly 1.1 1.2 1.3 1.4 2.1 2.2 2.3 2.4 3.1 3.2, which is SM-01's second direction."
+  },
+  "deferred": [
+    "Criterion 1 of V09 is closed for the index and its authentication contract, and open for the obtaining. Four 2025 documents are the operator's to supply; nothing here fetches one.",
+    "No source is authenticated by a hash from its issuing body, so no row is Confirmed. An operator-supplied issuer hash is what would move any row to Confirmed.",
+    "Which evaluation-form version applied in 2025 stays open (row EI-02), and four of the five defaulted rows rest on that gap."
+  ],
+  "known_gaps": [
+    "The matrix quotes the 2025 evaluation's recorded figures. It sits in docs/tier4_orchestration_state/msca_dn/, outside the dev-graph root at workspaces/msca_dn/, so no snapshot reads it and it cannot reach an evidence pack. That is the position the ESR record already holds under spec decision 12, and the blind lane's isolation rests on that exclusion plus the assessor running with no tools from outside the repository.",
+    "Four index entries are tracked inputs: the scorecard, the 2026 profile, the appendix mapping and the pre-evaluation specification. An edit to any one makes the matrix stale until it is re-derived.",
+    "The five era_neutral rows record harness assumptions rather than call rules. They affect a number or an interpretation and are declared, not sourced, because no call document of either year states them.",
+    "AM-01 claims an inclusion and not a set equality: a 2025 cross-reference the 2026 mapping has no row for would not have been seen. SM-01's anchor comparison bounds what such a sentence could reroute, and the matrix carries the residual as an uncertainty.",
+    "Whether an area's rows are all of its scoring-relevant rules is the author's judgement. The check refuses an unsourced relation; it cannot report a rule nobody wrote a row for.",
+    "V09 does not author the historical profile. V10 does, from this matrix."
+  ],
+  "not_evidence_of": [
+    "That the 2025 rules are known. A defaulted row is a declaration that a rule is unsourced.",
+    "A closed gate G3. V10 closes F05; this ticket closes its source half.",
+    "Operator approval. Both declarations are agent_drafted_pending_operator_review.",
+    "A new assessor run, a changed baseline, or any movement toward a target score."
+  ],
+  "side_effect": {
+    "what": "The R04 declaration drafts were re-rendered, and a successor re-render record states the hashes of the two files that moved.",
+    "why": "The drafts' adoption-cost scan reads every committed file under docs/, workspaces/ and plans/ for each fidelity register's path and hash. The authority index pins the sanitised revision's register and the matrix names it, so that revision's draft and the shared checklist gained three dependent rows. The scan's own documentation states the coupling and the response: re-render.",
+    "artifacts": [
+      "docs/tier4_orchestration_state/msca_dn/declarations/draft_sanitised_v1.json",
+      "docs/tier4_orchestration_state/msca_dn/declarations/review_checklist.md",
+      "docs/tier4_orchestration_state/decision_log/msca-dn-declaration-draft-rerender_2026-10-12.json"
+    ],
+    "unchanged": "draft_resolved_fixes.json, byte for byte: no new artifact names its register. The 2026-10-09 re-render record is unedited and still describes it.",
+    "test_contract_changed": "tests/test_msca_dn_declaration_drafts.py::TestTheRerenderRecordAgreesWithTheDrafts now reads the whole series of re-render records and checks the newest statement of each draft's hash against the committed bytes, rather than a single named record. The invariant is unchanged.",
+    "declared_status": "Confirmed",
+    "basis": "the re-render diff and the hashes, measured on this checkout; py -3.10 -m tools.draft_fidelity_declarations --check exits 0"
+  },
+  "review": {
+    "what": "Both axes of /code-review ran against this change. The standards axis found a portability defect in the byte bindings and duplicated code between the two bound records; the spec axis found three rows claiming more than their citations measure and one contradiction between the report and the matrix.",
+    "acted_on": [
+      "Three trees whose bytes are hashed carried no .gitattributes -text pattern, and plans/msca_dn_pre_evaluation_spec.md had CRLF in the working tree against LF in the index, so the hash recorded for it was not portable. The patterns were added, the file was re-checked-out as LF and both artifacts were re-derived.",
+      "harness/record_binding.py now holds the source-role vocabulary, the status vocabulary, the hash and the binding check that the deferral register and this matrix both need. The fail-closed field readers stay separate: each record raises its own exception type and its tests assert that type.",
+      "TH-04 was split. The maximum stays equivalent; the resolution is now TH-05, defaulted.",
+      "SM-01's second direction is measured rather than assumed.",
+      "AM-01's claim is narrowed to the inclusion it evidences.",
+      "SA-05 and SA-06 were added for two harness assumptions that affect a number.",
+      "Both operator_supplied entries now record where that provenance is written down, and the check reports a vouched rank without one.",
+      "The report's status counts were wrong — twelve, nine and two against a matrix holding sixteen, six and one — and are now the measured eighteen, seven and one.",
+      "The rows are built area by area over one parsed record set, and the index's two tables are frozen dataclasses. The replay stayed byte-equal across the refactor."
+    ],
+    "declined": [
+      "Back-porting MatrixCheck.lines() to the deferral register's RegisterCheck. V11's padded labels are deliberate and the register is committed evidence.",
+      "Replacing the re-render record series' import-time glob. The series is the contract and a test asserts it is not empty."
+    ]
+  }
+}

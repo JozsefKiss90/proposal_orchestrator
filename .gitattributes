@@ -15,6 +15,13 @@
 #
 # Scope: only trees whose bytes are hashed. Code, prose and the demo instance
 # keep the platform default.
+#
+# Three single files join the trees because records outside those trees bind
+# them: the V09 authority source index pins the PE-01 decision and the
+# pre-evaluation specification, and the V11 deferral register binds the
+# predecessor ticket ledger. The byte-equal --check of
+# tools/author_msca_dn_authority_matrix.py and tools/author_deferral_register.py
+# is what fails without them.
 
 *.pdf binary
 docs/tier2a_instrument_schemas/**/*.rtf -text
@@ -24,3 +31,6 @@ workspaces/** -text
 harness/blind_reports/** -text
 harness/*.json -text
 harness/profiles/** -text
+docs/tier4_orchestration_state/decision_log/msca-dn-*.json -text
+plans/msca_dn_pre_evaluation_spec.md -text
+plans/pe08_review_and_pe09_handoff_tickets.md -text
