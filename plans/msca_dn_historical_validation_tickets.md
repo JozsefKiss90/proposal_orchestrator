@@ -75,12 +75,20 @@ reconstruct an identifier from a hash prefix.
 | V11 | Open-deferral register | G7 prereq | F11 | None |
 | V12 | Correct the PE-09 runbook | G2, G4, G5 | F04, F12 | V04, V06, V07, V10 |
 | V13 | Private execution readiness receipt and its validator | G5 | F04 evidence | V08, V10, V12 |
-| V14 | Operator: Stage A historical experiment, frozen before ESR | G6 | — | V03, V05, V06, V11, V13 |
+| V17 | The original's configuration route | G2 | runbook §11 row 1 | V07, V08 |
+| V18 | The register of a submitted document | G2 | runbook §11 row 2 | V17 |
+| V14 | Operator: Stage A historical experiment, frozen before ESR | G6 | — | V03, V05, V06, V11, V13, V17, V18 |
 | V15 | Milestone acceptance record | G7 | — | V14 |
 
 Seven tickets can start immediately: V01, V02c, V02d, V04, V05, V09 and V11 have no blockers. The
 audit's dependency shape is preserved: G1 precedes G2; G3 and G4 proceed independently; G2, G3, G4 and
 G5 all precede G6; G7 follows G6.
+
+V17 and V18 were added on 2026-10-13, after V13. They are the two implementation gaps the PE-09
+runbook listed as blocking stage A step 1, and stage A step 1 is V14's second criterion. Both sit
+under G2 with V07 and V08, whose work they finish. V07 made the document configuration selectable and
+V08 built the measurement the original's configuration is declared from. These two carry that
+declaration into an import and a register.
 
 ### Finding to ticket map
 
@@ -1132,9 +1140,126 @@ two, so each fence left one over and shifted the pairing of every inline span af
 the fences before reading inline code, and reads the command lines separately, where a path is an
 argument. Both floors are asserted.
 
+## V17 — The original's configuration route
+
+**Gate:** G2. **Closes:** row 1 of the PE-09 runbook's implementation gaps. **Blocked by:** V07, V08.
+
+**Problem.** V07 made every assumption the importer hard-coded a field of a selectable document
+configuration, and V08 built the dry import that measures a document before it is imported. Between
+them there is no route. The five fields the official original still needs — its page map, its page
+count, its body point size, its work-package layout and its graph root — are facts about a PDF held in
+a private network. Declaring them in this repository would put them here, and the V08 procedure told
+the operator to do exactly that.
+
+**What to build.** A private configuration input, a reader that checks it against the dry import's own
+measurement, and a private graph root authored outside this repository.
+
+### Acceptance criteria
+
+- [x] The five fields are declared in a file the operator authors privately, and nothing about them is
+      declared in this repository. `runner/original_configuration.py` reads a record of schema
+      `original_document_configuration/1` and `tools/original_configuration_template.json` is the form.
+      The reader refuses a missing field, an empty one, an unfilled placeholder, a status outside
+      CLAUDE.md §12.2's four, a duplicate sub-section or revision, an empty page map and a missing
+      answer where null is one. The committed template is refused twice over: every value is a
+      placeholder, and it sits inside this repository.
+- [x] Every declared value the dry import measured is checked against that measurement, and what cannot
+      be checked is reported as unchecked. Twenty-five findings and four unchecked answers, every one
+      with a case: twenty-one over a single mutation, four with cases of their own. The names come from
+      the reader's own source, so a finding nobody wrote a case for fails the test. The page count, the body point size, every numbered marker,
+      the criterion headings, the coverage of the map and the declared PDF's own hash all stand against
+      the inventory; a sub-section the document opens with, an exact-marker block and a document with no
+      work-package table are reported unchecked rather than agreeing.
+- [x] A private graph root is authored outside this repository, by the pattern of
+      `tools/author_msca_dn_workspace.py`, and a root inside it is refused.
+      `tools/author_original_workspace.py` writes the README, the intake record and the dev-graph
+      directories the importer needs. What counts as *inside* is the module's own location, never an
+      argument. The intake record is the one the dry import authored, recorded rather than re-declared,
+      so the proposal number is declared once.
+- [x] A completed configuration inherits nothing from the sanitised copy, and the copy's own
+      configuration cannot be redeclared from an input. `complete_from_input` refuses an input naming
+      another document and refuses any configuration that is already complete, because both committed
+      manifests are bound by hash into the frozen baseline. A test holds the completed document's
+      identity, description and page count clear of the copy's vocabulary.
+- [x] Both sanitised configurations still reproduce byte-equal, and the lazily resolved declaration
+      contract is why. One assumption more moved out of module scope than the ticket needed: the
+      sentence the import manifest carries about its claim ledger, which said the sanitisation removed
+      every citation. Rendered into the original's manifest it would have asserted a sanitisation of the
+      submitted text. The copy declares the sentence it was already rendering, so its manifests keep
+      their bytes.
+
+**Verification.** Build a non-sensitive Part B shape, run the dry import over it, declare a
+configuration, author the private root and import it, all in a temporary directory outside the
+repository. The real original's values are the operator's.
+
+**Status 2026-10-13.** Five of five criteria closed. The route exists and no value of the real original
+is declared anywhere in this repository: its graph root, its declaration directory and its
+configuration input are undeclared here, and the test asserts it. No assessor ran and no quota was
+spent.
+
+The suite ran in three chunks: 7,985 passed, 37 failed and 86 skipped of 8,108 collected. None of the
+37 is this change's. `tests/harness` and `tests/runner` return the figures V13 measured against a HEAD
+worktree, and the third chunk fails 18 in the same eight modules V13 recorded. No msca-dn module
+fails.
+
+Evidence: `plans/reports/v17_v18_original_import_route_2026-10-13.md`; decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-original-import-route_2026-10-13.json`.
+
+## V18 — The register of a submitted document
+
+**Gate:** G2. **Closes:** row 2 of the PE-09 runbook's implementation gaps. **Blocked by:** V17.
+
+**Problem.** The fidelity register's provenance header declares a sanitisation, a transformation and a
+reflow. Those are the copy's facts, so V07 made `render_register` refuse the submitted text rather than
+label the original with them. The importer renders a register per revision, so that refusal blocks the
+original's import outright. The submitted document also asks a different fidelity question: not how a
+derivative differs from the submission, but what reading the submission through an extraction costs.
+
+**What to build.** A register renderer for a submitted document, and the dispatch that chooses between
+the two.
+
+### Acceptance criteria
+
+- [x] The submitted text has a register renderer of its own, and neither renderer will render the
+      other's document. `tools/author_original_workspace.render_submitted_register` refuses a document
+      that is not the submitted text, `render_register` still refuses one that is, and `register_of` is
+      the one place that chooses. Both carry record type `fidelity_register`, because both are read by
+      the same readers.
+- [x] Its header declares the submitted document's own facts. The assessed file is the authenticated
+      original, the transformation block records that none was applied, the reflow block records that
+      none happened, and the ESR statement is the copy's inverted: the ESR evaluated this text, so a
+      difference is not explained by changed wording. The transformation block says in so many words
+      that it is not a claim the extraction preserved everything.
+- [x] What the extraction loses is the V08 reconciliation, and the register is not authored over an open
+      or inadmissible one. An item still `unreconciled` refuses the write, a record marked complete over
+      an open item refuses it, and a `preserved` verdict resting on a measurement equally true of a
+      document whose figures are gone refuses it by V08's own check. The declared half asks for a
+      `presence` and an `extraction_fidelity` per sub-section, under a record type of its own: a
+      transformation declared about the submitted text would read as a sanitisation of it.
+- [x] The integrity audit can still read it. `harness/candidate_provenance.py` resolves the private
+      candidate's provenance end to end in the test: it finds the manifest in the private graph root,
+      reads the register the manifest names, and reports the identity scope as the submitted
+      document's own. The fixture measures no citation marker, so the grounding cause stays Unresolved
+      with the gap flagged, which is the honest answer for a document whose citations nothing resolves.
+- [x] No private content enters this repository. Every path the register names is relative to the
+      private root, every record it binds sits under that root, and the ESR hash it cannot produce
+      there is named as unresolved rather than restated. A test asserts no register, graph root or page
+      text of the original is committed.
+
+**Verification.** Render the register over the non-sensitive fixture, with the reconciliation open and
+then complete, and resolve its provenance through the audit's own reader. The real register is the
+operator's, authored in the private network.
+
+**Status 2026-10-13.** Five of five criteria closed. The register the operator will hold does not
+exist here, and the renderer refuses to produce one over an open reconciliation. No assessor ran and no
+quota was spent.
+
+Evidence: `plans/reports/v17_v18_original_import_route_2026-10-13.md`; decision record
+`docs/tier4_orchestration_state/decision_log/msca-dn-original-import-route_2026-10-13.json`.
+
 ## V14 — Operator: Stage A historical experiment, frozen before ESR
 
-**Gate:** G6. **Blocked by:** V03, V05, V06, V11, V13.
+**Gate:** G6. **Blocked by:** V03, V05, V06, V11, V13, V17, V18.
 
 **Execution boundary.** The operator performs this ticket. Claude does not run the private assessment,
 does not transmit proposal content, and spends no model quota on it. Claude may prepare records and

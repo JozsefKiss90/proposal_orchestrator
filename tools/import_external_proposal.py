@@ -98,7 +98,7 @@ import hashlib
 import json
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Optional, Sequence
@@ -138,10 +138,21 @@ from runner.external_proposal import (
     split_sentences,
     versions,
 )
+from runner.original_configuration import (
+    ConfigurationRefused,
+    OriginalConfiguration,
+    load_configuration,
+)
+from runner.original_configuration import check as check_configuration
 from runner.paths import find_repo_root
 from runner.source_index import PAGE_TEXT_METHOD, SOURCE_INDEX_RECORD_TYPE
 from tools import author_msca_dn_workspace as ws
-from tools.fidelity_declarations import FidelityDeclarationsError, validate_inputs
+from tools.fidelity_declarations import (
+    DEFAULT_CONTRACT,
+    Contract,
+    FidelityDeclarationsError,
+    validate_inputs,
+)
 
 # --------------------------------------------------------------------------- #
 # Constants: the spec's names
@@ -314,6 +325,7 @@ REQUIRED_DOCUMENT_FIELDS: tuple[str, ...] = (
     "reader_caveat_key",
     "reader_caveat",
     "first_revision_key",
+    "claim_ledger_note",
     "revisions",
 )
 
@@ -431,6 +443,41 @@ class DocumentConfig:
     key itself is the document's, because the committed manifests are bound by
     hash into the frozen baseline and cannot be renamed, and because no other
     document may be described in the derivative's vocabulary."""
+    claim_ledger_note: str = ""
+    """Why this document's claim ledger stands where it does, for the manifest.
+
+    Required and never defaulted (V17). The sentence the copy carries states
+    that the sanitisation removed every citation, which is a fact about the
+    copy. Rendered into the original's manifest it would assert a sanitisation
+    of the submitted text, so each document says this in its own words."""
+    import_ticket: str = "PE-03"
+    """The ticket under which this document is imported, for the manifest.
+
+    The copy was imported at PE-03 and its manifests are bound by hash, so that
+    is the default. The original is imported inside the private network, under
+    another ticket, and its manifest says which."""
+    configuration_input_rel: Optional[Path] = None
+    """The private configuration input this document was completed from, or
+    ``None`` for a document declared here in full (V17).
+
+    A handle, not a sentence: ``page_map_declared_from`` names the input in
+    prose for a reader, and a renderer needs the file. The register of a
+    submitted document reads it back and re-checks it."""
+    declarations_dir_rel: Optional[Path] = None
+    """Where this document's fidelity declaration inputs live, or ``None`` for
+    the public case's directory. The original's are private, so its location is
+    declared from outside this repository (V17)."""
+    declaration_fields: tuple[str, ...] = ()
+    """What each declaration row must state, or ``()`` for the public case's two.
+
+    The copy's operator declares a presence and a transformation. A
+    transformation declared about the submitted text would read as a
+    sanitisation statement about the document nothing sanitised, so the
+    submitted text declares its own fields."""
+    declaration_record_type: str = ""
+    """The ``record_type`` this document's declaration inputs carry, or ``""``
+    for the public case's. A distinct type refuses a file filed under the wrong
+    document by its type rather than by its fields."""
     declared_status: str = "Assumed"
     """CLAUDE.md §12.2 status of the values declared here. Assumed by default:
     a title, a role and a page map are operator statements. What the importer
@@ -584,6 +631,21 @@ class DocumentConfig:
     def intake_rel(self) -> Path:
         """Repo-relative path of the intake record this document's id comes from."""
         return self.require_workspace() / INTAKE_REL / f"{self.require_intake_id()}.json"
+
+    def declaration_contract(self) -> Contract:
+        """Which fidelity declarations this document's registers read (V17).
+
+        Equal to :data:`tools.fidelity_declarations.DEFAULT_CONTRACT` when the
+        document declares no part of its own, so the two committed registers
+        read exactly what they read before. Each part is declared
+        independently, because a document may share a location and not a
+        vocabulary.
+        """
+        return Contract(
+            declared_dir_rel=self.declarations_dir_rel,
+            declared_fields=self.declaration_fields or None,
+            declared_record_type=self.declaration_record_type or None,
+        )
 
     # -- refusals -- #
 
@@ -817,6 +879,13 @@ SANITISED_DERIVATIVE = DocumentConfig(
         "judgment of evidence base, length or page-limit compliance is admissible from it."
     ),
     first_revision_key="is_the_first_sanitised_derivative",
+    claim_ledger_note=(
+        "These are the proposal's own assertions. The sanitisation removed every citation "
+        "(spec §2.8), so no claim has an external source and none declares source_grounded; "
+        "the span locates the assertion in its page source and is not evidence for it. "
+        "Nobody in this repository approves a proposal's assertions, so approval is not applicable. "
+        "The integrity audit (PE-07) enumerates this ledger and reports each claim Unresolved."
+    ),
     declared_status="Assumed",
     status_note=(
         "The title, role, short name, page statement, reader caveat and page map are operator "
@@ -858,6 +927,18 @@ OFFICIAL_ORIGINAL = DocumentConfig(
         "declared here yet, which is why selecting this document refuses."
     ),
     first_revision_key="is_the_first_version_of_the_original",
+    claim_ledger_note=(
+        "These are the proposal's own assertions, extracted from the submitted text. No claim "
+        "declares source_grounded: resolving a citation to its source is the imported-source "
+        "grounding route of ticket X01, which has not landed, so a citation this document "
+        "carries is not resolved here. The span locates the assertion in its page source and is "
+        "not evidence for it. Nobody in this repository approves a proposal's assertions, so "
+        "approval is not applicable. The integrity audit enumerates this ledger and reports each "
+        "claim Unresolved."
+    ),
+    import_ticket="PE-09 stage A step 1, under V17; run inside the private network",
+    declaration_fields=("presence", "extraction_fidelity"),
+    declaration_record_type="extraction_fidelity_declarations",
     declared_status="Assumed",
     status_note=(
         "Every value here is an operator declaration about a document this repository does not "
@@ -913,6 +994,142 @@ def _index_documents() -> dict[str, DocumentConfig]:
 
 
 _DOCUMENT_BY_REVISION: dict[str, DocumentConfig] = _index_documents()
+
+
+def register_document(config: DocumentConfig) -> DocumentConfig:
+    """Make *config*'s revisions resolvable by :func:`config_for` (V17).
+
+    Every renderer resolves a revision to its document through one lookup over
+    :data:`DOCUMENTS`, which is how a page map, a page count or a title can
+    never be borrowed across documents. A document completed from a private
+    input is not in that tuple: its revisions are declared at run time, inside
+    the private network, so they are registered here instead.
+
+    Two things this does not allow. A configuration id :data:`DOCUMENTS` does
+    not declare cannot be registered, so the registry is still closed over the
+    documents this tool knows. And a revision another document already owns
+    cannot be taken, so one document's page texts can never resolve as
+    another's. The registration lasts for the process, like the completed
+    configuration itself.
+    """
+    if config.config_id not in {doc.config_id for doc in DOCUMENTS}:
+        raise ImportRefused(
+            f"document {config.config_id!r} is not one this tool declares; known: "
+            f"{[d.config_id for d in DOCUMENTS]}"
+        )
+    for rev in config.revisions:
+        owner = _DOCUMENT_BY_REVISION.get(rev.revision_id)
+        if owner is not None and owner.config_id != config.config_id:
+            raise ImportRefused(
+                f"revision {rev.revision_id!r} already belongs to document "
+                f"{owner.config_id!r}; a revision resolves to exactly one document"
+            )
+        _DOCUMENT_BY_REVISION[rev.revision_id] = config
+    return config
+
+
+def complete_from_input(
+    config: DocumentConfig, configuration: OriginalConfiguration
+) -> DocumentConfig:
+    """*config* with the operator's private declarations applied (V17).
+
+    The five fields the official original is missing are facts about a PDF held
+    in a private network, so they are declared in a file the operator authors
+    there (:mod:`runner.original_configuration`) and applied here. Nothing is
+    merged from another document: every value below comes from the input, and
+    what the input does not declare stays as this configuration declares it.
+
+    Two refusals keep this from becoming a way to redeclare a committed
+    document. The input must name the configuration it completes, and a
+    configuration that is already complete may not be completed again: both
+    sanitised manifests are bound by hash into the frozen baseline, and the
+    page map they were measured under is not a runtime argument.
+
+    ``page_map_declared_from`` and ``status_note`` are rewritten, because the
+    sentences this configuration carries say the page map is *not* declared
+    yet. Left as they were, the import manifest would state that.
+    """
+    if configuration.config_id != config.config_id:
+        raise ImportRefused(
+            f"the configuration input declares document {configuration.config_id!r} and "
+            f"{config.config_id!r} is selected. An input completes the document it names."
+        )
+    if not config.missing_fields():
+        raise ImportRefused(
+            f"document {config.config_id!r} is already complete, so a configuration input may "
+            f"not redeclare it. Its page map, page count and revisions are the ones its "
+            f"committed manifests were measured under, and those manifests are bound by hash."
+        )
+    layout = configuration.work_package_layout
+    completed = replace(
+        config,
+        workspace_rel=Path(configuration.workspace_rel),
+        sub_sections=tuple(
+            SubSectionSpec(
+                sub_section_id=spec.sub_section_id,
+                section_id=spec.section_id,
+                declared_pages=spec.declared_pages,
+                marker=spec.marker,
+                declared_title=spec.declared_title,
+                exact_marker=spec.exact_marker,
+            )
+            for spec in configuration.sub_sections
+        ),
+        criterion_heading_markers=configuration.criterion_heading_markers,
+        marker_page_tolerance=configuration.marker_page_tolerance,
+        expected_pages=configuration.expected_pages,
+        body_point_size=configuration.body_point_size,
+        work_package_layout=(
+            None
+            if layout is None
+            else WorkPackageLayout(
+                sub_section_id=layout.sub_section_id,
+                header_labels=layout.header_labels,
+                register_declared_labels=layout.register_declared_labels,
+                consequence=layout.consequence,
+            )
+        ),
+        scorecard_rel=(
+            config.scorecard_rel
+            if configuration.scorecard_rel is None
+            else Path(configuration.scorecard_rel)
+        ),
+        declarations_dir_rel=Path(configuration.declarations_dir_rel),
+        configuration_input_rel=Path(configuration.path_rel),
+        revisions=tuple(
+            Revision(
+                revision_id=rev.revision_id,
+                pdf_rel=Path(rev.pdf_rel),
+                source_id_prefix=rev.source_id_prefix,
+                manifest_name=rev.manifest_name,
+                register_rel=Path(rev.register_rel),
+                candidate_role=rev.candidate_role,
+                candidate_version=rev.candidate_version,
+                expected_pages=rev.expected_pages,
+                supersedes=rev.supersedes,
+                change_id=rev.change_id,
+                summary=rev.summary,
+            )
+            for rev in configuration.revisions
+        ),
+        declared_status=configuration.declared_status,
+        page_map_declared_from=(
+            f"{configuration.path_rel} (sha256 {configuration.sha256}), declared by "
+            f"{configuration.declared_by} on {configuration.declared_on} from the V08 "
+            f"dry-import reconciliation against the PDF"
+        ),
+        status_note=(
+            f"{configuration.status_note} The page count, the body point size, every declared "
+            f"marker and the coverage of the page map were checked against the dry-import "
+            f"inventory {configuration.measurement_rel} (sha256 "
+            f"{configuration.measurement_sha256}) before this import, by "
+            f"runner/original_configuration.py. What that check cannot reach it reports as "
+            f"unchecked rather than as agreeing."
+        ),
+    )
+    # Every renderer resolves a revision to its document through config_for,
+    # and these revisions were declared at run time.
+    return register_document(completed)
 
 
 def document_by_id(config_id: str) -> DocumentConfig:
@@ -1948,7 +2165,7 @@ def render_manifest(
         "record_type": MANIFEST_RECORD_TYPE,
         "schema_ref": _SCHEMA_REF,
         "spec": SPEC_REL,
-        "ticket": "PE-03",
+        "ticket": config.import_ticket,
         "tool": "tools/import_external_proposal.py",
         "candidate": {
             "path": revision.pdf_rel.as_posix(),
@@ -2013,13 +2230,10 @@ def render_manifest(
             "evidence_strength": "unconfirmed",
             "declared_status": "Unresolved",
             "approval": "not_applicable",
-            "why": (
-                "These are the proposal's own assertions. The sanitisation removed every citation "
-                "(spec §2.8), so no claim has an external source and none declares source_grounded; "
-                "the span locates the assertion in its page source and is not evidence for it. "
-                "Nobody in this repository approves a proposal's assertions, so approval is not applicable. "
-                "The integrity audit (PE-07) enumerates this ledger and reports each claim Unresolved."
-            ),
+            # The document's own sentence, never a generic one: the copy's says
+            # the sanitisation removed every citation, which is not true of the
+            # submitted text and would be asserted of it by a shared default.
+            "why": config.claim_ledger_note,
         },
         "extraction_losses": _losses(imp),
         **_runtime_environment_block(config),
@@ -2077,9 +2291,25 @@ def render_all(repo_root: Path, config: DocumentConfig = DEFAULT_DOCUMENT) -> di
             render_manifest(repo_root, imp, imps)
         )
         out[imp.revision.register_rel.as_posix()] = canonical_json_bytes(
-            ws.render_register(repo_root, imp.revision)
+            register_of(repo_root, imp.revision)
         )
     return out
+
+
+def register_of(repo_root: Path, revision: Revision) -> dict[str, Any]:
+    """*revision*'s fidelity register, from the renderer its document has (V17).
+
+    The sanitised case's header declares a sanitisation, a transformation and a
+    reflow, so :func:`tools.author_msca_dn_workspace.render_register` refuses
+    the submitted text rather than labelling it with the copy's facts. The
+    submitted text has a renderer of its own, and this is the one place that
+    chooses between them. Imported late, because that module reads this one.
+    """
+    if config_for(revision).is_submitted_document:
+        from tools import author_original_workspace as ows
+
+        return ows.render_submitted_register(repo_root, revision)
+    return ws.render_register(repo_root, revision)
 
 
 def check(repo_root: Path, config: DocumentConfig = DEFAULT_DOCUMENT) -> list[str]:
@@ -2106,7 +2336,11 @@ def author(repo_root: Path, config: DocumentConfig = DEFAULT_DOCUMENT) -> list[s
     """
     config.require_complete()
     workspace = config.require_workspace()
-    validate_inputs(repo_root, [(r.revision_id, r.register_rel) for r in config.revisions])
+    validate_inputs(
+        repo_root,
+        [(r.revision_id, r.register_rel) for r in config.revisions],
+        config.declaration_contract(),
+    )
     changed: list[str] = []
     sources_rel = (workspace / SOURCES_REL).as_posix()
     # Bootstrap: the source index is written first and without building the
@@ -2161,8 +2395,26 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         action="store_true",
         help="print the selected document's identity and what it still needs, and write nothing",
     )
+    parser.add_argument(
+        "--config-input",
+        type=Path,
+        default=None,
+        help=(
+            "a private configuration input (runner/original_configuration.py) completing the "
+            "selected document. Checked against the dry-import inventory it names before it is "
+            "applied; a disagreement is reported and nothing is written."
+        ),
+    )
     add_environment_flag(parser)
-    parser.add_argument("--repo-root", type=Path, default=None)
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=None,
+        help=(
+            "the root every path is resolved against. For the submitted original this is the "
+            "private root, never a directory in this repository."
+        ),
+    )
     args = parser.parse_args(argv)
     requested = environment_exit_code(args)
     if requested is not None:
@@ -2170,6 +2422,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     repo_root = args.repo_root or find_repo_root()
     try:
         config = document_by_id(args.document)
+        if args.config_input is not None:
+            configuration = load_configuration(args.config_input, repo_root)
+            report = check_configuration(configuration, repo_root)
+            for line in report.lines():
+                print(line)
+            if not report.green:
+                print(
+                    f"refused: the configuration disagrees with the measurement it names in "
+                    f"{len(report.findings)} place(s); nothing was written",
+                    file=sys.stderr,
+                )
+                return 1
+            config = complete_from_input(config, configuration)
         if args.describe:
             print(json.dumps(config.identity(), indent=2, ensure_ascii=False))
             return 0
@@ -2186,7 +2451,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"wrote: {rel}")
         print("no change" if not changed else f"{len(changed)} file(s) written")
         return 0
-    except (ImportRefused, DevGraphError, FidelityDeclarationsError) as exc:
+    except (
+        ImportRefused,
+        ConfigurationRefused,
+        DevGraphError,
+        FidelityDeclarationsError,
+    ) as exc:
         print(f"refused: {exc}", file=sys.stderr)
         return 1
 

@@ -1,0 +1,137 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-original-import-route_2026-10-13",
+  "date": "2026-10-13",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation",
+  "ticket": "V17 and V18 of plans/msca_dn_historical_validation_tickets.md",
+  "gate": "G2",
+  "closes": "both implementation-gap rows of plans/msca_dn_pe09_runbook.md section 11 that blocked stage A step 1: the original's document configuration, and a fidelity register renderer for a submitted document. V14's second criterion is what they unblock.",
+  "authority": "Agent-authored under CLAUDE.md. Advisory, out-of-band QA for a private run this repository does not perform. Closes no gate and confers no authority. The original's own values are the operator's, and acceptance is the operator's.",
+  "decision": "The five fields the official original still needed are declared in a file the operator authors inside the private network, checked against the dry import's own measurement, and applied to the selected document configuration at run time. The submitted document gets a register renderer of its own, and the importer chooses between the two by the document's own is_submitted_document flag.",
+  "why": "V07 made the document configuration selectable and V08 built the measurement a page map is declared from, but nothing carried a private declaration into an import. The V08 procedure told the operator to declare the page map, the page count, the body point size, the work-package layout and the graph root on OFFICIAL_ORIGINAL in this repository, which would have put the submitted document's structure here. And the importer renders a register per revision, so render_register's refusal of a submitted document blocked the original's import outright rather than only withholding a header.",
+  "what_v17_built": {
+    "reader": "runner/original_configuration.py: schema original_document_configuration/1, a fail-closed reader, and check() against the dry-import inventory",
+    "template": "tools/original_configuration_template.json, every value an angle-bracketed placeholder",
+    "private_root": "tools/author_original_workspace.py authors the README, the intake record and the dev-graph directories under a root that must resolve outside this repository",
+    "completion": "tools.import_external_proposal.complete_from_input applies the declaration and register_document makes its revisions resolvable; --config-input is the flag"
+  },
+  "refused_outright": [
+    "a missing field, an empty field, or an unfilled angle-bracketed placeholder",
+    "a declared_status outside CLAUDE.md 12.2's four",
+    "a duplicate sub-section or revision id, an empty page map, or no revision",
+    "a silence where null is an answer: work_package_layout and dn_type must be written",
+    "a configuration input that does not sit under the private root it declares paths against",
+    "a private root that resolves inside this repository, measured from the module's own location",
+    "an input naming a document other than the one selected",
+    "a configuration that is already complete, because the copy's manifests are bound by hash into the frozen baseline"
+  ],
+  "reported_as_a_finding": {
+    "count": 25,
+    "named_by_one_mutation_each": 21,
+    "with_a_case_of_their_own": 4,
+    "how_the_coverage_is_held": "The test reads the finding names out of the reader's own source and asserts every one is produced by a case. A finding added to the reader and not to the test fails there rather than passing unnoticed; the same rule holds the four unchecked answers.",
+    "the_ones_that_carry_the_ticket": [
+      "page_count_disagrees_with_the_measurement, body_point_size_not_measured and body_point_size_is_not_the_largest_share: the declaration stands against the measured distribution rather than beside it",
+      "marker_not_measured_anywhere and marker_not_on_its_declared_page: every numbered marker is matched against the blocks the dry import reported as candidate headings, within the declared tolerance",
+      "page_in_no_sub_section_and_not_declared: a page the map does not reach is a finding unless the input declares it with a basis, so a cover page is an answer and silence is not",
+      "measurement_is_not_the_one_declared and measurement_measured_another_file: the configuration is bound to one inventory by its bytes, and to the authenticated hash by the inventory's own",
+      "declared_pdf_is_not_the_authenticated_file: the import cannot read a file the operator did not authenticate"
+    ],
+    "reported_unchecked_rather_than_agreeing": [
+      "sub_section_opens_the_document",
+      "marker_is_a_whole_block",
+      "work_package_layout_declared_as_none",
+      "later_revision_hash_not_authenticated_here"
+    ]
+  },
+  "what_v18_built": {
+    "renderer": "tools.author_original_workspace.render_submitted_register",
+    "dispatch": "tools.import_external_proposal.register_of, the one place that chooses between the two renderers",
+    "the_header_declares": [
+      "the assessed file is the authenticated original, with the operator's declared hash beside the measured one",
+      "transformation.applied false and reflow.applied false, with the statement that this is not a claim the extraction preserved everything",
+      "the ESR evaluated this text, so a difference from its total is not explained by changed wording or removed evidence",
+      "the V08 reconciliation, each record bound by the hash of its canonical bytes",
+      "the network type, checked on the page the configuration declares, or Unresolved when none is declared"
+    ],
+    "refusals": [
+      "a document that is not the submitted text",
+      "an acceptance record still carrying an unreconciled item",
+      "an acceptance record marked complete over an open item",
+      "a preserved verdict resting on a measurement equally true of a document whose figures are gone (V08's own check)",
+      "an acceptance record or inventory over other bytes",
+      "an intake record under another id or naming another document",
+      "a network-type phrase the declared page does not carry"
+    ],
+    "declared_half": "its own contract: a presence and an extraction_fidelity per sub-section, under record type extraction_fidelity_declarations, in a directory the private configuration declares. A transformation declared about the submitted text would read as a sanitisation of it."
+  },
+  "side_effect": {
+    "what": "One V07-class defect, found because the original became importable. The import manifest's claims block carried the sentence 'the sanitisation removed every citation', rendered by a generic renderer from no configuration. Rendered into the original's manifest it would have asserted a sanitisation of the submitted text.",
+    "now": "claim_ledger_note is a required document configuration field, and import_ticket is a declared one. The copy declares the sentence it was already rendering, so both hash-bound manifests keep their bytes; the original declares that no claim of its own is resolved to a source until X01.",
+    "declared_status": "Confirmed",
+    "basis": "the copy's --check still exits 0 and a test holds the two sentences apart"
+  },
+  "the_declaration_contract": {
+    "what": "tools/fidelity_declarations.py gained a Contract: where a document's declaration inputs live, what each row must state, and the record type they carry.",
+    "why": "The submitted original's declarations cannot live under this repository's Tier 3, and the question its operator answers per sub-section is not the copy's.",
+    "how_the_copy_is_unaffected": "Each part is declared as None by a document with no answer of its own, and three properties resolve it against the module constants when read. So DECLARATIONS_DIR_REL stays the public case's single answer rather than a value a dataclass snapshotted at import, and the four existing tests that redirect it keep working unchanged."
+  },
+  "artifacts": {
+    "reader": "runner/original_configuration.py",
+    "template": "tools/original_configuration_template.json",
+    "author_and_renderer": "tools/author_original_workspace.py",
+    "test": "tests/test_msca_dn_original_import_route.py",
+    "changed": [
+      "tools/import_external_proposal.py",
+      "tools/fidelity_declarations.py",
+      "tools/author_msca_dn_workspace.py"
+    ],
+    "runbook": "plans/msca_dn_pe09_runbook.md",
+    "procedure": "plans/msca_dn_v08_original_dry_import_procedure.md",
+    "lane_declaration": "harness/acceptance_lanes/msca_dn_historical.json",
+    "lane_document": "harness/ACCEPTANCE_LANE.md",
+    "report": "plans/reports/v17_v18_original_import_route_2026-10-13.md",
+    "ledger": "plans/msca_dn_historical_validation_tickets.md"
+  },
+  "declared_values": {
+    "schema": "original_document_configuration/1",
+    "required_input_fields": 14,
+    "findings": 21,
+    "new_document_configuration_fields": 6,
+    "declaration_fields_of_the_submitted_text": ["presence", "extraction_fidelity"],
+    "test_cases": 135,
+    "lane_area": "dry_import, which the historical run does not depend on"
+  },
+  "verification": {
+    "the_route_runs_end_to_end": "On a four-page Part B shape built with pymupdf in a temporary directory outside the repository: dry import, configuration, private graph root, import, register, and both --check replays. The real original's values are the operator's.",
+    "the_checks_are_not_vacuous": "Twelve mutation runs, one rule disabled each: the placeholder rule, the page-count comparison, the body-size comparison, the marker page check, the page-coverage rule, the inventory binding, the complete-reconciliation refusal, the admissible-reconciliation refusal, the reconciliation-over-these-bytes refusal, the wrong-document refusal, the already-complete refusal and the named-document refusal. Every one failed at least one check; the page-count comparison failed five. Each module was restored from a copy.",
+    "the_audit_still_reads_the_register": "harness/candidate_provenance.resolve_provenance runs against the private graph root in the test and reports is_submitted_document true and the identity scope as the submitted document's own. The fixture measures no citation marker, so the grounding cause stays Unresolved with the gap flagged.",
+    "tests": {
+      "tests/test_msca_dn_original_import_route.py": 135,
+      "the modules V17 changed": "403 passed across tests/test_msca_dn_import.py, test_msca_dn_workspace.py, test_msca_dn_fidelity_declarations.py, test_msca_dn_dry_import.py, tests/runner/test_dry_import.py and test_msca_dn_declaration_drafts.py",
+      "tests/harness/test_acceptance_lane.py": 68,
+      "tests/test_msca_dn_pe09_runbook.py": 19
+    },
+    "full_suite": "Run in three chunks, because a whole-suite run is killed for host memory on this host. tests/harness: 1,843 passed, 17 skipped, no failure. tests/runner: 4,353 passed, 19 failed, 65 skipped. Everything else: 1,789 passed, 18 failed, 4 skipped. 7,985 passed and 37 failed of 8,108 collected.",
+    "no_failure_is_this_changes": "The first two chunks return the figures V13 measured against a HEAD worktree, case for case. The third fails 18 in the same eight modules V13 recorded: the transport migration line, the demo instance's data, and one missing optional extra the lane's exclusion document names. No msca-dn module fails.",
+    "byte_equality": "py -3.10 -m tools.import_external_proposal --check exits 0, so both sanitised revisions' sources, document records, manifests and registers still reproduce. ws.check(REPO) is empty.",
+    "typecheck": "mypy reports no error of their own in either new module; the nine it reports are pre-existing, in runner/source_index.py and runner/dev_graph/documents.py.",
+    "prose": "The runbook, the operator procedure and the ticket ledger pass the repository's linter with no error. harness/ACCEPTANCE_LANE.md carries the same two errors it carried before this ticket.",
+    "quota": "none spent. No assessor ran, no runner phase was dispatched, no scoring was performed, and the frozen 74.60 baseline is untouched."
+  },
+  "known_gaps": [
+    "No page map for the real original exists. The route is here and the declaration is the operator's, produced in the private network.",
+    "register_document holds a completed configuration for the life of the process, because its revisions are declared at run time. A configuration id DOCUMENTS does not declare cannot be registered, and a revision another document owns cannot be taken.",
+    "The register names the ESR by path and not by hash: the ESR is a public artifact of this repository, and a hash the private root cannot produce is not restated there.",
+    "The evaluator scorecard an unlabelled sub-section takes its title from is copied into the private root from this repository. It is public, so nothing private moves, but the import then reads that copy.",
+    "The grounding axis is unchanged. A claim the original carries is extracted, counted and never resolved to a source until ticket X01."
+  ],
+  "not_evidence_of": [
+    "that the original has been imported, here or anywhere this repository can see",
+    "that the extraction of the original preserves anything: the reconciliation settles that page by page, and the register refuses to be written until it is complete",
+    "that a result over the original would be comparable with the ESR's",
+    "that the private environment permits any content to be sent or to leave it",
+    "that V17 or V18 is accepted. Acceptance is the operator's."
+  ]
+}

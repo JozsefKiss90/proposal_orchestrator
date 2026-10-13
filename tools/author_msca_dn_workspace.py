@@ -293,15 +293,20 @@ def _render_declared_half(
     through unchanged (:mod:`tools.fidelity_declarations`). With no input the
     half is the empty one this tool rendered before R01, byte for byte.
     """
+    from tools.import_external_proposal import config_for
+
     rows, block = fidelity_declarations.declared_half(
         repo_root,
         revision.revision_id,
         revision.register_rel,
         (row["sub_section_id"] for row in derived["sub_sections"]),
+        config_for(revision).declaration_contract(),
     )
     half: dict[str, Any] = {
         "kind": "declared",
-        "fields_per_sub_section": list(fidelity_declarations.REQUIRED_FIELDS),
+        "fields_per_sub_section": list(
+            config_for(revision).declaration_contract().required_fields
+        ),
         "note": (
             "Two independent fields per sub-section: a present but heavily sanitised section is "
             "not an absent one (spec decision 9). Filled by the operator beside PE-03's derived half."

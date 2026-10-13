@@ -134,6 +134,58 @@ SUB_SECTIONS_KEY = "sub_sections"
 INPUT_BLOCK_KEY = "declaration_input"
 
 
+@dataclass(frozen=True)
+class Contract:
+    """Which declarations one document's register reads, and from where (V17).
+
+    The three values above are the sanitised case's, and they were this
+    module's only answer until V17. A second document needed another one. The
+    submitted original is held in a private network, so its declarations cannot
+    live under this repository's Tier 3. The question its operator answers per
+    sub-section is not the copy's either: a *transformation* declared about the
+    submitted text would read as a sanitisation statement about the document
+    nothing sanitised, which is the confusion
+    :func:`tools.author_msca_dn_workspace.render_register` refuses outright.
+
+    So a document configuration declares its own contract and this module reads
+    it. :data:`DEFAULT_CONTRACT` is the sanitised case's, unchanged, so both
+    committed registers render byte for byte as before.
+
+    Each part is declared as ``None`` by a document that has no answer of its
+    own, and the three properties below resolve it against the constants above
+    when it is read. So the constants stay the public case's single answer
+    rather than a value this class snapshotted at import.
+    """
+
+    declared_dir_rel: Optional[Path] = None
+    declared_fields: Optional[tuple[str, ...]] = None
+    declared_record_type: Optional[str] = None
+
+    @property
+    def dir_rel(self) -> Path:
+        """Where the inputs live, relative to the root the tool resolves against."""
+        return DECLARATIONS_DIR_REL if self.declared_dir_rel is None else self.declared_dir_rel
+
+    @property
+    def required_fields(self) -> tuple[str, ...]:
+        """What each row must state. Every field is required and none defaults."""
+        return REQUIRED_FIELDS if self.declared_fields is None else self.declared_fields
+
+    @property
+    def record_type(self) -> str:
+        """The ``record_type`` an input must carry, so a file filed under the
+        wrong document is refused by its type rather than by its fields."""
+        return (
+            DECLARATIONS_RECORD_TYPE
+            if self.declared_record_type is None
+            else self.declared_record_type
+        )
+
+
+#: The sanitised case's contract: the one every caller gets when it names none.
+DEFAULT_CONTRACT: "Contract" = Contract()
+
+
 class FidelityDeclarationsError(Exception):
     """Refusal: a declaration input is malformed, misfiled, or would be lost."""
 
@@ -143,9 +195,9 @@ def file_sha256(path: Path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def declarations_rel(revision_id: str) -> Path:
+def declarations_rel(revision_id: str, contract: Contract = DEFAULT_CONTRACT) -> Path:
     """The relative path of *revision_id*'s declaration input."""
-    return DECLARATIONS_DIR_REL / f"{revision_id}.json"
+    return contract.dir_rel / f"{revision_id}.json"
 
 
 @dataclass(frozen=True)
@@ -158,6 +210,9 @@ class Declarations:
     """The input's path, or ``None`` when no input exists for this revision."""
     sha256: Optional[str]
     """The input's bytes, so the register names what it carried."""
+    contract: Contract = DEFAULT_CONTRACT
+    """The contract these rows were read under, so every refusal below names
+    the input the operator should be editing rather than the default one."""
 
     @property
     def supplied(self) -> bool:
@@ -178,14 +233,16 @@ def _stated(value: Any) -> bool:
     return value is not None
 
 
-def _check_row(rel: Path, index: int, row: Any, seen: set[str]) -> dict[str, Any]:
+def _check_row(
+    rel: Path, index: int, row: Any, seen: set[str], contract: Contract = DEFAULT_CONTRACT
+) -> dict[str, Any]:
     where = f"sub_sections[{index}]"
     if not isinstance(row, dict):
         raise _refuse(rel, f"{where} must be a JSON object, found {type(row).__name__}")
     sub_section_id = row.get("sub_section_id")
     if not isinstance(sub_section_id, str) or not sub_section_id.strip():
         raise _refuse(rel, f"{where} needs a non-blank 'sub_section_id' string")
-    for field_name in REQUIRED_FIELDS:
+    for field_name in contract.required_fields:
         if field_name not in row:
             raise _refuse(rel, f"{where} ({sub_section_id}) needs a {field_name!r} field")
         if not _stated(row[field_name]):
@@ -205,23 +262,27 @@ def _read_json(path: Path, rel: Path) -> Any:
         raise _refuse(rel, f"is not valid JSON ({exc})") from exc
 
 
-def load_declarations(repo_root: Path, revision_id: str) -> Declarations:
+def load_declarations(
+    repo_root: Path, revision_id: str, contract: Contract = DEFAULT_CONTRACT
+) -> Declarations:
     """*revision_id*'s declarations, or the empty declaration when none exists.
 
     Refuses a present-but-malformed input. Nothing is written here, so a
     refusal always leaves the register as it was.
     """
-    rel = declarations_rel(revision_id)
+    rel = declarations_rel(revision_id, contract)
     path = repo_root / rel
     if not path.is_file():
-        return Declarations(revision_id=revision_id, rows=(), path_rel=None, sha256=None)
+        return Declarations(
+            revision_id=revision_id, rows=(), path_rel=None, sha256=None, contract=contract
+        )
     data = _read_json(path, rel)
     if not isinstance(data, dict):
         raise _refuse(rel, f"must hold a JSON object, found {type(data).__name__}")
     record_type = data.get("record_type")
-    if record_type != DECLARATIONS_RECORD_TYPE:
+    if record_type != contract.record_type:
         raise _refuse(
-            rel, f"record_type must be {DECLARATIONS_RECORD_TYPE!r}, found {record_type!r}"
+            rel, f"record_type must be {contract.record_type!r}, found {record_type!r}"
         )
     declared_revision = data.get("revision_id")
     if declared_revision != revision_id:
@@ -238,12 +299,13 @@ def load_declarations(repo_root: Path, revision_id: str) -> Declarations:
             f"found {type(rows).__name__}",
         )
     seen: set[str] = set()
-    checked = tuple(_check_row(rel, i, row, seen) for i, row in enumerate(rows))
+    checked = tuple(_check_row(rel, i, row, seen, contract) for i, row in enumerate(rows))
     return Declarations(
         revision_id=revision_id,
         rows=checked,
         path_rel=rel.as_posix(),
         sha256=file_sha256(path),
+        contract=contract,
     )
 
 
@@ -258,7 +320,7 @@ def resolve_rows(
     declaration is a legitimate state while review is open.
     """
     order = {sub_section_id: i for i, sub_section_id in enumerate(inventory_ids)}
-    rel = declarations_rel(declarations.revision_id)
+    rel = declarations_rel(declarations.revision_id, declarations.contract)
     for row in declarations.rows:
         if row["sub_section_id"] not in order:
             raise _refuse(
@@ -361,7 +423,7 @@ def guard_against_silent_loss(
     )
     if input_is_newer:
         return
-    rel = declarations_rel(declarations.revision_id)
+    rel = declarations_rel(declarations.revision_id, declarations.contract)
     behind = (
         f"{rel.as_posix()} does not declare them"
         if declarations.supplied
@@ -371,33 +433,42 @@ def guard_against_silent_loss(
         f"{register_rel.as_posix()} declares sub-section(s) {', '.join(orphaned)} under "
         f"'{DECLARED_HALF_KEY}.{SUB_SECTIONS_KEY}' and {behind}. The authoring tools render "
         f"this file in full, so writing it would erase them. Add them to {rel.as_posix()} "
-        f"(record_type {DECLARATIONS_RECORD_TYPE!r}, revision_id "
+        f"(record_type {declarations.contract.record_type!r}, revision_id "
         f"{declarations.revision_id!r}) and re-run. To withdraw a declaration, remove it "
         "from that input rather than from the register."
     )
 
 
-def validate_inputs(repo_root: Path, revisions: Iterable[tuple[str, Path]]) -> None:
+def validate_inputs(
+    repo_root: Path,
+    revisions: Iterable[tuple[str, Path]],
+    contract: Contract = DEFAULT_CONTRACT,
+) -> None:
     """Load and guard the declaration input of each ``(revision_id, register)``.
 
     Called by a tool before its first write. The renderer loads and guards
     again when it reaches each register; that second pass is what protects a
-    tool whose writes start before every register is rendered.
+    tool whose writes start before every register is rendered. One *contract*
+    for the call, because the revisions of one call are one document's.
     """
     for revision_id, register_rel in revisions:
         guard_against_silent_loss(
-            repo_root, register_rel, load_declarations(repo_root, revision_id)
+            repo_root, register_rel, load_declarations(repo_root, revision_id, contract)
         )
 
 
 def declared_half(
-    repo_root: Path, revision_id: str, register_rel: Path, inventory_ids: Iterable[str]
+    repo_root: Path,
+    revision_id: str,
+    register_rel: Path,
+    inventory_ids: Iterable[str],
+    contract: Contract = DEFAULT_CONTRACT,
 ) -> tuple[tuple[dict[str, Any], ...], Optional[dict[str, Any]]]:
     """The rendered rows and input block of *revision_id*'s declared half.
 
     One call for the renderer: load, guard, resolve against the inventory.
     """
-    declarations = load_declarations(repo_root, revision_id)
+    declarations = load_declarations(repo_root, revision_id, contract)
     guard_against_silent_loss(repo_root, register_rel, declarations)
     rows = resolve_rows(declarations, tuple(inventory_ids))
     return rows, input_block(declarations, rows)

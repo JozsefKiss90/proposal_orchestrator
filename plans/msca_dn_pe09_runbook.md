@@ -239,18 +239,42 @@ The dry import refuses a hash the bytes do not match, and refuses any path insid
 for the submitted text. It writes no graph state, so nothing it produces can be read as an imported
 document. The page map it establishes is what the import then needs declared.
 
-### Step 1b — configuration work before the import
+### Step 1b — configure the original, privately (V17)
 
-**[future]** A separate ticket, not a step anyone can run today:
+The five fields `--describe` names are facts about a document this repository does not hold, so they
+are declared in a file the operator authors in the private network. Nothing about them is declared
+here. Copy `tools/original_configuration_template.json` to the private root and answer every
+angle-bracketed value: the page map, the page count, the body point size, the work-package layout,
+the graph root, and where the V08 records sit.
 
-1. A private workspace root beside `workspaces/msca_dn/`, never inside the public one, authored by
-   the pattern of `tools/author_msca_dn_workspace.py`.
-2. The five fields `--describe` names, declared on `OFFICIAL_ORIGINAL` from the dry import's
-   measurement: the page map, the page count, the body point size, the work-package layout and that
-   private workspace root.
-3. A fidelity register renderer for a submitted document. `tools/author_msca_dn_workspace.py`
-   refuses one today, because its provenance header declares a sanitisation, a transformation and a
-   reflow. Those are the copy's facts, not the original's.
+Three rules the form enforces rather than states:
+
+- Every path in it is relative to the private root, and that root may not be inside this
+  repository. The committed template is refused on both counts.
+- A placeholder is not a declaration. An unanswered field refuses and names itself.
+- Null is an answer and silence is not. A document with no work-package table says so, and one
+  whose network type nothing here checks says that too.
+
+Then declare each sub-section's own number, section, page range and opening marker. A page no
+sub-section covers has to be listed under `pages_outside_the_map` with a basis: a cover page is a
+legitimate answer and silence is not.
+
+The configuration is checked against the dry import's own inventory before anything is written.
+`runner/original_configuration.py` compares the page count, the body point size, every numbered
+marker and the coverage of the map against that measurement. What it cannot reach it reports as
+unchecked rather than as agreeing. It refuses a configuration whose inventory measured other bytes.
+It refuses one naming a PDF the operator did not authenticate.
+
+Author the private graph root with it. The tool writes the same skeleton the public one writes —
+README, intake record, the dev-graph directories the importer needs — and refuses a root inside this
+repository:
+
+```
+py -3.10 -m tools.author_original_workspace --root <private root> --config-input <configuration input relative to that root>
+```
+
+The intake record is not re-declared. The dry import already authored one against the schema, and
+this records that file into the graph root, so the submission id is declared once.
 
 The original is not a revision of the sanitised copy. Its intake id differs
 (`msca-dn-2025-original`), and a revision of one document may not supersede a revision of another.
@@ -258,8 +282,18 @@ A comparison between the two documents is a record of its own.
 
 ### Step 1c — what the import records, and what to read
 
-Once configured, the importer records what it measures. Each line is a check the operator reads
-before going on:
+The import reads the same configuration input, completes the document from it, and writes under the
+private root:
+
+```
+py -3.10 -m tools.import_external_proposal --document official_original --config-input <configuration input> --repo-root <private root>
+```
+
+A configuration that disagrees with the measurement is reported and nothing is written. The import
+also refuses to redeclare a document that is already complete, so the committed sanitised page map
+stays the one its hash-bound manifests were measured under.
+
+The importer records what it measures. Each line is a check the operator reads before going on:
 
 | Measured | Where it lands | Check |
 |---|---|---|
@@ -269,13 +303,25 @@ before going on:
 | tables | `derived.tables`, `derived.table_3_1a` | the work-package header layout the audit parser reads |
 | extraction accounting | `derived.per_page_extraction_losses` | zero pages with loss, or each loss explained |
 | import manifest | the workspace's `dev_graph/imports/<manifest name>` | written once; its path is the one every later command names |
-| fidelity register | the declared register path | the declared half comes from the revision's declaration input (R01), one file per revision |
+| fidelity register | the declared register path | written by the submitted document's own renderer (V18), not the copy's; its declared half comes from the revision's declaration input, one file per revision |
 | document node and version | the dev-graph import | one current version; its node id is the candidate id |
 | materialised candidate | the audit's `candidates/<node id>/` directory | the content hash the preflight binds |
 
 Then, against the original and only there, the operator records the per-sub-section
 `fidelity_to_submitted_original` declarations the R04 drafts left Unresolved. V01 requires those
 declarations before any miss can claim Confirmed preservation.
+
+The original's own register asks a different question, and its renderer is a different one (V18).
+The copy's header declares a sanitisation, a transformation and a reflow, which are the copy's
+facts, so `tools/author_msca_dn_workspace.py` refuses the submitted text. The submitted document's
+register declares that nothing stands between the submission and the text assessed, and says in so
+many words that this is not a claim the extraction preserved everything.
+
+What the extraction loses is the V08 reconciliation, and the register will not be written over an
+open one. An item still `unreconciled`, or a `preserved` verdict resting on a measurement equally
+true of a document whose figures are gone, refuses the write and names the class. Its declared half
+asks for a `presence` and an `extraction_fidelity` per sub-section, under a record type of its own:
+a transformation declared about the submitted text would read as a sanitisation of it.
 
 ## 5. Fresh preflight and isolated blind assessment (stage A, steps 2–3)
 
@@ -533,13 +579,11 @@ declaration about the original leaves only if those rules say it may.
 
 | Gap | Blocks |
 |---|---|
-| The original's document configuration: page map, page count, body point size, work-package layout and private workspace root (§4) | stage A step 1 |
-| A fidelity register renderer for a submitted document (§4) | stage A step 1 |
 | Claim loader, ledger statuses and E2 integration for imported documents (§9) | the grounding axis in both stages |
 | A labelled row-by-observation reading of two comparisons over different baselines (§6) | the stage-A reading against the public comparison |
 | The D14 successor provenance update and the D13 adoption, if decided (§2.2) | nothing in the harness; the register bindings |
 
-Two rows have closed. V10 authored the historical profile from V09's matrix (§3), and V13 built the readiness receipt and its validator (§1.1).
+Four rows have closed. V10 authored the historical profile from V09's matrix (§3), V13 built the readiness receipt and its validator (§1.1), V17 built the original's configuration route (§4 step 1b) and V18 its register renderer (§4 step 1c). The original's own values stay the operator's: the route is here and the declarations are theirs.
 
 ## 12. Handoff statement
 

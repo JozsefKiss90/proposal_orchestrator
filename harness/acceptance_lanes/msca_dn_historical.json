@@ -37,10 +37,11 @@
   "areas": [
     {
       "name": "dry_import",
-      "invariant": "A document is measured before it is imported. The measurement declares no page map and writes no graph state. A 'preserved' fidelity verdict may not rest on a measurement that is equally true of a document whose graphical evidence is gone. The submitted original and its derived text stay outside this repository. The historical run does not depend on this invariant. Stage A reads the sanitised copy, and V08 gates the original's import and V13's readiness receipt.",
+      "invariant": "A document is measured before it is imported, and the measurement declares no page map. The original's page map, page count and body size are declared privately and checked against that measurement. A 'preserved' fidelity verdict may not rest on a measurement equally true of a document whose figures are gone. The submitted text's register is its own, and it is not written over an open reconciliation. The original, its graph root and every record derived from it stay outside this repository. The historical run does not depend on this invariant, because the private PE-09 run is what imports the original.",
       "modules": [
         "tests/runner/test_dry_import.py",
-        "tests/test_msca_dn_dry_import.py"
+        "tests/test_msca_dn_dry_import.py",
+        "tests/test_msca_dn_original_import_route.py"
       ],
       "depended_on": false
     },

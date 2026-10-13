@@ -133,33 +133,71 @@ record holds. Otherwise every finding is printed and the exit status is 1. The c
 `item_missing`, `unknown_item`, `unknown_verdict`, `verdict_without_attestation`, `unknown_basis`,
 `measurement_basis_not_proof` and `complete_with_unreconciled_item`.
 
-Nothing else reads this record. The import of the original is where it would be gated, and that cannot
-run until you have declared the page map, so an inadmissible verdict is reported here and blocks
-nothing elsewhere.
+Set `complete` to `true` once every class carries a verdict. The register of the submitted document
+reads this record and will not be written while an item is still `unreconciled`, or while a
+`preserved` verdict rests on a measurement (V18). So an inadmissible record blocks the import rather
+than only being reported here.
 
-## Step 5 — record the intake inside the private graph root
+## Step 5 — declare the configuration, in the private network (V17)
 
-The dry import writes the intake record as a file and records nothing in a graph. To record it, call
-`runner.dev_graph.intake.record_esr_intake` with the private graph root. One record per intake id,
-written once; different content under the same id is refused, and a later change in what is known is a
-new intake id.
+The page map you reconciled is a fact about a document this repository does not hold, so it is
+declared where that document is. Copy `tools/original_configuration_template.json` to the private
+root and answer every angle-bracketed value. Nothing about the original is declared in this
+repository, and the committed copy of the template is refused as a configuration: it sits inside the
+repository, and a placeholder is not a declaration.
 
-## Step 6 — what is still not done
+What the form asks for, beyond the five fields the importer names:
 
-The dry import establishes the page map and the provenance. It does not import the document.
+| Field | What to answer |
+|---|---|
+| `authenticated_sha256` | the hash from Step 1, so the import cannot read a file you did not authenticate |
+| `measurement` | the inventory's path and its own sha256, so the declaration is bound to one measurement |
+| `dry_import_dir` | where the V08 records sit, so the register can bind each by hash |
+| `workspace_rel` | the private graph root, relative to the private root |
+| `declarations_dir_rel` | where your per-sub-section declarations will live |
+| `pages_outside_the_map` | every page no sub-section covers, each with a basis |
+| `dn_type` | the network type and the page that states it, or `null` to leave it Unresolved |
 
-- Declare the page map, the page count, the body point size, the work-package layout and the graph
-  root on `OFFICIAL_ORIGINAL` in `tools/import_external_proposal.py`. Until then
-  `py -3.10 -m tools.import_external_proposal --document official_original --check` refuses and names
-  each missing field.
-- The original's graph root is undeclared on purpose. Declaring one inside this repository would put
-  the submitted text's page records here, which criterion 6 forbids.
-- The original has no fidelity register renderer. `tools/author_msca_dn_workspace.render_register`
-  refuses a submitted document, because its provenance header declares a sanitisation, a
-  transformation and a reflow — the copy's facts, not the original's.
-- The 2025 profile is V09 and V10. A result over the original scored under
-  `msca_dn_2026_default.json` would score a historical submission by a later year's configuration.
-- The private execution readiness receipt is V13, and it is blocked by this ticket.
+Then author the graph root. The tool writes the README, records the intake, and creates the
+dev-graph directories the importer needs:
+
+```
+py -3.10 -m tools.author_original_workspace --root <private root> --config-input <configuration input relative to that root>
+```
+
+It refuses a root that resolves inside this repository, and a configuration input that sits outside
+the private root. It re-reads the dry import's inventory and reports every declared value that
+disagrees with it, writing nothing. The intake record is the one the dry import authored: it is
+recorded into the graph root rather than re-declared, so the proposal number is declared once.
+
+## Step 6 — import the original (V17, V18)
+
+```
+py -3.10 -m tools.import_external_proposal --document official_original --config-input <configuration input> --repo-root <private root>
+```
+
+This writes the page sources, the document record, the import manifest and the fidelity register,
+all under the private root. The register is the submitted document's own (V18). It declares that
+nothing stands between the submission and the text assessed. It also says, in so many words, that
+this is not a claim the extraction preserved everything. Its declared half asks for a `presence` and an
+`extraction_fidelity` per sub-section, under a record type of its own.
+
+Both tools have a `--check` that exits 1 if any file they own would change, so the import replays
+byte-equal. The copy's configuration cannot be redeclared through an input: its manifests are bound
+by hash into the frozen baseline.
+
+## Step 7 — what is still not done
+
+- The grounding axis. A claim this document carries is extracted, counted and never resolved to a
+  source: the imported-source route is ticket X01. Until it lands, no cell may declare
+  `source_grounded`.
+- The 2025 profile is `harness/profiles/msca_dn_2025_historical.json` (V10). A result over the
+  original scored under `msca_dn_2026_default.json` would score a historical submission by a later
+  year's configuration.
+- The readiness receipt (V13) is validated before the run, in the private network, by
+  `py -3.10 -m harness.commands.execution_receipt`.
+- Nothing in this procedure authorises the run. What may be sent and what may leave are the private
+  environment's rules, and `plans/msca_dn_pe09_runbook.md` §10 states none of them.
 
 ## What a span buys
 

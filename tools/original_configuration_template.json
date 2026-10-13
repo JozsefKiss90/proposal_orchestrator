@@ -1,0 +1,57 @@
+{
+  "schema": "original_document_configuration/1",
+  "record_type": "original_document_configuration",
+  "_how_to_use": [
+    "The form the operator fills in, inside the private network, after the V08 dry import.",
+    "Copy it to the private root, answer every angle-bracketed value, and keep it there:",
+    "every path below is relative to that root, and a configuration outside it is refused.",
+    "This copy is refused twice over — by its location in this repository, and because a",
+    "placeholder is not a declaration. See plans/msca_dn_v08_original_dry_import_procedure.md."
+  ],
+  "config_id": "official_original",
+  "declared_by": "<who reconciled the document and declares these values>",
+  "declared_on": "<the date of that reconciliation, YYYY-MM-DD>",
+  "declared_status": "<Confirmed, Inferred, Assumed or Unresolved, per CLAUDE.md 12.2>",
+  "status_note": "<which of these values you reconciled against the PDF, and which you declare without one>",
+  "authenticated_sha256": "<the hash of the PDF from the authoritative source, the one the dry import was given>",
+  "measurement": {
+    "path": "<path of the dry import's inventory, relative to the private root>",
+    "sha256": "<that file's sha256; the configuration is bound to one measurement>"
+  },
+  "dry_import_dir": "<directory holding the dry import's records, relative to the private root>",
+  "workspace_rel": "<the private graph root, relative to the private root>",
+  "declarations_dir_rel": "<directory for your per-sub-section declaration inputs, relative to the private root>",
+  "scorecard_rel": null,
+  "expected_pages": "<the page count the dry import measured>",
+  "body_point_size": "<the body point size, as the measured distribution spells it>",
+  "marker_page_tolerance": 0,
+  "sub_sections": [
+    {
+      "sub_section_id": "<the sub-section's own number, as the document writes it>",
+      "section_id": "<excellence_section, impact_section or implementation_section>",
+      "declared_pages": ["<first page>", "<last page>"],
+      "marker": "<the block prefix that opens it, or null when it opens the document>",
+      "declared_title": "<a title for an unlabelled sub-section, or null to take it from the heading>",
+      "exact_marker": false
+    }
+  ],
+  "criterion_heading_markers": [],
+  "work_package_layout": null,
+  "dn_type": null,
+  "pages_outside_the_map": [],
+  "revisions": [
+    {
+      "revision_id": "<a plain identifier for this PDF of the document>",
+      "pdf_rel": "<the PDF, relative to the private root>",
+      "source_id_prefix": "<prefix of this revision's page source ids>",
+      "manifest_name": "<file name of the import manifest>",
+      "register_rel": "<the fidelity register this revision writes, relative to the private root>",
+      "candidate_role": "<what this file is, for the register's input table>",
+      "candidate_version": "<which version of the document it is>",
+      "summary": "<what this revision is, in one sentence>",
+      "expected_pages": null,
+      "supersedes": null,
+      "change_id": null
+    }
+  ]
+}
