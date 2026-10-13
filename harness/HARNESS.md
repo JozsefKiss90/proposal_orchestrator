@@ -190,10 +190,57 @@ Each is a finding, not a sentence in a report:
 - **Confirmed on unvouched bytes.** A row may declare `Confirmed` only when a citation behind it rests
   on a source whose hash came from the issuing body. A document sitting in a repository with no
   recorded download provenance is pinned, not authenticated.
+- **Confirmed on a bracketed era.** A row may not declare `Confirmed` while it cites a historical
+  source whose place in the closed call is unresolved. Such a source fixes a wording, not a rule that
+  governed.
 
 An authentication rank is itself evidence, so it carries one too. An entry claiming a rank above
 `computed_only` must name where that provenance is recorded, and `check` reports one that does not.
 The rank would otherwise rest on the index author's word, which is the thing the rank improves on.
+
+### A profile authored from a matrix
+
+A historical profile scores a closed call's submission under that call's rules. Its claim has two halves. Each element is
+either sourced to a row of an equivalence matrix, or declared open because a matrix row is open. The
+reader `harness/historical_profile.py` reports where that does not hold.
+
+The finding that matters is an element sourced to a row whose verdict cannot establish a value. That
+is the profile claiming the matrix settled what the matrix recorded as open. Two more guard the other
+directions. A matrix row no element reads is a rule the profile ignores in silence. A limitation over
+a row the matrix has since sourced is the profile understating what is known.
+
+A reused instrument is not a sourced rule. The matrix carries such a row as era-neutral, because no
+call document of either year states it. The profile then declares that element this repository's own
+choice. An element declared that way whose row is a call's rule is refused.
+
+### Three questions about a source, asked separately
+
+A source entry answers three independent questions. One column answering all three is how a file
+hashed locally comes to read as an authenticated authority.
+
+| Question | Field | What settles it |
+|---|---|---|
+| Are the bytes fixed and reproducible? | `authentication` | A hash. The issuing body's, the operator's word, or this tree's own. |
+| Are they the bytes the issuing body published? | `source_authenticity` | A retrieval from the published address, a second independent copy, an archive of that address. |
+| Was this the version in force for the era it states rules for? | `historical_applicability` | The document saying so. Retrieval dates do not: bytes fetched today evidence what is published today. |
+
+A retrieval settles the second question and cannot settle the third. Captures that surround a call
+window bracket it without closing it, because a version served between two captures and never
+captured leaves no trace. That is `bracketed_not_conclusive`, and it is not a failure: it is the
+honest answer, and the finding above keeps a row from confirming on it.
+
+Each answer above `unrecorded` names what it rests on, and the record has to carry it. A `provenance`
+block holds the acts. It records the published address, and what was read and when. It records the
+title, version and date the document gives itself, the captures and the second copies.
+
+`check` reports a rank with no basis. It separately reports a rank whose provenance lacks what that
+rank needs. Corroboration with neither a capture nor a copy recorded is a sentence about an act with
+nothing beside it. A declared second copy whose hash is not the entry's own is refused outright,
+because a copy with other bytes corroborates nothing.
+
+Older declarations carry none of these fields. They stay readable, and their entries read as held
+files with no recorded origin, which is what declaring nothing means. A superseded record whose own
+reader can no longer open it is evidence nobody can check.
 
 ### Locating a passage
 

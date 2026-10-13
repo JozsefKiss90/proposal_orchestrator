@@ -877,6 +877,141 @@ class TestBoundRecords:
 # --------------------------------------------------------------------------- #
 
 
+class TestTheThreeAxes:
+    """Byte integrity, source authenticity and historical applicability.
+
+    They are separate questions, and the reader's job is to stop one answer
+    standing in for another.
+    """
+
+    def test_an_entry_declaring_nothing_reads_as_origin_unrecorded(self, world):
+        """What a version-1 index means, stated once here.
+
+        Older indexes declare none of these fields. Their entries must read as
+        a held file with no recorded origin, never as a corroborated one.
+        """
+        _, index = world()
+        for source in index.obtained():
+            assert source.source_authenticity == "unrecorded"
+            assert source.historical_applicability == "not_applicable"
+            assert source.provenance is None
+            assert not source.origin_recorded
+            assert source.applicability_conclusive
+
+    def test_a_corroborating_copy_with_other_bytes_is_refused_at_load(self, world):
+        sources = [
+            _index_entry(
+                sha256=_sha(world.root / "records/historical.json"),
+                source_authenticity="independently_corroborated",
+                source_authenticity_basis="a second host served the same bytes",
+                provenance={
+                    "official_url": "https://example.invalid/a.json",
+                    "retrieved_on": "2026-10-13",
+                    "corroborating_copies": [
+                        {"url": "https://example.invalid/mirror/a.json", "sha256": "0" * 64}
+                    ],
+                },
+            )
+        ]
+        with pytest.raises(am.AuthorityMatrixError, match="corroborates nothing"):
+            world(sources=sources)
+
+    def test_an_authenticity_with_no_basis_is_reported(self, world):
+        sources = [
+            _index_entry(
+                sha256=_sha(world.root / "records/historical.json"),
+                source_authenticity="retrieved_from_official_url",
+                provenance={
+                    "official_url": "https://example.invalid/a.json",
+                    "retrieved_on": "2026-10-13",
+                },
+            )
+        ]
+        matrix, index = world(sources=sources)
+        report = am.check(matrix, index, world.root)
+        assert report.authenticities_claimed_without_a_basis
+        assert not report.green
+
+    def test_an_applicability_with_no_basis_is_reported(self, world):
+        sources = [
+            _index_entry(
+                sha256=_sha(world.root / "records/historical.json"),
+                historical_applicability="in_force_confirmed",
+            )
+        ]
+        matrix, index = world(sources=sources)
+        report = am.check(matrix, index, world.root)
+        assert report.applicabilities_claimed_without_a_basis
+
+    def test_a_rank_its_provenance_does_not_carry_is_reported(self, world):
+        """The basis says an act happened; the record has to carry it.
+
+        Corroboration with neither a capture nor a copy recorded is a sentence
+        about an act with nothing beside it.
+        """
+        sources = [
+            _index_entry(
+                sha256=_sha(world.root / "records/historical.json"),
+                source_authenticity="independently_corroborated",
+                source_authenticity_basis="two hosts agreed",
+                provenance={"official_url": "https://example.invalid/a.json"},
+            )
+        ]
+        matrix, index = world(sources=sources)
+        report = am.check(matrix, index, world.root)
+        assert report.ranks_unsupported_by_their_provenance
+        assert "a second capture or a corroborating copy" in (
+            report.ranks_unsupported_by_their_provenance[0]
+        )
+
+    def test_a_confirmed_row_on_a_bracketed_source_is_reported(self, world):
+        """The finding the third axis exists for.
+
+        The bytes can be fixed and their origin settled while the document's
+        place in a closed call is not. A confirmation resting there confirms
+        a wording, not a rule that governed.
+        """
+        sources = [
+            _index_entry(
+                sha256=_sha(world.root / "records/historical.json"),
+                authentication="issuer_hash_confirmed",
+                authentication_basis="an expected hash from the issuing body matched",
+                source_authenticity="retrieved_from_web_archive",
+                source_authenticity_basis="read from an archive of the published address",
+                historical_applicability="bracketed_not_conclusive",
+                historical_applicability_basis="two captures surround the window",
+                provenance={
+                    "official_url": "https://example.invalid/a.json",
+                    "retrieved_on": "2026-10-13",
+                    "archive_captures": [
+                        {"url": "https://example.invalid/t1/a.json", "captured_on": "2025-06-19"}
+                    ],
+                },
+            )
+        ]
+        matrix, index = world(rows=[_row(declared_status="Confirmed")], sources=sources)
+        report = am.check(matrix, index, world.root)
+        # Byte integrity and origin are both settled, so the older finding is
+        # silent and only the applicability one fires.
+        assert not report.confirmed_without_an_authenticated_source
+        assert report.confirmed_on_inconclusive_applicability
+
+    def test_an_absence_claiming_an_origin_is_refused_at_load(self, world):
+        sources = [
+            {
+                "path": "records/absent.pdf",
+                "class": "work_programme",
+                "era": "historical",
+                "authentication": "not_obtained",
+                "source_authenticity": "retrieved_from_official_url",
+                "role": "immutable_evidence",
+                "states": "a document nobody has",
+            }
+        ]
+        with pytest.raises(am.AuthorityMatrixError, match="claims source_authenticity"):
+            world(sources=sources)
+
+
 class TestRendering:
     def test_both_readings_name_what_the_verdicts_mean(self, world):
         matrix, index = world()
@@ -884,7 +1019,10 @@ class TestRendering:
         assert "No verdict means *no difference was found*" in reading
         assert "**not** equivalence" in reading
         index_reading = am.render_index(index)
-        assert "may not declare Confirmed" in index_reading
+        # The reading is hard-wrapped, so the sentence is matched after the
+        # wrapping is collapsed. Asserting on the wrapped text makes the test
+        # fail when a word earlier in the paragraph changes length.
+        assert "may not declare Confirmed" in " ".join(index_reading.split())
 
     def test_the_index_reading_lists_what_is_missing(self, world):
         sources = [

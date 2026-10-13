@@ -1,0 +1,1422 @@
+{
+  "schema": "authority_equivalence_matrix/1",
+  "record_type": "authority_equivalence_matrix",
+  "matrix_name": "msca_dn_2025_to_2026_equivalence_2026-10-13",
+  "subject": "every scoring-relevant rule of the 2025 MSCA Doctoral Networks evaluation, read against the 2026 profile",
+  "authored_on": "2026-10-13",
+  "ticket": "V09 of plans/msca_dn_historical_validation_tickets.md",
+  "advisory": true,
+  "blocking": false,
+  "purpose": "The runbook proposes preparing a historical profile as a copy of the 2026 one, leaving a rule unchanged where no source states a difference. That is a defaulting policy, not evidence that the rule applied in 2025. This matrix replaces it: each rule is sourced to a 2025 document, or recorded as defaulted with the rule its defaulting affects, or recorded as an unresolved limitation. No verdict means that no difference was found.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "declared_status": "Inferred",
+  "declared_status_note": "Inferred, not Confirmed. Every sourced row rests on a pinned document whose bytes nothing from an issuing body vouches for, and harness.authority_matrix.check refuses a Confirmed row on such a source.",
+  "supersedes": "the equivalence matrix authored on 2026-10-12, `docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-12.json` (sha256 115949d3fe4858340128a6ce1fc3afe83f28a085347714752ccf1ca9d9453bcd). That matrix carried six defaulted rows and two unresolved, every one of them resting on a 2025 document this repository did not hold. Three of those documents have since been obtained, so the six defaultings are re-derived here against the sources themselves and one new row records a difference they revealed. The superseded matrix stays in the tree unedited: a correction to a matrix is a successor matrix, and what was believed on 2026-10-12 is part of the evidence. The specification's decision 3, which pinned one 2026 profile because the 2025 sources were absent, stands as written.",
+  "uncertainties": [
+    "No row is defaulted. Two are unresolved, and each names what is missing: the binding of this submission to a call, and the evaluation form version the 2025 evaluators were given.",
+    "Twenty-five rows are Inferred and none is Confirmed. Every 2025 document here is hashed in this tree and none carries a hash published by its issuing body, so no row may be Confirmed on byte integrity. Three documents are corroborated by a second independent copy, which raises what is known about their origin and not about what governed the call.",
+    "Two 2025 authorities state different score resolutions. The work programme says one decimal place, the evaluation form says half marks. TH-05 shows which was applied to this submission, from a recorded score no half-mark rule could award. It does not resolve the conflict in general, and a statement about any other 2025 proposal must carry it.",
+    "Every row citing the 2025 evaluation form inherits EI-02's bracket. Three captures of one archive are one witness observed three times, and a version served between two captures and never captured would leave no trace.",
+    "The 2025 application form has no recorded origin, and nothing establishes it was the version in force. The five rows citing it are Inferred for that reason, and retrieving a corroborating copy of it is not attempted here.",
+    "A sourced row claims what its citations measure and no more. SM-01 compares the aspect anchors in both directions; AM-01 claims an inclusion only, so a 2025 cross-reference the 2026 mapping has no row for would not have been seen.",
+    "Whether an area's rows are all of its scoring-relevant rules is this author's judgement. The check reads what each row cites and refuses an unsourced relation; it cannot report a rule nobody wrote a row for.",
+    "The rows sourced to the 2025 evaluation's own record settle what was applied to this submission. None of them settles a rule of the 2025 call, and the check refuses a call-wide claim resting only on them.",
+    "EI-01, the six score-level descriptions, was the largest unsourced input to a numerical comparison. All six sentences are now located in the 2025 form, word for word, so the comparison no longer rests on a 2026 document alone.",
+    "This matrix quotes the 2025 evaluation's recorded figures. It lives beside the ESR record, outside the dev-graph root, and is not snapshotted; the blind lane's isolation rests on that exclusion and on the assessor running with no tools from outside the repository, exactly as it does for the ESR record itself."
+  ],
+  "isolation_note": "Written under docs/tier4_orchestration_state/msca_dn/, outside the dev-graph root at workspaces/msca_dn/. No snapshot reads it, so it cannot reach an evidence pack, which is the position the ESR record already holds (specification decision 12).",
+  "authority_note": "This matrix confers no authority and closes no gate. It records what the sources state. A row marked defaulted is a declaration that a rule is unsourced, not a finding that it is wrong, and a row marked equivalent is a statement about the documents cited rather than about every rule of the call.",
+  "required_areas": [
+    "criteria",
+    "weights",
+    "thresholds",
+    "evaluator_instructions",
+    "variant",
+    "section_mapping",
+    "appendix_mapping",
+    "scoring_assumption"
+  ],
+  "source_index": {
+    "path": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-13.json",
+    "sha256": "cfb935b0e0e9c42e3e14701d870645017a89822a3792d1a58441e64b1c853575"
+  },
+  "written_by": "tools/author_msca_dn_authority_matrix.py",
+  "rows": [
+    {
+      "id": "CI-01",
+      "area": "call_identity",
+      "rule": "Which call the 2025 submission was evaluated under. Every other row's 2025 side is addressed to this call.",
+      "affects": "an interpretation",
+      "verdict": "unresolved",
+      "settles": "as_applied_to_this_submission",
+      "declared_status": "Assumed",
+      "status_basis": "Two records declare the identifier Assumed and give the same reason. The value is the operator's declaration, and this module refuses to render if either record stops declaring it Assumed. The work programme now evidences that a call with that identifier existed, with the dates it cites. It does not evidence that this submission was made to it, which is what the row is about, so the status stays Assumed.",
+      "limitation": "The call itself is now pinned. The work programme part states its identifier, its opening date and its deadline, so the call this submission is declared against exists and its conditions are held. What is still missing is the binding: the Evaluation Summary Report names no proposal number, and nothing in this repository shows this submission was entered into that call. Two records declare the binding, and a declaration is not evidence of it.",
+      "consequence": "The historical profile carries the operator's declared call identifier with declared_status Assumed, never Confirmed, and the matrix is cited as the reason.",
+      "would_be_settled_by": [
+        "docs/tier3_project_instantiation/source_materials/msca_dn/submission_acknowledgement.pdf"
+      ],
+      "citations": [
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 23,
+          "quote": "Call - MSCA Doctoral Networks 2025 HORIZON-MSCA-2025-DN-01 Conditions for the Call",
+          "states": "the work programme states the identifier of the 2025 call"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 23,
+          "quote": "Opening: 28 May 2025 Deadline(s): 25 Nov 2025",
+          "states": "and that call's opening date and deadline"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/decision_log/msca-dn-pe01-workspace_2026-10-04.json",
+          "field": "declared_values/historical_call_id/reason",
+          "states": "the PE-01 decision records the call identifier as the operator's declaration"
+        },
+        {
+          "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+          "field": "provenance/historical_submission/call_id/basis",
+          "states": "the fidelity register records the same basis for the same identifier"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "CI-01-M1",
+          "claim": "the PE-01 decision declares the call identifier Assumed",
+          "record": "docs/tier4_orchestration_state/decision_log/msca-dn-pe01-workspace_2026-10-04.json",
+          "field": "declared_values/historical_call_id/declared_status",
+          "expected": "Assumed"
+        },
+        {
+          "id": "CI-01-M2",
+          "claim": "the fidelity register declares the same identifier Assumed",
+          "record": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+          "field": "provenance/historical_submission/call_id/declared_status",
+          "expected": "Assumed"
+        }
+      ]
+    },
+    {
+      "id": "CR-01",
+      "area": "criteria",
+      "rule": "The three criteria the proposal is scored on, and their order: Excellence, Impact, Implementation.",
+      "affects": "both",
+      "verdict": "equivalent",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "Criterion 1 - Excellence Score:  4.20 (Threshold: 3 / 5.00 , Weight: 50.00% ); Criterion 2 - Impact Score:  4.50 (Threshold: 3 / 5.00 , Weight: 30.00%; Criterion 3 - implementation Score:  4.20 (Threshold: 3 / 5.00 , Weight: 20.00% )",
+      "current_value": "Excellence, Impact, Implementation",
+      "declared_status": "Inferred",
+      "status_basis": "The 2025 side is stated twice: by the evaluation's own recorded wording, which is evidence of what was applied to this submission, and by the work programme the call was opened under, which names the three criteria as the call's. It is Inferred rather than Confirmed because no hash from the issuing body vouches for either document's bytes.",
+      "consequence": "The historical profile declares the same three criteria in the same order, sourced to this row rather than copied.",
+      "citations": [
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/wording",
+          "states": "the 2025 evaluation's recorded wording for criterion 1",
+          "quote": "Criterion 1 - Excellence Score:  4.20 (Threshold: 3 / 5.00 , Weight: 50.00% )"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#1/wording",
+          "states": "the 2025 evaluation's recorded wording for criterion 2",
+          "quote": "Criterion 2 - Impact Score:  4.50 (Threshold: 3 / 5.00 , Weight: 30.00%"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#2/wording",
+          "states": "the 2025 evaluation's recorded wording for criterion 3",
+          "quote": "Criterion 3 - implementation Score:  4.20 (Threshold: 3 / 5.00 , Weight: 20.00% )"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 123,
+          "quote": "the award criteria 'excellence', 'impact' and 'quality and efficiency of the implementation'",
+          "states": "the work programme names the three award criteria of the 2025 call"
+        },
+        {
+          "source": "harness/profiles/msca_dn_2026_default.json",
+          "field": "criteria",
+          "states": "the 2026 profile's three criteria, in order"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "CR-01-M1",
+          "claim": "the 2025 evaluation awarded three criterion scores",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria",
+          "expected_length": 3
+        },
+        {
+          "id": "CR-01-M2",
+          "claim": "the 2026 profile declares three criteria",
+          "record": "harness/profiles/msca_dn_2026_default.json",
+          "field": "criteria",
+          "expected_length": 3
+        },
+        {
+          "id": "CR-01-M3",
+          "claim": "the 2025 evaluation's criterion 1 is Excellence",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/registry_criterion_id",
+          "expected": "Excellence"
+        },
+        {
+          "id": "CR-01-M6",
+          "claim": "the 2026 profile's criterion 1 is Excellence",
+          "record": "harness/profiles/msca_dn_2026_default.json",
+          "field": "criteria/#0/registry_criterion_id",
+          "expected": "Excellence"
+        },
+        {
+          "id": "CR-01-M4",
+          "claim": "the 2025 evaluation's criterion 2 is Impact",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#1/registry_criterion_id",
+          "expected": "Impact"
+        },
+        {
+          "id": "CR-01-M7",
+          "claim": "the 2026 profile's criterion 2 is Impact",
+          "record": "harness/profiles/msca_dn_2026_default.json",
+          "field": "criteria/#1/registry_criterion_id",
+          "expected": "Impact"
+        },
+        {
+          "id": "CR-01-M5",
+          "claim": "the 2025 evaluation's criterion 3 is Implementation",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#2/registry_criterion_id",
+          "expected": "Implementation"
+        },
+        {
+          "id": "CR-01-M8",
+          "claim": "the 2026 profile's criterion 3 is Implementation",
+          "record": "harness/profiles/msca_dn_2026_default.json",
+          "field": "criteria/#2/registry_criterion_id",
+          "expected": "Implementation"
+        }
+      ]
+    },
+    {
+      "id": "CR-02",
+      "area": "criteria",
+      "rule": "Which criterion each of the ten aspects is graded under: four under Excellence, four under Impact, two under Implementation.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "the evaluation form served through the 2025 call window carries all ten aspect texts, each inside the section of the criterion the scorecard grades it under",
+      "current_value": "excellence: exc-obj, exc-method, exc-training, exc-supervision; impact: imp-structuring, imp-career, imp-dissemination, imp-magnitude; implementation: impl-workplan, impl-participants",
+      "declared_status": "Inferred",
+      "status_basis": "Measured, not read off a list. The 2025 form is walked once, its three criterion section headings locate three boundaries, and every one of the ten aspect texts is required to fall inside its own criterion's section. An aspect present but grouped elsewhere refuses here. Inferred, not Confirmed, because that form's place in the call is bracketed and not closed, which row EI-02 keeps open.",
+      "consequence": "The historical profile keeps the criterion-to-aspect assignment, sourced to the 2025 form's own grouping rather than carried over from 2026.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 4,
+          "quote": "Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art).",
+          "states": "aspect 1.1 under 1. Excellence"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 4,
+          "quote": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality and appropriateness of open science practices).",
+          "states": "aspect 1.2 under 1. Excellence"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 4,
+          "quote": "Quality and credibility of the training programme (including transferable skills, inter/multidisciplinary, inter-sectoral and gender as well as other diversity aspects).",
+          "states": "aspect 1.3 under 1. Excellence"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 4,
+          "quote": "Quality of the supervision (including mandatory joint supervision for industrial and joint doctorate projects).",
+          "states": "aspect 1.4 under 1. Excellence"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 5,
+          "quote": "Contribution to structuring doctoral training at the European level and to strengthening European innovation capacity, including the potential for: a) meaningful contribution of the non-academic sector to the doctoral training, as appropriate to the implementation mode and research field b) developing sustainable elements of doctoral programmes.",
+          "states": "aspect 2.1 under 2. Impact"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 5,
+          "quote": "Credibility of the measures to enhance the career perspectives and employability of researchers and contribution to their skills development.",
+          "states": "aspect 2.2 under 2. Impact"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 5,
+          "quote": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities.",
+          "states": "aspect 2.3 under 2. Impact"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 5,
+          "quote": "The magnitude and importance of the project’s contribution to the expected scientific, societal and economic impacts.",
+          "states": "aspect 2.4 under 2. Impact"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 6,
+          "quote": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages.",
+          "states": "aspect 3.1 under 3. Quality and efficiency of the implementation"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 6,
+          "quote": "Quality, capacity and role of each participant, including hosting arrangements and extent to which the consortium as a whole brings together the necessary expertise.",
+          "states": "aspect 3.2 under 3. Quality and efficiency of the implementation"
+        },
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "criteria",
+          "states": "the 2026 evaluation form's aspects, grouped by criterion"
+        }
+      ]
+    },
+    {
+      "id": "WT-01",
+      "area": "weights",
+      "rule": "The criterion weights used to compute the weighted total.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "excellence 50%, impact 30%, implementation 20%",
+      "current_value": "excellence 50%, impact 30%, implementation 20%",
+      "declared_status": "Inferred",
+      "status_basis": "Each weight is recorded three times: in the 2025 evaluation's own per-criterion wording, in the work programme's weighting row for that call, and in the 2026 scorecard derived from the evaluation form. The call document and the result agree, so the weights are the call's rule and not only what this submission was given. Inferred for the reason CR-01 gives.",
+      "consequence": "The historical profile keeps these weights, sourced to the 2025 evaluation's own record rather than carried over.",
+      "citations": [
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/wording",
+          "states": "the weight the 2025 evaluation applied to criterion 1",
+          "quote": "Criterion 1 - Excellence Score:  4.20 (Threshold: 3 / 5.00 , Weight: 50.00% )"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#1/wording",
+          "states": "the weight the 2025 evaluation applied to criterion 2",
+          "quote": "Criterion 2 - Impact Score:  4.50 (Threshold: 3 / 5.00 , Weight: 30.00%"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#2/wording",
+          "states": "the weight the 2025 evaluation applied to criterion 3",
+          "quote": "Criterion 3 - implementation Score:  4.20 (Threshold: 3 / 5.00 , Weight: 20.00% )"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 124,
+          "quote": "50% 30% 20% Weighting",
+          "states": "the work programme's weighting row for the 2025 call"
+        },
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "criteria",
+          "states": "the 2026 scorecard's weights, derived from the evaluation form"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "WT-01-M1",
+          "claim": "the 2025 evaluation weighted excellence at 50%",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/weight_pct",
+          "expected": 50
+        },
+        {
+          "id": "WT-01-M2",
+          "claim": "the 2026 scorecard weights excellence at 50%",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "criteria/#0/weight_pct",
+          "expected": 50
+        },
+        {
+          "id": "WT-01-M3",
+          "claim": "the 2025 evaluation weighted impact at 30%",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#1/weight_pct",
+          "expected": 30
+        },
+        {
+          "id": "WT-01-M4",
+          "claim": "the 2026 scorecard weights impact at 30%",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "criteria/#1/weight_pct",
+          "expected": 30
+        },
+        {
+          "id": "WT-01-M5",
+          "claim": "the 2025 evaluation weighted implementation at 20%",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#2/weight_pct",
+          "expected": 20
+        },
+        {
+          "id": "WT-01-M6",
+          "claim": "the 2026 scorecard weights implementation at 20%",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "criteria/#2/weight_pct",
+          "expected": 20
+        }
+      ]
+    },
+    {
+      "id": "WT-02",
+      "area": "weights",
+      "rule": "The evaluation form's statement that weighting serves the ranking and not the determination of whether a proposal passed the thresholds.",
+      "affects": "an interpretation",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "Weighting is only for the ranking (not to determine if the proposal passed the thresholds).",
+      "current_value": "Weighting is only for the ranking (not to determine if the proposal passed the thresholds).",
+      "declared_status": "Inferred",
+      "status_basis": "The two forms carry the sentence word for word. Inferred, not Confirmed, because the 2025 form's place in the call is bracketed, which row EI-02 keeps open.",
+      "consequence": "The historical profile carries the sentence, sourced to the 2025 form. A pass or fail statement about the 2025 result rests on it and may cite this row.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "Weighting is only for the ranking (not to determine if the proposal passed the thresholds).",
+          "states": "the 2025 evaluation form on what weighting is for"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+          "page": 2,
+          "quote": "Weighting is only for the ranking (not to determine if the proposal passed the thresholds).",
+          "states": "the 2026 evaluation form on what weighting is for"
+        }
+      ]
+    },
+    {
+      "id": "TH-01",
+      "area": "thresholds",
+      "rule": "The per-criterion threshold a criterion score must reach.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "excellence threshold 3, impact threshold 3, implementation threshold 3",
+      "current_value": "3",
+      "declared_status": "Inferred",
+      "status_basis": "The 2025 evaluation records the threshold beside each of its three criterion scores, and the evaluation form of that call window states the same figure as a rule. Result and rule agree. Inferred for the reason CR-01 gives.",
+      "consequence": "The historical profile keeps the per-criterion threshold unchanged.",
+      "citations": [
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/wording",
+          "states": "the threshold recorded beside criterion 1",
+          "quote": "Criterion 1 - Excellence Score:  4.20 (Threshold: 3 / 5.00 , Weight: 50.00% )"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#1/wording",
+          "states": "the threshold recorded beside criterion 2",
+          "quote": "Criterion 2 - Impact Score:  4.50 (Threshold: 3 / 5.00 , Weight: 30.00%"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#2/wording",
+          "states": "the threshold recorded beside criterion 3",
+          "quote": "Criterion 3 - implementation Score:  4.20 (Threshold: 3 / 5.00 , Weight: 20.00% )"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "The threshold for the individual criteria is 3.",
+          "states": "the 2025 evaluation form on the per-criterion threshold"
+        },
+        {
+          "source": "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf",
+          "page": 27,
+          "quote": "The threshold for individual criteria will be 3.",
+          "states": "the 2026 General Annexes on the per-criterion threshold"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "TH-01-M1",
+          "claim": "the 2025 evaluation applied a threshold of 3 to excellence",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/threshold",
+          "expected": 3
+        },
+        {
+          "id": "TH-01-M2",
+          "claim": "the 2025 evaluation applied a threshold of 3 to impact",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#1/threshold",
+          "expected": 3
+        },
+        {
+          "id": "TH-01-M3",
+          "claim": "the 2025 evaluation applied a threshold of 3 to implementation",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#2/threshold",
+          "expected": 3
+        },
+        {
+          "id": "TH-01-M4",
+          "claim": "the 2026 scorecard declares the same per-criterion threshold",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "scoring/individual_threshold",
+          "expected": 3
+        }
+      ]
+    },
+    {
+      "id": "TH-02",
+      "area": "thresholds",
+      "rule": "The overall threshold, and the total it applies to.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "Evaluation Result Total score: 85.80 % (Threshold: 70 /100.00)",
+      "current_value": "70 of 100",
+      "declared_status": "Inferred",
+      "status_basis": "The 2025 evaluation's recorded result wording carries the threshold and the maximum it is out of, and the work programme the call was opened under sets the same threshold as a percentage of the weighted total. Seventy per cent of a hundred is seventy points, so the two are the same rule stated in two units. Inferred for the reason CR-01 gives.",
+      "consequence": "The historical profile keeps the overall threshold and maximum.",
+      "citations": [
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/result_wording",
+          "states": "the 2025 evaluation's recorded overall threshold and maximum",
+          "quote": "Evaluation Result Total score: 85.80 % (Threshold: 70 /100.00)"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 123,
+          "quote": "Proposals scoring equal to or above 70% will be considered for funding",
+          "states": "the work programme sets the 2025 call's funding threshold"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+          "page": 2,
+          "quote": "The overall threshold, applying to the sum of the 3 individual scores, is 70 points.",
+          "states": "the 2026 evaluation form on the overall threshold"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "TH-02-M1",
+          "claim": "the 2025 evaluation records an overall threshold of 70",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/overall_threshold",
+          "expected": 70
+        },
+        {
+          "id": "TH-02-M2",
+          "claim": "out of 100",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/overall_max",
+          "expected": 100
+        },
+        {
+          "id": "TH-02-M3",
+          "claim": "the 2026 scorecard declares the same overall threshold",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "scoring/overall_threshold",
+          "expected": 70
+        },
+        {
+          "id": "TH-02-M4",
+          "claim": "and the same maximum",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "scoring/overall_max",
+          "expected": 100
+        }
+      ]
+    },
+    {
+      "id": "TH-03",
+      "area": "thresholds",
+      "rule": "Which authority sets the overall threshold where the General Annexes and the evaluation form disagree. The annexes state a generic threshold on the unweighted sum; the form states one on the weighted total.",
+      "affects": "an interpretation",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "the call's own work programme part governs. Its General Annexes refer training and mobility actions to that part, the part itself takes the weighting and the thresholds into its specific conditions, and the evaluation form of the call window says a call may set different rules",
+      "current_value": "The MSCA evaluation form (Tier 2A) overrides the General Annexes' generic overall threshold of 10 on the unweighted sum with 70 on a weighted total out of 100; the General Annexes themselves allow it ('Specific calls or topics may have different rules'). The per-criterion threshold of 3 is unchanged. Tier interaction logged per CLAUDE.md §12.3 in docs/tier4_orchestration_state/decision_log/msca-dn-pe02-evaluation-bundle_2026-10-04.json.",
+      "declared_status": "Inferred",
+      "status_basis": "Three 2025 documents point the same way, and none of them is this repository's. The General Annexes hand training and mobility actions to the work programme part; that part states the weighting and thresholds are in its own specific conditions; and the evaluation form of the call window says a specific call may differ. So the call document outranked the generic one in 2025, which is the resolution the 2026 documents were given. Inferred, not Confirmed, because no issuing body's hash vouches for any of the three.",
+      "consequence": "The historical profile reads the 2025 scores against the call's own threshold, citing this row. The resolution is no longer carried forward from 2026.",
+      "citations": [
+        {
+          "source": "docs/tier1_normative_framework/programme_guidance/wp-14-general-annexes_horizon-2025_en.pdf",
+          "page": 24,
+          "quote": "Training and mobility actions (TMA)",
+          "states": "the 2025 General Annexes refer this action type to the work programme part"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 24,
+          "quote": "For application of the general award criteria, including weighting and thresholds, see the specific conditions at the end of this Work Programme part.",
+          "states": "that part takes the weighting and the thresholds into its own conditions"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "Specific calls or topics may have different rules",
+          "states": "the 2025 evaluation form allows a call to set different rules"
+        },
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "scoring/annex_d_override/resolution",
+          "states": "the resolution taken on the 2026 documents"
+        }
+      ]
+    },
+    {
+      "id": "TH-04",
+      "area": "thresholds",
+      "rule": "The maximum a criterion score may reach.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "the maximum recorded beside each criterion score is 5.00",
+      "current_value": "5, the upper end of the scorecard's scale",
+      "declared_status": "Inferred",
+      "status_basis": "The 2025 evaluation prints the maximum beside every criterion score it records, and the work programme of that call states it as a rule. Inferred for the reason CR-01 gives. The claim is the maximum and nothing else: row TH-05 carries the resolution, which the two 2025 authorities state differently.",
+      "consequence": "The historical profile keeps the maximum.",
+      "citations": [
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/wording",
+          "states": "the 2025 evaluation's recorded maximum for criterion 1",
+          "quote": "Criterion 1 - Excellence Score:  4.20 (Threshold: 3 / 5.00 , Weight: 50.00% )"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 123,
+          "quote": "Each criterion will be scored out of 5.",
+          "states": "the work programme states the maximum for the 2025 call"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+          "page": 2,
+          "quote": "Scoring must be in the range from 0-5. Scores will be awarded with a resolution of one decimal place.",
+          "states": "the 2026 evaluation form on the range and its resolution"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "TH-04-M1",
+          "claim": "the 2026 scorecard declares the scale",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "scoring/scale",
+          "expected": "0-5, one decimal place"
+        }
+      ]
+    },
+    {
+      "id": "TH-05",
+      "area": "thresholds",
+      "rule": "The resolution a criterion score is awarded to.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "one decimal place. The two 2025 authorities state different resolutions, and the recorded scores decide between them: excellence 4.2, implementation 4.2 is not a half mark",
+      "current_value": "one decimal place",
+      "declared_status": "Inferred",
+      "status_basis": "The two 2025 authorities disagree. The work programme of the call states one decimal place; the evaluation form of the call window states that half marks may be given. The recorded result settles which was applied, because a score of 4.2 is not a half mark and could not have been awarded under the form's rule. This module refuses to render if no recorded score is finer than a half mark, because then both rules would fit and the equivalence would be the absence of a visible difference again. Inferred, not Confirmed: the rule applied to this submission is evidenced, and the conflict between the two 2025 documents is recorded rather than resolved in general.",
+      "consequence": "The historical profile keeps one decimal place and cites this row, not a defaulting. A statement about any other 2025 proposal must carry the conflict between the two authorities, which the matrix records as an uncertainty.",
+      "citations": [
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 123,
+          "quote": "Scores will be awarded with a resolution of one decimal place",
+          "states": "the work programme states one decimal place for the 2025 call"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "Scoring must be in the range from 0-5. Half-marks may be given.",
+          "states": "the evaluation form of the call window states half marks instead"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/score",
+          "states": "a recorded score that no half-mark rule could have awarded",
+          "quote": "4.2"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+          "page": 2,
+          "quote": "Scoring must be in the range from 0-5. Scores will be awarded with a resolution of one decimal place.",
+          "states": "the 2026 evaluation form on the range and its resolution"
+        },
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "scoring/scale",
+          "states": "the resolution as the scorecard carries it"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "TH-05-M1",
+          "claim": "the 2025 evaluation recorded 4.2 for excellence",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#0/score",
+          "expected": 4.2
+        },
+        {
+          "id": "TH-05-M2",
+          "claim": "the 2025 evaluation recorded 4.5 for impact",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#1/score",
+          "expected": 4.5
+        },
+        {
+          "id": "TH-05-M3",
+          "claim": "the 2025 evaluation recorded 4.2 for implementation",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria/#2/score",
+          "expected": 4.2
+        }
+      ]
+    },
+    {
+      "id": "TH-06",
+      "area": "thresholds",
+      "rule": "The total the three criterion scores are summed into, as the evaluation form itself prints it.",
+      "affects": "a number",
+      "verdict": "differs",
+      "settles": "call_wide",
+      "historical_value": "the 2025 evaluation form prints an unweighted total out of 15 and states an overall threshold of 10 points on the sum of the three scores",
+      "current_value": "70 points on a weighted total out of 100",
+      "difference": "The 2025 evaluation form's own total is the three criterion scores added up, out of 15, read against 10 points. The 2026 form instead states the threshold on the weighted total out of 100. The difference is in the form, and it is not the difference that governed: the work programme of the 2025 call sets the threshold at 70% of the weighted total, and the recorded result is a weighted total out of 100. So the 2025 form's generic total was superseded by the call's own rule, which is what TH-03 resolves and TH-02 measures.",
+      "declared_status": "Inferred",
+      "status_basis": "Both forms are read directly, and the recorded result shows which total was actually formed. Inferred, not Confirmed, for the reason CR-01 gives, and because the 2025 form's place in the call is bracketed.",
+      "consequence": "The historical profile forms the weighted total out of 100 and cites the call document for it. It must not cite the 2025 evaluation form's /15 total, and a reader comparing the two eras is told why the form's own total does not apply.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "The overall threshold, applying to the sum of the 3 individual scores, is 10 points.",
+          "states": "the 2025 evaluation form's generic overall threshold"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 6,
+          "quote": "Total score Overall threshold /15",
+          "states": "and the total it prints that threshold against"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 123,
+          "quote": "Proposals scoring equal to or above 70% will be considered for funding",
+          "states": "the work programme's threshold for the 2025 call instead"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/result_wording",
+          "states": "the total the 2025 evaluation actually recorded",
+          "quote": "Evaluation Result Total score: 85.80 % (Threshold: 70 /100.00)"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+          "page": 2,
+          "quote": "The overall threshold, applying to the sum of the 3 individual scores, is 70 points.",
+          "states": "the 2026 evaluation form on the overall threshold"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "TH-06-M1",
+          "claim": "the 2025 evaluation recorded a maximum of 100, not the form's fifteen",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/overall_max",
+          "expected": 100
+        }
+      ]
+    },
+    {
+      "id": "EI-01",
+      "area": "evaluator_instructions",
+      "rule": "The six score-level descriptions, 0 to 5, an evaluator grades against.",
+      "affects": "both",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "all six sentences occur word for word in the evaluation form served through the 2025 call window",
+      "current_value": "0: The proposal fails to address the criterion or cannot be assessed due to missing or incomplete information.; 1: Poor. The criterion is inadequately addressed, or there are serious inherent weaknesses.; 2: Fair. The proposal broadly addresses the criterion, but there are significant weaknesses.; 3: Good. The proposal addresses the criterion well, but a number of shortcomings are present.; 4: Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.; 5: Excellent. The proposal successfully addresses all relevant aspects of the criterion. Any shortcomings are minor.",
+      "declared_status": "Inferred",
+      "status_basis": "Each of the six sentences is located in the 2025 form and in the 2026 form, and the citation below refuses if any one of them stops occurring on the page it cites. This was the largest unsourced input to a numerical comparison, and it is now sourced on both sides. Inferred, not Confirmed, because the 2025 form's place in the call is bracketed, which row EI-02 keeps open.",
+      "consequence": "The historical profile keeps the level descriptions and cites this row. A grade awarded under them is no longer resting on a 2026 document alone.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "The proposal fails to address the criterion or cannot be assessed due to missing or incomplete information.",
+          "states": "the 2025 evaluation form's level 0 description"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "Poor. The criterion is inadequately addressed, or there are serious inherent weaknesses.",
+          "states": "the 2025 evaluation form's level 1 description"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "Fair. The proposal broadly addresses the criterion, but there are significant weaknesses.",
+          "states": "the 2025 evaluation form's level 2 description"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "Good. The proposal addresses the criterion well, but a number of shortcomings are present.",
+          "states": "the 2025 evaluation form's level 3 description"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.",
+          "states": "the 2025 evaluation form's level 4 description"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 2,
+          "quote": "Excellent. The proposal successfully addresses all relevant aspects of the criterion. Any shortcomings are minor.",
+          "states": "the 2025 evaluation form's level 5 description"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+          "page": 2,
+          "quote": "Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.",
+          "states": "the 2026 evaluation form's level 4 description, one of six"
+        },
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "scoring/levels",
+          "states": "all six descriptions, as the scorecard holds them"
+        }
+      ]
+    },
+    {
+      "id": "EI-02",
+      "area": "evaluator_instructions",
+      "rule": "Which version of the evaluation form was in force for the 2025 call.",
+      "affects": "an interpretation",
+      "verdict": "unresolved",
+      "settles": "call_wide",
+      "current_value": "version 2.2 dated 2025-12-17",
+      "declared_status": "Unresolved",
+      "status_basis": "A version served at the issuing body's template address through the call window is now held, and its place in the call is bracketed rather than settled. Nothing states which version the 2025 evaluation used.",
+      "limitation": "Three captures of the issuing body's template address carry one archive digest, dated inside the call window, the last of them twenty days before the deadline, and the next distinct digest is months after it. That brackets the window and does not close it: a version served between two captures and never captured would leave no trace, and nothing states which version the evaluators were given. The captures are also of one archive, so they are one witness observed three times rather than three independent witnesses. Every row citing the 2025 form is Inferred because of this, and none is Confirmed.",
+      "consequence": "The historical profile records that the evaluation-form version the 2025 evaluators used is not established. It does not claim the held version applied, and every rule it takes from that form is declared Inferred.",
+      "would_be_settled_by": [],
+      "citations": [
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "provenance/version_date",
+          "states": "the version date the stored evaluation form declares",
+          "quote": "2025-12-17"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "EI-02-M1",
+          "claim": "the stored evaluation form's declared version",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "provenance/version",
+          "expected": "2.2"
+        },
+        {
+          "id": "EI-02-M2",
+          "claim": "and its declared date",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "provenance/version_date",
+          "expected": "2025-12-17"
+        }
+      ]
+    },
+    {
+      "id": "EI-03",
+      "area": "evaluator_instructions",
+      "rule": "Scores are awarded for the criteria and not for the individual aspects listed under them.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "the 2025 evaluation records 3 criterion scores and 29 observations, none of which carries a score",
+      "current_value": "Evaluation scores will be awarded for the criteria, and not for the different aspects listed in the table.",
+      "declared_status": "Inferred",
+      "status_basis": "The 2025 side is stated and also measured. The work programme of the call carries the rule in words, and the recorded result bears it out: three criterion scores are recorded and no observation carries a score field. Inferred rather than Confirmed because no issuing body's hash vouches for either document.",
+      "consequence": "The historical profile keeps the rule that the ten aspect cells inform a criterion score and are never averaged into one.",
+      "citations": [
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria",
+          "states": "three criterion scores, and no aspect score, in the 2025 evaluation"
+        },
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "observations",
+          "states": "every recorded observation, none of which carries a score"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 123,
+          "quote": "Evaluation scores will be awarded for each of these criteria, and not for the different aspects listed in the table below.",
+          "states": "the work programme of the 2025 call states the same rule"
+        },
+        {
+          "source": "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf",
+          "page": 27,
+          "quote": "Evaluation scores will be awarded for the criteria, and not for the different aspects listed in the table.",
+          "states": "the 2026 General Annexes on what a score is awarded for"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "EI-03-M1",
+          "claim": "three criterion scores",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/criteria",
+          "expected_length": 3
+        },
+        {
+          "id": "EI-03-M2",
+          "claim": "29 observations, none with a score",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "observations",
+          "expected_length": 29
+        }
+      ]
+    },
+    {
+      "id": "EI-04",
+      "area": "evaluator_instructions",
+      "rule": "The applicability-tag grammar that selects which of the evaluation form's aspects a Doctoral Network proposal is graded on.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "the evaluation form of the 2025 call window carries the same tag grammar, and names this action type in the tags that select the ten aspects",
+      "current_value": "Keep every aspect whose [OPTION for ...] tag names MSCA Doctoral networks, plus the 'all MSCA except ...' aspects whose exception list does not name it. Exclude every Postdoctoral fellowships, Staff exchanges, COFUND, COFUND Choose Europe and Special needs allowances variant.",
+      "declared_status": "Inferred",
+      "status_basis": "The grammar is the evaluation form's alone: this module refuses to render if either application form carries an applicability tag, and neither does. The 2025 form carries it, and row CR-02 measures that the aspects it selects for this action type are the scorecard's ten, each under the same criterion. One tag's scope did move between the eras, and it does not move the selection: the 2025 tag names a third action type that the 2026 tag does not, and this action type is named in both. Inferred for the reason EI-02 gives.",
+      "consequence": "The historical profile keeps the tag grammar and the scope rule, cited to the 2025 form. CR-02 carries the measured selection, so no row rests on the assumption that the two forms tagged alike.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 4,
+          "quote": "[OPTION for MSCA Doctoral networks Quality and credibility of the training programme",
+          "states": "a 2025 tag naming this action type for one of the ten aspects"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+          "page": 4,
+          "quote": "[OPTION for MSCA Doctoral networks, Postdoctoral fellowships and Staff exchanges:",
+          "states": "the one tag whose scope moved, as the 2025 form states it"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+          "page": 4,
+          "quote": "[OPTION for MSCA Doctoral networks, Postdoctoral fellowships:",
+          "states": "and as the 2026 form states it, with a third action type dropped"
+        },
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "provenance/dn_scope_rule",
+          "states": "the scope rule derived from the 2026 evaluation form's tags"
+        },
+        {
+          "source": "harness/profiles/msca_dn_2026_default.json",
+          "field": "option_tag_grammar",
+          "states": "the tag vocabulary the 2026 profile declares"
+        }
+      ]
+    },
+    {
+      "id": "VA-01",
+      "area": "variant",
+      "rule": "Which Doctoral Network implementation mode the 2025 submission used.",
+      "affects": "an interpretation",
+      "verdict": "equivalent",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "standard Doctoral Network, not an Industrial Doctorate and not a Joint Doctorate",
+      "current_value": "standard Doctoral Network (not DN-ID, not DN-JD)",
+      "declared_status": "Inferred",
+      "status_basis": "The fidelity register declares the mode Confirmed on a phrase its authoring tool checks on page 32 of the sanitised copy. This row is Inferred rather than Confirmed because no hash from an issuing body vouches for that copy's bytes.",
+      "consequence": "The historical profile declares the same implementation mode, sourced to the submission's own text.",
+      "citations": [
+        {
+          "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+          "field": "provenance/historical_submission/dn_type/basis",
+          "states": "the page of the submission the mode is checked on",
+          "quote": "the sanitised copy states it on p. 32; the tool checks the phrase on that page"
+        },
+        {
+          "source": "harness/profiles/msca_dn_2026_default.json",
+          "field": "implementation_mode",
+          "states": "the mode the 2026 profile declares",
+          "quote": "standard Doctoral Network (not DN-ID, not DN-JD)"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "VA-01-M1",
+          "claim": "the fidelity register declares the mode Confirmed",
+          "record": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+          "field": "provenance/historical_submission/dn_type/declared_status",
+          "expected": "Confirmed"
+        },
+        {
+          "id": "VA-01-M2",
+          "claim": "and the 2026 profile declares the same mode",
+          "record": "harness/profiles/msca_dn_2026_default.json",
+          "field": "implementation_mode",
+          "expected": "standard Doctoral Network (not DN-ID, not DN-JD)"
+        }
+      ]
+    },
+    {
+      "id": "VA-02",
+      "area": "variant",
+      "rule": "The implementation modes the application form recognises, and which must be declared in the Part B header.",
+      "affects": "an interpretation",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "DN, DN-ID or DN-JD",
+      "current_value": "DN, DN-ID or DN-JD",
+      "declared_status": "Inferred",
+      "status_basis": "The same sentence is located in both application forms, verbatim, and the 2025 form is a 2025-call document rather than evidence about one submission.",
+      "consequence": "The historical profile may declare the mode vocabulary as sourced to the 2025 form, not carried from the 2026 one.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 25,
+          "quote": "the implementation mode applied to (i.e. DN, DN-ID or DN-JD)",
+          "states": "the 2025 form on the modes a Part B header must declare"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 5,
+          "quote": "the implementation mode applied to (i.e. DN, DN-ID or DN-JD)",
+          "states": "the same sentence in the 2026 form"
+        }
+      ]
+    },
+    {
+      "id": "SM-01",
+      "area": "section_mapping",
+      "rule": "The ten numbered Part B aspect headings the criteria decompose into, sections 1.1 to 3.2.",
+      "affects": "an interpretation",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "the same ten headings, all occurring verbatim in the 2025 form, and its criteria table carries no eleventh aspect anchor",
+      "current_value": "the ten headings the scorecard derives from the 2026 form",
+      "declared_status": "Inferred",
+      "status_basis": "Ten citations, one per heading, each located in the 2025 form and each quote verified to occur on the page it cites. That settles one direction. The other is measured: the anchors printed across each form's criteria table are read out and compared, with the page either side of the table required to carry none, and both sets are exactly 1.1 1.2 1.3 1.4 2.1 2.2 2.3 2.4 3.1 3.2. This module refuses to render if either set stops matching the scorecard's, or if the page rule stops matching the scorecard's own declared 2026 pages.",
+      "consequence": "The historical profile reuses the criterion-to-section mapping unchanged, with this row as the source.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 49,
+          "quote": "Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
+          "states": "aspect exc-obj (1.1) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 49,
+          "quote": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality and appropriateness of open science practices)",
+          "states": "aspect exc-method (1.2) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 49,
+          "quote": "Quality and credibility of the training programme (including transferable skills, inter/multidisciplinary, inter-sectoral and gender as well as other diversity aspects)",
+          "states": "aspect exc-training (1.3) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 50,
+          "quote": "Quality of the supervision (including mandatory joint supervision for industrial and joint doctorate projects)",
+          "states": "aspect exc-supervision (1.4) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 50,
+          "quote": "Contribution to structuring doctoral training at the European level and to strengthening European innovation capacity, including the potential for: a) Meaningful contribution of the non-academic sector to the doctoral training, as appropriate to the implementation mode and research field b) Developing sustainable (=lasting) elements of doctoral programmes after the end of the DN funding",
+          "states": "aspect imp-structuring (2.1) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 50,
+          "quote": "Credibility of the measures to enhance the career perspectives and employability of researchers and contribution to their skills development",
+          "states": "aspect imp-career (2.2) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 50,
+          "quote": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities",
+          "states": "aspect imp-dissemination (2.3) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 50,
+          "quote": "The magnitude and importance of the project’s contribution to the expected scientific, societal and economic impacts (project’s pathways towards impact)",
+          "states": "aspect imp-magnitude (2.4) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 50,
+          "quote": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
+          "states": "aspect impl-workplan (3.1) is a Part B heading of the 2025 form, verbatim"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 52,
+          "quote": "Quality, capacity and role of each participant, including hosting arrangements and extent to which the consortium as a whole brings together the necessary expertise",
+          "states": "aspect impl-participants (3.2) is a Part B heading of the 2025 form, verbatim"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "SM-01-M1",
+          "claim": "criterion excellence carries the aspects this row enumerates",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "criteria/#0/aspects",
+          "expected_length": 4
+        },
+        {
+          "id": "SM-01-M2",
+          "claim": "criterion impact carries the aspects this row enumerates",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "criteria/#1/aspects",
+          "expected_length": 4
+        },
+        {
+          "id": "SM-01-M3",
+          "claim": "criterion implementation carries the aspects this row enumerates",
+          "record": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "criteria/#2/aspects",
+          "expected_length": 2
+        }
+      ]
+    },
+    {
+      "id": "SM-02",
+      "area": "section_mapping",
+      "rule": "The Part B1 length limits: 34 pages in total, of which 30 are available to sections 1 to 3.",
+      "affects": "an interpretation",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "34 pages in total, 30 for sections 1 to 3",
+      "current_value": "34 pages in total, 30 for sections 1 to 3",
+      "declared_status": "Inferred",
+      "status_basis": "Both sentences are located in the 2025 form and in the 2026 form, verbatim. The form-equivalence record is cited as corroboration and is within the scope it measured; the 2025 form itself is what settles the row.",
+      "consequence": "No page-based judgment is admissible over the sanitised copy at all, which the fidelity register declares. The limits are recorded because the historical profile's structural authority has to name them.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 24,
+          "quote": "The maximum total length for this document is 34 pages.",
+          "states": "the 2025 form's total cap"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 24,
+          "quote": "Of the maximum 30 pages applied to sections 1, 2 and 3, applicants are free to decide on the allocation of pages between the sections.",
+          "states": "the 2025 form's cap on sections 1 to 3"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 4,
+          "quote": "The maximum total length for this document is 34 pages.",
+          "states": "the 2026 form's total cap"
+        },
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "provenance/v5_equivalence/statement",
+          "states": "the form-equivalence record, within the section structure it measured",
+          "quote": "For HORIZON-MSCA-2026-DN-01 the V5.0 (2025 call) and V6.0 (2026 call) Part B templates are structurally identical: the same ten numbered aspect headings §1.1 to §3.2, the same Tables 3.1 a to 3.1 e, the same 34-page Part B1 cap with sections 1-3 at 30, the same Part B2 sections 4 to 10. V6.0 adds Part B2 section 11 (RAISE DN) for a different call. Measured in spec §2.12."
+        }
+      ]
+    },
+    {
+      "id": "SM-03",
+      "area": "section_mapping",
+      "rule": "Which sections Part B2 contains.",
+      "affects": "an interpretation",
+      "verdict": "differs",
+      "settles": "call_wide",
+      "historical_value": "Part B2 ends at section 10, the declaration on the use of AI",
+      "current_value": "Part B2 adds section 11, RAISE DN, for a different call",
+      "difference": "The 2026 form adds a Part B2 section 11 the 2025 form does not have. It is reserved for applicants of another call, so no 2025 submission could have had one.",
+      "declared_status": "Inferred",
+      "status_basis": "The 2025 form's section 10 is followed by its example block; the 2026 form's section 10 is followed by section 11. Both quotes are verified on the pages they cite.",
+      "consequence": "The appendix mapping's rule excluding Part B2 section 11 has no subject under the 2025 form. The historical profile keeps the rule and records that it is vacuous rather than deleting it.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 44,
+          "quote": "10. Declaration on the use of AI Example, not to be completed",
+          "states": "the 2025 form's last Part B2 section, followed by its example block"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf",
+          "page": 23,
+          "quote": "11. RAISE DN (Only for applicants of HORIZON-RAISE-2026-01-MSCA, 1 page)",
+          "states": "the section the 2026 form adds after section 10"
+        }
+      ]
+    },
+    {
+      "id": "AM-01",
+      "area": "appendix_mapping",
+      "rule": "The cross-references that route table rows to criteria at the criterion-grading stage.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "call_wide",
+      "historical_value": "all 11 distinct cross-reference sentences occur verbatim in the 2025 form",
+      "current_value": "7 mapping rows, derived from the 2026 form",
+      "declared_status": "Inferred",
+      "status_basis": "One citation per distinct sentence, each located in the 2025 form and verified on the page it cites. This is the row the form-equivalence record could not settle: that record measured headings, tables, caps and section numbering, not the instructional sentences the mapping routes on. The claim is an inclusion and not a set equality. Every sentence the 2026 mapping routes on is in the 2025 form; whether the 2025 form carries a further cross-reference the mapping has no row for is unmeasured, and cannot be searched for without the 2025 mapping's own list. Row SM-01 settles the aspect anchors in both directions, which bounds what such a sentence could reroute.",
+      "consequence": "The historical profile reuses the appendix mapping unchanged, sourced to the 2025 form rather than carried over on the form-equivalence record. The unmeasured direction stays an uncertainty of this matrix and is not closed by this row.",
+      "citations": [
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 31,
+          "quote": "The action should be divided in Work Packages and described in the Table 3.1a under the Implementation section.",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 31,
+          "quote": "Describe each DC’s individual research project, including for each a title, objectives, expected results, and planned secondments (purpose, timing, duration, host, sector).",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 38,
+          "quote": "Total duration of secondments (months)",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 33,
+          "quote": "To avoid duplication, the role and scientific profile of the supervisors should only be listed in the \"Participating Organisations\" tables (see section 8 below).",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 35,
+          "quote": "Concrete plans for sections 2.3 must be included in the corresponding table 3.1 a Description of Work Packages.",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 50,
+          "quote": "Concrete plans for sections 2.3 must be included in the corresponding implementation tables.",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 37,
+          "quote": "PDE = dissemination and/or exploitation of results",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 34,
+          "quote": "meaningful exposure of Doctoral Candidates to the non-academic sector through secondments",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 38,
+          "quote": "Total duration in non- academic sector (months)",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 39,
+          "quote": "Appropriateness of the infrastructure and capacity of each participating organisation, as outlined in Section 8 (Participating Organisations), in light of the tasks allocated to them in the action;",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+          "page": 39,
+          "quote": "Role of associated partners to the programme (please see also section 8).",
+          "states": "the cross-reference the appendix mapping routes on, in the 2025 form"
+        },
+        {
+          "source": "harness/criterion_appendix_mapping_msca_dn.json",
+          "field": "rows",
+          "states": "the mapping rows these sentences are the authority for"
+        }
+      ]
+    },
+    {
+      "id": "SA-01",
+      "area": "scoring_assumption",
+      "rule": "The weighted total is each criterion score times its weight in percent over five, summed.",
+      "affects": "a number",
+      "verdict": "equivalent",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "Evaluation Result Total score: 85.80 % (Threshold: 70 /100.00)",
+      "current_value": "S = 10·E + 6·I + 4·Q",
+      "declared_status": "Inferred",
+      "status_basis": "Arithmetic evidence, and now a rule to match it. The formula applied to the 2025 evaluation's own recorded criterion scores reproduces its own recorded total, and this module refuses to render if it stops doing so. The work programme of the call states the two inputs the formula is built from: a maximum of five per criterion and the weighting row. Inferred, not Confirmed, for the reason CR-01 gives.",
+      "consequence": "The historical profile keeps the total formula. It is the one scoring rule whose 2025 application is evidenced by arithmetic rather than by wording.",
+      "citations": [
+        {
+          "source": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/total",
+          "states": "the total the formula has to reproduce"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 123,
+          "quote": "Each criterion will be scored out of 5.",
+          "states": "the work programme on the maximum each criterion is scored out of"
+        },
+        {
+          "source": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+          "page": 124,
+          "quote": "50% 30% 20% Weighting",
+          "states": "and on the weights the total applies to those scores"
+        },
+        {
+          "source": "harness/evaluator_scorecard_msca_dn.json",
+          "field": "scoring/total_formula",
+          "states": "the formula, as the 2026 scorecard holds it",
+          "quote": "S = 10·E + 6·I + 4·Q"
+        }
+      ],
+      "measurements": [
+        {
+          "id": "SA-01-M1",
+          "claim": "the recorded total the formula reproduces",
+          "record": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json",
+          "field": "evaluation_result/total",
+          "expected": 85.8
+        }
+      ]
+    },
+    {
+      "id": "SA-02",
+      "area": "scoring_assumption",
+      "rule": "Criterion grading draws five samples per criterion and reports the median with its spread, labelled within-assessor repeatability.",
+      "affects": "a number",
+      "verdict": "era_neutral",
+      "settles": "as_applied_to_this_submission",
+      "current_value": "N=5 per criterion score, median and spread reported",
+      "declared_status": "Inferred",
+      "status_basis": "The specification's decisions 5 and 11 fix the sample count and the statistic. The citation resolves as text in the specification, so a reworded decision fails the check.",
+      "why_era_neutral": "The sample count and the statistic belong to the assessing harness, not to either call. No call document states them, and neither can differ between the two calls.",
+      "consequence": "The historical profile inherits the method. The matrix records that it is not a 2025 rule and cannot be sourced to one, so a difference between the assessor's median and the 2025 total is not attributable to a rule change.",
+      "citations": [
+        {
+          "source": "plans/msca_dn_pre_evaluation_spec.md",
+          "field": "five samples per criterion",
+          "states": "the specification's decision on the criterion-grading stage"
+        },
+        {
+          "source": "plans/msca_dn_pre_evaluation_spec.md",
+          "field": "N=5 for the three criterion scores",
+          "states": "the specification's decision on the sample count and the statistic"
+        }
+      ]
+    },
+    {
+      "id": "SA-03",
+      "area": "scoring_assumption",
+      "rule": "Where the evidence pack carries no claim ledger, a cell reports grounding unassessable — never failed and never passed.",
+      "affects": "an interpretation",
+      "verdict": "era_neutral",
+      "settles": "as_applied_to_this_submission",
+      "current_value": "grounding unassessable where no ledger reaches the pack",
+      "declared_status": "Inferred",
+      "status_basis": "The specification's decision 14 states the rule. The citation resolves as text in the specification.",
+      "why_era_neutral": "The rule governs how this harness reports an axis it cannot assess over a damaged copy. No call document states it, in either year.",
+      "consequence": "The historical profile inherits the rule. A grounding result is reported as unassessable and is never read as a score the 2025 evaluators would recognise.",
+      "citations": [
+        {
+          "source": "plans/msca_dn_pre_evaluation_spec.md",
+          "field": "the cell reports grounding **unassessable**",
+          "states": "the specification's decision on an unassessable axis"
+        }
+      ]
+    },
+    {
+      "id": "SA-04",
+      "area": "scoring_assumption",
+      "rule": "The assessed text is a sanitised derivative produced after the evaluation, not the text the 2025 evaluation read.",
+      "affects": "both",
+      "verdict": "era_neutral",
+      "settles": "as_applied_to_this_submission",
+      "historical_value": "This file is not the text the ESR evaluated. It is a derivative produced by sanitisation after evaluation, and no result over it is a result over the submission.",
+      "declared_status": "Inferred",
+      "status_basis": "The fidelity register states it over the file it pins by hash. This is a property of one derivative, measured on it.",
+      "why_era_neutral": "The candidate's fidelity is not a rule either call states. It is the condition of the document being assessed, and it bounds every row above regardless of which year's rules apply.",
+      "consequence": "No result over this copy is a result over the submission. The historical profile changes nothing about that, and a comparison with the 2025 total carries the statement.",
+      "citations": [
+        {
+          "source": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+          "field": "provenance/current_assessment_artifact/statement",
+          "states": "the register's statement over the file it pins",
+          "quote": "This file is not the text the ESR evaluated. It is a derivative produced by sanitisation after evaluation, and no result over it is a result over the submission."
+        }
+      ],
+      "measurements": [
+        {
+          "id": "SA-04-M1",
+          "claim": "the assessed file is declared not to be the submitted document",
+          "record": "docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json",
+          "field": "provenance/current_assessment_artifact/is_submitted_document",
+          "expected": false
+        }
+      ]
+    },
+    {
+      "id": "SA-05",
+      "area": "scoring_assumption",
+      "rule": "A blind cell reports addressal and grounding as two values, and never blends them into one.",
+      "affects": "an interpretation",
+      "verdict": "era_neutral",
+      "settles": "as_applied_to_this_submission",
+      "current_value": "two values per cell, grounding never folded into addressal",
+      "declared_status": "Inferred",
+      "status_basis": "The specification's decision 4 states the rule and its reason. The citation resolves as text in the specification, so a reworded decision fails the check.",
+      "why_era_neutral": "What a cell reports is this harness's own output shape. Neither call states it, and neither could: no 2025 or 2026 document knows of a cell.",
+      "consequence": "The historical profile inherits the two-value cell. A reader comparing a cell with a 2025 criterion score is comparing an assessor's two axes with an evaluator's single grade, which this row records as a method difference rather than a rule difference.",
+      "citations": [
+        {
+          "source": "plans/msca_dn_pre_evaluation_spec.md",
+          "field": "reports addressal and grounding as two values",
+          "states": "the specification's decision on what a blind cell reports"
+        }
+      ]
+    },
+    {
+      "id": "SA-06",
+      "area": "scoring_assumption",
+      "rule": "The criterion scorer reads the complete criterion section plus the declared appendix rows, with no selection and no budget filler.",
+      "affects": "a number",
+      "verdict": "era_neutral",
+      "settles": "as_applied_to_this_submission",
+      "current_value": "the whole section verbatim, within the 32,768-token pack budget, with every declared appendix row resolved",
+      "declared_status": "Inferred",
+      "status_basis": "The specification states the input and its bound, and both citations resolve as text in it. What the scorer reads is a harness decision, not a call rule, which is why it is recorded here rather than compared across the two years.",
+      "why_era_neutral": "An evaluator reads the proposal. A pack budget and a selection rule are properties of the assessing harness, so no call document of either year states them.",
+      "consequence": "The historical profile inherits the input rule. A truncated or selected input would change a criterion score without any 2025 rule changing, which is why the bound is recorded as a scoring assumption and not left implicit.",
+      "citations": [
+        {
+          "source": "plans/msca_dn_pre_evaluation_spec.md",
+          "field": "the criterion lane carries no selection at all",
+          "states": "the specification on selection in the criterion lane"
+        },
+        {
+          "source": "plans/msca_dn_pre_evaluation_spec.md",
+          "field": "the assembled input fit the budget without truncation",
+          "states": "the specification's acceptance condition on the criterion input"
+        }
+      ]
+    }
+  ]
+}

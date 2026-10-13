@@ -1,0 +1,102 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-historical-profile_2026-10-13",
+  "date": "2026-10-13",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation",
+  "ticket": "V10 of plans/msca_dn_historical_validation_tickets.md",
+  "gate": "G3",
+  "closes": "finding F05 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md. V09 closed its source half by obtaining and pinning the 2025 authorities; this ticket closes the profile half by authoring the configuration those sources support.",
+  "authority": "Agent-authored under CLAUDE.md. Advisory, out-of-band QA. Closes no gate and confers no authority. Acceptance and the review_state move are the operator's.",
+  "decision": "A second pre-evaluation profile is authored for the 2025 call, beside the 2026 one rather than replacing it. Every element of it names the matrix rows that establish the 2025 rule, or declares what the matrix left open. The 2026 profile is not edited, and the new profile pins its bytes so an edit to it is reported.",
+  "why": "The only Doctoral Networks profile at the previous revision was written for the 2026 call. Assessing the 2025 original under it would score a historical submission by a later year's configuration, and nothing in the artifact would have said so. A copy of that profile under a new identifier would have had the same defect, so the binding to the matrix is the point of the ticket rather than a decoration on it.",
+  "artifacts": {
+    "profile": {
+      "path": "harness/profiles/msca_dn_2025_historical.json",
+      "sha256": "e71142c74722596c47c8c86206db12199b4db7ed6d9a893ce8a44c3f47374507",
+      "profile_id": "msca_dn_2025_historical"
+    },
+    "profile_reading": "harness/profiles/msca_dn_2025_historical.md",
+    "author": "tools/author_msca_dn_historical_profile.py",
+    "reader": "harness/historical_profile.py",
+    "command": "harness/commands/historical_profile.py",
+    "tests": [
+      "tests/test_msca_dn_historical_profile.py",
+      "tests/harness/test_historical_profile.py"
+    ],
+    "report": "plans/reports/v10_historical_profile_2026-10-13.md",
+    "authored_from": {
+      "matrix": {
+        "path": "docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-13.json",
+        "sha256": "2e1fba3b3bf5bc8609911250d66e04b70e791af091402f8cf78cb87c2da9a273"
+      },
+      "source_index": {
+        "path": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-13.json",
+        "sha256": "cfb935b0e0e9c42e3e14701d870645017a89822a3792d1a58441e64b1c853575"
+      }
+    },
+    "counterpart_not_edited": {
+      "path": "harness/profiles/msca_dn_2026_default.json",
+      "sha256": "308a955dada102e92212f87c43cdf28576b49f1cb2a6894acb64c2ac87a3fee2",
+      "rule": "The new profile pins this hash. An edit to the 2026 profile fails the new profile's check and one of its tests, which is how the ticket's third criterion is measured rather than asserted."
+    }
+  },
+  "declared_values": {
+    "sourced_elements": 13,
+    "declared_limitations": 2,
+    "harness_own_instruments": 2,
+    "matrix_rows_read": 27,
+    "declared_status": "Inferred",
+    "declared_status_note": "The profile declares what the matrix declares. A profile cannot be more certain than the record it is authored from, and a test asserts the two agree.",
+    "what_differs_from_the_2026_profile": [
+      "target_call: the 2025 call, its opening and its deadline, stated by the work programme the call was opened under",
+      "structural_authority: the 2025 application form at version 5.0, not the 2026 template at 6.0",
+      "a recorded vacuous rule: the appendix mapping excludes a Part B2 section the 2025 form does not have, so the rule is kept and recorded as having no subject",
+      "the printed total: the 2025 evaluation form's unweighted total out of 15 is recorded and not used, because the call's work programme sets the threshold on the weighted total"
+    ],
+    "what_is_reused_and_why": [
+      "the scorecard, because every scoring rule it carries is sourced to a 2025 document by the matrix rows the profile names",
+      "the rubrics, because they are this harness's grading instrument and no call document of either year states them. The matrix carries them as era neutral, and the profile declares the reuse as a reuse rather than as a 2025 rule."
+    ]
+  },
+  "refusals": [
+    "an element sourced to a matrix row that is not there",
+    "an element sourced to a row whose verdict cannot establish a value, which is the defect the whole binding exists to prevent",
+    "a limitation declared over a row the matrix has since sourced",
+    "a matrix row no profile element reads",
+    "an element declared this harness's own whose row is a rule of a call"
+  ],
+  "verification": {
+    "byte_equal_replay": "py -3.10 -m tools.author_msca_dn_historical_profile --check prints 'up to date'",
+    "profile_check": "py -3.10 -m harness.commands.historical_profile reports green over 9 findings",
+    "loads_under_the_same_loader": "harness.profile.load_profile reads both profiles; a second loader would be a second contract",
+    "tests": {
+      "tests/test_msca_dn_historical_profile.py": 28,
+      "tests/harness/test_historical_profile.py": 21,
+      "tests/harness/ and the two workspace modules": "1,774 passed, 17 skipped"
+    },
+    "reuse_across_a_pair": "the refusal is the existing machinery's. The preflight compares profile_id and profile_version against the loaded bundle, and the freeze binds both. The two profiles carry different document hashes, so a report made under one is a mismatch against the other.",
+    "lane": "the two new test modules are registered in the acceptance lane's profile area, and the lane document's table row matches the declaration. The lane itself was not run: its single-process result is not measured here.",
+    "quota": "none spent. No assessor ran, no runner phase was dispatched, no scoring was performed, and no component was tuned toward any score. The 74.60 baseline is untouched."
+  },
+  "known_gaps": [
+    "No row of the matrix is Confirmed, so no element of this profile is Confirmed.",
+    "The evaluation form version the 2025 evaluators used is not established, and the scorecard's limitation says so.",
+    "The submission's binding to a call identifier is declared, not evidenced, and the target call's limitation says so.",
+    "The 2025 application form, which this profile names as its structural authority, has no recorded origin and no established place in the call.",
+    "The rubrics are reused from the 2026 profile. That is a reuse of an instrument, and no call document of either year prescribes them.",
+    "No assessment has been run under this profile. Loading it is not evidence of a score."
+  ],
+  "not_evidence_of": [
+    "that the 2025 evaluators would score this text as this profile scores it",
+    "that the harness's scoring method is correct",
+    "that the 2026 profile's own applicability question is settled. That stays open for Stage B, and this ticket does not touch it.",
+    "that V10 is accepted. Acceptance is the operator's."
+  ],
+  "side_effect": {
+    "what": "One test contract changed. tests/test_msca_dn_workspace.py asserted the 2026 profile was the only Doctoral Networks profile in the tree.",
+    "now": "It asserts there are two, that each names its own call, and that their profile ids differ. That is a stronger statement than the one it replaced, and it is the statement this ticket makes true.",
+    "declared_status": "Confirmed",
+    "basis": "the test fails on the old assertion and passes on the new one"
+  }
+}

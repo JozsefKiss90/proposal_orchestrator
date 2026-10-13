@@ -189,11 +189,24 @@ class TestIntake:
         assert "2025" in intake.call_id and "2026" in target
         assert not hasattr(ws, "BASELINE_TARGET_CALL_ID"), "the profile owns the target call"
 
-    def test_the_profile_is_the_only_dn_profile_and_names_the_target_call(self) -> None:
-        profiles = sorted((REPO / "harness/profiles").glob("msca_dn*.json"))
-        assert profiles == [DN_PROFILE]
-        profile = json.loads(DN_PROFILE.read_text(encoding="utf-8"))
-        assert profile["target_call"]["call_id"] == "HORIZON-MSCA-2026-DN-01"
+    def test_there_are_two_dn_profiles_and_each_names_its_own_call(self) -> None:
+        """One profile per era, and neither standing in for the other.
+
+        Ticket V10 added the historical profile beside this one. The failure
+        this guards is the older one: a single profile used for both eras, so
+        a closed call's submission would be scored by a later year's rules.
+        """
+        profiles = sorted(
+            path.name for path in (REPO / "harness/profiles").glob("msca_dn*.json")
+        )
+        assert profiles == ["msca_dn_2025_historical.json", "msca_dn_2026_default.json"]
+        current = json.loads(DN_PROFILE.read_text(encoding="utf-8"))
+        assert current["target_call"]["call_id"] == "HORIZON-MSCA-2026-DN-01"
+        historical = json.loads(
+            (REPO / "harness/profiles/msca_dn_2025_historical.json").read_text(encoding="utf-8")
+        )
+        assert historical["target_call"]["call_id"] == "HORIZON-MSCA-2025-DN-01"
+        assert historical["profile_id"] != current["profile_id"]
 
     def test_the_esr_reference_names_the_esr_by_hash_and_the_register(self) -> None:
         intake = read_esr_intake(WORKSPACE, ws.INTAKE_ID)

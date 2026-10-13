@@ -1,0 +1,45 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-declaration-draft-rerender_2026-10-13",
+  "date": "2026-10-13",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation, ticket V09 (Pin the 2025 authority documents and build the equivalence matrix) in plans/msca_dn_historical_validation_tickets.md. The second re-render V09 has caused, after the three 2025 authority documents were obtained and a successor index and matrix were authored.",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §12.1 (an output names its inputs), §15 (documented state governs). Ticket V09, under the operator's in-session instruction of 2026-10-13 authorising retrieval and indexing of the public authority documents. Not a constitutional amendment.",
+  "succeeds": "docs/tier4_orchestration_state/decision_log/msca-dn-declaration-draft-rerender_2026-10-12.json. That record is left exactly as written. It describes the re-render the 2026-10-12 authority pair caused, and its hashes for the two files below are superseded by the hashes recorded here. Its hash for draft_resolved_fixes.json still describes the committed file.",
+  "decision": "The same two artifacts under docs/tier4_orchestration_state/msca_dn/declarations/ were re-rendered again by their own tool, py -3.10 -m tools.draft_fidelity_declarations. Their bytes changed and the new hashes are recorded below. The third, draft_resolved_fixes.json, was not re-rendered and its bytes are unchanged.",
+  "why": "The drafts carry an adoption-cost scan deliberately coupled to the repository tree. A successor authority index and matrix were committed on 2026-10-13, and the index pins the sanitised revision's register by hash as the superseded one did. So the scan found three further dependents and the enumeration moved. The tool's own documentation states the coupling and the response: re-render. Leaving the enumeration behind would tell the operator a smaller adoption cost than the tree now carries.",
+  "what_made_them_stale": {
+    "declared_status": "Confirmed",
+    "basis": "the re-render diff, measured on this checkout",
+    "new_dependents_found": [
+      "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-13.json (pins the sanitised revision's register by its full sha256, and names its path; the successor index)",
+      "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-13.md (names the path, in that index's rendered reading)",
+      "docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-13.json (names the path, in a row's citations)"
+    ],
+    "note": "The superseded 2026-10-12 pair is still enumerated, and still by path and hash. It stays in the tree unedited, so it stays a dependent: adopting a declaration would require explaining the superseded records as well as the current ones."
+  },
+  "hashes": {
+    "algorithm": "sha256 over the file bytes as committed",
+    "docs/tier4_orchestration_state/msca_dn/declarations/draft_sanitised_v1.json": {
+      "before": "1a7d826825b1141c6a3909e78f2c8d409703daf562872c9ef2791bebc548254e",
+      "after": "add68afa99dce225b7cd1be46af9830396d831c067f12fe9056569a717fdbd36"
+    },
+    "docs/tier4_orchestration_state/msca_dn/declarations/review_checklist.md": {
+      "before": "ff44e2521f68666ceaa1da2b481a80daed03135c7feec748c78da88bb00ee8ad",
+      "after": "4d25709d6039869ae568ec47285aa0d63eec0cf57f9bcdc1827645f3b3808851",
+      "note": "No record pins this file as evidence, so its movement breaks no binding. It is the operator's reading of the drafts and has to match them."
+    }
+  },
+  "unchanged": [
+    "docs/tier4_orchestration_state/msca_dn/declarations/draft_resolved_fixes.json. Its revision's register is named by none of the three new dependents.",
+    "Both fidelity registers, their bytes and their hashes.",
+    "Every approval record, disposition and committed integrity audit. None was re-rendered and none is edited here."
+  ],
+  "the_cycle_and_how_it_is_cut": {
+    "problem": "A record that explains a re-render by naming a register path is itself a dependent, so writing it would make the drafts stale again. That happened once on 2026-10-12 and was fixed by removing the path, not by re-rendering.",
+    "rule": "This record cites the drafts and the three new dependents by path, and names no register path and no register hash. The scan therefore does not see it.",
+    "asserted_by": "tests/test_msca_dn_declaration_drafts.py::TestDeterminismAndTheCommittedArtifacts::test_the_committed_artifacts_are_reproducible, which fails if any committed artifact moves the enumeration."
+  },
+  "verification": "py -3.10 -m tools.draft_fidelity_declarations --check exits 0 with the two files re-rendered, and tools.draft_fidelity_declarations.check returns an empty list on this checkout.",
+  "does_not_close": "Nothing. V09's own acceptance is the operator's, and finding F05 closes at V10. This record is housekeeping forced by the coupling, and it changes no declaration's content: the adoption-cost enumeration grew, and no declared fact moved."
+}

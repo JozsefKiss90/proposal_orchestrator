@@ -10,6 +10,7 @@ judge, invoked as ``py -3.10 -m harness.commands.<name>`` from the repo root:
 * :mod:`harness.commands.blind_assessment` — candidate-bound blind assessment.
 * :mod:`harness.commands.deferral_register` — reads an open-deferral register.
 * :mod:`harness.commands.authority_matrix` — reads a rule-equivalence matrix.
+* :mod:`harness.commands.historical_profile` — reads a historical profile against one.
 
 The last two are readers rather than judge runners: they invoke no judge, write a
 Markdown reading of a declaration and exit non-zero on a finding. They are listed
@@ -30,4 +31,5 @@ __all__ = [
     "blind_assessment",
     "deferral_register",
     "authority_matrix",
+    "historical_profile",
 ]

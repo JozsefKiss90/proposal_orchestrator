@@ -66,13 +66,15 @@
     },
     {
       "name": "profile",
-      "invariant": "An instrument profile resolves to its own rubrics, scorecard and criterion routing. A criterion cannot be scored under a profile that does not declare it.",
+      "invariant": "An instrument profile resolves to its own rubrics, scorecard and criterion routing. A criterion cannot be scored under a profile that does not declare it. A historical profile's every element is either sourced to a matrix row or declared open because a matrix row is open. An element resting on an open row is reported, not scored under.",
       "modules": [
-        "tests/harness/test_profile.py",
+        "tests/harness/test_historical_profile.py",
         "tests/harness/test_msca_dn_profile.py",
+        "tests/harness/test_profile.py",
         "tests/harness/test_ria_profile.py",
+        "tests/harness/test_routing.py",
         "tests/harness/test_rubrics.py",
-        "tests/harness/test_routing.py"
+        "tests/test_msca_dn_historical_profile.py"
       ],
       "depended_on": true
     },

@@ -1,0 +1,231 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-authority-matrix_2026-10-13",
+  "date": "2026-10-13",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation",
+  "ticket": "V09 of plans/msca_dn_historical_validation_tickets.md",
+  "gate": "G3",
+  "succeeds": {
+    "record": "docs/tier4_orchestration_state/decision_log/msca-dn-authority-matrix_2026-10-12.json",
+    "sha256": "af59b19ed5cc7a0b54f9d380bdc424813e8390d38693455cbe07e881fadb5d14",
+    "rule": "That record is left exactly as written. It describes a state in which four 2025 documents were absent and six rows were defaulted, and that is what was true when it was authored. This record does not correct it; it records what changed and why."
+  },
+  "operator_instruction": {
+    "date": "2026-10-13",
+    "what": "The operator instructed that the public authority documents be found online, and authorised downloading, inspecting, storing and indexing them. The operator amended ticket V09's 'the operator supplies the source documents' wording accordingly, and directed that duplicate manual downloads not be required.",
+    "constraints_carried": [
+      "Record provenance accurately: published address, retrieval date, the title, version and date the document gives itself, the computed sha256, and any archive captures or corroborating copies.",
+      "Do not label a retrieval operator_supplied or issuer_hash_confirmed.",
+      "Separate byte integrity, source authenticity and historical applicability.",
+      "Do not promote a claim to Confirmed because a document arrived.",
+      "Preserve genuine unresolved limitations.",
+      "No new assessor run. No quota spent."
+    ],
+    "constitutional_standing": "An explicit in-session human instruction, CLAUDE.md §1 and §3 priority 1. It narrows no constitutional rule: §13.2 and §13.3 forbid inventing call constraints and project facts, and retrieving a published call document and citing its pages is the opposite of inventing one. §10.6 is satisfied more fully than before, because the 2025 source documents now govern where generic programme knowledge and 2026 documents stood in for them."
+  },
+  "decision": "Three 2025 authority documents were retrieved, stored, pinned and cited; the source index schema was amended to answer three provenance questions separately instead of one; and the six defaulted rows were re-derived against the documents themselves. A successor index and matrix carry the result. The superseded pair stays in the tree unedited, which is what the superseded index says must happen to it.",
+  "documents_obtained": {
+    "declared_status": "Confirmed",
+    "basis": "each file is in the tree and its sha256 is computed from its bytes",
+    "entries": [
+      {
+        "path": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+        "sha256": "dd1209675abd79075768093ea277ddf0afe2985f489a5514f8f219d5902fbacf",
+        "title": "Horizon Europe Work Programme 2023-2025, 2. Marie Sklodowska-Curie Actions, Commission Decision C(2025) 2779 of 14 May 2025",
+        "pages": 158,
+        "source_authenticity": "independently_corroborated",
+        "historical_applicability": "in_force_confirmed",
+        "carries": "the 2025 call's own conditions and topic text at pages 23 to 26, and the award criteria, weighting and funding threshold in the specific conditions at pages 123 and 124"
+      },
+      {
+        "path": "docs/tier1_normative_framework/programme_guidance/wp-14-general-annexes_horizon-2025_en.pdf",
+        "sha256": "2f2454f28b18583af2f9684455c80d35a17bda5ded7000de0c416e3960037d81",
+        "title": "Horizon Europe Work Programme 2025, 14. General Annexes, Commission Decision C(2025) 2779 of 14 May 2025",
+        "pages": 44,
+        "source_authenticity": "independently_corroborated",
+        "historical_applicability": "in_force_confirmed",
+        "note": "The operator placed this file. It was read from the published address afterwards and the bytes agree, so the placement and the retrieval corroborate each other."
+      },
+      {
+        "path": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf",
+        "sha256": "9269f133098bd41cfa7564486d8c37c1ea21980c6abcbce8d14dc40121402608",
+        "title": "Horizon Europe Evaluation Form (HE MSCA), Version 2.0, 28 February 2025",
+        "pages": 9,
+        "source_authenticity": "retrieved_from_web_archive",
+        "historical_applicability": "bracketed_not_conclusive",
+        "note": "The published template address serves whichever version is current and now serves version 2.2. These bytes come from an archive of that address, captured 2025-06-19, 2025-10-03 and 2025-11-05 under one archive digest. One archive observed three times is one witness, and the captures bracket the call window without closing it."
+      }
+    ]
+  },
+  "no_separate_call_document": {
+    "decision": "No separate 2025 call document is stored, and the index declares no destination for one. The work programme part carries the call's own conditions and topic text, and the rows about them cite its pages.",
+    "why": "An index slot filled by a file that duplicates pages of a document already pinned would add a second set of bytes to keep in agreement with the first, and nothing to the evidence. The operator directed this on 2026-10-13."
+  },
+  "amendment": {
+    "what": "The source index schema moves from authority_source_index/1 to /2. Three fields per entry are added: source_authenticity, historical_applicability and provenance, each with its own basis field where it claims evidence.",
+    "why": "One field, authentication, was answering three questions. A file retrieved from the issuing body's published address is hashed in this tree exactly as a file of unknown origin is, so byte integrity alone cannot distinguish them; and neither says whether the document governed a closed call. Recording a retrieval as operator_supplied would have been false, and as issuer_hash_confirmed would have been a fabrication.",
+    "smallest_that_works": "The authentication vocabulary is unchanged, and no rank was added to it. A retrieved document stays computed_only, so it remains unable to carry a Confirmed row. The new evidence is recorded in the new fields rather than by promoting the old one.",
+    "historical_records_preserved": "The reader accepts both schemas. A version-1 entry declares none of the three fields and reads as a held file with no recorded origin and no established place in its era, which is what declaring nothing means. The superseded index and matrix still load and still check green, which tests/test_msca_dn_authority_matrix.py::TestTheSuccession asserts.",
+    "checks_added": [
+      "authenticities_claimed_without_a_basis",
+      "applicabilities_claimed_without_a_basis",
+      "ranks_unsupported_by_their_provenance",
+      "confirmed_on_inconclusive_applicability"
+    ],
+    "refusals_added": [
+      "a declared corroborating copy whose sha256 is not the stored file's, refused when the index is rendered and reported when it is read",
+      "a rank claiming evidence with no basis, and a rank whose provenance record lacks what that rank needs",
+      "an absence claiming an origin for bytes nobody has"
+    ]
+  },
+  "artifacts": {
+    "source_index": {
+      "path": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-13.json",
+      "sha256": "cfb935b0e0e9c42e3e14701d870645017a89822a3792d1a58441e64b1c853575"
+    },
+    "source_index_reading": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-13.md",
+    "matrix": {
+      "path": "docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-13.json",
+      "sha256": "2e1fba3b3bf5bc8609911250d66e04b70e791af091402f8cf78cb87c2da9a273"
+    },
+    "matrix_reading": "docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-13.md",
+    "reader": "harness/authority_matrix.py",
+    "command": "harness/commands/authority_matrix.py",
+    "author": "tools/author_msca_dn_authority_matrix.py",
+    "tests": [
+      "tests/test_msca_dn_authority_matrix.py",
+      "tests/harness/test_authority_matrix.py"
+    ],
+    "report": "plans/reports/v09_authority_matrix_2026-10-13.md",
+    "superseded_pair_untouched": [
+      {
+        "path": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-12.json",
+        "sha256": "6a93702973a16f7daccea522c9a7543e129a3d4a170be6215b7265029bc4cae5"
+      },
+      {
+        "path": "docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-12.json",
+        "sha256": "115949d3fe4858340128a6ce1fc3afe83f28a085347714752ccf1ca9d9453bcd"
+      }
+    ],
+    "superseded_reading_re_rendered": {
+      "path": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-12.md",
+      "why": "A reading is rendered from its declaration by the reader, and the reader gained the three axes. The declaration's bytes are unchanged; its reading now reports its entries as origin unrecorded, which is what that declaration says. Leaving the reading as written would have committed a rendering no reader produces."
+    }
+  },
+  "declared_values": {
+    "rows": 27,
+    "areas": 9,
+    "verdicts": {
+      "equivalent": 18,
+      "differs": 2,
+      "unresolved": 2,
+      "era_neutral": 5
+    },
+    "statuses": {
+      "Inferred": 25,
+      "Assumed": 1,
+      "Unresolved": 1,
+      "Confirmed": 0
+    },
+    "documents_obtained": 15,
+    "documents_not_obtained": 1,
+    "defaultings_closed": {
+      "count": 6,
+      "rows": [
+        "CR-02",
+        "WT-02",
+        "TH-03",
+        "TH-05",
+        "EI-01",
+        "EI-04"
+      ],
+      "declared_status": "Confirmed",
+      "basis": "the superseded matrix records six defaulted rows and this one records none; both are in the tree and can be read against each other"
+    },
+    "row_added": {
+      "id": "TH-06",
+      "verdict": "differs",
+      "what": "The 2025 evaluation form prints an unweighted total out of 15 with an overall threshold of 10 points. The 2026 form states the threshold on the weighted total out of 100. The difference is in the forms and is not the rule that governed: the call's work programme sets 70% of the weighted total, and the recorded result is a weighted total out of 100."
+    },
+    "the_score_resolution": {
+      "row": "TH-05",
+      "was": "defaulted, carried from the 2026 form",
+      "now": "equivalent",
+      "declared_status": "Inferred",
+      "the_conflict": "Two 2025 authorities disagree. The work programme states a resolution of one decimal place; the evaluation form of the call window states that half marks may be given.",
+      "how_it_was_decided": "The recorded result decides it. Two of the three criterion scores are 4.2, which no half-mark rule could award, so the work programme's resolution was what was applied. The deriver refuses to render the row if no recorded score is finer than a half mark, because both rules would then fit and the equivalence would again be an absence of visible difference.",
+      "what_is_not_settled": "The conflict itself. Which authority governs the resolution for any other 2025 proposal is not resolved here, and the matrix records that as an uncertainty."
+    },
+    "tier_conflict_logged": {
+      "authority": "CLAUDE.md §3 and §12.3",
+      "between": "Tier 2A, the 2025 evaluation form, and Tier 2B, the MSCA part of the 2025 work programme, on the score resolution and on the total the overall threshold applies to",
+      "resolution_for_this_submission": "The call's work programme governed, evidenced by the recorded scores and the recorded total. The evaluation form itself provides the ground for that: it states that specific calls or topics may have different rules.",
+      "resolution_in_general": "Unresolved. Surfaced to the operator by this record."
+    },
+    "the_2025_call_identifier": {
+      "row": "CI-01",
+      "verdict": "unresolved",
+      "declared_status": "Assumed",
+      "what_changed": "The call is now pinned. The work programme states its identifier, its opening date and its deadline.",
+      "what_did_not": "The binding. Nothing shows this submission was entered into that call, and two records declare it. A declaration is not evidence of itself."
+    },
+    "the_form_version": {
+      "row": "EI-02",
+      "verdict": "unresolved",
+      "declared_status": "Unresolved",
+      "why_it_stays_open": "Three captures of the published template address carry one archive digest, dated inside the call window, the last twenty days before the deadline, and the next distinct digest is months later. A version served between two captures and never captured would leave no trace, and the captures are of one archive. Every row citing that form is Inferred because of this."
+    },
+    "the_2025_application_form": {
+      "path": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+      "source_authenticity": "unrecorded",
+      "historical_applicability": "unresolved",
+      "why": "It was in this tree before any retrieval was made, and nothing records where it came from or that it was the version in force. No corroborating copy was sought for it, which is work this record does not claim to have done."
+    },
+    "the_vouched_authentications": {
+      "ranks": [
+        "operator_supplied"
+      ],
+      "entries": 2,
+      "note": "The two operator-vouched records are transcriptions authored here, so they have no external origin and state no era's rules. Their authenticity and applicability are both not_applicable, which is the separation working: the operator vouches for the bytes and nobody is claiming a published document.",
+      "paths": "Deliberately not restated. A committed record naming a fidelity register's path or hash is picked up by the R04 adoption-cost scan and makes the declaration drafts stale."
+    }
+  },
+  "verification": {
+    "byte_equal_replay": "py -3.10 -m tools.author_msca_dn_authority_matrix --check prints 'up to date'",
+    "matrix_check": "py -3.10 -m harness.commands.authority_matrix --matrix docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-13.json reports green over 29 findings",
+    "superseded_pair": "the 2026-10-12 index and matrix load under authority_source_index/1 and check green, asserted by TestTheSuccession",
+    "quotes_re_derived": "74 document quotes are re-located on the page each cites, through runner.source_index.read_page_text, by tests/test_msca_dn_authority_matrix.py::TestTheRows::test_every_document_quote_is_on_the_page_it_cites",
+    "aspect_grouping_measured": "the ten aspect texts are each required to fall inside their own criterion's section of the 2025 form, with the three section headings supplying the boundaries; an aspect present but grouped elsewhere refuses",
+    "lane": "not run. The acceptance lane's single-process result is not measured here.",
+    "quota": "none spent. No assessor ran, no runner phase was dispatched, and no component was tuned toward any score. The 74.60 baseline is untouched."
+  },
+  "known_gaps": [
+    "No entry carries a hash published by its issuing body, so no row is Confirmed.",
+    "The 2025 evaluation form's place in the call is bracketed and not closed.",
+    "The 2025 application form has no recorded origin and no established place in the call.",
+    "The submission's binding to a call identifier is declared, not evidenced.",
+    "The conflict between the two 2025 authorities on the score resolution is resolved for this submission only.",
+    "Whether each area's rows are all of its scoring-relevant rules is the author's judgement. The check cannot report a rule nobody wrote a row for.",
+    "The acceptance lane was not run, so this work's effect on it is unmeasured."
+  ],
+  "not_evidence_of": [
+    "that the 2025 evaluation would score the sanitised text the same way",
+    "that the harness's scoring method is correct",
+    "that V09 is accepted. Acceptance and the review_state move are the operator's.",
+    "that the retrieved documents are authentic in the sense an issuing body's hash would establish. They are corroborated, which is less."
+  ],
+  "side_effect": {
+    "what": "The declaration drafts under docs/tier4_orchestration_state/msca_dn/declarations/ were re-rendered a second time, and a successor re-render record was written.",
+    "record": "docs/tier4_orchestration_state/decision_log/msca-dn-declaration-draft-rerender_2026-10-13.json",
+    "why": "The successor index pins the sanitised revision's register by hash, so the adoption-cost scan found three further dependents.",
+    "declared_status": "Confirmed",
+    "basis": "the re-render diff, measured on this checkout"
+  },
+  "tier_placement": {
+    "what": "A byte-identical second copy of the work programme part was found at docs/tier1_normative_framework/programme_guidance/wp-2-msca-actions_horizon-2023-2024_en.pdf, placed there while this work was in progress and never committed.",
+    "decision": "It was removed rather than committed, and the copy under docs/tier2b_topic_and_call_sources/work_programmes/msca/ is the one pinned.",
+    "why": "CLAUDE.md §5 puts work programme documents in Tier 2B; Tier 1 holds legislation and programme-wide guidance. Committing both would also put two sets of identical bytes in the tree to keep in agreement with each other, which is the duplication the no_separate_call_document decision avoids for the same reason.",
+    "nothing_lost": "sha256 dd1209675abd79075768093ea277ddf0afe2985f489a5514f8f219d5902fbacf, identical to the pinned copy and recorded in the index with the published address it came from."
+  }
+}

@@ -95,12 +95,21 @@ from runner.paths import find_repo_root
 __all__ = [
     "AuthorityMatrixError",
     "SCHEMA_INDEX",
+    "SCHEMA_INDEX_READABLE",
     "SCHEMA_MATRIX",
     "SOURCE_CLASSES",
     "ERAS",
     "AUTHENTICATIONS",
     "UNVOUCHED_AUTHENTICATIONS",
     "AUTHENTICATIONS_NEEDING_A_BASIS",
+    "SOURCE_AUTHENTICITIES",
+    "AUTHENTICITIES_NEEDING_A_BASIS",
+    "HISTORICAL_APPLICABILITIES",
+    "APPLICABILITIES_NEEDING_A_BASIS",
+    "INCONCLUSIVE_APPLICABILITIES",
+    "ArchiveCapture",
+    "CorroboratingCopy",
+    "Provenance",
     "SUBMISSION_SCOPED_CLASSES",
     "VERDICTS",
     "SOURCED_VERDICTS",
@@ -126,9 +135,19 @@ __all__ = [
     "render_matrix",
 ]
 
-#: The source-index schema this reader understands. An authoring tool carries
+#: The source-index schema this reader writes about. An authoring tool carries
 #: its own copy, because it may not import this package.
-SCHEMA_INDEX = "authority_source_index/1"
+SCHEMA_INDEX = "authority_source_index/2"
+
+#: Every source-index schema this reader accepts. Version 1 predates the three
+#: provenance axes below and declares none of them, so its entries read as
+#: origin unrecorded and applicability not established. It stays readable: a
+#: superseded index is historical evidence, and evidence that its own reader can
+#: no longer open is evidence nobody can check.
+SCHEMA_INDEX_READABLE: tuple[str, ...] = (
+    "authority_source_index/1",
+    "authority_source_index/2",
+)
 
 #: The matrix schema this reader understands.
 SCHEMA_MATRIX = "authority_equivalence_matrix/1"
@@ -188,6 +207,74 @@ UNVOUCHED_AUTHENTICATIONS: tuple[str, ...] = (
     "not_obtained",
 )
 
+#: What evidence says the stored bytes are the document the issuing body
+#: published. Separate from :data:`AUTHENTICATIONS`, which says only how the
+#: bytes are vouched for once they are here: a file can be hashed in this tree,
+#: and so carry perfect byte integrity, while nothing records where it came
+#: from. Conflating the two is what let a locally hashed download read as an
+#: authenticated document.
+SOURCE_AUTHENTICITIES: tuple[str, ...] = (
+    # An expected hash published by the issuing body, matched against the file.
+    "issuer_hash_matched",
+    # The same bytes obtained a second, independent way: a second host of the
+    # issuing body, an independent archive, or a copy the operator already held.
+    "independently_corroborated",
+    # Retrieved once from the issuing body's own published address.
+    "retrieved_from_official_url",
+    # Retrieved from an independent archive of that address, the address itself
+    # no longer serving those bytes.
+    "retrieved_from_web_archive",
+    # The operator placed the file. No address is recorded.
+    "operator_placed",
+    # Nothing records where the bytes came from.
+    "unrecorded",
+    # A record this repository authored. It has no external origin to record.
+    "not_applicable",
+)
+
+#: Authenticities that claim evidence of origin and so must say what it is.
+#: ``unrecorded`` and ``not_applicable`` claim nothing, so they need nothing.
+AUTHENTICITIES_NEEDING_A_BASIS: tuple[str, ...] = (
+    "issuer_hash_matched",
+    "independently_corroborated",
+    "retrieved_from_official_url",
+    "retrieved_from_web_archive",
+    "operator_placed",
+)
+
+#: Whether a source was the version in force for the era whose rules it states.
+#: The third axis, and the one a retrieval cannot establish: bytes fetched today
+#: are evidence of what is published today, not of what governed a closed call.
+HISTORICAL_APPLICABILITIES: tuple[str, ...] = (
+    # The document itself states the call or period it governs.
+    "in_force_confirmed",
+    # The document declares its own edition or version date, which places it in
+    # the era but does not show it was the version applied.
+    "edition_declared",
+    # Retrieval or capture dates surround the call window without closing it.
+    # Nothing rules out a version that was served and never captured.
+    "bracketed_not_conclusive",
+    # Not established.
+    "unresolved",
+    # A current-era source, or a record of this repository.
+    "not_applicable",
+)
+
+#: Applicabilities that must say what the evidence is.
+APPLICABILITIES_NEEDING_A_BASIS: tuple[str, ...] = (
+    "in_force_confirmed",
+    "edition_declared",
+    "bracketed_not_conclusive",
+)
+
+#: Applicabilities under which a historical claim cannot be ``Confirmed``. A
+#: document whose place in the era is bracketed or unresolved may ground an
+#: inference and may not ground a confirmation.
+INCONCLUSIVE_APPLICABILITIES: tuple[str, ...] = (
+    "bracketed_not_conclusive",
+    "unresolved",
+)
+
 #: Classes whose evidence settles what was applied to one submission, and not a
 #: rule of the call it was submitted to.
 SUBMISSION_SCOPED_CLASSES: tuple[str, ...] = ("evaluation_output", "submission_record")
@@ -226,6 +313,58 @@ class AuthorityMatrixError(ValueError):
 # --------------------------------------------------------------------------- #
 # The source index
 # --------------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class ArchiveCapture:
+    """One independent capture of a source's published address."""
+
+    #: The archive's address for the capture.
+    url: str
+    #: When the archive took it.
+    captured_on: str
+    #: The archive's own digest of the captured bytes, where it publishes one.
+    #: Its own format, not a sha256, so it is recorded and never compared.
+    digest: str = ""
+
+
+@dataclass(frozen=True)
+class CorroboratingCopy:
+    """The same bytes obtained a second, independent way."""
+
+    #: Where this copy came from.
+    url: str
+    #: sha256 of that copy. Equal to the entry's own, or it corroborates nothing.
+    sha256: str
+    #: What makes this copy independent of the first.
+    note: str = ""
+
+
+@dataclass(frozen=True)
+class Provenance:
+    """Where a source's bytes came from, as the index records it.
+
+    Every field is a record of an act, not a judgement about it. The judgement
+    lives in the entry's authenticity and applicability, which this record is
+    the basis for.
+    """
+
+    #: The issuing body's own published address.
+    official_url: str = ""
+    #: What was actually read, where that is not the official address.
+    retrieved_from: str = ""
+    #: The date of the retrieval.
+    retrieved_on: str = ""
+    #: The title the document gives itself.
+    title: str = ""
+    #: The version the document gives itself.
+    declared_version: str = ""
+    #: The date the document gives itself.
+    document_date: str = ""
+    #: Why the stored filename differs from the published one, where it does.
+    filename_note: str = ""
+    archive_captures: tuple[ArchiveCapture, ...] = ()
+    corroborating_copies: tuple[CorroboratingCopy, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -269,6 +408,19 @@ class Source:
     #: is one of :data:`AUTHENTICATIONS_NEEDING_A_BASIS`: a rank above
     #: ``computed_only`` has to point at the record that vouches for the bytes.
     authentication_basis: str = ""
+    #: One of :data:`SOURCE_AUTHENTICITIES`. The second axis: what says these
+    #: bytes are the issuing body's. Defaults to the claim a version-1 index
+    #: makes by declaring nothing.
+    source_authenticity: str = "unrecorded"
+    #: What that authenticity rests on. Required for the ranks that claim one.
+    source_authenticity_basis: str = ""
+    #: One of :data:`HISTORICAL_APPLICABILITIES`. The third axis: whether this
+    #: was the version in force for the era it states rules for.
+    historical_applicability: str = "not_applicable"
+    #: What that applicability rests on. Required for the ranks that claim one.
+    historical_applicability_basis: str = ""
+    #: Where the bytes came from, recorded act by act.
+    provenance: Provenance | None = None
     #: sha256 of the bytes. Empty exactly when the source is not obtained.
     sha256: str = ""
     #: The document's page count, where it is a paginated document. A page
@@ -292,6 +444,20 @@ class Source:
     def vouched(self) -> bool:
         """Whether a ``Confirmed`` row may rest on this source."""
         return self.authentication not in UNVOUCHED_AUTHENTICATIONS
+
+    @property
+    def origin_recorded(self) -> bool:
+        """Whether anything at all records where the bytes came from."""
+        return self.source_authenticity not in ("unrecorded", "not_applicable")
+
+    @property
+    def applicability_conclusive(self) -> bool:
+        """Whether this source's place in its era is settled.
+
+        ``not_applicable`` is conclusive: a current-era source is not being
+        asked to stand for a closed call.
+        """
+        return self.historical_applicability not in INCONCLUSIVE_APPLICABILITIES
 
     @property
     def submission_scoped(self) -> bool:
@@ -328,6 +494,10 @@ class SourceIndex:
     #: Where this declaration was read from, repository-relative.
     source: str
     written_by: str = ""
+    #: The schema the declaration itself carried, one of
+    #: :data:`SCHEMA_INDEX_READABLE`. Recorded so a reading of a superseded
+    #: index names the schema that index was written against.
+    schema: str = SCHEMA_INDEX
 
     def by_path(self) -> dict[str, Source]:
         return {s.path: s for s in self.sources}
@@ -518,6 +688,46 @@ def _one_of(value: Any, allowed: Sequence[str], field: str, source: str) -> str:
     return str(value)
 
 
+def _provenance(raw: Mapping[str, Any], sha256: str, where: str) -> Provenance:
+    """Read a provenance record, refusing a corroboration that corroborates nothing.
+
+    A second copy is evidence only if its bytes are the same bytes. A declared
+    copy whose hash differs from the entry's is either a different document or a
+    mis-recorded hash, and both make the claim it supports false.
+    """
+    copies: list[CorroboratingCopy] = []
+    for item in raw.get("corroborating_copies", ()) or ():
+        copy = CorroboratingCopy(
+            url=_required(item, "url", where),
+            sha256=_required(item, "sha256", where),
+            note=str(item.get("note", "")),
+        )
+        if copy.sha256 != sha256:
+            raise AuthorityMatrixError(
+                f"{where}: corroborating copy {copy.url} declares sha256 {copy.sha256}, "
+                f"which is not this entry's {sha256}; it corroborates nothing"
+            )
+        copies.append(copy)
+    return Provenance(
+        official_url=str(raw.get("official_url", "")),
+        retrieved_from=str(raw.get("retrieved_from", "")),
+        retrieved_on=str(raw.get("retrieved_on", "")),
+        title=str(raw.get("title", "")),
+        declared_version=str(raw.get("declared_version", "")),
+        document_date=str(raw.get("document_date", "")),
+        filename_note=str(raw.get("filename_note", "")),
+        archive_captures=tuple(
+            ArchiveCapture(
+                url=_required(c, "url", where),
+                captured_on=_required(c, "captured_on", where),
+                digest=str(c.get("digest", "")),
+            )
+            for c in raw.get("archive_captures", ()) or ()
+        ),
+        corroborating_copies=tuple(copies),
+    )
+
+
 def _source(raw: Mapping[str, Any], source: str) -> Source:
     path = _required(raw, "path", source)
     where = f"{source}: source {path}"
@@ -531,6 +741,37 @@ def _source(raw: Mapping[str, Any], source: str) -> Source:
         raise AuthorityMatrixError(f"{where}: not obtained, yet a sha256 is declared")
     if authentication != "not_obtained" and not sha:
         raise AuthorityMatrixError(f"{where}: obtained, yet no sha256 is declared")
+    # What an entry declaring nothing claims. A held file with no recorded
+    # origin is ``unrecorded``; an absence has no bytes whose origin could be
+    # recorded, so it is ``not_applicable``. A version-1 index declares neither
+    # field, and this is what its entries mean.
+    authenticity = _one_of(
+        raw.get(
+            "source_authenticity",
+            "not_applicable" if authentication == "not_obtained" else "unrecorded",
+        ),
+        SOURCE_AUTHENTICITIES,
+        "source_authenticity",
+        where,
+    )
+    applicability = _one_of(
+        raw.get("historical_applicability", "not_applicable"),
+        HISTORICAL_APPLICABILITIES,
+        "historical_applicability",
+        where,
+    )
+    raw_provenance = raw.get("provenance")
+    if authentication == "not_obtained":
+        # No bytes are held, so there is nothing whose origin could be recorded.
+        # An absence that claimed one would be describing a document nobody has.
+        if authenticity != "not_applicable":
+            raise AuthorityMatrixError(
+                f"{where}: not obtained, yet claims source_authenticity {authenticity}"
+            )
+        if raw_provenance:
+            raise AuthorityMatrixError(
+                f"{where}: not obtained, yet declares a provenance record"
+            )
     pages = raw.get("pages")
     return Source(
         path=path,
@@ -540,6 +781,15 @@ def _source(raw: Mapping[str, Any], source: str) -> Source:
         states=_required(raw, "states", source),
         role=_one_of(_required(raw, "role", source), SOURCE_ROLES, "role", where),
         authentication_basis=str(raw.get("authentication_basis", "")),
+        source_authenticity=authenticity,
+        source_authenticity_basis=str(raw.get("source_authenticity_basis", "")),
+        historical_applicability=applicability,
+        historical_applicability_basis=str(raw.get("historical_applicability_basis", "")),
+        provenance=(
+            _provenance(raw_provenance, sha, where)
+            if isinstance(raw_provenance, Mapping)
+            else None
+        ),
         sha256=sha,
         pages=int(pages) if pages is not None else None,
         version=str(raw.get("version", "")),
@@ -567,8 +817,11 @@ def load_source_index(path: Path, repo_root: Path | None = None) -> SourceIndex:
     source = _rel(path, root)
     raw = _parse(path, source)
     schema = raw.get("schema")
-    if schema != SCHEMA_INDEX:
-        raise AuthorityMatrixError(f"{source}: schema is {schema!r}, expected {SCHEMA_INDEX!r}")
+    if schema not in SCHEMA_INDEX_READABLE:
+        raise AuthorityMatrixError(
+            f"{source}: schema is {schema!r}, expected one of "
+            f"{', '.join(repr(s) for s in SCHEMA_INDEX_READABLE)}"
+        )
     return SourceIndex(
         name=_required(raw, "index_name", source),
         subject=_required(raw, "subject", source),
@@ -587,6 +840,7 @@ def load_source_index(path: Path, repo_root: Path | None = None) -> SourceIndex:
         sources=tuple(_source(s, source) for s in _required(raw, "sources", source)),
         source=source,
         written_by=str(raw.get("written_by", "")),
+        schema=str(schema),
     )
 
 
@@ -729,6 +983,7 @@ class MatrixCheck:
     # -- a conclusion that reaches further than its evidence ---------------- #
     call_wide_claims_on_submission_evidence: tuple[str, ...] = ()
     confirmed_without_an_authenticated_source: tuple[str, ...] = ()
+    confirmed_on_inconclusive_applicability: tuple[str, ...] = ()
     # -- the records themselves --------------------------------------------- #
     missing_sources: tuple[str, ...] = ()
     edited_immutable_sources: tuple[str, ...] = ()
@@ -736,6 +991,9 @@ class MatrixCheck:
     stale_source_index: tuple[str, ...] = ()
     unobtained_sources_declared_with_pages: tuple[str, ...] = ()
     authentications_claimed_without_a_basis: tuple[str, ...] = ()
+    authenticities_claimed_without_a_basis: tuple[str, ...] = ()
+    applicabilities_claimed_without_a_basis: tuple[str, ...] = ()
+    ranks_unsupported_by_their_provenance: tuple[str, ...] = ()
     # -- a measurement that fails ------------------------------------------- #
     measurements_of_undeclared_sources: tuple[str, ...] = ()
     failed_measurements: tuple[str, ...] = ()
@@ -759,9 +1017,40 @@ class MatrixCheck:
         return tuple(out)
 
 
+#: What each rank needs in the provenance record to be more than an assertion.
+#: A prose basis says what was done; these say the record has to carry it, so a
+#: rank cannot outrun what is written down beside it.
+_RANK_REQUIREMENTS: dict[str, str] = {
+    "independently_corroborated": "a second capture or a corroborating copy",
+    "retrieved_from_official_url": "an official_url and a retrieved_on date",
+    "retrieved_from_web_archive": "an archive capture and a retrieved_on date",
+    "edition_declared": "a declared_version or a document_date",
+    "bracketed_not_conclusive": "the archive captures that form the brackets",
+}
+
+
+def _rank_unsupported(source: Source, rank: str) -> bool:
+    """Whether *rank* lacks the provenance record it needs."""
+    prov = source.provenance
+    if rank == "independently_corroborated":
+        return prov is None or not (prov.archive_captures or prov.corroborating_copies)
+    if rank == "retrieved_from_official_url":
+        return prov is None or not (prov.official_url and prov.retrieved_on)
+    if rank == "retrieved_from_web_archive":
+        return prov is None or not (prov.archive_captures and prov.retrieved_on)
+    if rank == "edition_declared":
+        return prov is None or not (prov.declared_version or prov.document_date)
+    if rank == "bracketed_not_conclusive":
+        return prov is None or not prov.archive_captures
+    return False
+
+
 def _check_sources(index: SourceIndex, repo_root: Path) -> dict[str, tuple[str, ...]]:
     pages_on_absent: list[str] = []
     unevidenced: list[str] = []
+    unevidenced_origin: list[str] = []
+    unevidenced_era: list[str] = []
+    unsupported: list[str] = []
     for source in index.sources:
         if not source.obtained and source.pages is not None:
             # A page count over a document nobody has is a measurement of
@@ -775,6 +1064,24 @@ def _check_sources(index: SourceIndex, repo_root: Path) -> dict[str, tuple[str, 
             # Without a record saying who and where, it is the index author's
             # own word, which is the thing the rank is supposed to improve on.
             unevidenced.append(f"{source.path}: {source.authentication}")
+        if (
+            source.source_authenticity in AUTHENTICITIES_NEEDING_A_BASIS
+            and not source.source_authenticity_basis.strip()
+        ):
+            # Every authenticity above ``unrecorded`` names an act — a
+            # retrieval, a capture, a second copy. The basis is where that act
+            # is written down, and without it the rank is an assertion.
+            unevidenced_origin.append(f"{source.path}: {source.source_authenticity}")
+        if (
+            source.historical_applicability in APPLICABILITIES_NEEDING_A_BASIS
+            and not source.historical_applicability_basis.strip()
+        ):
+            unevidenced_era.append(f"{source.path}: {source.historical_applicability}")
+        for rank in (source.source_authenticity, source.historical_applicability):
+            if rank in _RANK_REQUIREMENTS and _rank_unsupported(source, rank):
+                unsupported.append(
+                    f"{source.path}: {rank} needs {_RANK_REQUIREMENTS[rank]} in its provenance"
+                )
     bindings = check_bindings(index.obtained(), repo_root)
     return {
         "missing_sources": bindings.missing,
@@ -782,6 +1089,9 @@ def _check_sources(index: SourceIndex, repo_root: Path) -> dict[str, tuple[str, 
         "stale_tracked_inputs": bindings.stale_tracked,
         "unobtained_sources_declared_with_pages": tuple(pages_on_absent),
         "authentications_claimed_without_a_basis": tuple(unevidenced),
+        "authenticities_claimed_without_a_basis": tuple(unevidenced_origin),
+        "applicabilities_claimed_without_a_basis": tuple(unevidenced_era),
+        "ranks_unsupported_by_their_provenance": tuple(unsupported),
     }
 
 
@@ -868,6 +1178,7 @@ def _check_citations(
     no_historical: list[str] = []
     submission_only: list[str] = []
     unvouched_confirmed: list[str] = []
+    confirmed_on_bracketed: list[str] = []
     cache: dict[str, Any] = {}
 
     for row in matrix.rows:
@@ -881,6 +1192,7 @@ def _check_citations(
         historical = False
         non_submission_historical = False
         vouched = False
+        inconclusive: list[str] = []
         for position, citation in enumerate(row.citations, 1):
             label = f"{row.id} citation {position}"
             source = declared.get(citation.source)
@@ -894,6 +1206,8 @@ def _check_citations(
                 historical = True
                 if not source.submission_scoped:
                     non_submission_historical = True
+                if not source.applicability_conclusive:
+                    inconclusive.append(citation.source)
             if source.vouched:
                 vouched = True
 
@@ -940,6 +1254,13 @@ def _check_citations(
             submission_only.append(row.id)
         if row.declared_status == "Confirmed" and not vouched:
             unvouched_confirmed.append(row.id)
+        if row.declared_status == "Confirmed" and inconclusive:
+            # Byte integrity and source authenticity can both be settled while
+            # the document's place in the closed call is not. A confirmation
+            # resting on such a source confirms the wording, not the rule.
+            confirmed_on_bracketed.append(
+                f"{row.id}: {', '.join(sorted(set(inconclusive)))}"
+            )
 
     return {
         "rows_without_a_citation": tuple(no_citation),
@@ -951,6 +1272,7 @@ def _check_citations(
         "equivalence_without_historical_evidence": tuple(no_historical),
         "call_wide_claims_on_submission_evidence": tuple(submission_only),
         "confirmed_without_an_authenticated_source": tuple(unvouched_confirmed),
+        "confirmed_on_inconclusive_applicability": tuple(confirmed_on_bracketed),
     }
 
 
@@ -1037,7 +1359,7 @@ def render_index(index: SourceIndex) -> str:
 
     add(f"# Authority source index — {index.subject}")
     add("")
-    add(f"Authored {index.authored_on}. Index `{index.name}`, schema `{SCHEMA_INDEX}`,")
+    add(f"Authored {index.authored_on}. Index `{index.name}`, schema `{index.schema}`,")
     add(f"written by `{index.written_by}`.")
     add("")
     add(f"Review state: **{_as_words(index.review_state)}**.")
@@ -1057,26 +1379,101 @@ def render_index(index: SourceIndex) -> str:
 
     add("## What is obtained")
     add("")
-    add("| Document | Era | Class | Bytes vouched for | How | States |")
-    add("|---|---|---|---|---|---|")
+    add("| Document | Era | Class | States |")
+    add("|---|---|---|---|")
     for source in obtained:
         version = f" (v{source.version})" if source.version else ""
         add(
             f"| `{source.path}`{version} | {source.era} | {_as_words(source.cls)} | "
-            f"{_as_words(source.authentication)} | "
-            f"{_one_line(source.authentication_basis) or '—'} | "
             f"{_one_line(source.states)} |"
         )
     add("")
+
+    add("### Three questions, asked separately")
+    add("")
     add(
         _wrap(
-            "No document here is authenticated by a hash from its issuing body. A document pinned "
-            "in this tree with no recorded download provenance is `computed_only`: its bytes are "
-            "fixed, and nothing says they are the official ones. A row resting only on such a "
-            "document may not declare Confirmed, and the check reports it if it does."
+            "Byte integrity asks whether the bytes are fixed and reproducible. Source "
+            "authenticity asks whether they are the ones the issuing body published. Historical "
+            "applicability asks whether this was the version in force for the era the document "
+            "states rules for. They are different questions with different answers, and one "
+            "column answering all three is how a file hashed locally comes to read as an "
+            "authenticated authority."
         )
     )
     add("")
+    add("| Document | Byte integrity | Source authenticity | Historical applicability |")
+    add("|---|---|---|---|")
+    for source in obtained:
+        add(
+            f"| `{source.path.rsplit('/', 1)[-1]}` | {_as_words(source.authentication)} | "
+            f"{_as_words(source.source_authenticity)} | "
+            f"{_as_words(source.historical_applicability)} |"
+        )
+    add("")
+    bases = [
+        (source, axis, basis)
+        for source in obtained
+        for axis, basis in (
+            ("byte integrity", source.authentication_basis),
+            ("source authenticity", source.source_authenticity_basis),
+            ("historical applicability", source.historical_applicability_basis),
+        )
+        if basis.strip()
+    ]
+    if bases:
+        add("| Document | Axis | What it rests on |")
+        add("|---|---|---|")
+        for source, axis, basis in bases:
+            add(f"| `{source.path.rsplit('/', 1)[-1]}` | {axis} | {_one_line(basis)} |")
+        add("")
+    add(
+        _wrap(
+            "A rank that claims evidence must name it. `check` reports any entry whose "
+            "authentication, authenticity or applicability claims more than `unrecorded` and "
+            "records no basis. No entry carries a hash published by its issuing body, so no row "
+            "may declare Confirmed on byte integrity alone; and a row citing a historical source "
+            "whose applicability is bracketed or unresolved may not declare Confirmed either, "
+            "because that source fixes a wording and not a rule in force."
+        )
+    )
+    add("")
+
+    with_provenance = [s for s in obtained if s.provenance is not None]
+    if with_provenance:
+        add("## Where the bytes came from")
+        add("")
+        add("| Document | Title it gives itself | Retrieved | From |")
+        add("|---|---|---|---|")
+        for source in with_provenance:
+            prov = source.provenance
+            assert prov is not None
+            declared = f" v{prov.declared_version}" if prov.declared_version else ""
+            dated = f", {prov.document_date}" if prov.document_date else ""
+            add(
+                f"| `{source.path.rsplit('/', 1)[-1]}` | "
+                f"{_one_line(prov.title)}{declared}{dated} | {prov.retrieved_on or '—'} | "
+                f"{prov.retrieved_from or prov.official_url or '—'} |"
+            )
+        add("")
+        for source in with_provenance:
+            prov = source.provenance
+            assert prov is not None
+            if not (prov.archive_captures or prov.corroborating_copies or prov.filename_note):
+                continue
+            add(f"**`{source.path.rsplit('/', 1)[-1]}`**")
+            add("")
+            if prov.official_url:
+                add(f"- Published address: {prov.official_url}")
+            for capture in prov.archive_captures:
+                digest = f", archive digest `{capture.digest}`" if capture.digest else ""
+                add(f"- Captured {capture.captured_on} by an independent archive{digest}")
+            for copy in prov.corroborating_copies:
+                note = f" — {_one_line(copy.note)}" if copy.note else ""
+                add(f"- Same bytes from {copy.url}{note}")
+            if prov.filename_note:
+                add(f"- Stored filename: {_one_line(prov.filename_note)}")
+            add("")
 
     if absent:
         add("## What is not obtained")
@@ -1089,9 +1486,8 @@ def render_index(index: SourceIndex) -> str:
         add("")
         add(
             _wrap(
-                "Each row is open because of a document in this table. The operator supplies "
-                "them; nothing in this repository fetches one, and no row closes by assuming "
-                "what one would say."
+                "Each row is open because of a document in this table. No row closes by "
+                "assuming what one would say, and a citation of one fails the check."
             )
         )
         add("")

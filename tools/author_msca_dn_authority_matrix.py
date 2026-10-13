@@ -123,32 +123,51 @@ PROFILE_REL = Path("harness/profiles/msca_dn_2026_default.json")
 APPENDIX_REL = Path("harness/criterion_appendix_mapping_msca_dn.json")
 SPEC_REL = Path("plans/msca_dn_pre_evaluation_spec.md")
 
-#: Where a 2025 document will be filed when the operator supplies it. These are
-#: destinations, not documents: nothing is asserted about a file at one of them.
+#: The MSCA part of the work programme the 2025 call was opened under. Its
+#: published filename says 2023-2024; its own cover says the 2023-2025 edition
+#: and carries Commission Decision C(2025) 2779 of 14 May 2025, the same
+#: decision as the General Annexes below. It carries the call's own conditions
+#: and topic text, so no separate call document is held or needed.
 HIST_WP_REL = Path(
-    "docs/tier2b_topic_and_call_sources/work_programmes/msca/historical_work_programme.pdf"
+    "docs/tier2b_topic_and_call_sources/work_programmes/msca/"
+    "wp-2-msca-actions_horizon-2023-2025_en.pdf"
 )
+#: The General Annexes of the same work programme, under the same decision.
 HIST_ANNEXES_REL = Path(
-    "docs/tier1_normative_framework/programme_guidance/historical_general_annexes.pdf"
+    "docs/tier1_normative_framework/programme_guidance/wp-14-general-annexes_horizon-2025_en.pdf"
 )
-HIST_CALL_REL = Path(
-    "docs/tier2b_topic_and_call_sources/call_extracts/historical_dn_call_conditions.pdf"
-)
+#: The evaluation form served at the issuing body's template address through the
+#: 2025 call window. The address now serves a later version, so this copy comes
+#: from an independent archive of it, and its place in the call is bracketed and
+#: not closed.
 HIST_EF_REL = Path(
-    "docs/tier2a_instrument_schemas/evaluation_forms/msca/historical_evaluation_form.pdf"
+    "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_v2.0_2025-02-28.pdf"
+)
+
+#: What would bind this submission to a call identifier, and is not held. A
+#: destination, not a document: nothing is asserted about a file there.
+SUBMISSION_ACK_REL = Path(
+    "docs/tier3_project_instantiation/source_materials/msca_dn/submission_acknowledgement.pdf"
 )
 
 AUTHORITY_DIR = DN_DIR / "authority"
-INDEX_REL = AUTHORITY_DIR / "authority_source_index_2026-10-12.json"
-MATRIX_REL = AUTHORITY_DIR / "equivalence_matrix_2025_2026-10-12.json"
+INDEX_REL = AUTHORITY_DIR / "authority_source_index_2026-10-13.json"
+MATRIX_REL = AUTHORITY_DIR / "equivalence_matrix_2025_2026-10-13.json"
+
+#: The pair this one supersedes. They are historical evidence and are not
+#: edited: the 2026-10-12 index declared four 2025 documents absent, and a
+#: correction to an index is a successor index. Their hashes are read from the
+#: tree, so a superseded record that moved is reported rather than restated.
+PRIOR_INDEX_REL = AUTHORITY_DIR / "authority_source_index_2026-10-12.json"
+PRIOR_MATRIX_REL = AUTHORITY_DIR / "equivalence_matrix_2025_2026-10-12.json"
 
 #: The schemas the two declarations carry. ``harness.authority_matrix`` holds the
 #: reader's copies, and ``tests/test_msca_dn_authority_matrix.py`` asserts they
 #: agree. Deliberate double entry: this module may not import the harness.
-SCHEMA_INDEX = "authority_source_index/1"
+SCHEMA_INDEX = "authority_source_index/2"
 SCHEMA_MATRIX = "authority_equivalence_matrix/1"
 
-AUTHORED_ON = "2026-10-12"
+AUTHORED_ON = "2026-10-13"
 TICKET = "V09 of plans/msca_dn_historical_validation_tickets.md"
 HISTORICAL_LABEL = "2025"
 CURRENT_LABEL = "2026"
@@ -170,6 +189,63 @@ REQUIRED_AREAS: tuple[str, ...] = (
 
 class AuthorityAuthoringError(RuntimeError):
     """A record or document this module refuses to render against."""
+
+
+# --------------------------------------------------------------------------- #
+# What the 2025 authorities say, quoted
+#
+# Each quote is checked against the page it is cited from when the matrix is
+# rendered, so a quote that stops occurring refuses rather than being written.
+# They are named here because several rows cite the same sentence, and a
+# sentence transcribed twice is a sentence that can differ from itself.
+# --------------------------------------------------------------------------- #
+
+#: The work programme part, on the call itself.
+Q25_CALL_HEADING = (
+    "Call - MSCA Doctoral Networks 2025 HORIZON-MSCA-2025-DN-01 Conditions for the Call"
+)
+Q25_CALL_DATES = "Opening: 28 May 2025 Deadline(s): 25 Nov 2025"
+Q25_AWARD_DEFER = (
+    "For application of the general award criteria, including weighting and thresholds, see the "
+    "specific conditions at the end of this Work Programme part."
+)
+
+#: The work programme part's specific conditions, on scoring.
+Q25_CRITERIA_NAMES = (
+    "the award criteria 'excellence', 'impact' and 'quality and efficiency of the implementation'"
+)
+Q25_NO_ASPECT_SCORES = (
+    "Evaluation scores will be awarded for each of these criteria, and not for the different "
+    "aspects listed in the table below."
+)
+Q25_MAXIMUM = "Each criterion will be scored out of 5."
+Q25_RESOLUTION = "Scores will be awarded with a resolution of one decimal place"
+Q25_FUNDING_THRESHOLD = "Proposals scoring equal to or above 70% will be considered for funding"
+Q25_WEIGHTING = "50% 30% 20% Weighting"
+
+#: The General Annexes of the same programme, on who sets the award criteria.
+Q25_TMA_DEFER = "Training and mobility actions (TMA)"
+Q25_ANNEX_INDIVIDUAL = "The threshold for individual criteria will be 3."
+
+#: The evaluation form served through the call window, on scoring.
+Q25_EF_SCALE = "Scoring must be in the range from 0-5. Half-marks may be given."
+Q25_EF_INDIVIDUAL = "The threshold for the individual criteria is 3."
+Q25_EF_OVERALL = (
+    "The overall threshold, applying to the sum of the 3 individual scores, is 10 points."
+)
+Q25_EF_WEIGHTING_RANKING = (
+    "Weighting is only for the ranking (not to determine if the proposal passed the thresholds)."
+)
+Q25_EF_CALL_MAY_DIFFER = "Specific calls or topics may have different rules"
+Q25_EF_TOTAL_15 = "Total score Overall threshold /15"
+#: The applicability tags, where the two eras scope one of them differently.
+Q25_EF_DN_TAG = (
+    "[OPTION for MSCA Doctoral networks Quality and credibility of the training programme"
+)
+Q25_EF_WIDE_TAG = (
+    "[OPTION for MSCA Doctoral networks, Postdoctoral fellowships and Staff exchanges:"
+)
+Q26_EF_WIDE_TAG = "[OPTION for MSCA Doctoral networks, Postdoctoral fellowships:"
 
 
 # --------------------------------------------------------------------------- #
@@ -379,6 +455,72 @@ def _refuse_unless_anchor_sets_agree(
     return declared
 
 
+#: The three criterion section headings of an evaluation form, in order. Each
+#: must occur exactly once, or the walk below has no boundaries to measure
+#: against.
+CRITERION_SECTION_HEADINGS: tuple[str, ...] = (
+    "1. Excellence",
+    "2. Impact",
+    "3. Quality and efficiency of the implementation",
+)
+
+
+def _refuse_unless_aspects_group_the_same_way(
+    scorecard: Mapping[str, Any], document: _Document
+) -> tuple[dict[str, Any], ...]:
+    """Refuse unless *document* groups the ten aspects as the scorecard does.
+
+    The claim is about which criterion each aspect is graded under, so reading
+    it off a list of aspect texts would not establish it: the texts could all
+    be present and grouped differently. This walks the document once, finds the
+    three criterion section boundaries, and requires every aspect text to fall
+    inside its own criterion's section. A heading that occurs twice gives no
+    boundary, and an aspect outside its section is the difference the row would
+    otherwise have called equivalence.
+    """
+    pages = {n: document.text(n) for n in range(1, document.pages + 1)}
+    whole = "\n".join(pages[n] for n in sorted(pages))
+    offsets: list[int] = []
+    for heading in CRITERION_SECTION_HEADINGS:
+        if whole.count(heading) != 1:
+            raise AuthorityAuthoringError(
+                f"{document.rel}: the criterion heading {heading!r} occurs "
+                f"{whole.count(heading)} times; the aspect grouping cannot be measured"
+            )
+        offsets.append(whole.index(heading))
+    if offsets != sorted(offsets):
+        raise AuthorityAuthoringError(
+            f"{document.rel}: the three criterion headings are out of order"
+        )
+    bounds = offsets + [len(whole)]
+
+    citations: list[dict[str, Any]] = []
+    for position, criterion in enumerate(scorecard["criteria"]):
+        for aspect in criterion["aspects"]:
+            text = normalise_whitespace(aspect["text"])
+            offset = whole.find(text)
+            if offset < 0:
+                raise AuthorityAuthoringError(
+                    f"{document.rel}: aspect {aspect['anchor']} is not in the document; the "
+                    "grouping claim would rest on an absent aspect"
+                )
+            if not bounds[position] < offset < bounds[position + 1]:
+                raise AuthorityAuthoringError(
+                    f"{document.rel}: aspect {aspect['anchor']} does not sit under "
+                    f"{CRITERION_SECTION_HEADINGS[position]!r}; the grouping differs"
+                )
+            page = next(n for n in sorted(pages) if text in pages[n])
+            citations.append(
+                _verified(
+                    document,
+                    page,
+                    text,
+                    f"aspect {aspect['anchor']} under {CRITERION_SECTION_HEADINGS[position]}",
+                )
+            )
+    return tuple(citations)
+
+
 def _appendix_quote_citations(
     mapping: Mapping[str, Any], v5: _Document, v6: _Document
 ) -> tuple[dict[str, Any], ...]:
@@ -471,6 +613,29 @@ def _total_reproduces(esr: Mapping[str, Any], scorecard: Mapping[str, Any]) -> d
     return parts
 
 
+def _refuse_unless_a_score_rules_out_half_marks(esr: Mapping[str, Any]) -> str:
+    """Refuse unless a recorded score is finer than a half-mark.
+
+    Two 2025 authorities state different resolutions: the work programme one
+    decimal place, the evaluation form half-marks. The recorded scores decide
+    which was applied, but only if at least one of them is not also a
+    half-mark. If every recorded score happened to be a half-mark, both rules
+    would fit and the row would be reading the absence of a visible difference
+    as agreement, which is the defect the matrix exists to prevent.
+    """
+    finer = [
+        f"{c['criterion_id']} {c['score']}"
+        for c in esr["evaluation_result"]["criteria"]
+        if abs(round(float(c["score"]) * 2) - float(c["score"]) * 2) > 1e-9
+    ]
+    if not finer:
+        raise AuthorityAuthoringError(
+            f"{ESR_REL.as_posix()}: every recorded score is a whole or half mark, so the "
+            "recorded result cannot say which of the two 2025 resolutions was applied"
+        )
+    return ", ".join(finer)
+
+
 def _declared_assumed(record: Mapping[str, Any], pointer: Sequence[str], where: str) -> None:
     """Refuse unless the record still declares the value at *pointer* Assumed."""
     node: Any = record
@@ -521,6 +686,12 @@ class _Records:
     v6: _Document
     ef: _Document
     annexes: _Document
+    #: The MSCA part of the work programme the 2025 call was opened under.
+    hist_wp: _Document
+    #: The General Annexes of that same work programme.
+    hist_annexes: _Document
+    #: The evaluation form served through the 2025 call window.
+    hist_ef: _Document
     #: The aspect anchors, measured equal in both forms' criteria tables.
     anchors: tuple[str, ...]
 
@@ -573,6 +744,9 @@ def _records(repo_root: Path) -> _Records:
         v6=v6,
         ef=_Document(repo_root, EF_REL),
         annexes=_Document(repo_root, GENERAL_ANNEXES_REL),
+        hist_wp=_Document(repo_root, HIST_WP_REL),
+        hist_annexes=_Document(repo_root, HIST_ANNEXES_REL),
+        hist_ef=_Document(repo_root, HIST_EF_REL),
         anchors=anchors,
     )
 
@@ -594,8 +768,7 @@ def _call_identity_rows(src: _Records) -> list[dict[str, Any]]:
             "area": "call_identity",
             "rule": (
                 "Which call the 2025 submission was evaluated under. Every other row's 2025 "
-                "side is addressed to this call, and the four unobtained documents can only be "
-                "fetched once it is settled."
+                "side is addressed to this call."
             ),
             "affects": "an interpretation",
             "verdict": "unresolved",
@@ -604,19 +777,37 @@ def _call_identity_rows(src: _Records) -> list[dict[str, Any]]:
             "status_basis": (
                 "Two records declare the identifier Assumed and give the same reason. The value "
                 "is the operator's declaration, and this module refuses to render if either "
-                "record stops declaring it Assumed."
+                "record stops declaring it Assumed. The work programme now evidences that a "
+                "call with that identifier existed, with the dates it cites. It does not "
+                "evidence that this submission was made to it, which is what the row is about, "
+                "so the status stays Assumed."
             ),
             "limitation": (
-                "The Evaluation Summary Report names no call and no proposal number, and the "
-                "2025 work programme is not in this repository. Nothing here confirms the call "
-                "the 2025 evaluation was run under."
+                "The call itself is now pinned. The work programme part states its identifier, "
+                "its opening date and its deadline, so the call this submission is declared "
+                "against exists and its conditions are held. What is still missing is the "
+                "binding: the Evaluation Summary Report names no proposal number, and nothing "
+                "in this repository shows this submission was entered into that call. Two "
+                "records declare the binding, and a declaration is not evidence of it."
             ),
             "consequence": (
                 "The historical profile carries the operator's declared call identifier with "
                 "declared_status Assumed, never Confirmed, and the matrix is cited as the reason."
             ),
-            "would_be_settled_by": [HIST_CALL_REL.as_posix(), HIST_WP_REL.as_posix()],
+            "would_be_settled_by": [SUBMISSION_ACK_REL.as_posix()],
             "citations": [
+                _verified(
+                    src.hist_wp,
+                    23,
+                    Q25_CALL_HEADING,
+                    "the work programme states the identifier of the 2025 call",
+                ),
+                _verified(
+                    src.hist_wp,
+                    23,
+                    Q25_CALL_DATES,
+                    "and that call's opening date and deadline",
+                ),
                 _field_citation(
                     pe01_rel,
                     "declared_values/historical_call_id/reason",
@@ -708,9 +899,11 @@ def _criteria_rows(src: _Records) -> list[dict[str, Any]]:
             "current_value": ", ".join(c["registry_criterion_id"] for c in profile["criteria"]),
             "declared_status": "Inferred",
             "status_basis": (
-                "The 2025 side is the evaluation's own recorded wording, which is evidence of "
-                "what was applied to this submission. It is Inferred rather than Confirmed "
-                "because no hash from the issuing body vouches for the report's bytes."
+                "The 2025 side is stated twice: by the evaluation's own recorded wording, which "
+                "is evidence of what was applied to this submission, and by the work programme "
+                "the call was opened under, which names the three criteria as the call's. It is "
+                "Inferred rather than Confirmed because no hash from the issuing body vouches "
+                "for either document's bytes."
             ),
             "consequence": (
                 "The historical profile declares the same three criteria in the same order, "
@@ -726,9 +919,15 @@ def _criteria_rows(src: _Records) -> list[dict[str, Any]]:
                 for position, criterion in enumerate(result["criteria"])
             ]
             + [
+                _verified(
+                    src.hist_wp,
+                    123,
+                    Q25_CRITERIA_NAMES,
+                    "the work programme names the three award criteria of the 2025 call",
+                ),
                 _field_citation(
                     profile_rel, "criteria", "the 2026 profile's three criteria, in order"
-                )
+                ),
             ],
             "measurements": criterion_measurements,
         }
@@ -742,39 +941,31 @@ def _criteria_rows(src: _Records) -> list[dict[str, Any]]:
                 "four under Impact, two under Implementation."
             ),
             "affects": "a number",
-            "verdict": "defaulted",
+            "verdict": "equivalent",
             "settles": "call_wide",
+            "historical_value": (
+                "the evaluation form served through the 2025 call window carries all ten aspect "
+                "texts, each inside the section of the criterion the scorecard grades it under"
+            ),
             "current_value": "; ".join(
                 f"{c['id']}: {', '.join(a['id'] for a in c['aspects'])}"
                 for c in scorecard["criteria"]
             ),
-            "declared_status": "Assumed",
+            "declared_status": "Inferred",
             "status_basis": (
-                "The assignment is read off the 2026 evaluation form through the scorecard. No "
-                "2025 document in this repository states it: SM-01 shows the ten headings are "
-                "the 2025 form's, and the assignment of a heading to a criterion is the "
-                "evaluation form's, not the application form's."
+                "Measured, not read off a list. The 2025 form is walked once, its three "
+                "criterion section headings locate three boundaries, and every one of the ten "
+                "aspect texts is required to fall inside its own criterion's section. An aspect "
+                "present but grouped elsewhere refuses here. Inferred, not Confirmed, because "
+                "that form's place in the call is bracketed and not closed, which row EI-02 "
+                "keeps open."
             ),
-            "defaulting": {
-                "carried_from": (
-                    "the 2026 evaluation form, through harness/evaluator_scorecard_msca_dn.json"
-                ),
-                "affected_rule": (
-                    "which criterion each of the ten aspects is graded under, and therefore "
-                    "which criterion score each piece of evidence moves"
-                ),
-                "risk": (
-                    "A reassigned aspect moves evidence between criteria and changes two "
-                    "criterion scores without changing any text. The comparison with the 2025 "
-                    "result would then compare two different decompositions."
-                ),
-            },
             "consequence": (
-                "The historical profile keeps the 2026 criterion-to-aspect assignment and "
-                "records it as defaulted, not equivalent."
+                "The historical profile keeps the criterion-to-aspect assignment, sourced to "
+                "the 2025 form's own grouping rather than carried over from 2026."
             ),
-            "would_be_settled_by": [HIST_EF_REL.as_posix()],
-            "citations": [
+            "citations": list(_refuse_unless_aspects_group_the_same_way(scorecard, src.hist_ef))
+            + [
                 _field_citation(
                     scorecard_rel,
                     "criteria",
@@ -834,9 +1025,11 @@ def _weight_rows(src: _Records) -> list[dict[str, Any]]:
             ),
             "declared_status": "Inferred",
             "status_basis": (
-                "Each weight is recorded twice: in the 2025 evaluation's own per-criterion "
-                "wording, and in the 2026 scorecard derived from the evaluation form. Inferred "
-                "for the reason CR-01 gives."
+                "Each weight is recorded three times: in the 2025 evaluation's own "
+                "per-criterion wording, in the work programme's weighting row for that call, "
+                "and in the 2026 scorecard derived from the evaluation form. The call document "
+                "and the result agree, so the weights are the call's rule and not only what "
+                "this submission was given. Inferred for the reason CR-01 gives."
             ),
             "consequence": (
                 "The historical profile keeps these weights, sourced to the 2025 evaluation's "
@@ -852,11 +1045,17 @@ def _weight_rows(src: _Records) -> list[dict[str, Any]]:
                 for position, criterion in enumerate(result["criteria"])
             ]
             + [
+                _verified(
+                    src.hist_wp,
+                    124,
+                    Q25_WEIGHTING,
+                    "the work programme's weighting row for the 2025 call",
+                ),
                 _field_citation(
                     scorecard_rel,
                     "criteria",
                     "the 2026 scorecard's weights, derived from the evaluation form",
-                )
+                ),
             ],
             "measurements": weight_measurements,
         }
@@ -870,34 +1069,27 @@ def _weight_rows(src: _Records) -> list[dict[str, Any]]:
                 "determination of whether a proposal passed the thresholds."
             ),
             "affects": "an interpretation",
-            "verdict": "defaulted",
+            "verdict": "equivalent",
             "settles": "call_wide",
+            "historical_value": Q25_EF_WEIGHTING_RANKING,
             "current_value": scoring["weighting_source_quote"],
-            "declared_status": "Assumed",
+            "declared_status": "Inferred",
             "status_basis": (
-                "Only the 2026 evaluation form states the sentence. The 2025 evaluation's "
-                "recorded total was compared with a threshold of 70 of 100, which TH-02 "
-                "measures; this row does not adjudicate how that sits beside the sentence, "
-                "because the 2025 form is what would."
+                "The two forms carry the sentence word for word. Inferred, not Confirmed, "
+                "because the 2025 form's place in the call is bracketed, which row EI-02 keeps "
+                "open."
             ),
-            "defaulting": {
-                "carried_from": "the 2026 evaluation form, page 2",
-                "affected_rule": (
-                    "whether a pass is decided on the three unweighted criterion scores, with "
-                    "the weighted total used for ranking"
-                ),
-                "risk": (
-                    "If the 2025 form put weighting into threshold determination, a pass or fail "
-                    "reading of the 2025 criterion scores would be wrong. No score moves; its "
-                    "interpretation does."
-                ),
-            },
             "consequence": (
-                "The historical profile carries the sentence as defaulted. A pass or fail "
-                "statement about the 2025 result rests on it and has to say so."
+                "The historical profile carries the sentence, sourced to the 2025 form. A pass "
+                "or fail statement about the 2025 result rests on it and may cite this row."
             ),
-            "would_be_settled_by": [HIST_EF_REL.as_posix()],
             "citations": [
+                _verified(
+                    src.hist_ef,
+                    2,
+                    Q25_EF_WEIGHTING_RANKING,
+                    "the 2025 evaluation form on what weighting is for",
+                ),
                 _verified(
                     ef,
                     2,
@@ -920,6 +1112,7 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
     scoring = src.scoring
     esr_rel = ESR_REL.as_posix()
     scorecard_rel = SCORECARD_REL.as_posix()
+    finer_than_half_marks = _refuse_unless_a_score_rules_out_half_marks(src.esr)
     rows: list[dict[str, Any]] = []
     threshold_measurements = [
         _measurement(
@@ -955,7 +1148,8 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
             "declared_status": "Inferred",
             "status_basis": (
                 "The 2025 evaluation records the threshold beside each of its three criterion "
-                "scores. Inferred for the reason CR-01 gives."
+                "scores, and the evaluation form of that call window states the same figure as "
+                "a rule. Result and rule agree. Inferred for the reason CR-01 gives."
             ),
             "consequence": "The historical profile keeps the per-criterion threshold unchanged.",
             "citations": [
@@ -969,11 +1163,17 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
             ]
             + [
                 _verified(
+                    src.hist_ef,
+                    2,
+                    Q25_EF_INDIVIDUAL,
+                    "the 2025 evaluation form on the per-criterion threshold",
+                ),
+                _verified(
                     annexes,
                     scoring["individual_threshold_source"]["page"],
                     scoring["individual_threshold_source"]["quote"],
                     "the 2026 General Annexes on the per-criterion threshold",
-                )
+                ),
             ],
             "measurements": threshold_measurements,
         }
@@ -991,7 +1191,10 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
             "declared_status": "Inferred",
             "status_basis": (
                 "The 2025 evaluation's recorded result wording carries the threshold and the "
-                "maximum it is out of. Inferred for the reason CR-01 gives."
+                "maximum it is out of, and the work programme the call was opened under sets "
+                "the same threshold as a percentage of the weighted total. Seventy per cent of "
+                "a hundred is seventy points, so the two are the same rule stated in two "
+                "units. Inferred for the reason CR-01 gives."
             ),
             "consequence": "The historical profile keeps the overall threshold and maximum.",
             "citations": [
@@ -1000,6 +1203,12 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
                     "evaluation_result/result_wording",
                     "the 2025 evaluation's recorded overall threshold and maximum",
                     quote=result["result_wording"],
+                ),
+                _verified(
+                    src.hist_wp,
+                    123,
+                    Q25_FUNDING_THRESHOLD,
+                    "the work programme sets the 2025 call's funding threshold",
                 ),
                 _verified(
                     ef,
@@ -1051,37 +1260,48 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
                 "unweighted sum; the form states one on the weighted total."
             ),
             "affects": "an interpretation",
-            "verdict": "defaulted",
+            "verdict": "equivalent",
             "settles": "call_wide",
+            "historical_value": (
+                "the call's own work programme part governs. Its General Annexes refer training "
+                "and mobility actions to that part, the part itself takes the weighting and the "
+                "thresholds into its specific conditions, and the evaluation form of the call "
+                "window says a call may set different rules"
+            ),
             "current_value": scoring["annex_d_override"]["resolution"],
-            "declared_status": "Assumed",
+            "declared_status": "Inferred",
             "status_basis": (
-                "The resolution was taken on the 2026 annexes and the 2026 form. Neither 2025 "
-                "document is in this repository, so the resolution is carried forward rather "
-                "than re-derived."
+                "Three 2025 documents point the same way, and none of them is this "
+                "repository's. The General Annexes hand training and mobility actions to the "
+                "work programme part; that part states the weighting and thresholds are in its "
+                "own specific conditions; and the evaluation form of the call window says a "
+                "specific call may differ. So the call document outranked the generic one in "
+                "2025, which is the resolution the 2026 documents were given. Inferred, not "
+                "Confirmed, because no issuing body's hash vouches for any of the three."
             ),
-            "defaulting": {
-                "carried_from": (
-                    "the 2026 General Annexes and the 2026 evaluation form, resolved in "
-                    "docs/tier4_orchestration_state/decision_log/"
-                    "msca-dn-pe02-evaluation-bundle_2026-10-04.json"
-                ),
-                "affected_rule": (
-                    "which overall threshold the 2025 criterion scores are read against, and on "
-                    "whose authority"
-                ),
-                "risk": (
-                    "The 2025 annexes may state a different generic threshold, or not permit a "
-                    "call to override it. TH-02 measures 70 of 100 as applied to this "
-                    "submission, so the risk is to the general rule and not to this result."
-                ),
-            },
             "consequence": (
-                "The historical profile keeps the override and records it as defaulted. A "
-                "statement about any other 2025 proposal may not rest on it."
+                "The historical profile reads the 2025 scores against the call's own threshold, "
+                "citing this row. The resolution is no longer carried forward from 2026."
             ),
-            "would_be_settled_by": [HIST_ANNEXES_REL.as_posix(), HIST_EF_REL.as_posix()],
             "citations": [
+                _verified(
+                    src.hist_annexes,
+                    24,
+                    Q25_TMA_DEFER,
+                    "the 2025 General Annexes refer this action type to the work programme part",
+                ),
+                _verified(
+                    src.hist_wp,
+                    24,
+                    Q25_AWARD_DEFER,
+                    "that part takes the weighting and the thresholds into its own conditions",
+                ),
+                _verified(
+                    src.hist_ef,
+                    2,
+                    Q25_EF_CALL_MAY_DIFFER,
+                    "the 2025 evaluation form allows a call to set different rules",
+                ),
                 _field_citation(
                     scorecard_rel,
                     "scoring/annex_d_override/resolution",
@@ -1103,9 +1323,10 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
             "declared_status": "Inferred",
             "status_basis": (
                 "The 2025 evaluation prints the maximum beside every criterion score it "
-                "records. Inferred for the reason CR-01 gives. The claim is the maximum and "
-                "nothing else: row TH-05 carries the resolution, which this record does not "
-                "state."
+                "records, and the work programme of that call states it as a rule. Inferred "
+                "for the reason CR-01 gives. The claim is the maximum and nothing else: row "
+                "TH-05 carries the resolution, which the two 2025 authorities state "
+                "differently."
             ),
             "consequence": "The historical profile keeps the maximum.",
             "citations": [
@@ -1114,6 +1335,12 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
                     "evaluation_result/criteria/#0/wording",
                     "the 2025 evaluation's recorded maximum for criterion 1",
                     quote=result["criteria"][0]["wording"],
+                ),
+                _verified(
+                    src.hist_wp,
+                    123,
+                    Q25_MAXIMUM,
+                    "the work programme states the maximum for the 2025 call",
                 ),
                 _verified(
                     ef,
@@ -1139,45 +1366,154 @@ def _threshold_rows(src: _Records) -> list[dict[str, Any]]:
             "area": "thresholds",
             "rule": "The resolution a criterion score is awarded to.",
             "affects": "a number",
-            "verdict": "defaulted",
+            "verdict": "equivalent",
             "settles": "call_wide",
+            "historical_value": (
+                "one decimal place. The two 2025 authorities state different resolutions, and "
+                f"the recorded scores decide between them: {finer_than_half_marks} is not a "
+                "half mark"
+            ),
             "current_value": "one decimal place",
-            "declared_status": "Assumed",
+            "declared_status": "Inferred",
             "status_basis": (
-                "Only the 2026 evaluation form states a resolution. The 2025 evaluation prints "
-                "its three scores to two decimals, as 4.20, 4.50 and 4.20, and states no "
-                "resolution rule. All three happen to end in zero, which is consistent with a "
-                "one-decimal rule and is not evidence of one. Calling this equivalent would be "
-                "recording the absence of a visible difference as agreement."
+                "The two 2025 authorities disagree. The work programme of the call states one "
+                "decimal place; the evaluation form of the call window states that half marks "
+                "may be given. The recorded result settles which was applied, because a score "
+                "of 4.2 is not a half mark and could not have been awarded under the form's "
+                "rule. This module refuses to render if no recorded score is finer than a half "
+                "mark, because then both rules would fit and the equivalence would be the "
+                "absence of a visible difference again. Inferred, not Confirmed: the rule "
+                "applied to this submission is evidenced, and the conflict between the two 2025 "
+                "documents is recorded rather than resolved in general."
             ),
-            "defaulting": {
-                "carried_from": "the 2026 evaluation form, page 2",
-                "affected_rule": (
-                    "the resolution the harness awards a criterion score to, and therefore the "
-                    "rounding applied before the weighted total is formed"
-                ),
-                "risk": (
-                    "A coarser 2025 resolution moves a criterion score by up to half a point. "
-                    "The total weights excellence by ten, so that is five points of the "
-                    "weighted total on criterion 1 alone, and the comparison with the recorded "
-                    "85.80 shifts without any judgement changing."
-                ),
-            },
             "consequence": (
-                "The historical profile keeps one decimal place and records it as defaulted."
+                "The historical profile keeps one decimal place and cites this row, not a "
+                "defaulting. A statement about any other 2025 proposal must carry the conflict "
+                "between the two authorities, which the matrix records as an uncertainty."
             ),
-            "would_be_settled_by": [HIST_EF_REL.as_posix()],
             "citations": [
+                _verified(
+                    src.hist_wp,
+                    123,
+                    Q25_RESOLUTION,
+                    "the work programme states one decimal place for the 2025 call",
+                ),
+                _verified(
+                    src.hist_ef,
+                    2,
+                    Q25_EF_SCALE,
+                    "the evaluation form of the call window states half marks instead",
+                ),
+                _field_citation(
+                    esr_rel,
+                    "evaluation_result/criteria/#0/score",
+                    "a recorded score that no half-mark rule could have awarded",
+                    quote=str(result["criteria"][0]["score"]),
+                ),
                 _verified(
                     ef,
                     2,
                     scoring["scale_source_quote"],
-                    "the 2026 evaluation form, the only side that states a resolution",
+                    "the 2026 evaluation form on the range and its resolution",
                 ),
                 _field_citation(
                     scorecard_rel,
                     "scoring/scale",
                     "the resolution as the scorecard carries it",
+                ),
+            ],
+            "measurements": [
+                _measurement(
+                    f"TH-05-M{position + 1}",
+                    f"the 2025 evaluation recorded {criterion['score']} for "
+                    f"{criterion['criterion_id']}",
+                    ESR_REL,
+                    f"evaluation_result/criteria/#{position}/score",
+                    expected=criterion["score"],
+                )
+                for position, criterion in enumerate(result["criteria"])
+            ],
+        }
+    )
+    rows.append(
+        {
+            "id": "TH-06",
+            "area": "thresholds",
+            "rule": (
+                "The total the three criterion scores are summed into, as the evaluation form "
+                "itself prints it."
+            ),
+            "affects": "a number",
+            "verdict": "differs",
+            "settles": "call_wide",
+            "historical_value": (
+                "the 2025 evaluation form prints an unweighted total out of 15 and states an "
+                "overall threshold of 10 points on the sum of the three scores"
+            ),
+            "current_value": (
+                f"{scoring['overall_threshold']} points on a weighted total out of "
+                f"{scoring['overall_max']}"
+            ),
+            "difference": (
+                "The 2025 evaluation form's own total is the three criterion scores added up, "
+                "out of 15, read against 10 points. The 2026 form instead states the threshold "
+                "on the weighted total out of 100. The difference is in the form, and it is not "
+                "the difference that governed: the work programme of the 2025 call sets the "
+                "threshold at 70% of the weighted total, and the recorded result is a weighted "
+                "total out of 100. So the 2025 form's generic total was superseded by the "
+                "call's own rule, which is what TH-03 resolves and TH-02 measures."
+            ),
+            "declared_status": "Inferred",
+            "status_basis": (
+                "Both forms are read directly, and the recorded result shows which total was "
+                "actually formed. Inferred, not Confirmed, for the reason CR-01 gives, and "
+                "because the 2025 form's place in the call is bracketed."
+            ),
+            "consequence": (
+                "The historical profile forms the weighted total out of 100 and cites the call "
+                "document for it. It must not cite the 2025 evaluation form's /15 total, and a "
+                "reader comparing the two eras is told why the form's own total does not apply."
+            ),
+            "citations": [
+                _verified(
+                    src.hist_ef,
+                    2,
+                    Q25_EF_OVERALL,
+                    "the 2025 evaluation form's generic overall threshold",
+                ),
+                _verified(
+                    src.hist_ef,
+                    6,
+                    Q25_EF_TOTAL_15,
+                    "and the total it prints that threshold against",
+                ),
+                _verified(
+                    src.hist_wp,
+                    123,
+                    Q25_FUNDING_THRESHOLD,
+                    "the work programme's threshold for the 2025 call instead",
+                ),
+                _field_citation(
+                    esr_rel,
+                    "evaluation_result/result_wording",
+                    "the total the 2025 evaluation actually recorded",
+                    quote=result["result_wording"],
+                ),
+                _verified(
+                    ef,
+                    2,
+                    scoring["threshold_source_quote"],
+                    "the 2026 evaluation form on the overall threshold",
+                ),
+            ],
+            "measurements": [
+                _measurement(
+                    "TH-06-M1",
+                    "the 2025 evaluation recorded a maximum of "
+                    f"{result['overall_max']}, not the form's fifteen",
+                    ESR_REL,
+                    "evaluation_result/overall_max",
+                    expected=result["overall_max"],
                 ),
             ],
         }
@@ -1204,31 +1540,35 @@ def _evaluator_instruction_rows(src: _Records) -> list[dict[str, Any]]:
             "area": "evaluator_instructions",
             "rule": "The six score-level descriptions, 0 to 5, an evaluator grades against.",
             "affects": "both",
-            "verdict": "defaulted",
+            "verdict": "equivalent",
             "settles": "call_wide",
+            "historical_value": (
+                "all six sentences occur word for word in the evaluation form served through "
+                "the 2025 call window"
+            ),
             "current_value": "; ".join(f"{k}: {v}" for k, v in scoring["levels"].items()),
-            "declared_status": "Assumed",
+            "declared_status": "Inferred",
             "status_basis": (
-                "The six sentences are the 2026 evaluation form's, page 2. No 2025 document in "
-                "this repository carries them, and the 2025 evaluation's record quotes none of "
-                "them."
+                "Each of the six sentences is located in the 2025 form and in the 2026 form, "
+                "and the citation below refuses if any one of them stops occurring on the page "
+                "it cites. This was the largest unsourced input to a numerical comparison, and "
+                "it is now sourced on both sides. Inferred, not Confirmed, because the 2025 "
+                "form's place in the call is bracketed, which row EI-02 keeps open."
             ),
-            "defaulting": {
-                "carried_from": "the 2026 evaluation form, page 2",
-                "affected_rule": "what a criterion score of 4 means",
-                "risk": (
-                    "A changed level sentence changes every grade the assessor awards. A "
-                    "comparison with the 2025 total would then be between two scales wearing "
-                    "the same numbers."
-                ),
-            },
             "consequence": (
-                "The historical profile keeps the level descriptions and records them as "
-                "defaulted. This is the largest single unsourced input to a numerical "
-                "comparison with the 2025 result."
+                "The historical profile keeps the level descriptions and cites this row. A "
+                "grade awarded under them is no longer resting on a 2026 document alone."
             ),
-            "would_be_settled_by": [HIST_EF_REL.as_posix()],
             "citations": [
+                _verified(
+                    src.hist_ef,
+                    2,
+                    scoring["levels"][level],
+                    f"the 2025 evaluation form's level {level} description",
+                )
+                for level in sorted(scoring["levels"])
+            ]
+            + [
                 _verified(
                     ef,
                     2,
@@ -1257,22 +1597,26 @@ def _evaluator_instruction_rows(src: _Records) -> list[dict[str, Any]]:
             ),
             "declared_status": "Unresolved",
             "status_basis": (
-                "The stored form declares one version and one date. Nothing states which "
-                "version the 2025 evaluation used."
+                "A version served at the issuing body's template address through the call "
+                "window is now held, and its place in the call is bracketed rather than "
+                "settled. Nothing states which version the 2025 evaluation used."
             ),
             "limitation": (
-                f"The stored evaluation form declares version {scorecard['provenance']['version']}, "
-                f"dated {scorecard['provenance']['version_date']}. No record in this repository "
-                "states the version in force when the 2025 submission was evaluated, and "
-                "whether that date precedes or follows the evaluation is itself unrecorded. "
-                "Every defaulted row in this area rests on this gap."
+                "Three captures of the issuing body's template address carry one archive "
+                "digest, dated inside the call window, the last of them twenty days before the "
+                "deadline, and the next distinct digest is months after it. That brackets the "
+                "window and does not close it: a version served between two captures and never "
+                "captured would leave no trace, and nothing states which version the "
+                "evaluators were given. The captures are also of one archive, so they are one "
+                "witness observed three times rather than three independent witnesses. Every "
+                "row citing the 2025 form is Inferred because of this, and none is Confirmed."
             ),
             "consequence": (
-                "The historical profile records that the evaluation-form version behind its "
-                "defaulted rules is unknown. It does not claim the stored version applied in "
-                "2025."
+                "The historical profile records that the evaluation-form version the 2025 "
+                "evaluators used is not established. It does not claim the held version "
+                "applied, and every rule it takes from that form is declared Inferred."
             ),
-            "would_be_settled_by": [HIST_EF_REL.as_posix(), HIST_CALL_REL.as_posix()],
+            "would_be_settled_by": [],
             "citations": [
                 _field_citation(
                     scorecard_rel,
@@ -1317,10 +1661,11 @@ def _evaluator_instruction_rows(src: _Records) -> list[dict[str, Any]]:
             "current_value": scoring["no_aspect_scores_rule"]["quote"],
             "declared_status": "Inferred",
             "status_basis": (
-                "The 2025 side is an absence that is measured rather than assumed: three "
-                "criterion scores are recorded and no observation carries a score field. An "
-                "absence evidences that the rule was applied; it does not confirm the rule's "
-                "text, which is why this is Inferred."
+                "The 2025 side is stated and also measured. The work programme of the call "
+                "carries the rule in words, and the recorded result bears it out: three "
+                "criterion scores are recorded and no observation carries a score field. "
+                "Inferred rather than Confirmed because no issuing body's hash vouches for "
+                "either document."
             ),
             "consequence": (
                 "The historical profile keeps the rule that the ten aspect cells inform a "
@@ -1336,6 +1681,12 @@ def _evaluator_instruction_rows(src: _Records) -> list[dict[str, Any]]:
                     esr_rel,
                     "observations",
                     "every recorded observation, none of which carries a score",
+                ),
+                _verified(
+                    src.hist_wp,
+                    123,
+                    Q25_NO_ASPECT_SCORES,
+                    "the work programme of the 2025 call states the same rule",
                 ),
                 _verified(
                     annexes,
@@ -1371,35 +1722,47 @@ def _evaluator_instruction_rows(src: _Records) -> list[dict[str, Any]]:
                 "aspects a Doctoral Network proposal is graded on."
             ),
             "affects": "a number",
-            "verdict": "defaulted",
+            "verdict": "equivalent",
             "settles": "call_wide",
+            "historical_value": (
+                "the evaluation form of the 2025 call window carries the same tag grammar, and "
+                "names this action type in the tags that select the ten aspects"
+            ),
             "current_value": scorecard["provenance"]["dn_scope_rule"],
-            "declared_status": "Assumed",
+            "declared_status": "Inferred",
             "status_basis": (
                 "The grammar is the evaluation form's alone: this module refuses to render if "
-                "either application form carries an applicability tag, and neither does. So the "
-                "form-equivalence record over the two application forms cannot reach it, and no "
-                "2025 document in this repository states it."
+                "either application form carries an applicability tag, and neither does. The "
+                "2025 form carries it, and row CR-02 measures that the aspects it selects for "
+                "this action type are the scorecard's ten, each under the same criterion. One "
+                "tag's scope did move between the eras, and it does not move the selection: "
+                "the 2025 tag names a third action type that the 2026 tag does not, and this "
+                "action type is named in both. Inferred for the reason EI-02 gives."
             ),
-            "defaulting": {
-                "carried_from": "the 2026 evaluation form, through the scorecard's scope rule",
-                "affected_rule": (
-                    "which of the evaluation form's aspects are the ten a Doctoral Network "
-                    "proposal is graded on"
-                ),
-                "risk": (
-                    "If the 2025 form tagged aspects differently, the ten-aspect set is the "
-                    "wrong set and every cell is graded against an aspect the 2025 evaluators "
-                    "did not use."
-                ),
-            },
             "consequence": (
-                "The historical profile keeps the tag grammar and the scope rule, recorded as "
-                "defaulted. SM-01 shows the ten headings are the 2025 form's; it does not show "
-                "that the 2025 evaluation form selected the same ten."
+                "The historical profile keeps the tag grammar and the scope rule, cited to the "
+                "2025 form. CR-02 carries the measured selection, so no row rests on the "
+                "assumption that the two forms tagged alike."
             ),
-            "would_be_settled_by": [HIST_EF_REL.as_posix()],
             "citations": [
+                _verified(
+                    src.hist_ef,
+                    4,
+                    Q25_EF_DN_TAG,
+                    "a 2025 tag naming this action type for one of the ten aspects",
+                ),
+                _verified(
+                    src.hist_ef,
+                    4,
+                    Q25_EF_WIDE_TAG,
+                    "the one tag whose scope moved, as the 2025 form states it",
+                ),
+                _verified(
+                    ef,
+                    4,
+                    Q26_EF_WIDE_TAG,
+                    "and as the 2026 form states it, with a third action type dropped",
+                ),
                 _field_citation(
                     scorecard_rel,
                     "provenance/dn_scope_rule",
@@ -1752,9 +2115,12 @@ def _scoring_assumption_rows(src: _Records) -> list[dict[str, Any]]:
             "current_value": scoring["total_formula"],
             "declared_status": "Inferred",
             "status_basis": (
-                "Arithmetic evidence: the formula applied to the 2025 evaluation's own recorded "
-                "criterion scores reproduces its own recorded total. This module refuses to "
-                "render if it stops doing so."
+                "Arithmetic evidence, and now a rule to match it. The formula applied to the "
+                "2025 evaluation's own recorded criterion scores reproduces its own recorded "
+                "total, and this module refuses to render if it stops doing so. The work "
+                "programme of the call states the two inputs the formula is built from: a "
+                "maximum of five per criterion and the weighting row. Inferred, not Confirmed, "
+                "for the reason CR-01 gives."
             ),
             "consequence": (
                 "The historical profile keeps the total formula. It is the one scoring rule "
@@ -1765,6 +2131,18 @@ def _scoring_assumption_rows(src: _Records) -> list[dict[str, Any]]:
                     esr_rel,
                     "evaluation_result/total",
                     "the total the formula has to reproduce",
+                ),
+                _verified(
+                    src.hist_wp,
+                    123,
+                    Q25_MAXIMUM,
+                    "the work programme on the maximum each criterion is scored out of",
+                ),
+                _verified(
+                    src.hist_wp,
+                    124,
+                    Q25_WEIGHTING,
+                    "and on the weights the total applies to those scores",
                 ),
                 _field_citation(
                     scorecard_rel,
@@ -2044,8 +2422,57 @@ class _Basis:
 
 
 @dataclass(frozen=True)
+class _Capture:
+    """One capture of a document's published address by an independent archive."""
+
+    url: str
+    captured_on: str
+    #: The archive's own digest, in the archive's own format. Recorded so a
+    #: reader can ask the archive the same question, never compared here.
+    digest: str = ""
+
+
+@dataclass(frozen=True)
+class _Copy:
+    """The same bytes obtained a second, independent way."""
+
+    url: str
+    #: sha256 of that copy. Checked against the stored file when the index is
+    #: rendered, because a copy whose bytes differ corroborates nothing.
+    sha256: str
+    note: str = ""
+
+
+@dataclass(frozen=True)
+class _Provenance:
+    """Where a document's bytes came from, recorded act by act.
+
+    Facts only. Every judgement about them — whether they are the issuing
+    body's, whether they governed a closed call — is a separate field that
+    names this record as its basis.
+    """
+
+    official_url: str = ""
+    retrieved_from: str = ""
+    retrieved_on: str = ""
+    title: str = ""
+    declared_version: str = ""
+    document_date: str = ""
+    filename_note: str = ""
+    captures: tuple[_Capture, ...] = ()
+    copies: tuple[_Copy, ...] = ()
+
+
+@dataclass(frozen=True)
 class _Obtained:
-    """A document or record this repository holds, as the index declares it."""
+    """A document or record this repository holds, as the index declares it.
+
+    Three independent questions, three fields. ``authentication`` says how the
+    bytes are vouched for once they are here. ``authenticity`` says what makes
+    them the issuing body's. ``applicability`` says whether this was the
+    version in force for the era the document states rules for. A retrieval
+    settles the second and cannot settle the third.
+    """
 
     rel: Path
     cls: str
@@ -2055,15 +2482,52 @@ class _Obtained:
     version: str
     states: str
     basis: Optional[_Basis] = None
+    authenticity: str = "unrecorded"
+    authenticity_basis: str = ""
+    applicability: str = "not_applicable"
+    applicability_basis: str = ""
+    provenance: Optional[_Provenance] = None
 
 
 @dataclass(frozen=True)
 class _Absent:
-    """A 2025 document this repository does not hold, and where it will be filed."""
+    """A document this repository does not hold, and where it will be filed."""
 
     rel: Path
     cls: str
     states: str
+
+
+#: The issuing body's document root. Every published address below hangs off it.
+PORTAL = "https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027"
+#: The address the evaluation form's template is published at. One address
+#: serves whichever version is current, which is why a version in force for a
+#: closed call can only be read from an archive of it.
+EF_TEMPLATE_URL = f"{PORTAL}/horizon/temp-form/ef/ef_he-msca_en.pdf"
+#: The archive this repository read.
+ARCHIVE = "https://web.archive.org/web"
+#: The date every retrieval below was made.
+RETRIEVED_ON = "2026-10-13"
+#: The work programme part's published address, and the issuing body's second
+#: site for the same document.
+HIST_WP_URL = f"{PORTAL}/horizon/wp-call/2023-2024/wp-2-msca-actions_horizon-2023-2024_en.pdf"
+HIST_WP_MIRROR_URL = (
+    "https://marie-sklodowska-curie-actions.ec.europa.eu/sites/default/files/2025-05/"
+    "wp-2-msca-actions_horizon-2023-2024_en.pdf"
+)
+HIST_ANNEXES_URL = f"{PORTAL}/horizon/wp-call/2025/wp-14-general-annexes_horizon-2025_en.pdf"
+
+#: The sha256 of each retrieved copy, as recorded when it was retrieved. The
+#: index refuses to render if a declared copy's hash is not the stored file's,
+#: because a copy whose bytes differ corroborates nothing.
+HIST_WP_SHA = "dd1209675abd79075768093ea277ddf0afe2985f489a5514f8f219d5902fbacf"
+HIST_ANNEXES_SHA = "2f2454f28b18583af2f9684455c80d35a17bda5ded7000de0c416e3960037d81"
+EF_V22_SHA = "f7478ef7f1eac4c327c62489b66f0c8531ee890917671442846027f329bfbd2c"
+
+
+def _capture_url(timestamp: str, url: str) -> str:
+    """An archive capture address that serves the captured bytes unmodified."""
+    return f"{ARCHIVE}/{timestamp}id_/{url}"
 
 
 #: The obtained documents and records, in the order the index lists them.
@@ -2079,6 +2543,7 @@ OBTAINED: tuple[_Obtained, ...] = (
             "the MSCA Doctoral Networks application form of the 2025 call, Part B template "
             "included"
         ),
+        applicability="unresolved",
     ),
     _Obtained(
         rel=AF_V6_REL,
@@ -2097,6 +2562,36 @@ OBTAINED: tuple[_Obtained, ...] = (
         role="immutable_evidence",
         version="2.2",
         states="the evaluation form the 2026 scorecard is derived from",
+        authenticity="independently_corroborated",
+        authenticity_basis=(
+            "an independent archive of the issuing body's template address serves these bytes. "
+            "The file was already in this tree, and the archived capture was read afterwards "
+            "and agrees with it byte for byte"
+        ),
+        provenance=_Provenance(
+            official_url=EF_TEMPLATE_URL,
+            retrieved_on=RETRIEVED_ON,
+            title="Horizon Europe Evaluation Form (HE MSCA)",
+            declared_version="2.2",
+            document_date="2025-12-17",
+            captures=(
+                _Capture(
+                    url=_capture_url("20260312122434", EF_TEMPLATE_URL),
+                    captured_on="2026-03-12",
+                    digest="FQSNHZPEEYLINX6FCJHO566PIL27Y6UK",
+                ),
+            ),
+            copies=(
+                _Copy(
+                    url=_capture_url("20260312122434", EF_TEMPLATE_URL),
+                    sha256=EF_V22_SHA,
+                    note=(
+                        "the archived capture of the published address, read into a scratch "
+                        "file and hashed; it is this entry's bytes"
+                    ),
+                ),
+            ),
+        ),
     ),
     _Obtained(
         rel=GENERAL_ANNEXES_REL,
@@ -2117,7 +2612,149 @@ OBTAINED: tuple[_Obtained, ...] = (
         states="the MSCA part of the 2026-2027 work programme",
     ),
     _Obtained(
+        rel=HIST_WP_REL,
+        cls="work_programme",
+        era="historical",
+        authentication="computed_only",
+        role="immutable_evidence",
+        version="",
+        states=(
+            "the MSCA part of the work programme the 2025 call was opened under, carrying that "
+            "call's own conditions and topic text, its award criteria, its weighting and its "
+            "funding threshold"
+        ),
+        authenticity="independently_corroborated",
+        authenticity_basis=(
+            "retrieved from the issuing body's published address and, the same day, from that "
+            "body's own second site for this work programme; the two downloads agree byte for "
+            "byte, and both agree with the file pinned here"
+        ),
+        applicability="in_force_confirmed",
+        applicability_basis=(
+            "the document states the call it governs. Page 23 carries the 2025 Doctoral "
+            "Networks call heading with its identifier, its opening date and its deadline, and "
+            "the cover carries the Commission Decision the General Annexes pinned here carry too"
+        ),
+        provenance=_Provenance(
+            official_url=HIST_WP_URL,
+            retrieved_on=RETRIEVED_ON,
+            title="Horizon Europe Work Programme 2023-2025, 2. Marie Sklodowska-Curie Actions",
+            document_date="2025-05-14",
+            filename_note=(
+                "stored under the edition its cover declares. The published filename says "
+                "2023-2024, which names neither the edition nor the decision the document "
+                "itself carries, and a reader who trusted it would cite the wrong year"
+            ),
+            copies=(
+                _Copy(
+                    url=HIST_WP_MIRROR_URL,
+                    sha256=HIST_WP_SHA,
+                    note=(
+                        "the issuing body's second site for this work programme, a different "
+                        "host and a different path from the published address"
+                    ),
+                ),
+            ),
+        ),
+    ),
+    _Obtained(
+        rel=HIST_ANNEXES_REL,
+        cls="programme_guidance",
+        era="historical",
+        authentication="computed_only",
+        role="immutable_evidence",
+        version="",
+        states=(
+            "the General Annexes of the work programme the 2025 call was opened under, whose "
+            "award-criteria table refers training and mobility actions to the work programme "
+            "part pinned above"
+        ),
+        authenticity="independently_corroborated",
+        authenticity_basis=(
+            "the operator placed the file, and the issuing body's published address was read "
+            "afterwards and served the same bytes; the placement and the retrieval are "
+            "independent of each other and agree"
+        ),
+        applicability="in_force_confirmed",
+        applicability_basis=(
+            "the document's cover names the 2025 work programme and the Commission Decision "
+            "that adopted it, which is the decision the work programme part pinned here carries "
+            "as well, so the two are parts of one adopted programme"
+        ),
+        provenance=_Provenance(
+            official_url=HIST_ANNEXES_URL,
+            retrieved_from="placed by the operator, then read from the published address",
+            retrieved_on=RETRIEVED_ON,
+            title="Horizon Europe Work Programme 2025, 14. General Annexes",
+            document_date="2025-05-14",
+            copies=(
+                _Copy(
+                    url=HIST_ANNEXES_URL,
+                    sha256=HIST_ANNEXES_SHA,
+                    note="the published address, read after the operator placed the file",
+                ),
+            ),
+        ),
+    ),
+    _Obtained(
+        rel=HIST_EF_REL,
+        cls="instrument_evaluation_form",
+        era="historical",
+        authentication="computed_only",
+        role="immutable_evidence",
+        version="2.0",
+        states=(
+            "the version of the evaluation form served at the issuing body's template address "
+            "through the 2025 call window, carrying that form's own scoring, threshold and "
+            "weighting statements"
+        ),
+        authenticity="retrieved_from_web_archive",
+        authenticity_basis=(
+            "the template address serves whichever version is current and now serves a later "
+            "one, so these bytes come from an independent archive of that address. One archive "
+            "is one witness: no second, independent copy of this version was found"
+        ),
+        applicability="bracketed_not_conclusive",
+        applicability_basis=(
+            "three captures of the template address carry one archive digest, dated inside the "
+            "call window and the last of them twenty days before the deadline, and the next "
+            "distinct digest is months after it. That brackets the window without closing it. A "
+            "version served between two captures and never captured would leave no trace here"
+        ),
+        provenance=_Provenance(
+            official_url=EF_TEMPLATE_URL,
+            retrieved_from=_capture_url("20250619081843", EF_TEMPLATE_URL),
+            retrieved_on=RETRIEVED_ON,
+            title="Horizon Europe Evaluation Form (HE MSCA)",
+            declared_version="2.0",
+            document_date="2025-02-28",
+            filename_note=(
+                "stored under its declared version and date. The published address carries one "
+                "filename for every version, and that filename is already taken in this tree by "
+                "the later version pinned above"
+            ),
+            captures=(
+                _Capture(
+                    url=_capture_url("20250619081843", EF_TEMPLATE_URL),
+                    captured_on="2025-06-19",
+                    digest="ODDXOSHI52ABE7ZJQ4EWCIHCNHHR5YBU",
+                ),
+                _Capture(
+                    url=_capture_url("20251003102007", EF_TEMPLATE_URL),
+                    captured_on="2025-10-03",
+                    digest="ODDXOSHI52ABE7ZJQ4EWCIHCNHHR5YBU",
+                ),
+                _Capture(
+                    url=_capture_url("20251105174714", EF_TEMPLATE_URL),
+                    captured_on="2025-11-05",
+                    digest="ODDXOSHI52ABE7ZJQ4EWCIHCNHHR5YBU",
+                ),
+            ),
+        ),
+    ),
+    _Obtained(
         rel=ESR_REL,
+        authenticity="not_applicable",
         cls="evaluation_output",
         era="historical",
         authentication="operator_supplied",
@@ -2135,6 +2772,7 @@ OBTAINED: tuple[_Obtained, ...] = (
     ),
     _Obtained(
         rel=FIDELITY_REL,
+        authenticity="not_applicable",
         cls="submission_record",
         era="historical",
         authentication="operator_supplied",
@@ -2203,24 +2841,12 @@ OBTAINED: tuple[_Obtained, ...] = (
 #: be filed when the operator supplies it, not a claim about a file.
 NOT_OBTAINED: tuple[_Absent, ...] = (
     _Absent(
-        rel=HIST_WP_REL,
-        cls="work_programme",
-        states="the MSCA part of the work programme in force for the 2025 call",
-    ),
-    _Absent(
-        rel=HIST_ANNEXES_REL,
-        cls="programme_guidance",
-        states="the General Annexes in force for the 2025 call",
-    ),
-    _Absent(
-        rel=HIST_CALL_REL,
-        cls="call_document",
-        states="the conditions and topic text of the 2025 Doctoral Networks call",
-    ),
-    _Absent(
-        rel=HIST_EF_REL,
-        cls="instrument_evaluation_form",
-        states="the version of the evaluation form in force for the 2025 call",
+        rel=SUBMISSION_ACK_REL,
+        cls="submission_record",
+        states=(
+            "the submission's own acknowledgement of receipt, which would bind this submission "
+            "to a call identifier rather than leaving the binding declared"
+        ),
     ),
 )
 
@@ -2292,6 +2918,167 @@ def _resolved_basis(repo_root: Path, source: _Obtained) -> str:
     return source.basis.wording
 
 
+#: What a rank has to carry in its provenance record before it is more than a
+#: word. ``harness.authority_matrix`` reports the same requirement over the
+#: written index; this refuses before the index is written.
+RANK_REQUIREMENTS: tuple[tuple[str, str], ...] = (
+    ("independently_corroborated", "a capture or a corroborating copy"),
+    ("retrieved_from_official_url", "an official address and a retrieval date"),
+    ("retrieved_from_web_archive", "an archive capture and a retrieval date"),
+    ("edition_declared", "a declared version or a document date"),
+    ("bracketed_not_conclusive", "the archive captures that form the brackets"),
+)
+
+#: Ranks that claim evidence of origin, and so must say what it is.
+AUTHENTICITIES_NEEDING_A_BASIS: tuple[str, ...] = (
+    "issuer_hash_matched",
+    "independently_corroborated",
+    "retrieved_from_official_url",
+    "retrieved_from_web_archive",
+    "operator_placed",
+)
+#: Applicabilities that must say what they rest on.
+APPLICABILITIES_NEEDING_A_BASIS: tuple[str, ...] = (
+    "in_force_confirmed",
+    "edition_declared",
+    "bracketed_not_conclusive",
+)
+
+
+def _rank_is_supported(source: _Obtained, rank: str) -> bool:
+    """Whether *source*'s provenance carries what *rank* needs."""
+    prov = source.provenance
+    if rank == "independently_corroborated":
+        return prov is not None and bool(prov.captures or prov.copies)
+    if rank == "retrieved_from_official_url":
+        return prov is not None and bool(prov.official_url and prov.retrieved_on)
+    if rank == "retrieved_from_web_archive":
+        return prov is not None and bool(prov.captures and prov.retrieved_on)
+    if rank == "edition_declared":
+        return prov is not None and bool(prov.declared_version or prov.document_date)
+    if rank == "bracketed_not_conclusive":
+        return prov is not None and bool(prov.captures)
+    return True
+
+
+def _refuse_an_unevidenced_rank(source: _Obtained) -> None:
+    """Refuse a rank with no basis, or one its provenance does not carry.
+
+    The two defects are separate. A rank with no basis is this module asserting
+    a provenance; a rank whose record does not carry what the rank needs is a
+    basis that says more than the record beside it does.
+    """
+    for rank, basis, needing in (
+        (source.authenticity, source.authenticity_basis, AUTHENTICITIES_NEEDING_A_BASIS),
+        (source.applicability, source.applicability_basis, APPLICABILITIES_NEEDING_A_BASIS),
+    ):
+        if rank in needing and not basis.strip():
+            raise AuthorityAuthoringError(
+                f"{source.rel.as_posix()}: {rank} claims evidence and declares no basis"
+            )
+    for rank, needs in RANK_REQUIREMENTS:
+        if rank in (source.authenticity, source.applicability) and not _rank_is_supported(
+            source, rank
+        ):
+            raise AuthorityAuthoringError(
+                f"{source.rel.as_posix()}: {rank} needs {needs} in its provenance record"
+            )
+
+
+def _refuse_a_copy_that_is_not_this_file(source: _Obtained, sha256: str) -> None:
+    """Refuse a declared copy whose hash is not the stored file's.
+
+    A second copy is evidence only if it is the same bytes. One whose hash
+    differs is either a different document or a mis-recorded hash, and either
+    way the corroboration it is cited for does not hold.
+    """
+    prov = source.provenance
+    if prov is None:
+        return
+    for copy in prov.copies:
+        if copy.sha256 != sha256:
+            raise AuthorityAuthoringError(
+                f"{source.rel.as_posix()}: the copy at {copy.url} is recorded as "
+                f"{copy.sha256}, which is not this file's {sha256}; it corroborates nothing"
+            )
+
+
+def _provenance_entry(prov: _Provenance) -> dict[str, Any]:
+    """The provenance record, omitting every field that was not recorded."""
+    entry: dict[str, Any] = {}
+    for key, value in (
+        ("official_url", prov.official_url),
+        ("retrieved_from", prov.retrieved_from),
+        ("retrieved_on", prov.retrieved_on),
+        ("title", prov.title),
+        ("declared_version", prov.declared_version),
+        ("document_date", prov.document_date),
+        ("filename_note", prov.filename_note),
+    ):
+        if value:
+            entry[key] = value
+    if prov.captures:
+        entry["archive_captures"] = [
+            {"url": c.url, "captured_on": c.captured_on, **({"digest": c.digest} if c.digest else {})}
+            for c in prov.captures
+        ]
+    if prov.copies:
+        entry["corroborating_copies"] = [
+            {"url": c.url, "sha256": c.sha256, **({"note": c.note} if c.note else {})}
+            for c in prov.copies
+        ]
+    return entry
+
+
+def _prior_matrix(repo_root: Path) -> str:
+    """What this matrix replaces, with the replaced bytes read from the tree."""
+    path = repo_root / PRIOR_MATRIX_REL
+    if not path.is_file():
+        raise AuthorityAuthoringError(
+            f"{PRIOR_MATRIX_REL.as_posix()}: the superseded matrix is not in the tree; this "
+            "matrix declares a succession from a record nobody can read"
+        )
+    return (
+        f"the equivalence matrix authored on 2026-10-12, `{PRIOR_MATRIX_REL.as_posix()}` "
+        f"(sha256 {file_sha256(path)}). That matrix carried six defaulted rows and two "
+        "unresolved, every one of them resting on a 2025 document this repository did not "
+        "hold. Three of those documents have since been obtained, so the six defaultings are "
+        "re-derived here against the sources themselves and one new row records a difference "
+        "they revealed. The superseded matrix stays in the tree unedited: a correction to a "
+        "matrix is a successor matrix, and what was believed on 2026-10-12 is part of the "
+        "evidence. The specification's decision 3, which pinned one 2026 profile because the "
+        "2025 sources were absent, stands as written."
+    )
+
+
+def _supersession(repo_root: Path) -> str:
+    """What this index replaces, with the replaced bytes read from the tree.
+
+    The superseded pair is historical evidence and is not edited. Its hashes
+    are read here rather than written down, so a superseded record that has
+    itself moved shows up as a changed sentence instead of a restated hash that
+    no longer matches anything.
+    """
+    parts = []
+    for rel, what in ((PRIOR_INDEX_REL, "index"), (PRIOR_MATRIX_REL, "matrix")):
+        path = repo_root / rel
+        if not path.is_file():
+            raise AuthorityAuthoringError(
+                f"{rel.as_posix()}: the superseded {what} is not in the tree; this index "
+                "declares a succession from a record nobody can read"
+            )
+        parts.append(f"`{rel.as_posix()}` (sha256 {file_sha256(path)})")
+    return (
+        "the authority source index and equivalence matrix authored on 2026-10-12, "
+        + " and ".join(parts)
+        + ". Those two declared four 2025 documents absent. Three of them have since been "
+        "obtained and the fourth is not a document this repository needs, so the entries and "
+        "the rows resting on their absence are restated here. The superseded pair stays in the "
+        "tree unedited: a correction to an index is a successor index, and the record of what "
+        "was believed on 2026-10-12 is part of the evidence."
+    )
+
+
 def render_index(repo_root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """The source index. ``would_settle`` is derived from *rows*, never typed."""
     settled_by: dict[str, list[str]] = {}
@@ -2316,6 +3103,16 @@ def render_index(repo_root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str
         basis = _resolved_basis(repo_root, source)
         if basis:
             entry["authentication_basis"] = basis
+        _refuse_an_unevidenced_rank(source)
+        _refuse_a_copy_that_is_not_this_file(source, entry["sha256"])
+        entry["source_authenticity"] = source.authenticity
+        if source.authenticity_basis:
+            entry["source_authenticity_basis"] = source.authenticity_basis
+        entry["historical_applicability"] = source.applicability
+        if source.applicability_basis:
+            entry["historical_applicability_basis"] = source.applicability_basis
+        if source.provenance is not None:
+            entry["provenance"] = _provenance_entry(source.provenance)
         if source.version:
             entry["version"] = source.version
         if source.rel.suffix == ".pdf":
@@ -2333,13 +3130,15 @@ def render_index(repo_root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str
                 "class": absent.cls,
                 "era": "historical",
                 "authentication": "not_obtained",
+                "source_authenticity": "not_applicable",
+                "historical_applicability": "not_applicable",
                 "role": "immutable_evidence",
                 "states": absent.states,
                 "required": True,
                 "would_settle": sorted(settled_by.get(key, ())),
                 "path_note": (
-                    "A destination, not a document. This is where the file is filed when the "
-                    "operator supplies it."
+                    "A destination, not a document. This is where the file is filed when it is "
+                    "obtained."
                 ),
             }
         )
@@ -2347,7 +3146,7 @@ def render_index(repo_root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str
     return {
         "schema": SCHEMA_INDEX,
         "record_type": "authority_source_index",
-        "index_name": "msca_dn_authority_sources_2026-10-12",
+        "index_name": "msca_dn_authority_sources_2026-10-13",
         "subject": (
             "the authority documents of the 2025 MSCA Doctoral Networks call and of the 2026 "
             "call the current profile was written for"
@@ -2360,39 +3159,49 @@ def render_index(repo_root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str
         "current_label": CURRENT_LABEL,
         "purpose": (
             "Every document a matrix row may cite, pinned by sha256, with the era whose rules it "
-            "states, the class of authority it is and how its bytes are vouched for. The four "
-            "2025 documents this repository does not hold are entries too, so a row cannot rest "
-            "on one by assuming what it would say."
+            "states, the class of authority it is, and three separate answers about it: how its "
+            "bytes are vouched for here, what says they are the issuing body's, and whether this "
+            "was the version in force for the era it states rules for. A document this "
+            "repository does not hold is an entry too, so a row cannot rest on one by assuming "
+            "what it would say."
         ),
         "review_state": "agent_drafted_pending_operator_review",
         "declared_status": "Inferred",
         "declared_status_note": (
-            "Inferred, not Confirmed. Each hash is computed from the bytes in this tree, which "
-            "is evidence of what is here. That those bytes are the document the issuing body "
-            "published is not established for any entry: nothing in this repository records "
-            "where a stored PDF was downloaded from. Only an operator-supplied hash from the "
-            "issuing body would move this."
+            "Inferred, not Confirmed, and now for a narrower reason than before. Four documents "
+            "record where their bytes came from, and three of those were retrieved from the "
+            "issuing body's own published addresses and agree with a second, independent copy. "
+            "That is evidence of origin, and it is not a hash published by the issuing body. No "
+            "entry carries one, so byte integrity stays computed in this tree and no row rests "
+            "a Confirmed status on it. The entries with no recorded origin at all are unchanged: "
+            "for them nothing says the stored bytes are the official ones."
         ),
-        "supersedes": (
-            "nothing. This is the first authority source index on this branch. The 2026-only "
-            "pinning the specification's decision 3 recorded stands as the state it replaces, "
-            "and a correction to this index is a successor index, never an edit."
-        ),
+        "supersedes": _supersession(repo_root),
         "uncertainties": [
             "No entry is authenticated by a hash from its issuing body, so no matrix row may "
-            "declare Confirmed and none does.",
-            "The four unobtained documents cannot be fetched until the 2025 call identifier is "
-            "settled, which row CI-01 records as unresolved.",
-            "The stored evaluation form declares a version date later than the 2025 call's own "
-            "year, and whether it was in force for that call is row EI-02's open question.",
+            "declare Confirmed and none does. Three documents are corroborated by a second "
+            "independent copy, which is evidence of origin and not an issuer's hash.",
+            "The 2025 evaluation form's place in the call is bracketed and not closed. Three "
+            "captures of its published address carry one digest, the last of them twenty days "
+            "before the deadline, and a version served between captures and never captured "
+            "would leave no trace. Row EI-02 keeps that open.",
+            "The 2025 application form has no recorded origin and no established place in the "
+            "call. It was in this tree before any retrieval was made, and the five rows citing "
+            "it are Inferred for that reason.",
+            "No separate 2025 call document is held, and none is needed: the work programme "
+            "part pinned here carries the call's own conditions and topic text, and the rows "
+            "about them cite its pages.",
+            "The submission's binding to a call identifier is declared, not evidenced. The one "
+            "unobtained entry is the document that would settle it.",
             "Four entries are tracked inputs: the scorecard, the 2026 profile, the appendix "
             "mapping and the specification. Any edit to one makes the matrix stale until it is "
             "re-derived.",
         ],
         "authority_note": (
             "This index confers no authority. It records what is held and what is missing. "
-            "Pinning a document is not authenticating it, and recording a destination for an "
-            "absent document asserts nothing about a file there."
+            "Pinning a document is not authenticating it, retrieving one from its published "
+            "address is not establishing what governed a closed call, and recording a "
+            "destination for an absent document asserts nothing about a file there."
         ),
         "written_by": "tools/author_msca_dn_authority_matrix.py",
         "sources": sources,
@@ -2400,13 +3209,13 @@ def render_index(repo_root: Path, rows: Sequence[Mapping[str, Any]]) -> dict[str
 
 
 def render_matrix(
-    rows: Sequence[Mapping[str, Any]], index_sha256: str
+    rows: Sequence[Mapping[str, Any]], index_sha256: str, prior_matrix: str
 ) -> dict[str, Any]:
     """The matrix, bound to the index by the hash of the bytes written."""
     return {
         "schema": SCHEMA_MATRIX,
         "record_type": "authority_equivalence_matrix",
-        "matrix_name": "msca_dn_2025_to_2026_equivalence_2026-10-12",
+        "matrix_name": "msca_dn_2025_to_2026_equivalence_2026-10-13",
         "subject": (
             "every scoring-relevant rule of the 2025 MSCA Doctoral Networks evaluation, read "
             "against the 2026 profile"
@@ -2430,15 +3239,27 @@ def render_matrix(
             "nothing from an issuing body vouches for, and harness.authority_matrix.check "
             "refuses a Confirmed row on such a source."
         ),
-        "supersedes": (
-            "nothing. It is the first equivalence matrix on this branch. It supersedes no "
-            "record and edits none: the specification's decision 3, which pinned one 2026 "
-            "profile because the 2025 sources were absent, stands as written, and this matrix "
-            "is what a historical profile is authored from instead."
-        ),
+        "supersedes": prior_matrix,
         "uncertainties": [
-            "Six rows are defaulted and two unresolved. All eight trace to the four unobtained "
-            "2025 documents, and five of them to the 2025 evaluation form alone.",
+            "No row is defaulted. Two are unresolved, and each names what is missing: the "
+            "binding of this submission to a call, and the evaluation form version the 2025 "
+            "evaluators were given.",
+            "Twenty-five rows are Inferred and none is Confirmed. Every 2025 document here is "
+            "hashed in this tree and none carries a hash published by its issuing body, so no "
+            "row may be Confirmed on byte integrity. Three documents are corroborated by a "
+            "second independent copy, which raises what is known about their origin and not "
+            "about what governed the call.",
+            "Two 2025 authorities state different score resolutions. The work programme says "
+            "one decimal place, the evaluation form says half marks. TH-05 shows which was "
+            "applied to this submission, from a recorded score no half-mark rule could award. "
+            "It does not resolve the conflict in general, and a statement about any other 2025 "
+            "proposal must carry it.",
+            "Every row citing the 2025 evaluation form inherits EI-02's bracket. Three captures "
+            "of one archive are one witness observed three times, and a version served between "
+            "two captures and never captured would leave no trace.",
+            "The 2025 application form has no recorded origin, and nothing establishes it was "
+            "the version in force. The five rows citing it are Inferred for that reason, and "
+            "retrieving a corroborating copy of it is not attempted here.",
             "A sourced row claims what its citations measure and no more. SM-01 compares the "
             "aspect anchors in both directions; AM-01 claims an inclusion only, so a 2025 "
             "cross-reference the 2026 mapping has no row for would not have been seen.",
@@ -2448,8 +3269,9 @@ def render_matrix(
             "The rows sourced to the 2025 evaluation's own record settle what was applied to "
             "this submission. None of them settles a rule of the 2025 call, and the check "
             "refuses a call-wide claim resting only on them.",
-            "EI-01, the six score-level descriptions, is the largest unsourced input to any "
-            "numerical comparison with the 2025 result.",
+            "EI-01, the six score-level descriptions, was the largest unsourced input to a "
+            "numerical comparison. All six sentences are now located in the 2025 form, word "
+            "for word, so the comparison no longer rests on a 2026 document alone.",
             "This matrix quotes the 2025 evaluation's recorded figures. It lives beside the ESR "
             "record, outside the dev-graph root, and is not snapshotted; the blind lane's "
             "isolation rests on that exclusion and on the assessor running with no tools from "
@@ -2463,7 +3285,8 @@ def render_matrix(
         "authority_note": (
             "This matrix confers no authority and closes no gate. It records what the sources "
             "state. A row marked defaulted is a declaration that a rule is unsourced, not a "
-            "finding that it is wrong."
+            "finding that it is wrong, and a row marked equivalent is a statement about the "
+            "documents cited rather than about every rule of the call."
         ),
         "required_areas": list(REQUIRED_AREAS),
         "source_index": {"path": INDEX_REL.as_posix(), "sha256": index_sha256},
@@ -2484,7 +3307,9 @@ def render_all(repo_root: Path) -> dict[str, bytes]:
     index_sha = hashlib.sha256(index_bytes).hexdigest()
     return {
         INDEX_REL.as_posix(): index_bytes,
-        MATRIX_REL.as_posix(): canonical_json_bytes(render_matrix(rows, index_sha)),
+        MATRIX_REL.as_posix(): canonical_json_bytes(
+            render_matrix(rows, index_sha, _prior_matrix(repo_root))
+        ),
     }
 
 

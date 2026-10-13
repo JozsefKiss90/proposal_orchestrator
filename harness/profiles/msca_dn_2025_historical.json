@@ -1,0 +1,312 @@
+{
+  "schema": "pre_evaluation_profile/historical/1",
+  "profile_id": "msca_dn_2025_historical",
+  "label": "MSCA Doctoral Networks — 2025 historical pre-evaluation profile, authored from the equivalence matrix",
+  "authored_on": "2026-10-13",
+  "ticket": "V10 of plans/msca_dn_historical_validation_tickets.md",
+  "written_by": "tools/author_msca_dn_historical_profile.py",
+  "advisory": true,
+  "blocking": false,
+  "purpose": "Score the submitted 2025 original under the rules of its own call. Every element below either names the matrix rows that establish the 2025 rule, or declares what the matrix left open. An element that did neither would be the 2026 profile under another name.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "declared_status": "Inferred",
+  "declared_status_note": "Inferred, not Confirmed. Every rule here is sourced to a document of the 2025 call, and no document carries a hash published by its issuing body. The matrix declares no row Confirmed, and a profile cannot be more certain than the matrix it is authored from.",
+  "counterpart": {
+    "path": "harness/profiles/msca_dn_2026_default.json",
+    "profile_id": "msca_dn_2026_default",
+    "sha256": "308a955dada102e92212f87c43cdf28576b49f1cb2a6894acb64c2ac87a3fee2",
+    "rule": "That profile is not edited by this ticket, and its own applicability question stays open. This one is a second profile beside it, not a replacement."
+  },
+  "authored_from": {
+    "matrix": {
+      "path": "docs/tier4_orchestration_state/msca_dn/authority/equivalence_matrix_2025_2026-10-13.json",
+      "sha256": "2e1fba3b3bf5bc8609911250d66e04b70e791af091402f8cf78cb87c2da9a273",
+      "role": "tracked_input"
+    },
+    "source_index": {
+      "path": "docs/tier4_orchestration_state/msca_dn/authority/authority_source_index_2026-10-13.json",
+      "sha256": "cfb935b0e0e9c42e3e14701d870645017a89822a3792d1a58441e64b1c853575",
+      "role": "tracked_input"
+    },
+    "rule": "Both are pinned by the sha256 of their bytes. A profile read beside a matrix that has moved is stale, and the check reports it rather than scoring under it."
+  },
+  "instrument": {
+    "registry_instrument_type": "MSCA-DN",
+    "name": "MSCA Doctoral Networks",
+    "form_name": "HE MSCA Evaluation Form"
+  },
+  "option_tag_grammar": {
+    "applicable_variant": "Doctoral networks",
+    "known_variants": [
+      "Doctoral networks",
+      "Postdoctoral fellowships",
+      "Staff exchanges",
+      "COFUND Choose Europe",
+      "COFUND",
+      "Special needs allowances"
+    ],
+    "variant_prefix": "MSCA ",
+    "all_except_prefix": "all MSCA except "
+  },
+  "criteria": [
+    {
+      "id": "excellence",
+      "registry_criterion_id": "Excellence",
+      "section_ids": [
+        "excellence_section"
+      ],
+      "weight_pct": 50,
+      "threshold_score": 3
+    },
+    {
+      "id": "impact",
+      "registry_criterion_id": "Impact",
+      "section_ids": [
+        "impact_section"
+      ],
+      "weight_pct": 30,
+      "threshold_score": 3
+    },
+    {
+      "id": "implementation",
+      "registry_criterion_id": "Implementation",
+      "section_ids": [
+        "implementation_section"
+      ],
+      "weight_pct": 20,
+      "threshold_score": 3
+    }
+  ],
+  "registry_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+  "scorecard": {
+    "path": "harness/evaluator_scorecard_msca_dn.json",
+    "scorecard_id": "msca_dn_evaluation_scorecard",
+    "version": "2.2"
+  },
+  "rubric_set": {
+    "path": "harness/rubrics_msca_dn.json",
+    "rubric_set_id": "msca_dn_rubrics",
+    "version": "1.0.0"
+  },
+  "criterion_appendix_mapping": {
+    "path": "harness/criterion_appendix_mapping_msca_dn.json"
+  },
+  "structural_authority": {
+    "path": "docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf",
+    "version": "5.0",
+    "sha256": "b77f148e8875359a64594889c3c4580d10d4024aaf23d949ac67b2b6dcbf03f7",
+    "why_this_one": "The 2025 call's own application form, not the 2026 template the current profile names. Rows SM-01 and SM-02 measure the ten aspect headings and the Part B1 caps against it.",
+    "the_added_section": {
+      "matrix_row": "SM-03",
+      "what": "The 2026 template adds a Part B2 section the 2025 form does not have, so the appendix mapping's rule excluding that section has no subject here. The rule is kept and recorded as vacuous rather than deleted."
+    },
+    "origin_not_recorded": "Nothing records where this form's bytes came from, and nothing establishes it was the version in force. The source index declares both unresolved, and the five rows citing it are Inferred for that reason."
+  },
+  "implementation_mode": "standard Doctoral Network (not DN-ID, not DN-JD)",
+  "target_call": {
+    "call_id": "HORIZON-MSCA-2025-DN-01",
+    "topic_id": "HORIZON-MSCA-2025-DN-01-01",
+    "opening": "2025-05-28",
+    "deadline": "2025-11-25",
+    "source_path": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-msca-actions_horizon-2023-2025_en.pdf",
+    "source_page": 23,
+    "label": "historical assessment of the submitted 2025 original",
+    "the_call": {
+      "declared_status": "Inferred",
+      "basis": "the work programme the call was opened under states the identifier, the opening date and the deadline on the page cited here. Inferred rather than Confirmed because no hash published by the issuing body vouches for that document's bytes.",
+      "quotes": [
+        "Call - MSCA Doctoral Networks 2025 HORIZON-MSCA-2025-DN-01 Conditions for the Call",
+        "Opening: 28 May 2025 Deadline(s): 25 Nov 2025"
+      ]
+    },
+    "the_binding": {
+      "declared_status": "Assumed",
+      "basis": "two records declare that this submission was made to this call, and neither evidences it. Row CI-01 keeps that open.",
+      "matrix_row": "CI-01"
+    }
+  },
+  "scoring": {
+    "scale": "0-5, one decimal place",
+    "score_maximum": 5,
+    "individual_threshold": 3,
+    "overall_threshold": 70,
+    "overall_max": 100,
+    "total_formula": "S = 10·E + 6·I + 4·Q",
+    "weighting_is_for_ranking": "Weighting is only for the ranking (not to determine if the proposal passed the thresholds).",
+    "levels": {
+      "0": "The proposal fails to address the criterion or cannot be assessed due to missing or incomplete information.",
+      "1": "Poor. The criterion is inadequately addressed, or there are serious inherent weaknesses.",
+      "2": "Fair. The proposal broadly addresses the criterion, but there are significant weaknesses.",
+      "3": "Good. The proposal addresses the criterion well, but a number of shortcomings are present.",
+      "4": "Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.",
+      "5": "Excellent. The proposal successfully addresses all relevant aspects of the criterion. Any shortcomings are minor."
+    },
+    "the_total_the_2025_form_printed": {
+      "matrix_row": "TH-06",
+      "what": "The 2025 evaluation form prints an unweighted total out of 15 with an overall threshold of 10 points. This profile does not use it. The call's own work programme sets the threshold at 70% of the weighted total, and the recorded 2025 result is a weighted total out of 100."
+    },
+    "the_resolution_conflict": {
+      "matrix_row": "TH-05",
+      "what": "The work programme states one decimal place and the evaluation form of the call window states that half marks may be given. The recorded scores show which was applied. The conflict is not resolved for any other proposal."
+    }
+  },
+  "sourced_from_the_matrix": {
+    "criteria": {
+      "matrix_rows": [
+        "CR-01",
+        "CR-02"
+      ],
+      "verdicts": [
+        "equivalent",
+        "equivalent"
+      ]
+    },
+    "weights": {
+      "matrix_rows": [
+        "WT-01",
+        "SA-01"
+      ],
+      "verdicts": [
+        "equivalent",
+        "equivalent"
+      ]
+    },
+    "weighting_is_for_ranking": {
+      "matrix_rows": [
+        "WT-02"
+      ],
+      "verdicts": [
+        "equivalent"
+      ]
+    },
+    "individual_threshold": {
+      "matrix_rows": [
+        "TH-01"
+      ],
+      "verdicts": [
+        "equivalent"
+      ]
+    },
+    "overall_threshold": {
+      "matrix_rows": [
+        "TH-02",
+        "TH-03",
+        "TH-06"
+      ],
+      "verdicts": [
+        "equivalent",
+        "equivalent",
+        "differs"
+      ]
+    },
+    "score_maximum": {
+      "matrix_rows": [
+        "TH-04"
+      ],
+      "verdicts": [
+        "equivalent"
+      ]
+    },
+    "score_resolution": {
+      "matrix_rows": [
+        "TH-05"
+      ],
+      "verdicts": [
+        "equivalent"
+      ]
+    },
+    "score_levels": {
+      "matrix_rows": [
+        "EI-01"
+      ],
+      "verdicts": [
+        "equivalent"
+      ]
+    },
+    "scores_are_per_criterion": {
+      "matrix_rows": [
+        "EI-03"
+      ],
+      "verdicts": [
+        "equivalent"
+      ]
+    },
+    "option_tag_grammar": {
+      "matrix_rows": [
+        "EI-04"
+      ],
+      "verdicts": [
+        "equivalent"
+      ]
+    },
+    "implementation_mode": {
+      "matrix_rows": [
+        "VA-01",
+        "VA-02"
+      ],
+      "verdicts": [
+        "equivalent",
+        "equivalent"
+      ]
+    },
+    "structural_authority": {
+      "matrix_rows": [
+        "SM-01",
+        "SM-02",
+        "SM-03"
+      ],
+      "verdicts": [
+        "equivalent",
+        "equivalent",
+        "differs"
+      ]
+    },
+    "criterion_appendix_mapping": {
+      "matrix_rows": [
+        "AM-01"
+      ],
+      "verdicts": [
+        "equivalent"
+      ]
+    }
+  },
+  "declared_limitations": [
+    {
+      "element": "target_call",
+      "matrix_row": "CI-01",
+      "verdict": "unresolved",
+      "limitation": "The call's own identifier, opening and deadline are stated by the work programme the call was opened under. That this submission was entered into that call is declared by two records and evidenced by neither, so the binding is Assumed."
+    },
+    {
+      "element": "scorecard",
+      "matrix_row": "EI-02",
+      "verdict": "unresolved",
+      "limitation": "The scorecard is derived from the 2026 evaluation form, and every scoring rule it carries is sourced to a 2025 document by the rows above. Which version of the evaluation form the 2025 evaluators were given is not established: captures of the published address bracket the call window without closing it."
+    }
+  ],
+  "the_harness_own_instruments": [
+    {
+      "element": "rubric_set",
+      "matrix_rows": [
+        "SA-02",
+        "SA-03",
+        "SA-05",
+        "SA-06"
+      ],
+      "why": "The rubrics are this harness's grading instrument, not a rule of either call. No call document of either year states them, which is why the matrix carries them as era neutral rather than equivalent. They are unchanged from the 2026 profile, and that is a reuse of an instrument and not a finding that the 2025 call prescribed it."
+    },
+    {
+      "element": "assessed_text",
+      "matrix_rows": [
+        "SA-04"
+      ],
+      "why": "The text this profile is used to assess is a sanitised derivative produced after the 2025 evaluation, not the text the 2025 evaluators read."
+    }
+  ],
+  "not_evidence_of": [
+    "that the 2025 evaluators would score this text as this profile scores it",
+    "that the harness's scoring method is correct",
+    "that this profile is accepted. Acceptance is the operator's."
+  ],
+  "authority_note": "This profile confers no authority and closes no gate. It configures an out-of-band assessment. Loading it is not evidence that any assessment was run."
+}

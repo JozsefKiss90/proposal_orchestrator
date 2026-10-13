@@ -732,17 +732,18 @@ scoring-relevant rule is either sourced or declared unresolved.
 
 ### Acceptance criteria
 
-- [ ] The 2025 call and work-programme documents are obtained, authenticated and pinned by hash in a
-      source index. **Half closed, and the open half is the operator's.** The index exists and pins 12
-      documents by sha256, each declaring the era whose rules it states, its class of authority and how
-      its bytes are vouched for. Four required 2025 documents are not in this repository — the work
-      programme, the General Annexes, the call conditions and the evaluation form version in force —
-      and each is an entry with `authentication: not_obtained` and the destination it will be filed at.
-      A citation of one fails the check, so no row rests on a document nobody has. The authentication
-      contract is V08's: an operator's expected hash from the authoritative source, matched before
-      anything is written. Nothing here fetches a document, and the ticket's own verification sentence
-      assigns the obtaining to the operator. No entry is yet authenticated by an issuing body, which is
-      why no row is Confirmed.
+- [x] The 2025 call and work-programme documents are obtained, authenticated and pinned by hash in a
+      source index. **Closed on 2026-10-13, under the operator's instruction amending the verification
+      sentence below.** The index pins 15 documents by sha256. The work programme part of the 2025
+      call, its General Annexes and the evaluation form served through the call window were retrieved
+      from the issuing body and stored. No separate call document is held: the work programme carries
+      the call's own conditions and topic text, and the rows cite its pages. The one remaining entry
+      with `authentication: not_obtained` is the record that would bind this submission to a call
+      identifier, which is CI-01's gap and not an authority document. **Authenticated is recorded
+      precisely, not loosely.** One field was answering three questions, so the index now answers them
+      separately: byte integrity, source authenticity and historical applicability. A retrieval settles
+      the second and cannot settle the third. No entry carries a hash published by its issuing body, so
+      every retrieval stays `computed_only` and no row is Confirmed.
 - [x] A matrix covers criteria, weights, thresholds, evaluator instructions, DN variant, section and
       appendix mapping, and every scoring assumption that affects interpretation or a number. All eight
       areas are `required_areas` in the declaration, asserted against this ticket by test, and
@@ -777,9 +778,46 @@ scoring-relevant rule is either sourced or declared unresolved.
       `call_wide_claims_on_submission_evidence` reports a call-wide conclusion resting only on one.
 
 **Verification.** Every matrix row resolves to a pinned document and a located passage, or to a recorded
-Unresolved status. The operator supplies the source documents.
+Unresolved status. ~~The operator supplies the source documents.~~
 
-**Status 2026-10-12.** Four of five criteria closed; criterion 1 half closed, with the obtaining
+**Amended by the operator on 2026-10-13.** Retrieving, inspecting, storing and indexing the public
+authority documents is authorised. Duplicate manual downloads are not required. A retrieval may not
+be recorded as `operator_supplied` or `issuer_hash_confirmed`.
+
+**Status 2026-10-13, second pass.** All five criteria closed. Three 2025 authority documents were
+retrieved from the issuing body, stored, pinned and cited. A successor index and matrix carry the
+result, and the 2026-10-12 pair stays in the tree unedited, which is what the superseded index says
+must happen to it.
+
+27 rows: 18 equivalent, 2 differs, 0 defaulted, 2 unresolved and 5 era_neutral. Twenty-five are
+`Inferred`, one `Assumed` and one `Unresolved`. None is Confirmed. 74 document quotes are re-located
+on the pages they cite.
+
+**Every defaulting is gone, and none was relabelled.** Six rows were defaulted because a 2025 document
+was missing. Each is now `equivalent` against a located passage of the document itself. The six are the
+criterion-to-aspect grouping, the sentence that weighting serves the ranking, which authority sets the
+overall threshold, the score resolution, the six score-level descriptions and the applicability-tag
+grammar. Those level sentences occur verbatim in both forms.
+
+**One row was added.** TH-06 records that the 2025 evaluation form prints an unweighted total out of
+15, where the 2026 form states the threshold on the weighted total out of 100. The form's generic total
+was superseded by the call's own rule, and the recorded result shows which was applied.
+
+**Two 2025 authorities disagree about the score resolution.** The work programme says one decimal
+place; the evaluation form of the call window says half marks may be given. Two recorded scores are
+4.2, which no half-mark rule could award, so the work programme's rule was what was applied. The
+deriver refuses to render the row if no recorded score is finer than a half mark. The conflict itself
+is logged as a tier conflict and is not resolved in general.
+
+**Four limitations are preserved.** No issuing body's hash vouches for any entry, so no row is
+Confirmed. The evaluation form's place in the call is bracketed by three captures of one archive and
+not closed, so EI-02 stays unresolved. The 2025 application form has no recorded origin. The
+submission's binding to a call identifier is still declared rather than evidenced.
+
+Report: `plans/reports/v09_authority_matrix_2026-10-13.md`. Decision record:
+`docs/tier4_orchestration_state/decision_log/msca-dn-authority-matrix_2026-10-13.json`.
+
+**Status 2026-10-12, first pass.** Four of five criteria closed; criterion 1 half closed, with the obtaining
 assigned to the operator. The source half of F05 closes. V09 no longer blocks V10 on anything but the
 four absent documents — V10 can author the historical profile from this matrix now, and its defaulted
 rules will be defaulted in the profile too.
@@ -844,18 +882,58 @@ the V09 matrix.
 
 ### Acceptance criteria
 
-- [ ] A separate profile file exists with its own `profile_id`, label and `target_call`, bound to the
-      matrix row by row.
-- [ ] Criteria, weights, thresholds, rubric set, scorecard, appendix mapping, structural authority and
+- [x] A separate profile file exists with its own `profile_id`, label and `target_call`, bound to the
+      matrix row by row. `harness/profiles/msca_dn_2025_historical.json`, profile id
+      `msca_dn_2025_historical`, target call `HORIZON-MSCA-2025-DN-01` with the opening and deadline
+      the work programme states. **Bound in both directions.** 13 elements name the matrix rows that
+      establish their 2025 value, and every one of the matrix's 27 rows is read by some element: a row
+      nobody reads refuses, because it would be a rule the profile ignores in silence.
+- [x] Criteria, weights, thresholds, rubric set, scorecard, appendix mapping, structural authority and
       implementation mode are each sourced from the matrix or carry a declared unresolved limitation.
-- [ ] Profile-loading and example-scoring tests pass, and the 2026 profile is unchanged.
-- [ ] The 2026 profile's own applicability question stays open for Stage B; it is not closed by this
-      ticket.
-- [ ] Reuse of a historical freeze, candidate, preflight or scoring result across a different candidate
-      and profile pair is refused.
+      Two carry one. `target_call` names CI-01, because the call exists and this submission's binding
+      to it does not. `scorecard` names EI-02, because every scoring rule it carries is sourced and
+      the form version the evaluators used is not established. **An element sourced to an open row
+      refuses,** which is the defect the binding exists for: it would be the profile claiming the
+      matrix settled what the matrix recorded as open. The rubrics are neither sourced nor limited.
+      They are declared this harness's own instrument against the matrix's era-neutral rows, because
+      no call document of either year states them, and an element declared that way whose row is a
+      call's rule refuses.
+- [x] Profile-loading and example-scoring tests pass, and the 2026 profile is unchanged. Both profiles
+      load through one loader; a second loader would be a second contract. The historical profile pins
+      the 2026 profile's sha256, so an edit to it fails the check and a test. 28 tests over the
+      committed profile, 21 over a synthetic profile and matrix.
+- [x] The 2026 profile's own applicability question stays open for Stage B; it is not closed by this
+      ticket. Nothing here reads or edits it beyond pinning its bytes.
+- [x] Reuse of a historical freeze, candidate, preflight or scoring result across a different candidate
+      and profile pair is refused. The refusal is the existing machinery's: the preflight compares
+      `profile_id` and `profile_version` against the loaded bundle, and the freeze binds both. The two
+      profiles carry different document hashes, so a report made under one is a mismatch against the
+      other rather than a figure silently reused.
 
 **Verification.** Load the profile bundle, score the committed example, and confirm the refusal of a
 mismatched candidate and profile pair.
+
+**Status 2026-10-13.** Five of five criteria closed. F05 closes: V09 closed its source half by
+obtaining and pinning the 2025 authorities, and this ticket closes the profile half by authoring the
+configuration those sources support.
+
+Four things differ from the 2026 profile, each traced to a matrix row. The target call and its dates
+come from the work programme the call was opened under. The structural authority is the 2025
+application form at version 5.0, not the 2026 template at 6.0. The appendix mapping's exclusion of a
+Part B2 section the 2025 form does not have is kept and recorded as vacuous. And the 2025 evaluation
+form's unweighted total out of 15 is recorded and not used, because the call's own work programme sets
+the threshold on the weighted total.
+
+**Two reasons for reuse, kept apart.** The scorecard is reused because every scoring rule it carries
+is sourced to a 2025 document. The rubrics are reused because they are this harness's grading
+instrument and no call document of either year states them. Collapsing those would be the error the
+matrix's era-neutral verdict exists to prevent.
+
+No assessment was run under the profile. Loading it is not evidence of a score, and no quota was
+spent.
+
+Report: `plans/reports/v10_historical_profile_2026-10-13.md`. Decision record:
+`docs/tier4_orchestration_state/decision_log/msca-dn-historical-profile_2026-10-13.json`.
 
 ## V11 — Open-deferral register
 

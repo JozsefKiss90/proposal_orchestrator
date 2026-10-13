@@ -13,25 +13,54 @@ written for. A citation of an unobtained document fails `harness.authority_matri
 
 ## What is obtained
 
-| Document | Era | Class | Bytes vouched for | How | States |
-|---|---|---|---|---|---|
-| `docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf` (v5.0) | historical | instrument application form | computed only | — | the MSCA Doctoral Networks application form of the 2025 call, Part B template included |
-| `docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf` (v6.0) | current | instrument application form | computed only | — | the Part B template of the 2026 call |
-| `docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf` (v2.2) | current | instrument evaluation form | computed only | — | the evaluation form the 2026 scorecard is derived from |
-| `docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf` | current | programme guidance | computed only | — | the General Annexes of the 2026-2027 work programme |
-| `docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf` | current | work programme | computed only | — | the MSCA part of the 2026-2027 work programme |
-| `docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json` | historical | evaluation output | operator supplied | an operator transcription of the 2025 report, dated 2026-10-07, stated in the record's own `authored_by` field; no hash from an issuing body | the 2025 evaluation's own recorded result, criterion by criterion |
-| `docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json` | historical | submission record | operator supplied | the operator, named in the register's own `provenance/declared_by` field; no hash from an issuing body | the fidelity register over the sanitised copy, with the submission's declared facts |
-| `docs/tier4_orchestration_state/decision_log/msca-dn-pe01-workspace_2026-10-04.json` | cross_era | repository decision | computed only | — | the PE-01 decision, which declares the 2025 call identifier Assumed |
-| `harness/evaluator_scorecard_msca_dn.json` (v2.2) | current | derived configuration | computed only | — | the scoring contract derived from the 2026 evaluation form |
-| `harness/profiles/msca_dn_2026_default.json` | current | derived configuration | computed only | — | the 2026 pre-evaluation profile the matrix compares against |
-| `harness/criterion_appendix_mapping_msca_dn.json` | current | derived configuration | computed only | — | the criterion-to-table routing derived from the 2026 form |
-| `plans/msca_dn_pre_evaluation_spec.md` | cross_era | repository decision | computed only | — | the pre-evaluation specification, which fixes the harness's own scoring method |
+| Document | Era | Class | States |
+|---|---|---|---|
+| `docs/tier2a_instrument_schemas/application_forms/msca/af_he-msca-dn_en.pdf` (v5.0) | historical | instrument application form | the MSCA Doctoral Networks application form of the 2025 call, Part B template included |
+| `docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA DN).pdf` (v6.0) | current | instrument application form | the Part B template of the 2026 call |
+| `docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf` (v2.2) | current | instrument evaluation form | the evaluation form the 2026 scorecard is derived from |
+| `docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf` | current | programme guidance | the General Annexes of the 2026-2027 work programme |
+| `docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf` | current | work programme | the MSCA part of the 2026-2027 work programme |
+| `docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json` | historical | evaluation output | the 2025 evaluation's own recorded result, criterion by criterion |
+| `docs/tier3_project_instantiation/source_materials/msca_dn/fidelity_register.json` | historical | submission record | the fidelity register over the sanitised copy, with the submission's declared facts |
+| `docs/tier4_orchestration_state/decision_log/msca-dn-pe01-workspace_2026-10-04.json` | cross_era | repository decision | the PE-01 decision, which declares the 2025 call identifier Assumed |
+| `harness/evaluator_scorecard_msca_dn.json` (v2.2) | current | derived configuration | the scoring contract derived from the 2026 evaluation form |
+| `harness/profiles/msca_dn_2026_default.json` | current | derived configuration | the 2026 pre-evaluation profile the matrix compares against |
+| `harness/criterion_appendix_mapping_msca_dn.json` | current | derived configuration | the criterion-to-table routing derived from the 2026 form |
+| `plans/msca_dn_pre_evaluation_spec.md` | cross_era | repository decision | the pre-evaluation specification, which fixes the harness's own scoring method |
 
-No document here is authenticated by a hash from its issuing body. A document pinned in this tree
-with no recorded download provenance is `computed_only`: its bytes are fixed, and nothing says
-they are the official ones. A row resting only on such a document may not declare Confirmed, and
-the check reports it if it does.
+### Three questions, asked separately
+
+Byte integrity asks whether the bytes are fixed and reproducible. Source authenticity asks whether
+they are the ones the issuing body published. Historical applicability asks whether this was the
+version in force for the era the document states rules for. They are different questions with
+different answers, and one column answering all three is how a file hashed locally comes to read
+as an authenticated authority.
+
+| Document | Byte integrity | Source authenticity | Historical applicability |
+|---|---|---|---|
+| `af_he-msca-dn_en.pdf` | computed only | unrecorded | not applicable |
+| `Tpl_Application Form (Part B) (HE MSCA DN).pdf` | computed only | unrecorded | not applicable |
+| `ef_he-msca_en.pdf` | computed only | unrecorded | not applicable |
+| `wp-15-general-annexes_horizon-2026-2027_en.pdf` | computed only | unrecorded | not applicable |
+| `wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf` | computed only | unrecorded | not applicable |
+| `msca-dn-2025-esr.json` | operator supplied | unrecorded | not applicable |
+| `fidelity_register.json` | operator supplied | unrecorded | not applicable |
+| `msca-dn-pe01-workspace_2026-10-04.json` | computed only | unrecorded | not applicable |
+| `evaluator_scorecard_msca_dn.json` | computed only | unrecorded | not applicable |
+| `msca_dn_2026_default.json` | computed only | unrecorded | not applicable |
+| `criterion_appendix_mapping_msca_dn.json` | computed only | unrecorded | not applicable |
+| `msca_dn_pre_evaluation_spec.md` | computed only | unrecorded | not applicable |
+
+| Document | Axis | What it rests on |
+|---|---|---|
+| `msca-dn-2025-esr.json` | byte integrity | an operator transcription of the 2025 report, dated 2026-10-07, stated in the record's own `authored_by` field; no hash from an issuing body |
+| `fidelity_register.json` | byte integrity | the operator, named in the register's own `provenance/declared_by` field; no hash from an issuing body |
+
+A rank that claims evidence must name it. `check` reports any entry whose authentication,
+authenticity or applicability claims more than `unrecorded` and records no basis. No entry carries
+a hash published by its issuing body, so no row may declare Confirmed on byte integrity alone; and
+a row citing a historical source whose applicability is bracketed or unresolved may not declare
+Confirmed either, because that source fixes a wording and not a rule in force.
 
 ## What is not obtained
 
@@ -42,8 +71,8 @@ the check reports it if it does.
 | the conditions and topic text of the 2025 Doctoral Networks call | historical | call document | CI-01, EI-02 |
 | the version of the evaluation form in force for the 2025 call | historical | instrument evaluation form | CR-02, EI-01, EI-02, EI-04, TH-03, TH-05, WT-02 |
 
-Each row is open because of a document in this table. The operator supplies them; nothing in this
-repository fetches one, and no row closes by assuming what one would say.
+Each row is open because of a document in this table. No row closes by assuming what one would
+say, and a citation of one fails the check.
 
 ## What a record settles, and no more
 

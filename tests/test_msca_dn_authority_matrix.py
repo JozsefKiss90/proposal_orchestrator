@@ -136,10 +136,10 @@ class TestTheRenderer:
 
 
 class TestTheIndex:
-    def test_twelve_documents_are_obtained_and_four_are_not(self, index):
+    def test_fifteen_documents_are_obtained_and_one_is_not(self, index):
         assert len(index.sources) == 16
-        assert len(index.obtained()) == 12
-        assert len(index.missing_required()) == 4
+        assert len(index.obtained()) == 15
+        assert len(index.missing_required()) == 1
 
     def test_every_obtained_entry_pins_the_file_on_disk(self, index):
         for source in index.obtained():
@@ -151,14 +151,20 @@ class TestTheIndex:
         for source in index.missing_required():
             assert not (REPO / source.path).exists(), source.path
 
-    def test_the_four_absent_documents_are_the_2025_authorities(self, index):
-        assert {s.cls for s in index.missing_required()} == {
-            "work_programme",
-            "programme_guidance",
-            "call_document",
-            "instrument_evaluation_form",
-        }
-        assert {s.era for s in index.missing_required()} == {"historical"}
+    def test_the_one_absence_is_the_submission_binding(self, index):
+        """What is missing is no longer an authority document.
+
+        The three 2025 authorities the earlier index declared absent are held.
+        The fourth, a separate call document, is not needed: the work
+        programme part carries the call's own conditions. What remains absent
+        is the record that would bind this submission to a call.
+        """
+        (absent,) = index.missing_required()
+        assert absent.path == amx.SUBMISSION_ACK_REL.as_posix()
+        assert absent.cls == "submission_record"
+        assert absent.source_authenticity == "not_applicable"
+        assert absent.sha256 == ""
+        assert "call_document" not in {s.cls for s in index.sources}
 
     def test_no_entry_is_authenticated_by_an_issuing_body(self, index):
         # The reason no row may declare Confirmed. If this ever stops holding,
@@ -166,12 +172,21 @@ class TestTheIndex:
         # satisfied.
         assert not [s.path for s in index.sources if s.authentication == "issuer_hash_confirmed"]
 
-    def test_one_2025_document_is_held_and_it_is_the_application_form(self, index):
+    def test_the_2025_authorities_are_held_as_well_as_the_submission_records(self, index):
         historical = [s for s in index.by_era("historical") if s.obtained]
-        assert amx.AF_V5_REL.as_posix() in [s.path for s in historical]
-        # The other two 2025-era sources are about this submission, not the call.
+        held = {s.path for s in historical}
+        for rel in (
+            amx.AF_V5_REL,
+            amx.HIST_WP_REL,
+            amx.HIST_ANNEXES_REL,
+            amx.HIST_EF_REL,
+        ):
+            assert rel.as_posix() in held, rel
         assert {s.cls for s in historical} == {
             "instrument_application_form",
+            "work_programme",
+            "programme_guidance",
+            "instrument_evaluation_form",
             "evaluation_output",
             "submission_record",
         }
@@ -188,10 +203,71 @@ class TestTheIndex:
                 row = next(r for r in matrix.rows if r.id == row_id)
                 assert source.path in row.would_be_settled_by
 
-    def test_the_evaluation_form_is_the_single_largest_gap(self, index):
-        gaps = {s.cls: len(s.would_settle) for s in index.missing_required()}
-        assert gaps["instrument_evaluation_form"] == 7
-        assert gaps["instrument_evaluation_form"] == max(gaps.values())
+    def test_the_one_gap_settles_the_one_assumed_row(self, index):
+        (absent,) = index.missing_required()
+        assert absent.would_settle == ("CI-01",)
+
+    def test_the_three_questions_are_answered_separately(self, index):
+        """Every obtained entry answers all three, and none stands in for another.
+
+        The retrieved documents are the point: their bytes are hashed in this
+        tree like every other file, so byte integrity alone would read them as
+        no better evidenced than a file of unknown origin.
+        """
+        retrieved = {
+            amx.HIST_WP_REL.as_posix(),
+            amx.HIST_ANNEXES_REL.as_posix(),
+            amx.HIST_EF_REL.as_posix(),
+        }
+        for source in index.obtained():
+            assert source.authentication in am.AUTHENTICATIONS
+            assert source.source_authenticity in am.SOURCE_AUTHENTICITIES
+            assert source.historical_applicability in am.HISTORICAL_APPLICABILITIES
+            if source.path in retrieved:
+                # Origin recorded, byte integrity still only computed here.
+                assert source.authentication == "computed_only"
+                assert source.origin_recorded
+                assert source.provenance is not None
+                assert source.provenance.official_url
+                assert source.provenance.retrieved_on
+
+    def test_the_corroborated_documents_name_bytes_that_are_this_file(self, index):
+        """A second copy is evidence only if it is the same bytes."""
+        corroborated = [
+            s for s in index.obtained() if s.source_authenticity == "independently_corroborated"
+        ]
+        assert len(corroborated) == 3
+        for source in corroborated:
+            assert source.provenance is not None
+            copies = source.provenance.corroborating_copies
+            captures = source.provenance.archive_captures
+            assert copies or captures, source.path
+            for copy in copies:
+                assert copy.sha256 == source.sha256, source.path
+
+    def test_the_archived_form_does_not_claim_its_place_in_the_call(self, index):
+        """The one retrieval that cannot settle the third question.
+
+        Its address no longer serves these bytes, so one archive is the only
+        witness, and captures bracket the call window without closing it.
+        """
+        form = index.by_path()[amx.HIST_EF_REL.as_posix()]
+        assert form.source_authenticity == "retrieved_from_web_archive"
+        assert form.historical_applicability == "bracketed_not_conclusive"
+        assert not form.applicability_conclusive
+        assert form.provenance is not None
+        assert len(form.provenance.archive_captures) == 3
+        # One digest across all three: one witness, observed three times.
+        assert len({c.digest for c in form.provenance.archive_captures}) == 1
+
+    def test_no_row_citing_the_archived_form_declares_confirmed(self, matrix, index):
+        """The teeth of the third axis, read over the committed matrix."""
+        bracketed = {
+            s.path for s in index.obtained() if not s.applicability_conclusive
+        }
+        for row in matrix.rows:
+            if {c.source for c in row.citations} & bracketed:
+                assert row.declared_status != "Confirmed", row.id
 
     def test_every_vouched_entry_says_where_that_is_recorded(self, index):
         """A rank above computed_only names a field, and the field still says it."""
@@ -241,13 +317,20 @@ class TestTheRows:
     def test_the_verdicts_are_the_committed_distribution(self, matrix):
         counts = {v: len(rows) for v, rows in matrix.rows_by_verdict().items()}
         assert counts == {
-            "equivalent": 12,
-            "differs": 1,
-            "defaulted": 6,
+            "equivalent": 18,
+            "differs": 2,
             "unresolved": 2,
             "era_neutral": 5,
         }
-        assert len(matrix.rows) == 26
+        assert len(matrix.rows) == 27
+
+    def test_no_row_is_defaulted_any_more(self, matrix):
+        """The six defaultings are re-derived, not relabelled.
+
+        Each one is now equivalent because a 2025 document states the rule,
+        and the next test requires every such row to cite one.
+        """
+        assert "defaulted" not in matrix.rows_by_verdict()
 
     def test_no_row_declares_confirmed(self, matrix):
         # Criterion-adjacent, and enforced by the check: every source is
@@ -280,24 +363,39 @@ class TestTheRows:
             ]
             assert carriers, f"{row.id} claims a call-wide rule on submission evidence"
 
-    def test_every_defaulted_row_names_its_rule_and_its_risk(self, matrix):
-        defaulted = matrix.rows_by_verdict()["defaulted"]
-        for row in defaulted:
+    def test_a_defaulted_row_would_still_have_to_name_its_rule_and_its_risk(self, matrix):
+        """The invariant stays, over an empty set for now.
+
+        It is the rule a future defaulting is held to, not a statement that
+        one exists.
+        """
+        for row in matrix.rows_by_verdict().get("defaulted", ()):
             assert row.defaulting is not None
             assert row.defaulting.affected_rule.strip()
             assert row.defaulting.risk.strip()
             assert row.defaulting.carried_from.strip()
 
-    def test_every_unsourced_row_names_a_document_that_would_settle_it(self, matrix):
+    def test_every_unresolved_row_names_its_gap(self, matrix):
+        """A row that settles nothing says what is missing.
+
+        One of the two names a document that would settle it. The other
+        cannot: what would settle EI-02 is a statement from the issuing body
+        about a version it no longer publishes, which is not a file this
+        repository has a destination for. That row carries a limitation
+        instead, and leaving it unnamed is what this forbids.
+        """
         for row in matrix.rows:
             if row.verdict in ("defaulted", "unresolved"):
-                assert row.would_be_settled_by, row.id
+                assert row.would_be_settled_by or row.limitation.strip(), row.id
 
-    def test_the_one_difference_is_the_added_part_b2_section(self, matrix):
-        (row,) = matrix.rows_by_verdict()["differs"]
-        assert row.id == "SM-03"
-        assert "section 11" in row.difference
-        assert "vacuous" in row.consequence
+    def test_the_two_differences_are_the_part_b2_section_and_the_printed_total(self, matrix):
+        by_id = {r.id: r for r in matrix.rows_by_verdict()["differs"]}
+        assert set(by_id) == {"SM-03", "TH-06"}
+        assert "section 11" in by_id["SM-03"].difference
+        assert "vacuous" in by_id["SM-03"].consequence
+        # The form's own total differs; the rule that governed did not.
+        assert "out of 15" in by_id["TH-06"].difference
+        assert "superseded" in by_id["TH-06"].difference
 
     def test_every_era_neutral_row_says_why_no_era_states_it(self, matrix):
         for row in matrix.rows_by_verdict()["era_neutral"]:
@@ -325,7 +423,7 @@ class TestTheRows:
         # Non-vacuous: the ten aspect headings, the eleven appendix
         # cross-references and the fourteen hand-named passages of the scoring,
         # page-cap, mode and Part B2 rows.
-        assert checked == 35
+        assert checked == 74
 
     def test_both_criteria_tables_carry_exactly_the_scorecard_anchors(self, scorecard):
         """SM-01's second direction, re-measured off the two forms."""
@@ -343,20 +441,23 @@ class TestTheRows:
             bounding = [pages[0] - 1, pages[-1] + 1]
             assert not amx._anchors_on(document, bounding), rel.as_posix()
 
-    def test_the_resolution_is_a_defaulting_and_the_maximum_is_not(self, matrix):
-        """The split the 2025 record's own wording forces.
+    def test_the_resolution_is_decided_by_a_score_no_half_mark_rule_could_award(self, matrix):
+        """The two 2025 authorities disagree, and the result decides.
 
-        It prints the maximum beside each score and states no resolution rule,
-        so the maximum is sourced and the resolution is carried from 2026.
+        The maximum stays a separate claim from the resolution, which is the
+        split the earlier matrix got wrong in the other direction.
         """
         (maximum,) = [r for r in matrix.rows if r.id == "TH-04"]
         (resolution,) = [r for r in matrix.rows if r.id == "TH-05"]
         assert maximum.verdict == "equivalent"
         assert "resolution" not in maximum.historical_value
-        assert resolution.verdict == "defaulted"
-        assert resolution.defaulting is not None
-        assert "resolution" in resolution.defaulting.affected_rule
-        assert amx.HIST_EF_REL.as_posix() in resolution.would_be_settled_by
+        assert resolution.verdict == "equivalent"
+        assert resolution.defaulting is None
+        assert "half mark" in resolution.historical_value
+        # Both sides of the 2025 conflict are cited, not just the one that won.
+        cited = {c.source for c in resolution.citations}
+        assert amx.HIST_WP_REL.as_posix() in cited
+        assert amx.HIST_EF_REL.as_posix() in cited
 
     def test_the_ten_aspect_headings_are_cited_one_each(self, matrix, scorecard):
         (row,) = [r for r in matrix.rows if r.id == "SM-01"]
@@ -576,9 +677,97 @@ class TestTheDerivationsRefuse:
         with pytest.raises(amx.AuthorityAuthoringError, match="claims no voucher"):
             amx._resolved_basis(REPO, overclaimed)
 
-    def test_a_2025_document_arriving_at_its_destination_refuses(self, tmp_path):
+    def test_a_copy_whose_hash_is_not_this_file_refuses(self):
+        source = amx._Obtained(
+            rel=amx.HIST_WP_REL,
+            cls="work_programme",
+            era="historical",
+            authentication="computed_only",
+            role="immutable_evidence",
+            version="",
+            states="a work programme",
+            authenticity="independently_corroborated",
+            authenticity_basis="a second host served the same bytes",
+            provenance=amx._Provenance(
+                official_url="https://example.invalid/a.pdf",
+                retrieved_on="2026-10-13",
+                copies=(amx._Copy(url="https://example.invalid/b.pdf", sha256="0" * 64),),
+            ),
+        )
+        with pytest.raises(amx.AuthorityAuthoringError, match="corroborates nothing"):
+            amx._refuse_a_copy_that_is_not_this_file(source, "1" * 64)
+
+    def test_an_authenticity_claiming_evidence_with_no_basis_refuses(self):
+        source = amx._Obtained(
+            rel=amx.HIST_WP_REL,
+            cls="work_programme",
+            era="historical",
+            authentication="computed_only",
+            role="immutable_evidence",
+            version="",
+            states="a work programme",
+            authenticity="retrieved_from_official_url",
+        )
+        with pytest.raises(amx.AuthorityAuthoringError, match="declares no basis"):
+            amx._refuse_an_unevidenced_rank(source)
+
+    def test_a_rank_its_provenance_does_not_carry_refuses(self):
+        source = amx._Obtained(
+            rel=amx.HIST_EF_REL,
+            cls="instrument_evaluation_form",
+            era="historical",
+            authentication="computed_only",
+            role="immutable_evidence",
+            version="2.0",
+            states="an evaluation form",
+            applicability="bracketed_not_conclusive",
+            applicability_basis="captures surround the window",
+        )
+        with pytest.raises(amx.AuthorityAuthoringError, match="needs the archive captures"):
+            amx._refuse_an_unevidenced_rank(source)
+
+    def test_a_result_of_only_half_marks_cannot_say_which_resolution_applied(self):
+        """The refusal row TH-05 rests on.
+
+        If every recorded score were also a half mark, both 2025 rules would
+        fit the result and the row would be reading an absence of difference
+        as agreement.
+        """
+        esr = {
+            "evaluation_result": {
+                "criteria": [
+                    {"criterion_id": "excellence", "score": 4.5},
+                    {"criterion_id": "impact", "score": 4.0},
+                ]
+            }
+        }
+        with pytest.raises(amx.AuthorityAuthoringError, match="whole or half mark"):
+            amx._refuse_unless_a_score_rules_out_half_marks(esr)
+
+    def test_an_aspect_the_2025_form_groups_elsewhere_refuses(self, scorecard):
+        """Presence is not grouping.
+
+        All ten texts could be in the document and sit under the wrong
+        criterion, which is the claim the row actually makes.
+        """
+        src = amx._records(REPO)
+        moved = json.loads(json.dumps(scorecard))
+        # Give criterion 1 an aspect whose text lives in criterion 3's section.
+        third = scorecard["criteria"][2]["aspects"][0]
+        moved["criteria"][0]["aspects"] = list(moved["criteria"][0]["aspects"]) + [third]
+        with pytest.raises(amx.AuthorityAuthoringError, match="does not sit under"):
+            amx._refuse_unless_aspects_group_the_same_way(moved, src.hist_ef)
+
+    def test_an_aspect_absent_from_the_2025_form_refuses(self, scorecard):
+        src = amx._records(REPO)
+        absent = json.loads(json.dumps(scorecard))
+        absent["criteria"][0]["aspects"][0]["text"] = "a sentence no form carries"
+        with pytest.raises(amx.AuthorityAuthoringError, match="is not in the document"):
+            amx._refuse_unless_aspects_group_the_same_way(absent, src.hist_ef)
+
+    def test_a_document_arriving_at_its_destination_refuses(self, tmp_path):
         amx._refuse_present_destinations(tmp_path)
-        target = tmp_path / amx.HIST_EF_REL
+        target = tmp_path / amx.SUBMISSION_ACK_REL
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(b"%PDF-1.7\n")
         with pytest.raises(amx.AuthorityAuthoringError, match="yet a file is there"):
@@ -588,6 +777,49 @@ class TestTheDerivationsRefuse:
 # --------------------------------------------------------------------------- #
 # 5. Scope
 # --------------------------------------------------------------------------- #
+
+
+class TestTheSuccession:
+    """What the 2026-10-12 pair is now, and what must stay true of it.
+
+    A correction to an index is a successor index, which the superseded index
+    says of itself. So the earlier pair is evidence, and evidence its own
+    reader can no longer open is evidence nobody can check.
+    """
+
+    def test_the_superseded_declarations_are_still_in_the_tree(self):
+        for rel in (amx.PRIOR_INDEX_REL, amx.PRIOR_MATRIX_REL):
+            assert (REPO / rel).is_file(), rel
+
+    def test_the_superseded_pair_still_loads_and_still_checks_green(self):
+        index = am.load_source_index(REPO / amx.PRIOR_INDEX_REL, REPO)
+        matrix = am.load_matrix(REPO / amx.PRIOR_MATRIX_REL, REPO)
+        assert index.schema == "authority_source_index/1"
+        report = am.check(matrix, index, REPO)
+        assert report.green, report.lines()
+
+    def test_the_earlier_index_reads_as_declaring_no_origins(self):
+        """What a version-1 entry means under the three axes.
+
+        It declared none of them, so every entry must read as a held file with
+        no recorded origin. Reading one as corroborated would be the successor
+        lending its evidence backwards.
+        """
+        index = am.load_source_index(REPO / amx.PRIOR_INDEX_REL, REPO)
+        for source in index.obtained():
+            assert source.source_authenticity == "unrecorded"
+            assert source.provenance is None
+
+    def test_both_successors_name_their_predecessor_by_hash(self, index, matrix):
+        for record, rel in ((index, amx.PRIOR_INDEX_REL), (matrix, amx.PRIOR_MATRIX_REL)):
+            assert rel.as_posix() in record.supersedes
+            assert hashlib.sha256((REPO / rel).read_bytes()).hexdigest() in record.supersedes
+
+    def test_the_successor_is_a_second_record_and_not_an_edit(self, index, matrix):
+        assert index.source != amx.PRIOR_INDEX_REL.as_posix()
+        assert matrix.source != amx.PRIOR_MATRIX_REL.as_posix()
+        assert index.authored_on == amx.AUTHORED_ON
+        assert matrix.authored_on == amx.AUTHORED_ON
 
 
 class TestScope:
