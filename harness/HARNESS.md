@@ -149,6 +149,65 @@ and what would close it. `review_state` says who has reviewed it and `declared_s
 its own reading is — `Inferred` where a row's openness is read off the absence of a closing decision,
 because an absence is not a confirmation.
 
+## Execution readiness receipt (`execution_receipt.py` + `commands/execution_receipt.py`)
+
+A run inside a private environment is one nobody here can watch. What this repository sees afterwards
+is the report's own declarations: a model pin, a version tag, a transport name. Each is a string the
+run was told to record. None of them evidences that the named CLI answered, that the named settings
+reached it, or that the environment permitted the content to be sent.
+
+A readiness receipt is where the private operator records that evidence, before the run. It covers
+eight things: the permitted processing and export route, the CLI version as the CLI printed it, the
+model pin, and the effective settings. Then the rendered argv, the isolation verification, the
+checkpoint path, and the preflight the run is bound to. The reader refuses an incomplete one and an
+unfilled template. It also refuses one bound to a candidate or profile other than the pair named on
+the command line.
+
+### Four claims a receipt may not make
+
+**That a setting reached the provider because it was configured.** A transport renders some settings as
+arguments and drops the rest. `TRANSPORT_SETTINGS` records which, read off
+`runner/claude_transport.py`. The pinned temperature reaches no provider, because the CLI takes no
+temperature argument. The judge's token limit is never rendered either: the child's ceiling is the
+transport's own environment variable. A receipt disagreeing with that table is reported, in both
+directions.
+
+**That a working directory is a sandbox.** A fresh directory outside every clone stops the assessor
+opening this tree. The child still runs with the operator's own privileges, filesystem rights and
+network access.
+
+**That the freeze verified the isolation.** The freeze reads what a report declares about its
+invocation. Verifying that invocation is a separate act, with a separate record. An evidence item
+citing the freeze is reported, whether or not it names a condition. The rule keys on the citation
+rather than on a condition name alone, because `assessor_transport` is a condition name and also an
+ordinary word.
+
+**That a model pin is attestation.** The pin is a declared identifier, recorded in a field rather than
+in a sentence, and a receipt marking it attested is refused.
+
+### The preflight is read, not trusted
+
+The receipt's preflight block copies figures the preflight report already carries. Reading that report
+back is what makes the copy evidence. The validator compares its bytes against the recorded hash.
+Then its record type, candidate, profile, profile version, pack-set hash, import manifest and
+grounding scope, each against what the receipt records.
+
+A preflight naming no import manifest is incomplete: the manifest is named explicitly, and the
+resolver's predecessor default is never relied on. So is one that realised no pack or no criterion
+input, because identifiers that line up are not completeness. An `insufficient_context` pack is not
+among these. The pack set records it as an explicit outcome, so refusing it here would refuse a
+declared result.
+
+### Where the receipt lives
+
+Outside this repository. It holds private paths and the operator's own verification acts, so the
+command refuses one stored here. That is measured against the repository root, the way the
+subscription judge measures its working directory. `execution_receipt_template.json` is the form to
+fill in. It is refused twice over: by that rule, and because its placeholders are not evidence. The
+template leaves `review_state` and `declared_status` unfilled too: both are the operator's own
+declaration, and a pre-answered one would ship an unreviewed Confirmed. The command writes nothing.
+Its summary carries field names, counts and verdicts rather than any value the receipt holds.
+
 ## Rule-equivalence matrix (`authority_matrix.py` + `commands/authority_matrix.py`)
 
 A proposal submitted under one year's call gets assessed by a profile written for another year's.

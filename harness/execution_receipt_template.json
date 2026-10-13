@@ -1,0 +1,104 @@
+{
+  "schema": "execution_readiness_receipt/1",
+  "record_type": "harness.execution_readiness_receipt",
+  "_what_this_is": "A template, not a receipt. Every <angle-bracketed> value is a placeholder, which the reader refuses as evidence. Fill it in inside the private environment, keep it there, and validate it with 'py -3.10 -m harness.commands.execution_receipt'. The validator refuses a receipt stored inside this repository.",
+  "receipt_id": "<a name for this receipt>",
+  "authored_on": "<the date it was filled in, YYYY-MM-DD>",
+  "review_state": "<one of: agent_drafted_pending_operator_review, operator_reviewed>",
+  "declared_status": "<one of: Confirmed, Inferred, Assumed, Unresolved>",
+  "purpose": "<the run this receipt is readiness evidence for>",
+  "written_by": "<who verified these things>",
+  "transport": "claude-cli",
+  "private_clone_root": "<the private clone's root directory>",
+  "repository_revision": "<the revision the decision log names>",
+  "processing_route": {
+    "authority": "<the private environment's own rule that permits this processing, named>",
+    "processing": "<what that rule permits to be sent to the provider>",
+    "export": "<what that rule permits to leave the environment>",
+    "verified_on": "<YYYY-MM-DD>",
+    "verified_by": "<who read the rule>"
+  },
+  "cli_version": {
+    "executable": "<the resolved path of the claude executable>",
+    "version_output": "<what 'claude --version' printed>",
+    "obtained_by": "<the command run, which must invoke --version>",
+    "verified_on": "<YYYY-MM-DD>"
+  },
+  "model_identity": {
+    "pin": "<model@version, the version tag naming claude-cli>",
+    "attested": false,
+    "note": "A declared identifier. The provider attests nothing on this transport."
+  },
+  "effective_settings": [
+    {
+      "name": "model",
+      "value": "<the pinned model>",
+      "transmitted": true,
+      "transport_evidence": "rendered as --model"
+    },
+    {
+      "name": "tools",
+      "value": "",
+      "transmitted": true,
+      "transport_evidence": "rendered as --tools \"\""
+    },
+    {
+      "name": "strict_mcp_config",
+      "value": "true",
+      "transmitted": true,
+      "transport_evidence": "rendered as --strict-mcp-config"
+    },
+    {
+      "name": "working_directory",
+      "value": "<the fresh directory the child runs in>",
+      "transmitted": true,
+      "transport_evidence": "the child process's working directory"
+    },
+    {
+      "name": "temperature",
+      "value": "0",
+      "transmitted": false,
+      "transport_evidence": "the claude CLI takes no temperature argument, so the pinned value reaches no provider; robustness comes from majority voting over N samples"
+    },
+    {
+      "name": "max_tokens",
+      "value": "<the configured limit>",
+      "transmitted": false,
+      "transport_evidence": "the judge's limit is not rendered; the child's ceiling is the transport's own CLAUDE_CODE_MAX_OUTPUT_TOKENS value"
+    }
+  ],
+  "rendered_invocation": {
+    "argv": [
+      "<every argument as handed to the operating system, one per entry>"
+    ],
+    "rendered_by": "runner/claude_transport.py",
+    "working_directory": "<the directory the child ran in>"
+  },
+  "isolation_check": {
+    "working_directory": "<the same directory>",
+    "working_directory_outside_every_clone": true,
+    "operating_system_sandbox": false,
+    "evidence": [
+      "<how the blindness was verified: the tests read, the argv inspected, the directory listed>"
+    ],
+    "verified_on": "<YYYY-MM-DD>",
+    "verified_by": "<who verified it>"
+  },
+  "checkpoint": {
+    "path": "<where the run will write its checkpoint, under the private clone>",
+    "already_exists": false
+  },
+  "preflight": {
+    "report_path": "<the preflight report, absolute or relative to this receipt>",
+    "report_sha256": "<its sha256>",
+    "pack_set_hash": "<the pack-set hash it recorded>",
+    "document_id": "<the candidate document id it recorded>",
+    "profile_id": "<the profile id it recorded>",
+    "profile_path": "<the profile's path in the clone>",
+    "profile_sha256": "<the profile file's sha256>",
+    "profile_version": "<the profile version the preflight recorded>",
+    "import_manifest_path": "<the import manifest the preflight named>",
+    "import_manifest_sha256": "<its sha256, as the preflight pinned it>",
+    "grounding_scope": "<the scope the preflight declared>"
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-execution-receipt_2026-10-13",
+  "date": "2026-10-13",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation",
+  "ticket": "V13 of plans/msca_dn_historical_validation_tickets.md",
+  "gate": "G5",
+  "closes": "the evidence half of finding F04 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md. With V12's share, F04 closes. V13's completion unblocks V14.",
+  "authority": "Agent-authored under CLAUDE.md. Advisory, out-of-band QA. Closes no gate and confers no authority. The receipt describes a run this repository does not perform, and acceptance is the operator's.",
+  "decision": "The operator's pre-run evidence about a private assessment becomes a receipt with a schema and a validator. The receipt covers eight sections, the reader refuses an incomplete one, and the validator reads it against the intended Stage A pair and against what its transport actually sends. The receipt lives outside this repository, and the command refuses one stored here.",
+  "why": "The subscription assessor's controls are real and tested, but they are not runtime evidence about a private run and they are not authorisation. What this repository reads afterwards is a model pin, a version tag and a transport name, each a string the run was told to record. None of them evidences that the named CLI answered, that the named settings reached it, or that the environment permitted the content to be sent. V12 recorded all of that as the operator's own record with nothing to check it against, which is the evidence half of F04.",
+  "what_the_receipt_covers": [
+    "processing_route: the rule of the private environment that permits the processing, what may be sent, and what may leave",
+    "cli_version: the resolved executable and what the CLI printed for --version",
+    "model_identity: the pin, with attested false beside it",
+    "effective_settings: each setting, its value, whether the transport sends it, and the evidence for that",
+    "rendered_invocation: the argv as handed to the operating system, and the directory it ran in",
+    "isolation_check: the verified directory, the sandbox answer, the evidence and who verified it",
+    "checkpoint: where the run will write it, and that nothing is there yet",
+    "preflight: the report the run is bound to, pinned by the hash of its bytes"
+  ],
+  "refused_outright": {
+    "exit_code": 2,
+    "cases": [
+      "a receipt stored inside this repository, measured against the repository root",
+      "an unfilled angle-bracketed placeholder in any declared field",
+      "a missing section, a missing field, or an empty field",
+      "a transport the settings table does not cover",
+      "a wrong schema, unreadable bytes, or no file"
+    ]
+  },
+  "reported_as_a_finding": {
+    "exit_code": 1,
+    "count": 19,
+    "the_five_that_carry_the_ticket": [
+      "a setting recorded as transmitted that the transport does not send, and the reverse. TRANSPORT_SETTINGS is read off runner/claude_transport.py: the pinned temperature reaches no provider because the CLI takes no temperature argument, and the judge's token limit is never rendered because the child's ceiling is the transport's own CLAUDE_CODE_MAX_OUTPUT_TOKENS value.",
+      "a claimed operating-system sandbox. A fresh directory outside every clone is not one: the child runs with the operator's own privileges, filesystem rights and network access.",
+      "the freeze cited as the isolation evidence, whether or not a condition is named. The rule keys on the citation rather than on a condition name alone, because assessor_transport is a freeze condition and also an ordinary word; the reader holds the freeze's own BASELINE_CHECKS tuple to name the condition when one appears.",
+      "a candidate or profile other than the intended Stage A pair. The candidate is named on the command line because the original's document id is private; the profile is pinned by the bytes in this tree.",
+      "a preflight whose bytes, record type, candidate, profile, profile version, pack-set hash, import manifest or grounding scope are not the ones the receipt records. The validator reads that report rather than trusting the receipt's copy. A preflight naming no import manifest is incomplete, and so is one that realised no pack or no criterion input. An insufficient_context pack is not among these: the pack set records it as an explicit outcome, so refusing it would refuse a declared result."
+    ],
+    "the_other_ten": [
+      "a setting the receipt does not cover at all",
+      "an argv without the empty tool list or without --strict-mcp-config",
+      "a non-empty tool list",
+      "two working directories that disagree",
+      "a working directory not declared outside every clone",
+      "a working directory inside the clone",
+      "a checkpoint that already exists",
+      "a checkpoint outside the clone",
+      "a version string not read from the CLI",
+      "a pin marked attested, or one that does not name the transport"
+    ],
+    "accounting": "nine of the nineteen fields are the five named above; the other ten are listed here."
+  },
+  "artifacts": {
+    "reader_and_validator": "harness/execution_receipt.py",
+    "command": "harness/commands/execution_receipt.py",
+    "template": "harness/execution_receipt_template.json",
+    "test": "tests/harness/test_execution_receipt.py",
+    "runbook": "plans/msca_dn_pe09_runbook.md",
+    "lane_declaration": "harness/acceptance_lanes/msca_dn_historical.json",
+    "lane_document": "harness/ACCEPTANCE_LANE.md",
+    "harness_document": "harness/HARNESS.md",
+    "report": "plans/reports/v13_execution_readiness_receipt_2026-10-13.md",
+    "ledger": "plans/msca_dn_historical_validation_tickets.md"
+  },
+  "declared_values": {
+    "schema": "execution_readiness_receipt/1",
+    "required_sections": 8,
+    "findings": 19,
+    "settings_the_table_covers": 6,
+    "settings_the_transport_does_not_send": [
+      "temperature",
+      "max_tokens"
+    ],
+    "test_cases": 118,
+    "lane_area": "handoff, already not depended on by the historical run"
+  },
+  "verification": {
+    "the_validator_is_not_vacuous": "Two mutation runs. The first made four changes to harness/execution_receipt.py: the settings table was altered to say the transport sends the temperature, the sandbox refusal was disabled, the placeholder rule was disabled, and the preflight hash comparison was skipped. Seven checks failed. The second made three changes over the rules added after review: the freeze-citation key, the preflight selection check and the required written_by. Nine checks failed. The module was restored from a copy each time.",
+    "the_missing_field_sweep_is_generated": "Every field of every section is removed in turn, read off the synthetic receipt rather than hand-listed, so a field added to the schema and not to the reader fails in this module.",
+    "tests": {
+      "tests/harness/test_execution_receipt.py": 118,
+      "tests/test_msca_dn_pe09_runbook.py": 19,
+      "tests/harness/test_acceptance_lane.py": 68,
+      "tests/harness (whole directory)": "1,843 passed, 17 skipped, 0 failed. The 17 are the skips the lane declares.",
+      "the rest of the lane": "1,080 passed, 0 failed."
+    },
+    "full_suite": "Run in three chunks, because the whole-suite run was killed twice for host memory. tests/harness: 1,843 passed, 17 skipped, no failure. tests/runner: 4,353 passed, 19 failed, 65 skipped. The top-level modules and tests/tools: 964 passed, 18 failed, 4 skipped. 7,160 passed and 37 failed in total.",
+    "no_failure_is_this_tickets": "The 37 were measured again at HEAD in a throwaway worktree with this tree's .env. The tests/runner failing set is identical, node id for node id. The other chunk fails 18 where HEAD fails 23, and every one of the 18 is in HEAD's set: not a single test fails here that passes at HEAD. The five that fail only at HEAD depend on gitignored run artifacts a fresh worktree does not carry. Structurally this is expected too: runner imports no harness module, which tests/harness/test_boundary.py asserts.",
+    "typecheck": "mypy reports no error in either new module.",
+    "agnosticism": "tests/harness/test_profile.py lints all of harness for instrument literals, and tests/harness/test_execution_receipt.py asserts it again over the two new modules.",
+    "boundary": "tests/harness/test_boundary.py passes: the one-way import boundary holds.",
+    "prose": "The two plan documents pass the repository's linter with no error. harness/HARNESS.md and harness/ACCEPTANCE_LANE.md carry the same error counts they carried before this ticket; this ticket's sections add none.",
+    "quota": "none spent. No assessor ran, no runner phase was dispatched, no scoring was performed, and the frozen 74.60 baseline is untouched. The only command executed outside the suite was the new one, against a synthetic receipt in a scratch directory."
+  },
+  "review": {
+    "axes": "A standards review and a spec review ran in parallel over the finished change.",
+    "acted_on": [
+      "The report claimed fourteen remaining findings where nine were narrated and ten remained. Section 4 now accounts for all nineteen, and the two it had omitted are listed.",
+      "The template pre-answered review_state as operator_reviewed and declared_status as Confirmed while every other field was a refused placeholder, so an operator filling only the angle brackets would have shipped an unreviewed Confirmed. Both are placeholders now, and a test asserts neither is a valid value.",
+      "_discover_profile in the new command was a verbatim copy of _discover in harness/commands/historical_profile.py, docstring included. It is now historical_profile.discover_declarations, shared by both commands.",
+      "TRANSPORT_ISOLATION_EVIDENCE was imported and never used. Removed; the test still binds both transport maps to it.",
+      "A pre-loop over REQUIRED_SECTIONS raised the same message _section raises seventy lines below. Removed, and effective_settings has its own presence check.",
+      "validate and render were named against the siblings' check and Markdown render. They are check and summary_lines.",
+      "ARGV_BLINDNESS_CONTROLS.get(transport, ()) defaulted for a transport load_receipt has already refused. Indexed, and the test binds both maps to the same keys.",
+      "The freeze rule substring-scanned BASELINE_CHECKS names over free prose, so honest evidence mentioning assessor_transport would have been reported and prose citing the freeze without naming a condition would not. It keys on the citation now, with a case for each direction.",
+      "A complete preflight was identifier-completeness only: a report with no realised pack validated green. A report that realised no pack or no criterion input is now incomplete, and an insufficient_context pack is explicitly not.",
+      "written_by was optional. It is required: who verified these things is evidence."
+    ],
+    "declined": [
+      "The data clump of profile_id, profile_path, profile_sha256 and profile_version travelling together. PreflightBinding mirrors the receipt's JSON keys one for one, which is this repository's shape for a parsed declaration.",
+      "The single-key transport maps as speculative generality. The key is what makes the module transport-aware, and the test binds the keys to the freeze's own isolation table rather than to a literal."
+    ],
+    "doc_corrected_rather_than_code": "The runbook listed a mismatched binding under refusals while the code reports it at exit 1. The code is right, and section 1.1 now puts it under findings.",
+    "report_section": "plans/reports/v13_execution_readiness_receipt_2026-10-13.md section 7"
+  },
+  "side_effect": {
+    "what": "One pre-existing defect in tests/test_msca_dn_pe09_runbook.py was fixed. Its path scan paired backticks over the whole document, and a fenced block opens with three backticks where the inline-code pattern can pair only two. Each fenced block therefore left one backtick over and shifted the pairing of every inline span after it.",
+    "how_it_surfaced": "Adding the command block of the runbook's new section 1.1 dropped eight cited paths from the scan. The scan had found twelve and found five. Only the non-vacuity floor caught it.",
+    "now": "The scan removes the fenced blocks before reading inline code, and reads the documented command lines separately, where a path is an argument rather than a backticked token. Both floors are asserted, and removing the fence-stripping fails the test.",
+    "declared_status": "Confirmed",
+    "basis": "the mutation fails the test, and the eight paths are back in the scan"
+  },
+  "known_gaps": [
+    "The real receipt does not exist. It is the operator's, produced privately, and V14 is where it is produced.",
+    "The validator reads the preflight report the receipt names, so it must run where that report is: in the private clone, not in this public workspace.",
+    "review_state and declared_status are the operator's own declarations on their own receipt. The reader checks that each is one of the repository's values and cannot check that the declaration is true.",
+    "The receipt records which rule of the private environment permits the processing. It does not grant it, and section 10 of the runbook states none of those rules."
+  ],
+  "not_evidence_of": [
+    "that PE-09 has been executed, here or anywhere this repository can see",
+    "that the private environment permits any content to leave it",
+    "that a validated receipt makes a run blind. The receipt records the controls and the verification; the controls are the transport's, with their own tests",
+    "that G5 is closed. The code for it exists, and closing the gate is the operator's",
+    "that V13 is accepted. Acceptance is the operator's."
+  ]
+}

@@ -1082,20 +1082,55 @@ refuses an incomplete or mismatched one.
 
 ### Acceptance criteria
 
-- [ ] The receipt covers the permitted processing and export route, the actual CLI version, the model
+- [x] The receipt covers the permitted processing and export route, the actual CLI version, the model
       identity, the effective settings, the rendered invocation, the isolation check, the checkpoint
-      path, and a complete preflight naming its import manifest.
-- [ ] The validator refuses an incomplete receipt and refuses one whose candidate or profile bindings do
-      not match the intended Stage A pair.
-- [ ] The receipt distinguishes an external working directory from a sandbox, and records that a
+      path, and a complete preflight naming its import manifest. Eight sections, each refused when
+      absent. The preflight half is read from the report rather than taken from the receipt's copy.
+- [x] The validator refuses an incomplete receipt and refuses one whose candidate or profile bindings do
+      not match the intended Stage A pair. The candidate is named on the command line, because the
+      original's document id is private. The profile is pinned by the bytes in this tree.
+- [x] The receipt distinguishes an external working directory from a sandbox, and records that a
       configured temperature or token limit is claimed as transmitted only where the transport enforces
-      it.
-- [ ] The isolation verification is a separate receipt from the freeze record, and neither is described
-      as a check the freeze performs.
-- [ ] No private content enters this repository through the receipt.
+      it. A claimed sandbox is refused. A settings table read off the transport refuses both an
+      overstated and an understated claim.
+- [x] The isolation verification is a separate receipt from the freeze record, and neither is described
+      as a check the freeze performs. A receipt citing a freeze condition or a freeze record as its own
+      isolation evidence is reported.
+- [x] No private content enters this repository through the receipt. The command refuses a receipt
+      stored inside the repository root, and the committed template is refused on that rule.
 
 **Verification.** Validate a complete synthetic receipt and confirm refusal for each missing field and
 for a mismatched binding. The real receipt is the operator's, produced privately.
+
+**Status 2026-10-13.** Five of five criteria closed. The evidence half of F04 closes, which closes F04
+with V12. G5 has its code. The blockers cleared: V08, V10 and V12 are all in the tree.
+
+The validator is `harness/execution_receipt.py`, read by
+`py -3.10 -m harness.commands.execution_receipt`. `harness/execution_receipt_template.json` is the
+form the operator fills in privately. §1.1 of the runbook documents the command, what it refuses and
+what it reports.
+
+The refusals are measured. `tests/harness/test_execution_receipt.py` builds a synthetic receipt and a
+synthetic preflight report in a temporary directory, then removes or alters one thing per case. The
+118 cases cover eight missing sections, every field of every section, every finding, the three
+command exit codes and the committed template. The missing-field sweep is generated from the
+receipt, so a field added to the schema and not to the reader fails there. Two mutation runs
+confirmed the module is not vacuous: seven changes failed sixteen checks between them.
+
+Two things the receipt does not do. It is not authorisation — §10 of the runbook governs what may
+leave the private environment, and the receipt records which rule permits the processing rather than
+granting it. It is not a gate: the harness is never run-blocking, and nothing here evaluates one.
+
+No quota was spent. No assessor ran. The frozen 74.60 baseline is untouched. Report:
+`plans/reports/v13_execution_readiness_receipt_2026-10-13.md`. Decision record:
+`docs/tier4_orchestration_state/decision_log/msca-dn-execution-receipt_2026-10-13.json`.
+
+One pre-existing defect was fixed to land this. The runbook guard's path scan paired backticks over
+the whole document. A fenced block is three backticks, where the inline-code pattern can pair only
+two, so each fence left one over and shifted the pairing of every inline span after it. Adding
+§1.1's command block therefore dropped eight cited paths from the scan silently. The scan now removes
+the fences before reading inline code, and reads the command lines separately, where a path is an
+argument. Both floors are asserted.
 
 ## V14 — Operator: Stage A historical experiment, frozen before ESR
 

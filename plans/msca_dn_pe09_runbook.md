@@ -41,13 +41,62 @@ Before any command runs, the private environment must hold:
   (`docs/tier4_orchestration_state/decision_log/msca-dn-operator-approval_2026-10-08.json`).
 - The environment's own rules on what may leave it (§10). This runbook invents none.
 - The operator's own evidence about the assessor: which `claude` CLI, which version, which
-  configuration, and which processing route the environment permits. **[future]** Ticket V13 turns
-  that evidence into a receipt with a validator. Until it lands, the evidence is the operator's
-  record and this runbook does not stand in for it.
+  configuration, and which processing route the environment permits. A readiness receipt records it,
+  and §1.1 validates that receipt before the run.
 - The deferrals and validation cases in §2, each read before the stage it belongs to.
 
 Nothing from the private environment is written back into this public workspace except what §10
 permits.
+
+### 1.1 The readiness receipt
+
+The receipt is the operator's pre-run evidence. `harness/execution_receipt_template.json` is the
+form to fill in, in the private environment. It covers eight things:
+
+- the permitted processing and export route;
+- the `claude` CLI version, as the CLI printed it;
+- the model pin;
+- every configured setting, with whether the transport sends it;
+- the rendered argv;
+- the isolation verification;
+- the checkpoint path;
+- the preflight the run is bound to.
+
+```
+py -3.10 -m harness.commands.execution_receipt --receipt <private receipt path> --expect-candidate <original document id> --expect-profile harness/profiles/msca_dn_2025_historical.json
+```
+
+It exits 0 when the receipt is complete and bound to the intended Stage A pair. It exits 1 on a
+finding, and 2 when it refuses to read the receipt at all. What it refuses:
+
+- A receipt stored inside this repository. The receipt holds private paths and the operator's own
+  verification acts, so it stays in the private environment. The committed template is refused on
+  this rule, which is the rule working.
+- An unfilled placeholder, a missing section, a missing field and an empty one. An absent answer is
+  never read as a negative answer. The template leaves `review_state` and `declared_status`
+  unfilled too, because both are the operator's own declaration.
+
+What it reports as a finding, at exit 1:
+
+- A receipt bound to another candidate or another profile than the pair named on the command line.
+  The profile is pinned by the bytes in this tree.
+- A setting recorded as transmitted that the transport does not send, and the reverse.
+  `harness/execution_receipt.py` holds that table, derived from `runner/claude_transport.py`: the
+  pinned temperature and the judge's token limit reach no provider on this transport.
+- A claimed operating-system sandbox. There is none (§5).
+- A freeze condition or a freeze record cited as the isolation evidence. The freeze reads what a
+  report declares about its invocation; verifying the invocation is this receipt's own act, and the
+  two are separate records.
+- A rendered argv without the empty tool list or without `--strict-mcp-config`.
+- A checkpoint path that already exists, or one outside the private clone.
+- A preflight whose bytes, candidate, profile, pack set, import manifest or grounding scope are not
+  the ones the receipt records. The validator reads that report rather than trusting the copy.
+- A preflight that realised no pack or no criterion input. Identifiers that line up are not
+  completeness. An `insufficient_context` pack is not among these: the pack set records it as an
+  explicit outcome.
+
+The receipt is readiness evidence, not authorisation. §10 governs what may leave the environment,
+and this runbook states none of those rules.
 
 ## 2. Deferrals and validation cases carried from the approval
 
@@ -488,10 +537,9 @@ declaration about the original leaves only if those rules say it may.
 | A fidelity register renderer for a submitted document (§4) | stage A step 1 |
 | Claim loader, ledger statuses and E2 integration for imported documents (§9) | the grounding axis in both stages |
 | A labelled row-by-observation reading of two comparisons over different baselines (§6) | the stage-A reading against the public comparison |
-| The private execution readiness receipt and its validator, ticket V13 (§1) | the operator's pre-run evidence, not a harness command |
 | The D14 successor provenance update and the D13 adoption, if decided (§2.2) | nothing in the harness; the register bindings |
 
-The historical profile is no longer a gap. V10 authored it from V09's matrix (§3).
+Two rows have closed. V10 authored the historical profile from V09's matrix (§3), and V13 built the readiness receipt and its validator (§1.1).
 
 ## 12. Handoff statement
 

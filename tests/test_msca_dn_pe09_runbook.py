@@ -69,6 +69,8 @@ _FLAG = re.compile(r"--[a-z][a-z0-9-]*")
 _OPTION_ROW = re.compile(r"^  (-{1,2}[^\s].*)$")
 _BACKTICKED = re.compile(r"`([^`]+)`")
 _TEST_REF = re.compile(r"(tests/[\w/]+\.py)(?:::(\w+))?")
+#: A fenced block, removed before the inline-code scan.
+_FENCE = re.compile(r"```.*?```", re.DOTALL)
 
 
 # --------------------------------------------------------------------------- #
@@ -338,18 +340,46 @@ class TestTheFreezeConditions:
 
 
 class TestEveryCitationResolves:
+    """Two scans, because the runbook cites a path two ways.
+
+    Inline code is read with the fenced blocks removed first. A fence is three
+    backticks, and the inline-code pattern can pair only two of them, so each
+    fenced block left in leaves one backtick over and shifts the pairing of
+    every inline span after it. Scanning the prose with the fences out makes
+    the pairing well defined, and the command lines are then scanned on their
+    own, where a path is an argument rather than a backticked token.
+    """
+
     def _paths(self, runbook: str) -> set[str]:
-        found: set[str] = set()
-        for token in _BACKTICKED.findall(runbook):
-            token = token.strip()
-            if "<" in token or " " in token or token.startswith("."):
-                continue
-            if token.startswith(_PATH_ROOTS):
-                found.add(token.split("::", 1)[0])
-        return found
+        return self._prose_paths(runbook) | self._argument_paths(runbook)
+
+    def _keep(self, token: str) -> str | None:
+        token = token.strip()
+        if "<" in token or " " in token or token.startswith("."):
+            return None
+        if not token.startswith(_PATH_ROOTS):
+            return None
+        return token.split("::", 1)[0]
+
+    def _prose_paths(self, runbook: str) -> set[str]:
+        prose = _FENCE.sub("", runbook)
+        return {
+            kept
+            for token in _BACKTICKED.findall(prose)
+            if (kept := self._keep(token)) is not None
+        }
+
+    def _argument_paths(self, runbook: str) -> set[str]:
+        return {
+            kept
+            for line in _command_lines(runbook)
+            for token in line.split()
+            if (kept := self._keep(token)) is not None
+        }
 
     def test_the_scan_finds_paths(self, runbook: str) -> None:
-        assert len(self._paths(runbook)) >= 10
+        assert len(self._prose_paths(runbook)) >= 10
+        assert len(self._argument_paths(runbook)) >= 2
 
     def test_every_cited_path_exists(self, runbook: str) -> None:
         missing = sorted(p for p in self._paths(runbook) if not (REPO / p).exists())

@@ -52,6 +52,8 @@ from harness.record_binding import (
 
 __all__ = [
     "SCHEMA",
+    "PROFILE_DIR",
+    "discover_declarations",
     "SOURCING_VERDICTS",
     "HistoricalProfileError",
     "SourcedElement",
@@ -75,8 +77,30 @@ SCHEMA = "pre_evaluation_profile/historical/1"
 SOURCING_VERDICTS: tuple[str, ...] = ("equivalent", "differs", "era_neutral")
 
 
+#: Where profile declarations live, relative to the repository root.
+PROFILE_DIR = Path("harness/profiles")
+
+
 class HistoricalProfileError(ValueError):
     """A declaration this reader refuses to read."""
+
+
+def discover_declarations(repo_root: Path) -> list[Path]:
+    """Every declaration under :data:`PROFILE_DIR` carrying :data:`SCHEMA`.
+
+    Found by schema rather than by filename, because a filename would name an
+    instrument and this package may not. A caller that gets other than one
+    path asks the operator which, rather than picking.
+    """
+    found: list[Path] = []
+    for path in sorted((repo_root / PROFILE_DIR).glob("*.json")):
+        try:
+            head = path.read_text(encoding="utf-8-sig")
+        except OSError:
+            continue
+        if f'"{SCHEMA}"' in head:
+            found.append(path)
+    return found
 
 
 # --------------------------------------------------------------------------- #

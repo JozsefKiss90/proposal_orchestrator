@@ -15,27 +15,9 @@ from typing import Optional, Sequence
 
 from harness import historical_profile as hp
 
-#: Where profile declarations live. The command finds the historical one by its
-#: schema rather than by its filename, because a filename would name an
-#: instrument and this package may not.
-PROFILE_DIR = Path("harness/profiles")
-
 
 def _reading_path(profile_path: Path) -> Path:
     return profile_path.with_suffix(".md")
-
-
-def _discover(repo_root: Path) -> list[Path]:
-    """Every profile declaration carrying the historical schema."""
-    found: list[Path] = []
-    for path in sorted((repo_root / PROFILE_DIR).glob("*.json")):
-        try:
-            head = path.read_text(encoding="utf-8-sig")
-        except OSError:
-            continue
-        if f'"{hp.SCHEMA}"' in head:
-            found.append(path)
-    return found
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -60,7 +42,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if args.profile:
         profile_path = repo_root / args.profile
     else:
-        found = _discover(repo_root)
+        found = hp.discover_declarations(repo_root)
         if len(found) != 1:
             where = ", ".join(p.as_posix() for p in found) or "none"
             print(
