@@ -1010,23 +1010,62 @@ V12 remains blocked by V07 and V10.
 
 ### Acceptance criteria
 
-- [ ] The planted-marker claim is corrected: it is a transport and isolation test, not a runtime freeze
-      step. The documented freeze check list matches `BASELINE_CHECKS` after V04.
-- [ ] Checkpointing's automatic default is stated, and the private handoff records the exact checkpoint
+- [x] The planted-marker claim is corrected: it is a transport and isolation test, not a runtime freeze
+      step. The documented freeze check list matches `BASELINE_CHECKS` after V04. Section 5 enumerates
+      the 22 conditions in the order the freeze runs them, and cites the planted-marker test among the
+      transport and isolation controls instead. Both halves are measured:
+      `tests/test_msca_dn_pe09_runbook.py::TestTheFreezeConditions` fails when the enumeration and the
+      tuple disagree, and when either freeze heading mentions a marker.
+- [x] Checkpointing's automatic default is stated, and the private handoff records the exact checkpoint
       path and preserves malformed responses and any salvage decision. Recovery is stated as no
-      permission to replace an inconvenient valid sample.
-- [ ] The historical defaulting instruction is replaced by the V09 and V10 sourcing requirement.
-- [ ] Original-import instructions use the V07 configuration route and the V08 dry import.
-- [ ] The guaranteed-refusal cross-baseline `diff` command leaves the operational success path, replaced
-      by an explicitly labelled row-by-observation comparison of the two readings.
-- [ ] Stage B reuse of Sections 4 to 6 explicitly excludes the ESR comparison, its review and its diff.
-- [ ] Declared model and temperature values are described as declared identifiers. An external working
+      permission to replace an inconvenient valid sample. Section 5 states the default path under
+      `--repo-root`, the three flags that change it, the discard record a malformed response leaves
+      behind, the two-redraw budget, and the `salvage` command with the flags that bind its checkpoint.
+- [x] The historical defaulting instruction is replaced by the V09 and V10 sourcing requirement.
+      Section 3 names both profiles, the pinned source index, the matrix, the two commands that check
+      the profile against them, and the two elements whose matrix rows are still open.
+- [x] Original-import instructions use the V07 configuration route and the V08 dry import. Section 4
+      selects `--document official_original`, prints what that configuration still needs, and points at
+      `plans/msca_dn_v08_original_dry_import_procedure.md`. The five undeclared fields and the missing
+      register renderer stay declared gaps.
+- [x] The guaranteed-refusal cross-baseline `diff` command leaves the operational success path, replaced
+      by an explicitly labelled row-by-observation comparison of the two readings. No command line names
+      the public comparison, which a test asserts. The refusal is explained where the command stood, and
+      the manual reading states which cause of a moved row it cannot distinguish.
+- [x] Stage B reuse of Sections 4 to 6 explicitly excludes the ESR comparison, its review and its diff.
+      Section 8 reuses Sections 4 and 5 and the `audit` command alone, and says why `compare`, `review`
+      and `diff` do not apply.
+- [x] Declared model and temperature values are described as declared identifiers. An external working
       directory is distinguished from an operating-system sandbox, and tool disabling from authorisation
-      to transmit private content.
-- [ ] Every command in the runbook is verified against current help output before it is documented.
+      to transmit private content. Section 5 carries all three, and records that the pinned temperature
+      reaches no provider: the `claude` CLI takes no temperature argument.
+- [x] Every command in the runbook is verified against current help output before it is documented.
+      Verified by test rather than by reading. Every documented flag is read back from that command's
+      own `--help`, and every flag its parser marks required must appear on the documented line.
 
 **Verification.** Walk each documented command against its implementation and tests. The runbook keeps
 labelling PE-09 as unexecuted in this repository.
+
+**Status 2026-10-13.** Eight of eight criteria closed. F12 closes. V12's share of F04 closes, and the
+evidence half of F04 stays with V13, which this ticket now unblocks. The blockers cleared: V04, V06 and
+V07 are committed, and V10 is in the tree.
+
+The corrections are measured rather than reviewed. `tests/test_msca_dn_pe09_runbook.py` reads every
+documented command line and asks each command for its own `--help`. It fails on a flag the parser does
+not accept, and on a required flag the line omits. A mutation run confirmed it is not vacuous: renaming
+one flag and dropping one condition name failed three checks. The module is registered in the
+acceptance lane's new `handoff` area, which the historical run does not depend on.
+
+No quota was spent. No assessor ran. No command but `--help`, `--check`, `--describe` and
+`--environment` was executed,
+and the frozen 74.60 baseline is untouched. Report:
+`plans/reports/v12_pe09_runbook_corrected_2026-10-13.md`. Decision record:
+`docs/tier4_orchestration_state/decision_log/msca-dn-pe09-runbook_2026-10-13.json`.
+
+One test contract changed. `tests/harness/test_acceptance_lane.py` held that no box in this section is
+checked, which was right while the G4 acceptance was the only thing that could have checked one. It now
+holds that the section still records the acceptance closing none of these corrections, and that the
+closure above names its own date and work.
 
 ## V13 — Private execution readiness receipt and its validator
 

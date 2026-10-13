@@ -1,0 +1,119 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-pe09-runbook_2026-10-13",
+  "date": "2026-10-13",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN historical validation",
+  "ticket": "V12 of plans/msca_dn_historical_validation_tickets.md",
+  "gate": "G2, G4 and G5",
+  "closes": "finding F12 of plans/reports/MSCA_DN_Readiness_Audit_2026-10-08.md, and V12's share of F04. The evidence half of F04 stays with V13, which this ticket unblocks.",
+  "authority": "Agent-authored under CLAUDE.md. Advisory, out-of-band QA. Closes no gate and confers no authority. The runbook describes an execution this repository does not perform, and acceptance is the operator's.",
+  "decision": "The PE-09 runbook is corrected to describe only what the code does, and its operational claims are bound to a test rather than to a review. Every documented command line is read back against its own --help, the enumerated freeze conditions are compared with BASELINE_CHECKS, and every path, test module and test class it cites must exist.",
+  "why": "The runbook is the only artifact of this milestone a human executes, and it executes in a private network nobody here can watch. A stale claim is therefore discovered by the operator, mid-run, at the cost of a step. It had already happened once: V06 made --grounding-scope required and every documented preflight and assess line was wrong until V06 corrected them. A reviewed document decays at the speed of the code; a measured one fails in this suite instead.",
+  "corrections": [
+    {
+      "claim_before": "The freeze checks fifteen baseline conditions, including the planted-marker test.",
+      "now": "The freeze runs 22 conditions, enumerated in Section 5 in the order it runs them, and no marker check is among them. The planted-marker test is cited where it belongs, among the transport and isolation controls.",
+      "measured_by": "tests/test_msca_dn_pe09_runbook.py::TestTheFreezeConditions"
+    },
+    {
+      "claim_before": "Checkpointing is a flag to remember: 'record every call's response through the checkpoint (--checkpoint, --resume)'.",
+      "now": "Checkpointing is the default. The default path, the three flags that change it, the verbatim discard record a malformed response leaves, the two-redraw budget and the salvage command are all stated, and the private handoff records the exact checkpoint path.",
+      "measured_by": "tests/test_msca_dn_pe09_runbook.py::TestTheCorrectionsHold::test_checkpointing_is_described_as_the_default"
+    },
+    {
+      "claim_before": "The 2025 call text and work programme are not stored in this repository, so the historical profile is a hand-authored copy of the 2026 profile with its differences listed.",
+      "now": "V09 pinned the 2025 authorities and V10 authored the profile from the equivalence matrix over them. Section 3 names both profiles, the pinned index, the matrix, the two checking commands and the two elements whose matrix rows are still open.",
+      "measured_by": "tests/test_msca_dn_pe09_runbook.py::TestTheCorrectionsHold::test_the_historical_profile_is_the_one_on_this_build"
+    },
+    {
+      "claim_before": "The importer reads a fixed revision table and takes only --check and --repo-root; the original cannot be imported until the table is made selectable.",
+      "now": "V07 made the configuration selectable. Section 4 runs --document official_original --describe, reports the five required fields that configuration still lacks, and routes the measurement through V08's dry-import procedure.",
+      "measured_by": "tests/test_msca_dn_pe09_runbook.py::TestTheCorrectionsHold::test_the_import_route_is_v07s_with_v08s_measurement"
+    },
+    {
+      "claim_before": "A cross-baseline diff command on the success path, with a paragraph underneath saying it will be refused.",
+      "now": "No command line names the public comparison. The refusal is explained where the command stood, the replacement is a labelled row-by-observation reading, and the diff command that remains is the one that applies: two comparisons over the same private baseline.",
+      "measured_by": "tests/test_msca_dn_pe09_runbook.py::TestTheDocumentedCommands::test_no_command_line_names_the_public_comparison"
+    },
+    {
+      "claim_before": "Stage B uses 'the commands of Sections 4 to 6', with one sentence excusing compare.",
+      "now": "Stage B reuses Sections 4 and 5 and the audit command alone. compare, review and diff do not apply, because the resubmission has no evaluation summary report of its own.",
+      "measured_by": "tests/test_msca_dn_pe09_runbook.py::TestTheCorrectionsHold::test_stage_b_excludes_the_esr_comparison"
+    },
+    {
+      "claim_before": "The model and version pins read as properties of the run.",
+      "now": "They are declared identifiers. The report records model@version and nothing else about the assessor, and neither string attests that the named model answered. The pinned temperature of 0 reaches no provider, because the claude CLI takes no temperature argument; robustness comes from majority voting over N samples.",
+      "measured_by": "tests/test_msca_dn_pe09_runbook.py::TestTheCorrectionsHold::test_the_declared_identifiers_are_called_declared"
+    },
+    {
+      "claim_before": "Isolation was listed as enforced controls, with no statement of what they are not.",
+      "now": "The three controls stay, each with its test. Beside them: an external working directory is not an operating-system sandbox, and disabling tools is not authorisation to send private proposal content to a provider. Section 10 and the prerequisites govern that.",
+      "measured_by": "tests/test_msca_dn_pe09_runbook.py::TestTheCorrectionsHold::test_isolation_is_distinguished_from_authorisation"
+    }
+  ],
+  "artifacts": {
+    "runbook": "plans/msca_dn_pe09_runbook.md",
+    "test": "tests/test_msca_dn_pe09_runbook.py",
+    "lane_declaration": "harness/acceptance_lanes/msca_dn_historical.json",
+    "lane_document": "harness/ACCEPTANCE_LANE.md",
+    "report": "plans/reports/v12_pe09_runbook_corrected_2026-10-13.md",
+    "ledger": "plans/msca_dn_historical_validation_tickets.md",
+    "harness_document": "harness/HARNESS.md"
+  },
+  "declared_values": {
+    "baseline_conditions_enumerated": 22,
+    "documented_command_lines": 14,
+    "commands_covered": [
+      "harness.commands.blind_assessment preflight",
+      "harness.commands.blind_assessment assess",
+      "harness.commands.blind_assessment salvage",
+      "harness.commands.blind_assessment freeze",
+      "harness.commands.blind_assessment audit",
+      "harness.commands.blind_assessment compare",
+      "harness.commands.blind_assessment review",
+      "harness.commands.blind_assessment diff",
+      "harness.commands.historical_profile",
+      "tools.author_msca_dn_historical_profile",
+      "tools.import_external_proposal",
+      "tools.dry_import_original"
+    ],
+    "new_lane_area": {
+      "name": "handoff",
+      "depended_on": false,
+      "why_not_depended_on": "The runbook governs the private PE-09 execution. This repository's historical run does not read it."
+    }
+  },
+  "verification": {
+    "the_guard_is_not_vacuous": "A mutation run renamed --grounding-scope to --grounding-scopes on one line and dropped the final 's' from one condition name. Three checks failed: the documented-flag check, the required-flag check and the enumeration check. The runbook was restored from a copy taken before the mutation.",
+    "help_output": "Every flag is read from the command's own --help through this interpreter. No command but --help, --check, --describe and --environment was executed.",
+    "tests": {
+      "tests/test_msca_dn_pe09_runbook.py": 19,
+      "tests/harness/test_acceptance_lane.py": 68
+    },
+    "prose": "The repository's prose linter passes on the runbook: no errors.",
+    "quota": "none spent. No assessor ran, no runner phase was dispatched, no scoring was performed, and the frozen 74.60 baseline is untouched.",
+    "two_axis_review": "A standards review and a spec review ran in parallel over the finished change. Five findings were acted on: the salvage line gained --n, --criterion-n and --out-dir, which bind the checkpoint; section 6 no longer collides with section 5 on a step number; the same-baseline diff names the input that produces its after-side; the investigation list has its own heading rather than reading as that diff's output; and harness/HARNESS.md no longer says the lane document names sixteen areas. Three were declined with a stated reason, recorded in the report's section 10.",
+    "full_suite": "7,575 passed, 194 failed, 86 skipped. The failures are the branch's known whole-run inflation, measured at 207 on 2026-10-07 against 54 per directory. None is in a module this ticket touches."
+  },
+  "known_gaps": [
+    "The runbook still describes an execution that has not happened. Nothing here is a result.",
+    "Five required fields of the original's document configuration are undeclared, so the original cannot be imported on this build.",
+    "No tool compares two comparisons over different baselines. The cross-baseline reading stays a labelled manual reading.",
+    "The grounding axis stays unassessable for an imported proposal until ticket X01.",
+    "The operator's pre-run evidence about the assessor CLI, its version and the permitted processing route is a record without a validator until V13.",
+    "The runbook is over its length budget. docs/style/internal-docs-profile.md section 5 budgets a Plan at 2,500 words and says an over-budget document is split rather than compressed; the runbook was 2,525 words before this ticket and is 3,577 now. Compressing it would undo the ticket, so the report proposes the smallest split - section 2, whose deferral table already exists as a register - and leaves the decision to the operator."
+  ],
+  "not_evidence_of": [
+    "that PE-09 has been executed, or that any command here has been run against the original",
+    "that the private environment permits any content to leave it",
+    "that the documented sequence is sufficient, only that each command it names exists with the flags it names",
+    "that V12 is accepted. Acceptance is the operator's."
+  ],
+  "side_effect": {
+    "what": "One test contract changed. tests/harness/test_acceptance_lane.py held that no acceptance box in the V12 ticket section is checked.",
+    "now": "It holds that the section keeps the G4 acceptance's limit as written, and that a checked box is accompanied by the dated status of the work that closed it.",
+    "declared_status": "Confirmed",
+    "basis": "the test fails on an undated closure and passes on the dated one"
+  }
+}

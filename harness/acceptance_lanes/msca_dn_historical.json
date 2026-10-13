@@ -120,6 +120,14 @@
       "depended_on": true
     },
     {
+      "name": "handoff",
+      "invariant": "The operator-facing PE-09 runbook describes only what the code does. Every flag a documented command line carries is one its parser accepts. Every flag a parser marks required is documented. The enumerated freeze conditions are the code's own list. Every path, test module and test class the runbook cites exists. The historical run does not depend on this invariant, because the runbook governs the private PE-09 execution.",
+      "modules": [
+        "tests/test_msca_dn_pe09_runbook.py"
+      ],
+      "depended_on": false
+    },
+    {
       "name": "deferrals",
       "invariant": "Every item the operator approval of 2026-10-08 left open is registered with its owner, the evidence that would close it and whether the submitted original is needed, and a row marked closed without that evidence fails the register's check. Nothing closes by inheritance. The historical run does not depend on this invariant: the register gates the milestone's acceptance (V11 blocks V14), not the correctness of a Stage A reading.",
       "modules": [

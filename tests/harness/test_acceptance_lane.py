@@ -604,13 +604,26 @@ class TestTheG4Acceptance:
         assert "not applicable" in acceptance
         assert "74.60" in acceptance
 
-    def test_v12_still_carries_its_own_open_statement(self, ledger: str) -> None:
+    def test_v12_does_not_read_its_closure_into_the_g4_acceptance(
+        self, ledger: str
+    ) -> None:
         """Read from V12's side too: a reader who opens the ticket must not take
-        the G4 closure as closing it."""
+        the G4 closure as closing it.
+
+        Retires the pre-closure guard, which held that no box in the section is
+        checked. That guard was right while V12 was open, because the G4
+        acceptance was then the only thing that could have checked one, and it
+        closed none of these corrections. V12's own work closed them on
+        2026-10-13. What has to be guarded now is the attribution: the section
+        keeps the acceptance's limit as written, and dates its closure to the
+        work that earned it."""
         v12 = _section(ledger, "## V12 ")
         assert "Still open after the G4 acceptance" in v12
         assert "F04 and F12 stay open" in v12
-        assert not any(i.startswith("- [x]") for i in _checkbox_items(v12)), v12
+        if any(i.startswith("- [x]") for i in _checkbox_items(v12)):
+            assert "Status 2026-10-13" in v12, (
+                "a closed criterion with no dated status reads as closed by the acceptance"
+            )
 
     def test_the_acceptance_closes_no_other_gate(self, acceptance: str) -> None:
         assert "G1, G2, G3, G5, G6 and G7 are untouched" in acceptance
