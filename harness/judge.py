@@ -60,6 +60,7 @@ __all__ = [
     "JudgeResult",
     "MajorityJudgeResult",
     "Judge",
+    "build_judge_backend",
     "drafter_models",
     "resolve_judge_config",
 ]
@@ -195,6 +196,44 @@ def resolve_judge_config() -> JudgeConfig:
 
 
 # --------------------------------------------------------------------------- #
+# Backend construction
+# --------------------------------------------------------------------------- #
+
+
+def build_judge_backend(provider: Any, config: JudgeConfig) -> Backend:
+    """Build the real judge backend for a resolved provider configuration.
+
+    The judge model is pinned authoritatively from *config*, whatever model
+    the environment names.  Temperature and the token limit come from *config*
+    too.  A ``bedrock_converse`` provider builds the native Converse backend,
+    which needs no base URL (AN1a); every other non-CLI provider builds the
+    OpenAI-compatible HTTP backend, as before.
+
+    Raises
+    ------
+    JudgeIndependenceError
+        If *provider* is the ``claude_cli`` drafter transport.
+    """
+    from runner.transport.config import build_converse_backend, build_openai_backend
+
+    if provider.backend_name == "claude_cli":
+        raise JudgeIndependenceError(
+            "The independent judge requires a non-drafter API transport "
+            "(OpenAI-compatible or Bedrock Converse), but the resolved backend "
+            "is 'claude_cli' (the drafter transport). "
+            "Set ORCHESTRATOR_TRANSPORT_PRESET / ORCHESTRATOR_TRANSPORT_BACKEND "
+            "to a non-Claude backend for grader–generator independence."
+        )
+    provider = dataclasses.replace(provider, model=config.model)
+    build = (
+        build_converse_backend
+        if provider.backend_name == "bedrock_converse"
+        else build_openai_backend
+    )
+    return build(provider, temperature=config.temperature, max_tokens=config.max_tokens)
+
+
+# --------------------------------------------------------------------------- #
 # Result bundles
 # --------------------------------------------------------------------------- #
 
@@ -272,9 +311,10 @@ class Judge:
         :class:`~runner.transport.tool_loop.ToolLoopBackend` shape).  When
         supplied, no network or ``httpx`` is touched — the path used by tests
         and by callers that wire their own transport.  When ``None``, a real
-        OpenAI-compatible backend is built lazily from
-        ``resolve_provider_config()`` on first use, and a ``claude_cli`` transport
-        is rejected for independence.  Note: the *transport*-independence check
+        backend is built lazily from ``resolve_provider_config()`` on first use
+        (:func:`build_judge_backend`): native Converse for ``bedrock_converse``,
+        OpenAI-compatible otherwise, and a ``claude_cli`` transport is rejected
+        for independence.  Note: the *transport*-independence check
         (non-``claude_cli``) applies only to the default-built backend — the
         judge cannot introspect an arbitrary injected callable's transport, so
         on the injected path transport independence is the caller's
@@ -363,23 +403,9 @@ class Judge:
         if self._backend is not None:
             return self._backend
 
-        from runner.transport.config import build_openai_backend, resolve_provider_config
+        from runner.transport.config import resolve_provider_config
 
-        provider = resolve_provider_config()
-        if provider.backend_name == "claude_cli":
-            raise JudgeIndependenceError(
-                "The independent judge requires an OpenAI-compatible transport, "
-                "but the resolved backend is 'claude_cli' (the drafter transport). "
-                "Set ORCHESTRATOR_TRANSPORT_PRESET / ORCHESTRATOR_TRANSPORT_BACKEND "
-                "to a non-Claude backend for grader–generator independence."
-            )
-        # Pin the judge model authoritatively, independent of the env model.
-        provider = dataclasses.replace(provider, model=self.config.model)
-        self._backend = build_openai_backend(
-            provider,
-            temperature=self.config.temperature,
-            max_tokens=self.config.max_tokens,
-        )
+        self._backend = build_judge_backend(resolve_provider_config(), self.config)
         return self._backend
 
     def raw_invoke(self, system_prompt: str, user_prompt: str) -> str:

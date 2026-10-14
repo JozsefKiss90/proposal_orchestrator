@@ -1028,6 +1028,20 @@ The subscription builder also refuses a `HARNESS_JUDGE_VERSION` that does not
 contain `claude-cli`, so a report from that transport cannot carry another
 transport's tag.
 
+**The Converse transport (`--transport bedrock-converse`, ticket AN1a).** The
+private host reaches one model route: native Bedrock Converse through the
+`bedrock-runtime` endpoint. `Judge` builds `BedrockConverseBackend` when the
+resolved backend is `bedrock_converse`, and sends the pinned model,
+temperature 0 and the token limit as `modelId` and `inferenceConfig`. The
+request carries no tool configuration. The builder
+(`harness/commands/_converse_judge.py`) refuses an environment that resolves
+to another backend, and a `HARNESS_JUDGE_VERSION` that does not contain
+`bedrock-converse`. The pack is uncapped, as on the CLI. The `bedrock` preset
+is not used: it targets the `bedrock-mantle` proxy, which the private host
+cannot reach. The freeze's isolation entry and the receipt for this transport
+are ticket AN1b, and the shared-provider independence rule is ticket AN1c.
+Until AN1b lands, a Converse report cannot be frozen.
+
 **Integrity audit (`integrity_audit.py`, spec PE-07).** A Claude-free,
 deterministic audit of one candidate, run after the baseline is frozen:
 

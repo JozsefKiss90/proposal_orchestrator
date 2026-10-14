@@ -259,6 +259,15 @@ def _live_judge(args: argparse.Namespace, repo_root: Path) -> Judge:
     ``harness/commands/_subscription_judge.py`` for what each axis costs.
     """
     cfg = _judge_config(args)
+    if args.transport == TRANSPORT_BEDROCK_CONVERSE:
+        from harness.commands._converse_judge import build_converse_judge
+
+        judge, _backend = build_converse_judge(
+            cfg,
+            prov_path=repo_root / args.provenance,
+            max_retries=args.max_retries,
+        )
+        return judge
     if args.transport == TRANSPORT_CLAUDE_CLI:
         from harness.commands._subscription_judge import build_subscription_judge
 
@@ -289,6 +298,13 @@ TRANSPORT_OPENAI = "openai-compatible"
 #: The Max subscription.  No API key, weaker independence (see
 #: ``harness/commands/_subscription_judge.py``).
 TRANSPORT_CLAUDE_CLI = "claude-cli"
+
+#: Native Bedrock Converse, the only model route on the private host
+#: (``harness/commands/_converse_judge.py``).
+TRANSPORT_BEDROCK_CONVERSE = "bedrock-converse"
+
+#: Transports whose provider imposes no per-minute token ceiling on a pack.
+_UNCAPPED_TRANSPORTS = frozenset({TRANSPORT_CLAUDE_CLI, TRANSPORT_BEDROCK_CONVERSE})
 
 
 def _add_evidence_args(p: argparse.ArgumentParser) -> None:
@@ -343,7 +359,7 @@ def _add_evidence_args(p: argparse.ArgumentParser) -> None:
     )
     p.add_argument(
         "--transport",
-        choices=[TRANSPORT_OPENAI, TRANSPORT_CLAUDE_CLI],
+        choices=[TRANSPORT_OPENAI, TRANSPORT_CLAUDE_CLI, TRANSPORT_BEDROCK_CONVERSE],
         default=os.environ.get("HARNESS_ASSESSOR_TRANSPORT", TRANSPORT_OPENAI),
         help=(
             "assessor transport. %(default)s by default: a non-drafter model at "
@@ -351,7 +367,10 @@ def _add_evidence_args(p: argparse.ArgumentParser) -> None:
             f"'{TRANSPORT_CLAUDE_CLI}' speaks the Max subscription instead and "
             "needs no API key, at the cost of transport and vendor "
             "independence; HARNESS_JUDGE_MODEL must then be a Claude pin and "
-            "HARNESS_JUDGE_VERSION should name the transport. The transport also "
+            "HARNESS_JUDGE_VERSION should name the transport. "
+            f"'{TRANSPORT_BEDROCK_CONVERSE}' speaks native Bedrock Converse, the "
+            "private host's only route; the environment must resolve to "
+            "bedrock_converse and the version tag must name the transport. The transport also "
             "decides the pack ceiling, so give the preflight the one you will assess with"
         ),
     )
@@ -641,10 +660,10 @@ def _pack_params(args: argparse.Namespace) -> PackParams:
     """The evidence-selecting parameters, resolved exactly once for both commands.
 
     The pack ceiling belongs to the transport, not to the proposal.  A
-    per-minute token cap is the OpenAI-compatible provider's; the CLI has
-    none, so there the operator's budget alone governs.
+    per-minute token cap is the OpenAI-compatible provider's; the CLI and
+    Converse have none, so there the operator's budget alone governs.
     """
-    uncapped = args.transport == TRANSPORT_CLAUDE_CLI
+    uncapped = args.transport in _UNCAPPED_TRANSPORTS
     token_budget = args.budget
     if token_budget is None:
         token_budget = UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET if uncapped else DEFAULT_PACK_TOKEN_BUDGET
