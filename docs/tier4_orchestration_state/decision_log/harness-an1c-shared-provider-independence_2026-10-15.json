@@ -1,0 +1,92 @@
+{
+  "record_type": "decision_record",
+  "id": "harness-an1c-shared-provider-independence_2026-10-15",
+  "date": "2026-10-15",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN1c of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN1c. Advisory, out-of-band QA. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The agent, applying the rule the AN1c acceptance criteria state. The operator has not yet confirmed it in session.",
+  "question": "On AWS the drafter and the blind assessor would share one provider, Bedrock. Is an assessor on the shared provider admissible, and on what condition?",
+  "decision": "A shared provider is admissible when the assessor's model differs from every drafter model. The guard compares the model each id names, not the id string. The drafter's own model is refused in every id form the tests list, and an opaque profile id is a declared gap.",
+  "rule": {
+    "drafter_models": "runner.skill_runtime.SKILL_MODEL and runner.semantic_dispatch.AGENT_MODEL, read live by harness.judge.drafter_models(). Both are claude-opus-4-8 on 2026-10-15.",
+    "comparison": "harness.judge.canonical_model_id() on both sides. It lowercases the id and keeps its last path segment. It strips one geographic inference-profile prefix and one provider prefix. It then peels trailing qualifiers until none is left: a context alias such as [1m], a context window such as :200k, a Bedrock version such as -v1:0, a bare revision such as :0, a snapshot date and -latest.",
+    "refused": "The DRAFTER_ON_BEDROCK list in tests/harness/test_converse_judge.py, 16 forms of claude-opus-4-8.",
+    "admitted_examples": "The OTHER_CLAUDE_ON_BEDROCK list in the same file, including the near misses claude-opus-4-80 and claude-opus-4.8.",
+    "snapshots": {
+      "declared_status": "Assumed",
+      "statement": "Two snapshots of one model compare equal, so a dated snapshot of the drafter model is refused too. The agent chose this stricter reading; no source requires it."
+    },
+    "enforced_at": "harness.judge.JudgeConfig.__post_init__, before any backend is built or any request is sent. Every judge route builds through JudgeConfig, including harness.commands._converse_judge.build_converse_judge.",
+    "declared_status": "Confirmed",
+    "declared_status_basis": "What harness/judge.py enforces on 2026-10-15, shown by tests/harness/test_converse_judge.py."
+  },
+  "why": [
+    {
+      "declared_status": "Confirmed",
+      "point": "The string comparison let the drafter through on Bedrock. Before this ticket, JudgeConfig refused only the exact string claude-opus-4-8. Every Bedrock form of that model passed the guard.",
+      "basis": "tests/harness/test_converse_judge.py, TestJudgeIndependenceOnASharedProvider, run against the prior guard: 7 of the first 8 drafter forms in DRAFTER_ON_BEDROCK were admitted, and only the bare claude-opus-4-8 was refused. The environment-pin, before-any-request and Bedrock-named-drafter cases failed too. Every case in the class passes after the change."
+    },
+    {
+      "declared_status": "Confirmed",
+      "point": "A different-provider rule would leave the private host with no admissible assessor. ADR-001 allows Bedrock only, through PrivateLink, and no internet route.",
+      "basis": "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 9; the O6 scope in msca-dn-anonymisation-operator-decisions_2026-10-14.json."
+    },
+    {
+      "declared_status": "Inferred",
+      "point": "The provider carries the request but does not change what the model knows or sees. The blind lane rests on two axes of independence: a different model, and an assessor that can open nothing. Both survive a shared provider.",
+      "basis": "Model: the guard above. Context: AN1b measures from every request that no toolConfig is sent and records that no child process exists (ConverseRetryingBackend.invocation_record), and the freeze requires that record."
+    }
+  ],
+  "what_does_not_survive": [
+    {
+      "axis": "Provider and transport",
+      "declared_status": "Confirmed",
+      "statement": "The assessor and the drafter share Bedrock. The report says so: the version tag must contain bedrock-converse, which build_converse_judge enforces."
+    },
+    {
+      "axis": "Vendor and family",
+      "declared_status": "Inferred",
+      "statement": "A Claude assessor shares the drafter's training lineage and stylistic priors. It is a weaker check on phrasing, and on claims a sibling model finds self-evident, than a different-family assessor. This matches what harness/commands/_subscription_judge.py already states for the subscription route."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "An application inference profile has an opaque id (…:application-inference-profile/abc123). It names no model, so no string rule can tell whether it routes to the drafter model.",
+      "why_not_closed_here": "Resolving it needs a Bedrock lookup of the profile's model, which the private host can make but a string guard cannot. Until then, a pin of that kind is not covered by this guard and must not be used for the assessor."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The guard knows the drafter model only through SKILL_MODEL and AGENT_MODEL. A runner re-pointed at a non-CLI transport drafts with ORCHESTRATOR_TRANSPORT_MODEL from the pipeline environment (runner/skill_runtime.py, the provider_config.model arguments), which the guard does not read.",
+      "why_not_closed_here": "O6 approves the Converse route for the harness only and does not re-point the runner. The gap opens only if the runner is re-pointed, and that change must then extend drafter_models()."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "O2 has A3 rewrite spans with the pinned assessor model. AN15 then scores the derivative with that same assessor. The assessor would grade text it partly wrote, which this guard does not see, because A3 is not the drafter.",
+      "why_not_closed_here": "Outside AN1c's scope. AN6 or AN15 must decide whether A3 needs a model different from the assessor, and the operator must confirm."
+    }
+  ],
+  "inputs": [
+    ".scratch/msca-dn-anonymisation/tickets.md, AN1c",
+    "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 9, item 4",
+    "docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json, O2 and O6",
+    "harness/judge.py",
+    "harness/commands/_converse_judge.py",
+    "harness/commands/_subscription_judge.py"
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "This record holds no private content. It names model identifiers and repository files only.",
+    "basis": "Every identifier is a public model id or a synthetic test value; the account number in the test ARN is a placeholder."
+  },
+  "not_evidence_of": [
+    "A Converse run on the private host. Every test uses a fake Converse client.",
+    "The operator's confirmation of this rule."
+  ],
+  "decision_status": "Assumed",
+  "decision_status_basis": "The AN1c acceptance criteria state the rule. The operator has not confirmed it, so it is adopted pending that confirmation.",
+  "review": "A standards and a spec review of the change found seven id forms the first version admitted: :200k and :1m context windows, a bare :0 revision, slash route prefixes, the @date snapshot, [1m] and -latest. Each is now a refused test case."
+}

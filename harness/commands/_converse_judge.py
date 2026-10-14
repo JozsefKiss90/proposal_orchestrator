@@ -12,8 +12,12 @@ host with no internet route cannot reach (handoff §9, ticket AN1a).
 :func:`build_converse_judge` builds through
 :func:`harness.judge.build_judge_backend`, the same seam ``Judge._get_backend``
 uses.  The model-level non-drafter guard (:class:`~harness.judge.JudgeConfig`)
-therefore still applies.  Whether a shared provider with a different model is
-admissible is ticket AN1c's decision, not this module's.
+therefore still applies.  On Bedrock the drafter and the assessor share a
+provider, so the guard compares the model each id names
+(:func:`~harness.judge.canonical_model_id`), not the id string.  A different
+Claude model on the shared provider is admissible; the drafter's own model is
+refused in every id form the tests list (ticket AN1c, decision record
+``harness-an1c-shared-provider-independence_2026-10-15``).
 
 What the request carries
 ------------------------

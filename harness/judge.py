@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import dataclasses
 import os
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Callable
@@ -61,6 +62,7 @@ __all__ = [
     "MajorityJudgeResult",
     "Judge",
     "build_judge_backend",
+    "canonical_model_id",
     "drafter_models",
     "resolve_judge_config",
 ]
@@ -115,6 +117,48 @@ def drafter_models() -> frozenset[str]:
     return frozenset({SKILL_MODEL, AGENT_MODEL})
 
 
+#: Bedrock's wrapping around a model name: an optional geographic
+#: inference-profile prefix (``eu.``, ``us-gov.``, ``global.``), then the
+#: provider (``anthropic.``).  The provider segment holds no hyphen, so a
+#: dotted model name such as ``llama-3.3-70b`` is never read as a prefix.
+_BEDROCK_PREFIX = re.compile(r"^(?:[a-z]+(?:-[a-z]+)?\.)?[a-z0-9]+\.(?=[a-z])")
+#: Qualifiers a provider appends to a model name, one per match.  They are
+#: peeled until none is left, so ``-v1:0:200k`` loses ``:200k``, then
+#: ``-v1:0``.
+_TRAILING_QUALIFIERS = (
+    re.compile(r"\[[^\]]*\]$"),  # a context alias: [1m]
+    re.compile(r":\d+[km]$"),  # a Bedrock context window: :200k, :1m
+    re.compile(r"-v\d+(?::\d+)?$"),  # a Bedrock version: -v1:0, -v2
+    re.compile(r":\d+$"),  # a bare Bedrock revision: :0
+    re.compile(r"[-@]\d{8}$"),  # a snapshot date: -20251001, @20251001
+    re.compile(r"-latest$"),  # a moving alias
+)
+
+
+def canonical_model_id(model_id: str) -> str:
+    """Return the model a model id names, without the provider's wrapping.
+
+    On AWS the drafter and the assessor share Bedrock, which names one model
+    several ways, and a string comparison would let any of them past the
+    independence guard.  This keeps the last path segment (an ARN, or an
+    ``anthropic/`` route prefix), strips the inference-profile and provider
+    prefixes, then peels :data:`_TRAILING_QUALIFIERS` and lowercases the
+    rest.  Two snapshots of one model therefore compare equal, which the
+    guard wants.
+
+    An opaque application-inference-profile id names no model, and no string
+    rule can resolve it (ticket AN1c).
+    """
+    canonical = str(model_id).strip().lower().rsplit("/", 1)[-1]
+    canonical = _BEDROCK_PREFIX.sub("", canonical, count=1)
+    previous = None
+    while canonical != previous:
+        previous = canonical
+        for qualifier in _TRAILING_QUALIFIERS:
+            canonical = qualifier.sub("", canonical)
+    return canonical
+
+
 def _default_clock() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -131,8 +175,9 @@ class JudgeConfig:
     Attributes
     ----------
     model:
-        The judge model identifier.  Must not be a drafter model
-        (:func:`drafter_models`).
+        The judge model identifier.  Must not name a drafter model
+        (:func:`drafter_models`) in any form, compared by
+        :func:`canonical_model_id`.
     version:
         A pinned version tag (non-empty).  Recorded on every provenance record;
         changing it re-opens E1.5's advisory-only state.
@@ -163,7 +208,9 @@ class JudgeConfig:
                 f"robustness); got {self.temperature!r}."
             )
         drafters = drafter_models()
-        if self.model in drafters:
+        # By the model named, not the string: on Bedrock one model has several
+        # ids, and the drafter and the assessor share the provider (AN1c).
+        if canonical_model_id(self.model) in {canonical_model_id(d) for d in drafters}:
             raise JudgeIndependenceError(
                 f"Judge model {self.model!r} is a drafter/in-run model "
                 f"({sorted(drafters)}). Grader–generator independence requires a "

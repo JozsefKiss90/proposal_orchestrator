@@ -541,3 +541,91 @@ class TestTheReceiptForTheConversePass:
         result = er.check(er.load_receipt(receipt_path), intended, receipt_dir=receipt_path.parent, report=report)
         assert result.transport_disagrees_with_the_report
         assert not result.green
+
+
+# --------------------------------------------------------------------------- #
+# Judge independence on a shared provider (ticket AN1c)
+# --------------------------------------------------------------------------- #
+
+#: The drafter model, ``skill_runtime.SKILL_MODEL``, in the forms Bedrock
+#: names it: bare, foundation-model id, inference profiles, a dated snapshot,
+#: a profile ARN and mixed case.
+DRAFTER_ON_BEDROCK = [
+    "claude-opus-4-8",
+    "anthropic.claude-opus-4-8-v1:0",
+    "eu.anthropic.claude-opus-4-8-v1:0",
+    "us.anthropic.claude-opus-4-8",
+    "global.anthropic.claude-opus-4-8",
+    "apac.anthropic.claude-opus-4-8-20260801-v1:0",
+    "arn:aws:bedrock:eu-west-1:123456789012:inference-profile/eu.anthropic.claude-opus-4-8-v1:0",
+    "EU.Anthropic.Claude-Opus-4-8-V1:0",
+    "anthropic.claude-opus-4-8-v1:0:200k",
+    "anthropic.claude-opus-4-8:0",
+    "eu.anthropic.claude-opus-4-8-v1:0:1m",
+    "anthropic/claude-opus-4-8",
+    "openrouter/anthropic/claude-opus-4-8",
+    "claude-opus-4-8@20260801",
+    "claude-opus-4-8[1m]",
+    "claude-opus-4-8-latest",
+]
+
+#: Other Claude models on the same provider. The last two are near misses of
+#: the drafter's id that name a different model.
+OTHER_CLAUDE_ON_BEDROCK = [
+    PIN,
+    "eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "anthropic.claude-opus-4-1-v1:0",
+    "eu.anthropic.claude-opus-4",
+    "claude-opus-4-80",
+    "claude-opus-4.8",
+]
+
+
+class TestJudgeIndependenceOnASharedProvider:
+    @pytest.mark.parametrize("model", DRAFTER_ON_BEDROCK)
+    def test_the_drafter_model_in_any_bedrock_form_is_refused(self, model):
+        with pytest.raises(hj.JudgeIndependenceError, match="independence"):
+            JudgeConfig(model=model, version=VERSION)
+
+    @pytest.mark.parametrize("model", DRAFTER_ON_BEDROCK)
+    def test_the_canonical_form_is_the_drafter_model(self, model):
+        assert hj.canonical_model_id(model) == "claude-opus-4-8"
+
+    def test_a_drafter_pin_in_the_environment_is_refused(self, converse_env, monkeypatch):
+        """The route the command takes: the pin is resolved from the environment."""
+        monkeypatch.setenv("HARNESS_JUDGE_MODEL", "eu.anthropic.claude-opus-4-8-v1:0")
+        monkeypatch.setenv("HARNESS_JUDGE_VERSION", VERSION)
+        with pytest.raises(hj.JudgeIndependenceError):
+            hj.resolve_judge_config()
+
+    def test_the_refusal_comes_before_any_request(self, converse_env, client):
+        with pytest.raises(hj.JudgeIndependenceError):
+            Judge(JudgeConfig(model="eu.anthropic.claude-opus-4-8-v1:0", version=VERSION))
+        assert client.requests == []
+
+    def test_a_drafter_named_in_bedrock_form_is_matched_too(self, monkeypatch):
+        """Both sides are canonicalised: a runner pinned to a Bedrock id still
+        refuses the bare model name."""
+        monkeypatch.setattr(hj, "drafter_models", lambda: frozenset({"eu.anthropic.claude-opus-4-8-v1:0"}))
+        with pytest.raises(hj.JudgeIndependenceError):
+            JudgeConfig(model="claude-opus-4-8", version=VERSION)
+
+    @pytest.mark.parametrize("model", OTHER_CLAUDE_ON_BEDROCK)
+    def test_a_different_claude_model_passes_the_guard(self, model):
+        assert JudgeConfig(model=model, version=VERSION).model == model
+
+    def test_a_different_claude_model_runs_over_converse(self, converse_env, client, tmp_path):
+        judge, _wrapper = cj.build_converse_judge(
+            JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
+        )
+        assert judge.raw_invoke("s", "u")
+        assert client.requests[0]["modelId"] == PIN
+
+    @pytest.mark.parametrize(
+        "model",
+        ["llama-3.3-70b-versatile", "openai/gpt-oss-120b", "meta.llama3-1-70b-instruct-v1:0"],
+    )
+    def test_a_non_bedrock_or_non_claude_id_is_left_comparable(self, model):
+        """Canonicalisation strips only Bedrock's wrapping, so other ids stay distinct."""
+        assert hj.canonical_model_id(model) != "claude-opus-4-8"
+        assert JudgeConfig(model=model, version=VERSION).model == model

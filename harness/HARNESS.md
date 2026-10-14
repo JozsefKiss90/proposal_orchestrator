@@ -73,7 +73,7 @@ unbiased grader of its own pipeline).
 | Never a runtime gate / advisory-to-human | `report.py` — `HarnessReport(advisory=True, blocking=False)` cannot be constructed otherwise; no method returns a scheduler-consumable gate result |
 | `harness` never becomes a runtime dependency | one-way import: `harness → runner` only; `tests/harness/test_boundary.py` asserts `runner`, `tools/` and `scripts/` never import `harness`. The judge runners (E1.5 calibration, E4 grounding freeze, E5f rubric grading) therefore live in `harness/commands/` and run as `py -3.10 -m harness.commands.<name>` |
 | Deterministic-first routing | `routing.py` — a property named by a deterministic `PREDICATE_REGISTRY` function is refused for judging (`assert_judgeable` raises `DeterministicCoverageError`) |
-| Grader–generator independence | `judge.py` — `JudgeConfig` rejects any drafter/in-run model; the default backend rejects the `claude_cli` transport, forcing the OpenAI-compatible path |
+| Grader–generator independence | `judge.py` — `JudgeConfig` rejects any drafter/in-run model, in any Bedrock id form; the default backend rejects the `claude_cli` transport, forcing the OpenAI-compatible path |
 | Pin + determinism | `judge.py` — model + version pinned, temperature forced to 0; both recorded on every provenance record |
 | No silent repair | `judge.py` — a malformed/empty judge response raises `JudgeResponseError`; the judge never guesses a verdict |
 | Provenance for every verdict | `judge.py` builds a `ProvenanceRecord` for every `Verdict` and appends it to the attached `ProvenanceLog` before returning |
@@ -1047,7 +1047,16 @@ request carries no tool configuration. The builder
 to another backend, and a `HARNESS_JUDGE_VERSION` that does not contain
 `bedrock-converse`. The pack is uncapped, as on the CLI. The `bedrock` preset
 is not used: it targets the `bedrock-mantle` proxy, which the private host
-cannot reach. The shared-provider independence rule is ticket AN1c.
+cannot reach.
+
+**Independence on a shared provider (ticket AN1c).** On AWS the drafter and the
+assessor share Bedrock, which names one model several ways. `JudgeConfig`
+therefore compares the model each id names (`canonical_model_id`), not the id
+string. The drafter's model is refused in every form the tests list. A
+different Claude model on the shared provider passes. An opaque
+application-inference-profile id names no model and is not covered. The rule and
+its reason are in
+`docs/tier4_orchestration_state/decision_log/harness-an1c-shared-provider-independence_2026-10-15.json`.
 
 **Freezing a Converse report (ticket AN1b).** The judge's backend for this
 transport records every request it passes on. It builds each request with the
