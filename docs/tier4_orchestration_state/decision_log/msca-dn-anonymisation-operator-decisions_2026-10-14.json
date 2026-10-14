@@ -1,0 +1,111 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-anonymisation-operator-decisions_2026-10-14",
+  "date": "2026-10-14",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN0 of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-14. Advisory, out-of-band QA. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, answering each of O1 to O6 in session on 2026-10-14",
+  "decision": "O1 to O5 adopt the handoff's defaults. O6 approves the harness Bedrock Converse backend as a change to the blind lane's transport, for the harness only.",
+  "why": "The handoff left six decisions open. AN1a, AN2, AN4 and AN-P each wait on one or more of them.",
+  "inputs": [
+    "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 11 (open decisions O1 to O6)",
+    "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 9 (the harness cannot build a Bedrock backend)",
+    ".scratch/msca-dn-anonymisation/tickets.md (blocking edges)"
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "This record holds no private content: no names, institutions, acronyms, research groups, locations, figures or text from the submitted original or its derivatives.",
+    "basis": "Every answer is a choice among the handoff's own generic options."
+  },
+  "answer_kinds": {
+    "operator_adopted_default": "The operator was offered the handoff's default and chose it.",
+    "operator_answer": "The handoff gives no default, and the operator answered."
+  },
+  "decisions": [
+    {
+      "id": "O1",
+      "question": "Edit the Word source or the submitted PDF?",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Edit the Word source if it renders to the submitted PDF. Otherwise edit the submitted PDF in place.",
+      "consequence": "AN4 makes the render check, and the route follows from its result."
+    },
+    {
+      "id": "O2",
+      "question": "Which Bedrock model for A3, and which different one for A5?",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "A3 (span-edit rewrite) uses the pinned assessor model. A5 (closed-book model attack) uses a different member of the Claude family.",
+      "consequence": "AN6 pins the A3 model id. AN8b pins the A5 model id and refuses to run with the A3 model, as its own acceptance criterion requires.",
+      "open_part": "The A5 model id is not chosen. See known_gaps."
+    },
+    {
+      "id": "O3",
+      "question": "Re-identification threshold: zero correct guesses per category, or a tolerance?",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Zero correct guesses for institutions, people and the acronym. The country set may be guessed when the policy keeps it.",
+      "consequence": "AN8b fails on any correct guess of an institution, a person or the acronym.",
+      "open_part": "The attack also guesses the research group, and the default does not set its threshold. See known_gaps."
+    },
+    {
+      "id": "O4",
+      "question": "Which locations are kept at country level, given that MSCA scoring reads the network's geography?",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Generalise every location below country level. Keep each participant's EU, associated-country or third-country status.",
+      "consequence": "AN2 writes this rule into the public policy."
+    },
+    {
+      "id": "O5",
+      "question": "Run the FIELDWISE pilot first?",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "No. The pilot does not run unless the fellow agrees.",
+      "consequence": "AN-P stays parked. The fellow's agreement must be recorded before any pilot run."
+    },
+    {
+      "id": "O6",
+      "question": "Approve the harness Bedrock Converse backend (handoff section 9) as a change to the blind lane's transport?",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "Approved.",
+      "approved_before_an1": "Yes. No AN1a, AN1b or AN1c work exists on the branch when this record is written.",
+      "scope": "The harness blind assessor may use a bedrock-converse transport on AWS, under the ADR-001 controls the handoff lists. The approval covers the harness only. It does not re-point the runner's transport preset, and the local configuration stays on the Claude subscription.",
+      "conditions": [
+        "AN1a: the judge builds the Converse backend with the pinned model, temperature and token limit. The existing claude-cli and openai-compatible routes behave as before.",
+        "AN1b: the freeze gains a bedrock-converse isolation entry, and the V13 receipt records the transport actually used.",
+        "AN1c: the judge-independence rule is re-checked for a drafter and an assessor that share a provider.",
+        "Each of AN1a to AN1c is tested at the level V13 set (handoff section 9)."
+      ]
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "O2",
+      "declared_status": "Unresolved",
+      "gap": "The A3 and A5 Bedrock model ids are not named. AN6 and AN8b must record them before either runs."
+    },
+    {
+      "decision": "O3",
+      "declared_status": "Unresolved",
+      "gap": "The handoff's attack also names the research group, and the default sets no threshold for it. AN8b must not run until the operator sets one."
+    }
+  ],
+  "not_evidence_of": [
+    "Any implementation of AN1a to AN1c, or that the Bedrock backend works.",
+    "That a Word source exists or renders to the submitted PDF.",
+    "The fellow's agreement to a FIELDWISE pilot."
+  ],
+  "unblocks_when_recorded": [
+    "AN1a (needs O6)",
+    "AN2 (needs O3 and O4)"
+  ],
+  "stays_blocked": [
+    "AN4: also needs AN3",
+    "AN-P: needs AN11, and O5 answered yes"
+  ]
+}
