@@ -1,9 +1,10 @@
 """Validate a private execution readiness receipt before a run.
 
-The receipt is the operator's pre-run evidence: which CLI answered, which
-settings reach it, which directory the child runs in, and which preflight the
-run is bound to. This command reads one, refuses an incomplete one, and refuses
-one bound to a candidate or a profile other than the intended pair.
+The receipt is the operator's pre-run evidence: which transport answered, which
+settings reach it, what the assessor could reach, and which preflight the run
+is bound to. This command reads one, refuses an incomplete one, and refuses one
+bound to a candidate or a profile other than the intended pair. Given the run's
+blind report, it also refuses a receipt for another transport.
 
 The receipt stays in the private environment. This command refuses one stored
 inside the repository, and writes nothing anywhere.
@@ -14,10 +15,12 @@ Advisory. It closes no gate, runs no assessment and spends no quota.
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 from typing import Optional, Sequence
 
 from harness import execution_receipt as er
+from harness.blind_assessment import BLIND_REPORT_RECORD_TYPE
 from harness import historical_profile as hp
 from harness.record_binding import file_sha256
 
@@ -53,6 +56,27 @@ def _intended(
     )
 
 
+def _blind_report(raw: str) -> tuple[dict | None, str]:
+    """The blind report named by ``--report``, or ``None`` when none was named.
+
+    Read as JSON and checked for its record type, nothing more: the receipt
+    reads only the transport the run spoke.
+    """
+    if not raw:
+        return None, ""
+    path = Path(raw)
+    try:
+        report = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as exc:
+        return None, f"refused: the report {path.as_posix()} is not readable ({exc})"
+    if not isinstance(report, dict) or report.get("record_type") != BLIND_REPORT_RECORD_TYPE:
+        return None, (
+            f"refused: {path.as_posix()} is not a blind report "
+            f"(record_type {BLIND_REPORT_RECORD_TYPE!r})"
+        )
+    return report, ""
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
@@ -73,6 +97,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "declaration carrying the historical schema is found and used."
         ),
     )
+    parser.add_argument(
+        "--report",
+        default="",
+        help=(
+            "the blind report of the run, once it exists. The receipt must name the "
+            "transport the report's run spoke. Omit it before the run."
+        ),
+    )
     parser.add_argument("--repo-root", default=".", help="repository root (default: .)")
     args = parser.parse_args(argv)
 
@@ -89,7 +121,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"refused: {exc}")
         return 2
 
-    report = er.check(receipt, intended, receipt_dir=receipt_path.parent)
+    blind_report, refusal = _blind_report(args.report)
+    if refusal:
+        print(refusal)
+        return 2
+
+    report = er.check(
+        receipt, intended, receipt_dir=receipt_path.parent, report=blind_report
+    )
     for line in er.summary_lines(receipt, report):
         print(line)
     return 0 if report.green else 1

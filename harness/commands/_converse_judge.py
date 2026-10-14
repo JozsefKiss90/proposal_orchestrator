@@ -20,7 +20,8 @@ What the request carries
 The pinned model, temperature 0 and the configured token limit, sent as
 ``modelId`` and ``inferenceConfig``.  No tool configuration is sent, and no
 child process or working directory exists, so the assessor can open nothing.
-The freeze's isolation entry for this transport is ticket AN1b.
+:class:`ConverseRetryingBackend` records this from every request it passes on,
+and the freeze requires that record (ticket AN1b).
 
 The pin names the transport
 ---------------------------
@@ -52,6 +53,7 @@ from harness.provenance import ProvenanceLog
 __all__ = [
     "TRANSPORT_TAG",
     "ConverseJudgeError",
+    "ConverseRetryingBackend",
     "build_converse_judge",
 ]
 
@@ -70,6 +72,58 @@ class ConverseJudgeError(JudgeError):
     A :class:`~harness.judge.JudgeError` so the commands convert it to their
     fail-closed exit code rather than a traceback.
     """
+
+
+class ConverseRetryingBackend(PacedRetryingBackend):
+    """The retry wrapper, keeping an account of every request it passed on.
+
+    Before each call it builds the request the inner backend will send, with
+    the same builder that sends it, and notes whether that request carried a
+    ``toolConfig`` and which ``inferenceConfig`` it carried.  The record is
+    therefore measured from the requests, not declared from the configuration.
+    """
+
+    def __init__(self, inner: Any, **kwargs: Any) -> None:
+        super().__init__(inner, **kwargs)
+        self._requests = 0
+        self._tool_config_sent = False
+        self._inference_configs: list[dict[str, Any]] = []
+
+    def __call__(self, messages: list[dict[str, Any]]) -> dict[str, Any]:
+        # The builder is deterministic and makes no network call.
+        request = self._inner._build_request(messages)
+        self._requests += 1
+        self._tool_config_sent = self._tool_config_sent or "toolConfig" in request
+        config = dict(request.get("inferenceConfig") or {})
+        if config not in self._inference_configs:
+            self._inference_configs.append(config)
+        return super().__call__(messages)
+
+    def invocation_record(self) -> dict[str, Any]:
+        """What the assessor could reach, for the report and the freeze.
+
+        ``child_process`` is ``False`` by construction: Converse is an API
+        call, with no process and no working directory to measure.
+        ``inference_config`` is the one configuration every request carried,
+        a list when they differed, and ``None`` before the first request.
+        With no request sent, as in a run served wholly from a resumed
+        checkpoint, ``tool_config_sent`` is measured from a probe request the
+        same builder makes, so the claim is never made from silence.
+        """
+        configs = self._inference_configs
+        if self._requests:
+            tool_config_sent = self._tool_config_sent
+        else:
+            probe = self._inner._build_request([{"role": "user", "content": ""}])
+            tool_config_sent = "toolConfig" in probe
+        return {
+            "tool_config_sent": tool_config_sent,
+            "child_process": False,
+            "requests": self._requests,
+            "inference_config": (
+                None if not configs else configs[0] if len(configs) == 1 else list(configs)
+            ),
+        }
 
 
 def build_converse_judge(
@@ -110,7 +164,7 @@ def build_converse_judge(
         )
     inner = build_judge_backend(provider, cfg)
     # No pacing: an infinite token budget and no request floor.
-    wrapper = PacedRetryingBackend(
+    wrapper = ConverseRetryingBackend(
         inner, tpm_budget=float("inf"), rpm_budget=0, max_retries=max_retries, log=log
     )
     judge = Judge(cfg, backend=wrapper, provenance_log=ProvenanceLog(prov_path))

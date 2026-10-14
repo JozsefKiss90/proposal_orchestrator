@@ -158,15 +158,23 @@ _WORKING_DIRECTORY: str = "working_directory"
 
 #: What a baseline requires one transport's ``assessor_invocation`` to declare.
 #: The subscription transport runs an assessor child process and says what it
-#: could reach (``harness/commands/_subscription_judge.py``); an API transport
-#: runs none, declares nothing, and its ``invocation_evidence`` check is
-#: recorded not applicable rather than passed.  A transport this table does not
-#: know is refused: the freeze cannot say what evidence would be appropriate.
+#: could reach (``harness/commands/_subscription_judge.py``).  The Converse
+#: transport runs none, but it records from every request it sent that no
+#: request carried a tool configuration (``harness/commands/_converse_judge.py``).
+#: With no process and no filesystem, that is its whole claim.  The
+#: OpenAI-compatible transport declares nothing, and its ``invocation_evidence``
+#: check is recorded not applicable rather than passed.  A transport this table
+#: does not know is refused: the freeze cannot say what evidence would be
+#: appropriate.
 TRANSPORT_ISOLATION_EVIDENCE: Mapping[str, Mapping[str, Any]] = MappingProxyType({
     "claude-cli": MappingProxyType({
         "tools": "",
         "strict_mcp_config": True,
         _OUTSIDE_REPOSITORY: True,
+    }),
+    "bedrock-converse": MappingProxyType({
+        "tool_config_sent": False,
+        "child_process": False,
     }),
     "openai-compatible": MappingProxyType({}),
 })

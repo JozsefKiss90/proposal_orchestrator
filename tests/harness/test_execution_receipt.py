@@ -29,6 +29,7 @@ import pytest
 
 from harness import execution_receipt as er
 from harness import historical_profile as hp
+from harness.blind_assessment import BLIND_REPORT_RECORD_TYPE
 from harness.blind_baseline import BASELINE_CHECKS, TRANSPORT_ISOLATION_EVIDENCE
 from harness.commands import execution_receipt as command
 from harness.record_binding import REVIEW_STATES, STATUSES
@@ -62,7 +63,7 @@ def _preflight_doc(**overrides: Any) -> dict[str, Any]:
         "profile_id": PROFILE_ID,
         "profile_version": PROFILE_VERSION,
         "pack_set_hash": PACK_SET,
-        "grounding_scope": {"scope": SCOPE},
+        "grounding_scope": {"declared": SCOPE},
         "import_manifest": {"path": MANIFEST, "sha256": MANIFEST_SHA},
         "packs": [{"expectation_key": "k", "status": "complete"}],
         "criterion_inputs": [{"criterion_id": "c", "complete": True}],
@@ -88,8 +89,12 @@ def _argv() -> list[str]:
     ]
 
 
-def _receipt_doc(**overrides: Any) -> dict[str, Any]:
+def _receipt_doc(transport: str = "claude-cli", **overrides: Any) -> dict[str, Any]:
     """A complete receipt. Every case below removes or alters one thing."""
+    if transport == CONVERSE:
+        doc = _converse_receipt_doc()
+        doc.update(overrides)
+        return doc
     doc: dict[str, Any] = {
         "schema": er.SCHEMA,
         "record_type": er.RECEIPT_RECORD_TYPE,
@@ -99,7 +104,7 @@ def _receipt_doc(**overrides: Any) -> dict[str, Any]:
         "declared_status": "Confirmed",
         "purpose": "exercise the validator",
         "written_by": "tests",
-        "transport": "claude-cli",
+        "transport": transport,
         "private_clone_root": CLONE,
         "repository_revision": "ddd20bf",
         "processing_route": {
@@ -196,6 +201,66 @@ def _receipt_doc(**overrides: Any) -> dict[str, Any]:
     return doc
 
 
+CONVERSE = "bedrock-converse"
+CONVERSE_MODEL = "eu.anthropic.claude-sonnet-4-6"
+
+TEMPLATES = (
+    "execution_receipt_template.json",
+    "execution_receipt_template_bedrock_converse.json",
+)
+
+
+def _converse_receipt_doc() -> dict[str, Any]:
+    """A complete receipt for a Converse run: no CLI, no argv, no directory.
+
+    Built from the CLI receipt so the shared sections stay the same, with the
+    CLI's two sections replaced by the request Converse sends.
+    """
+    doc = _receipt_doc()
+    del doc["cli_version"], doc["rendered_invocation"]
+    doc["transport"] = CONVERSE
+    doc["model_identity"]["pin"] = f"{CONVERSE_MODEL}@{CONVERSE}-eu-west-1@2026-10-14"
+    doc["effective_settings"] = [
+        {
+            "name": "model",
+            "value": CONVERSE_MODEL,
+            "transmitted": True,
+            "transport_evidence": "sent as modelId",
+        },
+        {
+            "name": "temperature",
+            "value": "0",
+            "transmitted": True,
+            "transport_evidence": "sent as inferenceConfig.temperature",
+        },
+        {
+            "name": "max_tokens",
+            "value": "4096",
+            "transmitted": True,
+            "transport_evidence": "sent as inferenceConfig.maxTokens",
+        },
+    ]
+    doc["rendered_request"] = {
+        "model_id": CONVERSE_MODEL,
+        "temperature": 0.0,
+        "max_tokens": 4096,
+        "tool_config_present": False,
+        "region": "eu-west-1",
+        "rendered_by": "runner/transport/bedrock_converse.py",
+    }
+    doc["isolation_check"] = {
+        "tool_config_sent": False,
+        "child_process": False,
+        "evidence": [
+            "tests/harness/test_converse_judge.py::TestTheJudgeBuildsConverse",
+            "the rendered request inspected: no toolConfig key",
+        ],
+        "verified_on": "2026-10-14",
+        "verified_by": "the private operator",
+    }
+    return doc
+
+
 #: Every field of every object-shaped section, and every top-level field, read
 #: off the complete receipt above. Generated rather than hand-listed: the
 #: ticket asks for refusal on each missing field, and a hand-list goes stale
@@ -207,6 +272,14 @@ _SECTION_FIELDS: list[tuple[str, str]] = [
     for field in body
 ]
 _FIELD_IDS: list[str] = [f"{section}.{field}" for section, field in _SECTION_FIELDS]
+
+#: The same, for the two sections a Converse receipt fills differently.
+_CONVERSE_SECTION_FIELDS: list[tuple[str, str]] = [
+    (section, field)
+    for section, body in _converse_receipt_doc().items()
+    if section in ("rendered_request", "isolation_check")
+    for field in body
+]
 
 #: The top-level fields, minus the two the reader checks by other rules: the
 #: schema has its own refusal, and record_type is not read.
@@ -286,7 +359,7 @@ class TestACompleteReceipt:
 
 
 class TestTheLoaderRefusesAnIncompleteReceipt:
-    @pytest.mark.parametrize("section", er.REQUIRED_SECTIONS)
+    @pytest.mark.parametrize("section", er.REQUIRED_SECTIONS["claude-cli"])
     def test_a_missing_section_is_refused(self, tmp_path: Path, section: str) -> None:
         doc = _receipt_doc()
         del doc[section]
@@ -418,15 +491,21 @@ class TestTheBindings:
 
 
 class TestWhatTheTransportActuallySends:
-    def test_the_table_covers_every_transport_that_runs_a_child(self) -> None:
+    def test_the_table_covers_every_transport_that_declares_isolation(self) -> None:
         """Single-sourced against the freeze's own isolation table: a
-        transport that declares isolation evidence runs a child process, and
-        that is exactly the transport a receipt describes."""
-        runs_a_child = {
+        transport that owes isolation evidence is exactly the transport a
+        receipt describes. Only the one with a child process has an argv."""
+        declares = {
             name for name, evidence in TRANSPORT_ISOLATION_EVIDENCE.items() if evidence
         }
-        assert set(er.TRANSPORT_SETTINGS) == runs_a_child
-        assert set(er.ARGV_BLINDNESS_CONTROLS) == runs_a_child
+        assert set(er.TRANSPORT_SETTINGS) == declares
+        assert set(er.REQUIRED_SECTIONS) == declares
+        runs_a_child = {
+            name
+            for name, evidence in TRANSPORT_ISOLATION_EVIDENCE.items()
+            if evidence and evidence.get("child_process", True)
+        }
+        assert set(er.ARGV_BLINDNESS_CONTROLS) == runs_a_child == {"claude-cli"}
 
     def test_a_temperature_claimed_transmitted_is_refused(self, tmp_path: Path) -> None:
         """The pinned temperature reaches no provider on this transport: the
@@ -719,6 +798,13 @@ class TestThePreflightIsRead:
         report = _check(tmp_path, preflight=_preflight_doc(grounding_scope=None))
         assert report.preflight_incomplete
 
+    def test_the_scope_is_read_where_the_preflight_writes_it(self, tmp_path: Path) -> None:
+        """A preflight writes its declaration as ``grounding_scope.declared``.
+        A block carrying only a ``scope`` key declares nothing (AN1b found the
+        reader looking for that key, which no preflight writes)."""
+        report = _check(tmp_path, preflight=_preflight_doc(grounding_scope={"scope": SCOPE}))
+        assert report.preflight_incomplete
+
     @pytest.mark.parametrize("key", ["packs", "criterion_inputs"])
     def test_a_preflight_that_selected_nothing_is_incomplete(
         self, tmp_path: Path, key: str
@@ -747,7 +833,7 @@ class TestThePreflightIsRead:
 
     def test_a_scope_the_receipt_does_not_declare_is_a_finding(self, tmp_path: Path) -> None:
         report = _check(
-            tmp_path, preflight=_preflight_doc(grounding_scope={"scope": "source_grounded"})
+            tmp_path, preflight=_preflight_doc(grounding_scope={"declared": "source_grounded"})
         )
         assert report.preflight_disagrees_with_the_receipt
 
@@ -768,38 +854,245 @@ class TestTheReceiptStaysOutside:
     def test_a_receipt_outside_the_repository_is_accepted(self, tmp_path: Path) -> None:
         assert er.receipt_path_outside(tmp_path / "r.json", REPO_ROOT) == tmp_path / "r.json"
 
-    def test_the_committed_template_is_not_a_receipt(self) -> None:
+    @pytest.mark.parametrize("name", TEMPLATES)
+    def test_the_committed_template_is_not_a_receipt(self, name: str) -> None:
         """Two independent protections, and this asserts the second: even
         copied out of the tree, the template's placeholders are not
         evidence."""
-        template = REPO_ROOT / "harness" / "execution_receipt_template.json"
+        template = REPO_ROOT / "harness" / name
         assert template.is_file(), "the operator has no template to fill in"
         with pytest.raises(er.ReceiptError, match="placeholder"):
             er.load_receipt(template)
 
-    def test_the_template_does_not_pre_answer_the_declarations(self) -> None:
+    @pytest.mark.parametrize("name", TEMPLATES)
+    def test_the_template_does_not_pre_answer_the_declarations(self, name: str) -> None:
         """An operator who fills only the angle brackets must not ship an
         unreviewed Confirmed. Both declarations are the operator's, so the
         template leaves both unfilled."""
-        doc = json.loads(
-            (REPO_ROOT / "harness" / "execution_receipt_template.json").read_text(
-                encoding="utf-8-sig"
-            )
-        )
+        doc = json.loads((REPO_ROOT / "harness" / name).read_text(encoding="utf-8-sig"))
         assert doc["review_state"] not in REVIEW_STATES
         assert doc["declared_status"] not in STATUSES
 
-    def test_the_template_carries_every_required_section(self) -> None:
-        doc = json.loads(
-            (REPO_ROOT / "harness" / "execution_receipt_template.json").read_text(
-                encoding="utf-8-sig"
-            )
-        )
+    @pytest.mark.parametrize("name", TEMPLATES)
+    def test_the_template_carries_every_required_section(self, name: str) -> None:
+        doc = json.loads((REPO_ROOT / "harness" / name).read_text(encoding="utf-8-sig"))
         assert doc["schema"] == er.SCHEMA
-        for section in er.REQUIRED_SECTIONS:
+        assert set(doc) - {"_what_this_is"} == set(_receipt_doc(doc["transport"]))
+        for section in er.REQUIRED_SECTIONS[doc["transport"]]:
             assert section in doc, section
+        for section, body in _receipt_doc(doc["transport"]).items():
+            if isinstance(body, dict):
+                assert set(doc[section]) == set(body), section
         covered = {s["name"] for s in doc["effective_settings"]}
         assert covered == set(er.TRANSPORT_SETTINGS[doc["transport"]])
+
+
+# --------------------------------------------------------------------------- #
+# A Converse receipt (ticket AN1b)
+# --------------------------------------------------------------------------- #
+
+
+def _converse_check(tmp_path: Path, doc: dict[str, Any], **kwargs: Any) -> er.ReceiptCheck:
+    path = _world(tmp_path, receipt=doc)
+    return er.check(er.load_receipt(path), _intended(), receipt_dir=path.parent, **kwargs)
+
+
+def _setting(doc: dict[str, Any], name: str) -> dict[str, Any]:
+    return next(s for s in doc["effective_settings"] if s["name"] == name)
+
+
+class TestAConverseReceipt:
+    def test_it_validates(self, tmp_path: Path) -> None:
+        report = _converse_check(tmp_path, _converse_receipt_doc())
+        assert report.green, report.lines()
+
+    def test_the_loader_reads_the_request_not_a_cli(self, tmp_path: Path) -> None:
+        receipt = er.load_receipt(_world(tmp_path, receipt=_converse_receipt_doc()))
+        assert receipt.transport == CONVERSE
+        assert receipt.cli is None and receipt.invocation is None
+        assert receipt.request is not None
+        assert receipt.request.max_tokens == 4096
+        assert receipt.request.temperature == 0.0
+        assert receipt.request.tool_config_present is False
+        assert receipt.isolation.child_process is False
+
+    @pytest.mark.parametrize("section", er.REQUIRED_SECTIONS[CONVERSE])
+    def test_a_missing_section_is_refused(self, tmp_path: Path, section: str) -> None:
+        doc = _converse_receipt_doc()
+        del doc[section]
+        with pytest.raises(er.ReceiptError, match=section):
+            er.load_receipt(_world(tmp_path, receipt=doc))
+
+    @pytest.mark.parametrize(
+        ("section", "field"),
+        _CONVERSE_SECTION_FIELDS,
+        ids=[f"{s}.{f}" for s, f in _CONVERSE_SECTION_FIELDS],
+    )
+    def test_a_missing_field_is_refused(self, tmp_path: Path, section: str, field: str) -> None:
+        doc = _converse_receipt_doc()
+        del doc[section][field]
+        with pytest.raises(er.ReceiptError, match=field):
+            er.load_receipt(_world(tmp_path, receipt=doc))
+
+    @pytest.mark.parametrize("section", ["cli_version", "rendered_invocation"])
+    def test_cli_evidence_on_a_converse_receipt_is_refused(
+        self, tmp_path: Path, section: str
+    ) -> None:
+        """The receipt reads the transport actually used. A CLI version or an
+        argv on a Converse receipt is evidence about a run that did not
+        happen."""
+        doc = _converse_receipt_doc()
+        doc[section] = _receipt_doc()[section]
+        with pytest.raises(er.ReceiptError, match=section):
+            er.load_receipt(_world(tmp_path, receipt=doc))
+
+    def test_a_request_section_on_a_cli_receipt_is_refused(self, tmp_path: Path) -> None:
+        doc = _receipt_doc()
+        doc["rendered_request"] = _converse_receipt_doc()["rendered_request"]
+        with pytest.raises(er.ReceiptError, match="rendered_request"):
+            er.load_receipt(_world(tmp_path, receipt=doc))
+
+    @pytest.mark.parametrize(("field", "value"), [("max_tokens", "lots"), ("max_tokens", 0.5),
+                                                  ("temperature", True), ("max_tokens", 0)])
+    def test_a_value_that_is_not_a_usable_number_is_refused(
+        self, tmp_path: Path, field: str, value: Any
+    ) -> None:
+        doc = _converse_receipt_doc()
+        doc["rendered_request"][field] = value
+        with pytest.raises(er.ReceiptError, match=field):
+            er.load_receipt(_world(tmp_path, receipt=doc))
+
+    def test_an_unfilled_number_is_refused_as_a_placeholder(self, tmp_path: Path) -> None:
+        doc = _converse_receipt_doc()
+        doc["rendered_request"]["max_tokens"] = "<the maxTokens the request carries>"
+        with pytest.raises(er.ReceiptError, match="placeholder"):
+            er.load_receipt(_world(tmp_path, receipt=doc))
+
+
+class TestWhatConverseSends:
+    def test_the_table_sends_temperature_and_token_limit(self) -> None:
+        """Unlike the CLI, Converse renders both into ``inferenceConfig``."""
+        table = er.TRANSPORT_SETTINGS[CONVERSE]
+        assert dict(table) == {"model": True, "temperature": True, "max_tokens": True}
+
+    @pytest.mark.parametrize("name", ["temperature", "max_tokens"])
+    def test_a_sent_setting_recorded_as_withheld_is_refused(
+        self, tmp_path: Path, name: str
+    ) -> None:
+        """The CLI receipt's honest answer is the wrong one here."""
+        doc = _converse_receipt_doc()
+        _setting(doc, name)["transmitted"] = False
+        report = _converse_check(tmp_path, doc)
+        assert report.settings_recorded_as_withheld_the_transport_does_send
+
+    @pytest.mark.parametrize(
+        ("name", "value"),
+        [("model", "another-model"), ("temperature", "0.7"), ("max_tokens", "1024")],
+    )
+    def test_a_setting_the_request_does_not_carry_is_refused(
+        self, tmp_path: Path, name: str, value: str
+    ) -> None:
+        doc = _converse_receipt_doc()
+        _setting(doc, name)["value"] = value
+        report = _converse_check(tmp_path, doc)
+        assert report.settings_disagree_with_the_rendered_request
+        assert not report.green
+
+    def test_an_unreadable_setting_value_disagrees(self, tmp_path: Path) -> None:
+        doc = _converse_receipt_doc()
+        _setting(doc, "temperature")["value"] = "zero"
+        report = _converse_check(tmp_path, doc)
+        assert report.settings_disagree_with_the_rendered_request
+
+    def test_a_request_carrying_tools_is_refused(self, tmp_path: Path) -> None:
+        doc = _converse_receipt_doc()
+        doc["rendered_request"]["tool_config_present"] = True
+        report = _converse_check(tmp_path, doc)
+        assert report.invocation_missing_a_blindness_control
+
+    @pytest.mark.parametrize("flag", ["tool_config_sent", "child_process"])
+    def test_an_isolation_claim_the_transport_contradicts_is_refused(
+        self, tmp_path: Path, flag: str
+    ) -> None:
+        doc = _converse_receipt_doc()
+        doc["isolation_check"][flag] = True
+        report = _converse_check(tmp_path, doc)
+        assert report.isolation_contradicts_the_transport
+
+    def test_the_freeze_cited_as_evidence_is_still_refused(self, tmp_path: Path) -> None:
+        doc = _converse_receipt_doc()
+        doc["isolation_check"]["evidence"] = ["the freeze passed invocation_evidence"]
+        report = _converse_check(tmp_path, doc)
+        assert report.isolation_evidence_citing_the_freeze
+
+    def test_a_pin_naming_another_transport_is_refused(self, tmp_path: Path) -> None:
+        doc = _converse_receipt_doc()
+        doc["model_identity"]["pin"] = "claude-opus-4-8@claude-cli@2026-10-13"
+        report = _converse_check(tmp_path, doc)
+        assert report.model_pin_does_not_name_the_transport
+
+
+def _report_of(transport: str) -> dict[str, Any]:
+    """The fields of a blind report the receipt is read against."""
+    if transport != CONVERSE:
+        return {"assessor_transport": transport}
+    return {
+        "assessor_transport": transport,
+        "assessor_model": CONVERSE_MODEL,
+        "assessor_invocation": {
+            "tool_config_sent": False,
+            "child_process": False,
+            "requests": 24,
+            "inference_config": {"maxTokens": 4096, "temperature": 0.0},
+        },
+    }
+
+
+class TestTheReceiptAgainstTheReport:
+    """A receipt read beside the report of the run it was readiness for."""
+
+    @pytest.mark.parametrize("transport", ["claude-cli", CONVERSE])
+    def test_a_report_of_the_same_transport_agrees(self, tmp_path: Path, transport: str) -> None:
+        path = _world(tmp_path, receipt=_receipt_doc(transport))
+        report = er.check(
+            er.load_receipt(path),
+            _intended(),
+            receipt_dir=path.parent,
+            report=_report_of(transport),
+        )
+        assert report.green, report.lines()
+
+    def test_a_report_of_another_transport_is_refused(self, tmp_path: Path) -> None:
+        report = _converse_check(
+            tmp_path, _converse_receipt_doc(), report={"assessor_transport": "claude-cli"}
+        )
+        assert report.transport_disagrees_with_the_report
+        assert not report.green
+
+    def test_a_report_naming_no_transport_is_refused(self, tmp_path: Path) -> None:
+        report = _converse_check(tmp_path, _converse_receipt_doc(), report={})
+        assert report.transport_disagrees_with_the_report
+
+    def test_a_report_without_a_request_record_is_refused(self, tmp_path: Path) -> None:
+        """A Converse report owes the request it measured; one carrying none
+        cannot be shown to be the run the receipt describes."""
+        report = _converse_check(
+            tmp_path, _converse_receipt_doc(), report={"assessor_transport": CONVERSE}
+        )
+        assert report.request_disagrees_with_the_report
+
+    def test_a_cli_report_is_not_compared_on_a_request(self, tmp_path: Path) -> None:
+        path = _world(tmp_path, receipt=_receipt_doc())
+        report = er.check(
+            er.load_receipt(path), _intended(), receipt_dir=path.parent,
+            report={"assessor_transport": "claude-cli"},
+        )
+        assert not report.request_disagrees_with_the_report
+
+    def test_no_report_compares_nothing(self, tmp_path: Path) -> None:
+        """Before the run there is no report. The receipt still validates."""
+        report = _converse_check(tmp_path, _converse_receipt_doc())
+        assert not report.transport_disagrees_with_the_report
 
 
 # --------------------------------------------------------------------------- #
@@ -832,6 +1125,46 @@ class TestTheCommand:
         )
         assert code == 0, capsys.readouterr().out
         assert "green" in capsys.readouterr().out
+
+    def _report(self, tmp_path: Path, transport: str) -> Path:
+        path = tmp_path / "blind_report.json"
+        body = {"record_type": BLIND_REPORT_RECORD_TYPE, "assessor_transport": transport}
+        path.write_text(json.dumps(body), encoding="utf-8")
+        return path
+
+    def test_a_report_of_the_receipts_transport_exits_zero(
+        self, tmp_path: Path, capsys: Any
+    ) -> None:
+        path, _ = _bound_to_this_trees_profile(tmp_path)
+        report = self._report(tmp_path, "claude-cli")
+        code = command.main(
+            ["--receipt", str(path), "--expect-candidate", CANDIDATE,
+             "--repo-root", str(REPO_ROOT), "--report", str(report)]
+        )
+        assert code == 0, capsys.readouterr().out
+
+    def test_a_report_of_another_transport_exits_one(self, tmp_path: Path, capsys: Any) -> None:
+        path, _ = _bound_to_this_trees_profile(tmp_path)
+        report = self._report(tmp_path, CONVERSE)
+        code = command.main(
+            ["--receipt", str(path), "--expect-candidate", CANDIDATE,
+             "--repo-root", str(REPO_ROOT), "--report", str(report)]
+        )
+        assert code == 1
+        assert "TRANSPORT DISAGREES WITH THE REPORT" in capsys.readouterr().out
+
+    def test_a_file_that_is_not_a_blind_report_exits_two(
+        self, tmp_path: Path, capsys: Any
+    ) -> None:
+        path, _ = _bound_to_this_trees_profile(tmp_path)
+        other = tmp_path / "other.json"
+        other.write_text(json.dumps({"record_type": "something_else"}), encoding="utf-8")
+        code = command.main(
+            ["--receipt", str(path), "--expect-candidate", CANDIDATE,
+             "--repo-root", str(REPO_ROOT), "--report", str(other)]
+        )
+        assert code == 2
+        assert "refused" in capsys.readouterr().out
 
     def test_a_mismatched_candidate_exits_one(self, tmp_path: Path, capsys: Any) -> None:
         path, _ = _bound_to_this_trees_profile(tmp_path)
@@ -900,6 +1233,15 @@ class TestTheCommand:
 
 
 class TestTheModulesOwnContract:
+    def test_there_is_a_template_for_every_transport(self) -> None:
+        transports = {
+            json.loads((REPO_ROOT / "harness" / name).read_text(encoding="utf-8-sig"))[
+                "transport"
+            ]
+            for name in TEMPLATES
+        }
+        assert transports == set(er.TRANSPORT_SETTINGS)
+
     def test_it_names_no_instrument(self) -> None:
         """``tests/harness/test_profile.py`` lints this over all of
         ``harness``. Asserted here too: this module's subject is one

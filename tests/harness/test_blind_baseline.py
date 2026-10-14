@@ -154,6 +154,7 @@ class TestTheReportNamesItsTransport:
         assert set(bb.TRANSPORT_ISOLATION_EVIDENCE) == {
             cmd.TRANSPORT_CLAUDE_CLI,
             cmd.TRANSPORT_OPENAI,
+            cmd.TRANSPORT_BEDROCK_CONVERSE,
         }
 
     def test_the_isolation_the_freeze_requires_is_what_the_backend_declares(self, tmp_path):

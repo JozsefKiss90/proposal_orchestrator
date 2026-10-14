@@ -153,15 +153,21 @@ because an absence is not a confirmation.
 
 A run inside a private environment is one nobody here can watch. What this repository sees afterwards
 is the report's own declarations: a model pin, a version tag, a transport name. Each is a string the
-run was told to record. None of them evidences that the named CLI answered, that the named settings
-reached it, or that the environment permitted the content to be sent.
+run was told to record. None of them evidences that the named transport answered, that the named
+settings reached it, or that the environment permitted the content to be sent.
 
-A readiness receipt is where the private operator records that evidence, before the run. It covers
-eight things: the permitted processing and export route, the CLI version as the CLI printed it, the
-model pin, and the effective settings. Then the rendered argv, the isolation verification, the
-checkpoint path, and the preflight the run is bound to. The reader refuses an incomplete one and an
-unfilled template. It also refuses one bound to a candidate or profile other than the pair named on
-the command line.
+A readiness receipt is where the private operator records that evidence, before the run. It describes
+the transport actually used. On `claude-cli` it covers eight things. The first four are the permitted
+processing and export route, the CLI version as the CLI printed it, the model pin, and the effective
+settings. Then come the rendered argv, the isolation verification, the checkpoint path, and the
+preflight the run is bound to. On `bedrock-converse` no process runs, so the receipt carries no CLI
+version and no argv. It records the rendered request instead: model id, temperature, token limit,
+region and the absence of a `toolConfig`. A receipt carrying another transport's section is refused.
+
+The reader refuses an incomplete receipt and an unfilled template. It also refuses one bound to a
+candidate or profile other than the pair named on the command line. Given the run's blind report with
+`--report`, it refuses a receipt whose transport is not the report's. On Converse it also compares
+the report's model and measured `inferenceConfig` with the receipt's rendered request.
 
 ### Four claims a receipt may not make
 
@@ -169,8 +175,10 @@ the command line.
 arguments and drops the rest. `TRANSPORT_SETTINGS` records which, read off
 `runner/claude_transport.py`. The pinned temperature reaches no provider, because the CLI takes no
 temperature argument. The judge's token limit is never rendered either: the child's ceiling is the
-transport's own environment variable. A receipt disagreeing with that table is reported, in both
-directions.
+transport's own environment variable. On Converse the opposite holds: `temperature` and `maxTokens`
+travel in `inferenceConfig`, so a receipt recording either as withheld is reported. Each recorded
+value must also be the value the rendered request carries. A receipt disagreeing with the table is
+reported, in both directions.
 
 **That a working directory is a sandbox.** A fresh directory outside every clone stops the assessor
 opening this tree. The child still runs with the operator's own privileges, filesystem rights and
@@ -203,7 +211,8 @@ declared result.
 Outside this repository. It holds private paths and the operator's own verification acts, so the
 command refuses one stored here. That is measured against the repository root, the way the
 subscription judge measures its working directory. `execution_receipt_template.json` is the form to
-fill in. It is refused twice over: by that rule, and because its placeholders are not evidence. The
+fill in for the CLI, and `execution_receipt_template_bedrock_converse.json` the form for Converse.
+Each is refused twice over: by that rule, and because its placeholders are not evidence. Each
 template leaves `review_state` and `declared_status` unfilled too: both are the operator's own
 declaration, and a pre-answered one would ship an unreviewed Confirmed. The command writes nothing.
 Its summary carries field names, counts and verdicts rather than any value the receipt holds.
@@ -1038,9 +1047,18 @@ request carries no tool configuration. The builder
 to another backend, and a `HARNESS_JUDGE_VERSION` that does not contain
 `bedrock-converse`. The pack is uncapped, as on the CLI. The `bedrock` preset
 is not used: it targets the `bedrock-mantle` proxy, which the private host
-cannot reach. The freeze's isolation entry and the receipt for this transport
-are ticket AN1b, and the shared-provider independence rule is ticket AN1c.
-Until AN1b lands, a Converse report cannot be frozen.
+cannot reach. The shared-provider independence rule is ticket AN1c.
+
+**Freezing a Converse report (ticket AN1b).** The judge's backend for this
+transport records every request it passes on. It builds each request with the
+transport's own builder and notes whether it carried a `toolConfig`. The
+report's `assessor_invocation` therefore says `tool_config_sent: false` and
+`child_process: false`, with the request count and the `inferenceConfig` sent.
+The command reads that record after the pass, not before it. The freeze
+requires both flags false. Converse has no process and no filesystem, so
+there is no working directory to measure. A run served wholly from a resumed
+checkpoint sends no request. Its record is then measured from a probe request
+the same builder makes, so the claim never rests on silence.
 
 **Integrity audit (`integrity_audit.py`, spec PE-07).** A Claude-free,
 deterministic audit of one candidate, run after the baseline is frozen:

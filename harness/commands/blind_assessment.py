@@ -83,6 +83,7 @@ runner`` import boundary holds.  Advisory artifact; never a runtime gate
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import os
 import sys
@@ -875,10 +876,11 @@ def _portable(path: Path, repo_root: Path) -> str:
 
 
 def _invocation_record(judge: Judge) -> dict:
-    """The backend's account of what its child could reach, if it keeps one.
+    """The backend's account of what the assessor could reach, if it keeps one.
 
-    The subscription backend does (``invocation_record``); the OpenAI-compatible
-    backend has no child process and an injected test backend says nothing.
+    The subscription backend does (``invocation_record``), and so does the
+    Converse backend, from the requests it sent.  The OpenAI-compatible
+    backend has no child process, and an injected test backend says nothing.
     """
     backend = getattr(judge, "_backend", None)
     record = getattr(backend, "invocation_record", None)
@@ -1319,9 +1321,11 @@ def main(
             preflight_hash=preflight_hash,
             preflight_report=Path(args.preflight).as_posix(),
             assessor_transport=args.transport,
-            assessor_invocation=_invocation_record(assessor),
             grounding_scope=args.grounding_scope,
         )
+        # Read after the pass: a backend that measures its requests (Converse)
+        # has nothing to report before the first one.
+        report = dataclasses.replace(report, assessor_invocation=_invocation_record(assessor))
         path = write_report(report, out_dir)
         data = report.to_dict()
         print(render_report(data))

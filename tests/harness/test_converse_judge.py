@@ -263,3 +263,281 @@ class TestTheCommand:
         assert {r["modelId"] for r in client.requests} == {PIN}
         assert all("toolConfig" not in r for r in client.requests)
         assert all(r["inferenceConfig"]["temperature"] == 0.0 for r in client.requests)
+
+
+# --------------------------------------------------------------------------- #
+# The freeze (ticket AN1b)
+# --------------------------------------------------------------------------- #
+
+
+def _converse_pass(world: Path) -> tuple[Path, Any]:
+    """A full synthetic blind pass over the fake Converse client: the report
+    path and the profile bundle it was assessed under."""
+    bundle = load_profile_bundle(_graph_profile(world), repo_root=world)
+    out = world / "reports"
+    argv = [
+        "assess", "--document", "CAND-1", "--graph-root", str(world), "--out-dir", str(out),
+        "--repo-root", str(world), "--profile", str(bundle.profile.source_path),
+        "--transport", cmd.TRANSPORT_BEDROCK_CONVERSE, "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED,
+        "--assessor-model", PIN, "--assessor-version", VERSION, "--no-checkpoint",
+    ]
+    assert cmd.main(preflighted(argv, clock=lambda: FROZEN), clock=lambda: FROZEN) == 0
+    (path,) = [p for p in out.iterdir() if p.is_file()]
+    return path, bundle
+
+
+def _freeze(world: Path, bundle, report: Path, baseline: Path) -> int:
+    (candidate,) = (world / "reports" / "candidates").iterdir()
+    return cmd.main(
+        [
+            "freeze", "--report", str(report), "--candidate", str(candidate),
+            "--baseline-dir", str(baseline), "--repo-root", str(world),
+            "--profile", str(bundle.profile.source_path),
+        ],
+        clock=lambda: FROZEN,
+    )
+
+
+def _failed(report: dict, bundle, repo_root: Path) -> list[tuple[str, str]]:
+    import harness.blind_baseline as bb
+
+    return list(bb.run_baseline_checks(report, bundle, repo_root=repo_root).failures)
+
+
+class TestTheConverseFreeze:
+    def test_the_report_carries_the_measured_invocation_record(self, converse_env, client, world):
+        path, _bundle = _converse_pass(world)
+        record = json.loads(path.read_text(encoding="utf-8"))["assessor_invocation"]
+        assert record["tool_config_sent"] is False
+        assert record["child_process"] is False
+        assert record["requests"] == len(client.requests) > 0
+        assert record["inference_config"] == client.requests[0]["inferenceConfig"]
+        assert record["inference_config"]["temperature"] == 0.0
+
+    def test_a_synthetic_converse_pass_freezes_under_the_v04_checks(self, converse_env, client, world):
+        import harness.blind_baseline as bb
+
+        path, bundle = _converse_pass(world)
+        baseline = world / "baseline"
+        assert _freeze(world, bundle, path, baseline) == 0
+        record = bb.load_frozen_baseline(baseline).record
+        assert record["bindings"]["assessor_transport"] == cj.TRANSPORT_TAG
+        assert "invocation_evidence" in record["checks_passed"]
+        assert record["checks_not_applicable"] == []
+        assert set(record["checks_passed"]) == set(bb.BASELINE_CHECKS)
+
+    def test_the_freeze_record_carries_the_isolation_evidence(self, converse_env, client, world):
+        import harness.blind_baseline as bb
+
+        path, bundle = _converse_pass(world)
+        baseline = world / "baseline"
+        assert _freeze(world, bundle, path, baseline) == 0
+        invocation = bb.load_frozen_baseline(baseline).record["bindings"]["assessor_invocation"]
+        assert invocation["tool_config_sent"] is False
+        assert invocation["child_process"] is False
+
+    def test_the_freeze_table_has_a_converse_entry(self):
+        import harness.blind_baseline as bb
+
+        entry = bb.TRANSPORT_ISOLATION_EVIDENCE[cj.TRANSPORT_TAG]
+        assert dict(entry) == {"tool_config_sent": False, "child_process": False}
+
+    def test_a_report_whose_request_carried_tools_is_refused(self, converse_env, client, world):
+        path, bundle = _converse_pass(world)
+        report = json.loads(path.read_text(encoding="utf-8"))
+        report["assessor_invocation"]["tool_config_sent"] = True
+        ((name, reason),) = _failed(report, bundle, world)
+        assert name == "invocation_evidence"
+        assert "tool_config_sent" in reason
+
+    def test_a_report_without_the_invocation_record_is_refused(self, converse_env, client, world):
+        path, bundle = _converse_pass(world)
+        report = json.loads(path.read_text(encoding="utf-8"))
+        report["assessor_invocation"] = {}
+        ((name, reason),) = _failed(report, bundle, world)
+        assert name == "invocation_evidence"
+        assert cj.TRANSPORT_TAG in reason
+
+    def test_a_report_claiming_a_transport_with_no_entry_is_refused(self, converse_env, client, world):
+        """The mantle preset is not a route the private host has, and the
+        freeze has no isolation entry for it."""
+        path, bundle = _converse_pass(world)
+        report = json.loads(path.read_text(encoding="utf-8"))
+        report.update(assessor_transport="bedrock", assessor_version="bedrock-eu-west-1@2026-10-14")
+        failures = _failed(report, bundle, world)
+        assert ("invocation_evidence" in {name for name, _ in failures})
+        assert any("not one this freeze knows" in reason for _, reason in failures)
+
+
+class TestTheInvocationRecordIsMeasured:
+    def test_a_backend_configured_with_tools_reports_them_sent(self, converse_env, client, tmp_path):
+        """The record is read off the requests the backend built, not
+        declared: a Converse backend given a tool list sends a toolConfig,
+        and the record says so."""
+        judge, wrapper = cj.build_converse_judge(
+            JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
+        )
+        wrapper._inner._tools = [{"type": "function", "function": {"name": "read_file", "parameters": {}}}]
+        judge.raw_invoke("s", "u")
+        assert "toolConfig" in client.requests[0]
+        assert wrapper.invocation_record()["tool_config_sent"] is True
+
+    def test_no_request_means_no_inference_config(self, converse_env, client, tmp_path):
+        _judge, wrapper = cj.build_converse_judge(
+            JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
+        )
+        record = wrapper.invocation_record()
+        assert record["requests"] == 0
+        assert record["inference_config"] is None
+        assert record["tool_config_sent"] is False
+
+    def test_with_no_request_the_builder_is_still_measured(self, converse_env, client, tmp_path):
+        """A run served wholly from a checkpoint sends nothing. The record is
+        then measured from a probe the same builder makes, never from silence."""
+        _judge, wrapper = cj.build_converse_judge(
+            JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
+        )
+        wrapper._inner._tools = [{"type": "function", "function": {"name": "read_file", "parameters": {}}}]
+        assert wrapper.invocation_record()["tool_config_sent"] is True
+        assert client.requests == []
+
+    def test_an_unmade_claim_does_not_freeze(self, converse_env, client, world):
+        path, bundle = _converse_pass(world)
+        report = json.loads(path.read_text(encoding="utf-8"))
+        report["assessor_invocation"]["tool_config_sent"] = None
+        ((name, reason),) = _failed(report, bundle, world)
+        assert name == "invocation_evidence"
+        assert "tool_config_sent" in reason
+
+
+# --------------------------------------------------------------------------- #
+# The receipt for the pass (ticket AN1b)
+# --------------------------------------------------------------------------- #
+
+
+def _receipt_for(tmp_path: Path, world: Path, report: dict) -> tuple[Path, Any]:
+    """A filled Converse receipt for the pass that wrote *report*.
+
+    Every value is read off the pass: its preflight, its profile, and the
+    request the fake client received. The receipt lies outside the world, as
+    the private one lies outside the clone.
+    """
+    from harness import execution_receipt as er
+    from harness.record_binding import file_sha256
+
+    preflight_path = Path(report["preflight_report"])
+    preflight = json.loads(preflight_path.read_text(encoding="utf-8"))
+    profile = Path(_graph_profile(world))
+    request = report["assessor_invocation"]["inference_config"]
+    doc = json.loads(
+        (Path(__file__).resolve().parents[2] / "harness" / "execution_receipt_template_bedrock_converse.json")
+        .read_text(encoding="utf-8")
+    )
+    doc.pop("_what_this_is")
+    doc.update(
+        receipt_id="synthetic_converse_receipt", authored_on="2026-10-14",
+        review_state="operator_reviewed", declared_status="Confirmed",
+        purpose="the synthetic Converse pass", written_by="tests",
+        private_clone_root=str(world), repository_revision="synthetic",
+    )
+    doc["processing_route"] = {
+        "authority": "synthetic rule", "processing": "synthetic prompts",
+        "export": "nothing", "verified_on": "2026-10-14", "verified_by": "tests",
+    }
+    doc["model_identity"]["pin"] = report["assessor_pin"]
+    values = {"model": PIN, "temperature": str(request["temperature"]), "max_tokens": str(request["maxTokens"])}
+    for setting in doc["effective_settings"]:
+        setting["value"] = values[setting["name"]]
+    doc["rendered_request"].update(
+        model_id=PIN, temperature=request["temperature"], max_tokens=request["maxTokens"],
+        region="eu-west-1",
+    )
+    doc["isolation_check"].update(
+        evidence=["tests/harness/test_converse_judge.py::TestTheJudgeBuildsConverse"],
+        verified_on="2026-10-14", verified_by="tests",
+    )
+    doc["checkpoint"]["path"] = str(world / ".harness" / "checkpoints" / "synthetic.jsonl")
+    manifest = preflight["import_manifest"]
+    doc["preflight"] = {
+        "report_path": str(preflight_path), "report_sha256": file_sha256(preflight_path),
+        "pack_set_hash": preflight["pack_set_hash"], "document_id": preflight["document_id"],
+        "profile_id": preflight["profile_id"], "profile_path": str(profile),
+        "profile_sha256": file_sha256(profile), "profile_version": preflight["profile_version"],
+        "import_manifest_path": manifest["path"], "import_manifest_sha256": manifest["sha256"],
+        "grounding_scope": preflight["grounding_scope"]["declared"],
+    }
+    path = tmp_path / "private" / "readiness_receipt.json"
+    path.parent.mkdir()
+    path.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    intended = er.IntendedPair(
+        candidate_document_id=preflight["document_id"], profile_id=preflight["profile_id"],
+        profile_path=str(profile), profile_sha256=file_sha256(profile),
+    )
+    return path, intended
+
+
+@pytest.fixture
+def receipt_pass(converse_env, client, world, tmp_path):
+    """The Converse pass with a pinned import manifest, its report and its receipt."""
+    manifest = tmp_path / "import_manifest.json"
+    manifest.write_text('{"synthetic": true}', encoding="utf-8")
+    bundle = load_profile_bundle(_graph_profile(world), repo_root=world)
+    out = world / "reports"
+    argv = [
+        "assess", "--document", "CAND-1", "--graph-root", str(world), "--out-dir", str(out),
+        "--repo-root", str(world), "--profile", str(bundle.profile.source_path),
+        "--transport", cmd.TRANSPORT_BEDROCK_CONVERSE, "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED,
+        "--assessor-model", PIN, "--assessor-version", VERSION, "--no-checkpoint",
+        "--import-manifest", str(manifest),
+    ]
+    assert cmd.main(preflighted(argv, clock=lambda: FROZEN), clock=lambda: FROZEN) == 0
+    (path,) = [p for p in out.iterdir() if p.is_file()]
+    report = json.loads(path.read_text(encoding="utf-8"))
+    receipt, intended = _receipt_for(tmp_path, world, report)
+    return path, report, receipt, intended, bundle
+
+
+class TestTheReceiptForTheConversePass:
+    def test_the_receipt_validates_against_the_pass_and_its_report(self, receipt_pass):
+        from harness import execution_receipt as er
+
+        _path, report, receipt_path, intended, _bundle = receipt_pass
+        receipt = er.load_receipt(receipt_path)
+        result = er.check(receipt, intended, receipt_dir=receipt_path.parent, report=report)
+        assert result.green, result.lines()
+
+    def test_the_same_pass_also_freezes(self, receipt_pass, world):
+        path, _report, _receipt, _intended, bundle = receipt_pass
+        assert _freeze(world, bundle, path, world / "baseline") == 0
+
+    @pytest.mark.parametrize(
+        ("change", "value"),
+        [("maxTokens", 8192), ("temperature", 0.7)],
+    )
+    def test_a_report_that_sent_another_request_is_refused(self, receipt_pass, change, value):
+        from harness import execution_receipt as er
+
+        _path, report, receipt_path, intended, _bundle = receipt_pass
+        invocation = dict(report["assessor_invocation"])
+        invocation["inference_config"] = dict(invocation["inference_config"], **{change: value})
+        report = dict(report, assessor_invocation=invocation)
+        result = er.check(er.load_receipt(receipt_path), intended, receipt_dir=receipt_path.parent, report=report)
+        assert result.request_disagrees_with_the_report
+        assert not result.green
+
+    def test_a_report_of_another_model_is_refused(self, receipt_pass):
+        from harness import execution_receipt as er
+
+        _path, report, receipt_path, intended, _bundle = receipt_pass
+        report = dict(report, assessor_model="another-model")
+        result = er.check(er.load_receipt(receipt_path), intended, receipt_dir=receipt_path.parent, report=report)
+        assert result.request_disagrees_with_the_report
+
+    def test_a_report_whose_transport_differs_is_refused(self, receipt_pass):
+        from harness import execution_receipt as er
+
+        _path, report, receipt_path, intended, _bundle = receipt_pass
+        report = dict(report, assessor_transport="claude-cli")
+        result = er.check(er.load_receipt(receipt_path), intended, receipt_dir=receipt_path.parent, report=report)
+        assert result.transport_disagrees_with_the_report
+        assert not result.green
