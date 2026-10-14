@@ -16,6 +16,7 @@ acceptance record has to refuse to treat as proof.
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 from typing import Any
 
@@ -210,6 +211,52 @@ class TestTheFigureCensus:
 
     def test_it_lists_the_fonts_the_pages_use(self, inventory) -> None:
         assert inventory["figures"]["fonts"]
+
+
+class TestTheMetadataCensus:
+    """Which metadata a PDF carries, measured, with the values withheld."""
+
+    NAME = "Wendeline Fixturehold"
+
+    @pytest.fixture(scope="class")
+    def named(self, tmp_path_factory: pytest.TempPathFactory) -> Path:
+        path = tmp_path_factory.mktemp("dry_import_metadata") / "named.pdf"
+        doc = pymupdf.open()
+        doc.new_page().insert_text((72, 72), "1.1. Objectives", fontsize=12)
+        doc.set_metadata({"author": self.NAME, "title": "A title"})
+        doc.set_xml_metadata(f"<x:xmpmeta xmlns:x='adobe:ns:meta/'>{self.NAME}</x:xmpmeta>")
+        doc.embfile_add("notes.txt", b"notes")
+        doc.save(path)
+        doc.close()
+        return path
+
+    def test_every_information_field_is_listed(self, inventory) -> None:
+        assert tuple(inventory["metadata"]["fields"]) == di.METADATA_FIELDS
+
+    def test_a_document_without_metadata_measures_it_absent(self, inventory) -> None:
+        metadata = inventory["metadata"]
+        assert metadata["fields"]["author"] == {"populated": False}
+        assert metadata["xmp"] == {"present": False}
+
+    def test_populated_fields_are_flagged(self, named: Path) -> None:
+        metadata = di.measure(named)["metadata"]
+        assert metadata["fields"]["author"] == {"populated": True}
+        assert metadata["fields"]["title"]["populated"] is True
+        assert metadata["fields"]["subject"]["populated"] is False
+        assert metadata["xmp"]["present"] is True
+
+    def test_no_value_is_copied_into_the_inventory(self, named: Path) -> None:
+        inventory = di.measure(named)
+        dumped = json.dumps(inventory, ensure_ascii=False)
+        assert self.NAME not in dumped
+        # Not even its length: a name's length is a signal.
+        assert len(self.NAME) not in [
+            v for field in inventory["metadata"]["fields"].values() for v in field.values()
+        ]
+        assert "notes.txt" not in dumped
+
+    def test_it_says_why_the_values_are_withheld(self, inventory) -> None:
+        assert inventory["metadata"]["values_withheld"] == di.METADATA_WITHHELD_STATEMENT
 
 
 class TestPointSizes:

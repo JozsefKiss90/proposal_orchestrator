@@ -145,6 +145,29 @@ OPERATOR_BASES: frozenset[str] = frozenset(
 ACCEPTANCE_BASES: frozenset[str] = MEASUREMENT_ONLY_BASES | OPERATOR_BASES
 
 
+#: The document information fields the metadata census reports, in PDF order.
+METADATA_FIELDS: tuple[str, ...] = (
+    "title",
+    "author",
+    "subject",
+    "keywords",
+    "creator",
+    "producer",
+    "creationDate",
+    "modDate",
+    "trapped",
+)
+
+#: Why the metadata census counts and does not copy. Carried by the inventory
+#: verbatim, so a reader of the counts knows where the values are.
+METADATA_WITHHELD_STATEMENT: str = (
+    "Metadata values are withheld, and so are their lengths. A document's author and title are "
+    "the fields most likely to name a person or a project, and the length of a name is itself a "
+    "signal. Whether each field is populated is enough to compare two measurements. The values "
+    "stay in the PDF, where a reader who may see them reads them."
+)
+
+
 class DryImportRefused(RuntimeError):
     """Refusal: the input is not a readable file, or a record is malformed."""
 
@@ -265,6 +288,32 @@ def graphical_census(pdf: Path) -> dict[str, Any]:
             "per_page": rows,
             "fonts": sorted(fonts),
             "embedded_files": int(doc.embfile_count()),
+        }
+    finally:
+        doc.close()
+
+
+def metadata_census(pdf: Path) -> dict[str, Any]:
+    """Which metadata *pdf* carries: the information fields and the XMP packet.
+
+    Flagged, never copied or measured (:data:`METADATA_WITHHELD_STATEMENT`). A field is
+    populated when its value holds a character other than whitespace. Embedded
+    files are counted once, by the graphical census.
+    """
+    import pymupdf
+
+    doc = pymupdf.open(pdf)
+    try:
+        info = doc.metadata or {}
+        xmp = doc.get_xml_metadata() or ""
+        fields: dict[str, dict[str, Any]] = {}
+        for name in METADATA_FIELDS:
+            value = str(info.get(name) or "")
+            fields[name] = {"populated": bool(value.strip())}
+        return {
+            "fields": fields,
+            "xmp": {"present": bool(xmp.strip())},
+            "values_withheld": METADATA_WITHHELD_STATEMENT,
         }
     finally:
         doc.close()
@@ -571,6 +620,7 @@ def measure(pdf: Path) -> dict[str, Any]:
         "per_page": per_page,
         "tables": tables,
         "figures": figure_inventory(census),
+        "metadata": metadata_census(pdf),
         "point_sizes": sizes,
         "citation_markers": citation_inventory(pages),
         "character_accounting": character_accounting(pages),
