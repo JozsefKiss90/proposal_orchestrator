@@ -58,9 +58,10 @@ larger budget resumes it.
 
 What it does not do
 -------------------
-It does not apply the plan. AN4's edit harness edits only the PDF the intake
-pinned, and the plan locates edits on the A2 derivative. Applying them needs a
-harness that pins a stage output. Nor can code check that an edit keeps the
+It does not apply the plan. The plan locates edits on the A2 derivative, so
+applying it needs the stage-output harness AN7 added
+(:func:`runner.anonymisation_intake.apply_stage_edits`) and a stage that calls
+it. Nor can code check that an edit keeps the
 sentence's meaning: the operator reads the plan.
 
 What is private

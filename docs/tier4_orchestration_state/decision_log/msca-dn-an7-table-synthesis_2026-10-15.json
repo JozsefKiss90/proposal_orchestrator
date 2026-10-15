@@ -1,0 +1,71 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-an7-table-synthesis_2026-10-15",
+  "date": "2026-10-15",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN7 of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN7. An authoring tool's rules. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The agent, while implementing AN7. The operator has not yet confirmed these rules in session.",
+  "decision": "Stage A4 (runner/anonymisation_table.py) replaces the identifying cells of Table 1.4.1 in the A2 derivative and keeps the table's layout. Four rules bind later tickets.",
+  "rules": [
+    {
+      "id": "R1",
+      "rule": "The operator authors a private table specification (anonymisation_table_spec/1), pinned by hash like the dictionary. It declares every column once, with its header and one rule: keep, pseudonym, band or map. Bands and mapped values come only from it.",
+      "declared_status": "Inferred",
+      "basis": "Handoff section 5 A4 lists the fields an evaluator scores, including a career stage band and the kind of additional expertise. Which band or kind an evaluator reads is a judgment, and CLAUDE.md section 10.6 forbids supplying it from programme knowledge. The specification quotes the real table's values, so it is private."
+    },
+    {
+      "id": "R2",
+      "rule": "A4 never coins a pseudonym. A name or beneficiary cell must already hold the A2 replacement of exactly one dictionary entry of the declared category, and must read that entry's code. A cell with none is refused, and the operator adds the entity to the dictionary and runs A2 again.",
+      "declared_status": "Inferred",
+      "basis": "Handoff section 5 A4 asks for the same pseudonym wherever a supervisor appears. A2 already replaces every occurrence from the dictionary, so the dictionary is the one source of pseudonyms. A second source in A4 could disagree with it."
+    },
+    {
+      "id": "R3",
+      "rule": "Every person entry of the dictionary carries exactly one code in all its replacements, and no two person entries share a code. A dictionary that breaks this is refused.",
+      "declared_status": "Confirmed",
+      "basis": "Policy category person_name: replacement pattern '{role} {code}', the code fixed for the person, consistency per_entity."
+    },
+    {
+      "id": "R4",
+      "rule": "A band spans at least two values, bands do not overlap, and only the last may be open. A source value outside every band is refused. A cell carries the band alone, written 'lo to hi' or 'lo or more', or 'lo-hi' and 'lo+' when the long form does not fit; the column header carries the measure.",
+      "declared_status": "Inferred",
+      "basis": "Handoff section 5 A4: exact metrics go. A one-value band would keep the exact metric. Policy category identifying_number: rule band, pattern '{measure} {band}'."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "Identifying numbers outside the table, such as an h-index in prose, are not edited by A4. They are A3's, and no applied A3 plan exists yet."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "No code checks that the operator's bands and maps keep what an evaluator scores. The operator reads the row map, and A8 measures the score delta."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The row map is written beside the derivative in the stage's private directory, unencrypted. Handoff section 6 puts the mapping table in a KMS-encrypted store, apart from what is exported. Moving it there is part of the export procedure (AN11) and the host setup (AN12)."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "A4 does not search the document for supervisor mentions itself. It relies on A2 having replaced every dictionary match, and on the A5 leak scan (AN8a) to catch any mention A2 missed. A mention whose form the dictionary does not cover is caught by neither; the operator's read in A7 is the last line."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The fixture table has no publication-title column, so no rule for titles is tested. A real table with such a column would declare it map or keep, and nothing checks that titles go. The operator's specification for the DN original must cover it."
+    }
+  ],
+  "harness_change": "runner/anonymisation_intake.py gains apply_stage_edits, the AN4 edit harness for a stage output pinned by the hash its stage record holds. The intake record must still choose the submitted-PDF route. This closes the harness half of AN6's second known gap; applying the A3 plan is still not done.",
+  "inputs": [
+    "runner/anonymisation_table.py",
+    "runner/anonymisation_intake.py (apply_stage_edits)",
+    "tests/runner/test_anonymisation_table.py",
+    "runner/anonymisation_policy_v1.json (categories person_name, institution, identifying_number)",
+    "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 5 A4"
+  ],
+  "privacy": "This record names no entity. It quotes nothing from the DN original or the fixture.",
+  "decision_status": "Assumed",
+  "decision_status_basis": "Adopted by the agent. Operator confirmation is required before AN13 runs the stage on the DN original."
+}

@@ -570,15 +570,66 @@ DICTIONARY: dict[str, Any] = {
 }
 
 
-def write_dictionary(target: Path) -> Path:
-    """Write :data:`DICTIONARY` into *target*, outside this repository."""
+TABLE_SPEC_NAME = "table_spec.json"
+
+
+def _column(index: int, field: str, rule: str, **extra: Any) -> dict[str, Any]:
+    return {"index": index, "header": SUPERVISOR_TABLE_HEADER[index], "field": field,
+            "rule": rule, **extra}
+
+
+#: The Table 1.4.1 specification an operator would author for this fixture
+#: (AN7). It says which column is which, and how each is synthesised. The
+#: bands and the maps are a shape for testing, not a claim about how an
+#: evaluator reads a career stage.
+TABLE_SPEC: dict[str, Any] = {
+    "schema": "anonymisation_table_spec/1",
+    "record_type": "anonymisation_table_spec",
+    "synthetic": True,
+    "table": {"page": SUPERVISOR_TABLE_PAGE, "index": 0, "header_rows": 1},
+    "columns": [
+        _column(0, "supervisor", "pseudonym", category="person_name", row_key=True),
+        _column(1, "beneficiary", "pseudonym", category="institution"),
+        _column(2, "degree_level", "keep"),
+        _column(3, "career_stage", "map", map={
+            "Full professor": "Senior",
+            "Associate prof.": "Established",
+            "Senior scientist": "Established",
+        }),
+        _column(4, "h_index", "band", bands=[[0, 9], [10, 19], [20, 29], [30, 39], [40, None]]),
+        _column(5, "publication_count", "band",
+                bands=[[0, 49], [50, 99], [100, 199], [200, None]]),
+        _column(6, "phds_supervised", "band", bands=[[0, 4], [5, 9], [10, None]]),
+        _column(7, "postdocs_supervised", "band", bands=[[0, 4], [5, 9], [10, None]]),
+        _column(8, "dn_role", "keep"),
+        _column(9, "expertise_kind", "map", map={
+            "Lichen symbiosis": "Plant biology",
+            "Cryo-ET imaging": "Structural imaging",
+            "Industrial coatings": "Materials science",
+        }),
+    ],
+}
+
+
+def _write_private(target: Path, name: str, record: dict[str, Any], what: str) -> Path:
     target = Path(target).resolve()
     if target.is_relative_to(THIS_REPOSITORY):
-        raise FixtureRefused(f"{target} is inside the repository; the dictionary is private.")
+        raise FixtureRefused(f"{target} is inside the repository; the {what} is private.")
     target.mkdir(parents=True, exist_ok=True)
-    path = target / DICTIONARY_NAME
-    path.write_bytes((json.dumps(DICTIONARY, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+    path = target / name
+    path.write_bytes((json.dumps(record, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
     return path
+
+
+def write_dictionary(target: Path) -> Path:
+    """Write :data:`DICTIONARY` into *target*, outside this repository."""
+    return _write_private(target, DICTIONARY_NAME, DICTIONARY, "dictionary")
+
+
+def write_table_spec(target: Path, spec: dict[str, Any] | None = None) -> Path:
+    """Write *spec* (by default :data:`TABLE_SPEC`) into *target*, outside this repository."""
+    return _write_private(target, TABLE_SPEC_NAME, TABLE_SPEC if spec is None else spec,
+                          "table specification")
 
 
 def build(target: Path) -> BuiltFixture:

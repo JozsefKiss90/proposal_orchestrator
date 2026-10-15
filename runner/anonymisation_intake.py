@@ -482,11 +482,34 @@ def apply_span_edits(
     redacted. The returned edit log carries locations, sizes, widths and font
     names, and no text, original or replacement.
     """
-    import pymupdf
-
     pdf = require_private(pdf, "the PDF to edit")
     out_pdf = require_private(out_pdf, "the edited PDF")
     pin(pdf, require_pdf_route(intake_record), "the PDF to edit")
+    return _apply(pdf, edits, out_pdf)
+
+
+def apply_stage_edits(
+    pdf: Path, intake_record: Path, expected_sha256: str, edits: Sequence[SpanEdit],
+    out_pdf: Path,
+) -> list[dict[str, Any]]:
+    """Apply *edits* to a stage's output and write it to *out_pdf*.
+
+    The harness of :func:`apply_span_edits`, for a later stage that edits an
+    earlier stage's derivative rather than the intake PDF. The intake record
+    must still have chosen the submitted-PDF route. *pdf* must hash to
+    *expected_sha256*, which the caller takes from the record of the stage
+    that wrote it, never from the file itself.
+    """
+    pdf = require_private(pdf, "the PDF to edit")
+    out_pdf = require_private(out_pdf, "the edited PDF")
+    require_pdf_route(intake_record)
+    pin(pdf, expected_sha256, "the stage output to edit")
+    return _apply(pdf, edits, out_pdf)
+
+
+def _apply(pdf: Path, edits: Sequence[SpanEdit], out_pdf: Path) -> list[dict[str, Any]]:
+    import pymupdf
+
     doc = pymupdf.open(pdf)
     try:
         log = [_check_edit(doc, index, edit) for index, edit in enumerate(edits)]
