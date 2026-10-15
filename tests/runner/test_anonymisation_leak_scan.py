@@ -18,8 +18,8 @@ citation marker "[1, 2]" is planted as a marker, not as an identifier.
 
 Two kinds of match are listed for review instead of failing: a niche topic,
 which the policy flags for A3, and a case-folded occurrence of an entry the
-operator declared ``match_case``. Tier 4 records that ruling, pending the
-operator: ``msca-dn-an8a-leak-scan-verdict_2026-10-15.json``.
+operator declared ``match_case``. The operator confirmed that ruling:
+``msca-dn-an8a-leak-scan-verdict-confirmed_2026-10-15.json`` in Tier 4.
 
 The mutation run weakens A2, not the scan: the redaction runs with one
 normalisation switched off in its own matcher, so its self-check passes, and

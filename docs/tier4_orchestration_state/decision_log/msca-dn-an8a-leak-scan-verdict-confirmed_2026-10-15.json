@@ -1,0 +1,19 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-an8a-leak-scan-verdict-confirmed_2026-10-15",
+  "date": "2026-10-15",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN8a of .scratch/msca-dn-anonymisation/tickets.md",
+  "supersedes": ["msca-dn-an8a-leak-scan-verdict_2026-10-15"],
+  "authority": "CLAUDE.md section 9.4 (a decision that affects future interpretation is written to the decision log). The operator's in-session instruction 'I confirm the review rule; case variants and niche topics don't fail' is the authority for the confirmation. It is an authority fact and raises no evidence status.",
+  "review_state": "operator_confirmed",
+  "decided_by": "The operator, confirming the rule the agent drafted in the superseded record.",
+  "decision": "The leak scan's verdict rule stands as drafted. A case-folded occurrence of an entry declared match_case (case_variant) and a match of an entry in a flagged category such as a niche topic (flagged_category) do not fail the derivative. Both are listed in the report's review section with their reason and counted by category. Every other match of an edited entry or an identifier pattern is a hit and fails the derivative.",
+  "unchanged": "The rules, their reasons, their evidence statuses and the acceptance reading are those of the superseded record. This record changes only its review state and its decision status.",
+  "implemented_at": "runner/anonymisation_leak_scan.py, commit 2f07e0d; tests/runner/test_anonymisation_leak_scan.py, test_what_does_not_fail_is_listed_for_review.",
+  "consequence": "AN11 may build the public acceptance record on the scan's verdict field. The operator still reads the review list in A7.",
+  "privacy": "This record names no entity and quotes nothing from the DN original.",
+  "decision_status": "Confirmed",
+  "decision_status_basis": "The operator confirmed the rule in session on 2026-10-15. The confirmation settles the decision; it does not raise the evidence status of the reasons the superseded record gives."
+}
