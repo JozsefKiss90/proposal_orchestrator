@@ -1,0 +1,61 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-anonymisation-policy-adoption_2026-10-15",
+  "date": "2026-10-15",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN2 of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN2, recording one clarification the operator gave in session on 2026-10-15. Advisory, out-of-band QA. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "operator_clarified_policy_agent_drafted",
+  "decided_by": "The operator for the O4 clarification. The agent drafted the rest of the policy from the handoff's A1 table and the AN0 record.",
+  "decision": "Adopt anonymisation_policy/1, version 1, as the starting policy. Its hash is pinned below. Any change to the policy needs a successor to this record and re-opens acceptance.",
+  "policy": {
+    "path": "runner/anonymisation_policy_v1.json",
+    "schema": "anonymisation_policy/1",
+    "policy_version": 1,
+    "sha256": "79a81d9d33ffe796370055522c10ef8fcc1bce57b607bb9a49fabb0f4b2b8763",
+    "hash_rule": "runner.anonymisation_policy.policy_sha256: sha256 of the parsed record serialised with sorted keys, no whitespace and UTF-8. Line endings and indentation do not change it."
+  },
+  "inputs": [
+    "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 5 A1 (the category table)",
+    "docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json (O3 and O4)",
+    "tests/_anonymisation_fixture.py CATEGORIES (the category ids AN3 set)"
+  ],
+  "clarification": {
+    "decision": "O4",
+    "question": "O4 says to generalise every location below country level and keep each participant's status. Does the policy keep country names, or replace them with the status alone?",
+    "answer_kind": "operator_answer",
+    "answer": "Country names are kept. Cities and regions are generalised. Each participant's EU Member State, associated country or third country status is kept as well.",
+    "declared_status": "Confirmed",
+    "consequence": "The location category retains the country. Under O3, a correct guess of the country set does not fail a passage, because the policy keeps it."
+  },
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "Neither this record nor the policy holds private content: no names, institutions, acronyms, research groups, locations, figures or text from the submitted original.",
+    "basis": "tests/runner/test_anonymisation_policy.py, TestNamesNoRealEntity: every capitalised word in the policy is reviewed programme or document vocabulary, no planted fixture entity appears, and no identifier pattern matches.",
+    "limit": "The test cannot compare the policy with the private entity dictionary, which never enters this repository. A real entity written in lower case, or spelt like a word on the reviewed vocabulary list, would pass it. The agent also read every string in the policy."
+  },
+  "agent_choices": [
+    {
+      "declared_status": "Inferred",
+      "choice": "The rule vocabulary is the handoff table's own: replace, generalise, band, flag and operator_review, plus keep. The ticket names only keep, generalise and replace, but three of the table's rows use band, flag and operator review, and folding them into the three would lose what each row requires.",
+      "basis": "Handoff section 5 A1 table, Default rule column."
+    },
+    {
+      "declared_status": "Inferred",
+      "choice": "The research group is attacked under the institution category, because the table's institution row covers departments.",
+      "basis": "Handoff section 5 A1 table, institutions row; section 5 A5 names the research group as an attack target."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "O3",
+      "declared_status": "Unresolved",
+      "gap": "The research group has no threshold. The policy declares that target Unresolved, and AN8b must not run until the operator sets one. Setting it changes the policy and needs a successor to this record."
+    }
+  ],
+  "not_evidence_of": [
+    "That any stage applies the policy. AN5 onward do that.",
+    "That the policy is sufficient to anonymise the original. A5 and the operator's read in A7 decide that."
+  ]
+}

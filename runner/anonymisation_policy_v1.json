@@ -1,0 +1,295 @@
+{
+  "schema": "anonymisation_policy/1",
+  "record_type": "anonymisation_policy",
+  "policy_id": "msca-dn-anonymisation-policy",
+  "policy_version": 1,
+  "source": "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 5, stage A1 table",
+  "decisions_applied": [
+    {
+      "decision": "O3",
+      "record": "docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json",
+      "applied_as": "reidentification_threshold"
+    },
+    {
+      "decision": "O4",
+      "record": "docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json",
+      "applied_as": "category location"
+    },
+    {
+      "decision": "O4 clarification",
+      "record": "docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-policy-adoption_2026-10-15.json",
+      "applied_as": "category location keeps the country"
+    }
+  ],
+  "categories": [
+    {
+      "id": "person_name",
+      "label": "Person names (supervisors, PIs, staff)",
+      "rule": "replace",
+      "auto_edit": true,
+      "replacement_pattern": "{role} {code}",
+      "placeholders": {
+        "role": "the person's role in the network, such as supervisor",
+        "code": "a letter and a two-digit number, fixed for the person"
+      },
+      "example": "Supervisor S03",
+      "consistency": "per_entity",
+      "retain": ["role"],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": "Initials, possessives, diacritic variants and names split across a line break are the same person.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, person names row."
+    },
+    {
+      "id": "institution",
+      "label": "Institutions, departments, companies",
+      "rule": "replace",
+      "auto_edit": true,
+      "replacement_pattern": "{role} {code} ({kind}, {participation_status})",
+      "placeholders": {
+        "role": "the organisation's role in the network, such as beneficiary or associated partner",
+        "code": "a letter and a number, fixed for the organisation",
+        "kind": "the kind of organisation, such as university or company",
+        "participation_status": "EU Member State, associated country or third country"
+      },
+      "example": "Beneficiary B2 (university, EU Member State)",
+      "consistency": "per_entity",
+      "retain": ["role", "kind", "participation_status"],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": "A department takes the code of its organisation.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, institutions row; participation status kept under O4."
+    },
+    {
+      "id": "project_identity",
+      "label": "Project acronym and title",
+      "rule": "replace",
+      "auto_edit": true,
+      "replacement_pattern": "{pseudonym}",
+      "placeholders": {
+        "pseudonym": "one invented acronym and title, fixed across the document"
+      },
+      "example": null,
+      "consistency": "document",
+      "retain": [],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": null,
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, project acronym row."
+    },
+    {
+      "id": "location",
+      "label": "Cities, regions, countries",
+      "rule": "generalise",
+      "auto_edit": true,
+      "replacement_pattern": "{place_descriptor} in {country}",
+      "placeholders": {
+        "place_descriptor": "the kind and size of a place below country level, such as a capital city or a coastal region",
+        "country": "the country, kept"
+      },
+      "example": "a capital city, with its country kept",
+      "consistency": "per_entity",
+      "retain": ["country", "participation_status"],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": "Every location below country level is generalised. The country and each participant's EU Member State, associated country or third country status are kept, because evaluators score the network's geography.",
+      "declared_status": "Confirmed",
+      "basis": "O4 in the AN0 record; the operator confirmed in session on 2026-10-15 that country names are kept."
+    },
+    {
+      "id": "facility",
+      "label": "Unique facilities and named infrastructure",
+      "rule": "generalise",
+      "auto_edit": true,
+      "replacement_pattern": "a {scale} {facility_type}",
+      "placeholders": {
+        "scale": "the facility's reach, such as national or regional",
+        "facility_type": "what the facility is, kept specific enough to judge feasibility"
+      },
+      "example": "a national high-field NMR facility",
+      "consistency": "per_entity",
+      "retain": ["facility_type", "scale"],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": null,
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, facilities row."
+    },
+    {
+      "id": "dataset_cohort",
+      "label": "Named datasets and cohorts",
+      "rule": "generalise",
+      "auto_edit": true,
+      "replacement_pattern": "a {scale} {dataset_type} (n in {size_band})",
+      "placeholders": {
+        "scale": "the dataset's reach, such as national or multi-site",
+        "dataset_type": "what the dataset is, such as longitudinal cohort",
+        "size_band": "the size rounded to a band"
+      },
+      "example": "a national longitudinal cohort (n in 1,000 to 1,999)",
+      "consistency": "per_entity",
+      "retain": ["dataset_type", "scale", "size_band"],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": null,
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, datasets row."
+    },
+    {
+      "id": "grant",
+      "label": "Prior and current grants (ids, acronyms, funders when identifying)",
+      "rule": "generalise",
+      "auto_edit": true,
+      "replacement_pattern": "a {timing} {scheme_class} grant",
+      "placeholders": {
+        "timing": "prior or current",
+        "scheme_class": "the kind of grant, such as consolidator-stage or doctoral network"
+      },
+      "example": "a prior consolidator-stage grant",
+      "consistency": "per_entity",
+      "retain": ["timing", "scheme_class"],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": "Grant ids and grant acronyms always go. A funder goes only where naming it identifies the holder.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, grants row."
+    },
+    {
+      "id": "self_citation",
+      "label": "Self-citations and citations of consortium members",
+      "rule": "replace",
+      "auto_edit": true,
+      "replacement_pattern": "[R{n}]",
+      "placeholders": {
+        "n": "the marker's place in the reference list"
+      },
+      "example": "[R12]",
+      "consistency": "per_entity",
+      "retain": ["count", "position"],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": "Each matching reference list entry becomes a neutral placeholder, so the list keeps its length.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, self-citations row."
+    },
+    {
+      "id": "niche_topic",
+      "label": "Niche topic combinations",
+      "rule": "flag",
+      "auto_edit": false,
+      "replacement_pattern": null,
+      "placeholders": {},
+      "example": null,
+      "consistency": null,
+      "retain": [],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": "Flagged for A3 and A5. Rewritten in A3 only where the A5 attack shows the combination identifies the network.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, niche topics row."
+    },
+    {
+      "id": "identifying_number",
+      "label": "Numbers that identify (budgets per partner, staff counts, h-index)",
+      "rule": "band",
+      "auto_edit": true,
+      "replacement_pattern": "{measure} {band}",
+      "placeholders": {
+        "measure": "what the number measures, kept",
+        "band": "the value rounded to a band"
+      },
+      "example": "h-index 20 to 29",
+      "consistency": "per_occurrence",
+      "retain": ["measure", "band"],
+      "review_unit": null,
+      "permitted_actions": [],
+      "note": "Timing and effort figures that do not identify anyone are kept as they are.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, identifying numbers row."
+    },
+    {
+      "id": "identifying_figure",
+      "label": "Figures with logos, maps, photos, names",
+      "rule": "operator_review",
+      "auto_edit": false,
+      "replacement_pattern": null,
+      "placeholders": {},
+      "example": null,
+      "consistency": null,
+      "retain": [],
+      "review_unit": "per_figure",
+      "permitted_actions": ["redraw", "mask"],
+      "note": "The operator looks at each figure and redraws or masks it. No figure is silently dropped.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A1 table, figures row."
+    }
+  ],
+  "kept_content": [
+    "Scientific content",
+    "Methods",
+    "Work-package logic",
+    "Deliverable and milestone structure",
+    "Timing and effort figures that do not identify anyone"
+  ],
+  "reidentification_threshold": {
+    "targets": [
+      {
+        "target": "coordinating_institution",
+        "category": "institution",
+        "max_correct_guesses": 0,
+        "guess_admissible": false,
+        "kept_by": null,
+        "declared_status": "Confirmed",
+        "basis": "O3 in the AN0 record: zero correct guesses for institutions."
+      },
+      {
+        "target": "partner",
+        "category": "institution",
+        "max_correct_guesses": 0,
+        "guess_admissible": false,
+        "kept_by": null,
+        "declared_status": "Confirmed",
+        "basis": "O3 in the AN0 record: zero correct guesses for institutions."
+      },
+      {
+        "target": "supervisor",
+        "category": "person_name",
+        "max_correct_guesses": 0,
+        "guess_admissible": false,
+        "kept_by": null,
+        "declared_status": "Confirmed",
+        "basis": "O3 in the AN0 record: zero correct guesses for people."
+      },
+      {
+        "target": "project_acronym",
+        "category": "project_identity",
+        "max_correct_guesses": 0,
+        "guess_admissible": false,
+        "kept_by": null,
+        "declared_status": "Confirmed",
+        "basis": "O3 in the AN0 record: zero correct guesses for the acronym."
+      },
+      {
+        "target": "country_set",
+        "category": "location",
+        "max_correct_guesses": null,
+        "guess_admissible": true,
+        "kept_by": "country",
+        "declared_status": "Confirmed",
+        "basis": "O3 in the AN0 record: the country set may be guessed when the policy keeps it, and this policy keeps the country."
+      },
+      {
+        "target": "research_group",
+        "category": "institution",
+        "max_correct_guesses": null,
+        "guess_admissible": false,
+        "kept_by": null,
+        "declared_status": "Unresolved",
+        "basis": "AN0 known gap: O3 sets no threshold for the research group. AN8b may not run until the operator sets one."
+      }
+    ]
+  }
+}
