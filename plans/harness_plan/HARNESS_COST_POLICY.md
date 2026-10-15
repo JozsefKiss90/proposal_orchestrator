@@ -65,3 +65,44 @@ adversarial runs (behind M2-T10 / the showcase). One ticket, one budget line.
 ## Recommendation
 
 Pull the free cores out of E5 / E6 / E9 into native tickets now — they need only the local judge or pure set math — and leave **E10** as the single, clearly-bounded paid deferral. Net: the entire integrity surface runs on the subscription + a local judge at no marginal cost, and budget/online gates only the *external tooling*, never the *capability*.
+
+## Amendment 2026-10-14 (J0): one optional metered provider
+
+> **Status: drafted, pending operator signature.** Decision record:
+> `docs/tier4_orchestration_state/decision_log/harness-jev-j0-governance_2026-10-14.json`.
+> Source: `plans/reports/jev_harness_overhaul_assessment_2026-10-13.md` §12, ticket J0.
+> The policy above stays in force. This amendment adds one rule and retires E10's framework list.
+
+**The rule.** A separately metered provider may be wired into the harness only when all of these hold:
+
+1. **Optional.** It sits behind an injected backend. A missing key constructs nothing, every test runs
+   against a fake backend with zero network, and the acceptance lane stays green without it.
+2. **Never a gate.** Its outputs are advisory records. No value it returns reaches a freeze check,
+   a criterion score, `weighted_total`, or any runtime DAG node.
+3. **Capped.** Each run enforces a token budget and a request budget, and stops issuing new work when
+   either is reached. Default caps are in the decision record (2M input tokens per run, $5 per month);
+   the operator may change them there.
+4. **Data-classed.** Only material whose data class permits that provider is sent. The classes are
+   defined in the decision record and summarised below.
+5. **Replayable.** Live responses are recorded and replayed byte for byte. A live call is not treated
+   as reproducible.
+
+The first provider admitted under this rule is TypeSafe Jev (`jev-1.13.0`, pinned id, never an alias).
+
+**E10 is retired as a list.** DeepEval, Ragas, PromptFoo and DeepTeam are no longer separate
+placeholders. Any of them, or another metered service, is admitted later under this same rule with its
+own decision record. Their free cores stay on the native track as before.
+
+### Data classes for external processors
+
+| Class | Material | Claude subscription | Jev |
+|---|---|---|---|
+| D0 | Synthetic and pseudonymous fixtures (SYN-ALPHA, BIODIV-01 demo, MSCA-PF graph candidate, adversarial fixtures) | permitted | permitted now |
+| D1 | Repository metadata (hashes, counts, ids, statuses) | permitted | permitted |
+| D2 | The existing sanitised derivative, the ESR record, harness outputs quoting them | permitted | only after ZDR is confirmed in writing |
+| D3 | The accepted anonymised derivative of the original | after its acceptance record | after acceptance **and** confirmed ZDR |
+| D4 | The submitted original, its private configuration, graph root and register, the anonymisation mapping table, Table 1.4.1 as submitted, any unaccepted derivative, the Stage B candidate | not permitted (Bedrock inside the private network only) | never (J10 blocked) |
+
+"ZDR confirmed" means written confirmation from TypeSafe that zero data retention is active on the
+account in use, covering inputs and outputs, plus an executed DPA, recorded in a successor decision
+record. A statement that ZDR is "available" does not satisfy it.

@@ -1,0 +1,149 @@
+{
+  "record_type": "decision_record",
+  "id": "harness-jev-j0-governance_2026-10-14",
+  "date": "2026-10-14",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "Harness overhaul (Jev, Design 1)",
+  "ticket": "J0 of plans/reports/jev_harness_overhaul_assessment_2026-10-13.md section 12",
+  "authority": "Agent-drafted under CLAUDE.md, for the operator's decision. Advisory, out-of-band. Adds no runtime gate, amends no constitutional rule, and authorises no transmission until the operator signs the operator_decision block. The fields already filled record decisions the operator stated in session on 2026-10-14; the signature makes them the operator's record.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decision": "Adopt Design 1 of the assessment in its bounded form. Jev may be wired into harness/ as an optional, injected typed-decision provider. The cost policy is amended to permit one optional metered provider behind an injected backend and never a required one, and E10's framework list is folded into that rule. What may be sent to Jev is decided per data class (below): synthetic material now; the sanitised and anonymised derivatives only after the vendor's zero-data-retention terms are confirmed in writing; the submitted original, its private records and the Stage B candidate never.",
+  "why": "The assessment found Jev useful only for short-text classification over supplied evidence, outside the blind lane. Its single blocker for real use is the processing route: TypeSafe processes in the United States, documents no VPC, private-endpoint or EU option, and offers zero data retention to enterprise customers on request only. The private network (ADR-001 Decisions 1-2) cannot reach it, so the route for anything beyond synthetic fixtures runs through derivatives that are safe to process outside that network, under contractual retention terms.",
+  "inputs": [
+    "plans/reports/jev_harness_overhaul_assessment_2026-10-13.md (sections 1, 4.4, 11.1, 12, 14)",
+    "plans/harness_plan/HARNESS_COST_POLICY.md (set 2026-07-21)",
+    "docs/infrastructure_security/audit_package/ADR-001-security-decisions.md (Decisions 1-2)",
+    "plans/msca_dn_pe09_runbook.md section 10",
+    "https://typesafe.ai/enterprise, read 2026-10-14"
+  ],
+  "vendor_position": {
+    "read_on": "2026-10-14",
+    "documented": [
+      "Zero data retention is available for enterprise customers, set up per account on request.",
+      "Inputs and outputs are not used to train models.",
+      "A SOC 2 Type II report is available on request through the Trust Center.",
+      "Processing in the United States (assessment section 4.4); DPA with EU SCCs Module 2 (same)."
+    ],
+    "not_documented": [
+      "What zero data retention covers: inputs, outputs, request logs, abuse-monitoring copies, backups.",
+      "Retention without ZDR (the privacy policy says 'as long as reasonably necessary').",
+      "Any VPC, PrivateLink, on-premises or EU-region deployment. The enterprise FAQ asks the question and the page shows no answer.",
+      "The sub-processor list.",
+      "A deprecation notice period for a pinned model id."
+    ],
+    "operator_contact": {
+      "status": "requested",
+      "what": "The operator contacted TypeSafe about Jev API access with zero data retention for the proposal orchestrator.",
+      "requested_on": "on or before 2026-10-14",
+      "response": null
+    },
+    "questions_the_response_must_answer": [
+      "Is ZDR confirmed in writing for this account, effective from which date, and does it cover inputs, outputs, logs and abuse-monitoring copies?",
+      "Which sub-processors handle request content, and where?",
+      "Is the DPA with SCCs executed for this account, and who is the counterparty?",
+      "Is a dedicated, VPC or AWS PrivateLink endpoint available, in any region, and in the EU in particular?",
+      "What notice is given before jev-1.13.0 is retired?",
+      "The SOC 2 Type II report: received and its scope read."
+    ]
+  },
+  "zdr_confirmed": {
+    "definition": "Written confirmation from TypeSafe that zero data retention is active on the account used by TYPESAFE_API_KEY, covering request inputs and outputs, plus an executed DPA. Recorded in a successor decision record naming the document, its date and its hash. A sales email saying ZDR is 'available' does not satisfy this.",
+    "status": "Unresolved",
+    "successor_record": null
+  },
+  "data_classes": [
+    {
+      "class": "D0",
+      "name": "Synthetic and pseudonymous fixtures",
+      "members": [
+        "SYN-ALPHA instrument and hand-authored cells (tests/harness/test_profile.py)",
+        "the BIODIV-01 dev-graph demo candidate and the MSCA-PF graph candidate",
+        "E8-style adversarial fixtures"
+      ],
+      "claude_subscription": "permitted",
+      "jev": "permitted now",
+      "condition": "none"
+    },
+    {
+      "class": "D1",
+      "name": "Repository metadata",
+      "members": [
+        "hashes, counts, dates, decision ids, review statuses and command lines, as runbook section 10 already allows the public workspace to hold"
+      ],
+      "claude_subscription": "permitted",
+      "jev": "not needed; permitted",
+      "condition": "none"
+    },
+    {
+      "class": "D2",
+      "name": "The existing sanitised derivative, the ESR record and harness outputs quoting them",
+      "members": [
+        "docs/tier3_project_instantiation/source_materials/msca_dn/ (sanitised Part B)",
+        "the transcribed ESR in docs/tier4_orchestration_state/msca_dn/esr/",
+        "frozen reports, comparisons and reviews over the sanitised copy"
+      ],
+      "claude_subscription": "permitted (already in use under PE-01 to PE-08)",
+      "jev": "permitted only after zdr_confirmed",
+      "condition": "zdr_confirmed is Confirmed in a successor record. The ESR text is evaluator commentary about the original proposal and is treated as D2, not D0."
+    },
+    {
+      "class": "D3",
+      "name": "The accepted anonymised derivative of the original",
+      "members": [
+        "the derivative the planned anonymisation pipeline produces in the private network, once accepted"
+      ],
+      "claude_subscription": "permitted after acceptance",
+      "jev": "permitted after acceptance and zdr_confirmed",
+      "condition": "Accepted means: the deterministic redaction and model rewrite ran inside the private network; the re-identification pass found no hit; the operator signed it off; Table 1.4.1 is replaced by a structurally equivalent synthetic table; and its export is permitted by the private environment's own rule (runbook section 10). The acceptance is recorded as its own decision record. Until then the derivative is D4."
+    },
+    {
+      "class": "D4",
+      "name": "Private material",
+      "members": [
+        "the submitted MSCA-DN original and anything quoting it",
+        "the original's configuration input, private graph root and register (V17, V18)",
+        "the anonymisation mapping table (original to replacement)",
+        "Table 1.4.1 in its original form",
+        "a derivative not yet accepted",
+        "the Stage B 2026 candidate (V16)"
+      ],
+      "claude_subscription": "not permitted; Bedrock inside the private network only",
+      "jev": "never",
+      "condition": "Changes only through J10, which needs a vendor deployment option that does not exist today, or a separate operator decision to open egress under a DPA with ZDR. Neither is made here."
+    }
+  ],
+  "cost_policy_amendment": {
+    "file": "plans/harness_plan/HARNESS_COST_POLICY.md",
+    "section": "Amendment 2026-10-14 (J0): one optional metered provider",
+    "summary": "An optional metered provider is admitted behind an injected backend. It is never required: the acceptance lane stays green and every test passes with no key; a missing key constructs nothing. Spend is capped per run. E10's four-framework list is retired as a list and replaced by this one rule."
+  },
+  "spend_cap": {
+    "per_run_tokens": 2000000,
+    "per_month_usd": 5,
+    "basis": "Assessment section 11.5 estimates about $0.40 for the full benchmark at the posted $0.042 per million input tokens. The cap is an order of magnitude above it so it bites only on a runaway loop.",
+    "status": "Assumed, pending the operator's figure"
+  },
+  "operator_decision": {
+    "adopt_design_1_bounded": null,
+    "amend_cost_policy_as_drafted": null,
+    "data_classes_as_drafted": null,
+    "spend_cap": null,
+    "signed_by": null,
+    "signed_on": null
+  },
+  "unblocks_when_signed": [
+    "J1 (decision_provider.py) and J2 (benchmark on synthetic fixtures): D0 only, no ZDR needed",
+    "J4, J5, J7 on the BIODIV-01 and MSCA-PF demo candidates (D0)"
+  ],
+  "stays_blocked": [
+    "J3 and J4/J5 on the sanitised copy: until zdr_confirmed",
+    "J3 and J5 on the anonymised derivative: until its acceptance record and zdr_confirmed",
+    "J10: indefinitely"
+  ],
+  "not_evidence_of": [
+    "that TypeSafe has granted zero data retention",
+    "that any proposal text has been or may now be sent to TypeSafe",
+    "that the anonymised derivative exists or has been accepted",
+    "a change to the blind lane, the freeze, the receipt or any runtime gate"
+  ]
+}

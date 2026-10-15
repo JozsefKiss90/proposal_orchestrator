@@ -251,6 +251,7 @@ Did status-aware faithfulness + ledger completeness surface real issues (or give
 **Gated by:** (a) available budget, and (b) an online build session (satisfies the API-currency guardrail). Never a runtime gate.
 **Free cores already in the native track (do NOT wait on E10):** E5 → native rubric grader; E9 → set-math context precision/recall; E6 → native predicate bridge; E7a → deterministic α-block; E8 honesty invariants → hand-authored fixtures + deterministic block assertions.
 **Scope when funded:** framework bindings + provider/cost matrix + DeepTeam generation + any remaining adversarial runs. One ticket, one budget line.
+**2026-10-14 (J0, pending operator signature):** retired as a framework list. `HARNESS_COST_POLICY.md` § *Amendment 2026-10-14 (J0)* replaces it with one rule for any optional metered provider (optional, never a gate, capped, data-classed, replayable). Jev is the first provider admitted under it; any framework above comes in later under the same rule with its own decision record. Decision: `docs/tier4_orchestration_state/decision_log/harness-jev-j0-governance_2026-10-14.json`.
 
 ---
 
