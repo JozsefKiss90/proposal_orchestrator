@@ -453,7 +453,7 @@ def _check_edit(doc: Any, index: int, edit: SpanEdit) -> dict[str, Any]:
     }
 
 
-def _require_pdf_route(intake_record: Path) -> str:
+def require_pdf_route(intake_record: Path) -> str:
     """The pinned hash from *intake_record*, refused unless its route is the PDF."""
     intake_record = require_private(intake_record, "the intake record")
     try:
@@ -486,7 +486,7 @@ def apply_span_edits(
 
     pdf = require_private(pdf, "the PDF to edit")
     out_pdf = require_private(out_pdf, "the edited PDF")
-    pin(pdf, _require_pdf_route(intake_record), "the PDF to edit")
+    pin(pdf, require_pdf_route(intake_record), "the PDF to edit")
     doc = pymupdf.open(pdf)
     try:
         log = [_check_edit(doc, index, edit) for index, edit in enumerate(edits)]

@@ -503,6 +503,84 @@ def _manifest(pdf: Path) -> dict[str, Any]:
     }
 
 
+DICTIONARY_NAME = "entity_dictionary.json"
+
+
+def _d(eid: str, category: str, surface: str, replacements: list[str], *,
+       variants: tuple[str, ...] = (), **extra: Any) -> dict[str, Any]:
+    return {"id": eid, "category": category, "surface": surface, "variants": list(variants),
+            "replacements": replacements, **extra}
+
+
+def _person(given: str, family: str) -> dict[str, Any]:
+    return {"given": given, "family": family, "match_family_alone": True}
+
+
+#: The entity dictionary an operator would author for this fixture (AN5). Entry
+#: ids are the manifest's. Each replacement list ends in one short enough for
+#: the smallest box the entity occupies. Identifying numbers are absent: no
+#: honest band fits the box of the number it replaces, so they wait for A3/A4.
+DICTIONARY: dict[str, Any] = {
+    "schema": "anonymisation_entity_dictionary/1",
+    "record_type": "anonymisation_entity_dictionary",
+    "synthetic": True,
+    "entries": [
+        _d("E01", "person_name", "Orsolya Vantrell", ["Supervisor S01", "S01"],
+           person=_person("Orsolya", "Vantrell")),
+        _d("E02", "person_name", "Halvard Quist", ["Supervisor S02", "S02"],
+           person=_person("Halvard", "Quist")),
+        _d("E03", "person_name", "Mats Ostrander", ["Supervisor S03", "S03"],
+           person=_person("Mats", "Ostrander")),
+        _d("E07", "institution", "University of Kelpmoor",
+           ["Beneficiary B1 (university, EU Member State)", "Beneficiary B1", "B1"],
+           variants=("Univ. of Kelpmoor",)),
+        _d("E08", "institution", "Department of Cryobiology", ["a department of Beneficiary B1", "a B1 department"]),
+        _d("E09", "institution", "Fenwardt Biosystems GmbH",
+           ["Partner P1 (company, EU Member State)", "Partner P1"],
+           variants=("Fenwardt Biosystems",)),
+        _d("E10", "project_identity", "KELVARA", ["PROJ"]),
+        _d("E11", "project_identity", "Kelp-Derived Lichen Varnishes for Arctic Resilience",
+           ["Project Title Withheld"]),
+        _d("E13", "location", "Brennmark", ["a coastal town", "a town"]),
+        _d("E30", "location", "Upper Talvenia", ["a northern region", "a region"]),
+        _d("E14", "location", "Finland", [], country=True),
+        _d("E15", "location", "Austria", [], country=True),
+        _d("E31", "location", "Norway", [], country=True),
+        _d("E16", "facility", "Brennmark Tidal Flux Observatory",
+           ["a national tidal observatory", "an observatory"],
+           variants=("Brennmark Observatory",)),
+        _d("E17", "dataset_cohort", "VARNA-7 Longitudinal Lichen Cohort",
+           ["a national longitudinal cohort", "a cohort"],
+           variants=("VARNA-7 Cohort Consortium", "VARNA-7")),
+        _d("E18", "grant", "VARNISH", ["a grant"], match_case=True),
+        _d("E20", "self_citation", "Vantrell, O. and Quist, H. (2021)",
+           ["[R1] reference withheld", "[R1]"]),
+        _d("E32", "self_citation", "Quist, H. (2022)", ["[R2] reference withheld", "[R2]"]),
+        _d("E23", "niche_topic",
+           "cryo-electron tomography of lichen photobionts in high-altitude permafrost", []),
+    ],
+    "regex_classes": {
+        "doi": {"category": "self_citation", "replacements": ["[DOI withheld]", "[DOI]"]},
+        "grant_number": {"category": "grant", "replacements": ["[number withheld]", "[no.]"]},
+        "orcid": {"category": "person_name", "replacements": ["[ORCID withheld]"]},
+        "email": {"category": "person_name", "replacements": ["[e-mail withheld]"]},
+        "url": {"category": "project_identity", "replacements": ["[URL withheld]"]},
+        "phone": {"category": "person_name", "replacements": ["[phone withheld]"]},
+    },
+}
+
+
+def write_dictionary(target: Path) -> Path:
+    """Write :data:`DICTIONARY` into *target*, outside this repository."""
+    target = Path(target).resolve()
+    if target.is_relative_to(THIS_REPOSITORY):
+        raise FixtureRefused(f"{target} is inside the repository; the dictionary is private.")
+    target.mkdir(parents=True, exist_ok=True)
+    path = target / DICTIONARY_NAME
+    path.write_bytes((json.dumps(DICTIONARY, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+    return path
+
+
 def build(target: Path) -> BuiltFixture:
     """Write the fixture PDF and its manifest into *target*, outside this repository."""
     target = Path(target).resolve()
