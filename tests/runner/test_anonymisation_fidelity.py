@@ -183,13 +183,10 @@ def test_every_citation_difference_on_the_fixture_is_explained(unreviewed: dict[
     assert counts["findings"] == 0
 
 
-def test_replacement_text_set_at_a_new_size_is_a_finding(unreviewed: dict[str, Any]) -> None:
-    """The fixture's A2 run sets replacements smaller than the text they replace.
-    A6 is where that shows: no policy rule changes a point size."""
-    new = _of(unreviewed, "point_sizes", code="size_absent_from_reference")
-    assert new
-    assert all(d["status"] == "finding" for d in new)
-    assert not _of(unreviewed, "point_sizes", code="body_size_changed")
+def test_the_fixture_keeps_every_point_size(unreviewed: dict[str, Any]) -> None:
+    """A2 writes each replacement at its span's own size, so no size appears or goes."""
+    assert unreviewed["counts"]["point_sizes"] == {"differences": 0, "explained": 0,
+                                                   "findings": 0}
 
 
 def test_an_unreviewed_figure_is_a_finding_even_when_its_counts_match(
@@ -296,6 +293,15 @@ def test_a_lost_table_is_a_finding(world, policy) -> None:
     derivative["tables"]["per_table"] = []
     [finding] = _findings(_compare(world, policy, derivative), "tables")
     assert finding["code"] == "table_count_changed"
+
+
+def test_a_size_the_reference_does_not_carry_is_a_finding(world, policy) -> None:
+    """Replacement text set smaller than its span: no policy rule changes a point size."""
+    derivative = copy.deepcopy(world["reference"])
+    derivative["point_sizes"]["distribution"]["8.5"] = 12
+    [finding] = _findings(_compare(world, policy, derivative), "point_sizes")
+    assert finding["code"] == "size_absent_from_reference"
+    assert (finding["size"], finding["derivative"]) == ("8.5", 12)
 
 
 def test_a_changed_body_size_is_a_finding(world, policy) -> None:
@@ -480,7 +486,7 @@ def test_a_malformed_review_entry_is_a_finding(world, policy, change, code) -> N
 # --------------------------------------------------------------------------- #
 
 
-def test_a_review_of_every_figure_leaves_only_the_size_findings(
+def test_a_review_of_every_figure_passes_the_fixture(
     world: dict[str, Any], policy: ap.LoadedPolicy,
 ) -> None:
     sha = world["synthesised"].derivative_sha256
@@ -488,10 +494,9 @@ def test_a_review_of_every_figure_leaves_only_the_size_findings(
                            _review(sha, [_looked_at(p) for p in GRAPHICAL_PAGES]))
     result = _fidelity(world, policy, world["root"] / "a6_reviewed", figure_review=review)
     report = _report(result)
-    assert result.passed is False
+    assert result.passed is True
+    assert report["verdict"] == "pass"
     assert [f["status"] for f in report["figures"]] == ["preserved"] * 3
-    found = {c for c, n in report["counts"].items() if n["findings"]}
-    assert found == {"point_sizes"}
     assert report["input"]["figure_review_sha256"] == _sha(review)
 
 

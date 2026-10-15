@@ -23,8 +23,10 @@ takes the submitted PDF always, and a Word source optionally:
 * **PDF route.** No source, so the submitted PDF is the edit target.
   :func:`apply_span_edits` is its edit harness, and it runs only against an
   intake record whose route is the submitted PDF. It redacts a span and
-  inserts replacement text in the span's own box. A replacement wider than the
-  box at the span's point size overflows its length budget and is refused,
+  inserts replacement text in the span's own box, at the span's point size and
+  on its baseline. A write that lands at another size is refused. A
+  replacement wider than the box at the span's point size overflows its
+  length budget and is refused,
   because a longer text would reflow the page and break stage A6's comparison.
   The replacement is set in Helvetica whatever the original font was; the
   edit log records the original fonts so stage A6 can explain the change.
@@ -394,6 +396,8 @@ class _Char(NamedTuple):
     c: str
     size: float
     font: str
+    x: float
+    baseline: float
 
 
 def _chars_in(page: Any, rect: Any) -> list[_Char]:
@@ -407,8 +411,14 @@ def _chars_in(page: Any, rect: Any) -> list[_Char]:
                         continue
                     x0, y0, x1, y1 = char["bbox"]
                     if rect.x0 <= (x0 + x1) / 2 <= rect.x1 and rect.y0 <= (y0 + y1) / 2 <= rect.y1:
-                        out.append(_Char(char["c"], round(float(span["size"]), 2), span["font"]))
+                        out.append(_Char(char["c"], round(float(span["size"]), 2), span["font"],
+                                         float(x0), round(float(char["origin"][1]), 3)))
     return out
+
+
+def _baseline(chars: Sequence[_Char]) -> float:
+    """The baseline the span's first character sits on."""
+    return min(chars, key=lambda char: char.x).baseline
 
 
 def _check_edit(doc: Any, index: int, edit: SpanEdit) -> dict[str, Any]:
@@ -525,13 +535,14 @@ def _apply(pdf: Path, edits: Sequence[SpanEdit], out_pdf: Path) -> list[dict[str
                             f"page {number}: two spans overlap; each character is replaced once"
                         )
             page = doc[number - 1]
-            for edit, entry in items:
+            baselines = [_baseline(_chars_in(page, pymupdf.Rect(edit.rect))) for edit, _ in items]
+            for edit, _ in items:
+                # No text here: PyMuPDF writes redaction text with insert_textbox,
+                # which needs more height than a one-line box gives and shrinks
+                # the size until it fits (10 pt became 8.5 pt). The replacement
+                # is written below instead, at the span's own size and baseline.
                 page.add_redact_annot(
                     pymupdf.Rect(edit.rect),
-                    text=edit.replacement or None,
-                    fontname=REPLACEMENT_FONT,
-                    fontsize=entry["point_size"],
-                    align=pymupdf.TEXT_ALIGN_LEFT,
                     # False, not None: None paints a white box, a drawing A6 would count.
                     fill=False,  # type: ignore[arg-type]
                 )
@@ -542,12 +553,25 @@ def _apply(pdf: Path, edits: Sequence[SpanEdit], out_pdf: Path) -> list[dict[str
                 graphics=pymupdf.PDF_REDACT_LINE_ART_NONE,  # type: ignore[attr-defined]
                 text=pymupdf.PDF_REDACT_TEXT_REMOVE,  # type: ignore[attr-defined]
             )
+            for (edit, entry), baseline in zip(items, baselines):
+                if edit.replacement:
+                    page.insert_text(
+                        (edit.rect[0], baseline),
+                        edit.replacement,
+                        fontname=REPLACEMENT_FONT,
+                        fontsize=entry["point_size"],
+                    )
             for edit, entry in items:
-                written = "".join(char.c for char in _chars_in(page, pymupdf.Rect(edit.rect)))
-                if written != "".join(edit.replacement.split()):
+                chars = _chars_in(page, pymupdf.Rect(edit.rect))
+                if "".join(char.c for char in chars) != "".join(edit.replacement.split()):
                     raise ReplacementOverflow(
                         f"edit {entry['edit']} (page {number}): the replacement was not written "
                         f"whole inside the span's box, so it did not fit"
+                    )
+                if {char.size for char in chars} - {entry["point_size"]}:
+                    raise IntakeRefused(
+                        f"edit {entry['edit']} (page {number}): the replacement was written at "
+                        f"another size than the {entry['point_size']} pt it replaces"
                     )
         atomic_write_via(
             out_pdf,

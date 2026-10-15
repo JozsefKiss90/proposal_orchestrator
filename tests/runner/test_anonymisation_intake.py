@@ -83,6 +83,25 @@ def _find(pdf: Path, page: int, text: str) -> tuple[float, float, float, float]:
         doc.close()
 
 
+def _chars(pdf: Path, page: int, rect: tuple[float, float, float, float]) -> list[dict]:
+    """Each non-space character whose box centre lies in *rect*: its text, size and baseline."""
+    box = pymupdf.Rect(rect)
+    doc = pymupdf.open(pdf)
+    try:
+        return [
+            {"c": char["c"], "size": round(span["size"], 2), "baseline": round(char["origin"][1], 2)}
+            for block in doc[page - 1].get_text("rawdict")["blocks"]
+            for line in block.get("lines", ())
+            for span in line["spans"]
+            for char in span["chars"]
+            if not char["c"].isspace()
+            and box.contains(pymupdf.Point((char["bbox"][0] + char["bbox"][2]) / 2,
+                                           (char["bbox"][1] + char["bbox"][3]) / 2))
+        ]
+    finally:
+        doc.close()
+
+
 def _relabel(doc: Any) -> None:
     """Change the bytes and nothing the render check compares, as a real render would."""
     doc.set_metadata({"producer": "a word processor"})
@@ -321,6 +340,24 @@ class TestPdfEditHarness:
         assert "Fenwardt" not in text
         assert "Beneficiary B2" in text
         assert log[0]["used_points"] <= log[0]["budget_points"]
+
+    @pytest.mark.parametrize(
+        "page, original, replacement",
+        [(1, "Fenwardt Biosystems GmbH", "Beneficiary B2"), (2, "EUR 412,560", "EUR 400k")],
+    )
+    def test_a_replacement_keeps_its_spans_size_and_baseline(
+        self, pdf: Path, tmp_path: Path, page: int, original: str, replacement: str,
+    ) -> None:
+        """A replacement set smaller than the text it replaces is a visible change,
+        and stage A6 reports it as a finding (AN9)."""
+        rect = _find(pdf, page, original)
+        before = _chars(pdf, page, rect)
+        out = tmp_path / "private" / "edited.pdf"
+        log = self._edit(pdf, out, ai.SpanEdit(page=page, rect=rect, replacement=replacement))
+        after = _chars(out, page, rect)
+        assert "".join(c["c"] for c in after) == "".join(replacement.split())
+        assert {c["size"] for c in after} == {c["size"] for c in before} == {log[0]["point_size"]}
+        assert {c["baseline"] for c in after} == {c["baseline"] for c in before}
 
     def test_an_overflowing_replacement_is_refused(self, pdf: Path, tmp_path: Path) -> None:
         rect = _find(pdf, 1, "VARNISH")
