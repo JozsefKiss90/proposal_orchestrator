@@ -141,15 +141,15 @@ Constraints that apply to every ticket:
 - [x] The attack refuses to run with the same model as A3.
 - [x] The report states its limit: a closed-book model is not a motivated human expert.
 
-## AN9 — Structural fidelity comparison (A6)
+## AN9 — Structural fidelity comparison (A6) (DONE 2026-10-16)
 
 **What to build:** A comparison of the derivative's dry-import inventory with the A0 reference inventory. It covers page count, heading markers and their pages, tables, figures, body point size, and citation marker count and positions. Each difference is either explained by the policy, such as a masked logo, or reported as a finding to fix. "Zero is not proof" applies: a figure counted present is not accepted until it has been looked at.
 
 **Blocked by:** AN4, AN5.
 
-- [ ] Comparing the fixture with its redacted derivative reports differences per category.
-- [ ] A difference the policy does not explain is a finding, not a pass.
-- [ ] A figure whose only basis is a measurement is refused as preserved, consistent with the V08 acceptance check.
+- [x] Comparing the fixture with its redacted derivative reports differences per category.
+- [x] A difference the policy does not explain is a finding, not a pass.
+- [x] A figure whose only basis is a measurement is refused as preserved, consistent with the V08 acceptance check.
 
 ## AN10 — The derivative's identity, configuration and register
 
