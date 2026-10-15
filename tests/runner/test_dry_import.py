@@ -542,3 +542,26 @@ class TestDeterminism:
     ) -> None:
         paragraphs = join_segments(extract_document(pdf))
         assert di.heading_candidates(paragraphs) == inventory["heading_candidates"]
+
+
+class TestCitationPositions:
+    """AN9: stage A6 compares citation markers by count and by position, so the
+    inventory carries each page's counts, and a neutral ``[R12]`` label is a
+    class of its own."""
+
+    def test_each_page_carries_its_own_counts(self) -> None:
+        pages = [_page(1, "As shown [1] and [2, 3]."), _page(2, "See [R1] and doi 10.1234/x.")]
+        inventory = di.citation_inventory(pages)
+        assert inventory["per_page"] == [
+            {"page": 1, "counts": {"bracketed_numbers": 2, "bracketed_labels": 0, "doi": 0,
+                                   "url": 0, "author_year": 0}},
+            {"page": 2, "counts": {"bracketed_numbers": 0, "bracketed_labels": 1, "doi": 1,
+                                   "url": 0, "author_year": 0}},
+        ]
+
+    def test_the_totals_are_the_sum_of_the_pages(self) -> None:
+        pages = [_page(1, "[1] [R2] www.x.org"), _page(2, "[4] (Smith, 2020)")]
+        inventory = di.citation_inventory(pages)
+        for name, total in inventory["counts"].items():
+            assert total == sum(row["counts"][name] for row in inventory["per_page"])
+        assert inventory["counts"]["bracketed_numbers"] == 2

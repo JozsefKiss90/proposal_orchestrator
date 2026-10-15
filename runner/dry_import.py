@@ -532,17 +532,35 @@ def limitation_inventory(
     }
 
 
+#: The citation marker classes, in report order. ``bracketed_labels`` is a
+#: letter and a number in brackets, such as ``[R12]``: the neutral marker an
+#: anonymised derivative puts where a self-citation stood (AN9).
+CITATION_PATTERNS: tuple[tuple[str, str], ...] = (
+    ("bracketed_numbers", r"\[\d+(?:\s*[,–-]\s*\d+)*\]"),
+    ("bracketed_labels", r"\[[A-Z]\d+\]"),
+    ("doi", r"\b10\.\d{4,}/"),
+    ("url", r"https?://|\bwww\."),
+    ("author_year", r"\([A-Z][A-Za-z-]+(?: et al\.)?,? (?:19|20)\d{2}[a-z]?\)"),
+)
+
+
 def citation_inventory(pages: Sequence[PageExtract]) -> dict[str, Any]:
-    """Citation markers, counted. Zero is a count and not an expectation."""
-    joined = " ".join(page.text for page in pages)
-    patterns = (
-        ("bracketed_numbers", r"\[\d+(?:\s*[,–-]\s*\d+)*\]"),
-        ("doi", r"\b10\.\d{4,}/"),
-        ("url", r"https?://|\bwww\."),
-        ("author_year", r"\([A-Z][A-Za-z-]+(?: et al\.)?,? (?:19|20)\d{2}[a-z]?\)"),
-    )
+    """Citation markers, counted per page and in total. Zero is a count and not an expectation.
+
+    The per-page counts are the markers' positions (AN9): stage A6 compares them
+    page by page, so a marker moved to another page is not hidden by an
+    unchanged total.
+    """
+    page_counts = [
+        {name: len(re.findall(p, page.text)) for name, p in CITATION_PATTERNS} for page in pages
+    ]
     return {
-        "counts": {name: len(re.findall(p, joined)) for name, p in patterns},
+        "counts": {
+            name: sum(counts[name] for counts in page_counts) for name, _ in CITATION_PATTERNS
+        },
+        "per_page": [
+            {"page": page.page, "counts": counts} for page, counts in zip(pages, page_counts)
+        ],
         "not_proof": (
             "A marker count of zero is consistent with a document that cites nothing and with "
             "one whose citations were removed. A reference list carried as a figure is counted "
