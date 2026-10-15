@@ -41,6 +41,17 @@ reads that measurement back and compares:
 A page the map does not reach is a finding unless the input declares it, with a
 basis. The cover page of a submission is a legitimate answer; silence is not.
 
+A derivative's derivation (AN10)
+--------------------------------
+The same input completes the anonymised derivative of the original, a third
+document, from the derivative's own measurement. That input carries one more
+block, ``derivation``: the pipeline revision the derivative came from, and the
+paths of the A0 intake record, the policy, the A6 structural-fidelity report
+and every stage log. The block is optional here because the original's input
+has none; which document needs one is the importer's rule, not this reader's.
+Its paths are relative to the private root like every other, and :func:`check`
+holds them under it.
+
 What this module does not do
 ----------------------------
 It builds no :class:`~tools.import_external_proposal.DocumentConfig`. A
@@ -130,6 +141,19 @@ _PLACEHOLDER = re.compile(r"<[^>]*>")
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
+#: A git commit id, abbreviated or full. A branch name is not a revision: it
+#: names whatever the branch points at today.
+_COMMIT = re.compile(r"^[0-9a-f]{7,40}$")
+
+#: Fields a ``derivation`` block carries, every one required.
+_DERIVATION_FIELDS: tuple[str, ...] = (
+    "pipeline_revision",
+    "intake_record",
+    "policy",
+    "fidelity_report",
+    "stage_logs",
+)
+
 #: This repository, resolved from the module's own location rather than from an
 #: argument or the working directory. A configuration for the submitted text
 #: declares a private root, and what counts as *inside this repository* may not
@@ -216,6 +240,22 @@ class RevisionDeclaration:
 
 
 @dataclass(frozen=True)
+class DerivationDeclaration:
+    """Where an anonymised derivative came from (AN10).
+
+    The pipeline revision is an operator declaration: no stage record carries
+    the code revision it ran under. Every other field is a path the register
+    renderer reads and binds by hash.
+    """
+
+    pipeline_revision: str
+    intake_record: str
+    policy: str
+    fidelity_report: str
+    stage_logs: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class UnmappedPage:
     """A page the operator declares no sub-section covers, and why."""
 
@@ -261,6 +301,9 @@ class OriginalConfiguration:
     was not."""
     sha256: str
     """The input's own bytes, so a register can bind the declaration it rendered."""
+    derivation: Optional[DerivationDeclaration] = None
+    """Where the document was derived from, or ``None`` for a document that was
+    not derived by the anonymisation pipeline (AN10)."""
 
     @property
     def declared_paths(self) -> tuple[tuple[str, str], ...]:
@@ -275,6 +318,13 @@ class OriginalConfiguration:
         for rev in self.revisions:
             paths.append((f"revisions[{rev.revision_id}].pdf_rel", rev.pdf_rel))
             paths.append((f"revisions[{rev.revision_id}].register_rel", rev.register_rel))
+        derivation = self.derivation
+        if derivation is not None:
+            paths.append(("derivation.intake_record", derivation.intake_record))
+            paths.append(("derivation.policy", derivation.policy))
+            paths.append(("derivation.fidelity_report", derivation.fidelity_report))
+            for index, log in enumerate(derivation.stage_logs):
+                paths.append((f"derivation.stage_logs[{index}]", log))
         return tuple(paths)
 
     @property
@@ -483,6 +533,38 @@ def _unmapped(raw: Any) -> tuple[UnmappedPage, ...]:
     return tuple(out)
 
 
+def _derivation(raw: Any) -> Optional[DerivationDeclaration]:
+    if raw is None:
+        return None
+    where = "derivation"
+    if not isinstance(raw, dict):
+        raise _refuse(where, f"must be a JSON object or null, found {type(raw).__name__}")
+    for field in _DERIVATION_FIELDS:
+        if field not in raw:
+            raise _refuse(where, f"needs a {field!r} field")
+    revision = _text(raw, "pipeline_revision", where)
+    if not _COMMIT.match(revision):
+        raise _refuse(
+            where,
+            f"pipeline_revision must be a git commit id, 7 to 40 lower-case hex digits, found "
+            f"{revision!r}. A branch name says what the branch points at today, not what ran.",
+        )
+    logs = _labels(raw, "stage_logs", where)
+    if not logs:
+        raise _refuse(
+            where,
+            "stage_logs is empty. A derivative is made by at least one logged stage, and the "
+            "chain from the original to it is read from those logs.",
+        )
+    return DerivationDeclaration(
+        pipeline_revision=revision,
+        intake_record=_text(raw, "intake_record", where),
+        policy=_text(raw, "policy", where),
+        fidelity_report=_text(raw, "fidelity_report", where),
+        stage_logs=logs,
+    )
+
+
 def _revision(raw: Any, index: int, seen: set[str]) -> RevisionDeclaration:
     where = f"revisions[{index}]"
     if not isinstance(raw, dict):
@@ -618,6 +700,7 @@ def load_configuration(path: Path, root: Optional[Path] = None) -> OriginalConfi
         ),
         path_rel=relative,
         sha256=hashlib.sha256(data).hexdigest(),
+        derivation=_derivation(raw.get("derivation")),
     )
 
 

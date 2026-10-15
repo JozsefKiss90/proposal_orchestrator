@@ -151,15 +151,15 @@ Constraints that apply to every ticket:
 - [x] A difference the policy does not explain is a finding, not a pass.
 - [x] A figure whose only basis is a measurement is refused as preserved, consistent with the V08 acceptance check.
 
-## AN10 — The derivative's identity, configuration and register
+## AN10 — The derivative's identity, configuration and register (DONE 2026-10-16, rules pending operator confirmation)
 
 **What to build:** The derivative is a third document, distinct from the original and the sanitised copy, and nothing is inherited from the sanitised copy. It gets its own document identity and a configuration completed through the V17 route from its own measurement. A third register renderer, chosen by `register_of`, states the derivative's facts. These are: the pipeline revision and policy version it came from, layout preserved or reflowed, figure counts, neutral citation markers with counts kept, and a synthetic Table 1.4.1. Candidate provenance resolves the derivative's scope, so the integrity audit words its findings as a derivative of the original.
 
 **Blocked by:** AN9.
 
-- [ ] Configuration completion refuses to redeclare the sanitised copy, as it does today, and accepts the derivative's own identity.
-- [ ] Neither existing register renderer renders the derivative, and the new renderer renders nothing else.
-- [ ] The integrity audit on a fixture derivative words its scope as a derivative of the original.
+- [x] Configuration completion refuses to redeclare the sanitised copy, as it does today, and accepts the derivative's own identity.
+- [x] Neither existing register renderer renders the derivative, and the new renderer renders nothing else.
+- [x] The integrity audit on a fixture derivative words its scope as a derivative of the original.
 
 ## AN11 — Acceptance records and the written export procedure (A7)
 

@@ -627,12 +627,32 @@ def render_readme(configuration: OriginalConfiguration, config: Any) -> str:
     """The private graph root's README, in the document's own names."""
     revision = config.revisions[0]
     pages = config.expected_pages_of(revision)
+    if config.is_anonymised_derivative:
+        # AN10: the derivative takes the same route to its graph root, and its
+        # README says what it is rather than what the original is.
+        heading, opening, artifact = (
+            "the anonymised derivative",
+            f"This directory is the `--graph-root` of the anonymised derivative of the submitted\n"
+            f"original. It is not in the public repository and must not be copied into one until\n"
+            f"the derivative is accepted (A7). Every record here is derived from the derivative.\n",
+            "The assessment artifact under the register is an anonymised derivative of the\n"
+            "submitted text, not the text itself. The register states the pipeline revision, the\n"
+            "policy and the stage chain it came from.\n",
+        )
+    else:
+        heading, opening, artifact = (
+            "the Part B as submitted",
+            f"This directory is the `--graph-root` of the submitted original ({RUNBOOK_REL} §4).\n"
+            "It is not in the public repository and must not be copied into one. Every record here is\n"
+            "derived from the submitted text.\n",
+            "The assessment artifact under the register is the submitted text itself. A result over it\n"
+            "is a result over the submission, as far as the extraction carries it: what the extraction\n"
+            f"loses is the reconciliation in `{configuration.dry_import_dir}/{ACCEPTANCE_FILE}`.\n",
+        )
     return (
-        "# MSCA-DN private graph root: the Part B as submitted\n"
+        f"# MSCA-DN private graph root: {heading}\n"
         "\n"
-        f"This directory is the `--graph-root` of the submitted original ({RUNBOOK_REL} §4).\n"
-        "It is not in the public repository and must not be copied into one. Every record here is\n"
-        "derived from the submitted text.\n"
+        f"{opening}"
         "\n"
         "What lives here:\n"
         "\n"
@@ -654,12 +674,10 @@ def render_readme(configuration: OriginalConfiguration, config: Any) -> str:
         f"  `{Path(revision.register_rel).parent.as_posix()}/` of the private root.\n"
         "- The ESR record and the Tier 2A authorities, which are the public repository's.\n"
         "\n"
-        "The assessment artifact under the register is the submitted text itself. A result over it\n"
-        "is a result over the submission, as far as the extraction carries it: what the extraction\n"
-        f"loses is the reconciliation in `{configuration.dry_import_dir}/{ACCEPTANCE_FILE}`.\n"
+        f"{artifact}"
         "\n"
         "Authored by `py -3.10 -m tools.author_original_workspace` (skeleton, intake) and\n"
-        "`py -3.10 -m tools.import_external_proposal --document official_original` (sources,\n"
+        f"`py -3.10 -m tools.import_external_proposal --document {config.config_id}` (sources,\n"
         "document record, manifest, the register). Each tool's `--check` exits 1 if a file it owns\n"
         f"would change. The operator procedure is `{PROCEDURE_REL}`.\n"
     )

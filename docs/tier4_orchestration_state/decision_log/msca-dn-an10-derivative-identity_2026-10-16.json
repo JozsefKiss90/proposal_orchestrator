@@ -1,0 +1,60 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-an10-derivative-identity_2026-10-16",
+  "date": "2026-10-16",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN10 of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN10. An authoring tool's rules and one integrity-audit wording. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The agent, while implementing AN10. The operator has not yet confirmed these rules in session.",
+  "decision": "The anonymised derivative is a third document, ANONYMISED_DERIVATIVE in tools/import_external_proposal.py. It is completed through the V17 route from its own measurement, its register is tools/author_anonymised_register.py, and harness/candidate_provenance.py scopes its identities as a derivative of the original. Five rules bind later tickets.",
+  "rules": [
+    {
+      "id": "R1",
+      "rule": "A document is the submitted text, the anonymised derivative, or neither, and is never both. register_of chooses the register renderer by the two flags. Each of the three renderers refuses every document but its own.",
+      "declared_status": "Confirmed",
+      "basis": "AN10 acceptance criterion 2. tests/test_msca_dn_anonymised_derivative.py asserts every refusal."
+    },
+    {
+      "id": "R2",
+      "rule": "The derivative's private configuration input (original_document_configuration/1) carries a derivation block naming the pipeline revision and the paths of the A0 intake record, the policy, the A6 report and every stage log. Completion refuses the derivative without one and every other document with one. The pipeline revision must be a git commit id and stands Assumed, because no stage record carries it.",
+      "declared_status": "Inferred",
+      "basis": "Handoff section 7 asks the register to state the pipeline revision and policy. Handoff section 6 puts the derivative's configuration in the private network. One input keeps the V17 route; the block is optional in the reader because the original's input has none."
+    },
+    {
+      "id": "R3",
+      "rule": "The register is not authored over an A6 report whose verdict is not pass, over a chain with no A4 log, or when a stage record does not match the hash the A6 report bound. Layout, figure counts and citation counts are stated from the A6 report and both inventories.",
+      "declared_status": "Inferred",
+      "basis": "Handoff section 2: Table 1.4.1 is replaced, not removed. The V18 register is likewise not authored over an open reconciliation."
+    },
+    {
+      "id": "R4",
+      "rule": "Citation counts are kept when no marker of a class the policy keeps (bracketed numbers, author-year) left the derivative without a neutral marker standing in, and none was added. Neutral markers may also stand where a self-citation entry stood. DOIs and URLs that identify are counted as removed.",
+      "declared_status": "Inferred",
+      "basis": "runner/anonymisation_fidelity.py MARKER_CLASSES and NEUTRAL_CLASS. On the AN3 fixture the five numbered markers survive and two neutral markers replace self-citation entries in the reference list."
+    },
+    {
+      "id": "R5",
+      "rule": "The integrity audit scopes an anonymised derivative's identities as IDENTITY_ANONYMISED_DERIVATIVE when its register declares derived_from.route anonymisation_of_the_original, the candidate is not the submitted document, and its identifiers read as pseudonymised. A recruiting participant is then not compared with a host line, and the finding says the candidate is an anonymised derivative of the original. A contradictory declaration is flagged and left unstated.",
+      "declared_status": "Inferred",
+      "basis": "AN10 acceptance criterion 3. A pseudonym code is consistent per entity, but a host line A3 rewrote need not carry the code its table row carries. Comparing them could report an inconsistency the anonymisation made, so the audit does not compare them. The audit report schema gains no key; the scope is a value."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "Whether pseudonymised names should be compared after all is the operator's call. R5 keeps them not comparable."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The derivative's graph root and intake record go through the V08 dry import with --document anonymised_derivative and the V17 workspace author. The intake record takes the original's submission id and call id from the operator. Neither command is written into a procedure yet; AN14 runs the route."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "No A3 log is read, because A6 reads none yet. A derivative carrying applied A3 edits is refused by A6, and so has no register."
+    }
+  ],
+  "lane_change": "harness/acceptance_lanes/msca_dn_historical.json and harness/ACCEPTANCE_LANE.md: tests/test_msca_dn_anonymised_derivative.py joins the dry_import area, whose invariant gains one sentence. The area stays not depended on.",
+  "private_content": "None. This record names files, rules and counts from the synthetic AN3 fixture only."
+}

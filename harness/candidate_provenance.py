@@ -51,13 +51,23 @@ missing record and an unrecognised declaration: :data:`CAUSE_UNSTATED`, whose
 reason says the cause is Unresolved and borrows no other candidate's
 explanation.
 
-*The identity scope* comes from the register's declared ``identifiers`` value
-alone, because no measurement can tell a real partner name from a generalised
-one.  :data:`IDENTITY_GENERALISED` makes the host line not comparable with the
+*The identity scope* comes from the register's declared ``identifiers`` value,
+because no measurement can tell a real partner name from a generalised one.
+:data:`IDENTITY_GENERALISED` makes the host line not comparable with the
 table and supplies the sentence that says why.  :data:`IDENTITY_AS_SUBMITTED`
 makes the two comparable, and the audit compares them.
 :data:`IDENTITY_UNSTATED` leaves them not comparable, for the stated reason
 that nothing declares which they are — never for the sanitisation reason.
+
+An anonymised derivative of the original (AN10) declares one more thing: its
+``current_assessment_artifact.derived_from.route`` is
+:data:`DERIVATION_ROUTE_ANONYMISATION`.  With that route, identifiers read as
+changed and the candidate declared not the submitted document, the scope is
+:data:`IDENTITY_ANONYMISED_DERIVATIVE`, and its sentence says the candidate is
+a derivative of the original.  The two names stay not comparable: a code
+standing for an entity is not the entity, and a host line the rewrite touched
+need not carry the code its table row carries.  A route the vocabulary does
+not hold, or a derivative that contradicts it, is flagged and left unstated.
 
 *The expected ledger status* is the status the import manifest declares its
 ledger carries.  Without a manifest there is no declared expectation, and the
@@ -101,9 +111,12 @@ __all__ = [
     "IDENTITY_GENERALISED",
     "IDENTITY_AS_SUBMITTED",
     "IDENTITY_UNSTATED",
+    "IDENTITY_ANONYMISED_DERIVATIVE",
     "IDENTITY_SCOPES",
+    "DERIVATION_ROUTE_ANONYMISATION",
     "STATEMENT_GENERALISED",
     "STATEMENT_UNSTATED",
+    "STATEMENT_ANONYMISED_DERIVATIVE",
     "IDENTITY_STATEMENTS",
     "CITATIONS_REMOVED_WORDS",
     "CITATIONS_PRESENT_WORDS",
@@ -161,8 +174,21 @@ IDENTITY_GENERALISED: str = "identifiers_generalised"
 IDENTITY_AS_SUBMITTED: str = "identifiers_as_submitted"
 #: Nothing declares which; the audit compares nothing and says that.
 IDENTITY_UNSTATED: str = "identifiers_unstated"
+#: The candidate is an anonymised derivative of the original; its identifiers
+#: are codes from a private dictionary (AN10).
+IDENTITY_ANONYMISED_DERIVATIVE: str = "identifiers_pseudonymised_in_a_derivative_of_the_original"
 #: The closed set of identity scopes.
-IDENTITY_SCOPES: tuple[str, ...] = (IDENTITY_GENERALISED, IDENTITY_AS_SUBMITTED, IDENTITY_UNSTATED)
+IDENTITY_SCOPES: tuple[str, ...] = (
+    IDENTITY_GENERALISED,
+    IDENTITY_AS_SUBMITTED,
+    IDENTITY_UNSTATED,
+    IDENTITY_ANONYMISED_DERIVATIVE,
+)
+
+#: The ``derived_from.route`` an anonymised derivative's register declares.
+#: Mirrors ``tools/author_anonymised_register.DERIVATION_ROUTE``; the harness
+#: cannot import ``tools``, and a test holds the two equal.
+DERIVATION_ROUTE_ANONYMISATION: str = "anonymisation_of_the_original"
 
 #: The clause a not-comparable identity finding carries when identifiers were
 #: generalised.  Byte-identical to the committed sanitised audits' wording.
@@ -174,6 +200,11 @@ STATEMENT_UNSTATED: str = (
     "The candidate's recorded provenance does not state whether the identifiers are the "
     "submitted document's own, so the two cannot be compared"
 )
+#: The clause it carries for an anonymised derivative of the original.
+STATEMENT_ANONYMISED_DERIVATIVE: str = (
+    "The candidate is an anonymised derivative of the original and its identifiers are "
+    "pseudonyms, so the two cannot be compared"
+)
 #: Scope to the clause a not-comparable finding carries, one entry per scope.
 #: :data:`IDENTITY_AS_SUBMITTED` maps to the empty clause: the audit compares
 #: the two names under that scope, and a comparison needs no excuse.
@@ -181,6 +212,7 @@ IDENTITY_STATEMENTS: Mapping[str, str] = {
     IDENTITY_GENERALISED: STATEMENT_GENERALISED,
     IDENTITY_AS_SUBMITTED: "",
     IDENTITY_UNSTATED: STATEMENT_UNSTATED,
+    IDENTITY_ANONYMISED_DERIVATIVE: STATEMENT_ANONYMISED_DERIVATIVE,
 }
 
 #: Leading words of a declared ``citations`` value that mean the sources are gone.
@@ -573,7 +605,39 @@ def provenance_from_manifest(
     identifiers = _how_it_reads(
         identifiers_raw, IDENTIFIERS_GENERALISED_WORDS, IDENTIFIERS_AS_SUBMITTED_WORDS
     )
-    if identifiers == _DECLARED_CHANGED:
+    derived_from = artifact.get("derived_from")
+    route = derived_from.get("route") if isinstance(derived_from, Mapping) else None
+    if derived_from is not None:
+        scope = IDENTITY_UNSTATED
+        if not isinstance(derived_from, Mapping):
+            flags.append(
+                f"fidelity register {register_rel} declares a derived_from block that is not a "
+                "JSON object; the identity scope is Unresolved"
+            )
+        elif route != DERIVATION_ROUTE_ANONYMISATION:
+            flags.append(
+                f"fidelity register {register_rel} declares derived_from route {route!r}, which "
+                "is in no recognised vocabulary; the identity scope is Unresolved"
+            )
+        elif submitted is not False:
+            flags.append(
+                f"fidelity register {register_rel} declares the candidate derived from the "
+                "original and does not declare it not the submitted document; the identity "
+                "scope is Unresolved"
+            )
+        elif identifiers != _DECLARED_CHANGED:
+            flags.append(
+                f"fidelity register {register_rel} declares an anonymised derivative with "
+                f"identifiers {identifiers_raw!r}, which do not read as pseudonymised; the "
+                "identity scope is Unresolved"
+            )
+        else:
+            scope = IDENTITY_ANONYMISED_DERIVATIVE
+            basis.append(
+                f"the register declares the candidate derived from the original by route "
+                f"{route!r}, with identifiers {identifiers_raw!r}"
+            )
+    elif identifiers == _DECLARED_CHANGED:
         scope = IDENTITY_GENERALISED
         basis.append(f"the register declares identifiers {identifiers_raw!r}, read as generalised")
     elif identifiers == _DECLARED_UNCHANGED:

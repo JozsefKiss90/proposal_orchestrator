@@ -37,11 +37,12 @@
   "areas": [
     {
       "name": "dry_import",
-      "invariant": "A document is measured before it is imported, and the measurement declares no page map. The original's page map, page count and body size are declared privately and checked against that measurement. A 'preserved' fidelity verdict may not rest on a measurement equally true of a document whose figures are gone. The submitted text's register is its own, and it is not written over an open reconciliation. The original, its graph root and every record derived from it stay outside this repository. The historical run does not depend on this invariant, because the private PE-09 run is what imports the original.",
+      "invariant": "A document is measured before it is imported, and the measurement declares no page map. The original's page map, page count and body size are declared privately and checked against that measurement. A 'preserved' fidelity verdict may not rest on a measurement equally true of a document whose figures are gone. The submitted text's register is its own, and it is not written over an open reconciliation. The anonymised derivative is a third document: completed from its own measurement, its register is its own renderer's, and the audit words its identities as a derivative of the original. The original, its graph root and every record derived from it stay outside this repository. The historical run does not depend on this invariant, because the private PE-09 run is what imports the original.",
       "modules": [
         "tests/runner/test_dry_import.py",
         "tests/test_msca_dn_dry_import.py",
-        "tests/test_msca_dn_original_import_route.py"
+        "tests/test_msca_dn_original_import_route.py",
+        "tests/test_msca_dn_anonymised_derivative.py"
       ],
       "depended_on": false
     },

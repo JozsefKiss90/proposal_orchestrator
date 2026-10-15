@@ -348,6 +348,15 @@ def render_register(repo_root: Path, revision: Any = None) -> dict[str, Any]:
             f"sanitised derivative and is not applicable to it (V08 authors the original's own "
             f"provenance records)"
         )
+    if config.is_anonymised_derivative:
+        # The anonymised derivative is not the copy either: it was made from the
+        # authenticated original by another pipeline, under a policy this header
+        # does not name. Its register is tools/author_anonymised_register.py.
+        raise AuthoringError(
+            f"document {config.config_id!r} is an anonymised derivative of the original; this "
+            f"register header declares the sanitised copy's transformation and is not "
+            f"applicable to it (tools/author_anonymised_register.py renders its register)"
+        )
     expected_pages = config.expected_pages_of(revision)
     is_first = revision.supersedes is None
     derived = derive_register_half(repo_root, revision)

@@ -67,6 +67,13 @@ REFERENCED = cp.CandidateProvenance(
     expected_ledger_status="unresolved",
 )
 
+#: What an anonymised derivative of the original derives (AN10).
+ANONYMISED = cp.CandidateProvenance(
+    grounding_cause=cp.CAUSE_SOURCES_PRESENT,
+    identity_scope=cp.IDENTITY_ANONYMISED_DERIVATIVE,
+    expected_ledger_status="unresolved",
+)
+
 
 def _dn_findings(revision) -> set[tuple[str, str, str]]:
     """Every finding the current rules give over one materialised DN candidate.
@@ -715,6 +722,20 @@ class TestIdentityComparison:
         details = [x.detail for x in f if x.kind == ia.KIND_NOT_COMPARABLE]
         assert len(details) == 2
         assert all(d.endswith(cp.STATEMENT_GENERALISED) for d in details)
+
+    def test_an_anonymised_derivative_is_worded_as_a_derivative_of_the_original(
+        self, tmp_path, profile
+    ):
+        """AN10 criterion 3: the reason is the derivative's own, not the copy's.
+        tests/test_msca_dn_anonymised_derivative.py runs this with the
+        provenance resolved from a fixture derivative's register."""
+        f = _findings(_audit(tmp_path, profile, _named_hosts_world(), provenance=ANONYMISED),
+                      "dc_table_vs_projects")
+        details = [x.detail for x in f if x.kind == ia.KIND_NOT_COMPARABLE]
+        assert len(details) == 2
+        assert all(d.endswith(cp.STATEMENT_ANONYMISED_DERIVATIVE) for d in details)
+        assert all("derivative of the original" in d for d in details)
+        assert not any("sanitis" in d for d in details)
 
     def test_unstated_identifiers_say_so_and_borrow_no_reason(self, tmp_path, profile):
         f = _findings(_audit(tmp_path, profile, _named_hosts_world()), "dc_table_vs_projects")

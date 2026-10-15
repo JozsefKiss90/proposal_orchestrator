@@ -387,6 +387,10 @@ class DocumentConfig:
     config_id: str
     is_submitted_document: bool
     """``True`` only for the text that was actually submitted."""
+    is_anonymised_derivative: bool = False
+    """``True`` only for a derivative the anonymisation pipeline made from the
+    submitted text (AN10). It chooses that document's register renderer, and a
+    document may not be both this and the submitted text."""
     intake_id: Optional[str] = None
     document_id: Optional[str] = None
     """The dev-graph document id every revision of this document shares.
@@ -495,6 +499,11 @@ class DocumentConfig:
     # -- declared consistency, checked at construction -- #
 
     def __post_init__(self) -> None:
+        if self.is_submitted_document and self.is_anonymised_derivative:
+            raise ImportRefused(
+                f"document {self.config_id!r} declares itself both the submitted text and an "
+                f"anonymised derivative of it; a document is one or the other"
+            )
         if "{prefix}" not in self.source_id_template or "{page" not in self.source_id_template:
             raise ImportRefused(
                 f"document {self.config_id!r}: source_id_template must carry a prefix and a page "
@@ -964,8 +973,77 @@ OFFICIAL_ORIGINAL = DocumentConfig(
     ),
 )
 
+#: The anonymised derivative of the 2025 submission (AN10): a third document,
+#: made from the authenticated original by the anonymisation pipeline inside
+#: the private network. It is neither the submitted text nor the sanitised
+#: copy, and it inherits nothing from either: its page map, page count, body
+#: point size, graph root and revisions come from its own measurement, through
+#: a private configuration input (V17), and its register is its own renderer's.
+ANONYMISED_DERIVATIVE = DocumentConfig(
+    config_id="anonymised_derivative",
+    is_submitted_document=False,
+    is_anonymised_derivative=True,
+    intake_id="msca-dn-2025-anonymised-derivative",
+    document_id="MSCA-DN-2025_part_b_anonymised_derivative",
+    title="Anonymised derivative of the MSCA-DN 2025 Part B",
+    role=(
+        "Current assessment artifact: an anonymised derivative of the Part B as submitted, made "
+        "from the authenticated original by the anonymisation pipeline. Not the submitted text."
+    ),
+    workspace_rel=None,
+    sections=MSCA_DN_PART_B_SECTIONS,
+    short_name="the anonymised derivative",
+    page_map_declared_from=(
+        "the dry import of the derivative itself, through a private configuration input. No "
+        "page map is declared here, which is why selecting this document refuses until one is "
+        "applied."
+    ),
+    first_revision_key="is_the_first_anonymised_derivative",
+    claim_ledger_note=(
+        "These are the proposal's own assertions, extracted from an anonymised derivative of "
+        "the submitted text. No claim declares source_grounded: the derivative keeps the count "
+        "and position of every citation marker, and a self-citation became a neutral marker "
+        "that resolves to no source. The span locates the assertion in its page source and is "
+        "not evidence for it. Nobody in this repository approves a proposal's assertions, so "
+        "approval is not applicable. The integrity audit enumerates this ledger and reports "
+        "each claim Unresolved."
+    ),
+    import_ticket="AN14, under V17; the derivative is imported from its own configuration input",
+    declaration_fields=("presence", "transformation"),
+    declaration_record_type="anonymisation_declarations",
+    declared_status="Assumed",
+    status_note=(
+        "Every value here is an operator declaration about a document this repository does not "
+        "hold. Nothing has been derived from the derivative here, so no value is Confirmed and "
+        "none can be until its own dry import measures it."
+    ),
+    page_statement=(
+        "Page {page} of an anonymised derivative of the Part B submitted to the 2025 MSCA "
+        "Doctoral Networks call. Not the submitted text: names, places and identifiers are "
+        "pseudonyms, and the supervisor table is synthetic (fidelity register, derivation)."
+    ),
+    reader_caveat_key="an_anonymised_derivative_of_the_original",
+    reader_caveat=(
+        "This is an anonymised derivative of the submitted text. Identifiers are pseudonyms, "
+        "Table 1.4.1 is synthetic, and a self-citation is a neutral marker, so no judgment of "
+        "who the consortium is or what it cites is admissible from it. Its layout is the "
+        "original's only as far as its register's structural fidelity report says."
+    ),
+    manifest_records_runtime_environment=True,
+    summary=(
+        "Not imported here. Its page map, page count, body point size, graph root and revisions "
+        "are undeclared, and nothing is taken from the sanitised copy or the original. It is a "
+        "document of its own: its intake id differs from both, and its register states the "
+        "pipeline revision and policy it came from."
+    ),
+)
+
 #: Every document this tool can be pointed at.
-DOCUMENTS: tuple[DocumentConfig, ...] = (SANITISED_DERIVATIVE, OFFICIAL_ORIGINAL)
+DOCUMENTS: tuple[DocumentConfig, ...] = (
+    SANITISED_DERIVATIVE,
+    OFFICIAL_ORIGINAL,
+    ANONYMISED_DERIVATIVE,
+)
 #: The document selected when none is named: the one PE-03 imported.
 DEFAULT_DOCUMENT: DocumentConfig = SANITISED_DERIVATIVE
 
@@ -1059,6 +1137,17 @@ def complete_from_input(
             f"document {config.config_id!r} is already complete, so a configuration input may "
             f"not redeclare it. Its page map, page count and revisions are the ones its "
             f"committed manifests were measured under, and those manifests are bound by hash."
+        )
+    if config.is_anonymised_derivative and configuration.derivation is None:
+        raise ImportRefused(
+            f"document {config.config_id!r} is an anonymised derivative and its configuration "
+            f"input declares no derivation. Its register states the pipeline revision, the "
+            f"policy and the structural fidelity it came from, so the input must name them."
+        )
+    if not config.is_anonymised_derivative and configuration.derivation is not None:
+        raise ImportRefused(
+            f"document {config.config_id!r} is not an anonymised derivative and its "
+            f"configuration input declares a derivation. Only the derivative was derived."
         )
     layout = configuration.work_package_layout
     completed = replace(
@@ -2297,18 +2386,26 @@ def render_all(repo_root: Path, config: DocumentConfig = DEFAULT_DOCUMENT) -> di
 
 
 def register_of(repo_root: Path, revision: Revision) -> dict[str, Any]:
-    """*revision*'s fidelity register, from the renderer its document has (V17).
+    """*revision*'s fidelity register, from the renderer its document has (V17, AN10).
 
-    The sanitised case's header declares a sanitisation, a transformation and a
-    reflow, so :func:`tools.author_msca_dn_workspace.render_register` refuses
-    the submitted text rather than labelling it with the copy's facts. The
-    submitted text has a renderer of its own, and this is the one place that
-    chooses between them. Imported late, because that module reads this one.
+    Three documents, three renderers, and this is the one place that chooses
+    between them. The sanitised case's header declares a sanitisation, a
+    transformation and a reflow, so
+    :func:`tools.author_msca_dn_workspace.render_register` refuses both other
+    documents rather than labelling them with the copy's facts. The submitted
+    text and the anonymised derivative each have a renderer of their own, and
+    each refuses every document but its own. Imported late, because both
+    modules read this one.
     """
-    if config_for(revision).is_submitted_document:
+    config = config_for(revision)
+    if config.is_submitted_document:
         from tools import author_original_workspace as ows
 
         return ows.render_submitted_register(repo_root, revision)
+    if config.is_anonymised_derivative:
+        from tools import author_anonymised_register as aar
+
+        return aar.render_anonymised_register(repo_root, revision)
     return ws.render_register(repo_root, revision)
 
 
