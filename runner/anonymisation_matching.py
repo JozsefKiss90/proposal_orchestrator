@@ -36,8 +36,9 @@ mutation run can show that the leak scan depends on it:
 ``case``
     case-insensitive, by ``str.casefold``. An entry that declares
     ``match_case`` is matched with its case, because an acronym that is also
-    a word ("VARNISH") would otherwise replace the word. A leak scan should
-    ignore the flag, so that a "Varnish" A2 left is still found.
+    a word ("VARNISH") would otherwise replace the word. The leak scan
+    (:mod:`runner.anonymisation_leak_scan`) honours the flag for its verdict
+    and lists a case-folded occurrence for the operator's review.
 ``diacritics``
     compatibility decomposition with combining marks dropped, so "Vántrell"
     matches "Vantrell".

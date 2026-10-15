@@ -1,0 +1,48 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-an8a-leak-scan-verdict_2026-10-15",
+  "date": "2026-10-15",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN8a of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN8a. An authoring tool's rule. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The agent, while implementing AN8a. The operator has not yet confirmed it in session.",
+  "question": "Handoff section 5 A5 says the leak scan runs every dictionary entry and every normalised variant over the derivative, and that any hit fails. Two kinds of match conflict with a literal reading: an entry the operator declared match_case, found only when case is folded, and an entry in a category the policy flags rather than edits. Do they fail the derivative?",
+  "decision": "Neither fails. Both are listed in the report's review section with a reason, case_variant or flagged_category, and counted by category. Every other match of an edited entry or an identifier pattern is a hit and fails the derivative.",
+  "rules": [
+    {
+      "kind": "case_variant",
+      "rule": "The scan honours an entry's match_case declaration for its verdict. A case-folded occurrence that no strict match overlaps is listed for review.",
+      "reverses": "The AN5 docstring of runner/anonymisation_matching.py said a leak scan should ignore the flag, so that a case variant A2 left would still be found. AN8a changes that docstring.",
+      "why": {
+        "declared_status": "Inferred",
+        "point": "match_case exists for an acronym that is also a word, such as the fixture's grant acronym VARNISH. A2 keeps the word on purpose, so a scan that ignored the flag would fail every derivative that uses the word, and only removing the word could pass it. The occurrence is still shown to the operator, who reads the derivative in A7.",
+        "basis": "The fixture's reference title keeps the lower-case word; tests/runner/test_anonymisation_leak_scan.py, test_what_does_not_fail_is_listed_for_review."
+      }
+    },
+    {
+      "kind": "flagged_category",
+      "rule": "A match of an entry whose policy category has auto_edit false (niche topics) is listed for review, not counted as a hit.",
+      "why": {
+        "declared_status": "Confirmed",
+        "point": "The policy flags a niche topic combination for A3 and A5 and never edits it automatically. Rewriting is A3's job, where A5's model attack shows the combination identifies. A deterministic hit on it would fail every derivative before A3 could act.",
+        "basis": "Handoff section 5 A1 table, row 'Niche topic combinations': flag for A3 and A5, never auto-edit; rewrite only where A5 shows it identifies."
+      }
+    }
+  ],
+  "acceptance_reading": {
+    "declared_status": "Inferred",
+    "statement": "AN8a's 'catches every planted entity' is tested as every planting the dictionary or a regex class covers. Identifying numbers have no fixture dictionary entry (A3 and A4), figures carry their identity in pixels or line art (A6 and AN8b), countries are kept under O4, and the citation marker '[1, 2]' is not an identifier. The report lists what it does not scan under coverage.not_scanned.",
+    "mutation": "The mutation run weakens A2, not the scan. With diacritics, line_break_hyphenation or possessive off in A2, A2's self-check passes and the scan fails the derivative. With case, whitespace or initials off, every fixture planting also matches another form, so nothing is left and the scan passes; the test asserts both outcomes."
+  },
+  "inputs": [
+    "runner/anonymisation_leak_scan.py",
+    "runner/anonymisation_matching.py",
+    "tests/runner/test_anonymisation_leak_scan.py",
+    "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 5 A1 and A5"
+  ],
+  "privacy": "This record names fixture entities only, which are invented. It quotes nothing from the DN original.",
+  "decision_status": "Assumed",
+  "decision_status_basis": "Adopted by the agent in the absence of an operator ruling on the conflict. Operator confirmation, or a ruling that case variants fail, is required before AN11 builds the public acceptance record on the scan's verdict."
+}
