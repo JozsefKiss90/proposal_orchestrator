@@ -1,0 +1,68 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-an6-bounded-rewrite_2026-10-15",
+  "date": "2026-10-15",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN6 of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN6. An authoring tool's rules. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The agent, while implementing AN6. The operator has not yet confirmed these rules in session.",
+  "decision": "Stage A3 (runner/anonymisation_rewrite.py) writes a validated plan of span edits for the passages the caller flags, and does not apply it. Five rules bind later tickets.",
+  "rules": [
+    {
+      "id": "R1",
+      "rule": "Only passages the caller flags go to the model. The dictionary's flagged entries are offered as candidates and are not sent on their own.",
+      "declared_status": "Confirmed",
+      "basis": "Policy category niche_topic: rewritten in A3 only where the A5 attack shows the combination identifies the network. The operator, or AN8b, therefore passes the flags."
+    },
+    {
+      "id": "R2",
+      "rule": "Each edit must also carry 'original', the passage text at its offsets. An edit whose text differs is refused as span_mismatch.",
+      "declared_status": "Inferred",
+      "basis": "The handoff's edit fields are start, end, replacement, category and reason. A model can miscount offsets, and an edit validated against the passage must name what it replaces. The field adds no private content outside the private store."
+    },
+    {
+      "id": "R3",
+      "rule": "The token budget counts every recorded call of the stage, checkpointed ones included. Before each call the stage reserves the request's UTF-8 bytes, plus 64 tokens of framing, plus max_output_tokens, and stops when the reservation does not fit. A call that reports no usage, including a backend that keeps the previous call's usage, is charged its reservation. A call charged above its reservation, or one whose reply exceeds max_output_tokens, refuses the run, and its checkpoint refuses every resume.",
+      "declared_status": "Inferred",
+      "basis": "A token covers at least one byte, so the reservation bounds what an honest call can spend, and the stage stops before the budget rather than one call after it. A backend that breaks the bound can overspend by one call; the stage then refuses rather than continue on a bound that no longer holds."
+    },
+    {
+      "id": "R4",
+      "rule": "A checkpoint is reused only for the identical request: the same messages, model id and output limit. Any other checkpoint refuses the run, and no reply is redrawn or mixed with changed inputs. The plan and the queue are derived from the checkpoints and the operator's removal approvals, so a re-run with a new approval rewrites them without a model call.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A3: a failed run resumes rather than redraws. Removal approvals name the offsets the plan reports, so they must apply to the same checkpointed replies."
+    },
+    {
+      "id": "R5",
+      "rule": "Proposed new entities go to entity_proposals.json in the private store with status awaiting_operator. They change no text and no dictionary.",
+      "declared_status": "Confirmed",
+      "basis": "Handoff section 5 A3: new entities go to the operator for the dictionary and are not applied silently."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "The A3 Bedrock model id is still not named (AN0 known gap, O2). The stage refuses to run without a declared model id, refuses a backend serving another model, and records the id in every checkpoint and in the plan. The operator names the id before the private run (AN13)."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The plan is not applied. AN4's edit harness edits only the PDF its intake pinned, and the plan locates edits on the A2 derivative. Applying the plan needs a harness that pins a stage output."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "No code checks that an edit keeps the sentence's meaning. The operator reads the plan, and A6 and A8 measure the effect."
+    }
+  ],
+  "inputs": [
+    "runner/anonymisation_rewrite.py",
+    "tests/runner/test_anonymisation_rewrite.py",
+    "runner/anonymisation_policy_v1.json (category niche_topic)",
+    "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 5 A3",
+    "docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json (O2 and its known gap)"
+  ],
+  "privacy": "This record names no entity. It quotes nothing from the DN original or the fixture.",
+  "decision_status": "Assumed",
+  "decision_status_basis": "Adopted by the agent. Operator confirmation is required before AN13 runs the stage on the DN original."
+}
