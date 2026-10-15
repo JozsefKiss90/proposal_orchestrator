@@ -1,0 +1,80 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-an8b-model-attack_2026-10-15",
+  "date": "2026-10-15",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN8b of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN8b. An authoring tool's rules. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The agent, while implementing AN8b. The operator has not yet confirmed these rules in session.",
+  "decision": "The second half of stage A5 (runner/anonymisation_attack.py) asks a model other than A3's to re-identify the derivative, scores each guess against the entity dictionary, and writes a counts-only reidentification_report/1, a private details file and the A3 flags. Six rules bind later tickets.",
+  "rules": [
+    {
+      "id": "R1",
+      "rule": "The attack refuses to run while any threshold in the policy is declared Unresolved. The committed policy leaves the research group's threshold Unresolved, so the attack cannot run on it until the operator sets one.",
+      "declared_status": "Confirmed",
+      "basis": "AN0 known gap on O3: AN8b may not run until the operator sets the research-group threshold. The policy already carries the gap as an Unresolved target."
+    },
+    {
+      "id": "R2",
+      "rule": "The attack refuses an A5 model outside the Claude family, and one whose canonical id equals the A3 model's. The comparison uses canonical_model_id, which now lives in runner/model_ids.py and which harness.judge re-exports.",
+      "declared_status": "Inferred",
+      "basis": "O2 in the AN0 record: A5 uses a different member of the Claude family. AN1c showed that a string comparison lets Bedrock wrappings of one model through."
+    },
+    {
+      "id": "R3",
+      "rule": "The model sees the derivative in windows of whole passages, up to 60,000 characters each, so the whole document goes in one request when it fits.",
+      "declared_status": "Inferred",
+      "basis": "Re-identification combines clues across passages, so a passage-at-a-time attack would understate the risk. The A3 rule of one passage at a time bounds the rewriter's edits, not the attacker's reading."
+    },
+    {
+      "id": "R4",
+      "rule": "A guess is correct when the dictionary matcher finds an edited entry of the target's category in it. It is listed for review, without failing, when it matches another category's entry or an identifier pattern, or when it shares a word of four or more letters with an entry of the target's category that the derivative no longer contains. A guess at a target the policy keeps (the country set) is admissible and not scored.",
+      "declared_status": "Assumed",
+      "basis": "The dictionary records categories, not roles, so a coordinator guess and a partner guess are both scored against all institution entries. The review cases mirror the leak scan's confirmed review rule. A word the derivative still holds, such as 'University', is not evidence of a partial name."
+    },
+    {
+      "id": "R5",
+      "rule": "A correct guess sends back the one passage of A3's input that holds the guess's quote, flagged with the target's category and every category the policy flags rather than edits. Passage ids are positional, so the attacked derivative's own id is not used. A correct guess whose quote is missing from the cited passage, or is in no passage or several passages of A3's input, still fails the derivative, is counted as correct_unlocated, and is not flagged.",
+      "declared_status": "Inferred",
+      "basis": "Handoff section 5 A5: a correct guess fails the passage back to A3. The name itself is already gone after A2, so what gives a person away is usually a niche topic, which the policy rewrites only where A5 shows it identifies."
+    },
+    {
+      "id": "R6",
+      "rule": "A target fails when the distinct entities its correct guesses name outnumber its max_correct_guesses; a repeated guess counts once. A target abstains when no window drew a guess at it. The verdict is failed when any target fails, else incomplete when a reply or a guess was malformed, else passed. A derivative with no extractable text is refused. The report holds counts, hashes and model ids only, and states that a closed-book model is not a motivated human expert.",
+      "declared_status": "Inferred",
+      "basis": "Ticket AN8b acceptance criteria and handoff section 5 A5. A malformed reply is recorded, never repaired (CLAUDE.md section 17.5.4)."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "The research-group threshold is not set (AN0 known gap on O3). The attack refuses to run until a successor policy sets it."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The A5 Bedrock model id is not named (AN0 known gap on O2). The attack refuses an undeclared id and records the id in every checkpoint and in the report."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "A short form of an entity that the dictionary does not list, such as a company's first word alone, scores as review, not correct. The operator reads every review item, and may add the form to the dictionary as a variant."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "A guess whose quote a later stage changed, such as the A4 table synthesis, is in no passage of A3's input. It still fails the derivative but cannot be flagged, and the operator maps it from the private details."
+    }
+  ],
+  "inputs": [
+    "runner/anonymisation_attack.py",
+    "runner/model_ids.py",
+    "tests/runner/test_anonymisation_attack.py",
+    "runner/anonymisation_policy_v1.json (reidentification_threshold)",
+    "plans/msca_dn_anonymisation_handoff_2026-10-14.md section 5 A5",
+    "docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json (O2, O3 and their known gaps)",
+    "docs/tier4_orchestration_state/decision_log/msca-dn-an8a-leak-scan-verdict-confirmed_2026-10-15.json (the review rule R4 mirrors)"
+  ],
+  "privacy": "This record names no entity. It quotes nothing from the DN original or the fixture.",
+  "decision_status": "Assumed",
+  "decision_status_basis": "Adopted by the agent. Operator confirmation is required before AN13 runs the attack on the DN original."
+}
