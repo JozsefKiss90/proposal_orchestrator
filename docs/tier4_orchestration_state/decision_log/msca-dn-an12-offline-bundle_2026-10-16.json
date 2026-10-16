@@ -7,7 +7,7 @@
   "ticket": "AN12 of .scratch/msca-dn-anonymisation/tickets.md",
   "authority": "Agent-authored under CLAUDE.md while implementing ticket AN12, with operator decisions taken in session (D1 to D4) and rules R1 to R7 confirmed by the operator. Deployment tooling and an authoring tool's smoke driver. Closes no gate, adds no runtime gate and amends no constitutional rule. The host steps, and so the ticket's three criteria, remain the operator's.",
   "review_state": "operator_reviewed_2026-10-16",
-  "decided_by": "D1 to D4: the operator, in session on 2026-10-16. R1 to R7: drafted by the agent while implementing AN12, confirmed by the operator in session on 2026-10-16. R8: drafted by the agent while carrying out D4; not yet confirmed.",
+  "decided_by": "D1 to D4: the operator, in session on 2026-10-16. R1 to R8: drafted by the agent while implementing AN12, confirmed by the operator in session on 2026-10-16.",
   "decision": "The offline bundle carries its own CPython 3.11 interpreter, built by runner/offline_bundle.py from HEAD and verified on the host by the same module. tools/anonymisation_host_smoke.py runs A0 to A7 on the synthetic fixture; harness/commands/converse_smoke.py runs a synthetic blind pass over Converse, freezes it and validates its receipt. plans/msca_dn_an12_host_runbook.md is the operator's procedure.",
   "decisions": [
     {
@@ -20,7 +20,7 @@
       "id": "D2",
       "decision": "The audit package is amended for the bundled interpreter. The agent drafts the amendments in plans/msca_dn_an12_audit_amendment_draft.md, and the operator approves them before host step 6 installs the interpreter. The draft adds text to ADR-001 Decision 8, RSK-12, the deployment guide and the operational procedure, and replaces no approved wording.",
       "declared_status": "Confirmed",
-      "basis": "Operator decision in session, chosen over amending after the host run and over leaving the gap declared. The amendment text itself is pending the operator's approval."
+      "basis": "Operator decision in session, chosen over amending after the host run and over leaving the gap declared. The operator approved the draft on 2026-10-16, and it was applied as drafted, with RSK-12's ratings unchanged."
     },
     {
       "id": "D3",
@@ -81,8 +81,8 @@
     {
       "id": "R8",
       "rule": "verify's private_endpoint check resolves bedrock-runtime.<region>.amazonaws.com in the configured ADR-001 region and passes only when it resolves and every address is private. Without an ADR-001 region it fails and resolves nothing. A no-internet probe whose name does not resolve records the route as not measured (passed null), so the record does not pass; the runbook says to probe an IP address instead. A timeout or any other connection error is an unreachable route.",
-      "declared_status": "Inferred",
-      "basis": "The agent's implementation of D4. A DNS failure shows the name did not resolve, not that no route exists, so counting it as a pass would claim what was not measured. DC-02 records the endpoint's private addresses (172.31.27.207, 172.31.80.15). tests/runner/test_offline_bundle.py holds the cases."
+      "declared_status": "Confirmed",
+      "basis": "The agent's implementation of D4. A DNS failure shows the name did not resolve, not that no route exists, so counting it as a pass would claim what was not measured. DC-02 records the endpoint's private addresses (172.31.27.207, 172.31.80.15). tests/runner/test_offline_bundle.py holds the cases. Confirmed by the operator in session on 2026-10-16."
     }
   ],
   "known_gaps": [
@@ -96,7 +96,7 @@
     },
     {
       "declared_status": "Unresolved",
-      "gap": "The audit package still describes only the Python 3.9 bundle. The amendment is drafted in plans/msca_dn_an12_audit_amendment_draft.md (D2) and is pending the operator's approval, which comes before host step 6. Whether to reissue audit_package.zip is the operator's call."
+      "gap": "The audit package amendment (D2) is applied: ADR-001 Decision 8 amendment A1, RSK-12, deployment guide §12 and operational procedure §7.2. audit_package.zip is still the 2026-06-03 snapshot; reissuing it is the operator's call."
     },
     {
       "declared_status": "Unresolved",

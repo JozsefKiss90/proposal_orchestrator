@@ -181,7 +181,7 @@ Constraints that apply to every ticket:
 - [ ] The pipeline runs A0 to A7 on the synthetic fixture against live Bedrock within its token budgets.
 - [ ] A synthetic blind pass over Converse freezes on the host with a validated receipt.
 
-Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operator decision D1), `tools/anonymisation_host_smoke.py`, `harness/commands/converse_smoke.py`. Procedure: `plans/msca_dn_an12_host_runbook.md`. Decision record: `msca-dn-an12-offline-bundle_2026-10-16`. The three criteria stay open until the operator runs the host steps. Operator decisions D2 to D4 (2026-10-16): the audit amendment draft `plans/msca_dn_an12_audit_amendment_draft.md` is approved before host step 6; an A7 refusal over A3 edits satisfies criterion 2; `verify` measures the private endpoint and leaves a DNS-failed probe unmeasured.
+Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operator decision D1), `tools/anonymisation_host_smoke.py`, `harness/commands/converse_smoke.py`. Procedure: `plans/msca_dn_an12_host_runbook.md`. Decision record: `msca-dn-an12-offline-bundle_2026-10-16`. The three criteria stay open until the operator runs the host steps. Operator decisions D2 to D4 (2026-10-16): the audit amendment `plans/msca_dn_an12_audit_amendment_draft.md` is approved and applied (2026-10-16); an A7 refusal over A3 edits satisfies criterion 2; `verify` measures the private endpoint and leaves a DNS-failed probe unmeasured.
 
 ## AN12a — Apply the A3 rewrite plan (A3b)
 

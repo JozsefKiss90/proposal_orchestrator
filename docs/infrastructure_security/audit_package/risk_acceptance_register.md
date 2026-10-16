@@ -216,11 +216,11 @@ All mitigations reference verified infrastructure controls from the CG1-CG10 har
 | Field | Value |
 |---|---|
 | Risk ID | RSK-12 |
-| Risk description | A Python dependency (boto3, pyyaml, jsonschema, python-dotenv) contains a vulnerability or is compromised at the package repository level, introducing a security weakness into the application runtime. |
+| Risk description | A Python dependency or a bundled interpreter contains a vulnerability or is compromised at its source, introducing a security weakness into the application runtime. The orchestrator bundle depends on boto3, pyyaml, jsonschema and python-dotenv. The anonymisation bundle depends on sixteen pinned distributions, including PyMuPDF, and on a CPython 3.11.16 interpreter from python-build-standalone. |
 | Likelihood | **Low** |
 | Impact | **Medium** |
-| Mitigation | Dependencies are pinned in `requirements.txt`. The deployment uses pre-downloaded wheels bundled into the deployment tarball, not live package installation from PyPI. The host has no internet access, preventing runtime package downloads. The dependency set is minimal (4 packages plus transitive dependencies). |
-| Evidence | Deployment guide Section 4 (offline wheel installation), DC-32 (no internet egress) |
+| Mitigation | Both bundles use pre-downloaded wheels and install without PyPI; the host has no internet route. The anonymisation bundle pins every distribution and the interpreter archive by sha256, the build refuses any mismatch, and the host installs with `--require-hashes`. The interpreter's hash is checked against the release's published checksums. |
+| Evidence | Deployment guide §4 (offline wheel installation); `deploy/requirements-host.txt` and `deploy/offline_bundle.json`; the AN12 host verification record; DC-32 (no internet egress). |
 | Residual risk | **Low** |
 | Status | **Mitigated** |
 

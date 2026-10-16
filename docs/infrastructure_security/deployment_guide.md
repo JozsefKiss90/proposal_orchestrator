@@ -17,6 +17,7 @@
 | Dry run verification | PASS | 2026-06-02 | `transport=bedrock_converse`, `production_mode=True`, `[READY] n01_call_analysis` |
 | Smoke test — Phase 1 | PASS | 2026-06-03 | `overall_status=pass`, 4 skills OK, entry+exit gates pass, 6m 7s, ~438K tokens |
 | DC-38 — Full DAG run | PENDING | — | — |
+| Anonymisation bundle (AN12) | PENDING | — | `/opt/msca-dn-anonymisation`, bundled CPython 3.11.16, procedure `plans/msca_dn_an12_host_runbook.md` |
 
 ---
 
@@ -631,6 +632,16 @@ Session terminated unexpectedly
 
 **Cause**: t3.micro (1 GB) may be insufficient for a full 8-phase run.
 **Fix**: Resize to t3.medium or t3.large (see Section 9).
+
+---
+
+## 12. The anonymisation bundle (AN12)
+
+A second bundle carries the MSCA-DN anonymisation pipeline with its own Python 3.11 interpreter (ADR-001 Decision 8, amendment A1). Sections 4 and 5 still govern the orchestrator bundle.
+
+The procedure is `plans/msca_dn_an12_host_runbook.md`. It builds the bundle with `python -m runner.offline_bundle build`, installs it with `deploy/install_host.sh` and records `python -m runner.offline_bundle verify`.
+
+Use region `us-east-1`. The VPC's only Bedrock endpoint is `com.amazonaws.us-east-1.bedrock-runtime` (DC-01).
 
 ---
 

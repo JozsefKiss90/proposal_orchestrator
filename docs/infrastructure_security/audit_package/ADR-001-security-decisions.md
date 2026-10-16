@@ -6,6 +6,7 @@
 | Title | Security Architecture and Deployment Decisions |
 | Status | Accepted |
 | Date | 2026-06-03 |
+| Amended | 2026-10-16, amendment A1 to Decision 8 (the anonymisation bundle, MSCA-DN ticket AN12) |
 | Scope | Production inference provider selection, network architecture, identity management, secret storage, encryption key governance, audit infrastructure, data egress prevention, deployment strategy, transport abstraction |
 | Supersedes | None |
 | Related documents | `security_architecture_diagram.md`, `data_flow_document.md`, `risk_acceptance_register.md`, `operational_procedure.md`, `aws_deployment_hardening_plan.md`, `aws_hardening_control_register.md` |
@@ -346,6 +347,20 @@ Standard deployment patterns for Python applications involve installing dependen
 - `deploy_deps/` directory: pre-downloaded wheel files.
 - S3 gateway endpoint: DC-05, `vpce-0ee5648ce182bf85a`.
 - Host SG S3 prefix list rule: deployment guide Section 2, `sgr-0cc4c7112cd8277c2`.
+
+### Amendment A1 (2026-10-16) — The anonymisation bundle
+
+A second offline bundle carries the MSCA-DN anonymisation pipeline to the same host. It follows this decision's route: built on the operator's workstation, uploaded to S3 and installed through the S3 gateway endpoint. The host never contacts PyPI.
+
+The bundle carries its own interpreter, CPython 3.11.16 from python-build-standalone release 20260929. The pipeline's extraction library, PyMuPDF 1.28.2, publishes no wheel for the host's Python 3.9. The interpreter archive is pinned by sha256 and checked against the release's published checksums before bundling.
+
+The dependency set is sixteen distributions, pinned by version and hash in `deploy/requirements-host.txt`. The host installs them with `--no-index --require-hashes`, so a changed or substituted wheel stops the install. The bundle is built from committed files only, and two builds of one commit are byte-equal.
+
+The bundle installs into its own directory and leaves the host's Python 3.9 and the orchestrator install unchanged. After install, `python -m runner.offline_bundle verify` records the installed files, the interpreter, the ADR-001 environment controls, the Bedrock endpoint's private resolution and an unreachable internet endpoint.
+
+**Trade-off.** The interpreter is a binary from a third-party build project, outside the AL2023 package set. RSK-12 covers it.
+
+**Evidence.** `deploy/offline_bundle.json`, `deploy/requirements-host.txt`, the host verification record, and the decision record `msca-dn-an12-offline-bundle_2026-10-16`.
 
 ---
 

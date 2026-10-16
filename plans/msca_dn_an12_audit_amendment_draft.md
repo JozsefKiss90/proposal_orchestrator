@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Draft, awaiting operator approval.** Nothing below is applied to the audit package yet. |
+| Status | **Approved by the operator on 2026-10-16 and applied as drafted.** RSK-12's ratings stay unchanged. `audit_package.zip` is not reissued. |
 | Date | 2026-10-16 |
 | Decision | AN12 D2 (operator, 2026-10-16): draft now, approve before host step 6 installs the interpreter. |
 | Decision record | `docs/tier4_orchestration_state/decision_log/msca-dn-an12-offline-bundle_2026-10-16.json` |

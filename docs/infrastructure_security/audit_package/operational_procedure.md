@@ -431,6 +431,7 @@ which claude 2>&1
    ```
 2. Rebuild the tarball, upload, and redeploy.
 3. Verify imports on the host: `python3 -c "import boto3; import yaml; import jsonschema; print('OK')"`.
+4. The anonymisation bundle is not rebuilt with `pip download --python-version 3.9`. Change `deploy/requirements-host.txt` or `deploy/offline_bundle.json`, commit, and rebuild with `python -m runner.offline_bundle build` (deployment guide §12).
 
 ### 7.3 Updating IAM Permissions
 
