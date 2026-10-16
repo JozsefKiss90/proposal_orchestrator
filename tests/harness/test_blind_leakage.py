@@ -24,6 +24,7 @@ import harness.grounding_scope as gs
 from tests.harness._preflight import preflighted
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
+from harness.commands.converse_smoke import write_synthetic_profile
 from harness.rubrics import load_profile_bundle
 from runner.dev_graph import (
     PERMITTED_PURPOSES,
@@ -48,85 +49,8 @@ def _write_json(path: Path, data) -> Path:
     return path
 
 
-def _graph_profile(root: Path) -> Path:
-    """A call-neutral profile whose three criteria map onto the fixture
-    candidate's sections S1, S2 and S3."""
-    criteria = [
-        ("aims", "Aims", "S1", "aims-objectives", "Clarity of the objectives", ["objective"]),
-        ("plan", "Plan", "S2", "plan-tasks", "Credibility of the task plan", ["task"]),
-        ("outputs", "Outputs", "S3", "outputs-deliverables", "Definition of the deliverables", ["deliverable"]),
-    ]
-    registry = {
-        "instruments": [
-            {
-                "instrument_type": "SYN-GRAPH",
-                "criteria": [
-                    {"criterion_id": rid, "evaluator_expectations": [text]}
-                    for _c, rid, _s, _k, text, _t in criteria
-                ],
-            }
-        ]
-    }
-    scorecard = {
-        "scorecard_id": "syn_graph_scorecard",
-        "provenance": {"version": "0.1"},
-        "scoring": {"scale": "0-5", "levels": {"0": "none", "5": "full"}, "overall_threshold": 10, "overall_max": 15},
-        "criteria": [
-            {
-                "id": cid,
-                "name": rid,
-                "weight_pct": 34 if cid == "aims" else 33,
-                "aspects": [{"id": key, "text": text, "option_tag": "Track one", "source_page": 1}],
-            }
-            for cid, rid, _s, key, text, _t in criteria
-        ],
-        "excluded_aspects": [],
-    }
-    rubrics = {
-        "rubric_set_id": "syn_graph_rubrics",
-        "version": "0.1.0",
-        "scorecard_id": "syn_graph_scorecard",
-        "scorecard_version": "0.1",
-        "rubrics": [
-            {
-                "expectation_key": key,
-                "criterion_id": cid,
-                "expectation_text": text,
-                "rubric": "Integrity-framed: addressed AND grounded.",
-                "evaluation_steps": ["Check the spans.", "Check the claims."],
-                "pass_threshold": 0.7,
-                "selection_terms": terms,
-                "anchor_sub_section_ids": [sid],
-            }
-            for cid, _rid, sid, key, text, terms in criteria
-        ],
-    }
-    profile = {
-        "profile_id": "syn_graph",
-        "label": "Synthetic graph-mapped profile",
-        "instrument": {
-            "registry_instrument_type": "SYN-GRAPH",
-            "name": "Synthetic Graph Track",
-            "form_name": "Synthetic Graph Assessment Form",
-        },
-        "option_tag_grammar": {
-            "applicable_variant": "Track one",
-            "known_variants": ["Track one", "Track two"],
-            "variant_prefix": "",
-            "all_except_prefix": "all tracks except ",
-        },
-        "criteria": [
-            {"id": cid, "registry_criterion_id": rid, "section_ids": [sid]}
-            for cid, rid, sid, _k, _t, _terms in criteria
-        ],
-        "registry_path": "syn/registry.json",
-        "scorecard": {"path": "syn/scorecard.json", "scorecard_id": "syn_graph_scorecard", "version": "0.1"},
-        "rubric_set": {"path": "syn/rubrics.json", "rubric_set_id": "syn_graph_rubrics", "version": "0.1.0"},
-    }
-    _write_json(root / "syn/registry.json", registry)
-    _write_json(root / "syn/scorecard.json", scorecard)
-    _write_json(root / "syn/rubrics.json", rubrics)
-    return _write_json(root / "syn/profile.json", profile)
+#: The call-neutral three-criterion profile; the host smoke pass (AN12) uses it too.
+_graph_profile = write_synthetic_profile
 
 
 CRITERION_JSON = json.dumps(

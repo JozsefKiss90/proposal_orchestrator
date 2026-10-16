@@ -1,0 +1,21 @@
+# The private host's dependency closure for the offline bundle (AN12, ADR-001 Decision 8).
+# Exact pins with hashes. The host installs with --no-index --require-hashes, so a wheel
+# that is missing, extra or altered stops the install. Wheels target CPython 3.11 on
+# manylinux x86_64; runner/offline_bundle.py checks the downloaded set against this file.
+# pymupdf is the extraction pin of runner/extraction_environment.py.
+boto3==1.42.68 --hash=sha256:dbff353eb7dc93cbddd7926ed24793e0174c04adbe88860dfa639568442e4962
+botocore==1.42.68 --hash=sha256:9df7da26374601f890e2f115bfa573d65bf15b25fe136bb3aac809f6145f52ab
+jmespath==1.1.0 --hash=sha256:a5663118de4908c91729bea0acadca56526eb2698e83de10cd116ae0f4e97c64
+python-dateutil==2.9.0.post0 --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
+s3transfer==0.16.0 --hash=sha256:18e25d66fed509e3868dc1572b3f427ff947dd2c56f844a5bf09481ad3f3b2fe
+six==1.17.0 --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
+urllib3==1.26.20 --hash=sha256:0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e
+pyyaml==6.0.2 --hash=sha256:3ad2a3decf9aaba3d29c8f537ac4b243e36bef957511b4766cb0057d32b0be85
+jsonschema==4.23.0 --hash=sha256:fbadb6f8b144a8f8cf9f0b89ba94501d143e50411a1278633f56a7acf7fd5566
+attrs==24.3.0 --hash=sha256:ac96cd038792094f438ad1f6ff80837353805ac950cd2aa0e0625ef19850c308
+jsonschema-specifications==2024.10.1 --hash=sha256:a09a0680616357d9a0ecf05c12ad234479f549239d0f5b55f3deea67475da9bf
+referencing==0.35.1 --hash=sha256:eda6d3234d62814d1c64e305c1331c9a3a6132da475ab6382eaa997b21ee75de
+rpds-py==0.22.3 --hash=sha256:59f4a79c19232a5774aee369a0c296712ad0e77f24e62cad53160312b1c1eaa1
+typing-extensions==4.15.0 --hash=sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548
+python-dotenv==1.2.2 --hash=sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a
+pymupdf==1.28.2 --hash=sha256:397d6715c1f0df7548a92d0afd8ce370fc48fa47aeefac16be2bc04a16a8227f

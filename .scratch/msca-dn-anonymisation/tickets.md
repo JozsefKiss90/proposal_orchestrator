@@ -171,7 +171,7 @@ Constraints that apply to every ticket:
 - [x] The public record refuses to build unless the leak scan and attack both passed and the fidelity findings are all explained.
 - [x] The written export procedure names each step and the rule that permits it.
 
-## AN12 — Offline bundle and private-host smoke run
+## AN12 — Offline bundle and private-host smoke run (CODE DONE 2026-10-16, host steps pending operator)
 
 **What to build:** The pipeline and the Converse assessor reach the private host through the offline deployment bundle (Decision 8). On the host, the full pipeline runs on the synthetic fixture against live Bedrock, and a blind pass runs over the Converse backend. The operator performs the host steps.
 
@@ -180,6 +180,8 @@ Constraints that apply to every ticket:
 - [ ] The updated bundle installs on the private host without an internet route.
 - [ ] The pipeline runs A0 to A7 on the synthetic fixture against live Bedrock within its token budgets.
 - [ ] A synthetic blind pass over Converse freezes on the host with a validated receipt.
+
+Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operator decision D1), `tools/anonymisation_host_smoke.py`, `harness/commands/converse_smoke.py`. Procedure: `plans/msca_dn_an12_host_runbook.md`. Decision record: `msca-dn-an12-offline-bundle_2026-10-16`. The three criteria stay open until the operator runs the host steps.
 
 ## AN13 — Operator run on the DN original and acceptance
 

@@ -543,14 +543,30 @@ def _strings(value: Any) -> list[str]:
     return []
 
 
+#: A sha256 digest or a git revision, whole. A digest is one-way, so it holds no
+#: private content, but its hex digits can read as an identifier: nine decimal
+#: digits in a row match the grant number pattern (found by AN12).
+_DIGEST = re.compile(r"^(?:[0-9a-f]{64}|[0-9a-f]{40})$")
+
+
+def is_digest(value: str) -> bool:
+    """Whether *value* is a whole lowercase sha256 digest or 40-hex revision."""
+    return bool(_DIGEST.match(value))
+
+
 def _refuse_entities(record: Mapping[str, Any], entities: matching.EntityDictionary) -> None:
-    """Refuse *record* if any string in it matches the dictionary, case folded."""
+    """Refuse *record* if any string in it matches the dictionary, case folded.
+
+    A whole digest is not scanned: see :data:`_DIGEST`.
+    """
     folded = dataclasses.replace(
         entities,
         entries=tuple(dataclasses.replace(e, match_case=False) for e in entities.entries),
     )
     found: list[tuple[str, Optional[str]]] = []
     for string in _strings(record):
+        if is_digest(string):
+            continue
         for dictionary in (entities, folded):
             found += [(m.category, m.entry_id or m.regex_class)
                       for m in matching.find_matches(string, dictionary)]

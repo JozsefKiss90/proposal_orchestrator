@@ -1,0 +1,35 @@
+{
+  "schema": "offline_bundle_spec/1",
+  "record_type": "offline_bundle_spec",
+  "bundle_name": "msca-dn-anonymisation-host",
+  "purpose": "AN12: carry the anonymisation pipeline and the Converse assessor to the private host through the offline deployment bundle (ADR-001 Decision 8).",
+  "interpreter": {
+    "distribution": "python-build-standalone",
+    "python_version": "3.11.16",
+    "release": "20260929",
+    "archive": "cpython-3.11.16+20260929-x86_64-unknown-linux-gnu-install_only.tar.gz",
+    "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.11.16%2B20260929-x86_64-unknown-linux-gnu-install_only.tar.gz",
+    "sha256": "fbbfd0f2253996486455f44a28c09ac7e2df534b8a4835408d17c99d185b80ec",
+    "sha256_source": "the release's SHA256SUMS file, matched by a download on 2026-10-16",
+    "why": "The host's system Python is 3.9.25. PyMuPDF 1.28.2, the extraction pin, publishes no wheel for 3.9, and 3.11 is a measured interpreter of that pin. Decision recorded in msca-dn-an12-offline-bundle_2026-10-16."
+  },
+  "target": {
+    "python_tag": "cp311",
+    "machine": "x86_64",
+    "glibc": "2.34",
+    "glibc_status": "Assumed",
+    "glibc_basis": "Amazon Linux 2023 ships glibc 2.34. The build refuses a wheel that needs a newer glibc, and the host verification measures the real one."
+  },
+  "requirements": "deploy/requirements-host.txt",
+  "roots": [
+    "CLAUDE.md",
+    "pyproject.toml",
+    "deploy",
+    "runner",
+    "harness",
+    "tests/__init__.py",
+    "tests/_anonymisation_fixture.py",
+    "tests/fixtures/dev_graph_synthetic",
+    "tools/anonymisation_host_smoke.py"
+  ]
+}

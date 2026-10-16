@@ -126,6 +126,7 @@
       "invariant": "The operator-facing PE-09 runbook describes only what the code does. Every documented flag is one its parser accepts, and every required flag is documented. The freeze conditions are the code's own list, and every path and test the runbook cites exists. The operator's readiness receipt is validated before a private run, and an incomplete one is refused. So is a receipt stored here, while a mismatched pair, a claimed sandbox, an unsent setting and the freeze cited as evidence are reported. The historical run does not depend on this invariant, because the runbook and the receipt govern the private PE-09 execution.",
       "modules": [
         "tests/harness/test_execution_receipt.py",
+        "tests/harness/test_converse_smoke.py",
         "tests/test_msca_dn_pe09_runbook.py"
       ],
       "depended_on": false

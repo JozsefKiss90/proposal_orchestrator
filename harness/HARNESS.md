@@ -217,6 +217,17 @@ template leaves `review_state` and `declared_status` unfilled too: both are the 
 declaration, and a pre-answered one would ship an unreviewed Confirmed. The command writes nothing.
 Its summary carries field names, counts and verdicts rather than any value the receipt holds.
 
+### The host smoke pass (`commands/converse_smoke.py`, ticket AN12)
+
+`prepare` builds the synthetic dev-graph world outside the bundle and runs the preflight. It then
+drafts a Converse receipt holding the request the judge's own builder makes, with no model call.
+Every attestation stays a placeholder. `assess` refuses unless the operator's filled copy is green,
+as V13 requires before a private run. It then runs the assessment and the freeze through
+`blind_assessment`'s own commands, writing the checkpoint the receipt names. Last, it reads the
+receipt against the report with `execution_receipt.check` and adds no reading of its own. The
+report does not record the region, so the draft takes it from `AWS_REGION`. Both steps refuse a
+region outside ADR-001's two before any call. The procedure is `plans/msca_dn_an12_host_runbook.md`.
+
 ## Rule-equivalence matrix (`authority_matrix.py` + `commands/authority_matrix.py`)
 
 A proposal submitted under one year's call gets assessed by a profile written for another year's.

@@ -368,7 +368,26 @@ class TestNoPrivateContent:
     def test_the_dictionary_matcher_finds_nothing_in_the_public_record(
             self, accepted: aa.AcceptanceResult, entities: matching.EntityDictionary) -> None:
         for string in _strings(accepted.public):
+            if aa.is_digest(string):
+                continue  # one-way; see test_a_digest_is_not_read_as_an_identifier
             assert not matching.find_matches(string, entities), string
+
+    def test_a_digest_is_not_read_as_an_identifier(
+            self, entities: matching.EntityDictionary) -> None:
+        """AN12: a smoke run's policy hash began 579423577c, which the grant number
+        pattern matched, and A7 refused a clean derivative."""
+        digest = "579423577cbe07e4363e75178f402e224bcc2174a5d8e403090edf533c74fe23"
+        assert matching.find_matches(digest, entities), "the pattern does match the digest"
+        aa._refuse_entities({"policy_sha256": digest, "pipeline_revision": digest[:40]},
+                            entities)
+
+    def test_a_bare_identifier_is_still_refused(
+            self, entities: matching.EntityDictionary) -> None:
+        with pytest.raises(aa.AcceptanceRefused, match="grant_number"):
+            aa._refuse_entities({"signed_by": "579423577"}, entities)
+        with pytest.raises(aa.AcceptanceRefused):
+            aa._refuse_entities({"signed_by": "579423577cbe07e4363e75178f402e224bcc2174a5d8e40"
+                                              "3090edf533c74fe23 579423577"}, entities)
 
     def test_the_public_record_names_no_file_and_no_private_path(
             self, world: dict[str, Any], accepted: aa.AcceptanceResult) -> None:
