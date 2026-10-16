@@ -41,8 +41,10 @@ What :func:`verify` checks on the host
 --------------------------------------
 :data:`CHECKS`: the installed files against the manifest, the interpreter and
 glibc, the extraction pin, every installed distribution's version, the four
-ADR-001 environment controls, and, when asked, that an internet endpoint is
-unreachable. An unprobed route is not a pass. The record holds versions,
+ADR-001 environment controls, that the Bedrock runtime endpoint resolves only
+to private addresses (the VPC endpoint, ADR-001 DC-02), and, when asked, that
+an internet endpoint is unreachable. An unprobed route is not a pass, and nor
+is a probe whose name did not resolve: that measures DNS, not the route. The record holds versions,
 hashes and the checked settings only, never another environment value.
 """
 
@@ -52,6 +54,7 @@ import argparse
 import gzip
 import hashlib
 import io
+import ipaddress
 import json
 import os
 import platform
@@ -89,6 +92,7 @@ CHECKS: tuple[str, ...] = (
     "diagnostic_level",
     "transport",
     "region",
+    "private_endpoint",
     "no_internet_route",
 )
 
@@ -602,15 +606,45 @@ def _transport(environ: Mapping[str, str]) -> dict[str, Any]:
     return _check("transport", backend == HOST_BACKEND, f"{source} resolves to {backend}")
 
 
+def _region_setting(environ: Mapping[str, str]) -> Optional[tuple[str, str]]:
+    for var in ("AWS_REGION", "AWS_DEFAULT_REGION"):
+        if environ.get(var):
+            return var, environ[var]
+    return None
+
+
 def _region(environ: Mapping[str, str]) -> dict[str, Any]:
     from runner.anonymisation_rewrite import ALLOWED_REGIONS
 
-    for var in ("AWS_REGION", "AWS_DEFAULT_REGION"):
-        if environ.get(var):
-            region = environ[var]
-            return _check("region", region in ALLOWED_REGIONS,
-                          f"{var}={region}; ADR-001 allows {list(ALLOWED_REGIONS)}")
-    return _check("region", False, "neither AWS_REGION nor AWS_DEFAULT_REGION is set")
+    setting = _region_setting(environ)
+    if setting is None:
+        return _check("region", False, "neither AWS_REGION nor AWS_DEFAULT_REGION is set")
+    var, region = setting
+    return _check("region", region in ALLOWED_REGIONS,
+                  f"{var}={region}; ADR-001 allows {list(ALLOWED_REGIONS)}")
+
+
+def _resolve(host: str) -> list[str]:
+    infos = socket.getaddrinfo(host, 443, proto=socket.IPPROTO_TCP)
+    return sorted({str(info[4][0]) for info in infos})
+
+
+def _private_endpoint(environ: Mapping[str, str]) -> dict[str, Any]:
+    from runner.anonymisation_rewrite import ALLOWED_REGIONS
+
+    setting = _region_setting(environ)
+    if setting is None or setting[1] not in ALLOWED_REGIONS:
+        return _check("private_endpoint", False, "no ADR-001 region to resolve the endpoint in")
+    region = setting[1]
+    host = f"bedrock-runtime.{region}.amazonaws.com"
+    try:
+        addresses = _resolve(host)
+    except OSError as exc:
+        return _check("private_endpoint", False, f"{host} did not resolve ({type(exc).__name__})")
+    public = [a for a in addresses if not ipaddress.ip_address(a).is_private]
+    return _check("private_endpoint", bool(addresses) and not public,
+                  f"{host} resolves to {', '.join(addresses) or 'nothing'}"
+                  + (f"; not private: {', '.join(public)}" if public else ""))
 
 
 def _tcp(host: str, port: int, timeout: float) -> socket.socket:
@@ -624,6 +658,12 @@ def _probe(probe: Optional[tuple[str, int]], connect: Callable[..., Any]) -> dic
     host, port = probe
     try:
         connection = connect(host, port, 5)
+    except socket.gaierror as exc:
+        return _check("no_internet_route", None,
+                      f"{host} did not resolve ({type(exc).__name__}), so the route was not "
+                      "measured; probe an IP address instead")
+    except socket.timeout:
+        return _check("no_internet_route", True, f"{host}:{port} unreachable (timed out)")
     except OSError as exc:
         return _check("no_internet_route", True,
                       f"{host}:{port} unreachable ({type(exc).__name__})")
@@ -685,6 +725,7 @@ def verify(app_root: Path, *, environ: Optional[Mapping[str, str]] = None,
                f"ORCHESTRATOR_DIAGNOSTIC_LEVEL={level or '(unset)'}"),
         _transport(environ),
         _region(environ),
+        _private_endpoint(environ),
         _probe(probe, connect),
     ]
     return {
@@ -732,7 +773,8 @@ def _parser() -> argparse.ArgumentParser:
     v = sub.add_parser("verify", help="verify the installed tree on the host")
     v.add_argument("--app-root", type=Path, default=Path(__file__).resolve().parents[1])
     v.add_argument("--probe-no-internet", type=_endpoint, default=None, metavar="HOST:PORT",
-                   help="an internet endpoint that must be unreachable, such as pypi.org:443")
+                   help="an internet endpoint that must be unreachable, such as pypi.org:443; "
+                        "if its name does not resolve, give an IP address")
     v.add_argument("--record", type=Path, default=None, help="also write the record here")
     return parser
 

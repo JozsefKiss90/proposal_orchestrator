@@ -171,7 +171,7 @@ Constraints that apply to every ticket:
 - [x] The public record refuses to build unless the leak scan and attack both passed and the fidelity findings are all explained.
 - [x] The written export procedure names each step and the rule that permits it.
 
-## AN12 — Offline bundle and private-host smoke run (CODE DONE 2026-10-16, host steps pending operator)
+## AN12 — Offline bundle and private-host smoke run (CODE DONE 2026-10-16, rules confirmed, host steps pending operator)
 
 **What to build:** The pipeline and the Converse assessor reach the private host through the offline deployment bundle (Decision 8). On the host, the full pipeline runs on the synthetic fixture against live Bedrock, and a blind pass runs over the Converse backend. The operator performs the host steps.
 
@@ -181,13 +181,23 @@ Constraints that apply to every ticket:
 - [ ] The pipeline runs A0 to A7 on the synthetic fixture against live Bedrock within its token budgets.
 - [ ] A synthetic blind pass over Converse freezes on the host with a validated receipt.
 
-Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operator decision D1), `tools/anonymisation_host_smoke.py`, `harness/commands/converse_smoke.py`. Procedure: `plans/msca_dn_an12_host_runbook.md`. Decision record: `msca-dn-an12-offline-bundle_2026-10-16`. The three criteria stay open until the operator runs the host steps.
+Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operator decision D1), `tools/anonymisation_host_smoke.py`, `harness/commands/converse_smoke.py`. Procedure: `plans/msca_dn_an12_host_runbook.md`. Decision record: `msca-dn-an12-offline-bundle_2026-10-16`. The three criteria stay open until the operator runs the host steps. Operator decisions D2 to D4 (2026-10-16): the audit amendment draft `plans/msca_dn_an12_audit_amendment_draft.md` is approved before host step 6; an A7 refusal over A3 edits satisfies criterion 2; `verify` measures the private endpoint and leaves a DNS-failed probe unmeasured.
+
+## AN12a — Apply the A3 rewrite plan (A3b)
+
+**What to build:** A stage applies the validated span edits of an A3 rewrite plan to the A2 output through the stage edit harness (`apply_stage_edits`), as A4 does. It writes a new derivative and an edit log in the private store. A5, A6 and A7 then read the applied derivative. Queued entity proposals stay out: they go to the dictionary, and A2 reruns. Without this stage, any A3 edit makes A7 refuse (AN11 R3), so the DN original cannot reach acceptance.
+
+**Blocked by:** AN12 code (operator decision D3, 2026-10-16).
+
+- [ ] On the fixture, every validated A3 edit lands at its span, and the edit log binds the plan, input and output hashes.
+- [ ] An edit that no longer matches its passage is refused, and no text changes.
+- [ ] A7 accepts a derivative whose A3 edits were applied, and still refuses a plan with a queued entity proposal.
 
 ## AN13 — Operator run on the DN original and acceptance
 
 **What to build:** The operator authors the entity dictionary privately and runs the pipeline on the DN original inside the private network. They read the derivative, review the A5 and A6 reports and sign the acceptance. The derivative is exported as D3 through the written procedure.
 
-**Blocked by:** AN12.
+**Blocked by:** AN12, AN12a.
 
 - [ ] A signed private acceptance record and its public metadata record exist.
 - [ ] The derivative is exported through the written procedure and lands outside the network as D3.

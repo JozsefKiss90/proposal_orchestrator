@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import socket
 import io
 import json
 import subprocess
@@ -392,6 +393,24 @@ def _refused(host: str, port: int, timeout: float):
     raise OSError("no route to host")
 
 
+def _unresolved(host: str, port: int, timeout: float):
+    raise socket.gaierror(-2, "Name or service not known")
+
+
+def _resolves_to(*addresses: str):
+    def resolve(host: str) -> list[str]:
+        if not addresses:
+            raise socket.gaierror(-2, "Name or service not known")
+        return list(addresses)
+    return resolve
+
+
+@pytest.fixture(autouse=True)
+def _private_dns(monkeypatch):
+    """Bedrock resolves to the VPC endpoint unless a test says otherwise; no test resolves."""
+    monkeypatch.setattr(ob, "_resolve", _resolves_to("172.31.27.207", "172.31.80.15"))
+
+
 @pytest.fixture
 def installed(repo, inputs, tmp_path) -> Path:
     result = _build(repo, inputs, tmp_path / "out")
@@ -463,6 +482,50 @@ class TestTheHostVerification:
         check = next(c for c in record["checks"] if c["check"] == "no_internet_route")
         assert check["passed"] is None
         assert record["passed"] is False, "an unprobed route is not a pass"
+
+    def test_a_name_that_does_not_resolve_leaves_the_route_unmeasured(self, installed):
+        record = ob.verify(installed, environ=HOST_ENV, facts=_facts(), probe=("pypi.org", 443),
+                           connect=_unresolved)
+        check = next(c for c in record["checks"] if c["check"] == "no_internet_route")
+        assert check["passed"] is None
+        assert "did not resolve" in check["detail"] and "IP address" in check["detail"]
+        assert record["passed"] is False
+
+    def test_an_ip_literal_that_times_out_passes(self, installed):
+        def timed_out(host, port, timeout):
+            raise socket.timeout("timed out")
+        record = ob.verify(installed, environ=HOST_ENV, facts=_facts(), probe=("1.1.1.1", 443),
+                           connect=timed_out)
+        check = next(c for c in record["checks"] if c["check"] == "no_internet_route")
+        assert check["passed"] is True
+        assert "timed out" in check["detail"]
+
+    def test_bedrock_resolving_to_the_vpc_endpoint_passes(self, installed):
+        record = ob.verify(installed, environ=HOST_ENV, facts=_facts(), probe=("pypi.org", 443),
+                           connect=_refused)
+        check = next(c for c in record["checks"] if c["check"] == "private_endpoint")
+        assert check["passed"] is True
+        assert "bedrock-runtime.eu-west-1.amazonaws.com" in check["detail"]
+        assert "172.31.27.207" in check["detail"]
+
+    @pytest.mark.parametrize("addresses", [
+        ("52.94.4.10",),
+        ("172.31.27.207", "52.94.4.10"),
+        (),
+    ])
+    def test_bedrock_resolving_anywhere_else_fails(self, installed, monkeypatch, addresses):
+        monkeypatch.setattr(ob, "_resolve", _resolves_to(*addresses))
+        record = ob.verify(installed, environ=HOST_ENV, facts=_facts(), probe=("pypi.org", 443),
+                           connect=_refused)
+        assert _failed(record) == {"private_endpoint"}
+
+    def test_without_an_adr_001_region_the_endpoint_is_not_resolved(self, installed, monkeypatch):
+        def never(host):
+            raise AssertionError("resolved without a region")
+        monkeypatch.setattr(ob, "_resolve", never)
+        env = {k: v for k, v in HOST_ENV.items() if k != "AWS_REGION"}
+        record = ob.verify(installed, environ=env, facts=_facts())
+        assert {"region", "private_endpoint"} <= _failed(record)
 
     def test_the_record_holds_no_environment_value_but_the_ones_it_checks(self, installed):
         env = {**HOST_ENV, "AWS_SECRET_ACCESS_KEY": "s3cr3t", "SOME_TOKEN": "t0k3n"}

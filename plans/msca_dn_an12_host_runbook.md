@@ -59,7 +59,7 @@ Work in an SSM session as `ssm-user`. Keep every output under a private working 
    export ORCHESTRATOR_PRODUCTION_MODE=true
    export ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata
    export ORCHESTRATOR_TRANSPORT_BACKEND=bedrock_converse
-   export AWS_REGION=eu-west-1
+   export AWS_REGION=us-east-1
    cd /opt/msca-dn-anonymisation/app
    ../python/bin/python3 -m runner.offline_bundle verify --probe-no-internet pypi.org:443 \
      --record /home/ssm-user/an12/verification.json
@@ -67,15 +67,19 @@ Work in an SSM session as `ssm-user`. Keep every output under a private working 
 
    Exit status 0 means every check passed. The probe passes only when `pypi.org:443` is unreachable. Without `--probe-no-internet` the route is not measured, and the record does not pass.
 
+   The `private_endpoint` check resolves `bedrock-runtime.<region>.amazonaws.com` and passes only when every address is private. That is the VPC endpoint of ADR-001 DC-02.
+
+   If the probe's detail says the name did not resolve, the route was not measured. Rerun the command with an IP address, such as `--probe-no-internet 1.1.1.1:443`.
+
 ## Part 3: the pipeline on the synthetic fixture (criterion 2)
 
-The A3 and A5 models are the operator's O2 choice, and A5 must be a different Claude model from A3. The token budgets are also the operator's choice. Each model stage stops when its budget is reached, and the status file records the tokens each stage used.
+The A3 and A5 models are the operator's O2 choice, and A5 must be a different Claude model from A3. Use `us.anthropic.claude-*` inference profiles or bare `anthropic.claude-*` ids in `us-east-1`. The host's only Bedrock endpoint is in `us-east-1` (DC-01), and the invoke policy allows only those two id forms (DC-10). The token budgets are also the operator's choice. Each model stage stops when its budget is reached, and the status file records the tokens each stage used.
 
 8. Run the automatic stages:
 
    ```bash
    ../python/bin/python3 -m tools.anonymisation_host_smoke --root /home/ssm-user/an12/pipeline \
-     --region eu-west-1 --a3-model <A3-model-id> --a5-model <A5-model-id> \
+     --region us-east-1 --a3-model <A3-model-id> --a5-model <A5-model-id> \
      --max-output-tokens 2000 --a3-token-budget 100000 --a5-token-budget 200000
    ```
 
@@ -89,7 +93,7 @@ The A3 and A5 models are the operator's O2 choice, and A5 must be a different Cl
 
     ```bash
     ../python/bin/python3 -m tools.anonymisation_host_smoke --root /home/ssm-user/an12/pipeline \
-      --region eu-west-1 --a3-model <A3-model-id> --a5-model <A5-model-id> \
+      --region us-east-1 --a3-model <A3-model-id> --a5-model <A5-model-id> \
       --max-output-tokens 2000 --a3-token-budget 100000 --a5-token-budget 200000 \
       --figure-review <review-copy> --acceptance-input <acceptance-copy>
     ```
@@ -105,7 +109,8 @@ The assessor model must not be the drafter's model in any id form (AN1c). Its ve
 11. Prepare the pass. This step makes no model call:
 
     ```bash
-    ../python/bin/python3 -m harness.commands.converse_smoke prepare --root /home/ssm-user/an12/converse       --assessor-model <assessor-model-id> --assessor-version bedrock-converse-eu-west-1@<YYYY-MM-DD>
+    ../python/bin/python3 -m harness.commands.converse_smoke prepare --root /home/ssm-user/an12/converse \
+      --assessor-model <assessor-model-id> --assessor-version bedrock-converse-us-east-1@<YYYY-MM-DD>
     ```
 
     It builds the synthetic world, runs the preflight and writes `receipt_draft.json`. The draft holds the request the assessor will send, built by the transport's own builder. Everything you attest is left as a `<placeholder>`.

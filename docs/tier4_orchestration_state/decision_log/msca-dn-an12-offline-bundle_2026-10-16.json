@@ -5,9 +5,9 @@
   "branch": "msca-dn-pre-eval",
   "milestone": "MSCA-DN anonymisation pipeline",
   "ticket": "AN12 of .scratch/msca-dn-anonymisation/tickets.md",
-  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN12, with one operator decision taken in session (D1). Deployment tooling and an authoring tool's smoke driver. Closes no gate, adds no runtime gate and amends no constitutional rule. The host steps, and so the ticket's three criteria, remain the operator's.",
-  "review_state": "agent_drafted_pending_operator_review",
-  "decided_by": "D1: the operator, in session on 2026-10-16, choosing between a bundled interpreter, an off-pin PyMuPDF on Python 3.9, and blocking AN12 on an infrastructure change. R1 to R7: the agent, while implementing AN12; the operator has not yet confirmed them.",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN12, with operator decisions taken in session (D1 to D4) and rules R1 to R7 confirmed by the operator. Deployment tooling and an authoring tool's smoke driver. Closes no gate, adds no runtime gate and amends no constitutional rule. The host steps, and so the ticket's three criteria, remain the operator's.",
+  "review_state": "operator_reviewed_2026-10-16",
+  "decided_by": "D1 to D4: the operator, in session on 2026-10-16. R1 to R7: drafted by the agent while implementing AN12, confirmed by the operator in session on 2026-10-16. R8: drafted by the agent while carrying out D4; not yet confirmed.",
   "decision": "The offline bundle carries its own CPython 3.11 interpreter, built by runner/offline_bundle.py from HEAD and verified on the host by the same module. tools/anonymisation_host_smoke.py runs A0 to A7 on the synthetic fixture; harness/commands/converse_smoke.py runs a synthetic blind pass over Converse, freezes it and validates its receipt. plans/msca_dn_an12_host_runbook.md is the operator's procedure.",
   "decisions": [
     {
@@ -15,50 +15,74 @@
       "decision": "The bundle ships CPython 3.11.16 from python-build-standalone release 20260929, pinned by sha256 in deploy/offline_bundle.json, and leaves the host's system Python 3.9.25 untouched.",
       "declared_status": "Confirmed",
       "basis": "Operator decision in session. The facts it rests on were measured on 2026-10-16. pip download finds no PyMuPDF 1.28.2 wheel for Python 3.9 (the newest for 3.9 is 1.26.5, never measured against the committed artifacts), and finds pymupdf-1.28.2-cp310-abi3-manylinux_2_28_x86_64. Python 3.11 is in MEASURED_PYTHON of runner/extraction_environment.py. The archive's hash matched the release's SHA256SUMS on download."
+    },
+    {
+      "id": "D2",
+      "decision": "The audit package is amended for the bundled interpreter. The agent drafts the amendments in plans/msca_dn_an12_audit_amendment_draft.md, and the operator approves them before host step 6 installs the interpreter. The draft adds text to ADR-001 Decision 8, RSK-12, the deployment guide and the operational procedure, and replaces no approved wording.",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, chosen over amending after the host run and over leaving the gap declared. The amendment text itself is pending the operator's approval."
+    },
+    {
+      "id": "D3",
+      "decision": "If the live A3 model proposes an edit to the fixture and A7 refuses, that refusal satisfies AN12 criterion 2. Ticket AN12a applies the A3 plan, and AN13 is blocked on it.",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session. Criterion 2 asks that A0 to A7 run within their token budgets, not that A7 accepts. AN11 R3 refuses an acceptance over a plan with edits, so the DN original cannot reach acceptance without AN12a."
+    },
+    {
+      "id": "D4",
+      "decision": "Before the host run, runner.offline_bundle verify measures that the Bedrock runtime endpoint resolves to private addresses, and reports a probe whose name did not resolve separately from an unreachable route.",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session. R8 records how the agent implemented it."
     }
   ],
   "rules": [
     {
       "id": "R1",
       "rule": "deploy/requirements-host.txt pins the full closure, sixteen distributions, each as name==version with one sha256. The host installs with --no-index --require-hashes. The build refuses a wheel set that differs from the pins either way, a wheel whose hash differs, and a wheel that cannot run on cp311, x86_64 and glibc 2.34.",
-      "declared_status": "Inferred",
-      "basis": "The rule is the agent's. Its facts were measured: the versions are the ones the local test suite runs against; pip download resolved exactly these sixteen for cp311 manylinux; an offline pip download in hash-checking mode accepted the file; the pipeline and harness tests passed under Python 3.11 with these exact versions (907 tests, Windows wheels of the same versions)."
+      "declared_status": "Confirmed",
+      "basis": "The rule is the agent's. Its facts were measured: the versions are the ones the local test suite runs against; pip download resolved exactly these sixteen for cp311 manylinux; an offline pip download in hash-checking mode accepted the file; the pipeline and harness tests passed under Python 3.11 with these exact versions (907 tests, Windows wheels of the same versions). Confirmed by the operator in session on 2026-10-16."
     },
     {
       "id": "R2",
       "rule": "The bundle carries the spec's roots as committed at HEAD, read from git blobs, never the working tree. bundle_manifest.json binds every file by sha256 with the revision. Two builds of one commit with the same inputs are byte-equal.",
-      "declared_status": "Inferred",
-      "basis": "The pipeline revision an acceptance records (AN11 R5) must name the code that ran. Reading blobs keeps uncommitted edits and line-ending conversion off the host (the 5b57f09 lesson). tests/runner/test_offline_bundle.py asserts both, and runs both smokes from the roots alone in a fresh interpreter."
+      "declared_status": "Confirmed",
+      "basis": "The pipeline revision an acceptance records (AN11 R5) must name the code that ran. Reading blobs keeps uncommitted edits and line-ending conversion off the host (the 5b57f09 lesson). tests/runner/test_offline_bundle.py asserts both, and runs both smokes from the roots alone in a fresh interpreter. Confirmed by the operator in session on 2026-10-16."
     },
     {
       "id": "R3",
       "rule": "runner.offline_bundle verify checks the installed files, the interpreter and glibc, the extraction pin, every distribution's version, production mode, diagnostic level metadata, the bedrock_converse transport and an ADR-001 region. An internet endpoint is probed only when asked, and an unprobed route is not a pass.",
-      "declared_status": "Inferred",
-      "basis": "AN12 criterion 1 asks for an install without an internet route, so the route is measured rather than assumed. The record holds versions, hashes and the checked settings only."
+      "declared_status": "Confirmed",
+      "basis": "AN12 criterion 1 asks for an install without an internet route, so the route is measured rather than assumed. The record holds versions, hashes and the checked settings only. Confirmed by the operator in session on 2026-10-16."
     },
     {
       "id": "R4",
       "rule": "The pipeline smoke runs under a synthetic successor policy that sets the research-group threshold to zero, Assumed, for the fixture only. Its status file says so. It is never a policy for AN13.",
-      "declared_status": "Inferred",
-      "basis": "The committed policy leaves that threshold Unresolved, and the attack refuses under it (AN8b). The AN8b and AN11 tests use the same successor."
+      "declared_status": "Confirmed",
+      "basis": "The committed policy leaves that threshold Unresolved, and the attack refuses under it (AN8b). The AN8b and AN11 tests use the same successor. Confirmed by the operator in session on 2026-10-16."
     },
     {
       "id": "R5",
       "rule": "The smoke driver never makes the operator's two acts. It writes a figure review template and an acceptance input template with <placeholder> values, and refuses either input while a placeholder remains. A6 and A7 write into directories named for the hash of the input they used.",
-      "declared_status": "Inferred",
-      "basis": "A figure counted present is not accepted until it has been looked at (AN9), and the acceptance is the operator's signature (AN11 R4, R5). A written report is never overwritten, so a corrected review must not collide with an earlier one."
+      "declared_status": "Confirmed",
+      "basis": "A figure counted present is not accepted until it has been looked at (AN9), and the acceptance is the operator's signature (AN11 R4, R5). A written report is never overwritten, so a corrected review must not collide with an earlier one. Confirmed by the operator in session on 2026-10-16."
     },
     {
       "id": "R6",
       "rule": "The Converse smoke runs in the V13 order. prepare builds the world, runs the preflight and drafts the receipt from the request the judge's own builder makes, with no model call. assess refuses unless the operator's filled receipt is green, then runs with the checkpoint the receipt names, freezes, and reads the receipt against the report. The region comes from AWS_REGION or AWS_DEFAULT_REGION, and both steps refuse one outside eu-west-1 and us-east-1 before any call.",
-      "declared_status": "Inferred",
-      "basis": "V13: the receipt is validated before a private run. The blind report does not record the region (open since AN1b). The receipt validator refuses placeholders, so an unfilled draft cannot validate."
+      "declared_status": "Confirmed",
+      "basis": "V13: the receipt is validated before a private run. The blind report does not record the region (open since AN1b). The receipt validator refuses placeholders, so an unfilled draft cannot validate. Confirmed by the operator in session on 2026-10-16."
     },
     {
       "id": "R7",
       "rule": "The public acceptance record's entity check skips a string that is a whole lowercase sha256 digest or 40-hex revision. Every other string is still matched, a digest followed by an identifier included.",
+      "declared_status": "Confirmed",
+      "basis": "The rule is the agent's; the defect was measured. AN12's driver found that a policy hash beginning 579423577c matched the grant number pattern, and A7 refused a clean derivative. A digest is one-way, so it holds no private content. The exemption applies to any whole-digest string, not only the hash fields; the operator may narrow it to named fields. This changes how AN11 R1 is implemented, not what it requires. tests/runner/test_anonymisation_acceptance.py holds the regression. Confirmed by the operator in session on 2026-10-16."
+    },
+    {
+      "id": "R8",
+      "rule": "verify's private_endpoint check resolves bedrock-runtime.<region>.amazonaws.com in the configured ADR-001 region and passes only when it resolves and every address is private. Without an ADR-001 region it fails and resolves nothing. A no-internet probe whose name does not resolve records the route as not measured (passed null), so the record does not pass; the runbook says to probe an IP address instead. A timeout or any other connection error is an unreachable route.",
       "declared_status": "Inferred",
-      "basis": "The rule is the agent's; the defect was measured. AN12's driver found that a policy hash beginning 579423577c matched the grant number pattern, and A7 refused a clean derivative. A digest is one-way, so it holds no private content. The exemption applies to any whole-digest string, not only the hash fields; the operator may narrow it to named fields. This changes how AN11 R1 is implemented, not what it requires. tests/runner/test_anonymisation_acceptance.py holds the regression."
+      "basis": "The agent's implementation of D4. A DNS failure shows the name did not resolve, not that no route exists, so counting it as a pass would claim what was not measured. DC-02 records the endpoint's private addresses (172.31.27.207, 172.31.80.15). tests/runner/test_offline_bundle.py holds the cases."
     }
   ],
   "known_gaps": [
@@ -72,15 +96,15 @@
     },
     {
       "declared_status": "Unresolved",
-      "gap": "The deployment guide and ADR-001 Decision 8 still describe the Python 3.9 bundle and a four-package dependency set. Whether to amend the audit package is the operator's decision. The bundled interpreter also adds a binary to the supply chain that RSK-12 does not name."
+      "gap": "The audit package still describes only the Python 3.9 bundle. The amendment is drafted in plans/msca_dn_an12_audit_amendment_draft.md (D2) and is pending the operator's approval, which comes before host step 6. Whether to reissue audit_package.zip is the operator's call."
     },
     {
       "declared_status": "Unresolved",
-      "gap": "No stage applies an A3 plan (AN6, AN11 R3). If the live A3 model proposes an edit to the fixture, A7 refuses, and criterion 2 ends in a correct refusal rather than an acceptance."
+      "gap": "No stage applies an A3 plan (AN6, AN11 R3). If the live A3 model proposes an edit to the fixture, A7 refuses, and criterion 2 ends in a correct refusal rather than an acceptance. D3 accepts that refusal for criterion 2; ticket AN12a closes the gap before AN13."
     },
     {
       "declared_status": "Unresolved",
-      "gap": "The SSM session has no display, so the operator cannot look at the derivative's figures on the host. The fixture is synthetic, so its derivative may be copied out to be viewed; the route is the operator's choice."
+      "gap": "The SSM session has no display, so the operator cannot look at the derivative's figures on the host. The fixture is synthetic, so its derivative may be copied out to be viewed; the route is the operator's choice. The agent recommends copying the synthetic derivative out through the operator's usual route. That route is closed to the real derivative in AN13, so AN13 needs a figure review route that stays inside the network."
     },
     {
       "declared_status": "Unresolved",
@@ -88,12 +112,20 @@
     },
     {
       "declared_status": "Unresolved",
-      "gap": "runner.offline_bundle verify does not measure that bedrock-runtime resolves to the VPC endpoint (ADR-001 DC-02). Its internet probe passes on any connection error, a DNS failure included, and probes one endpoint. The record names the error class."
+      "gap": "verify now measures that bedrock-runtime resolves to private addresses, and a probe whose name did not resolve no longer passes (D4, R8). It still probes a single internet endpoint, and private resolution shows where the name points, not that every call takes that path."
     },
     {
       "declared_status": "Unresolved",
       "gap": "The smoke driver imports the AN3 fixture builder from tests/, so the bundle ships tests/__init__.py and tests/_anonymisation_fixture.py. The import boundary names only the harness, so this is permitted, but production code now depends on a test module."
     }
   ],
-  "private_content": "None. This record names files, versions, hashes and rules. The smoke runs read only the synthetic AN3 fixture and the synthetic dev-graph world."
+  "private_content": "None. This record names files, versions, hashes and rules. The smoke runs read only the synthetic AN3 fixture and the synthetic dev-graph world.",
+  "findings": [
+    {
+      "id": "F1",
+      "finding": "The AN12 runbook set region eu-west-1. The VPC's only Bedrock endpoint is com.amazonaws.us-east-1.bedrock-runtime (DC-01), and the invoke policy allows only anthropic.claude-* and us.anthropic.claude-* resources (DC-10). An eu-west-1 call from the host would have no private route, and an eu. inference profile would be denied. The runbook now uses us-east-1 and names the two allowed id forms.",
+      "declared_status": "Inferred",
+      "basis": "docs/infrastructure_security/aws_hardening_control_register.md DC-01, DC-10 and DC-16; the deployment guide's region us-east-1. Not yet measured on the host; the private_endpoint check measures it at step 7."
+    }
+  ]
 }
