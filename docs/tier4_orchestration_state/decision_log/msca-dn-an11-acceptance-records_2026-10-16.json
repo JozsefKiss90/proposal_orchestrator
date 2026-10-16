@@ -1,0 +1,69 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-an11-acceptance-records_2026-10-16",
+  "date": "2026-10-16",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "MSCA-DN anonymisation pipeline",
+  "ticket": "AN11 of .scratch/msca-dn-anonymisation/tickets.md",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket AN11. An authoring tool's rules and a written procedure. Accepts no derivative, closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The agent, while implementing AN11. The operator has not yet confirmed these rules in session.",
+  "decision": "Stage A7 is runner/anonymisation_acceptance.py. It writes a private acceptance record (anonymisation_acceptance/1) and a public metadata record (anonymisation_acceptance_public/1), which the J0 D3 condition points to once the operator commits it. The export is written down in plans/msca_dn_anonymisation_export_procedure.md. Six rules bind AN12 and AN13.",
+  "rules": [
+    {
+      "id": "R1",
+      "rule": "The public record is built from the private record alone. Its keys are a closed set, and every string in it, keys included, is matched against the entity dictionary with case folded. Any match refuses the acceptance before either record is written.",
+      "declared_status": "Inferred",
+      "basis": "AN11 acceptance criterion 1. The operator's entries (signer, export rule) are the only free text, so the dictionary check is what stops them carrying a name. tests/runner/test_anonymisation_acceptance.py asserts it."
+    },
+    {
+      "id": "R2",
+      "rule": "The model attack must pass with no correct guess at any target the policy does not keep, unlocated correct guesses included, even where the policy's threshold would allow some.",
+      "declared_status": "Inferred",
+      "basis": "The J0 D3 condition reads 'the re-identification pass found no hit'. Every committed threshold is zero today, so the rule changes nothing now. It would bind a successor policy that set a threshold above zero."
+    },
+    {
+      "id": "R3",
+      "rule": "An A3 rewrite plan holding a validated edit, a queued entity proposal or a malformed reply refuses the acceptance. The plan must be of the A2 output, under the same policy, by the A3 model the attack checked its independence against.",
+      "declared_status": "Inferred",
+      "basis": "A3 applies no edit and A6 reads no A3 log (AN6, AN9). A derivative accepted over a plan with edits would not carry what A3 asked for."
+    },
+    {
+      "id": "R4",
+      "rule": "The operator attests six reads in the private input: the derivative, the leak scan report, its review items, the re-identification report, the A6 report, and that the stages ran inside the private network. Each must be true.",
+      "declared_status": "Inferred",
+      "basis": "Handoff A7: the operator reads the derivative and reviews the A5 and A6 reports. The leak scan lists review items that do not fail the scan (AN8a), so their read is attested separately."
+    },
+    {
+      "id": "R5",
+      "rule": "The signature, the pipeline revision and the export rule are operator declarations. The public record states the pipeline revision and the export rule as Assumed, and the signature as a declaration, not a cryptographic one.",
+      "declared_status": "Inferred",
+      "basis": "No stage record carries the commit (as in AN10 R2), and runbook section 10 leaves the export rule to the private environment."
+    },
+    {
+      "id": "R6",
+      "rule": "The public acceptance record leaves first, alone, and is committed unchanged to the decision log; the derivative is D3 from that commit. Only then does the export set leave: exactly the derivative, its V17 configuration input and its fidelity register. Both go through the S3 gateway endpoint under ec2-ssm-role.",
+      "declared_status": "Inferred",
+      "basis": "The J0 D3 condition: until the acceptance record exists the derivative is D4, so it may not leave before the record is committed. The record itself is metadata, which runbook section 10 lets the public workspace hold. Handoff section 6 for the files. ADR-001 Decision 7 and operational procedure section 3.6 for the route."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "The deployment guide records a write grant for ec2-ssm-role to evidence/ only. Operational procedure section 3.6 writes to deliverables/, which no recorded grant covers. AN12 confirms the grant on the host or names another prefix."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The mapping table is not yet written to a KMS-encrypted store. The private record binds its parts by hash; the row map still sits beside the derivative (AN7)."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "How long the export archive stays in the bucket after download. No recorded rule says."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The model attack still cannot run on the committed policy, whose research-group threshold is Unresolved (AN8b). Until a successor policy sets it, no acceptance can be built over the committed policy."
+    }
+  ],
+  "private_content": "None. This record names files, rules and counts from the synthetic AN3 fixture only."
+}

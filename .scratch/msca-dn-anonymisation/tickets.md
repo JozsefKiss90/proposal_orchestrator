@@ -161,15 +161,15 @@ Constraints that apply to every ticket:
 - [x] Neither existing register renderer renders the derivative, and the new renderer renders nothing else.
 - [x] The integrity audit on a fixture derivative words its scope as a derivative of the original.
 
-## AN11 — Acceptance records and the written export procedure (A7)
+## AN11 — Acceptance records and the written export procedure (A7) (DONE 2026-10-16, rules pending operator confirmation)
 
 **What to build:** The operator acceptance step produces two records. The private record holds the full acceptance, the mapping table hash, the edit log hash and the re-identification details. The public Tier 4 record holds metadata only. It records the derivative hash, the policy version and hash, the pipeline revision, A5 and A6 counts by category, the model ids, the operator's signature and the private environment's rule that permits export. This public record is the one the J0 D3 condition points to. The export procedure through the S3 gateway, under the deployment role per ADR-001 Decision 7, is written down.
 
 **Blocked by:** AN8b, AN9, AN10.
 
-- [ ] A test asserts that the public record contains no private content.
-- [ ] The public record refuses to build unless the leak scan and attack both passed and the fidelity findings are all explained.
-- [ ] The written export procedure names each step and the rule that permits it.
+- [x] A test asserts that the public record contains no private content.
+- [x] The public record refuses to build unless the leak scan and attack both passed and the fidelity findings are all explained.
+- [x] The written export procedure names each step and the rule that permits it.
 
 ## AN12 — Offline bundle and private-host smoke run
 
