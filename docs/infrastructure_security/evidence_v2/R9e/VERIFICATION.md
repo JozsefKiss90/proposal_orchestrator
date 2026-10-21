@@ -1,5 +1,7 @@
 # R9e — verification report
 
+> **Superseded 2026-10-21: R9e is reopened.** OD1 was revised to eu-north-1 (`aws-redeployment-od1-region-r1_2026-10-21`). The N/A closing below no longer holds; R9e is to be built and verified anew.
+
 | Field | Value |
 |---|---|
 | Verified by / on | agent (Claude) / 2026-10-21 |

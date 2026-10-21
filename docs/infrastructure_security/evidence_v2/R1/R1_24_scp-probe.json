@@ -1,0 +1,184 @@
+{
+  "account": "797661577394",
+  "region": "us-east-1",
+  "collected_utc": "2026-10-21T10:24:17Z",
+  "default_vpc_used_for_dry_runs": "vpc-00000000000000000",
+  "summary": {
+    "allowed": [
+      "interface_endpoint",
+      "gateway_endpoint",
+      "flow_logs",
+      "run_t3_medium",
+      "iam_create_role",
+      "iam_create_policy",
+      "iam_boundary",
+      "iam_instance_profile",
+      "kms_create_key",
+      "s3_bucket_policy",
+      "logs_group_kms",
+      "bedrock_list"
+    ],
+    "inconclusive": [
+      "secret_policy"
+    ],
+    "scp_denied": [
+      "vpc",
+      "subnet",
+      "security_group",
+      "route_table",
+      "cloudtrail_trail",
+      "cfn_create_stack",
+      "ssm_send_command",
+      "bedrock_logging_read"
+    ]
+  },
+  "probes": [
+    {
+      "probe": "vpc",
+      "action": "ec2:CreateVpc",
+      "outcome": "scp_denied",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the CreateVpc operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:CreateVpc on resource: arn:aws:ec2:us-east-1:797661577394:vpc/* with an explicit deny in a service control policy: ar"
+    },
+    {
+      "probe": "subnet",
+      "action": "ec2:CreateSubnet",
+      "outcome": "scp_denied",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the CreateSubnet operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:CreateSubnet on resource: arn:aws:ec2:us-east-1:797661577394:vpc/* with an explicit deny in a service control poli"
+    },
+    {
+      "probe": "security_group",
+      "action": "ec2:CreateSecurityGroup",
+      "outcome": "scp_denied",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the CreateSecurityGroup operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:CreateSecurityGroup on resource: arn:aws:ec2:us-east-1:797661577394:vpc/* with an explicit deny in a servic"
+    },
+    {
+      "probe": "route_table",
+      "action": "ec2:CreateRouteTable",
+      "outcome": "scp_denied",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the CreateRouteTable operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:CreateRouteTable on resource: arn:aws:ec2:us-east-1:797661577394:vpc/* with an explicit deny in a service cont"
+    },
+    {
+      "probe": "interface_endpoint",
+      "action": "ec2:CreateVpcEndpoint",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (InvalidVpcId.NotFound) when calling the CreateVpcEndpoint operation: The Vpc Id vpc-00000000000000000 does not exist"
+    },
+    {
+      "probe": "gateway_endpoint",
+      "action": "ec2:CreateVpcEndpoint",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (InvalidVpcId.NotFound) when calling the CreateVpcEndpoint operation: The Vpc Id vpc-00000000000000000 does not exist"
+    },
+    {
+      "probe": "flow_logs",
+      "action": "ec2:CreateFlowLogs",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (InvalidVpcId.NotFound) when calling the CreateFlowLogs operation: Unknown resource vpc-00000000000000000"
+    },
+    {
+      "probe": "run_t3_medium",
+      "action": "ec2:RunInstances",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (InvalidAMIID.Malformed) when calling the RunInstances operation: Invalid id: \"ami-00000000000000000\" (expecting \"ami-...\")"
+    },
+    {
+      "probe": "iam_create_role",
+      "action": "iam:CreateRole",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (MalformedPolicyDocument) when calling the CreateRole operation: Syntax error at position (1,3)"
+    },
+    {
+      "probe": "iam_create_policy",
+      "action": "iam:CreatePolicy",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (MalformedPolicyDocument) when calling the CreatePolicy operation: Syntax errors in policy."
+    },
+    {
+      "probe": "iam_boundary",
+      "action": "iam:PutRolePermissionsBoundary",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (NoSuchEntity) when calling the PutRolePermissionsBoundary operation: The role with name po-probe-does-not-exist-797661577394 cannot be found."
+    },
+    {
+      "probe": "iam_instance_profile",
+      "action": "iam:AddRoleToInstanceProfile",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (NoSuchEntity) when calling the AddRoleToInstanceProfile operation: The role with name po-probe-does-not-exist-797661577394 cannot be found."
+    },
+    {
+      "probe": "kms_create_key",
+      "action": "kms:CreateKey",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (MalformedPolicyDocumentException) when calling the CreateKey operation:"
+    },
+    {
+      "probe": "cloudtrail_trail",
+      "action": "cloudtrail:CreateTrail",
+      "outcome": "scp_denied",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the CreateTrail operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: cloudtrail:CreateTrail on resource: arn:aws:cloudtrail:us-east-1:797661577394:trail/po-probe with an explicit deny in a service control policy: arn:aws:organizations::32"
+    },
+    {
+      "probe": "s3_bucket_policy",
+      "action": "s3:PutBucketPolicy",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (NoSuchBucket) when calling the PutBucketPolicy operation: The specified bucket does not exist"
+    },
+    {
+      "probe": "secret_policy",
+      "action": "secretsmanager:PutResourcePolicy",
+      "outcome": "inconclusive",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (MalformedPolicyDocumentException) when calling the PutResourcePolicy operation: This resource policy contains a syntax error."
+    },
+    {
+      "probe": "logs_group_kms",
+      "action": "logs:CreateLogGroup",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the CreateLogGroup operation: The specified KMS key does not exist or is not allowed to be used with Arn 'arn:aws:logs:us-east-1:797661577394:log-group:/proposal-orchestrator/probe'"
+    },
+    {
+      "probe": "cfn_create_stack",
+      "action": "cloudformation:CreateStack",
+      "outcome": "scp_denied",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the CreateStack operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: cloudformation:CreateStack on resource: arn:aws:cloudformation:us-east-1:797661577394:stack/po-probe/* with an explicit deny in a service control policy: arn:aws:organizations::3"
+    },
+    {
+      "probe": "ssm_send_command",
+      "action": "ssm:SendCommand",
+      "outcome": "scp_denied",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the SendCommand operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ssm:SendCommand on resource: arn:aws:ec2:us-east-1:797661577394:instance/i-00000000000000000 with an explicit deny in a service control policy: arn:aws:organizations::32"
+    },
+    {
+      "probe": "bedrock_list",
+      "action": "bedrock:ListFoundationModels",
+      "outcome": "allowed",
+      "exit_code": 0,
+      "message": "{\n    \"modelSummaries\": 15\n}"
+    },
+    {
+      "probe": "bedrock_logging_read",
+      "action": "bedrock:GetModelInvocationLoggingConfiguration",
+      "outcome": "scp_denied",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the GetModelInvocationLoggingConfiguration operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: bedrock:GetModelInvocationLoggingConfiguration with an explicit deny in a service control policy: arn:aws:organizations::323258891184:policy/o"
+    }
+  ]
+}

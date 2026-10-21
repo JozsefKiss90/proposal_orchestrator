@@ -1,0 +1,80 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-od1-region-r1_2026-10-21",
+  "date": "2026-10-21",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R1 of plans/aws_redeployment_tickets.md (revises OD1 of R0)",
+  "supersedes": "aws-redeployment-operator-decisions_2026-10-21, decision OD1 only, and with it that record's statement that R9e closes N/A. Every other decision there stands, except OD11, which aws-redeployment-od11-admin-identity-r2_2026-10-21 revises.",
+  "authority": "Agent-authored under CLAUDE.md, recording a decision the operator gave in session on 2026-10-21 on measurements made in R1. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no gate and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-21 ('mehet az eu-north-1'), choosing eu-north-1 over activating advanced features to keep us-east-1",
+  "decision": "The host, endpoints, key, trail, secret and Bedrock calls are in eu-north-1 (Europe, Stockholm), the project's Region. Bedrock is called through eu. cross-Region inference profiles. us-east-1 is used only for global services (IAM, STS, Budgets, CloudShell sessions).",
+  "why": "R0 chose us-east-1. R1 measured that this account cannot build regional resources there: it is a 'Sign up for AWS (new)' project account, and its AWS-managed SCPs allow regional actions only in the project's Region.",
+  "findings": [
+    {
+      "id": "F-OD1r1-1",
+      "declared_status": "Confirmed",
+      "finding": "In us-east-1 the SCP statement UsEast1Partitional denies every action outside a list of global or partitional actions (iam, sts, budgets, cloudshell, logs, some kms and bedrock invoke/list actions and others). ec2:CreateVpc, CreateSubnet, CreateSecurityGroup, CreateRouteTable, cloudtrail:CreateTrail, cloudformation:CreateStack and ssm:SendCommand are denied there.",
+      "basis": "docs/infrastructure_security/evidence_v2/R1/R1_25_decoded-createvpc.json; docs/infrastructure_security/evidence_v2/R1/R1_24_scp-probe.json (us-east-1)."
+    },
+    {
+      "id": "F-OD1r1-2",
+      "declared_status": "Confirmed",
+      "finding": "Of the 17 enabled Regions only eu-north-1 allows regional calls.",
+      "basis": "docs/infrastructure_security/evidence_v2/R1/R1_26_region-access.txt."
+    },
+    {
+      "id": "F-OD1r1-3",
+      "declared_status": "Confirmed",
+      "finding": "In eu-north-1 on the Free plan, EC2 dry runs with real ids succeed for VPC, subnet, security group, route table, bedrock-runtime interface endpoint, S3 gateway endpoint, flow logs and a t3.medium launch with encrypted gp3 and IMDSv2 (hop limit 1).",
+      "basis": "docs/infrastructure_security/evidence_v2/R1/R1_27_scp-probe-eu-north-1.json (attempt 2, real_ids_used true)."
+    },
+    {
+      "id": "F-OD1r1-4",
+      "declared_status": "Inferred",
+      "finding": "In eu-north-1 cloudtrail:CreateTrail, cloudformation:CreateStack, ssm:SendCommand, the IAM, KMS, S3, Secrets Manager and CloudWatch Logs probes are not denied by an SCP.",
+      "basis": "Each returned a validation or not-found error without naming a service control policy, while the same CloudTrail, CloudFormation and SSM probes in us-east-1 returned an SCP denial; so those services evaluate SCPs before validation. A validation error alone does not prove the identity-policy side; AccountFullAccessRole carries AdministratorAccess (R1_00_role-policies.json)."
+    },
+    {
+      "id": "F-OD1r1-5",
+      "declared_status": "Confirmed",
+      "finding": "26 Anthropic inference profiles are visible in eu-north-1 (eu. and global.), among them Opus 5.5, Sonnet 5.5, Haiku 5.5 and Opus 4.8; the 14 Anthropic models there support INFERENCE_PROFILE only. A Converse call through eu.anthropic.claude-haiku-4-5-20251001-v1:0 from eu-north-1 returned OK.",
+      "basis": "docs/infrastructure_security/evidence_v2/R1/R1_28_claude-profiles-eu-north-1.json, R1_28_claude-models-eu-north-1.json, R1_29_converse-eu-profile.json."
+    },
+    {
+      "id": "F-OD1r1-6",
+      "declared_status": "Confirmed",
+      "finding": "The Bedrock model invocation logging configuration in eu-north-1 reads empty.",
+      "basis": "docs/infrastructure_security/evidence_v2/R1/R1_27_scp-probe-eu-north-1.json, probe bedrock_logging_read (exit 0, empty output)."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "OD1-r1",
+      "question": "Region (OD1), given that this account builds regional resources only in its project Region",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "eu-north-1, with eu. cross-Region inference profiles.",
+      "reason": "It is the only Region this account can build in on the Free plan, so OD10 (no upgrade before ELTE approval) stands. eu. profiles keep processing inside the EU. The models the workloads need are available there (F-OD1r1-5), which answers R0's reason for us-east-1. The alternative, activating advanced features to keep us-east-1, needs the paid plan now and cannot be reversed.",
+      "consequence": "R9e reopens: a Converse preset for eu-north-1 with eu. profiles, transport tests without a fixed Region, and the AN12 runbook's region lines and id rule with its guard test. R9 exports AWS_REGION=eu-north-1. R5's invoke policy names the eu. profiles chosen in OD7 and the foundation-model ARNs in every EU Region they route to (from R1_28 and R2); global. profiles are denied unless OD7 chooses one. DC-16's approved Regions are eu-north-1 plus those routed Regions. data_flow_document.md section 4.3 no longer needs the EU-US transfer basis for Bedrock; R13 restates residency and transfers for eu-north-1 and the EU routing. R14 prices everything for eu-north-1. CloudShell sessions stay in us-east-1 (where the R1 files live) and every regional command names --region eu-north-1."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "OD1-r1",
+      "declared_status": "Unresolved",
+      "gap": "Which EU Regions each chosen eu. profile routes to, and the token quotas per model in eu-north-1, are R2's to measure."
+    },
+    {
+      "decision": "OD1-r1",
+      "declared_status": "Unresolved",
+      "gap": "The Free plan SCPs could still refuse a specific creation that the probes did not cover; R4 to R11 would show it as an explicit deny."
+    }
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content. The only model output recorded is the fixed string OK.",
+    "basis": "Identifiers and AWS outputs only."
+  }
+}

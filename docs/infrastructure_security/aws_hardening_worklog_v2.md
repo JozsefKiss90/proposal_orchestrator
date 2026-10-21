@@ -93,3 +93,31 @@ Each entry records the same fields as v1:
 | Next Action | Operator runs Parts A and B and hands back after step 23; agent writes `STEPS_cleanup.md` from the inventory. |
 
 ---
+
+### 2026-10-21 — R1: account model measured; OD11 and OD1 revised; R9e reopened
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-21T10:56:00Z |
+| Control ID | R1 (baseline); DC-16, DC-28, DC-40 noted |
+| Action Taken | Measured that account 797661577394 is a "Sign up for AWS (new)" project account (Builder ID owner, AccountFullAccessRole, AWS-managed organization and SCPs, Free plan). OD11 revised (r2: Builder ID through AccountFullAccessRole; STEPS_fix1). us-east-1 SCP refusals (STEPS_fix2, step 25 decode) and Region access (step 26) led to OD1 revised to eu-north-1 with eu. profiles (`aws-redeployment-od1-region-r1_2026-10-21`), operator decision. SCP probe re-run in eu-north-1 (step 27, real ids): networking, endpoints, flow logs and t3.medium allowed; Bedrock eu. profile Converse returned OK (step 29). R9e reopened. Probe script corrected (false positives in step 24 recorded in RUNLOG). STEPS_fix3 and STEPS_fix4 written. |
+| Evidence Requested | Remaining R1 steps per STEPS_fix4 |
+| Evidence Received | In CloudShell `~/R1` (R1_00_*, R1_13, R1_24–R1_29); R1_01, R1_10 in the repository |
+| Verification Result | PENDING |
+| Next Action | Operator continues R1 per STEPS_fix4; confirms OD11-r2. |
+
+---
+
+### 2026-10-21 — R1: Account baseline — evidence verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-21T12:07:00Z |
+| Control ID | R1 (baseline); DC-28 observed (invocation logging empty in eu-north-1) |
+| Action Taken | Verified 42 evidence files against STEPS.md and fixes 1–4 and STEPS_cleanup.md. Recorded the operator-approved deviations in `aws-redeployment-r1-baseline-deviations_2026-10-21`. Explore AWS leftovers removed (Lambda with public URL, its log group, SG, key pair, three roles). |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R1/` (42 files), `evidence_v2/R1/VERIFICATION.md` |
+| Verification Result | All criteria PASS or N/A with reason; awaiting operator confirmation |
+| Next Action | Operator confirms R1. Then R2 (Bedrock access and quotas, settles OD7) and R3 (IaC skeleton for eu-north-1); R9e (EU preset) and R10 can run in parallel. |
+
+---

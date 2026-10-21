@@ -1,0 +1,43 @@
+{
+    "Budgets": [
+        {
+            "BudgetName": "My Monthly Cost Budget",
+            "BudgetLimit": {
+                "Amount": "10.0",
+                "Unit": "USD"
+            },
+            "TimeUnit": "MONTHLY",
+            "TimePeriod": {
+                "Start": "2026-10-01T00:00:00+00:00",
+                "End": "2087-06-15T00:00:00+00:00"
+            },
+            "CalculatedSpend": {
+                "ActualSpend": {
+                    "Amount": "0.006",
+                    "Unit": "USD"
+                }
+            },
+            "BudgetType": "COST",
+            "LastUpdatedTime": "2026-10-21T07:50:06.661000+00:00",
+            "FilterExpression": {
+                "Not": {
+                    "Dimensions": {
+                        "Key": "RECORD_TYPE",
+                        "Values": [
+                            "Credit",
+                            "Refund"
+                        ]
+                    }
+                }
+            },
+            "Metrics": [
+                "UnblendedCost"
+            ],
+            "BillingViewArn": "arn:aws:billing::797661577394:billingview/primary",
+            "HealthStatus": {
+                "Status": "HEALTHY",
+                "LastUpdatedTime": "2026-10-21T07:50:06.167000+00:00"
+            }
+        }
+    ]
+}

@@ -1,0 +1,81 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-od11-admin-identity-r2_2026-10-21",
+  "date": "2026-10-21",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R1 of plans/aws_redeployment_tickets.md (revises OD11 again)",
+  "supersedes": "aws-redeployment-od11-admin-identity_2026-10-21 in full. Its premise, that the account is a standalone account with a root user and IAM console users, was measured false in R1 step 00.",
+  "authority": "Agent-authored under CLAUDE.md from measurements the operator made in session on 2026-10-21. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no gate and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "Drafted by the agent from the R1 step 00 measurements; confirmed by the operator in session on 2026-10-21.",
+  "decision": "The admin identity is the operator's AWS Builder ID, with MFA, acting in account 797661577394 through the AWS-managed role AccountFullAccessRole (AdministratorAccess). No IAM user and no access key is created. The CLI runs in CloudShell, and on the workstation through `aws login` if R1 step 10 shows it works for this sign-in.",
+  "why": "R1 step 00 showed that the account was created through 'Sign up for AWS (new)'. In that model the Builder ID owns the account instead of a root user, and IAM users cannot sign in to the console, so the r1 decision (IAM user po-admin) cannot be carried out.",
+  "findings": [
+    {
+      "id": "F-OD11r2-1",
+      "declared_status": "Confirmed",
+      "finding": "The console identity is arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/<session>. The role sits under /managed/, trusts only account-access.amazonaws.com, carries AdministratorAccess and no inline policy, and has no permission boundary.",
+      "basis": "evidence_v2/R1: R1_00_caller-identity.json, R1_00_role.json, R1_00_role-policies.json, R1_00_role-inline.json (operator, CloudShell us-east-1, 2026-10-21)."
+    },
+    {
+      "id": "F-OD11r2-2",
+      "declared_status": "Confirmed",
+      "finding": "The account is a member of organization o-81s4kwxswn, whose management account is outside this project; service control policies are enabled.",
+      "basis": "evidence_v2/R1/R1_00_organization.json."
+    },
+    {
+      "id": "F-OD11r2-3",
+      "declared_status": "Confirmed",
+      "finding": "Root sign-in with the account e-mail is refused ('An AWS account with that sign-in information does not exist'). The account has no IAM users and no root access keys.",
+      "basis": "Operator in session (screenshot not saved); evidence_v2/R1/R1_00_account-summary.json: Users 0, AccountAccessKeysPresent 0, AccountMFAEnabled 0."
+    },
+    {
+      "id": "F-OD11r2-4",
+      "declared_status": "Confirmed",
+      "finding": "In 'Sign up for AWS (new)' no root user is created; the Builder ID owns the project accounts; AWS opts the owner in to AWS Organizations and IAM Identity Center and manages the SCPs and RCPs; IAM users and roles can be created but used only for programmatic access, not console access.",
+      "basis": "AWS Account Management Reference Guide, 'Compare sign-up options' (docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html), read 2026-10-21."
+    },
+    {
+      "id": "F-OD11r2-5",
+      "declared_status": "Confirmed",
+      "finding": "The account stays on the Free plan inside this organization: accountPlanType FREE, status ACTIVE, credits about 200 USD, expiring 2027-04-19. The r1 concern that joining an organization would upgrade the plan does not arise; the organization already exists.",
+      "basis": "evidence_v2/R1/R1_00_plan-state.json."
+    },
+    {
+      "id": "F-OD11r2-6",
+      "declared_status": "Inferred",
+      "finding": "AccountMFAEnabled 0 reflects the absence of usable root credentials, not an open root login. The owner's MFA is the Builder ID's.",
+      "basis": "F-OD11r2-3 and F-OD11r2-4. Not measurable from the member account."
+    },
+    {
+      "id": "F-OD11r2-7",
+      "declared_status": "Confirmed",
+      "finding": "`aws login` works for this Builder ID sign-in: the workstation (aws-cli 2.34.54) received assumed-role/AccountFullAccessRole credentials.",
+      "basis": "docs/infrastructure_security/evidence_v2/R1/R1_10_workstation-identity.json; RUNLOG step 10."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "OD11-r2",
+      "question": "Admin identity (OD11) in a 'Sign up for AWS (new)' account",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "The operator's Builder ID with MFA (WEBAUTHN registered 2026-10-21), through AccountFullAccessRole. No IAM users, no access keys.",
+      "reason": "It is the only console identity this account model provides; it already carries MFA and leaves no long-term key anywhere. Confirmed by the operator in session on 2026-10-21.",
+      "consequence": "R1 steps 01-05 and 07-09 are replaced by STEPS_fix1.md. CloudTrail attributes admin actions to assumed-role/AccountFullAccessRole/<session>. R8 names AccountFullAccessRole as the admin principal in the secret's resource policy, if one is named at all. The runtime role created in R5 is an IAM role used programmatically by EC2, which the model permits. DC-40 is re-assessed in R12b against an AWS-managed organization in which the operator cannot write SCPs. R14's upgrade checklist starts from AWS Settings, not from a root login."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "OD11-r2",
+      "declared_status": "Unresolved",
+      "gap": "The AWS-managed SCPs and RCPs are not visible from the member account. Any of them could restrict a later step (for example Bedrock, Marketplace subscriptions or regions); R2 and R5 would show it as an explicit deny."
+    }
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content.",
+    "basis": "Identifiers of roles, accounts and an organization only."
+  }
+}

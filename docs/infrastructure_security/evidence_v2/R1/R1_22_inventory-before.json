@@ -1,0 +1,830 @@
+{
+  "account": "797661577394",
+  "collected_utc": "2026-10-21T11:19:03Z",
+  "regions_scanned": 17,
+  "regions_with_findings": [
+    "eu-north-1"
+  ],
+  "regions_with_errors": [
+    "ap-south-1",
+    "eu-west-3",
+    "eu-west-2",
+    "eu-west-1",
+    "ap-northeast-3",
+    "ap-northeast-2",
+    "ap-northeast-1",
+    "ca-central-1",
+    "sa-east-1",
+    "ap-southeast-1",
+    "ap-southeast-2",
+    "eu-central-1",
+    "us-east-1",
+    "us-east-2",
+    "us-west-1",
+    "us-west-2"
+  ],
+  "by_region": [
+    {
+      "region": "ap-south-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:ap-south-1:7976615773"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:ap-south-1:797661577394"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:ap-south-1:7976615773"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:ap-sout"
+      }
+    },
+    {
+      "region": "eu-north-1",
+      "instances": [],
+      "volumes": [],
+      "snapshots": [],
+      "key_pairs": [
+        {
+          "name": "test-key",
+          "id": "key-07c12e181fa44fed9"
+        }
+      ],
+      "security_groups": [
+        {
+          "id": "sg-085c137a9e87fc7ba",
+          "name": "launch-wizard-1",
+          "vpc": "vpc-0fcb706a089aeb352"
+        }
+      ],
+      "elastic_ips": [],
+      "nat_gateways": [],
+      "vpc_endpoints": [],
+      "non_default_vpcs": [],
+      "load_balancers": [],
+      "lambda_functions": [
+        {
+          "name": "lambda_test",
+          "runtime": "nodejs22.x"
+        }
+      ],
+      "rds_instances": [],
+      "rds_clusters": [],
+      "rds_snapshots": [],
+      "rds_cluster_snapshots": []
+    },
+    {
+      "region": "eu-west-3",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:eu-west-3:79766157739"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:eu-west-3:797661577394:"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:eu-west-3:79766157739"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:eu-west"
+      }
+    },
+    {
+      "region": "eu-west-2",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:eu-west-2:79766157739"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:eu-west-2:797661577394:"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:eu-west-2:79766157739"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:eu-west"
+      }
+    },
+    {
+      "region": "eu-west-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:eu-west-1:79766157739"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:eu-west-1:797661577394:"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:eu-west-1:79766157739"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:eu-west"
+      }
+    },
+    {
+      "region": "ap-northeast-3",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:ap-northeast-3:797661"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:ap-northeast-3:79766157"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:ap-northeast-3:797661"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:ap-nort"
+      }
+    },
+    {
+      "region": "ap-northeast-2",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:ap-northeast-2:797661"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:ap-northeast-2:79766157"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:ap-northeast-2:797661"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:ap-nort"
+      }
+    },
+    {
+      "region": "ap-northeast-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:ap-northeast-1:797661"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:ap-northeast-1:79766157"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:ap-northeast-1:797661"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:ap-nort"
+      }
+    },
+    {
+      "region": "ca-central-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:ca-central-1:79766157"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:ca-central-1:7976615773"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:ca-central-1:79766157"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:ca-cent"
+      }
+    },
+    {
+      "region": "sa-east-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:sa-east-1:79766157739"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:sa-east-1:797661577394:"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:sa-east-1:79766157739"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:sa-east"
+      }
+    },
+    {
+      "region": "ap-southeast-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:ap-southeast-1:797661"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:ap-southeast-1:79766157"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:ap-southeast-1:797661"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:ap-sout"
+      }
+    },
+    {
+      "region": "ap-southeast-2",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:ap-southeast-2:797661"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:ap-southeast-2:79766157"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:ap-southeast-2:797661"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:ap-sout"
+      }
+    },
+    {
+      "region": "eu-central-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:eu-central-1:79766157"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:eu-central-1:7976615773"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:eu-central-1:79766157"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:eu-cent"
+      }
+    },
+    {
+      "region": "us-east-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:us-east-1:79766157739"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:us-east-1:797661577394:"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:us-east-1:79766157739"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:us-east"
+      }
+    },
+    {
+      "region": "us-east-2",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:us-east-2:79766157739"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:us-east-2:797661577394:"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:us-east-2:79766157739"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:us-east"
+      }
+    },
+    {
+      "region": "us-west-1",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:us-west-1:79766157739"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:us-west-1:797661577394:"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:us-west-1:79766157739"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:us-west"
+      }
+    },
+    {
+      "region": "us-west-2",
+      "instances": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstances operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeI"
+      },
+      "volumes": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVolumes operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVol"
+      },
+      "snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeS"
+      },
+      "key_pairs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeKeyPairs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeKe"
+      },
+      "security_groups": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeSecurityGroups operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Desc"
+      },
+      "elastic_ips": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeAddresses operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeA"
+      },
+      "nat_gateways": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeNatGateways operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Describ"
+      },
+      "vpc_endpoints": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcEndpoints operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:Descri"
+      },
+      "non_default_vpcs": {
+        "error": "\naws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeVpcs operation: You are not authorized to perform this operation. User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: ec2:DescribeVpcs w"
+      },
+      "load_balancers": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeLoadBalancers operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: elasticloadbalancing:DescribeLoadBalancers with an explicit deny in "
+      },
+      "lambda_functions": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the ListFunctions operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: lambda:ListFunctions on resource: * with an explicit deny in a serv"
+      },
+      "rds_instances": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBInstances operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBInstances on resource: arn:aws:rds:us-west-2:79766157739"
+      },
+      "rds_clusters": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusters operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusters on resource: arn:aws:rds:us-west-2:797661577394:"
+      },
+      "rds_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBSnapshots on resource: arn:aws:rds:us-west-2:79766157739"
+      },
+      "rds_cluster_snapshots": {
+        "error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the DescribeDBClusterSnapshots operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f1-708d-5d78-5cf047462512 is not authorized to perform: rds:DescribeDBClusterSnapshots on resource: arn:aws:rds:us-west"
+      }
+    }
+  ]
+}

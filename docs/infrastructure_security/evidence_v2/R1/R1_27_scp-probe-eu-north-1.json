@@ -1,0 +1,189 @@
+{
+  "account": "797661577394",
+  "region": "eu-north-1",
+  "collected_utc": "2026-10-21T10:50:19Z",
+  "real_ids_used": true,
+  "default_vpc": "vpc-0fcb706a089aeb352",
+  "default_subnet": "subnet-0bc0681e80bb6b515",
+  "ami": "ami-0a7acf71650e53201",
+  "summary": {
+    "UNEXPECTED_SUCCESS": [
+      "bedrock_logging_read"
+    ],
+    "allowed": [
+      "vpc",
+      "subnet",
+      "security_group",
+      "route_table",
+      "interface_endpoint",
+      "gateway_endpoint",
+      "flow_logs",
+      "run_t3_medium",
+      "bedrock_list"
+    ],
+    "inconclusive": [
+      "secret_policy"
+    ],
+    "validation_error": [
+      "iam_create_role",
+      "iam_create_policy",
+      "iam_boundary",
+      "iam_instance_profile",
+      "kms_create_key",
+      "cloudtrail_trail",
+      "s3_bucket_policy",
+      "logs_group_kms",
+      "cfn_create_stack",
+      "ssm_send_command"
+    ]
+  },
+  "probes": [
+    {
+      "probe": "vpc",
+      "action": "ec2:CreateVpc",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (DryRunOperation) when calling the CreateVpc operation: Request would have succeeded, but DryRun flag is set."
+    },
+    {
+      "probe": "subnet",
+      "action": "ec2:CreateSubnet",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (DryRunOperation) when calling the CreateSubnet operation: Request would have succeeded, but DryRun flag is set."
+    },
+    {
+      "probe": "security_group",
+      "action": "ec2:CreateSecurityGroup",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (DryRunOperation) when calling the CreateSecurityGroup operation: Request would have succeeded, but DryRun flag is set."
+    },
+    {
+      "probe": "route_table",
+      "action": "ec2:CreateRouteTable",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (DryRunOperation) when calling the CreateRouteTable operation: Request would have succeeded, but DryRun flag is set."
+    },
+    {
+      "probe": "interface_endpoint",
+      "action": "ec2:CreateVpcEndpoint",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (DryRunOperation) when calling the CreateVpcEndpoint operation: Request would have succeeded, but DryRun flag is set."
+    },
+    {
+      "probe": "gateway_endpoint",
+      "action": "ec2:CreateVpcEndpoint",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (DryRunOperation) when calling the CreateVpcEndpoint operation: Request would have succeeded, but DryRun flag is set."
+    },
+    {
+      "probe": "flow_logs",
+      "action": "ec2:CreateFlowLogs",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (DryRunOperation) when calling the CreateFlowLogs operation: Request would have succeeded, but DryRun flag is set."
+    },
+    {
+      "probe": "run_t3_medium",
+      "action": "ec2:RunInstances",
+      "outcome": "allowed",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (DryRunOperation) when calling the RunInstances operation: Request would have succeeded, but DryRun flag is set."
+    },
+    {
+      "probe": "iam_create_role",
+      "action": "iam:CreateRole",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (MalformedPolicyDocument) when calling the CreateRole operation: Syntax error at position (1,3)"
+    },
+    {
+      "probe": "iam_create_policy",
+      "action": "iam:CreatePolicy",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (MalformedPolicyDocument) when calling the CreatePolicy operation: Syntax errors in policy."
+    },
+    {
+      "probe": "iam_boundary",
+      "action": "iam:PutRolePermissionsBoundary",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (NoSuchEntity) when calling the PutRolePermissionsBoundary operation: The role with name po-probe-does-not-exist-797661577394 cannot be found."
+    },
+    {
+      "probe": "iam_instance_profile",
+      "action": "iam:AddRoleToInstanceProfile",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (NoSuchEntity) when calling the AddRoleToInstanceProfile operation: The role with name po-probe-does-not-exist-797661577394 cannot be found."
+    },
+    {
+      "probe": "kms_create_key",
+      "action": "kms:CreateKey",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (MalformedPolicyDocumentException) when calling the CreateKey operation:"
+    },
+    {
+      "probe": "cloudtrail_trail",
+      "action": "cloudtrail:CreateTrail",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (S3BucketDoesNotExistException) when calling the CreateTrail operation: S3 bucket po-probe-does-not-exist-797661577394 does not exist!"
+    },
+    {
+      "probe": "s3_bucket_policy",
+      "action": "s3:PutBucketPolicy",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (NoSuchBucket) when calling the PutBucketPolicy operation: The specified bucket does not exist"
+    },
+    {
+      "probe": "secret_policy",
+      "action": "secretsmanager:PutResourcePolicy",
+      "outcome": "inconclusive",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (MalformedPolicyDocumentException) when calling the PutResourcePolicy operation: This resource policy contains a syntax error."
+    },
+    {
+      "probe": "logs_group_kms",
+      "action": "logs:CreateLogGroup",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (AccessDeniedException) when calling the CreateLogGroup operation: The specified KMS key does not exist or is not allowed to be used with Arn 'arn:aws:logs:eu-north-1:797661577394:log-group:/proposal-orchestrator/probe'"
+    },
+    {
+      "probe": "cfn_create_stack",
+      "action": "cloudformation:CreateStack",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (ValidationError) when calling the CreateStack operation: Template format error: unsupported structure."
+    },
+    {
+      "probe": "ssm_send_command",
+      "action": "ssm:SendCommand",
+      "outcome": "validation_error",
+      "exit_code": 254,
+      "message": "\naws: [ERROR]: An error occurred (InvalidInstanceId) when calling the SendCommand operation: Instances not in a valid state for account"
+    },
+    {
+      "probe": "bedrock_list",
+      "action": "bedrock:ListFoundationModels",
+      "outcome": "allowed",
+      "exit_code": 0,
+      "message": "{\n    \"modelSummaries\": 14\n}"
+    },
+    {
+      "probe": "bedrock_logging_read",
+      "action": "bedrock:GetModelInvocationLoggingConfiguration",
+      "outcome": "UNEXPECTED_SUCCESS",
+      "exit_code": 0,
+      "message": ""
+    }
+  ]
+}

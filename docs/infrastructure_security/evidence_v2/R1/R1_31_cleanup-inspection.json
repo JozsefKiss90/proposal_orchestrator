@@ -1,0 +1,113 @@
+[
+  {
+    "kind": "iam_role",
+    "name": "PowerUser-lambda-1",
+    "role": {
+      "created": "2026-10-19T15:10:32+00:00",
+      "trust": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      },
+      "lastUsed": {},
+      "tags": null,
+      "description": "Power user role for lambda.amazonaws.com"
+    },
+    "attached_policies": [
+      "arn:aws:iam::aws:policy/PowerUserAccess"
+    ],
+    "inline_policies": [],
+    "instance_profiles": []
+  },
+  {
+    "kind": "iam_role",
+    "name": "PowerUserRole",
+    "role": {
+      "created": "2026-10-19T15:10:32+00:00",
+      "trust": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      },
+      "lastUsed": {
+        "LastUsedDate": "2026-10-19T15:12:51+00:00",
+        "Region": "eu-north-1"
+      },
+      "tags": null,
+      "description": "Power user role for lambda.amazonaws.com"
+    },
+    "attached_policies": [
+      "arn:aws:iam::aws:policy/PowerUserAccess"
+    ],
+    "inline_policies": [],
+    "instance_profiles": []
+  },
+  {
+    "kind": "iam_role",
+    "name": "rds-monitoring-role",
+    "role": {
+      "created": "2026-10-19T15:06:06+00:00",
+      "trust": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "monitoring.rds.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      },
+      "lastUsed": {},
+      "tags": null,
+      "description": null
+    },
+    "attached_policies": [
+      "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+    ],
+    "inline_policies": [],
+    "instance_profiles": []
+  },
+  {
+    "kind": "lambda",
+    "name": "lambda_test",
+    "config": {
+      "role": "arn:aws:iam::797661577394:role/PowerUserRole",
+      "lastModified": "2026-10-19T15:10:48.915+0000"
+    },
+    "function_urls": [
+      "https://k235bbax676l5rerpqi2earak40hdwmo.lambda-url.eu-north-1.on.aws/"
+    ],
+    "event_source_mappings": []
+  },
+  {
+    "kind": "security_group",
+    "id": "sg-085c137a9e87fc7ba",
+    "attached_network_interfaces": []
+  },
+  {
+    "kind": "log_groups_eu_north_1",
+    "groups": [
+      {
+        "name": "/aws/lambda/lambda_test",
+        "storedBytes": 1192
+      }
+    ]
+  }
+]

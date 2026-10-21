@@ -1,0 +1,35 @@
+{
+    "Role": {
+        "Path": "/managed/",
+        "RoleName": "AccountFullAccessRole",
+        "RoleId": "AROA3TOCVYCZBORIWT6IM",
+        "Arn": "arn:aws:iam::797661577394:role/managed/AccountFullAccessRole",
+        "CreateDate": "2026-08-11T17:41:56+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "account-access.amazonaws.com"
+                    },
+                    "Action": [
+                        "sts:AssumeRole",
+                        "sts:SetContext"
+                    ]
+                }
+            ]
+        },
+        "MaxSessionDuration": 43200,
+        "Tags": [
+            {
+                "Key": "OwnerLocalUserId",
+                "Value": "641844f8-60f1-708d-5d78-5cf047462512"
+            }
+        ],
+        "RoleLastUsed": {
+            "LastUsedDate": "2026-10-21T09:25:49+00:00",
+            "Region": "us-east-1"
+        }
+    }
+}

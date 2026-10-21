@@ -1,0 +1,40 @@
+{
+    "Budget": {
+        "BudgetName": "po-alert-test",
+        "BudgetLimit": {
+            "Amount": "0.01",
+            "Unit": "USD"
+        },
+        "TimeUnit": "MONTHLY",
+        "TimePeriod": {
+            "Start": "2026-10-01T00:00:00+00:00",
+            "End": "2087-06-15T00:00:00+00:00"
+        },
+        "CalculatedSpend": {
+            "ActualSpend": {
+                "Amount": "0.006",
+                "Unit": "USD"
+            }
+        },
+        "BudgetType": "COST",
+        "LastUpdatedTime": "2026-10-21T10:59:51.807000+00:00",
+        "FilterExpression": {
+            "Not": {
+                "Dimensions": {
+                    "Key": "RECORD_TYPE",
+                    "Values": [
+                        "Credit",
+                        "Refund"
+                    ]
+                }
+            }
+        },
+        "Metrics": [
+            "UnblendedCost"
+        ],
+        "HealthStatus": {
+            "Status": "HEALTHY",
+            "LastUpdatedTime": "2026-10-21T10:59:51.311000+00:00"
+        }
+    }
+}

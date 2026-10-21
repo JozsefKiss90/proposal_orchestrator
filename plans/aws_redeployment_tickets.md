@@ -156,7 +156,7 @@ the runbook. If OD1 keeps us-east-1, the ticket closes as N/A with that reason.
 - [ ] An EU Converse preset exists and is tested.
 - [ ] No transport test fixes the region.
 - [ ] The runbook guard test passes on the edited runbook.
-- [x] Or: the ticket is closed N/A, with OD1 cited. (2026-10-21: OD1 keeps us-east-1; see `evidence_v2/R9e/VERIFICATION.md`.)
+- [ ] Or: the ticket is closed N/A, with OD1 cited. (Closed N/A 2026-10-21, **reopened** the same day: OD1 is now eu-north-1, decision record `aws-redeployment-od1-region-r1_2026-10-21`.)
 
 ## R10 Phase 8 drafter through the transport layer (F5)
 

@@ -6,7 +6,7 @@
 |---|---|
 | Created | 2026-10-21 (ticket E0) |
 | Account | `797661577394` |
-| Region | Per OD1 (ticket R0); not yet decided |
+| Region | `eu-north-1`, Bedrock through `eu.` profiles (OD1 successor `aws-redeployment-od1-region-r1_2026-10-21`); us-east-1 for global services only |
 | Plan | `plans/aws_redeployment_handoff_2026-10-21.md` |
 | Tickets | `plans/aws_redeployment_tickets.md` |
 | Evidence tree | `evidence_v2/` (protocol: `evidence_v2/README.md`) |
@@ -73,7 +73,7 @@ path under `evidence_v2/`. Nothing in this register is carried over from v1's ev
 |---|---|---|---|---|---|---|
 | DC-16 | Region enforcement via IAM condition | `aws:RequestedRegion` condition limits calls to the OD1 region and the regions the OD7 profiles route to | R5, R12b | NOT_STARTED | — | — |
 | DC-17 | Negative region test | A Bedrock call to an unapproved region fails | R12b | NOT_STARTED | — | — |
-| DC-40 | SCP for region restriction (if Organization) | SCP denying Bedrock in non-approved regions, if the account is in an Organization | R12b | NOT_STARTED | — | Re-assess; N/A unless the account joined an Organization |
+| DC-40 | SCP for region restriction (if Organization) | SCP denying Bedrock in non-approved regions, if the account is in an Organization | R12b | NOT_STARTED | — | Re-assess. R1 step 00: the account is a member of the AWS-managed organization of the new sign-up experience (management account outside this project), with SCPs enabled and managed by AWS |
 
 ---
 

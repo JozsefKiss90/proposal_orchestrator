@@ -1,5 +1,10 @@
 # R1 — Account baseline: step sheet
 
+> **Superseded in part by `STEPS_fix1.md` (2026-10-21).** Step 00 showed that the account was created
+> through "Sign up for AWS (new)": it has no usable root user and IAM users cannot sign in to the
+> console. Steps 01–05, 07–09 and the criteria of 15 and 19 below are replaced there. This sheet is
+> kept unchanged otherwise as the record of what was first planned.
+
 | Field | Value |
 |---|---|
 | Ticket | `R1` in `plans/aws_redeployment_tickets.md` |

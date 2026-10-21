@@ -1,0 +1,42 @@
+== C1 2026-10-21T11:38:03Z
+url deleted
+{
+    "StatusCode": 204
+}
+function deleted
+log group deleted
+== C2 2026-10-21T11:38:10Z
+{
+    "Return": true,
+    "GroupId": "sg-085c137a9e87fc7ba"
+}
+sg launch-wizard-1 deleted
+{
+    "Return": true,
+    "KeyPairId": "key-07c12e181fa44fed9"
+}
+key pair test-key deleted
+== C3 2026-10-21T11:38:15Z
+PowerUserRole deleted
+PowerUser-lambda-1 deleted
+rds-monitoring-role deleted
+== C1 2026-10-21T11:58:46Z
+
+aws: [ERROR]: An error occurred (ResourceNotFoundException) when calling the DeleteFunctionUrlConfig operation: The resource you requested does not exist.
+
+Additional error details:
+Type: User
+
+aws: [ERROR]: An error occurred (ResourceNotFoundException) when calling the DeleteFunction operation: Function not found: arn:aws:lambda:eu-north-1:797661577394:function:lambda_test
+
+Additional error details:
+Type: User
+
+aws: [ERROR]: An error occurred (ResourceNotFoundException) when calling the DeleteLogGroup operation: The specified log group does not exist.
+== C2 2026-10-21T11:59:08Z
+
+aws: [ERROR]: An error occurred (InvalidGroup.NotFound) when calling the DeleteSecurityGroup operation: The security group 'sg-085c137a9e87fc7ba' does not exist
+{
+    "Return": true
+}
+key pair test-key deleted

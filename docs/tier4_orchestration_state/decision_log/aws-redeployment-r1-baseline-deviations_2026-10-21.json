@@ -1,0 +1,47 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r1-baseline-deviations_2026-10-21",
+  "date": "2026-10-21",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R1 of plans/aws_redeployment_tickets.md",
+  "authority": "Agent-authored under CLAUDE.md, recording deviations from R1's criteria that the operator approved in session on 2026-10-21. Execution aid (CLAUDE.md §10.2). Closes no gate and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-21",
+  "decision": "R1 is verified against its criteria as adapted to the 'Sign up for AWS (new)' Free plan account: the console default Region item is N/A, and the budget alert is evidenced by its ALARM state rather than a delivered e-mail, with a CLI check of credits and alert states at the start of every working session and weekly in R14.",
+  "why": "Two R1 items cannot be done in this account on the Free plan: Unified Settings needs the paid plan, and notification-contact verification is denied by the project SCP DenyNotificationContactsOperations, so budget e-mail recipients stay Inactive.",
+  "decisions": [
+    {
+      "id": "R1-D1",
+      "question": "Console home Region set to the OD1 Region",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "N/A.",
+      "reason": "Unified Settings is refused on the Free plan (docs/infrastructure_security/evidence_v2/R1/R1_11_unified-settings-unavailable.png). The project's Region is eu-north-1 (docs/infrastructure_security/evidence_v2/R1/R1_11_default-region.png, R1_32_aws-settings-projects.png).",
+      "consequence": "Every step sheet names --region eu-north-1 explicitly; the operator uses the console Region selector. Revisit at the OD10 upgrade."
+    },
+    {
+      "id": "R1-D2",
+      "question": "Budget recipient verified and a test alert received",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "Replaced by: the test budget's notification reached ALARM (docs/infrastructure_security/evidence_v2/R1/R1_20_test-alert-state.json), plus a CLI check of remaining credits (freetier get-account-plan-state) and budget notification states at the start of every working session and weekly in R14.",
+      "reason": "Verification e-mails cannot be sent (docs/infrastructure_security/evidence_v2/R1/R1_18_recipient-inactive-verification-denied.png); AWS Settings offers no other notification channel, and the CLI has no Free Tier alert-preference command. On the Free plan no charge accrues; the risk is credit exhaustion closing the account.",
+      "consequence": "OD13's 10 USD budget stays as an evaluated guard whose state is read by CLI, not as an e-mail alarm. R14 must script the check; every later step sheet that creates billable resources starts with it. Revisit at the OD10 upgrade."
+    },
+    {
+      "id": "R1-D3",
+      "question": "Account-level EBS encryption and IMDSv2 defaults",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Set and evidenced in eu-north-1 (docs/infrastructure_security/evidence_v2/R1/R1_12_ebs-default-encryption-eu-north-1.json, R1_14_imds-defaults-eu-north-1.json). The us-east-1 refusals are kept as history; STEPS_fix2's N/A is not needed.",
+      "reason": "OD1 moved to eu-north-1, where the SCPs allow these settings.",
+      "consequence": "R11 still sets both on the host itself."
+    }
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content.",
+    "basis": "AWS outputs and identifiers only."
+  }
+}
