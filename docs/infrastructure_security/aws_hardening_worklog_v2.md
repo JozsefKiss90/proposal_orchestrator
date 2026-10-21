@@ -76,7 +76,7 @@ Each entry records the same fields as v1:
 | Evidence Requested | — |
 | Evidence Received | — |
 | Verification Result | PASS (tests) |
-| Next Action | Operator re-runs `py -3.10 -m pytest tests/test_evidence_protocol_scaffold.py` on Windows. |
+| Next Action | Done: operator re-ran `py -3.10 -m pytest tests/test_evidence_protocol_scaffold.py` on Windows on 2026-10-21, 22 passed; committed as `777c686`. `.gitattributes` now keeps `*.sh` at LF so CloudShell scripts survive a Windows checkout. |
 
 ---
 

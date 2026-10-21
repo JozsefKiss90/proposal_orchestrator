@@ -76,8 +76,10 @@ Sign in as `po-admin` with MFA. Set the console Region to **US East (N. Virginia
 **CloudShell**. **Actions → Upload file** → `docs/infrastructure_security/evidence_v2/R1/r1_inventory.sh`.
 
 ```bash
-mkdir -p ~/R1 && mv ~/r1_inventory.sh ~/R1/ && cd ~/R1 && aws --version
+mkdir -p ~/R1 && mv ~/r1_inventory.sh ~/R1/ && cd ~/R1 && sed -i 's/\r$//' r1_inventory.sh && aws --version
 ```
+
+(`sed` strips Windows line endings, in case the file was saved with CRLF.)
 
 All later CloudShell steps run in `~/R1`. No evidence file.
 

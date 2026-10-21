@@ -34,3 +34,9 @@ harness/profiles/** -text
 docs/tier4_orchestration_state/decision_log/msca-dn-*.json -text
 plans/msca_dn_pre_evaluation_spec.md -text
 plans/pe08_review_and_pe09_handoff_tickets.md -text
+
+# Shell scripts run on Linux (CloudShell, the private host). With
+# core.autocrlf=true a Windows checkout would give them CRLF endings, and bash
+# then fails on the first line with "$'\r': command not found". Store and check
+# them out with LF on every platform (AWS redeployment, ticket R1).
+*.sh text eol=lf
