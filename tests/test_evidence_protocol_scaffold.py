@@ -92,6 +92,18 @@ def test_scan_reads_nested_files_of_any_extension(tmp_path: Path) -> None:
     assert [f.pattern for f in scan.scan_folder(folder)] == ["SessionToken"]
 
 
+@pytest.mark.parametrize("encoding", ["utf-16", "utf-16-be"])
+def test_scan_decodes_utf16_files_as_powershell_writes_them(tmp_path: Path, encoding: str) -> None:
+    """Windows PowerShell 5.1 redirects with ``>`` in UTF-16; the scan must still see the pattern."""
+    folder = _clean_folder(tmp_path)
+    data = PLANTED["AKIA"].encode(encoding)
+    if encoding == "utf-16-be":
+        data = b"\xfe\xff" + data
+    (folder / "R1_08_workstation-identity.json").write_bytes(data)
+
+    assert [f.pattern for f in scan.scan_folder(folder)] == ["AKIA"]
+
+
 def test_case_insensitive_patterns_catch_upper_and_lower_case(tmp_path: Path) -> None:
     folder = _clean_folder(tmp_path)
     (folder / "env.txt").write_text(

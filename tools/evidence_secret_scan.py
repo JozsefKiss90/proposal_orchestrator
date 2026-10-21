@@ -15,7 +15,10 @@ regard to case, so that ``AWS_SECRET_ACCESS_KEY`` and ``sessiontoken`` are
 caught as well.
 
 Every file under the folder is read as bytes, whatever its extension, so a
-pasted ``.txt`` or a ``.md`` run log is scanned like a ``.json`` export.
+pasted ``.txt`` or a ``.md`` run log is scanned like a ``.json`` export. A
+file that starts with a UTF-16 byte-order mark is decoded first: Windows
+PowerShell 5.1 writes UTF-16 when output is redirected with ``>``, and a byte
+match would miss a pattern whose characters are interleaved with zero bytes.
 Screenshots are scanned too; they are expected to be clean as bytes, and the
 operator still checks them by eye.
 
@@ -65,10 +68,21 @@ class Finding:
         return f"{shown.as_posix()}:{self.line}: forbidden pattern {self.pattern}"
 
 
+_UTF16_BOMS = (b"\xff\xfe", b"\xfe\xff")
+
+
+def _normalised_bytes(path: Path) -> bytes:
+    """The file's bytes, with UTF-16 text (detected by its BOM) re-encoded as UTF-8."""
+    data = path.read_bytes()
+    if data.startswith(_UTF16_BOMS):
+        return data.decode("utf-16", errors="replace").encode("utf-8")
+    return data
+
+
 def scan_file(path: Path) -> list[Finding]:
     """Return every finding in *path*, in line order."""
     findings: list[Finding] = []
-    data = path.read_bytes()
+    data = _normalised_bytes(path)
     for number, line in enumerate(data.splitlines(), start=1):
         for name, pattern in FORBIDDEN_PATTERNS.items():
             if pattern.search(line):

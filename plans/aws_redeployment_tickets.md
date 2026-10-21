@@ -51,10 +51,10 @@ models the account can call.
 
 **Blocked by:** None — can start immediately.
 
-- [ ] Each OD has an answer, or is marked "deferred" with its consequence stated.
-- [ ] OD7 is marked deferred to R2.
-- [ ] The OD1 reason is recorded, whichever region is chosen.
-- [ ] The record is committed to the decision log.
+- [x] Each OD has an answer, or is marked "deferred" with its consequence stated.
+- [x] OD7 is marked deferred to R2.
+- [x] The OD1 reason is recorded, whichever region is chosen.
+- [x] The record is committed to the decision log.
 
 ## R1 Account baseline
 
@@ -156,7 +156,7 @@ the runbook. If OD1 keeps us-east-1, the ticket closes as N/A with that reason.
 - [ ] An EU Converse preset exists and is tested.
 - [ ] No transport test fixes the region.
 - [ ] The runbook guard test passes on the edited runbook.
-- [ ] Or: the ticket is closed N/A, with OD1 cited.
+- [x] Or: the ticket is closed N/A, with OD1 cited. (2026-10-21: OD1 keeps us-east-1; see `evidence_v2/R9e/VERIFICATION.md`.)
 
 ## R10 Phase 8 drafter through the transport layer (F5)
 

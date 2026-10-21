@@ -1,0 +1,63 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-od11-admin-identity_2026-10-21",
+  "date": "2026-10-21",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R1 of plans/aws_redeployment_tickets.md (revises OD11 of R0)",
+  "supersedes": "aws-redeployment-operator-decisions_2026-10-21, decision OD11 only. Every other decision in that record stands.",
+  "authority": "Agent-authored under CLAUDE.md, recording a decision the operator gave in session on 2026-10-21. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no gate and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-21, choosing among three options the agent set out while preparing R1",
+  "decision": "The daily admin identity is an IAM user, po-admin, with AdministratorAccess, a console password and MFA, and no access keys. The operator uses the CLI from CloudShell, and from the workstation through `aws login` (AWS CLI 2.32 or later), which issues short-lived credentials from the console sign-in. Root keeps MFA, has no access keys, and is not used after R1. IAM Identity Center is not enabled.",
+  "why": "R0 adopted OD11's suggested default, an IAM Identity Center user. Preparing R1 showed that the default conflicts with OD10.",
+  "findings": [
+    {
+      "id": "F-OD11-1",
+      "declared_status": "Confirmed",
+      "finding": "Only an organization instance of IAM Identity Center gives users access to AWS accounts. An account instance supports application assignments only; its capability table lists the AWS access portal for AWS accounts and multi-account permissions as unavailable.",
+      "basis": "AWS IAM Identity Center User Guide, 'Organization and account instances of IAM Identity Center' (docs.aws.amazon.com/singlesignon/latest/userguide/identity-center-instances.html), read 2026-10-21."
+    },
+    {
+      "id": "F-OD11-2",
+      "declared_status": "Confirmed",
+      "finding": "A Free plan account is upgraded automatically to the paid plan if it joins AWS Organizations.",
+      "basis": "AWS Billing User Guide, 'Choosing an AWS Free Tier plan' (docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html), read 2026-10-21: 'Free account plans will automatically upgrade to paid plan if you join AWS Organizations ...'."
+    },
+    {
+      "id": "F-OD11-3",
+      "declared_status": "Inferred",
+      "finding": "Enabling Identity Center for account access would therefore put the account into an organization and upgrade it to the paid plan, which OD10 reserves to the operator after the ELTE IK financial office approves the reimbursement route. It would also make DC-40 (SCP) applicable.",
+      "basis": "F-OD11-1 and F-OD11-2 together. Whether creating an organization (rather than joining one) triggers the upgrade is not stated on the page; the agent treats it as doing so."
+    },
+    {
+      "id": "F-OD11-4",
+      "declared_status": "Confirmed",
+      "finding": "`aws login` lets root, IAM users and federated users use their console sign-in for the CLI. Credentials rotate every 15 minutes and last at most 12 hours. It needs AWS CLI 2.32.0 or later and the actions signin:AuthorizeOAuth2Access and signin:CreateOAuth2Token, which AdministratorAccess includes.",
+      "basis": "AWS Security Blog, 'Simplified developer access to AWS with aws login' (aws.amazon.com/blogs/security/simplified-developer-access-to-aws-with-aws-login), read 2026-10-21."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "OD11-r1",
+      "question": "Admin identity (OD11), given that Identity Center would upgrade the account",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "IAM admin user with MFA, no access keys; CLI through CloudShell and `aws login`. Recommended by the agent; chosen over 'keep using root until the upgrade, then Identity Center' and 'Identity Center now, upgrading the account'.",
+      "reason": "Keeps the account on the Free plan, as OD10 requires, while root stays unused and no long-term key exists anywhere.",
+      "consequence": "R1 creates po-admin and evidences its MFA and the absence of access keys. CloudTrail attributes admin actions to user/po-admin. R8 may name po-admin in the secret's resource policy as the admin principal. DC-40 stays N/A while the account is in no organization. At the OD10 upgrade the operator may revisit Identity Center; R14's checklist records that as optional."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "OD11-r1",
+      "declared_status": "Assumed",
+      "gap": "The workstation's AWS CLI version is not yet known. If it is older than 2.32.0, R1 step 08 upgrades it; the operator does this."
+    }
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content.",
+    "basis": "The record names an IAM user and AWS documentation pages only."
+  }
+}

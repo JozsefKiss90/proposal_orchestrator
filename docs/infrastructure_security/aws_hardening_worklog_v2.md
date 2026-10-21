@@ -47,7 +47,49 @@ Each entry records the same fields as v1:
 | Action Taken | Recorded the operator's decisions in `docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json`. OD1 = us-east-1 with `us.` profiles (operator reason: the region used before, more reliable for the models used). OD2–OD6, OD8–OD13 = suggested defaults. OD7 deferred to R2. |
 | Evidence Requested | — (no AWS step) |
 | Evidence Received | `evidence_v2/R0/VERIFICATION.md` |
-| Verification Result | 3 of 4 criteria PASS; "committed" pending the operator's git commit |
+| Verification Result | All 4 criteria PASS. Committed as `806660d`; operator confirmed 2026-10-21. R0 DONE. |
 | Next Action | Operator commits E0 + R0 and confirms R0. Then R9e closes N/A; R1 (account baseline step sheet) is next on the frontier, with R3, R9 and R10 also open. |
+
+---
+
+### 2026-10-21 — R9e: EU region support — closed N/A
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-21T08:52:00Z |
+| Control ID | R9e (no control) |
+| Action Taken | Closed N/A: OD1 keeps us-east-1 (decision record `aws-redeployment-operator-decisions_2026-10-21`). |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R9e/VERIFICATION.md` |
+| Verification Result | N/A with OD1 cited. R9e DONE. |
+| Next Action | R1 account baseline: step sheet `evidence_v2/R1/STEPS.md`. |
+
+---
+
+### 2026-10-21 — E0 follow-up: secret scan reads UTF-16
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-21T09:08:00Z |
+| Control ID | E0 (no control) |
+| Action Taken | `tools/evidence_secret_scan.py` decodes files that start with a UTF-16 byte-order mark before matching, because Windows PowerShell 5.1 writes UTF-16 on `>` redirection and a byte match would miss the patterns. Two tests added (22 in total, all pass). |
+| Evidence Requested | — |
+| Evidence Received | — |
+| Verification Result | PASS (tests) |
+| Next Action | Operator re-runs `py -3.10 -m pytest tests/test_evidence_protocol_scaffold.py` on Windows. |
+
+---
+
+### 2026-10-21 — R1: Account baseline — step sheet delivered
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-21T09:08:00Z |
+| Control ID | R1 (account baseline; no control directly) |
+| Action Taken | OD11 revised in `decision_log/aws-redeployment-od11-admin-identity_2026-10-21.json` (IAM user `po-admin` with MFA, no access keys, CLI via CloudShell and `aws login`; Identity Center would join an organization and upgrade the Free plan). Wrote `evidence_v2/R1/STEPS.md` (Parts A and B, steps 01–23) and the read-only inventory script `evidence_v2/R1/r1_inventory.sh`. |
+| Evidence Requested | R1_02, R1_07–R1_22 as listed in `STEPS.md` |
+| Evidence Received | Pending |
+| Verification Result | PENDING |
+| Next Action | Operator runs Parts A and B and hands back after step 23; agent writes `STEPS_cleanup.md` from the inventory. |
 
 ---
