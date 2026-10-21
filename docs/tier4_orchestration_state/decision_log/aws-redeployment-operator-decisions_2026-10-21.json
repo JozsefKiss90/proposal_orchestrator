@@ -1,0 +1,187 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-operator-decisions_2026-10-21",
+  "date": "2026-10-21",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R0 of plans/aws_redeployment_tickets.md",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-21. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no gate, adds no runtime gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-21: OD1 answered with a stated reason; OD2 to OD6 and OD8 to OD13 adopted as the handoff's suggested defaults; OD7 deferred to R2 as the ticket requires.",
+  "decision": "The new account 797661577394 is rebuilt in us-east-1 with us. inference profiles. Every other decision follows the handoff's suggested default. The model set (OD7) is settled by a successor record after R2.",
+  "why": "The handoff left thirteen operator decisions open. R1, R3, R9, R9e and R10 wait on them, and R5 and R11 also wait on OD7.",
+  "inputs": [
+    "plans/aws_redeployment_handoff_2026-10-21.md section 5 (operator decisions OD1 to OD13, options and suggested defaults)",
+    "plans/aws_redeployment_handoff_2026-10-21.md section 4 (findings F1 to F9) and section 8 (cost model)",
+    "docs/infrastructure_security/audit_package/data_flow_document.md section 4.3 (international data transfers)",
+    "plans/aws_redeployment_tickets.md (blocking edges)"
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "This record holds no secret value, credential, prompt text or proposal content, and no identifier of the old account.",
+    "basis": "Every answer is a choice among the handoff's own options."
+  },
+  "answer_kinds": {
+    "operator_adopted_default": "The operator was offered the handoff's suggested default and chose it.",
+    "operator_answer": "The operator chose an option and stated the reason.",
+    "deferred": "The decision is left open by design; the consequence states what waits on it."
+  },
+  "decisions": [
+    {
+      "id": "OD1",
+      "question": "Region for the host, endpoints, key, trail and Bedrock",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "us-east-1, with us. cross-region inference profiles, as in the first deployment.",
+      "reason": "Operator: the first deployment ran there, and it is the more reliable region for the models the workloads use. The model part is the operator's expectation; R2 confirms which models the new account can call there.",
+      "consequence": "Proposal data processed through Bedrock leaves the EU: us. profiles route within US regions (F2). The transfer rests on the EU-US Data Privacy Framework and the AWS DPA with SCCs, as data_flow_document.md section 4.3 already states; R13 restates it for the new account. R9e closes N/A citing OD1. The AN12 runbook's region lines stand unchanged. R9 still exports AWS_REGION (F4), because the default-region fallback must not be what selects the region. If ELTE's DPO or the funding terms later require EU-only processing, OD1 is reopened and R9e with it."
+    },
+    {
+      "id": "OD2",
+      "question": "Runtime identity (F1)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) One host role that is itself hardened: permission boundary and explicit deny attached, the boundary extended for exactly the SSM actions the host needs, plus a narrow deploy-bucket read.",
+      "reason": "Suggested default: no code change, and CloudTrail shows the hardened identity as the caller.",
+      "consequence": "R5 builds one role and instance profile. The KMS key policy (R6), the secret policy (R8) and the Bedrock endpoint policy (R11) name that role. No STS assume-role code is needed."
+    },
+    {
+      "id": "OD3",
+      "question": "VPC (F3)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) A dedicated VPC with no Internet Gateway.",
+      "reason": "Suggested default; closes F3.",
+      "consequence": "R4 creates the VPC; the default VPC is not used."
+    },
+    {
+      "id": "OD4",
+      "question": "Availability zones for interface endpoints",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "One AZ while on credits and a single host.",
+      "reason": "Suggested default; halves the interface-endpoint cost (handoff section 8).",
+      "consequence": "An outage of that AZ stops work until it recovers. Revisit before long-term use. R4 creates the private subnet in one AZ; R11 places the endpoints there."
+    },
+    {
+      "id": "OD5",
+      "question": "Endpoint lifecycle",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Interface endpoints and host are created per working session from a separate stack and deleted afterwards, until the DN work is done.",
+      "reason": "Suggested default; keeps the hourly cost to the hours actually worked.",
+      "consequence": "R3 separates the endpoints-and-host stack; R11 proves it deletes and recreates cleanly; R14 provides start, stop and teardown scripts; R13 documents the lifecycle in the operational procedure."
+    },
+    {
+      "id": "OD6",
+      "question": "How the infrastructure is written",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "CloudFormation, in two stacks: base (network, IAM, KMS, audit) and endpoints-and-host (the costed part).",
+      "reason": "Suggested default: native, free, and runnable from CloudShell.",
+      "consequence": "R3 lays out the templates (suggested location deploy/aws/) with a lint step on the workstation."
+    },
+    {
+      "id": "OD7",
+      "question": "Model set",
+      "answer_kind": "deferred",
+      "declared_status": "Unresolved",
+      "answer": "Deferred to R2.",
+      "reason": "Only R2 shows which Claude models the new account can call in us-east-1, and with which quotas.",
+      "consequence": "A successor record after R2 names the orchestrator model, two distinct models for AN12 A3 and A5, and an assessor that differs from the drafter in every id form (AN1c). Until then R5 (invoke policy, explicit deny), R11 (endpoint policy) and R15 (runbook arguments) cannot be completed."
+    },
+    {
+      "id": "OD8",
+      "question": "Configuration source (F4)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) A launcher reads proposal-orchestrator/env-config from Secrets Manager and exports its values.",
+      "reason": "Suggested default; keeps ADR-001 D4 true in practice.",
+      "consequence": "R8 creates the secret; R9 writes the launcher; R12b evidences DC-33 to DC-35 through the launcher on the host."
+    },
+    {
+      "id": "OD9",
+      "question": "Host image and size",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "AL2023 x86_64, t3.medium, stopped when idle.",
+      "reason": "Suggested default; t3.medium is the size the deployment guide recommends for a full DAG run.",
+      "consequence": "The AN12 bundle's platform (manylinux x86_64, bundled CPython 3.11) is unchanged. Whether the Free plan allows t3.medium is not yet known; see known_gaps."
+    },
+    {
+      "id": "OD10",
+      "question": "When to leave the Free plan",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Upgrade only after the ELTE IK financial office approves the reimbursement route, entering ELTE's billing details at the same moment. Only the operator does this.",
+      "reason": "Suggested default; the funding route is still pending approval.",
+      "consequence": "If R2 shows that the Free plan blocks Bedrock, the work stops at R2 until the approval arrives, which bears on the 2026-11-23 deadline. R14 writes the upgrade checklist; the operator carries it out."
+    },
+    {
+      "id": "OD11",
+      "question": "Admin identity",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "An IAM Identity Center user with MFA for daily work; root MFA on and root unused.",
+      "reason": "Suggested default; CloudTrail then attributes admin actions to a named identity.",
+      "consequence": "R1 sets it up. R8 may name the corresponding admin role in the secret's resource policy."
+    },
+    {
+      "id": "OD12",
+      "question": "Is DC-38 in scope now?",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "No. DC-38 stays deferred, but F5 is fixed anyway (R10).",
+      "reason": "Suggested default; F5 is a production-mode bypass regardless of DC-38.",
+      "consequence": "R16 stays open as deferred with OD12 cited, and register v2 marks DC-38 DEFERRED when R16 is closed that way. R10 keeps its priority as a security fix."
+    },
+    {
+      "id": "OD13",
+      "question": "Cost guardrails",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Two budgets: 10 USD per month while on credits; after the upgrade, the approved HUF amount converted to USD at the day's rate, with alerts at 50, 80 and 100 percent. No automatic AWS Budgets action on IAM.",
+      "reason": "Suggested default.",
+      "consequence": "R1 keeps the existing 10 USD budget and verifies its recipient so that alerts are actually delivered. The second budget is created at the OD10 upgrade, from R14's checklist."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "OD7",
+      "declared_status": "Unresolved",
+      "gap": "No model is named. R2's successor record must settle it before R5 and R11."
+    },
+    {
+      "decision": "OD9",
+      "declared_status": "Unresolved",
+      "gap": "Whether the Free plan permits t3.medium (or Bedrock at all) is unmeasured. R1 and R2 find out before R11; if not, the operator chooses between a smaller instance and the OD10 upgrade."
+    },
+    {
+      "decision": "OD13",
+      "declared_status": "Inferred",
+      "gap": "The default excludes Budgets actions on IAM but does not say whether a Budgets action may stop the instance. This record reads it as alerts only. The operator may add an instance-stop action in R1."
+    },
+    {
+      "decision": "OD1",
+      "declared_status": "Assumed",
+      "gap": "No ELTE DPO or funding-term requirement for EU-only processing is known. If one appears, OD1 is reopened."
+    }
+  ],
+  "not_evidence_of": [
+    "That any model is callable from the new account, or that the Free plan permits Bedrock.",
+    "Any AWS resource in account 797661577394.",
+    "Approval of the funding or reimbursement route by the ELTE IK financial office."
+  ],
+  "unblocks_when_recorded": [
+    "R1 (with E0, done)",
+    "R3",
+    "R9",
+    "R9e (closes N/A: OD1 keeps us-east-1)",
+    "R10 (priority kept by OD12)"
+  ],
+  "stays_blocked": [
+    "R2: needs R1",
+    "R5: needs R2 and the OD7 successor record",
+    "R11: needs R4 to R8 and the operator's explicit go"
+  ]
+}
