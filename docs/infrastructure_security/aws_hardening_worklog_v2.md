@@ -117,7 +117,21 @@ Each entry records the same fields as v1:
 | Action Taken | Verified 42 evidence files against STEPS.md and fixes 1–4 and STEPS_cleanup.md. Recorded the operator-approved deviations in `aws-redeployment-r1-baseline-deviations_2026-10-21`. Explore AWS leftovers removed (Lambda with public URL, its log group, SG, key pair, three roles). |
 | Evidence Requested | — |
 | Evidence Received | `evidence_v2/R1/` (42 files), `evidence_v2/R1/VERIFICATION.md` |
-| Verification Result | All criteria PASS or N/A with reason; awaiting operator confirmation |
+| Verification Result | All criteria PASS or N/A with reason. Operator confirmed 2026-10-21 (commit `399ee02`). R1 DONE. |
 | Next Action | Operator confirms R1. Then R2 (Bedrock access and quotas, settles OD7) and R3 (IaC skeleton for eu-north-1); R9e (EU preset) and R10 can run in parallel. |
+
+---
+
+### 2026-10-21 — R2: Bedrock access check — evidence verified, OD7 settled
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-21T21:05:00Z |
+| Control ID | DC-36 (R2 part); feeds DC-04, DC-10, DC-16; DC-28 observed (invocation logging empty after the calls) |
+| Action Taken | Step sheet `STEPS.md` and operator-decided extension `STEPS_fix1.md` run from CloudShell (eu-north-1 home). Session-start check (R1-D2) clean: FREE / ACTIVE, 199.99 USD, all budget alerts OK. Converse through `eu.` profiles: Opus 4.6 and Sonnet 4.6 answer `OK`; Opus 5.5, 5, 4.8, 4.7, Sonnet 5.5, 5 and Haiku 5.5 refused ("not available for this account"). Applied cross-Region RPM 5 (Opus 4.6) and 10 (Sonnet 4.6, Haiku 4.5) against 10,000 default; TPM at default. OD7 settled with the operator: `aws-redeployment-od7-model-set_2026-10-21` (orchestrator Opus 4.6 interim, Opus 5 target; A3 Sonnet 4.6, A5 Opus 4.6; assessor Sonnet 4.6; `global.` excluded and denied). |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R2/` (45 `R2_*` files), `evidence_v2/R2/VERIFICATION.md` |
+| Verification Result | All step criteria PASS (agent secret scan CLEAN). Ticket open until the operator's scan line, the commit of the OD7 record and the operator's confirmation. |
+| Next Action | Operator re-runs the secret scan, commits R2 and the OD7 record, confirms R2. Operator's option (OD10 input): an Account and billing support case asking for newer Claude models and higher RPM. Then R3; R9e (eu-north-1 preset, AN12 runbook ids, AN1c drafter on the host) and R10 in parallel; R5 uses the OD7 resource list. |
 
 ---

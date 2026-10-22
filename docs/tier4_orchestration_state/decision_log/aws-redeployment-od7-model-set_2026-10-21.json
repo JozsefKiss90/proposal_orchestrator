@@ -1,0 +1,134 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-od7-model-set_2026-10-21",
+  "date": "2026-10-21",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R2 of plans/aws_redeployment_tickets.md (settles OD7 of R0)",
+  "supersedes": "aws-redeployment-operator-decisions_2026-10-21, decision OD7 only (deferred to R2). Every other decision there stands as revised by aws-redeployment-od1-region-r1_2026-10-21 and aws-redeployment-od11-admin-identity-r2_2026-10-21.",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-21 on measurements made in R2. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no gate, amends no constitutional rule and changes no code pin.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-21: A3 Sonnet 4.6 / A5 Opus 4.6, assessor Sonnet 4.6, global. profiles excluded and denied in R5 (answers to the agent's questions); orchestrator Opus 4.6 as an interim choice with Opus 5 as the target, after asking whether Opus 5 was possible ('mehet', 21:02 UTC)",
+  "decision": "The host calls Bedrock in eu-north-1 through two eu. system-defined inference profiles: eu.anthropic.claude-opus-4-6-v1 (orchestrator and drafter; AN12 A5) and eu.anthropic.claude-sonnet-4-6 (AN12 A3; assessor). global. profiles are excluded and denied. Opus 4.6 is the orchestrator for now because no newer Opus answers for this account; Opus 5 (or newer) is the target once the account can call it.",
+  "why": "OD7 was deferred until R2 showed which models this account can call. R2 found that only the 4.6 generation and older answer, with request-per-minute quotas cut to 5-10.",
+  "findings": [
+    {
+      "id": "F-R2-1",
+      "declared_status": "Confirmed",
+      "finding": "From eu-north-1 through eu. profiles, Opus 4.6, Sonnet 4.6 and (in R1) Haiku 4.5 return the fixed string OK. Opus 5.5, Opus 5, Opus 4.8, Opus 4.7, Sonnet 5.5, Sonnet 5 and Haiku 5.5 are refused with AccessDeniedException 'anthropic.claude-<model> is not available for this account ... contact AWS Sales', although get-foundation-model-availability reports each AUTHORIZED.",
+      "basis": "docs/infrastructure_security/evidence_v2/R2/R2_07_converse-*.json, R2_14_converse-*.json, R2_05_availability-*.json; docs/infrastructure_security/evidence_v2/R1/R1_29_converse-eu-profile.json."
+    },
+    {
+      "id": "F-R2-2",
+      "declared_status": "Confirmed",
+      "finding": "Applied cross-Region requests per minute: Opus 4.6 5 (L-11DFF789), Sonnet 4.6 10 (L-00FF3314), Haiku 4.5 10 (L-CCA5DF70), against a default of 10,000; tokens per minute at default: Opus 4.6 3,000,000 (L-0AD9BBE8), Sonnet 4.6 6,000,000 (L-15B8E632), Haiku 4.5 5,000,000 (L-58BE175A). All adjustable.",
+      "basis": "docs/infrastructure_security/evidence_v2/R2/R2_08_quotas-applied.json, R2_09_quotas-default.json."
+    },
+    {
+      "id": "F-R2-3",
+      "declared_status": "Inferred",
+      "finding": "The refusals are an account-level model allow-list, not an SCP or a missing use-case form: the refused models have no cross-Region quota line in this account, while Haiku 4.5, Opus 4.5, Opus 4.6, Sonnet 4.5 and Sonnet 4.6 do. Whether the OD10 upgrade, a support case or a quota request lifts it is unknown.",
+      "basis": "docs/infrastructure_security/evidence_v2/R2/R2_08_quotas-applied.json (RUNLOG step 08d); the error text names the account and AWS Sales, not a policy."
+    },
+    {
+      "id": "F-R2-4",
+      "declared_status": "Confirmed",
+      "finding": "A successful first call creates the model's Marketplace agreement (NOT_AVAILABLE to AVAILABLE); a refused call creates none.",
+      "basis": "docs/infrastructure_security/evidence_v2/R2/R2_05_availability-sonnet-4-6.json, R2_07_availability-after-*.json, R2_15_availability-opus-4-6-v1.json."
+    },
+    {
+      "id": "F-R2-5",
+      "declared_status": "Confirmed",
+      "finding": "Each chosen eu. profile is SYSTEM_DEFINED, ARN arn:aws:bedrock:eu-north-1:797661577394:inference-profile/<id>, and routes to the foundation model in eu-north-1, eu-west-3, eu-south-1, eu-south-2, eu-west-1 and eu-central-1. Bedrock model invocation logging in eu-north-1 reads empty after the calls.",
+      "basis": "docs/infrastructure_security/evidence_v2/R2/R2_06_profile-sonnet-4-6.json, R2_15_profile-opus-4-6-v1.json, R2_10_invocation-logging.json."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "OD7-orchestrator",
+      "question": "Orchestrator model on the host (ORCHESTRATOR_TRANSPORT_MODEL; the drafter)",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "eu.anthropic.claude-opus-4-6-v1, as an interim choice. Target: eu.anthropic.claude-opus-5 or newer, once this account can call it.",
+      "reason": "The operator wanted Opus 5; it is refused for this account (F-R2-1, R2_14_converse-opus-5.json). Opus 4.6 is the newest Opus that answers.",
+      "consequence": "R8 stores ORCHESTRATOR_TRANSPORT_MODEL=eu.anthropic.claude-opus-4-6-v1. At 5 requests per minute (F-R2-2) sequential work fits; parallel DAG work will be throttled. Switching to the target model needs a short R2 re-check (one Converse call and its quota lines), then R5's model list, R11's endpoint policy and the secret value change; R3 keeps the model list a parameter."
+    },
+    {
+      "id": "OD7-an12",
+      "question": "AN12 A3 and A5 models (must differ)",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "A3: eu.anthropic.claude-sonnet-4-6. A5: eu.anthropic.claude-opus-4-6-v1.",
+      "reason": "Two distinct models that answer; the heavier A5 stage gets the stronger model.",
+      "consequence": "R9e rewrites the AN12 runbook's region and id lines for eu-north-1 and these ids; R15 passes them as --a3-model / --a5-model."
+    },
+    {
+      "id": "OD7-assessor",
+      "question": "Assessor model (must differ from the drafter in every id form, AN1c)",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "eu.anthropic.claude-sonnet-4-6.",
+      "reason": "It names a different model from the Opus 4.6 drafter in every id form, and from the target Opus 5 as well, so it survives the orchestrator switch.",
+      "consequence": "The AN1c guard must know the host's drafter model (Opus 4.6, from ORCHESTRATOR_TRANSPORT_MODEL), not only the CLI pin claude-opus-4-8; R9e checks this. The assessor version tag names bedrock-converse and eu-north-1."
+    },
+    {
+      "id": "OD7-global",
+      "question": "global. inference profiles",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "Excluded, and denied in R5's explicit deny.",
+      "reason": "global. profiles may route outside the EU; OD1-r1 chose EU processing.",
+      "consequence": "Fable 5 and 5.1 (offered here only as global.) are unavailable to the host. DC-16's approved Regions are eu-north-1 plus the five routed EU Regions."
+    },
+    {
+      "id": "OD7-resources",
+      "question": "Bedrock resources the host may invoke (input to R5 invoke policy and R11 endpoint policy, F2)",
+      "answer_kind": "derived_from_operator_answers",
+      "declared_status": "Confirmed",
+      "answer": {
+        "inference_profiles": [
+          "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6"
+        ],
+        "foundation_models": [
+          "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-sonnet-4-6",
+          "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-sonnet-4-6",
+          "arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-sonnet-4-6",
+          "arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-sonnet-4-6",
+          "arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-6",
+          "arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-sonnet-4-6"
+        ]
+      },
+      "reason": "Cross-Region inference needs the profile ARN and the foundation-model ARN in every Region the profile routes to (F2, F-R2-5).",
+      "consequence": "Haiku 4.5 answers but is not in the set; it is not allowed unless a later record adds it."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "OD7-orchestrator",
+      "declared_status": "Unresolved",
+      "gap": "Whether a support case (Account and billing), a quota request or the OD10 upgrade makes Opus 5 or newer callable, and lifts the 5-10 RPM cut. Operator's to pursue; input to OD10."
+    },
+    {
+      "decision": "OD7-orchestrator",
+      "declared_status": "Unresolved",
+      "gap": "Whether the Converse backend's retry handles throttling at 5 RPM without failing a run; R9e / R15 to show."
+    },
+    {
+      "decision": "OD7-resources",
+      "declared_status": "Unresolved",
+      "gap": "DC-36 is closed only when the same models answer from the host through PrivateLink (R11)."
+    }
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content. The only model output recorded is the fixed string OK.",
+    "basis": "Identifiers and AWS outputs only."
+  }
+}

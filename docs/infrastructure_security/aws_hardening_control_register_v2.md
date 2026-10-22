@@ -136,7 +136,7 @@ path under `evidence_v2/`. Nothing in this register is carried over from v1's ev
 | DC-33 | `ORCHESTRATOR_PRODUCTION_MODE=true` | Production mode set, read on the host through the R9 launcher | R8, R9, R12b | NOT_STARTED | — | — |
 | DC-34 | Converse transport preset | Transport preset selects the Bedrock Converse backend for the OD1 region | R8, R9, R12b | NOT_STARTED | — | — |
 | DC-35 | `ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata` | Diagnostic level prevents prompt and response content being written to disk | R8, R9, R12b | NOT_STARTED | — | — |
-| DC-36 | Model availability confirmed in target region | The OD7 models answer in the OD1 region | R2, R11 | NOT_STARTED | — | — |
+| DC-36 | Model availability confirmed in target region | The OD7 models answer in the OD1 region | R2, R11 | IN_PROGRESS | `evidence_v2/R2/` (`VERIFICATION.md`; `R2_07_converse-sonnet-4-6.json`, `R2_14_converse-opus-4-6-v1.json`, `R2_08_quotas-applied.json`) | R2 part verified 2026-10-21: the OD7 models (`aws-redeployment-od7-model-set_2026-10-21`) `eu.anthropic.claude-opus-4-6-v1` and `eu.anthropic.claude-sonnet-4-6` answer from eu-north-1 (CloudShell); RPM 5 / 10. Newer models refused for this account. Host-side call through PrivateLink remains for R11. |
 | DC-38 | Full DAG run succeeds with production config | All phases complete, all gates pass under production configuration | R16 | NOT_STARTED | — | Scope per OD12 |
 
 ---
@@ -161,8 +161,8 @@ path under `evidence_v2/`. Nothing in this register is carried over from v1's ev
 | 6 - CloudTrail | 5 | 5 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 7 - CloudWatch | 3 | 3 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 8 - Data Egress | 4 | 4 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 9 - Production Config | 5 | 5 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 9 - Production Config | 5 | 4 | 1 | 0 | 0 | 0 | 0 | 0 |
 | 10 - Compliance | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL** | **41** | **41** | **0** | **0** | **0** | **0** | **0** | **0** |
+| **TOTAL** | **41** | **40** | **1** | **0** | **0** | **0** | **0** | **0** |
 
 Resource IDs are not listed here. They live in each ticket's `<ticket-id>_outputs.json`.
