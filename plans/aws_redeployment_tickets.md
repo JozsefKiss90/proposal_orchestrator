@@ -71,9 +71,9 @@ step sheet:
 
 **Blocked by:** E0, R0.
 
-- [ ] Each item has CLI output or console evidence, verified against its PASS criterion.
-- [ ] The budget recipient shows as verified, and a test alert has arrived.
-- [ ] No billable resource is running outside the plan, in any region.
+- [x] Each item has CLI output or console evidence, verified against its PASS criterion. (Console home Region N/A on the Free plan: `aws-redeployment-r1-baseline-deviations_2026-10-21`, R1-D1.)
+- [x] The budget recipient shows as verified, and a test alert has arrived. (Replaced, operator-approved: recipient verification is SCP-denied; the test alert reached `ALARM` and credits and alert states are checked by CLI — R1-D2.)
+- [x] No billable resource is running outside the plan, in any region.
 
 ## R2 Bedrock access check, closing OD7
 
@@ -91,10 +91,11 @@ models for AN12 A3 and A5, and an assessor that differs from the drafter in ever
 
 **Blocked by:** R1.
 
-- [ ] A table lists each usable model by profile id, with its quotas and the regions it routes to.
-- [ ] The OD7 successor decision record is committed.
-- [ ] If the Free plan blocks Bedrock, the ticket stops here. The agent reports the block to the
-      operator as an input to OD10 and builds nothing on top of it.
+- [x] A table lists each usable model by profile id, with its quotas and the regions it routes to. (`docs/infrastructure_security/evidence_v2/R2/VERIFICATION.md`, "Usable models": Opus 4.6, Sonnet 4.6, Haiku 4.5; newer models refused for this account.)
+- [x] The OD7 successor decision record is committed. (`aws-redeployment-od7-model-set_2026-10-21`, commit `690f90c`.)
+- [x] If the Free plan blocks Bedrock, the ticket stops here. The agent reports the block to the
+      operator as an input to OD10 and builds nothing on top of it. (N/A: Bedrock is not blocked. The
+      account-level model restriction and the RPM cut were reported as OD10 input, F-R2-1 to F-R2-3.)
 
 ## R3 IaC skeleton and old-ID guard
 

@@ -46,7 +46,7 @@
 | C4 | No findings; errors only in denied Regions | `R1_34_inventory-after.json` | PASS | — |
 | C4 | No role at path `/` | `R1_35_roles-after.json` | PASS | 13 roles, all AWS-managed |
 | C4 | No log groups | `R1_36_log-groups-after.json` | PASS | empty |
-| 30 | Workstation profile Region eu-north-1 | RUNLOG | OPEN | Ran in CloudShell instead of PowerShell; repeat on the workstation (not a ticket criterion) |
+| 30 | Workstation profile Region eu-north-1 | RUNLOG | PASS | First run in CloudShell by mistake; repeated in PowerShell on the workstation at 12:12Z |
 
 ## Ticket checklist
 
@@ -61,7 +61,7 @@
 - [x] Every criterion above is PASS, or N/A with a stated reason (step 30 is a convenience, not a criterion).
 - [x] Register v2 updated for: none required; DC-40 note and the Region field updated during R1.
 - [x] Worklog v2 entry: 2026-10-21T12:07:00Z.
-- [ ] Operator confirmed in session on `<YYYY-MM-DD>`.
+- [x] Operator confirmed in session on 2026-10-21: committed R1 as `399ee02` and asked to continue with R2 in a new session.
 
 ## Findings carried forward
 

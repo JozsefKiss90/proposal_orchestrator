@@ -4,7 +4,7 @@
 |---|---|
 | Verified by / on | agent (Claude) / 2026-10-21 |
 | Step sheet | `STEPS.md` (steps 01–12) and `STEPS_fix1.md` (steps 13–15); added read-only steps 05r, 07d, 08d, 15b are recorded in `RUNLOG.md` |
-| Secret scan | Agent: `python3 -m tools.evidence_secret_scan docs/infrastructure_security/evidence_v2/R2` → `CLEAN` (exit 0), 45 `R2_*` files. The operator's `py -3.10` run in PowerShell printed no line in session; to be repeated once and its `CLEAN` line reported before the commit. |
+| Secret scan | Agent: `python3 -m tools.evidence_secret_scan docs/infrastructure_security/evidence_v2/R2` → `CLEAN` (exit 0), 45 `R2_*` files. Operator: `py -3.10 -m tools.evidence_secret_scan docs/infrastructure_security/evidence_v2/R2` → `CLEAN` (re-run 2026-10-22, before commit `690f90c`). |
 
 ## Criteria
 
@@ -33,7 +33,7 @@
 | 09 | Default value for every code used from step 08 | `R2_09_quotas-default.json` | PASS | 97 lines; all six codes present |
 | 10 | Empty or `{}`, no `loggingConfig` | `R2_10_invocation-logging.json` | PASS | 0 bytes |
 | 11 | ACTIVE; credits ≥ step 01 − 0.10 | `R2_11_plan-state-after.json` | PASS | ACTIVE, 199.99 USD |
-| 12 | 45 files home; secret scan clean | (no file) | PASS (agent) / pending (operator line) | See "Secret scan" above |
+| 12 | 45 files home; secret scan clean | (no file) | PASS | 45 files; `CLEAN` in both runs (see "Secret scan") |
 
 ## Usable models (ticket table)
 
@@ -69,15 +69,15 @@ Sonnet 4.5 (older than a usable model of the same family). `global.` profiles no
 | Ticket criterion (from `plans/aws_redeployment_tickets.md`) | Status | Evidence |
 |---|---|---|
 | A table lists each usable model by profile id, with its quotas and the regions it routes to | PASS | "Usable models" above |
-| The OD7 successor decision record is committed | PENDING (written) | `docs/tier4_orchestration_state/decision_log/aws-redeployment-od7-model-set_2026-10-21.json`, settled in session; awaits the operator's commit |
+| The OD7 successor decision record is committed | PASS | `docs/tier4_orchestration_state/decision_log/aws-redeployment-od7-model-set_2026-10-21.json`, commit `690f90c` |
 | If the Free plan blocks Bedrock, the ticket stops and the block is reported as OD10 input | N/A | Bedrock is not blocked: three models answer. The partial model restriction and RPM cut are reported as OD10 input (F-R2-1 to F-R2-3) |
 
 ## Done conditions (handoff §7a)
 
-- [ ] Every criterion above is PASS, or N/A with a stated reason. (Open: operator's scan line, OD7 record.)
+- [x] Every criterion above is PASS, or N/A with a stated reason.
 - [x] Register v2 updated for: DC-36 (IN_PROGRESS; R11 closes the host-side part).
 - [x] Worklog v2 entry: 2026-10-21T21:05:00Z.
-- [ ] Operator confirmed in session.
+- [x] Operator confirmed in session on 2026-10-22 ("Mehet az R2 lezárása."), after committing `690f90c`.
 
 ## Follow-up
 

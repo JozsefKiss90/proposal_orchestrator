@@ -47,6 +47,8 @@
 | — | 11:34 | operator | — | **Operator approval in session** | Step 11 N/A (Unified Settings needs the paid plan). Steps 18–20: the evidence is the `ALARM` state of `po-alert-test` (`R1_20_test-alert-state.json`); credits and alert states are checked by CLI at the start of every working session and weekly in R14, since e-mail delivery cannot be verified in this account. |
 | C1–C4 (attempt 1) | ~11:40–11:55 | operator | interrupted | — | All four blocks ran; the CloudShell session then crashed before the output was read back. |
 | C1, C2 (attempt 2) | 11:58–11:59 | operator | ok | Re-run after the crash | C1: DeleteFunctionUrlConfig, DeleteFunction and DeleteLogGroup all ResourceNotFound, i.e. already deleted by attempt 1. C2: DeleteSecurityGroup InvalidGroup.NotFound (already deleted); DeleteKeyPair returned true (idempotent). C3 not re-run; C4 verifies. Both attempts append to `R1_33_cleanup-log.txt`. |
+| 30 | 12:05 / 12:12 | operator | ok | First run in CloudShell by mistake (harmless); repeated in PowerShell on the workstation | `aws configure set region eu-north-1 --profile po-r1`. |
+| 23 | 12:05 | operator | ok | Zip excluded the two scripts (already in the repository) | 35 files brought home; folder holds 42 `R1_*` evidence files with the screenshots. |
 
 ## Notes
 

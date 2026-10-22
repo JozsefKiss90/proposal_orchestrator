@@ -135,3 +135,17 @@ Each entry records the same fields as v1:
 | Next Action | Operator re-runs the secret scan, commits R2 and the OD7 record, confirms R2. Operator's option (OD10 input): an Account and billing support case asking for newer Claude models and higher RPM. Then R3; R9e (eu-north-1 preset, AN12 runbook ids, AN1c drafter on the host) and R10 in parallel; R5 uses the OD7 resource list. |
 
 ---
+
+### 2026-10-22 — R2: Bedrock access check — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-22T13:40:00Z |
+| Control ID | DC-36 (R2 part verified; stays IN_PROGRESS until R11) |
+| Action Taken | Operator re-ran the secret scan (`CLEAN`), committed the R2 evidence, the OD7 record `aws-redeployment-od7-model-set_2026-10-21`, register v2 and worklog as `690f90c`, and confirmed R2 in session. R2 ticked in `plans/aws_redeployment_tickets.md`. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R2/VERIFICATION.md` (all criteria PASS or N/A with reason) |
+| Verification Result | R2 DONE. |
+| Next Action | Frontier: R3 (IaC skeleton, model list as a parameter), R9 / R9e (eu-north-1 Converse preset, AN12 runbook ids, AN1c drafter on the host), R10. R5 uses the OD7 resource list once R3 is done. Operator's option for OD10: an Account and billing support case for newer Claude models and higher RPM. |
+
+---

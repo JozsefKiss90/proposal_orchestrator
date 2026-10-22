@@ -35,6 +35,7 @@ Kept by the agent from what the operator reports in session (marked as such).
 | 11 | ~15:50 | operator (reported in session) | ok | none | none. `ACTIVE`, credits 199.99 USD (unchanged; the figure lags). |
 | 12 | ~15:56 | operator (reported in session) | ok | none | none. Zip downloaded, expanded, 45 `R2_*` files copied into the repository. The `py -3.10` scan printed no line in the session paste; the agent's run of the same module over the folder: `CLEAN`, exit 0. |
 | — | ~21:02 | operator (in session) | decision | OD7 settled | Answers: A3 Sonnet 4.6, A5 Opus 4.6, assessor Sonnet 4.6, `global.` excluded and denied in R5. Orchestrator: operator asked for Opus 5; agent pointed to its refusal (`R2_14_converse-opus-5.json`); operator approved Opus 4.6 as interim with Opus 5 as target ("mehet"). Recorded in `aws-redeployment-od7-model-set_2026-10-21`. |
+| — | 2026-10-22 ~13:40 | operator (reported in session) | ok | — | Secret scan re-run in PowerShell with `py -3.10`: `CLEAN`. R2 evidence, OD7 record, register v2 and worklog committed as `690f90c`. Operator confirmed R2 closed. |
 
 ## Notes
 
