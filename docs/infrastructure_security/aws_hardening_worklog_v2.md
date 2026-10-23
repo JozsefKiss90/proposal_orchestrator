@@ -205,3 +205,27 @@ Each entry records the same fields as v1:
 | Next Action | Frontier: R4 (network stack; `network.json` complete), R5 (IAM stack; OD7 list as parameters), R12a (parameterised collector, reads `outputs_contract.json`), with R9, R9e, R10. R4 is the first real stack creation and first shows whether the `DeployTarget` rule evaluates (F-OD6r3-2). |
 
 ---
+
+### 2026-10-24 — R4: network template filled, decisions recorded, step sheet written
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-24T00:40:00Z |
+| Control ID | DC-03, DC-05, DC-06, DC-07, PL-8 (preparation; nothing created yet) |
+| Action Taken | Operator settled the four open points of `plans/aws_redeployment_r4_handoff_2026-10-23.md` §4 in session ('1a, 2b + record igen, 3a read-only, 3c igen, 4 a+b'); recorded as `docs/tier4_orchestration_state/decision_log/aws-redeployment-r4-network_2026-10-24.json` (R4-D1 loopback placeholder replaces the default egress; R4-D2 lasting rule: the VPC's default security group carries no rule; R4-D3 read-only endpoint policy on the deploy bucket with `aws:ResourceAccount` and `aws:PrincipalAccount`; R4-D4 `AWS::EC2::Route` forbidden by the template guard plus `tests/test_aws_network_template.py`). `deploy/aws/templates/10-network.yaml` filled: VPC (DNS on), one private subnet, route table + association, host SG (egress 443 to prefix list inline, to endpoint SG standalone), endpoint SG (ingress 443 from host SG, placeholder egress), S3 gateway endpoint, seven contract outputs; `SkeletonPlaceholder` removed. `tools/aws_template_guard.py` refuses `AWS::EC2::Route` (reported once); guard test fixtures adjusted; `deploy/aws/README.md` updated. `evidence_v2/R4/STEPS.md` (10 steps, three rounds; change set read before execution) and `RUNLOG.md` skeleton written. |
+| Evidence Requested | `R4_01`–`R4_10`, `R4_outputs.json` per `STEPS.md` |
+| Evidence Received | none yet. Agent checks in the device shell (Linux, Python 3.10.12): cfn-lint 1.57.2 `--regions eu-north-1` exit 0 on all six templates; template guard `CLEAN: 6 template(s)`; old-ID guard `CLEAN (20 ids checked)`; secret scan of `evidence_v2/R4` `CLEAN`; `pytest` 143 passed over the four AWS test files and the E0 scaffold test (121 over the four AWS files). |
+| Verification Result | Pending operator run. |
+| Next Action | Operator: round 1 (steps 01–04), hand back; both read `R4_04_change-set.json` (eight `Add` entries, nothing hourly; F-OD6r3-2 shows here) before step 05. |
+
+### 2026-10-24 — R4: network stack created and verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-24T00:55:00Z |
+| Control ID | DC-06, PL-8 (VERIFIED_PASS); DC-03, DC-07 (IN_PROGRESS, SG halves); DC-05 (IN_PROGRESS, S3 half) |
+| Action Taken | Operator ran `evidence_v2/R4/STEPS.md` steps 01–09 on 2026-10-23 22:20–22:41 UTC (PowerShell, profile `po-r1`). Change set `r4-create-01` read by both before execution: eight `Add` entries, nothing hourly. Stack `proposal-orchestrator-network` `CREATE_COMPLETE` (first stack in the account; `cloudformation:CreateStack` allowed in eu-north-1, F-OD1r1-4 Confirmed; the `DeployTarget` rule's pseudo-parameter references accepted, F-OD6r3-2 Confirmed as accepted, enforcement on mismatch Inferred). Outputs saved to `R4_outputs.json`. The VPC's default security group emptied by rule id (R4-D2). Credits 199.99 USD before and after. |
+| Evidence Requested | `R4_01`–`R4_09`, `R4_outputs.json` |
+| Evidence Received | All 29 files; agent re-checked each against the step-sheet criteria in the device shell (`VERIFICATION.md`: every criterion PASS; step 10 pending). Secret scan and old-ID guard CLEAN on the agent's run. |
+| Verification Result | PASS for every criterion of rounds 1–2; ticket criteria 1–4 PASS. Register v2 rows DC-03, DC-05, DC-06, DC-07 (wording corrected), PL-8 updated. |
+| Next Action | Operator: round 3 (step 10: secret scan and old-ID guard over the finished folder), then `py -3.10 -m pytest tests/test_evidence_protocol_scaffold.py` (register v2 statuses) and commit; confirm in session. Agent then ticks R4. R7 then waits only on R6; R11 on R5–R8. |

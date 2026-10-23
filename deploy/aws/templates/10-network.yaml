@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  proposal-orchestrator network stack (filled by ticket R4): a dedicated VPC
-  with no Internet Gateway, one private subnet, a route table with the local
-  route and the S3 prefix list only, the host and endpoint security groups,
-  and an S3 gateway endpoint restricted to the project's own buckets.
-  Skeleton written in R3. Free of hourly cost. See deploy/aws/README.md.
+  proposal-orchestrator network stack (ticket R4): a dedicated VPC with no
+  Internet Gateway, one private subnet, a route table with the local route and
+  the S3 prefix-list route only, the host and endpoint security groups, and an
+  S3 gateway endpoint restricted to the project's own deploy bucket. Free of
+  hourly cost. See deploy/aws/README.md.
 
 Metadata:
   ProposalOrchestrator:
@@ -13,6 +13,7 @@ Metadata:
     FilledBy: R4
     Contract: deploy/aws/outputs_contract.json
     Decision: aws-redeployment-od6-stack-layout-r3_2026-10-22
+    FillDecision: aws-redeployment-r4-network_2026-10-24
 
 Parameters:
   ProjectName:
@@ -62,16 +63,188 @@ Rules:
         AssertDescription: The stack is not being created in ExpectedRegion.
 
 Resources:
-  # R3 skeleton only. R4 replaces this no-cost placeholder with the network
-  # resources and adds the outputs named in deploy/aws/outputs_contract.json.
-  # The Metadata block references every parameter, so the skeleton lints
-  # without unused-parameter warnings.
-  SkeletonPlaceholder:
-    Type: AWS::CloudFormation::WaitConditionHandle
-    Metadata:
-      SkeletonParameters:
-        ProjectName: !Ref ProjectName
-        AvailabilityZone: !Ref AvailabilityZone
-        VpcCidr: !Ref VpcCidr
-        PrivateSubnetCidr: !Ref PrivateSubnetCidr
-        S3PrefixListId: !Ref S3PrefixListId
+  # OD3: a dedicated VPC. No Internet Gateway, no NAT Gateway, no gateway
+  # attachment exists in this template (tools/aws_template_guard.py refuses
+  # them). PL-8: both DNS attributes on, so the interface endpoints' private
+  # DNS names (R11) resolve from the host.
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-vpc"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # OD4: one private subnet in one zone. No public IP on launch.
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: !Ref PrivateSubnetCidr
+      AvailabilityZone: !Ref AvailabilityZone
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-private-subnet"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # DC-06: the route table holds the local route only. The S3 gateway endpoint
+  # adds the one prefix-list route; no AWS::EC2::Route resource exists here.
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-private-rt"
+        - Key: project
+          Value: !Ref ProjectName
+
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+
+  # DC-07 (security-group half): the host may open TCP 443 to the S3 prefix
+  # list (inline, which replaces the AWS default allow-all egress) and to the
+  # endpoint security group (HostToEndpointEgress below, standalone to avoid a
+  # circular reference). No ingress rule: SSM reaches the host through the
+  # ssm/ssmmessages/ec2messages interface endpoints, outbound from the host.
+  HostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: >-
+        proposal-orchestrator host security group. Egress TCP 443 to the
+        endpoint security group and to the S3 prefix list only. No ingress.
+      VpcId: !Ref Vpc
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          DestinationPrefixListId: !Ref S3PrefixListId
+          Description: HTTPS to S3 through the gateway endpoint (AWS-managed S3 prefix list)
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-host-sg"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # DC-03 (security-group half): the interface endpoints (R11) accept TCP 443
+  # from the host security group only. The one egress entry is the documented
+  # placeholder that replaces the AWS default allow-all egress; a loopback
+  # destination matches nothing that leaves a network interface
+  # (aws-redeployment-r4-network_2026-10-24, R4-D1).
+  EndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: >-
+        proposal-orchestrator interface-endpoint security group. Ingress TCP
+        443 from the host security group only. No usable egress.
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref HostSecurityGroup
+          Description: HTTPS from the host security group
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 127.0.0.1/32
+          Description: Placeholder replacing the AWS default allow-all egress; loopback matches no destination
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-endpoint-sg"
+        - Key: project
+          Value: !Ref ProjectName
+
+  HostToEndpointEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !GetAtt HostSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      DestinationSecurityGroupId: !GetAtt EndpointSecurityGroup.GroupId
+      Description: HTTPS to the interface endpoints (endpoint security group)
+
+  # F7 / DC-05 (S3 half): the gateway endpoint on the private route table,
+  # with a policy that admits read-only access to this account's deploy bucket
+  # by principals of this account only. aws:PrincipalAccount refuses requests
+  # signed with another account's credentials (presigned URLs included) and
+  # anonymous requests; aws:ResourceAccount refuses every bucket outside this
+  # account. R5's role policy and R7's bucket policy narrow it further
+  # (aws-redeployment-r4-network_2026-10-24, R4-D3).
+  S3GatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ProjectDeployBucketReadOnlyFromThisAccount
+            Effect: Allow
+            Principal: "*"
+            Action:
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource:
+              - !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}"
+              - !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}/*"
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref "AWS::AccountId"
+                aws:PrincipalAccount: !Ref "AWS::AccountId"
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-s3-gateway-endpoint"
+        - Key: project
+          Value: !Ref ProjectName
+
+Outputs:
+  VpcId:
+    Description: The dedicated VPC (OD3).
+    Value: !Ref Vpc
+    Export:
+      Name: proposal-orchestrator-network-VpcId
+  PrivateSubnetId:
+    Description: The one private subnet (OD4); the host and the interface endpoints go here.
+    Value: !Ref PrivateSubnet
+    Export:
+      Name: proposal-orchestrator-network-PrivateSubnetId
+  PrivateSubnetAz:
+    Description: The zone of the private subnet.
+    Value: !GetAtt PrivateSubnet.AvailabilityZone
+    Export:
+      Name: proposal-orchestrator-network-PrivateSubnetAz
+  PrivateRouteTableId:
+    Description: The route table of the private subnet (local route and the S3 prefix-list route only).
+    Value: !Ref PrivateRouteTable
+    Export:
+      Name: proposal-orchestrator-network-PrivateRouteTableId
+  HostSecurityGroupId:
+    Description: The host security group (DC-07).
+    Value: !GetAtt HostSecurityGroup.GroupId
+    Export:
+      Name: proposal-orchestrator-network-HostSecurityGroupId
+  EndpointSecurityGroupId:
+    Description: The interface-endpoint security group (DC-03).
+    Value: !GetAtt EndpointSecurityGroup.GroupId
+    Export:
+      Name: proposal-orchestrator-network-EndpointSecurityGroupId
+  S3GatewayEndpointId:
+    Description: The S3 gateway endpoint (F7, DC-05).
+    Value: !Ref S3GatewayEndpoint
+    Export:
+      Name: proposal-orchestrator-network-S3GatewayEndpointId

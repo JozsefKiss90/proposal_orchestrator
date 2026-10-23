@@ -1,0 +1,107 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r4-network_2026-10-24",
+  "date": "2026-10-24",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R4 of plans/aws_redeployment_tickets.md (network base stack)",
+  "supersedes": "Nothing. Applies aws-redeployment-od6-stack-layout-r3_2026-10-22 (layout, deploy by change set, guards) and the R0 decisions OD3, OD4 and OD9 to the network stack; adds one lasting rule (R4-D2) and settles the four points of plans/aws_redeployment_r4_handoff_2026-10-23.md section 4.",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-24 on the agent's R4 proposals. Execution aid for infrastructure work (CLAUDE.md section 10.2). Closes no gate, adds no runtime gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-24 ('1a, 2b + record igen, 3a read-only, 3c igen, 4 a+b'), accepting the agent's proposals on the four points of plans/aws_redeployment_r4_handoff_2026-10-23.md section 4",
+  "decision": "The network stack (deploy/aws/templates/10-network.yaml) removes both security groups' AWS-default egress in the template, the endpoint security group keeping the documented loopback placeholder; the VPC's default security group is emptied by the operator after the stack is created and stays empty as a lasting rule; the S3 gateway endpoint policy admits read-only actions on this account's deploy bucket for principals of this account only; the template guard refuses AWS::EC2::Route and a new test pins the network template's shape.",
+  "why": "The handoff's four open points each had one cheap answer that keeps DC-03, DC-06 and DC-07 true for every security group and route table in the VPC, and keeps F7 closed without naming a role that does not exist yet.",
+  "inputs": [
+    "plans/aws_redeployment_r4_handoff_2026-10-23.md sections 1, 3 and 4",
+    "plans/aws_redeployment_tickets.md R4, R5, R7, R11, R12a, R12b, R15",
+    "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F3, F7, F10), section 5 (OD3, OD4, OD9), sections 7 and 7a",
+    "aws-redeployment-od6-stack-layout-r3_2026-10-22 (OD6-r3-deploy, OD6-r3-guards, F-OD6r3-2)",
+    "docs/infrastructure_security/deployment_guide.md (old DC-38 steps that uploaded logs from the host with aws s3 cp); plans/msca_dn_an12_host_runbook.md ('only metadata leaves the host')",
+    "AWS CloudFormation reference pages AWS::EC2::SecurityGroup, AWS::EC2::VPCEndpoint, Rules section and rule-specific intrinsic functions, read 2026-10-24"
+  ],
+  "findings": [
+    {
+      "id": "F-R4-1",
+      "declared_status": "Confirmed",
+      "finding": "CloudFormation adds the allow-all egress rule to a security group only when the template declares no egress rule at all; the AWS::EC2::SecurityGroup reference page documents the inline entry IpProtocol -1 to CidrIp 127.0.0.1/32 as the way to remove it and limit egress to the loopback address, and prescribes standalone AWS::EC2::SecurityGroupEgress/Ingress resources when two groups reference each other.",
+      "basis": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-securitygroup.html, read 2026-10-24 ('When you create a security group, if you do not add egress rules, we add egress rules that allow all outbound IPv4 and IPv6 traffic. Otherwise, we do not add them.'; the 'Remove the default rule' example)."
+    },
+    {
+      "id": "F-R4-2",
+      "declared_status": "Confirmed",
+      "finding": "AWS::EC2::VPCEndpoint takes a Tags property, so the gateway endpoint carries the project tag and tools/aws_template_guard.py's UNTAGGABLE_TYPES needs no new entry for R4. AWS::EC2::Route takes no Tags.",
+      "basis": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpcendpoint.html, read 2026-10-24 (14 properties, Tags among them); cfn-lint 1.57.2 run on the filled template, exit 0."
+    },
+    {
+      "id": "F-R4-3",
+      "declared_status": "Inferred",
+      "finding": "Whether CloudFormation evaluates Ref AWS::AccountId / AWS::Region inside the DeployTarget rule is still unproven (F-OD6r3-2). The Rules-section and rule-functions reference pages name only template parameters in every example and state no rule either way. R4's first change set is the proof; the step sheet stops on a rejection.",
+      "basis": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/rules-section-structure.html and intrinsic-function-reference-rules.html, read 2026-10-24."
+    },
+    {
+      "id": "F-R4-4",
+      "declared_status": "Confirmed",
+      "finding": "The only host-to-S3 write in the old programme was the DC-38 log upload (deployment guide, aws s3 cp of the full-DAG log and run summary), and DC-38 is deferred under OD12. The AN12 runbook says only metadata leaves the host and names no S3 route for it. Nothing planned before R15/R16 writes to S3 from the host.",
+      "basis": "docs/infrastructure_security/deployment_guide.md (DC-38 section); plans/msca_dn_an12_host_runbook.md line 'Only metadata leaves the host'."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R4-D1",
+      "question": "How the AWS-default allow-all egress is removed from both security groups (handoff section 4, point 1)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "In the template. The host security group declares its S3 prefix-list egress inline (which replaces its default rule) and its egress to the endpoint security group as a standalone AWS::EC2::SecurityGroupEgress. The endpoint security group declares its ingress from the host group inline and one inline egress entry, the documented loopback placeholder (IpProtocol -1, CidrIp 127.0.0.1/32), which replaces its default rule. The placeholder is accepted as the evidence of 'no egress': describe-security-group-rules will show that one egress rule on the endpoint group, with a Description that names it as the placeholder.",
+      "reason": "Operator's answer '1a'. The documented pattern (F-R4-1); no circular reference; no post-creation CLI edit of a template-managed resource, so no drift.",
+      "consequence": "Register v2 DC-03 reads 'no other rules apart from the loopback placeholder that replaces AWS's default egress'. tests/test_aws_network_template.py pins the placeholder as the only CIDR rule in the template."
+    },
+    {
+      "id": "R4-D2",
+      "question": "The VPC's default security group (handoff section 4, point 2)",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "Lasting rule: the default security group of every project VPC carries no rule. CloudFormation cannot manage it, so after the stack is created the operator records its rules, revokes every ingress and egress rule by rule id (revoke-security-group-ingress/egress --security-group-rule-ids), and records the empty rule list; both records are R4 evidence. Nothing is ever attached to the default group. The rule holds for the lifetime of the VPC: a stack update never re-creates the default group, and the R12a collector checks that it is still empty.",
+      "reason": "Operator's answer '2b + record igen'. Cheap; DC-06 and DC-07 then hold for every security group in the VPC, not only the two the template manages.",
+      "consequence": "R4 step sheet step 08 (before, revoke, after). R12a adds one check: the default security group of the VpcId in R4_outputs.json has zero rules. If the VPC is ever replaced, the step is repeated for the new VPC in that ticket."
+    },
+    {
+      "id": "R4-D3",
+      "question": "S3 gateway endpoint policy (handoff section 4, point 3)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "One Allow statement, Principal '*', actions s3:GetObject, s3:ListBucket and s3:GetBucketLocation (read-only), resources arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId} and its objects, with Condition StringEquals on both aws:ResourceAccount and aws:PrincipalAccount = ${AWS::AccountId}. The trail bucket is not named (CloudTrail writes service-side). The AL2023 repository buckets are not named (OD9: offline bundle). The SSM Agent's regional buckets are not named; R11 shows whether Run Command needs them. The runtime role is not named (it does not exist before R5); R5's role policy and R7's bucket policy narrow access further.",
+      "reason": "Operator's answers '3a read-only' and '3c igen'. aws:PrincipalAccount refuses requests signed with another account's credentials, presigned URLs included, and anonymous requests; aws:ResourceAccount refuses every bucket outside the account; the bucket ARNs are the second belt. Nothing before R15/R16 writes to S3 from the host (F-R4-4).",
+      "consequence": "If a later ticket needs an upload route from the host (R15 export, R16 DC-38 logs) or Run Command needs an SSM bucket (R11), that ticket adds a statement by an UPDATE change set, with evidence, and writes a successor to this record. R12b's F7 negative test (presigned PUT to an outside bucket refused) is unchanged."
+    },
+    {
+      "id": "R4-D4",
+      "question": "Guard-test extension (handoff section 4, point 4)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Both: (a) AWS::EC2::Route joins FORBIDDEN_RESOURCE_TYPES in tools/aws_template_guard.py, for every template, since no project template writes a route (the S3 gateway endpoint adds the one prefix-list route itself); a forbidden type is reported once, without a project-tag finding. (b) tests/test_aws_network_template.py pins the network template's shape: the eight resources, both DNS attributes, no public IP on launch, the host group's two egress rules and no ingress, the endpoint group's one ingress and the placeholder egress, the gateway endpoint on the one route table, the read-only policy whose every resource ends in ${AWS::AccountId} or ${AWS::AccountId}/*, both conditions, Name and project tags, and the contract outputs. UNTAGGABLE_TYPES is unchanged (F-R4-2).",
+      "reason": "Operator's answer '4 a+b'. Both are cheap and run under py -3.10 with the R3 tests.",
+      "consequence": "The guard's open-cidr fixture in tests/test_aws_template_guard.py now plants a 0.0.0.0/0 security-group rule instead of a route, and a new case plants a prefix-list route. deploy/aws/README.md lists the new rule."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "R4-D3",
+      "declared_status": "Inferred",
+      "gap": "Whether SSM Run Command on the R11 host needs the SSM Agent's regional S3 buckets through the gateway endpoint. Left out, fail-closed; R11 shows it."
+    },
+    {
+      "decision": "R4-D1",
+      "declared_status": "Inferred",
+      "gap": "Whether CloudFormation evaluates the DeployTarget rule's pseudo-parameter references at change-set creation (F-OD6r3-2 / F-R4-3). R4 step 04 shows it; on a rejection the step sheet stops and the operator settles the successor."
+    }
+  ],
+  "not_evidence_of": [
+    "Any AWS resource in account 797661577394: this record precedes the first change set.",
+    "That the stack creates successfully, or that cloudformation:CreateStack is allowed in eu-north-1 (F-OD1r1-4)."
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account.",
+    "basis": "Template structure, parameter names, the new account's id and AWS documentation references only."
+  }
+}

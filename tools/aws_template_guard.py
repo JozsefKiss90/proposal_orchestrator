@@ -10,7 +10,10 @@ Checks, each reported under its name:
 
 ``forbidden-type``
     No Internet Gateway, egress-only Internet Gateway, NAT Gateway, Elastic
-    IP or gateway attachment (ADR-001 D2, D7, D8).
+    IP or gateway attachment (ADR-001 D2, D7, D8), and no ``AWS::EC2::Route``
+    at all: the only route a project route table carries besides ``local`` is
+    the prefix-list route the S3 gateway endpoint adds itself (ticket R4,
+    ``aws-redeployment-r4-network_2026-10-24`` R4-D4).
 ``open-cidr``
     No ``0.0.0.0/0`` or ``::/0`` anywhere in the template: no such route and
     no such security-group rule, not even temporarily.
@@ -63,6 +66,7 @@ FORBIDDEN_RESOURCE_TYPES = frozenset(
         "AWS::EC2::NatGateway",
         "AWS::EC2::EIP",
         "AWS::EC2::VPCGatewayAttachment",
+        "AWS::EC2::Route",
     }
 )
 
@@ -204,6 +208,7 @@ def check_template(path: Path) -> list[Finding]:
         rtype = (resource or {}).get("Type", "")
         if rtype in FORBIDDEN_RESOURCE_TYPES:
             add("forbidden-type", ("Resources", str(logical_id), "Type"))
+            continue  # a forbidden resource is reported once; its tags do not matter
         if rtype not in UNTAGGABLE_TYPES:
             tags = ((resource or {}).get("Properties") or {}).get("Tags")
             if not _has_project_tag(tags):

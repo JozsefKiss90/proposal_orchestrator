@@ -2,7 +2,7 @@
 
 Suggested in ``plans/aws_redeployment_r3_handoff_2026-10-22.md`` §2 and
 approved by the operator on 2026-10-22: no Internet or NAT gateway or Elastic
-IP, no ``0.0.0.0/0``, the project tag on every taggable resource, no
+IP (and, since R4, no ``AWS::EC2::Route``), no ``0.0.0.0/0``, the project tag on every taggable resource, no
 "temporary" or "validation" in a name or description (R5), no Region literal
 outside a parameter default (F9), no account literal, and a template small
 enough for ``--template-body``.
@@ -73,13 +73,14 @@ PLANTED = {
           Value: proposal-orchestrator
 """,
     "open-cidr": """\
-  Route:
-    Type: AWS::EC2::Route
+  OpenIngress:
+    Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      DestinationCidrBlock: 0.0.0.0/0
-      Tags:
-        - Key: project
-          Value: proposal-orchestrator
+      GroupId: !GetAtt HostSg.GroupId
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIp: 0.0.0.0/0
 """,
     "project-tag": """\
   Subnet:
@@ -161,9 +162,23 @@ def test_each_check_refuses_its_planted_fixture(tmp_path: Path, check: str) -> N
 
 
 def test_ipv6_open_cidr_is_refused(tmp_path: Path) -> None:
-    body = PLANTED["open-cidr"].replace("DestinationCidrBlock: 0.0.0.0/0", 'DestinationIpv6CidrBlock: "::/0"')
+    body = PLANTED["open-cidr"].replace("CidrIp: 0.0.0.0/0", 'CidrIpv6: "::/0"')
 
     assert {f.check for f in guard.check_template(_write(tmp_path, body))} == {"open-cidr"}
+
+
+def test_route_resource_is_refused_even_to_a_prefix_list(tmp_path: Path) -> None:
+    """R4 (R4-D4): no template writes a route; the S3 gateway endpoint adds its own."""
+    body = """\
+  PrefixListRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationPrefixListId: !Ref S3PrefixListId
+      VpcEndpointId: !Ref S3GatewayEndpoint
+"""
+
+    assert {f.check for f in guard.check_template(_write(tmp_path, CLEAN_RESOURCES + body))} == {"forbidden-type"}
 
 
 def test_temporary_in_a_description_is_refused(tmp_path: Path) -> None:

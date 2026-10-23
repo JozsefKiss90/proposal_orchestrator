@@ -1,0 +1,50 @@
+﻿{
+    "VpcEndpoints": [
+        {
+            "VpcEndpointId": "vpce-0770a3016be1317ef",
+            "VpcEndpointType": "Gateway",
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "ServiceName": "com.amazonaws.eu-north-1.s3",
+            "State": "available",
+            "PolicyDocument": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ProjectDeployBucketReadOnlyFromThisAccount\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"s3:GetObject\",\"s3:ListBucket\",\"s3:GetBucketLocation\"],\"Resource\":[\"arn:aws:s3:::proposal-orchestrator-deploy-797661577394\",\"arn:aws:s3:::proposal-orchestrator-deploy-797661577394/*\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalAccount\":\"797661577394\",\"aws:ResourceAccount\":\"797661577394\"}}}]}",
+            "RouteTableIds": [
+                "rtb-043f4e86aa0b174e2"
+            ],
+            "SubnetIds": [],
+            "Groups": [],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "service-defined"
+            },
+            "PrivateDnsEnabled": false,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [],
+            "DnsEntries": [],
+            "CreationTimestamp": "2026-10-23T22:30:59+00:00",
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-network"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "S3GatewayEndpoint"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-network/fdc73720-cf2f-11f1-866c-06ffd346fdd9"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-s3-gateway-endpoint"
+                }
+            ],
+            "OwnerId": "797661577394",
+            "ServiceRegion": "eu-north-1"
+        }
+    ]
+}

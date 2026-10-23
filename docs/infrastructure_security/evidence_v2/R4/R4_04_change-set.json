@@ -1,0 +1,139 @@
+﻿{
+    "Changes": [
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "EndpointSecurityGroup",
+                "ResourceType": "AWS::EC2::SecurityGroup",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "HostSecurityGroup",
+                "ResourceType": "AWS::EC2::SecurityGroup",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "HostToEndpointEgress",
+                "ResourceType": "AWS::EC2::SecurityGroupEgress",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "PrivateRouteTable",
+                "ResourceType": "AWS::EC2::RouteTable",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "PrivateSubnetRouteTableAssociation",
+                "ResourceType": "AWS::EC2::SubnetRouteTableAssociation",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "PrivateSubnet",
+                "ResourceType": "AWS::EC2::Subnet",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "S3GatewayEndpoint",
+                "ResourceType": "AWS::EC2::VPCEndpoint",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "Vpc",
+                "ResourceType": "AWS::EC2::VPC",
+                "Scope": [],
+                "Details": []
+            }
+        }
+    ],
+    "ChangeSetName": "r4-create-01",
+    "ChangeSetId": "arn:aws:cloudformation:eu-north-1:797661577394:changeSet/r4-create-01/ff53fe2f-db8b-40ec-b354-8519e64b36e9",
+    "StackId": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-network/fdc73720-cf2f-11f1-866c-06ffd346fdd9",
+    "StackName": "proposal-orchestrator-network",
+    "Description": null,
+    "Parameters": [
+        {
+            "ParameterKey": "PrivateSubnetCidr",
+            "ParameterValue": "10.60.0.0/25"
+        },
+        {
+            "ParameterKey": "VpcCidr",
+            "ParameterValue": "10.60.0.0/24"
+        },
+        {
+            "ParameterKey": "ProjectName",
+            "ParameterValue": "proposal-orchestrator"
+        },
+        {
+            "ParameterKey": "ExpectedAccountId",
+            "ParameterValue": "797661577394"
+        },
+        {
+            "ParameterKey": "AvailabilityZone",
+            "ParameterValue": "eu-north-1a"
+        },
+        {
+            "ParameterKey": "S3PrefixListId",
+            "ParameterValue": "pl-c3aa4faa"
+        },
+        {
+            "ParameterKey": "ExpectedRegion",
+            "ParameterValue": "eu-north-1"
+        }
+    ],
+    "CreationTime": "2026-10-23T22:20:45.410000+00:00",
+    "ExecutionStatus": "AVAILABLE",
+    "Status": "CREATE_COMPLETE",
+    "StatusReason": null,
+    "NotificationARNs": [],
+    "RollbackConfiguration": {},
+    "Capabilities": [],
+    "Tags": [
+        {
+            "Key": "project",
+            "Value": "proposal-orchestrator"
+        }
+    ],
+    "ParentChangeSetId": null,
+    "IncludeNestedStacks": false,
+    "RootChangeSetId": null,
+    "OnStackFailure": null,
+    "ImportExistingResources": null,
+    "StackDriftStatus": null,
+    "DeploymentMode": null
+}

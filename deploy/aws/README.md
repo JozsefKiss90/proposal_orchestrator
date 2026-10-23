@@ -31,11 +31,15 @@ R3 wrote every template as a **skeleton**: parameters, the `DeployTarget` rule a
 `SkeletonPlaceholder` (`AWS::CloudFormation::WaitConditionHandle`). The ticket in "Filled by"
 replaces the placeholder with the real resources and adds the outputs.
 
+Filled so far: `10-network.yaml` (R4, `aws-redeployment-r4-network_2026-10-24`; its shape is pinned by
+`tests/test_aws_network_template.py`).
+
 ## Rules every template keeps
 
 Checked by `tools/aws_template_guard.py` (and `tests/test_aws_template_guard.py`):
 
-- No Internet Gateway, egress-only gateway, NAT Gateway, Elastic IP or gateway attachment.
+- No Internet Gateway, egress-only gateway, NAT Gateway, Elastic IP or gateway attachment, and no
+  `AWS::EC2::Route` at all: the S3 gateway endpoint adds the one prefix-list route itself (R4).
 - No `0.0.0.0/0` or `::/0` anywhere: no such route and no such security-group rule.
 - Every resource that takes tags carries `project` = `proposal-orchestrator`. The stack tag is set
   on every change set too.
@@ -101,7 +105,7 @@ Each run:
 .\.venv-lint\Scripts\cfn-lint.exe --regions eu-north-1 -- deploy/aws/templates/*.yaml
 py -3.10 -m tools.aws_template_guard deploy/aws/templates
 py -3.10 -m tools.old_id_guard
-py -3.10 -m pytest tests/test_aws_iac_contract.py tests/test_aws_template_guard.py tests/test_old_id_guard.py
+py -3.10 -m pytest tests/test_aws_iac_contract.py tests/test_aws_template_guard.py tests/test_aws_network_template.py tests/test_old_id_guard.py
 ```
 
 `cfn-lint` exits 0 when it finds nothing. A ticket's step sheet saves this output as evidence.

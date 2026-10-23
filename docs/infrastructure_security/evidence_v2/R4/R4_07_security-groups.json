@@ -1,0 +1,118 @@
+﻿{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-0c4e5657a1bd246ff",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 443,
+                    "ToPort": 443,
+                    "UserIdGroupPairs": [
+                        {
+                            "Description": "HTTPS to the interface endpoints (endpoint security group)",
+                            "UserId": "797661577394",
+                            "GroupId": "sg-03cd8ea2cf5dae72c"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": [
+                        {
+                            "Description": "HTTPS to S3 through the gateway endpoint (AWS-managed S3 prefix list)",
+                            "PrefixListId": "pl-c3aa4faa"
+                        }
+                    ]
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-network"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "HostSecurityGroup"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-host-sg"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-network/fdc73720-cf2f-11f1-866c-06ffd346fdd9"
+                }
+            ],
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "SecurityGroupArn": "arn:aws:ec2:eu-north-1:797661577394:security-group/sg-0c4e5657a1bd246ff",
+            "OwnerId": "797661577394",
+            "GroupName": "proposal-orchestrator-network-HostSecurityGroup-LsxaMqo80str",
+            "Description": "proposal-orchestrator host security group. Egress TCP 443 to the endpoint security group and to the S3 prefix list only. No ingress.",
+            "IpPermissions": []
+        },
+        {
+            "GroupId": "sg-03cd8ea2cf5dae72c",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "Description": "Placeholder replacing the AWS default allow-all egress; loopback matches no destination",
+                            "CidrIp": "127.0.0.1/32"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-network/fdc73720-cf2f-11f1-866c-06ffd346fdd9"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-endpoint-sg"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "EndpointSecurityGroup"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-network"
+                }
+            ],
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "SecurityGroupArn": "arn:aws:ec2:eu-north-1:797661577394:security-group/sg-03cd8ea2cf5dae72c",
+            "OwnerId": "797661577394",
+            "GroupName": "proposal-orchestrator-network-EndpointSecurityGroup-oUg8d8raT4Nq",
+            "Description": "proposal-orchestrator interface-endpoint security group. Ingress TCP 443 from the host security group only. No usable egress.",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 443,
+                    "ToPort": 443,
+                    "UserIdGroupPairs": [
+                        {
+                            "Description": "HTTPS from the host security group",
+                            "UserId": "797661577394",
+                            "GroupId": "sg-0c4e5657a1bd246ff"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        }
+    ]
+}

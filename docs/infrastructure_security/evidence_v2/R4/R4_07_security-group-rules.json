@@ -1,0 +1,62 @@
+﻿{
+    "SecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-042f600bc63d1ec89",
+            "GroupId": "sg-0c4e5657a1bd246ff",
+            "GroupOwnerId": "797661577394",
+            "IsEgress": true,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "PrefixListId": "pl-c3aa4faa",
+            "Description": "HTTPS to S3 through the gateway endpoint (AWS-managed S3 prefix list)",
+            "Tags": [],
+            "SecurityGroupRuleArn": "arn:aws:ec2:eu-north-1:797661577394:security-group-rule/sgr-042f600bc63d1ec89"
+        },
+        {
+            "SecurityGroupRuleId": "sgr-019a4a04c0f6cdf8e",
+            "GroupId": "sg-03cd8ea2cf5dae72c",
+            "GroupOwnerId": "797661577394",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "ReferencedGroupInfo": {
+                "GroupId": "sg-0c4e5657a1bd246ff",
+                "UserId": "797661577394"
+            },
+            "Description": "HTTPS from the host security group",
+            "Tags": [],
+            "SecurityGroupRuleArn": "arn:aws:ec2:eu-north-1:797661577394:security-group-rule/sgr-019a4a04c0f6cdf8e"
+        },
+        {
+            "SecurityGroupRuleId": "sgr-03eb818e163333a43",
+            "GroupId": "sg-03cd8ea2cf5dae72c",
+            "GroupOwnerId": "797661577394",
+            "IsEgress": true,
+            "IpProtocol": "-1",
+            "FromPort": -1,
+            "ToPort": -1,
+            "CidrIpv4": "127.0.0.1/32",
+            "Description": "Placeholder replacing the AWS default allow-all egress; loopback matches no destination",
+            "Tags": [],
+            "SecurityGroupRuleArn": "arn:aws:ec2:eu-north-1:797661577394:security-group-rule/sgr-03eb818e163333a43"
+        },
+        {
+            "SecurityGroupRuleId": "sgr-0b5db6961605f27d0",
+            "GroupId": "sg-0c4e5657a1bd246ff",
+            "GroupOwnerId": "797661577394",
+            "IsEgress": true,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "ReferencedGroupInfo": {
+                "GroupId": "sg-03cd8ea2cf5dae72c",
+                "UserId": "797661577394"
+            },
+            "Description": "HTTPS to the interface endpoints (endpoint security group)",
+            "Tags": [],
+            "SecurityGroupRuleArn": "arn:aws:ec2:eu-north-1:797661577394:security-group-rule/sgr-0b5db6961605f27d0"
+        }
+    ]
+}
