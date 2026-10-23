@@ -1,0 +1,37 @@
+﻿{
+    "Parameters": [
+        {
+            "ParameterKey": "FoundationModelArns",
+            "NoEcho": false,
+            "Description": "ARNs of the foundation models those profiles route to, one per model and routed Region (OD7-resources, F2)."
+        },
+        {
+            "ParameterKey": "RoutedRegions",
+            "NoEcho": false,
+            "Description": "The Regions the chosen profiles route to (OD7, F-R2-5); the approved Regions of DC-16."
+        },
+        {
+            "ParameterKey": "ProjectName",
+            "DefaultValue": "proposal-orchestrator",
+            "NoEcho": false,
+            "Description": "Name prefix of every resource and value of the project tag."
+        },
+        {
+            "ParameterKey": "ExpectedAccountId",
+            "NoEcho": false,
+            "Description": "The account this stack must be created in. A rule compares it with AWS::AccountId."
+        },
+        {
+            "ParameterKey": "InferenceProfileArns",
+            "NoEcho": false,
+            "Description": "ARNs of the eu. system-defined inference profiles the host may invoke (OD7-resources). A list, never a literal in a policy, so that the interim Opus 4.6 can be replaced by the target model."
+        },
+        {
+            "ParameterKey": "ExpectedRegion",
+            "DefaultValue": "eu-north-1",
+            "NoEcho": false,
+            "Description": "The Region this stack must be created in (OD1-r1). A rule compares it with AWS::Region."
+        }
+    ],
+    "Description": "proposal-orchestrator IAM stack (filled by ticket R5): the one hardened runtime role and its instance profile (OD2 a), with the permission boundary, the explicit deny, an invoke policy naming the OD7 inference profiles and every foundation model they route to (F2), the supporting-services policy and a deploy-bucket read scoped to its prefixes; plus the flow-logs role. Skeleton written in R3. Free of hourly cost. See deploy/aws/README.md."
+}

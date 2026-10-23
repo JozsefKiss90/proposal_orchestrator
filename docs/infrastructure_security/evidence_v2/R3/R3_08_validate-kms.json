@@ -1,0 +1,27 @@
+﻿{
+    "Parameters": [
+        {
+            "ParameterKey": "ProjectName",
+            "DefaultValue": "proposal-orchestrator",
+            "NoEcho": false,
+            "Description": "Name prefix of every resource and value of the project tag."
+        },
+        {
+            "ParameterKey": "ExpectedAccountId",
+            "NoEcho": false,
+            "Description": "The account this stack must be created in. A rule compares it with AWS::AccountId."
+        },
+        {
+            "ParameterKey": "AdminRoleArn",
+            "NoEcho": false,
+            "Description": "The admin principal of the key policy (OD11-r2): the AWS-managed AccountFullAccessRole, with its path, exactly as evidence_v2/R1/R1_00_role.json reports its Arn."
+        },
+        {
+            "ParameterKey": "ExpectedRegion",
+            "DefaultValue": "eu-north-1",
+            "NoEcho": false,
+            "Description": "The Region this stack must be created in (OD1-r1). A rule compares it with AWS::Region."
+        }
+    ],
+    "Description": "proposal-orchestrator KMS stack (filled by ticket R6): one customer-managed key with rotation on and the alias alias/proposal-orchestrator. Its key policy grants the account root, the admin role, the runtime role (imported from the IAM stack), CloudTrail scoped by source ARN and CloudWatch Logs scoped to the project's log-group prefix. Skeleton written in R3. Free of hourly cost. See deploy/aws/README.md."
+}

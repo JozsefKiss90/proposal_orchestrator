@@ -1,0 +1,129 @@
+{
+  "schema": "proposal-orchestrator-iac-contract/1",
+  "project": "proposal-orchestrator",
+  "decision": "aws-redeployment-od6-stack-layout-r3_2026-10-22",
+  "purpose": "The stacks, their deploy order, their parameter files, and every stack output later tickets and the R12a evidence collector read. A template's Outputs must match this file once its ticket has replaced the skeleton placeholder (tests/test_aws_iac_contract.py).",
+  "export_name_rule": "<project>-<stack key>-<OutputKey>, only for stacks with exports true",
+  "outputs_file_rule": "After each create or update, the operator saves `aws cloudformation describe-stacks --stack-name <stack_name> --query \"Stacks[0].Outputs\" --output json` as docs/infrastructure_security/evidence_v2/<ticket>/<ticket>_outputs.json. Later step sheets and the collector take ids only from those files.",
+  "stacks": [
+    {
+      "key": "network",
+      "order": 1,
+      "stack_name": "proposal-orchestrator-network",
+      "ticket": "R4",
+      "lifecycle": "base",
+      "hourly_cost": false,
+      "exports": true,
+      "template": "deploy/aws/templates/10-network.yaml",
+      "parameters": "deploy/aws/parameters/network.json",
+      "parameters_from_evidence": {
+        "AvailabilityZone": "docs/infrastructure_security/evidence_v2/R3/R3_05_endpoint-services.json",
+        "S3PrefixListId": "docs/infrastructure_security/evidence_v2/R3/R3_06_s3-prefix-list.json"
+      },
+      "outputs": {
+        "VpcId": {"export": "proposal-orchestrator-network-VpcId", "consumers": ["R12a"]},
+        "PrivateSubnetId": {"export": "proposal-orchestrator-network-PrivateSubnetId", "consumers": ["R7", "R11", "R12a"]},
+        "PrivateSubnetAz": {"export": "proposal-orchestrator-network-PrivateSubnetAz", "consumers": ["R11", "R12a"]},
+        "PrivateRouteTableId": {"export": "proposal-orchestrator-network-PrivateRouteTableId", "consumers": ["R12a"]},
+        "HostSecurityGroupId": {"export": "proposal-orchestrator-network-HostSecurityGroupId", "consumers": ["R11", "R12a"]},
+        "EndpointSecurityGroupId": {"export": "proposal-orchestrator-network-EndpointSecurityGroupId", "consumers": ["R11", "R12a"]},
+        "S3GatewayEndpointId": {"export": "proposal-orchestrator-network-S3GatewayEndpointId", "consumers": ["R12a"]}
+      }
+    },
+    {
+      "key": "iam",
+      "order": 2,
+      "stack_name": "proposal-orchestrator-iam",
+      "ticket": "R5",
+      "lifecycle": "base",
+      "hourly_cost": false,
+      "exports": true,
+      "template": "deploy/aws/templates/20-iam.yaml",
+      "parameters": "deploy/aws/parameters/iam.json",
+      "parameters_from_evidence": {},
+      "outputs": {
+        "RuntimeRoleName": {"export": "proposal-orchestrator-iam-RuntimeRoleName", "consumers": ["R12a"]},
+        "RuntimeRoleArn": {"export": "proposal-orchestrator-iam-RuntimeRoleArn", "consumers": ["R6", "R7", "R8", "R11", "R12a"]},
+        "InstanceProfileName": {"export": "proposal-orchestrator-iam-InstanceProfileName", "consumers": ["R11", "R12a"]},
+        "InstanceProfileArn": {"export": "proposal-orchestrator-iam-InstanceProfileArn", "consumers": ["R11", "R12a"]},
+        "PermissionBoundaryArn": {"export": "proposal-orchestrator-iam-PermissionBoundaryArn", "consumers": ["R12a"]},
+        "ExplicitDenyPolicyArn": {"export": "proposal-orchestrator-iam-ExplicitDenyPolicyArn", "consumers": ["R12a"]},
+        "FlowLogsRoleArn": {"export": "proposal-orchestrator-iam-FlowLogsRoleArn", "consumers": ["R7", "R12a"]}
+      }
+    },
+    {
+      "key": "kms",
+      "order": 3,
+      "stack_name": "proposal-orchestrator-kms",
+      "ticket": "R6",
+      "lifecycle": "base",
+      "hourly_cost": false,
+      "exports": true,
+      "template": "deploy/aws/templates/30-kms.yaml",
+      "parameters": "deploy/aws/parameters/kms.json",
+      "parameters_from_evidence": {},
+      "outputs": {
+        "KeyArn": {"export": "proposal-orchestrator-kms-KeyArn", "consumers": ["R7", "R8", "R12a"]},
+        "KeyId": {"export": "proposal-orchestrator-kms-KeyId", "consumers": ["R12a"]},
+        "KeyAliasName": {"export": "proposal-orchestrator-kms-KeyAliasName", "consumers": ["R12a"]}
+      }
+    },
+    {
+      "key": "audit",
+      "order": 4,
+      "stack_name": "proposal-orchestrator-audit",
+      "ticket": "R7",
+      "lifecycle": "base",
+      "hourly_cost": false,
+      "exports": true,
+      "template": "deploy/aws/templates/40-audit.yaml",
+      "parameters": "deploy/aws/parameters/audit.json",
+      "parameters_from_evidence": {},
+      "outputs": {
+        "TrailBucketName": {"export": "proposal-orchestrator-audit-TrailBucketName", "consumers": ["R12a"]},
+        "DeployBucketName": {"export": "proposal-orchestrator-audit-DeployBucketName", "consumers": ["R12a", "R15"]},
+        "TrailArn": {"export": "proposal-orchestrator-audit-TrailArn", "consumers": ["R12a"]},
+        "FlowLogGroupName": {"export": "proposal-orchestrator-audit-FlowLogGroupName", "consumers": ["R12a"]},
+        "FlowLogGroupArn": {"export": "proposal-orchestrator-audit-FlowLogGroupArn", "consumers": ["R12a"]},
+        "FlowLogId": {"export": "proposal-orchestrator-audit-FlowLogId", "consumers": ["R12a"]}
+      }
+    },
+    {
+      "key": "secret",
+      "order": 5,
+      "stack_name": "proposal-orchestrator-secret",
+      "ticket": "R8",
+      "lifecycle": "base",
+      "hourly_cost": false,
+      "exports": true,
+      "template": "deploy/aws/templates/50-secret.yaml",
+      "parameters": "deploy/aws/parameters/secret.json",
+      "parameters_from_evidence": {},
+      "outputs": {
+        "SecretArn": {"export": "proposal-orchestrator-secret-SecretArn", "consumers": ["R9", "R11", "R12a"]},
+        "SecretName": {"export": "proposal-orchestrator-secret-SecretName", "consumers": ["R9", "R12a"]}
+      }
+    },
+    {
+      "key": "host",
+      "order": 6,
+      "stack_name": "proposal-orchestrator-host",
+      "ticket": "R11",
+      "lifecycle": "per_session",
+      "hourly_cost": true,
+      "exports": false,
+      "template": "deploy/aws/templates/90-host.yaml",
+      "parameters": "deploy/aws/parameters/host.json",
+      "parameters_from_evidence": {},
+      "outputs": {
+        "BedrockRuntimeEndpointId": {"export": null, "consumers": ["R12a"]},
+        "StsEndpointId": {"export": null, "consumers": ["R12a"]},
+        "SecretsManagerEndpointId": {"export": null, "consumers": ["R12a"]},
+        "SsmEndpointId": {"export": null, "consumers": ["R12a"]},
+        "SsmMessagesEndpointId": {"export": null, "consumers": ["R12a"]},
+        "Ec2MessagesEndpointId": {"export": null, "consumers": ["R12a"]},
+        "InstanceId": {"export": null, "consumers": ["R12a", "R12b", "R14", "R15"]}
+      }
+    }
+  ]
+}

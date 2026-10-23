@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  proposal-orchestrator IAM stack (filled by ticket R5): the one hardened
+  runtime role and its instance profile (OD2 a), with the permission
+  boundary, the explicit deny, an invoke policy naming the OD7 inference
+  profiles and every foundation model they route to (F2), the
+  supporting-services policy and a deploy-bucket read scoped to its prefixes;
+  plus the flow-logs role. Skeleton written in R3. Free of hourly cost.
+  See deploy/aws/README.md.
+
+Metadata:
+  ProposalOrchestrator:
+    Stack: iam
+    StackName: proposal-orchestrator-iam
+    FilledBy: R5
+    Contract: deploy/aws/outputs_contract.json
+    Decision: aws-redeployment-od6-stack-layout-r3_2026-10-22
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: proposal-orchestrator
+    AllowedValues:
+      - proposal-orchestrator
+    Description: Name prefix of every resource and value of the project tag.
+  ExpectedAccountId:
+    Type: String
+    AllowedPattern: "^[0-9]{12}$"
+    Description: The account this stack must be created in. A rule compares it with AWS::AccountId.
+  ExpectedRegion:
+    Type: String
+    Default: eu-north-1
+    AllowedPattern: "^[a-z]{2}-[a-z]+-[0-9]$"
+    Description: The Region this stack must be created in (OD1-r1). A rule compares it with AWS::Region.
+  InferenceProfileArns:
+    Type: CommaDelimitedList
+    Description: >-
+      ARNs of the eu. system-defined inference profiles the host may invoke
+      (OD7-resources). A list, never a literal in a policy, so that the
+      interim Opus 4.6 can be replaced by the target model.
+  FoundationModelArns:
+    Type: CommaDelimitedList
+    Description: >-
+      ARNs of the foundation models those profiles route to, one per model
+      and routed Region (OD7-resources, F2).
+  RoutedRegions:
+    Type: CommaDelimitedList
+    Description: >-
+      The Regions the chosen profiles route to (OD7, F-R2-5); the approved
+      Regions of DC-16.
+
+Rules:
+  DeployTarget:
+    Assertions:
+      - Assert: !Equals [!Ref ExpectedAccountId, !Ref "AWS::AccountId"]
+        AssertDescription: The stack is not being created in ExpectedAccountId.
+      - Assert: !Equals [!Ref ExpectedRegion, !Ref "AWS::Region"]
+        AssertDescription: The stack is not being created in ExpectedRegion.
+
+Resources:
+  # R3 skeleton only. R5 replaces this no-cost placeholder with the IAM
+  # resources and adds the outputs named in deploy/aws/outputs_contract.json.
+  # The Metadata block references every parameter, so the skeleton lints
+  # without unused-parameter warnings.
+  SkeletonPlaceholder:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Metadata:
+      SkeletonParameters:
+        ProjectName: !Ref ProjectName
+        InferenceProfileArns: !Ref InferenceProfileArns
+        FoundationModelArns: !Ref FoundationModelArns
+        RoutedRegions: !Ref RoutedRegions

@@ -1,0 +1,7 @@
+# Lint toolchain for the CloudFormation templates in deploy/aws/templates/ (ticket R3).
+# Installed into its own virtual environment, not into the py -3.10 test environment
+# (cfn-lint brings many dependencies). See deploy/aws/README.md, "Lint".
+#
+# Pinned to a release at least two weeks old when R3 was written (2026-10-22):
+# 1.57.2 was published 2026-10-06; 1.58.0 (2026-10-20) was too new.
+cfn-lint==1.57.2

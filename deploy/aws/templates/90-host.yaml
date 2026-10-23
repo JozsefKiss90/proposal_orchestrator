@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  proposal-orchestrator endpoints-and-host stack (filled by ticket R11): the
+  part with an hourly cost. Interface endpoints for bedrock-runtime, sts,
+  secretsmanager, ssm, ssmmessages and ec2messages with private DNS in the
+  one zone (OD4), a Bedrock endpoint policy naming the runtime role and the
+  OD7 resources, and the host (OD9) with no public IP, IMDSv2 required with
+  hop limit 1, an encrypted gp3 root volume deleted on termination and the
+  runtime instance profile. Created and deleted per working session (OD5),
+  each time with the operator's explicit go. Imports from the base stacks
+  and exports nothing. Skeleton written in R3. See deploy/aws/README.md.
+
+Metadata:
+  ProposalOrchestrator:
+    Stack: host
+    StackName: proposal-orchestrator-host
+    FilledBy: R11
+    Contract: deploy/aws/outputs_contract.json
+    Decision: aws-redeployment-od6-stack-layout-r3_2026-10-22
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: proposal-orchestrator
+    AllowedValues:
+      - proposal-orchestrator
+    Description: Name prefix of every resource and value of the project tag.
+  ExpectedAccountId:
+    Type: String
+    AllowedPattern: "^[0-9]{12}$"
+    Description: The account this stack must be created in. A rule compares it with AWS::AccountId.
+  ExpectedRegion:
+    Type: String
+    Default: eu-north-1
+    AllowedPattern: "^[a-z]{2}-[a-z]+-[0-9]$"
+    Description: The Region this stack must be created in (OD1-r1). A rule compares it with AWS::Region.
+  InferenceProfileArns:
+    Type: CommaDelimitedList
+    Description: Inference profile ARNs the Bedrock endpoint policy admits (OD7-resources).
+  FoundationModelArns:
+    Type: CommaDelimitedList
+    Description: Foundation model ARNs the Bedrock endpoint policy admits (OD7-resources, F2).
+  InstanceType:
+    Type: String
+    Default: t3.medium
+    AllowedValues:
+      - t3.micro
+      - t3.medium
+    Description: Host size (OD9). t3.micro only for a smoke run.
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+    Description: >-
+      AL2023 x86_64 image (OD9), resolved from the AWS public SSM parameter
+      when the stack is created. Readability is shown in
+      evidence_v2/R3/R3_07_al2023-ami-parameter.json.
+
+Rules:
+  DeployTarget:
+    Assertions:
+      - Assert: !Equals [!Ref ExpectedAccountId, !Ref "AWS::AccountId"]
+        AssertDescription: The stack is not being created in ExpectedAccountId.
+      - Assert: !Equals [!Ref ExpectedRegion, !Ref "AWS::Region"]
+        AssertDescription: The stack is not being created in ExpectedRegion.
+
+Resources:
+  # R3 skeleton only. R11 replaces this no-cost placeholder with the
+  # endpoints and the host and adds the outputs named in
+  # deploy/aws/outputs_contract.json (without exports).
+  SkeletonPlaceholder:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Metadata:
+      SkeletonParameters:
+        ProjectName: !Ref ProjectName
+        InferenceProfileArns: !Ref InferenceProfileArns
+        FoundationModelArns: !Ref FoundationModelArns
+        InstanceType: !Ref InstanceType
+        LatestAmiId: !Ref LatestAmiId

@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  proposal-orchestrator audit and storage stack (filled by ticket R7): the
+  trail bucket and the deploy bucket, both named with the account id as
+  suffix, versioned, blocked from public access and encrypted with the CMK;
+  the trail with log-file integrity checking and the CMK; the flow-log group
+  (CMK, 90-day retention) and flow logs on every subnet. Bedrock model
+  invocation logging stays unset. Skeleton written in R3. Free of hourly cost.
+  See deploy/aws/README.md.
+
+Metadata:
+  ProposalOrchestrator:
+    Stack: audit
+    StackName: proposal-orchestrator-audit
+    FilledBy: R7
+    Contract: deploy/aws/outputs_contract.json
+    Decision: aws-redeployment-od6-stack-layout-r3_2026-10-22
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: proposal-orchestrator
+    AllowedValues:
+      - proposal-orchestrator
+    Description: Name prefix of every resource and value of the project tag.
+  ExpectedAccountId:
+    Type: String
+    AllowedPattern: "^[0-9]{12}$"
+    Description: The account this stack must be created in. A rule compares it with AWS::AccountId.
+  ExpectedRegion:
+    Type: String
+    Default: eu-north-1
+    AllowedPattern: "^[a-z]{2}-[a-z]+-[0-9]$"
+    Description: The Region this stack must be created in (OD1-r1). A rule compares it with AWS::Region.
+
+Rules:
+  DeployTarget:
+    Assertions:
+      - Assert: !Equals [!Ref ExpectedAccountId, !Ref "AWS::AccountId"]
+        AssertDescription: The stack is not being created in ExpectedAccountId.
+      - Assert: !Equals [!Ref ExpectedRegion, !Ref "AWS::Region"]
+        AssertDescription: The stack is not being created in ExpectedRegion.
+
+Resources:
+  # R3 skeleton only. R7 replaces this no-cost placeholder with the buckets,
+  # the trail and the flow logs, and adds the outputs named in
+  # deploy/aws/outputs_contract.json. Bucket names are derived, not passed:
+  #   !Sub "${ProjectName}-deploy-${AWS::AccountId}"
+  #   !Sub "${ProjectName}-cloudtrail-${AWS::AccountId}"
+  SkeletonPlaceholder:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Metadata:
+      SkeletonParameters:
+        ProjectName: !Ref ProjectName
+        DeployBucketName: !Sub "${ProjectName}-deploy-${AWS::AccountId}"
+        TrailBucketName: !Sub "${ProjectName}-cloudtrail-${AWS::AccountId}"

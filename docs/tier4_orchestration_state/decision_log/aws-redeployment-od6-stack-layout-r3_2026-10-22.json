@@ -1,0 +1,127 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-od6-stack-layout-r3_2026-10-22",
+  "date": "2026-10-22",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R3 of plans/aws_redeployment_tickets.md (revises OD6 of R0)",
+  "supersedes": "aws-redeployment-operator-decisions_2026-10-21, decision OD6 only. CloudFormation stays the tool and the split between the free base and the costed endpoints-and-host part stays; the base is cut into one stack per ticket. Every other decision there stands as revised by aws-redeployment-od1-region-r1_2026-10-21, aws-redeployment-od11-admin-identity-r2_2026-10-21 and aws-redeployment-od7-model-set_2026-10-21.",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-22 on the agent's R3 proposals. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no gate, adds no runtime gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-22 ('1a, 2 ok, 3 igen, 4 ok, A igen/igen, B igen, C venv'), accepting the agent's proposals on the four points of plans/aws_redeployment_r3_handoff_2026-10-22.md §3 and three smaller points",
+  "decision": "The infrastructure is six CloudFormation stacks in eu-north-1, deployed in ticket order through change sets: network (R4), iam (R5), kms (R6), audit (R7), secret (R8) form the free base and export their outputs; host (R11) holds the interface endpoints and the host, imports from the base, exports nothing, and is created and deleted per working session. R3 writes skeleton templates (parameters, target rules, a no-cost placeholder), the parameter files, a machine-readable outputs contract, an old-account id guard and a template guard; each later ticket replaces its skeleton's placeholder.",
+  "why": "OD6 named two stacks, while R4, R5 and R7 each speak of their own stack. One stack per ticket lets each ticket deploy and roll back on its own, keeps the evidence per ticket, and keeps every template under the 51,200-byte --template-body limit without an S3 staging bucket, none of which exists before R7.",
+  "inputs": [
+    "plans/aws_redeployment_r3_handoff_2026-10-22.md sections 1 to 3",
+    "plans/aws_redeployment_tickets.md R3, R4 to R8, R11, R12a",
+    "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F2, F3, F7, F9, F10), section 5 (OD2 to OD6), sections 7, 7a and 9",
+    "docs/infrastructure_security/evidence_v2/R1/R1_00_role.json, R1_00_caller-identity.json",
+    "aws-redeployment-od7-model-set_2026-10-21 (OD7-resources)"
+  ],
+  "findings": [
+    {
+      "id": "F-OD6r3-1",
+      "declared_status": "Confirmed",
+      "finding": "The admin role's ARN carries its IAM path: arn:aws:iam::797661577394:role/managed/AccountFullAccessRole. The form without /managed/ given in the R3 handoff section 1 would not match the role in a key or secret policy.",
+      "basis": "docs/infrastructure_security/evidence_v2/R1/R1_00_role.json (Role.Path /managed/, Role.Arn)."
+    },
+    {
+      "id": "F-OD6r3-2",
+      "declared_status": "Inferred",
+      "finding": "cfn-lint 1.57.2 accepts Ref to the pseudo parameters AWS::AccountId and AWS::Region inside a Rules assertion, and rejects an unknown pseudo parameter there (E1020). The CloudFormation Rules documentation shows only template parameters in its examples, so whether CloudFormation itself evaluates the rule at change-set creation is first shown in R4.",
+      "basis": "Agent's lint run on the R3 skeletons and a planted variant, 2026-10-22; https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/rules-section-structure.html read 2026-10-22. The operator's lint output is R3 evidence (evidence_v2/R3/R3_03_cfn-lint.txt)."
+    },
+    {
+      "id": "F-OD6r3-3",
+      "declared_status": "Confirmed",
+      "finding": "The newest cfn-lint, 1.58.0, was published on 2026-10-20; 1.57.2, published 2026-10-06, is the newest release at least two weeks old.",
+      "basis": "PyPI release metadata for cfn-lint, read 2026-10-22."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "OD6-r3-layout",
+      "question": "Stack layout",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Six stacks, created in this order: proposal-orchestrator-network (R4), -iam (R5), -kms (R6), -audit (R7: trail bucket, deploy bucket, trail, flow-log group and flow logs), -secret (R8), -host (R11). The first five are the base: free of hourly cost, long-lived, exporting their outputs. The host stack imports from them, exports nothing, and is created and deleted per working session (OD5).",
+      "reason": "Agent's proposal, accepted: each ticket deploys and rolls back on its own; no template approaches the 51,200-byte --template-body limit; evidence stays per ticket. Imports run one way only (kms imports the runtime role; audit imports the key, the subnet and the flow-logs role; secret imports the key and the role; host imports all).",
+      "consequence": "An exported value cannot change while another stack imports it; replacing, say, the VPC means deleting the host stack first, which OD5 does after every session anyway. The ticket texts that speak of a single base stack (R3, R11 'leaves the base stack intact') read as 'the base stacks'."
+    },
+    {
+      "id": "OD6-r3-skeleton",
+      "question": "What R3's templates contain",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "(a) Skeletons: each template declares its parameters, the DeployTarget rule and a no-cost AWS::CloudFormation::WaitConditionHandle placeholder named SkeletonPlaceholder whose Metadata references every parameter. The ticket that fills a stack removes the placeholder and adds the resources and the contract outputs.",
+      "reason": "Keeps R4 to R11 the place where their resources are designed and evidenced; the skeletons still lint and pass validate-template, which shows the CloudFormation service answers in eu-north-1.",
+      "consequence": "tests/test_aws_iac_contract.py lets a template's Outputs be a subset of the contract while the placeholder is present, and requires them to equal it once the placeholder is gone."
+    },
+    {
+      "id": "OD6-r3-parameters",
+      "question": "Parameters and where their values come from",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "No account id or Region is a literal in any template: names and ARNs are built from AWS::AccountId and AWS::Region, and ExpectedAccountId (no default) and ExpectedRegion (default eu-north-1) are compared with them by a rule; the deploy step also checks sts get-caller-identity. The model list is three CommaDelimitedList parameters, InferenceProfileArns, FoundationModelArns (all 12 ARNs written out, since CloudFormation has no loop without the AWS::LanguageExtensions transform) and RoutedRegions. Bucket names are derived with !Sub as <project>-deploy-<account> and <project>-cloudtrail-<account>, not passed. The network stack takes one AvailabilityZone, VpcCidr 10.60.0.0/24, PrivateSubnetCidr 10.60.0.0/25 and S3PrefixListId; the host stack takes InstanceType (t3.medium) and the AL2023 AMI through its public SSM parameter. AdminRoleArn (kms, secret) and TransportModelId (secret, eu. profiles only) complete the set. Values live in deploy/aws/parameters/<stack>.json, in the create-change-set --parameters format.",
+      "reason": "Agent's proposal, accepted. Every value is checked by a test against its source: the account id and admin role against R1 evidence (F-OD6r3-1), the model list, routed Regions and transport model against the OD7 record, the zone and prefix list against R3 evidence.",
+      "consequence": "Switching to the target Opus model is a change to two parameter files and a successor OD7 record, plus R2's short re-check. AvailabilityZone and S3PrefixListId stay unset until R3's read-only lookups exist; the test refuses a value set before its evidence."
+    },
+    {
+      "id": "OD6-r3-outputs",
+      "question": "Output names",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "deploy/aws/outputs_contract.json names every output, its export (proposal-orchestrator-<stack>-<OutputKey>, base stacks only) and the tickets that read it. After each create or update the operator saves describe-stacks Outputs as <ticket>_outputs.json in the ticket's evidence folder; later step sheets and the R12a collector take ids only from those files.",
+      "reason": "Ticket R3's third exit condition; R12a's collector needs a fixed list to read.",
+      "consequence": "Adding an output means changing the contract and its test in the same ticket."
+    },
+    {
+      "id": "OD6-r3-deploy",
+      "question": "How a stack is deployed",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "create-change-set, then describe-change-set saved as evidence, then execute-change-set, with the stack tag project=proposal-orchestrator. The operator runs every step and approves each change set; for the host stack, each creation also needs the operator's explicit go (R11).",
+      "reason": "The operator sees exactly what will be created before it is created.",
+      "consequence": "deploy/aws/README.md gives the commands in PowerShell and CloudShell form."
+    },
+    {
+      "id": "OD6-r3-r3-steps",
+      "question": "Does R3 need an AWS step sheet?",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Yes, a read-only one, starting with the R1-D2 session check: caller identity, the eu-north-1 zones, which zones offer all six interface endpoint services, the S3 prefix list, the AL2023 AMI parameter, validate-template on each skeleton, and a stack listing showing nothing was created.",
+      "reason": "Later parameter values then come from evidence, not memory (handoff section 7a).",
+      "consequence": "R3 creates nothing in AWS. evidence_v2/R3/STEPS.md."
+    },
+    {
+      "id": "OD6-r3-guards",
+      "question": "Guards and lint",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "tools/old_id_guard.py matches the exact old ids of the first handoff's section 9 map, plus the old us-east-1 S3 prefix list and the old host security-group rule named in F7, over deploy/aws, evidence_v2, register v2, worklog v2 and the aws-redeployment-* decision records. tools/aws_template_guard.py refuses gateways and Elastic IPs, 0.0.0.0/0 and ::/0, a missing project tag, 'temporary' or 'validation' in a name or description, a Region literal outside a parameter default, an account literal and an oversized template. cfn-lint is pinned in deploy/aws/requirements-lint.txt (1.57.2, F-OD6r3-3) and installed into a separate virtual environment, .venv-lint.",
+      "reason": "Operator's answers A (both extras and worklog v2 in scope: yes), B (template guards: yes) and C (lint in its own venv).",
+      "consequence": "R12a runs tools.old_id_guard over its collector; R13 over the amended documents. A resource type without a Tags property is added to the template guard's allowlist only after checking its CloudFormation reference page."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "OD6-r3-parameters",
+      "declared_status": "Inferred",
+      "gap": "Whether CloudFormation evaluates the DeployTarget rule's pseudo-parameter references at change-set creation (F-OD6r3-2). R4 shows it; the deploy step's caller-identity check covers the account either way."
+    },
+    {
+      "decision": "OD6-r3-layout",
+      "declared_status": "Inferred",
+      "gap": "cloudformation:CreateStack is not SCP-denied in eu-north-1 (F-OD1r1-4, Inferred). R3's validate-template shows the service answers; R4 is the first real creation."
+    }
+  ],
+  "not_evidence_of": [
+    "Any AWS resource in account 797661577394.",
+    "That any skeleton creates successfully; R3 only lints and validates them."
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account.",
+    "basis": "Stack layout, parameter names and identifiers of the new account only."
+  }
+}

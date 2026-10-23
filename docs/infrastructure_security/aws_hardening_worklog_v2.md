@@ -149,3 +149,31 @@ Each entry records the same fields as v1:
 | Next Action | Frontier: R3 (IaC skeleton, model list as a parameter), R9 / R9e (eu-north-1 Converse preset, AN12 runbook ids, AN1c drafter on the host), R10. R5 uses the OD7 resource list once R3 is done. Operator's option for OD10: an Account and billing support case for newer Claude models and higher RPM. |
 
 ---
+
+### 2026-10-22 — R3: IaC skeleton and guards — written, step sheet ready
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-22T14:40:00Z |
+| Control ID | R3 (scaffolding); prepares DC-06 and PL-8 (R4) and the handoff §7 old-ID constraint |
+| Action Taken | Settled the four R3 handoff §3 points and three smaller ones with the operator in session; recorded as `aws-redeployment-od6-stack-layout-r3_2026-10-22` (successor to OD6): six stacks (network, iam, kms, audit, secret as the exporting base; host per session, no exports), skeleton templates with a no-cost placeholder, change-set deploys. Wrote `deploy/aws/` (six templates, parameter files, `outputs_contract.json`, `requirements-lint.txt` pinning cfn-lint 1.57.2, README), `tools/old_id_guard.py`, `tools/aws_template_guard.py`, three test files, `.venv-lint/` in `.gitignore`. Found that the admin role ARN carries the `/managed/` path (F-OD6r3-1); `AdminRoleArn` is taken from R1 evidence. Agent pre-run in the device shell (not evidence): cfn-lint exit 0, both guards CLEAN, 105 tests passed. |
+| Evidence Requested | `evidence_v2/R3/STEPS.md` steps 01–10 (session check, caller identity, lint, read-only lookups, validate-template, no stacks), then 11–12 (tests, guards, secret scan) after the agent fills `network.json` |
+| Evidence Received | pending |
+| Verification Result | PENDING |
+| Next Action | Operator runs R3 steps 01–10 from PowerShell and reports. Agent fills `AvailabilityZone` and `S3PrefixListId` from steps 05–06, operator runs steps 11–12, agent writes `VERIFICATION.md`. |
+
+---
+
+### 2026-10-23 — R3: IaC skeleton and guards — evidence verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-23T14:45:00Z |
+| Control ID | R3 (scaffolding); prepares DC-06 and PL-8 (R4) and the handoff §7 old-ID constraint |
+| Action Taken | Operator ran `evidence_v2/R3/STEPS.md` from PowerShell on the workstation: steps 01–10 on 2026-10-22, 11–12 on 2026-10-23. Session check clean (FREE / ACTIVE, 199.99 USD before and after, all alerts OK). cfn-lint 1.57.2 exit 0 on all six templates; validate-template exit 0 for all six in eu-north-1. Read-only lookups: zones eu-north-1a/b/c all offer the six interface services, chosen eu-north-1a; S3 prefix list `pl-c3aa4faa`; AL2023 AMI parameter readable. No stack and no export exist. Agent wrote `AvailabilityZone` and `S3PrefixListId` into `deploy/aws/parameters/network.json` from that evidence; then 105 tests passed under `py -3.10` (3.10.6), both guards CLEAN, secret scan CLEAN. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R3/` (23 `R3_*` files), `evidence_v2/R3/VERIFICATION.md` |
+| Verification Result | All criteria PASS. Ticket open until the operator's commit and confirmation. |
+| Next Action | Operator commits R3 (`deploy/aws/`, the two tools, three tests, the OD6-r3 record, `.gitignore`, evidence, worklog) and confirms R3; agent ticks R3. Then R4, R5 and R12a join the frontier (with R9, R9e, R10). Separate small fix to decide: the stale E0 test case on register v2 status. |
+
+---
