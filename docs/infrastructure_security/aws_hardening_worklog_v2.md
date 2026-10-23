@@ -229,3 +229,15 @@ Each entry records the same fields as v1:
 | Evidence Received | All 29 files; agent re-checked each against the step-sheet criteria in the device shell (`VERIFICATION.md`: every criterion PASS; step 10 pending). Secret scan and old-ID guard CLEAN on the agent's run. |
 | Verification Result | PASS for every criterion of rounds 1–2; ticket criteria 1–4 PASS. Register v2 rows DC-03, DC-05, DC-06, DC-07 (wording corrected), PL-8 updated. |
 | Next Action | Operator: round 3 (step 10: secret scan and old-ID guard over the finished folder), then `py -3.10 -m pytest tests/test_evidence_protocol_scaffold.py` (register v2 statuses) and commit; confirm in session. Agent then ticks R4. R7 then waits only on R6; R11 on R5–R8. |
+
+### 2026-10-24 — R4: network base stack — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-24T01:05:00Z |
+| Control ID | DC-06, PL-8 (VERIFIED_PASS); DC-03, DC-05, DC-07 (IN_PROGRESS) |
+| Action Taken | Operator ran step 10 (secret scan `CLEAN`, old-ID guard `CLEAN`), `pytest` 143 passed under `py -3.10` 3.10.6, committed R4 as `5819488` and confirmed in session. R4 ticked in `plans/aws_redeployment_tickets.md`; `evidence_v2/R4/VERIFICATION.md` done conditions completed. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R4/VERIFICATION.md` (all criteria PASS), `R4_10_secret-scan.txt`, `R4_10_old-id-guard.txt` |
+| Verification Result | R4 DONE. |
+| Next Action | Frontier: R5 (IAM stack; OD7 lists as parameters; imports nothing from R4 but its policies may name the deploy bucket by derived name), R12a (collector; add the default-SG check, R4-D2), R9, R9e, R10. R7 waits on R6; R11 on R5–R8. Operator: "Close R4" commit (tickets file, VERIFICATION, RUNLOG, worklog). |

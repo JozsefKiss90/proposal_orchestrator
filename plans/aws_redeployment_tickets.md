@@ -187,12 +187,12 @@ closes the one known production-mode bypass, whether or not DC-38 is in scope.
 
 **Blocked by:** E0, R1, R3.
 
-- [ ] The stack deploys, and its outputs are saved.
-- [ ] The route table shows no `igw-` or `nat-` target, and the VPC has no Internet Gateway.
-- [ ] The S3 endpoint policy restricts by resource account and names the project buckets. It
-      admits the AL2023 repository buckets only if OD9 added them.
-- [ ] DC-06 and PL-8 are evidenced, together with the security-group halves of DC-03 and DC-07.
-      DC-07's wording is corrected in register v2.
+- [x] The stack deploys, and its outputs are saved. (`evidence_v2/R4/R4_outputs.json`; stack `proposal-orchestrator-network` created 2026-10-23.)
+- [x] The route table shows no `igw-` or `nat-` target, and the VPC has no Internet Gateway.
+- [x] The S3 endpoint policy restricts by resource account and names the project buckets. It
+      admits the AL2023 repository buckets only if OD9 added them. (Read-only on the deploy bucket, `aws:ResourceAccount` + `aws:PrincipalAccount`; no AL2023, trail or SSM bucket — `aws-redeployment-r4-network_2026-10-24` R4-D3.)
+- [x] DC-06 and PL-8 are evidenced, together with the security-group halves of DC-03 and DC-07.
+      DC-07's wording is corrected in register v2. (Also: the VPC's default security group emptied, lasting rule R4-D2.)
 
 ## R5 IAM stack: the hardened role is the runtime role
 

@@ -4,8 +4,8 @@
 |---|---|
 | Verified by / on | agent (Claude) / 2026-10-24 (round 1 read 2026-10-23 ~22:22 UTC before execution; round 2 read 2026-10-23 ~22:45 UTC) |
 | Step sheet | `STEPS.md` (steps 01–10), run in three rounds: 01–04, then 05–09 after the operator's go on the change set, then 10 (`RUNLOG.md`) |
-| Secret scan | Agent re-run in the device shell after round 2 → `CLEAN` (exit 0). Operator's run over the finished folder: step 10, `R4_10_secret-scan.txt`. |
-| Old-ID guard | Agent re-run after round 2 over the default v2 scope (this report included) → `CLEAN`. Operator's run: step 10, `R4_10_old-id-guard.txt`. |
+| Secret scan | Operator: step 10, `R4_10_secret-scan.txt` → `CLEAN`, `exit=0`. Agent re-run in the device shell after round 2 → `CLEAN`. |
+| Old-ID guard | Operator: step 10, `R4_10_old-id-guard.txt` → `CLEAN` (20 ids). Agent re-run after round 2 over the default v2 scope (this report included) → `CLEAN`. |
 | Stack | `proposal-orchestrator-network`, created 2026-10-23T22:20:45Z (change set `r4-create-01`, executed ~22:30Z), `CREATE_COMPLETE`. Nothing with an hourly cost. Credits 199.99 USD before and after. |
 
 Every check below was re-run by the agent on the saved files (`utf-8-sig`), not taken from the
@@ -46,8 +46,8 @@ operator's pasted terminal output.
 | 08 | After: `SecurityGroupRules` `[]` | `R4_08_default-sg-after.json` | PASS | `[]` (**R4-D2**, lasting rule) |
 | 08 | One group `default`, in the VPC, `IpPermissions` `[]`, `IpPermissionsEgress` `[]` | `R4_08_default-sg.json` | PASS | As required; nothing attached to it |
 | 09 | `FREE`, `ACTIVE`, credits equal to step 01 | `R4_09_plan-state-after.json` | PASS | 199.99 USD, unchanged |
-| 10 | `CLEAN: docs/infrastructure_security/evidence_v2/R4`; `exit=0` | `R4_10_secret-scan.txt` | PENDING (round 3) | Agent's own run after round 2: CLEAN. The operator's run over the finished folder closes it |
-| 10 | `CLEAN … (20 ids checked)`; `exit=0` | `R4_10_old-id-guard.txt` | PENDING (round 3) | Agent's own run after round 2: CLEAN |
+| 10 | `CLEAN: docs/infrastructure_security/evidence_v2/R4`; `exit=0` | `R4_10_secret-scan.txt` | PASS | As required (operator, 2026-10-23 ~22:50 UTC, over the finished folder incl. this report); agent re-run after round 2 also CLEAN |
+| 10 | `CLEAN … (20 ids checked)`; `exit=0` | `R4_10_old-id-guard.txt` | PASS | As required; operator's `pytest` over the five test files (E0 scaffold + four AWS files): `143 passed`, Python 3.10.6 |
 
 ## Ticket checklist
 
@@ -60,10 +60,10 @@ operator's pasted terminal output.
 
 ## Done conditions (handoff §7a)
 
-- [x] Every criterion above is PASS, except step 10 (round 3: the operator's scan and guard over the finished folder, then commit).
+- [x] Every criterion above is PASS.
 - [x] Register v2 updated for DC-03, DC-05, DC-06, DC-07, PL-8 (2026-10-24).
 - [x] Worklog v2 entry: 2026-10-24T00:55:00Z (verification), after 2026-10-24T00:40:00Z (template, decisions, step sheet).
-- [ ] Operator confirmed in session (after step 10 and the commit).
+- [x] Operator confirmed in session on 2026-10-24 (after committing R4 as `5819488`, 45 files, 143 tests passed).
 
 ## Notes for later tickets
 

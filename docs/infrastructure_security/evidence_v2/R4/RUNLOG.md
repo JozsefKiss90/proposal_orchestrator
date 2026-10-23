@@ -5,7 +5,7 @@ Kept by the agent from what the operator reports in session (marked as such).
 | Field | Value |
 |---|---|
 | Step sheet | `STEPS.md` |
-| Run date (UTC) | 2026-10-23 (round 1, steps 01–04, 22:20–22:21 UTC; round 2, steps 05–09, 22:30–22:41 UTC) |
+| Run date (UTC) | 2026-10-23 (round 1, steps 01–04, 22:20–22:21 UTC; round 2, steps 05–09, 22:30–22:41 UTC; round 3, step 10, ~22:50 UTC) |
 | Operator | the operator (József) |
 | Where run | PowerShell in the VS Code terminal on the workstation, repository root, profile `po-r1` (`aws login --profile po-r1` at ~22:19 UTC as `assumed-role/AccountFullAccessRole/<session>`) |
 | Hourly-cost go given | n/a (R4 creates nothing with an hourly cost) |
@@ -23,8 +23,9 @@ Kept by the agent from what the operator reports in session (marked as such).
 | 07 | 22:36–22:37 | operator (reported in session) | ok | none | none. Eleven files. (Two command lines appeared wrapped in the pasted terminal output as `--outputjson` and `-Encodingutf8`; the files on disk are correct JSON written with the right options — a paste artefact, not a deviation.) |
 | 08 | 22:39 | operator (reported in session) | ok | none | none. Default group `sg-0a2fca76dd2129439`: two rules before (egress all, self-ingress all), both revoked by rule id (`Return` true each), `[]` after. |
 | 09 | 22:41 | operator (reported in session) | ok | none | none. FREE / ACTIVE, 199.99 USD, unchanged. |
+| 10 | ~22:50 | operator (reported in session) | ok | none | none. Secret scan `CLEAN`, old-ID guard `CLEAN` (20 ids), both `exit=0`; pytest `143 passed` over the five files. Committed as `5819488` (`completed R4`). |
 
 ## Notes
 
-- Round 2 (steps 05–09) handed back 2026-10-23 ~22:43 UTC; agent verification in `VERIFICATION.md` (all PASS). Round 3 (step 10) and the commit follow.
+- Round 2 (steps 05–09) handed back 2026-10-23 ~22:43 UTC; agent verification in `VERIFICATION.md` (all PASS). Round 3 (step 10) run and committed 2026-10-23 ~22:52 UTC; operator confirmed R4 in session 2026-10-24.
 - Round 1 (steps 01–04) handed back 2026-10-23 ~22:22 UTC. The agent's reading of `R4_04_change-set.json`: exactly the eight planned resources, nothing with an hourly cost; go for step 05 asked of the operator in session.
