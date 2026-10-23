@@ -206,16 +206,39 @@ def _register_rows(path: Path) -> dict[str, list[str]]:
     return rows
 
 
-def test_register_v2_lists_all_41_controls_as_not_started(repo_root: Path) -> None:
-    rows = _register_rows(repo_root / REGISTER_V2)
+def _defined_statuses(path: Path) -> set[str]:
+    """The status values the register's own "Status Definitions" table defines."""
+    text = path.read_text(encoding="utf-8")
+    section = text[text.index("## Status Definitions") :]
+    section = section[: section.index("\n## ", 1)]
+    return set(re.findall(r"^\| ([A-Z][A-Z_]+) \|", section, flags=re.MULTILINE))
 
+
+def test_register_v2_lists_all_41_controls_with_a_defined_status(repo_root: Path) -> None:
+    """E0 criterion 4, as it must hold after E0.
+
+    At E0 every control was NOT_STARTED. Later tickets move controls on
+    (R2 set DC-36 to IN_PROGRESS), so this checks that each status is one the
+    register defines and that the evidence column agrees with it, rather than
+    freezing the scaffold-time state.
+    """
+    rows = _register_rows(repo_root / REGISTER_V2)
+    statuses = _defined_statuses(repo_root / REGISTER_V2)
+
+    assert {"NOT_STARTED", "IN_PROGRESS", "VERIFIED_PASS", "NOT_APPLICABLE", "DEFERRED"} <= statuses
     assert set(rows) == EXPECTED_CONTROLS
     assert set(rows) == set(_register_rows(repo_root / REGISTER_V1)), "same controls as v1"
     for control, cells in rows.items():
         # Control ID | Name | Requirement | Ticket | Status | Evidence (v2) | Notes
         assert len(cells) == 7, control
-        assert cells[4] == "NOT_STARTED", control
-        assert cells[5] == "—", control
+        status, evidence, notes = cells[4], cells[5], cells[6]
+        assert status in statuses, control
+        if status == "NOT_STARTED":
+            assert evidence == "—", control
+        if status in ("EVIDENCE_SUBMITTED", "VERIFIED_PASS", "VERIFIED_FAIL"):
+            assert "evidence_v2/" in evidence, control
+        if status in ("NOT_APPLICABLE", "DEFERRED", "BLOCKED"):
+            assert notes != "—", f"{control}: {status} needs a reason"
 
 
 def test_register_v2_has_an_evidence_path_column(repo_root: Path) -> None:

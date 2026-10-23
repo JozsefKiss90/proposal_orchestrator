@@ -177,3 +177,17 @@ Each entry records the same fields as v1:
 | Next Action | Operator commits R3 (`deploy/aws/`, the two tools, three tests, the OD6-r3 record, `.gitignore`, evidence, worklog) and confirms R3; agent ticks R3. Then R4, R5 and R12a join the frontier (with R9, R9e, R10). Separate small fix to decide: the stale E0 test case on register v2 status. |
 
 ---
+
+### 2026-10-23 — E0: stale register v2 test case replaced
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-23T14:50:00Z |
+| Control ID | E0 (scaffolding); register v2 |
+| Action Taken | `tests/test_evidence_protocol_scaffold.py::test_register_v2_lists_all_41_controls_as_not_started` had failed since R2 legitimately set DC-36 to `IN_PROGRESS` (commit `690f90c`); it froze the scaffold-time state. Replaced, at the operator's request, by `test_register_v2_lists_all_41_controls_with_a_defined_status`: all 41 controls, the same set as v1, seven columns, each status one the register's "Status Definitions" table defines; `NOT_STARTED` has no evidence path; `EVIDENCE_SUBMITTED` / `VERIFIED_*` name an `evidence_v2/` path; `NOT_APPLICABLE` / `DEFERRED` / `BLOCKED` carry a reason. Register v2 itself unchanged. |
+| Evidence Requested | — |
+| Evidence Received | Agent run in the device shell: the E0 test file 22 passed; three planted register defects (undefined status, evidence path on `NOT_STARTED`, `VERIFIED_PASS` without evidence) each refused. |
+| Verification Result | PASS (agent). Operator to re-run with `py -3.10` and commit. |
+| Next Action | Operator: `py -3.10 -m pytest tests/test_evidence_protocol_scaffold.py`, then commit. |
+
+---
