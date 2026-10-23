@@ -108,9 +108,9 @@ and the old instance id.
 
 **Blocked by:** R0.
 
-- [ ] The templates lint cleanly on the workstation.
-- [ ] The old-ID test fails on a planted old id and passes on the real tree.
-- [ ] The stack outputs are named, so later tickets and the evidence collector can read ids from them.
+- [x] The templates lint cleanly on the workstation. (`docs/infrastructure_security/evidence_v2/R3/R3_03_cfn-lint.txt`: cfn-lint 1.57.2, exit 0 on all six templates; `R3_08_validate-*.json`: validate-template exit 0 in eu-north-1.)
+- [x] The old-ID test fails on a planted old id and passes on the real tree. (`tests/test_old_id_guard.py`, `tools/old_id_guard.py`; `R3_11_pytest.txt`, `R3_11_old-id-guard.txt`.)
+- [x] The stack outputs are named, so later tickets and the evidence collector can read ids from them. (`deploy/aws/outputs_contract.json`, checked by `tests/test_aws_iac_contract.py`. Layout revised from two stacks to six, operator-decided: `aws-redeployment-od6-stack-layout-r3_2026-10-22`, commit `be3198f`.)
 
 ## R12a Parameterised evidence collector
 

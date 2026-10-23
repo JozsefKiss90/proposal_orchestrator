@@ -45,14 +45,14 @@
 - [x] Every criterion above is PASS.
 - [x] Register v2 updated for: none. No register v2 row names R3 (R3 handoff §4); no guard test touches a control.
 - [x] Worklog v2 entry: 2026-10-23T14:45:00Z (verification), after 2026-10-22T14:40:00Z (written).
-- [ ] Operator confirmed in session on `<YYYY-MM-DD>`.
+- [x] Operator confirmed in session on 2026-10-23 (after committing R3 as `be3198f`).
 
 ## Notes for later tickets
 
 - R4: `network.json` holds `AvailabilityZone` = `eu-north-1a` and `S3PrefixListId` = `pl-c3aa4faa`, both from this folder. F-OD6r3-2: R4's first change set shows whether CloudFormation evaluates the `DeployTarget` rule's pseudo-parameter references; the deploy step's caller-identity check covers the account either way.
 - R6, R8: `AdminRoleArn` carries the `/managed/` path (F-OD6r3-1).
 - Each filling ticket removes `SkeletonPlaceholder`; the contract test then requires exactly the contract outputs.
-- Outside R3: `tests/test_evidence_protocol_scaffold.py::test_register_v2_lists_all_41_controls_as_not_started` has failed since R2 set DC-36 to `IN_PROGRESS` (commit `690f90c`). It is a stale E0 criterion, reported to the operator; not run in step 11.
+- Outside R3: `tests/test_evidence_protocol_scaffold.py::test_register_v2_lists_all_41_controls_as_not_started` had failed since R2 set DC-36 to `IN_PROGRESS` (commit `690f90c`). It was a stale E0 criterion, not run in step 11; replaced at the operator's request by `test_register_v2_lists_all_41_controls_with_a_defined_status` (commit `f5d8d2a`).
 
 ## Follow-up
 

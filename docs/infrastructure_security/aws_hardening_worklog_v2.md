@@ -191,3 +191,17 @@ Each entry records the same fields as v1:
 | Next Action | Operator: `py -3.10 -m pytest tests/test_evidence_protocol_scaffold.py`, then commit. |
 
 ---
+
+### 2026-10-23 — R3: IaC skeleton and old-ID guard — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-23T14:55:00Z |
+| Control ID | R3 (scaffolding) |
+| Action Taken | Operator committed R3 as `be3198f` and the E0 test fix as `f5d8d2a` (E0 test file 22 passed under `py -3.10` 3.10.6), and confirmed R3 in session. R3 ticked in `plans/aws_redeployment_tickets.md`; `evidence_v2/R3/VERIFICATION.md` done conditions completed. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R3/VERIFICATION.md` (all criteria PASS) |
+| Verification Result | R3 DONE. |
+| Next Action | Frontier: R4 (network stack; `network.json` complete), R5 (IAM stack; OD7 list as parameters), R12a (parameterised collector, reads `outputs_contract.json`), with R9, R9e, R10. R4 is the first real stack creation and first shows whether the `DeployTarget` rule evaluates (F-OD6r3-2). |
+
+---
