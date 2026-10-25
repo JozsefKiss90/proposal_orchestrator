@@ -240,4 +240,4 @@ Each entry records the same fields as v1:
 | Evidence Requested | — |
 | Evidence Received | `evidence_v2/R4/VERIFICATION.md` (all criteria PASS), `R4_10_secret-scan.txt`, `R4_10_old-id-guard.txt` |
 | Verification Result | R4 DONE. |
-| Next Action | Frontier: R5 (IAM stack; OD7 lists as parameters; imports nothing from R4 but its policies may name the deploy bucket by derived name), R12a (collector; add the default-SG check, R4-D2), R9, R9e, R10. R7 waits on R6; R11 on R5–R8. Operator: "Close R4" commit (tickets file, VERIFICATION, RUNLOG, worklog). |
+| Next Action | Frontier: R5 (IAM stack; OD7 lists as parameters; imports nothing from R4 but its policies may name the deploy bucket by derived name), R12a (collector; add the default-SG check, R4-D2), R9, R9e, R10. R7 waits on R6; R11 on R5–R8. R5 handoff written: `plans/aws_redeployment_r5_handoff_2026-10-24.md`. Operator: "Close R4" commit (tickets file, VERIFICATION, RUNLOG, worklog, R5 handoff). |
