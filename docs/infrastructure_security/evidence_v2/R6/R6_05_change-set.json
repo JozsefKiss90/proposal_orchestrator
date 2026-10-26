@@ -1,0 +1,63 @@
+﻿{
+    "Changes": [
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "ProjectKeyAlias",
+                "ResourceType": "AWS::KMS::Alias",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "ProjectKey",
+                "ResourceType": "AWS::KMS::Key",
+                "Scope": [],
+                "Details": []
+            }
+        }
+    ],
+    "ChangeSetName": "r6-create-01",
+    "ChangeSetId": "arn:aws:cloudformation:eu-north-1:797661577394:changeSet/r6-create-01/fe880d18-f512-452f-9c4b-a16561500627",
+    "StackId": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-kms/dab69030-d15c-11f1-bac1-06ffee14552d",
+    "StackName": "proposal-orchestrator-kms",
+    "Description": null,
+    "Parameters": [
+        {
+            "ParameterKey": "ProjectName",
+            "ParameterValue": "proposal-orchestrator"
+        },
+        {
+            "ParameterKey": "ExpectedAccountId",
+            "ParameterValue": "797661577394"
+        },
+        {
+            "ParameterKey": "ExpectedRegion",
+            "ParameterValue": "eu-north-1"
+        }
+    ],
+    "CreationTime": "2026-10-26T16:46:56.253000+00:00",
+    "ExecutionStatus": "AVAILABLE",
+    "Status": "CREATE_COMPLETE",
+    "StatusReason": null,
+    "NotificationARNs": [],
+    "RollbackConfiguration": {},
+    "Capabilities": [],
+    "Tags": [
+        {
+            "Key": "project",
+            "Value": "proposal-orchestrator"
+        }
+    ],
+    "ParentChangeSetId": null,
+    "IncludeNestedStacks": false,
+    "RootChangeSetId": null,
+    "OnStackFailure": null,
+    "ImportExistingResources": null,
+    "StackDriftStatus": null,
+    "DeploymentMode": null
+}

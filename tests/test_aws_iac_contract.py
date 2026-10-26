@@ -232,7 +232,9 @@ def test_account_and_region_values_come_from_records(key: str) -> None:
     assert od1_answer.startswith("eu-north-1")
 
 
-@pytest.mark.parametrize("key", ["kms", "secret"])
+# R6-D4: the kms stack takes no AdminRoleArn (root delegates to IAM); only the
+# secret stack (R8) still names the admin role.
+@pytest.mark.parametrize("key", ["secret"])
 def test_admin_role_is_the_r1_role_arn_with_its_path(key: str) -> None:
     role = _json(EVIDENCE_V2 / "R1" / "R1_00_role.json")["Role"]
 

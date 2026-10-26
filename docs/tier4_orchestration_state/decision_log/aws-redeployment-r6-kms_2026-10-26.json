@@ -1,0 +1,185 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r6-kms_2026-10-26",
+  "date": "2026-10-26",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R6 of plans/aws_redeployment_tickets.md (KMS key: the runtime role decrypts through the key policy)",
+  "supersedes": "aws-redeployment-od6-stack-layout-r3_2026-10-22, decision OD6-r3-parameters, the kms stack's parameter list only: AdminRoleArn is no longer a kms parameter (R6-D4); it stays a secret-stack parameter. Every other part of OD6-r3 stands. Otherwise applies OD2 (a), OD1-r1, OD11-r2, R5-D4 and R5-D6 to the KMS stack and settles the nine points of plans/aws_redeployment_r6_handoff_2026-10-25.md section 4; adds two lasting rules (R6-D2 trail name, R6-D10 no S3 Bucket Key on the trail bucket).",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-26 on the agent's R6 proposals. Execution aid for infrastructure work (CLAUDE.md section 10.2). Closes no gate, adds no runtime gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-26 ('1-9 a (a 4b-vel egyutt)', ~16:31 UTC), accepting option (a) of each of the nine points and of point 4b, and stating that the 1 USD/month key fee is the 'free (key: monthly)' case of OD6-r3. Point 10 (CloudTrail decrypt and the S3 Bucket Key, added by the agent after F-R6-4) answered '10a' (~16:44 UTC).",
+  "decision": "The KMS stack (deploy/aws/templates/30-kms.yaml) creates one customer-managed symmetric single-Region key with yearly rotation, retained on stack deletion and replacement, and the alias alias/${ProjectName}. Its key policy has five statements and four principals: the account root (kms:*, IAM delegation), the runtime role imported from the IAM stack (kms:Decrypt and kms:DescribeKey only via Secrets Manager or S3 in this Region), CloudTrail for the project trail (GenerateDataKey* and DescribeKey, by aws:SourceArn and the CloudTrail encryption context) and CloudWatch Logs in this Region for the /${ProjectName}/ log groups. The stack exports KeyArn, KeyId and KeyAliasName.",
+  "why": "The ticket: the runtime role decrypts through the key policy, not through an IAM side grant (F1 closed for KMS); every service grant is scoped as the service's own guide prescribes; nothing administers the key except through IAM under the root delegation.",
+  "inputs": [
+    "plans/aws_redeployment_r6_handoff_2026-10-25.md sections 1, 3 and 4",
+    "plans/aws_redeployment_tickets.md R6, R7, R8, R11",
+    "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F1), section 5 (OD2, OD8, OD11), sections 6, 7 and 7a",
+    "aws-redeployment-r5-iam_2026-10-25 (R5-D4, R5-D6); aws-redeployment-od6-stack-layout-r3_2026-10-22 (OD6-r3-parameters, F-OD6r3-1); aws-redeployment-od11-admin-identity-r2_2026-10-21",
+    "docs/infrastructure_security/evidence/04_kms/kms_key_policy.json and CG4_steps.txt, as history only (old account, us-east-1, bedrock role that no process used)",
+    "docs/infrastructure_security/evidence_v2/R6/R6_01_*.json, R6_02_caller-identity.json, R6_03_*.json (round 1 read-only lookups, 2026-10-26)",
+    "AWS documentation read 2026-10-26: CloudFormation reference AWS::KMS::Key; CloudTrail user guide 'Configure AWS KMS key policies for CloudTrail'; CloudWatch Logs user guide 'Encrypt log data in CloudWatch Logs using AWS KMS'; Secrets Manager user guide 'Secret encryption and decryption'; IAM user guide 'Testing IAM policies with the IAM policy simulator' and 'IAM policy simulator: how to'; AWS KMS pricing page (read 2026-10-25, R6 handoff)"
+  ],
+  "findings": [
+    {
+      "id": "F-R6-1",
+      "declared_status": "Confirmed",
+      "finding": "Before R6, eu-north-1 holds two KMS keys, both AWS-managed (the RDS and Lambda default keys) and enabled, no customer-managed key, twelve alias/aws/* aliases and no alias/proposal-orchestrator; the stack proposal-orchestrator-kms does not exist (exit 254); no trail is visible in eu-north-1, organization shadow trails included, so the name proposal-orchestrator-bedrock-trail is free.",
+      "basis": "evidence_v2/R6/R6_03_aliases-before.json, R6_03_keys-before.json, R6_03_keys-detail-before.json, R6_03_kms-stack-before.txt, R6_03_trails-before.json."
+    },
+    {
+      "id": "F-R6-2",
+      "declared_status": "Confirmed",
+      "finding": "The seven proposal-orchestrator-iam-* exports exist; proposal-orchestrator-iam-RuntimeRoleArn = arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role, equal to R5_outputs.json. The runtime role holds exactly the four R5 managed policies and no inline policy, so no identity policy grants it kms:Decrypt before R6.",
+      "basis": "evidence_v2/R6/R6_03_exports.json, R6_03_runtime-role-attached-before.json, R6_03_runtime-role-inline-before.json; evidence_v2/R5/R5_09_deny-kms-identity-grant.json."
+    },
+    {
+      "id": "F-R6-3",
+      "declared_status": "Confirmed",
+      "finding": "AWS::KMS::Key: KeySpec default SYMMETRIC_DEFAULT, KeyUsage default ENCRYPT_DECRYPT, MultiRegion default false; RotationPeriodInDays 90-2560, default 365; PendingWindowInDays 7-30, default 30; changing KeySpec, KeyUsage, Origin or MultiRegion fails the update regardless of UpdateReplacePolicy; removing the key from a stack schedules its deletion, which the template cannot cancel; every key-policy principal must exist; the key takes Tags; Ref returns the key id, GetAtt Arn the ARN. AWS::KMS::Alias takes no Tags and is already in UNTAGGABLE_TYPES, so the template guard is unchanged.",
+      "basis": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-kms-key.html, read 2026-10-26; tools/aws_template_guard.py."
+    },
+    {
+      "id": "F-R6-4",
+      "declared_status": "Confirmed",
+      "finding": "CloudTrail requires kms:GenerateDataKey* (conditioned by aws:SourceArn = the trail ARN and kms:EncryptionContext:aws:cloudtrail:arn like the account's trails) and kms:DescribeKey (aws:SourceArn). Its guide also lists a decrypt grant for the CloudTrail service principal and states that kms:Decrypt is required to create or update a trail with SSE-KMS when the trail's existing S3 bucket uses an S3 Bucket Key.",
+      "basis": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/create-kms-key-policy-for-cloudtrail.html, read 2026-10-26. v1 history: the v1 key policy granted CloudTrail only GenerateDataKey* and DescribeKey and the v1 trail was created and delivered (evidence/04_kms/kms_key_policy.json, evidence/06_cloudtrail)."
+    },
+    {
+      "id": "F-R6-5",
+      "declared_status": "Confirmed",
+      "finding": "CloudWatch Logs: the principal is logs.<Region>.amazonaws.com in the key's own Region; actions kms:Encrypt, kms:Decrypt, kms:ReEncrypt*, kms:GenerateDataKey*, kms:Describe*; the guide's account-wide variant conditions kms:EncryptionContext:aws:logs:arn with ArnLike. R6 narrows it to log-group:/${ProjectName}/*.",
+      "basis": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html, read 2026-10-26."
+    },
+    {
+      "id": "F-R6-6",
+      "declared_status": "Confirmed",
+      "finding": "AWS's own Secrets Manager key-policy example conditions kms:Decrypt and kms:DescribeKey with kms:ViaService = secretsmanager.<Region>.amazonaws.com; GetSecretValue makes Secrets Manager call kms:Decrypt on the caller's behalf. No code under runner/, deploy/*.sh, deploy/*.json or scripts/ calls KMS directly (grep, 2026-10-26).",
+      "basis": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/security-encryption.html, read 2026-10-26; agent's grep."
+    },
+    {
+      "id": "F-R6-7",
+      "declared_status": "Confirmed",
+      "finding": "The IAM policy simulator documentation names resource-based policy simulation for S3 buckets, SQS queues, SNS topics and Glacier vaults (console) and does not mention KMS keys.",
+      "basis": "https://docs.aws.amazon.com/IAM/latest/UserGuide/policies_policy-simulator-how-to.html, read 2026-10-26."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R6-D1",
+      "question": "Key cost (handoff section 4, point 1)",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "Proceed. The key costs 1 USD/month prorated hourly, plus 1 USD/month for each of the first two rotations (about 3 USD/month from the second year), paid from credits. The operator states this is the 'free (key: monthly)' case of OD6-r3, not an hourly-billed resource of the kind R11 gates.",
+      "reason": "Operator's answer in session ('1 usd az OD6-r3 free (key: monthly) esete').",
+      "consequence": "STEPS.md states the monthly fee in its header. R14's cost check counts the key."
+    },
+    {
+      "id": "R6-D2",
+      "question": "Trail name (point 2)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Lasting rule: the trail is ${ProjectName}-bedrock-trail (register v2 DC-23), ARN arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${ProjectName}-bedrock-trail, home Region eu-north-1.",
+      "reason": "Operator's answer '2a'. The key policy must name the trail before it exists.",
+      "consequence": "R7 creates exactly that trail, in eu-north-1. A different name or home Region needs a successor record and an UPDATE of the key policy first."
+    },
+    {
+      "id": "R6-D3",
+      "question": "kms:ViaService on the runtime role's grant (point 3)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "The runtime role's kms:Decrypt and kms:DescribeKey carry StringEquals kms:ViaService in [secretsmanager.${AWS::Region}.amazonaws.com, s3.${AWS::Region}.amazonaws.com].",
+      "reason": "Operator's answer '3a'. The host never calls KMS directly (F-R6-6); R8's secret and R7's deploy bucket reach the key through those two services.",
+      "consequence": "A direct SDK call (e.g. DescribeKey) by the runtime role is refused. R8 and R11 show the grant works; a refusal there leads to a successor record and an UPDATE change set."
+    },
+    {
+      "id": "R6-D4",
+      "question": "An admin statement for AdminRoleArn (point 4 and 4b)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "No admin statement: the account-root kms:* statement is the only administrative grant; the admin role (OD11-r2) administers the key through its AdministratorAccess. AdminRoleArn leaves 30-kms.yaml, parameters/kms.json, the kms case of tests/test_aws_iac_contract.py::test_admin_role_is_the_r1_role_arn_with_its_path and the README table's kms entry. 4b: recorded here as superseding OD6-r3-parameters for the kms stack only.",
+      "reason": "Operator's answer '4a' and '4b a'. DC-19 ('root, the runtime role, CloudTrail and CloudWatch Logs only') then holds literally.",
+      "consequence": "AdminRoleArn remains a secret-stack parameter (R8)."
+    },
+    {
+      "id": "R6-D5",
+      "question": "Retention and deletion (point 5)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "DeletionPolicy Retain and UpdateReplacePolicy Retain on the key; PendingWindowInDays 30.",
+      "reason": "Operator's answer '5a'. Deleting or replacing the stack must never schedule the deletion of the key that encrypts the trail, the logs, the secret and the deploy bundles.",
+      "consequence": "The kms stack is not deleted: deleting it would leave the key (and its fee) and remove the alias, and recreating it would create a second key. Retiring the key is a manual ScheduleKeyDeletion with a successor record."
+    },
+    {
+      "id": "R6-D6",
+      "question": "Rotation period (point 6)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "RotationPeriodInDays 365, set explicitly.",
+      "reason": "Operator's answer '6a'. The default, pinned by the test and visible in get-key-rotation-status.",
+      "consequence": "DC-18 is evidenced with KeyRotationEnabled true and RotationPeriodInDays 365."
+    },
+    {
+      "id": "R6-D7",
+      "question": "Guard and tests (point 7)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "tests/test_aws_kms_template.py pins the stack's shape: key and alias only; symmetric, single-Region, enabled, rotation 365; Retain policies and a 30-day window; tags; the five key-policy statements exactly; principals root, the runtime role through Fn::ImportValue only, CloudTrail and CloudWatch Logs; kms:Decrypt only for the runtime role, CloudWatch Logs and (through kms:*) root; kms:* only for root; no Principal '*'; alias alias/${ProjectName}; no AdminRoleArn; outputs equal the contract. The template guard is unchanged (F-R6-3).",
+      "reason": "Operator's answer '7a'.",
+      "consequence": "deploy/aws/README.md lists the KMS template test with the others."
+    },
+    {
+      "id": "R6-D8",
+      "question": "How 'no IAM policy grants that role Decrypt separately' is evidenced (point 8)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "The runtime role's attached and inline policies, read after the stack exists, equal R6_03 and R5_08; one simulate-principal-policy of kms:Decrypt on the new KeyArn with aws:RequestedRegion = eu-north-1 and no resource policy returns implicitDeny with AllowedByOrganizations and AllowedByPermissionsBoundary true; get-key-policy shows the key-policy grant, compared statement by statement with the template by script. No key-policy simulation (F-R6-7).",
+      "reason": "Operator's answer '8a'.",
+      "consequence": "The grant itself is exercised by R8 (secret read) and R11 (host)."
+    },
+    {
+      "id": "R6-D9",
+      "question": "Register v2 statuses (point 9)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "On a PASS verification: DC-18 VERIFIED_PASS; DC-19 VERIFIED_PASS on the policy-level criterion, noted 'CloudTrail and CloudWatch Logs grants exercised in R7, runtime grant in R8/R11'.",
+      "reason": "Operator's answer '9a'; same pattern as R5-D9 for DC-10.",
+      "consequence": "R7, R8 and R11 report any refusal against DC-19."
+    },
+    {
+      "id": "R6-D10",
+      "question": "CloudTrail kms:Decrypt and the S3 Bucket Key (point 10, added by the agent after F-R6-4)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Lasting rule: the key policy grants CloudTrail no kms:Decrypt. R7 creates the trail bucket without an S3 Bucket Key on this CMK (BucketKeyEnabled false or unset), so the CloudTrail guide's decrypt requirement for Bucket-Key buckets does not arise.",
+      "reason": "Operator's answer '10a'. CloudTrail only encrypts with this key; the v1 trail was created and delivered without a CloudTrail decrypt grant (F-R6-4). The narrowest grant that works.",
+      "consequence": "R7's audit template and its test pin the trail bucket's encryption without an S3 Bucket Key. If R7 shows that trail creation needs CloudTrail decrypt anyway, R7 stops and a successor record adds the statement by UPDATE change set."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "R6-D10",
+      "declared_status": "Inferred",
+      "gap": "That the trail is created and delivers without a CloudTrail decrypt grant when the bucket has no S3 Bucket Key is shown by R7 (v1 history supports it)."
+    },
+    {
+      "decision": "R6-D3",
+      "declared_status": "Inferred",
+      "gap": "That Secrets Manager and S3 are the only paths by which the runtime role needs the key is shown by R8 and R11's live calls."
+    },
+    {
+      "decision": "R6-D1",
+      "declared_status": "Unresolved",
+      "gap": "The AWS-managed organization's RCPs, which can apply to KMS, are not visible from the member account (OD11-r2 known gap). A restriction would show as an explicit deny at the change set (R6), or at first use (R7, R8)."
+    }
+  ],
+  "not_evidence_of": [
+    "Any KMS resource in account 797661577394: this record precedes the first R6 change set.",
+    "That CloudTrail, CloudWatch Logs or the runtime role can use the key in practice (R7, R8, R11)."
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account.",
+    "basis": "Template structure, policy actions, the new account's id, AWS documentation references and evidence paths only."
+  }
+}

@@ -278,3 +278,27 @@ Each entry records the same fields as v1:
 | Verification Result | R5 DONE. |
 | Next Action | Frontier: R6 (handoff `plans/aws_redeployment_r6_handoff_2026-10-25.md`), R12a, R9, R9e, R10. R7 waits on R6; R8 on R6; R11 on R6–R8. Operator: "Close R5" commit (tickets file, VERIFICATION, worklog, R6 handoff header). |
 
+
+### 2026-10-26 — R6: KMS template filled, decisions recorded, change set ready
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-26T16:50:00Z |
+| Control ID | DC-18, DC-19 (preparation; the key is not created yet) |
+| Action Taken | Operator settled the R6 handoff §4 points in session ('1–9 a', 4b included; 1 USD/month key fee acknowledged as the OD6-r3 'free (key: monthly)' case) and the agent's added point 10 ('10a'); recorded as `docs/tier4_orchestration_state/decision_log/aws-redeployment-r6-kms_2026-10-26.json` (R6-D1 cost; R6-D2 lasting rule trail `proposal-orchestrator-bedrock-trail`, home eu-north-1; R6-D3 runtime grant via Secrets Manager and S3 only; R6-D4 no admin statement, `AdminRoleArn` out of the kms stack, superseding OD6-r3-parameters for kms only; R6-D5 Retain, 30-day window; R6-D6 rotation 365; R6-D7 tests; R6-D8 exit-condition-2 evidence; R6-D9 register statuses; R6-D10 lasting rule: no CloudTrail decrypt, no S3 Bucket Key on the trail bucket). Round 1 read-only lookups run by the operator (`R6_01`–`R6_03`). `deploy/aws/templates/30-kms.yaml` filled (key, alias, three contract outputs); `parameters/kms.json` without `AdminRoleArn`; `tests/test_aws_kms_template.py` (12 tests); contract test's admin-role case narrowed to the secret stack; `deploy/aws/README.md` updated. `evidence_v2/R6/STEPS.md` steps 01–05 written. Round 1b run by the operator. |
+| Evidence Requested | `R6_01`–`R6_11`, `R6_outputs.json` per `STEPS.md` |
+| Evidence Received | `R6_01`–`R6_05` (all PASS). Change set `r6-create-01`: two `Add` (`ProjectKey`, `ProjectKeyAlias`), no capability, no `AdminRoleArn`. Agent checks: cfn-lint 1.57.2 exit 0; template guard CLEAN (6); old-ID guard CLEAN; 157 passed (agent Python 3.10.12, operator Python 3.10.6); secret scan of `evidence_v2/R6` CLEAN. |
+| Verification Result | Rounds 1 and 1b PASS; change set ready for the operator's go. |
+| Next Action | Operator: read `R6_05_change-set.json` and give the go in session (starts the key's monthly fee); agent then adds steps 06–11. |
+
+### 2026-10-26 — R6: KMS stack created and verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-26T17:05:00Z |
+| Control ID | DC-18, DC-19 (VERIFIED_PASS) |
+| Action Taken | Operator gave the go on change set `r6-create-01` ("mehet") and ran steps 06–10. Stack `proposal-orchestrator-kms` `CREATE_COMPLETE`: key `4ccc45a1-f205-4775-aa0b-195290bf1561` and `alias/proposal-orchestrator`. Agent verified every file by script and compared the live key policy with the resolved template statement by statement (equal). |
+| Evidence Requested | `R6_11_*` (round 3: tests, old-ID guard, secret scan) |
+| Evidence Received | `evidence_v2/R6/R6_01`–`R6_10`, `R6_outputs.json` (`VERIFICATION.md`: every criterion PASS except step 11, pending). Rotation on, 365 days; alias resolves to the key; five-statement key policy; no grants; runtime role unchanged since R5; IAM simulation `implicitDeny` for `kms:Decrypt`/`DescribeKey` with the boundary and organizations allowing. Credits 199.99 USD before and after. |
+| Verification Result | Rounds 1–2 PASS; ticket criteria 1–3 PASS. Register v2 rows DC-18, DC-19 updated (R6-D9). |
+| Next Action | Operator: step 11 (tests `-q`, old-ID guard, secret scan last), commit R6 and confirm in session; agent then completes `VERIFICATION.md` and ticks R6. Then R7 (trail name and Bucket-Key rule from R6-D2, R6-D10) and R8 open. |

@@ -1,11 +1,12 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
   proposal-orchestrator KMS stack (filled by ticket R6): one customer-managed
-  key with rotation on and the alias alias/proposal-orchestrator. Its key
-  policy grants the account root, the admin role, the runtime role
-  (imported from the IAM stack), CloudTrail scoped by source ARN and
-  CloudWatch Logs scoped to the project's log-group prefix. Skeleton written
-  in R3. Free of hourly cost. See deploy/aws/README.md.
+  symmetric key with rotation on and the alias alias/proposal-orchestrator.
+  Its key policy grants the account root (administration through IAM), the
+  runtime role imported from the IAM stack (decrypt through Secrets Manager
+  and S3 only), CloudTrail scoped to the project trail by source ARN and
+  CloudWatch Logs scoped to the project's log-group prefix. Free of hourly
+  cost; the key has a monthly fee. See deploy/aws/README.md.
 
 Metadata:
   ProposalOrchestrator:
@@ -14,6 +15,7 @@ Metadata:
     FilledBy: R6
     Contract: deploy/aws/outputs_contract.json
     Decision: aws-redeployment-od6-stack-layout-r3_2026-10-22
+    FillDecision: aws-redeployment-r6-kms_2026-10-26
 
 Parameters:
   ProjectName:
@@ -31,13 +33,6 @@ Parameters:
     Default: eu-north-1
     AllowedPattern: "^[a-z]{2}-[a-z]+-[0-9]$"
     Description: The Region this stack must be created in (OD1-r1). A rule compares it with AWS::Region.
-  AdminRoleArn:
-    Type: String
-    AllowedPattern: "^arn:aws:iam::[0-9]{12}:role/.+$"
-    Description: >-
-      The admin principal of the key policy (OD11-r2): the AWS-managed
-      AccountFullAccessRole, with its path, exactly as
-      evidence_v2/R1/R1_00_role.json reports its Arn.
 
 Rules:
   DeployTarget:
@@ -48,13 +43,114 @@ Rules:
         AssertDescription: The stack is not being created in ExpectedRegion.
 
 Resources:
-  # R3 skeleton only. R6 replaces this no-cost placeholder with the key and
-  # its alias and adds the outputs named in deploy/aws/outputs_contract.json.
-  # The Metadata block references every parameter, so the skeleton lints
-  # without unused-parameter warnings.
-  SkeletonPlaceholder:
-    Type: AWS::CloudFormation::WaitConditionHandle
-    Metadata:
-      SkeletonParameters:
-        ProjectName: !Ref ProjectName
-        AdminRoleArn: !Ref AdminRoleArn
+  # R6-D5: the key outlives the stack. Deleting or replacing it would make the
+  # trail, the flow logs, the secret and the deploy bundles unreadable.
+  ProjectKey:
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: !Sub >-
+        ${ProjectName} customer-managed key for the CloudTrail trail, the
+        project log groups, the runtime secret and the deploy bucket (R6).
+      Enabled: true
+      KeySpec: SYMMETRIC_DEFAULT
+      KeyUsage: ENCRYPT_DECRYPT
+      MultiRegion: false
+      EnableKeyRotation: true
+      RotationPeriodInDays: 365
+      PendingWindowInDays: 30
+      KeyPolicy:
+        Version: "2012-10-17"
+        Statement:
+          # Default statement: delegates to IAM and prevents a lockout. The
+          # admin role (OD11-r2) administers the key through AdministratorAccess
+          # (R6-D4); no separate admin statement.
+          - Sid: EnableRootAccountIamDelegation
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
+            Action: kms:*
+            Resource: "*"
+          # The runtime role (OD2 a) decrypts through this statement, never
+          # through an identity policy (R5-D6). Only when Secrets Manager (R8)
+          # or S3 (R7 deploy bucket) call KMS on its behalf (R6-D3).
+          - Sid: AllowRuntimeRoleDecryptViaServices
+            Effect: Allow
+            Principal:
+              AWS: !ImportValue proposal-orchestrator-iam-RuntimeRoleArn
+            Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+            Resource: "*"
+            Condition:
+              StringEquals:
+                kms:ViaService:
+                  - !Sub "secretsmanager.${AWS::Region}.amazonaws.com"
+                  - !Sub "s3.${AWS::Region}.amazonaws.com"
+          # CloudTrail, as the CloudTrail user guide requires, limited to the
+          # project trail R7 creates (R6-D2).
+          - Sid: AllowCloudTrailEncryptLogs
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: kms:GenerateDataKey*
+            Resource: "*"
+            Condition:
+              StringEquals:
+                aws:SourceArn: !Sub "arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${ProjectName}-bedrock-trail"
+              StringLike:
+                kms:EncryptionContext:aws:cloudtrail:arn: !Sub "arn:${AWS::Partition}:cloudtrail:*:${AWS::AccountId}:trail/*"
+          - Sid: AllowCloudTrailDescribeKey
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: kms:DescribeKey
+            Resource: "*"
+            Condition:
+              StringEquals:
+                aws:SourceArn: !Sub "arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${ProjectName}-bedrock-trail"
+          # CloudWatch Logs in this key's Region, only for the project's log
+          # groups (R5-D4: /${ProjectName}/vpc-flow-logs, created by R7).
+          - Sid: AllowCloudWatchLogsProjectLogGroups
+            Effect: Allow
+            Principal:
+              Service: !Sub "logs.${AWS::Region}.amazonaws.com"
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:Describe*
+            Resource: "*"
+            Condition:
+              ArnLike:
+                kms:EncryptionContext:aws:logs:arn: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ProjectName}/*"
+      Tags:
+        - Key: Name
+          Value: !Ref ProjectName
+        - Key: project
+          Value: !Ref ProjectName
+
+  ProjectKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${ProjectName}"
+      TargetKeyId: !Ref ProjectKey
+
+Outputs:
+  KeyArn:
+    Description: The CMK's ARN; R7 (trail, log group, deploy bucket) and R8 (secret) use it.
+    Value: !GetAtt ProjectKey.Arn
+    Export:
+      Name: proposal-orchestrator-kms-KeyArn
+  KeyId:
+    Description: The CMK's key id (R12a).
+    Value: !Ref ProjectKey
+    Export:
+      Name: proposal-orchestrator-kms-KeyId
+  KeyAliasName:
+    Description: The alias that resolves to the CMK (R12a).
+    Value: !Ref ProjectKeyAlias
+    Export:
+      Name: proposal-orchestrator-kms-KeyAliasName

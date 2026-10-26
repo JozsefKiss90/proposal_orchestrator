@@ -81,8 +81,8 @@ path under `evidence_v2/`. Nothing in this register is carried over from v1's ev
 
 | Control ID | Control Name | Requirement Summary | Ticket | Status | Evidence (v2) | Notes |
 |---|---|---|---|---|---|---|
-| DC-18 | Customer-managed KMS key with rotation | Symmetric CMK with alias `alias/proposal-orchestrator`, automatic rotation enabled | R6 | NOT_STARTED | — | — |
-| DC-19 | KMS key policy scoped | Key policy grants the account root, the runtime role, CloudTrail (SourceArn) and CloudWatch Logs (log-group prefix) only | R6 | NOT_STARTED | — | — |
+| DC-18 | Customer-managed KMS key with rotation | Symmetric CMK with alias `alias/proposal-orchestrator`, automatic rotation enabled | R6 | VERIFIED_PASS | `evidence_v2/R6/` (`VERIFICATION.md`; `R6_08_describe-key.json`, `R6_08_rotation-status.json`, `R6_08_describe-by-alias.json`, `R6_08_aliases-of-key.json`) | Verified 2026-10-26: customer-managed `SYMMETRIC_DEFAULT` / `ENCRYPT_DECRYPT` single-Region key `4ccc45a1-…` (`KeyArn` in `R6_outputs.json`), enabled, rotation on every 365 days (next 2027-10-26); `alias/proposal-orchestrator` resolves to it. Retained on stack deletion (R6-D5). |
+| DC-19 | KMS key policy scoped | Key policy grants the account root, the runtime role, CloudTrail (SourceArn) and CloudWatch Logs (log-group prefix) only | R6 | VERIFIED_PASS | `evidence_v2/R6/` (`VERIFICATION.md`; `R6_08_key-policy.json`, `R6_08_key-grants.json`, `R6_09_deny-kms-identity-grant.json`) | Verified 2026-10-26 at policy level: five statements equal the template — root `kms:*` (IAM delegation, no separate admin statement, R6-D4); the runtime role `kms:Decrypt`/`DescribeKey` only via Secrets Manager or S3 in eu-north-1 (R6-D3), and no identity policy or grant gives it Decrypt separately; CloudTrail `GenerateDataKey*`/`DescribeKey` for `trail/proposal-orchestrator-bedrock-trail` by `aws:SourceArn` (R6-D2; no CloudTrail decrypt, R6-D10); CloudWatch Logs in eu-north-1 for `log-group:/proposal-orchestrator/*`. The grants are exercised in R7 (CloudTrail, CloudWatch Logs) and R8/R11 (runtime role). |
 
 ---
 
