@@ -70,7 +70,7 @@ statement with `20-iam.yaml` after filling in `iam.json` and the pseudo paramete
 - [x] Every criterion above is PASS, or N/A with its reason (seven superseded step-09 files).
 - [x] Register v2 updated for DC-09, DC-10, DC-11, DC-12, DC-13, DC-16 (2026-10-25).
 - [x] Worklog v2 entries: 2026-10-25T14:50:00Z (template, decisions, step sheet) and 2026-10-25T21:55:00Z (verification).
-- [ ] Operator confirms in session (after committing R5).
+- [x] Operator committed R5 as `8dccd77` (94 files) and confirmed in session on 2026-10-26.
 
 ## Notes for later tickets
 

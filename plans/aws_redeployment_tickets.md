@@ -209,12 +209,12 @@ A flow-logs role completes the stack. No policy is named or described as tempora
 
 **Blocked by:** R2, R3.
 
-- [ ] IAM simulation allows invoke for each OD7 model and its routed foundation models.
-- [ ] IAM simulation denies admin actions, non-Claude models, `global.` profiles (unless OD7 chose
-      them), and S3, EC2 and IAM actions outside the policy.
-- [ ] The boundary and explicit deny are attached to the role the instance profile uses. DC-09 to
-      DC-13 are evidenced on that role.
-- [ ] No policy in the account carries "temporary" or "validation" in its name or description.
+- [x] IAM simulation allows invoke for each OD7 model and its routed foundation models. (`evidence_v2/R5/R5_09_allow-profiles.json` and twelve `R5_09_allow-fm-*.json`; the live routed call is R11, F-R5-2.)
+- [x] IAM simulation denies admin actions, non-Claude models, `global.` profiles (unless OD7 chose
+      them), and S3, EC2 and IAM actions outside the policy. (`R5_09_deny-*.json`, `R5_12_deny-*.json`; seven step-09 files superseded by `STEPS_fix1.md`.)
+- [x] The boundary and explicit deny are attached to the role the instance profile uses. DC-09 to
+      DC-13 are evidenced on that role. (DC-10–DC-13 VERIFIED_PASS; DC-09 IN_PROGRESS until R11 shows the host uses the profile — `aws-redeployment-r5-iam_2026-10-25` R5-D9.)
+- [x] No policy in the account carries "temporary" or "validation" in its name or description. (`R5_03_local-policies-before.json`, `R5_08_local-policies-after.json`, `R5_08_policy-*.json`; stack `proposal-orchestrator-iam`, commit `8dccd77`.)
 
 ## R6 KMS key
 

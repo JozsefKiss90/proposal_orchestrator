@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Date | 2026-10-25 |
-| Branch at writing | `msca-dn-pre-eval`; last commit `e617e5a`. **The R5 work is verified but not yet committed**: `20-iam.yaml`, the guard and its test, `tests/test_aws_iam_template.py`, decision record `aws-redeployment-r5-iam_2026-10-25`, register v2 (DC-09–DC-13, DC-16), worklog v2 (two entries), README and the whole `evidence_v2/R5/`. The operator commits R5 and confirms it in session; the agent then ticks R5 in the tickets file and the last done condition in `evidence_v2/R5/VERIFICATION.md` ("Close R5"). R6 starts only after that. |
+| Branch at writing | `msca-dn-pre-eval`; R5 committed as `8dccd77` (`R5 completed`) and confirmed 2026-10-26. The "Close R5" commit — R5 ticked in the tickets file, `evidence_v2/R5/VERIFICATION.md` done conditions, the closing worklog entry, this header — is the operator's to make if `git log` does not show it yet. |
 | For | The agent that runs ticket R6 with the operator in a new session |
 | Read first | `CLAUDE.md`; `plans/aws_redeployment_tickets.md` (inherited constraints; R6; R7, R8, R11 for what consumes R6's outputs); `plans/aws_redeployment_handoff_2026-10-21.md` §4 F1, §5 OD2, OD8, OD11, §6 R6, §7, §7a; §2 of this file (and the R4/R5 handoffs' §2); `docs/tier4_orchestration_state/decision_log/aws-redeployment-r5-iam_2026-10-25.json` (R5-D4 log-group rule, R5-D6 KMS, F-R5-2); `aws-redeployment-od6-stack-layout-r3_2026-10-22.json` (OD6-r3-parameters: `AdminRoleArn`, F-OD6r3-1 the `/managed/` path); `aws-redeployment-od11-admin-identity-r2_2026-10-21.json`; `deploy/aws/README.md`; `docs/infrastructure_security/evidence_v2/R5/VERIFICATION.md` ("Notes for later tickets"); the v1 key policy `docs/infrastructure_security/evidence/04_kms/kms_key_policy.json` and `CG4_steps.txt` — **as history to be corrected, not as source** (old account, us-east-1, grants the bedrock role that no process used) |
 | Decision records in force | as listed in the R5 handoff, plus `aws-redeployment-r4-network_2026-10-24` and `aws-redeployment-r5-iam_2026-10-25` |
-| Status | E0, R0–R4 done; **R5 verified, awaiting commit and confirmation**. Frontier after Close R5: **R6**, R12a, R9, R9e, R10. R7 waits for R6 (and R4, done); R8 for R5 and R6; R11 for R4–R8. |
+| Status | E0, R0–R5 done. Frontier: **R6**, R12a, R9, R9e, R10. R7 waits for R6 (and R4, done); R8 for R6; R11 for R6–R8. |
 
 ## 1. Facts that govern R6
 

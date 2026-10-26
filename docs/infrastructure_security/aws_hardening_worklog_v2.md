@@ -266,3 +266,15 @@ Each entry records the same fields as v1:
 | Verification Result | PASS; ticket criteria 1–4 PASS. Register v2 rows DC-09–DC-13, DC-16 updated. |
 | Next Action | Operator: commit R5 and confirm in session; agent then ticks R5. Frontier then: R6 (imports `RuntimeRoleArn`), R12a, R9, R9e, R10. R6 handoff written: `plans/aws_redeployment_r6_handoff_2026-10-25.md`. |
 
+### 2026-10-26 — R5: IAM stack — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-26T16:20:00Z |
+| Control ID | DC-10, DC-11, DC-12, DC-13 (VERIFIED_PASS); DC-09, DC-16 (IN_PROGRESS) |
+| Action Taken | Operator committed R5 as `8dccd77` (template, guard, tests, decision record, register, worklog, `evidence_v2/R5/`, R6 handoff) and confirmed in session. R5 ticked in `plans/aws_redeployment_tickets.md`; `evidence_v2/R5/VERIFICATION.md` done conditions completed. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R5/VERIFICATION.md` (all criteria PASS; seven superseded step-09 files N/A), `R5_11_pytest.txt` 168 passed, `R5_11_secret-scan.txt`, `R5_11_old-id-guard.txt` |
+| Verification Result | R5 DONE. |
+| Next Action | Frontier: R6 (handoff `plans/aws_redeployment_r6_handoff_2026-10-25.md`), R12a, R9, R9e, R10. R7 waits on R6; R8 on R6; R11 on R6–R8. Operator: "Close R5" commit (tickets file, VERIFICATION, worklog, R6 handoff header). |
+
