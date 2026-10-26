@@ -244,11 +244,11 @@ The ticket confirms that Bedrock invocation logging is unset.
 
 **Blocked by:** R4, R6.
 
-- [ ] Both buckets show Block Public Access, versioning and the CMK.
-- [ ] The trail validates log files and logs to the trail bucket.
-- [ ] Flow logs are active on every subnet.
-- [ ] The invocation-logging configuration is empty.
-- [ ] DC-08, DC-23 to DC-25 and DC-27 to DC-30 are evidenced. DC-26 waits for R11.
+- [x] Both buckets show Block Public Access, versioning and the CMK.
+- [x] The trail validates log files and logs to the trail bucket.
+- [x] Flow logs are active on every subnet. (One flow log on the VPC, ACTIVE / SUCCESS; records follow in R11, R7-D18.)
+- [x] The invocation-logging configuration is empty.
+- [x] DC-08, DC-23 to DC-25 and DC-27 to DC-30 are evidenced. DC-26 waits for R11. (All VERIFIED_PASS; DC-08 on configuration, R7-D18 — `aws-redeployment-r7-audit_2026-10-26`; stack `proposal-orchestrator-audit`, commit `874edeb`.)
 
 ## R8 Runtime secret
 

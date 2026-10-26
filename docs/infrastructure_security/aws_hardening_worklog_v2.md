@@ -338,3 +338,15 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R7/R7_06`–`R7_11b`, `R7_outputs.json` (`VERIFICATION.md`: every criterion PASS except step 12, pending). Both buckets CMK-encrypted (Bucket Key off on the trail bucket, on on the deploy bucket), BPA, versioning, owner-enforced; policies as the template; trail delivering SSE-KMS log and digest objects without a CloudTrail decrypt grant (R6-D10 holds); `validate-logs` 2/2 digests and 12/12 log files valid; one log group (CMK, 90 days); VPC flow log ACTIVE / SUCCESS, no records before R11; invocation logging unset, no `/aws/bedrock` group; deploy bucket refused `AES256` and key-less `aws:kms` uploads and accepted a header-less one with the CMK. Credits 199.99 USD before and after. |
 | Verification Result | Rounds 1–3 PASS; ticket criteria 1–5 PASS. Register v2 rows DC-08, DC-23, DC-24, DC-25, DC-27, DC-28, DC-29, DC-30 updated; DC-19 note updated (R7-D10, R7-D18). |
 | Next Action | Operator: step 12 (tests `-q`, old-ID guard, secret scan last), commit R7 and confirm in session; agent then completes `VERIFICATION.md` and ticks R7. R11 then waits only on R8. |
+
+### 2026-10-26 — R7: audit and storage stack — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-26T20:40:00Z |
+| Control ID | DC-08, DC-23, DC-24, DC-25, DC-27, DC-28, DC-29, DC-30 (VERIFIED_PASS); DC-19 (note) |
+| Action Taken | Operator ran step 12 (Python 3.10.6, 177 passed; old-ID guard and secret scan CLEAN, scan last), committed R7 as `874edeb` (template, contract, README, test, decision record, register, worklog, `evidence_v2/R7/`) and confirmed in session. R7 ticked in `plans/aws_redeployment_tickets.md`; `evidence_v2/R7/VERIFICATION.md` done conditions completed. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R7/VERIFICATION.md` (every criterion PASS, no N/A), `R7_12_pytest.txt`, `R7_12_old-id-guard.txt`, `R7_12_secret-scan.txt` |
+| Verification Result | R7 DONE. |
+| Next Action | Frontier: R8, R12a, R9, R9e, R10. R11 waits only on R8. Operator: "Close R7" commit (tickets file, VERIFICATION, worklog). Open for R11: flow-log records and the R5-D4 gap (R7-D18), DC-26, the deploy bucket's runtime-role denies by live calls (F-R7-7). |

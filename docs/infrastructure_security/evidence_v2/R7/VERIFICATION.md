@@ -74,7 +74,7 @@ references (from `R7_03_exports.json`).
 - [x] Register v2 updated for DC-08, DC-23, DC-24, DC-25, DC-27, DC-28, DC-29, DC-30 and the DC-19 note (2026-10-26).
 - [x] Worklog v2 entries: 2026-10-26T17:37:00Z (template, decisions, change set) and 2026-10-26T19:40:00Z (created and verified).
 - [x] Step 12 run by the operator (2026-10-26 ~20:27 UTC): 177 passed, old-ID guard and secret scan CLEAN.
-- [ ] R7 committed by the operator and confirmed in session.
+- [x] Operator committed R7 as `874edeb` (82 files) and confirmed in session on 2026-10-26 ("Zárjuk le az R7-et", ~20:38 UTC).
 
 ## Notes for later tickets
 
