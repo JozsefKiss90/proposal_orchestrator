@@ -62,7 +62,7 @@ script, not taken from the pasted terminal output. The key policy was compared s
 - [x] Every criterion above is PASS (no N/A).
 - [x] Register v2 updated for DC-18, DC-19 (2026-10-26).
 - [x] Worklog v2 entries: 2026-10-26T16:50:00Z (template, decisions, change set) and 2026-10-26T17:05:00Z (verification).
-- [ ] Operator commits R6 and confirms in session.
+- [x] Operator committed R6 as `0487e68` (48 files) and confirmed in session on 2026-10-26 ("Kész a commit. zárd le az R6-ot", ~17:08 UTC).
 
 ## Notes for later tickets
 

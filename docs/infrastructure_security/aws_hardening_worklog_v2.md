@@ -302,3 +302,15 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R6/R6_01`–`R6_10`, `R6_outputs.json` (`VERIFICATION.md`: every criterion PASS except step 11, pending). Rotation on, 365 days; alias resolves to the key; five-statement key policy; no grants; runtime role unchanged since R5; IAM simulation `implicitDeny` for `kms:Decrypt`/`DescribeKey` with the boundary and organizations allowing. Credits 199.99 USD before and after. |
 | Verification Result | Rounds 1–2 PASS; ticket criteria 1–3 PASS. Register v2 rows DC-18, DC-19 updated (R6-D9). |
 | Next Action | Operator: step 11 (tests `-q`, old-ID guard, secret scan last), commit R6 and confirm in session; agent then completes `VERIFICATION.md` and ticks R6. Then R7 (trail name and Bucket-Key rule from R6-D2, R6-D10) and R8 open. |
+
+### 2026-10-26 — R6: KMS stack — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-26T17:10:00Z |
+| Control ID | DC-18, DC-19 (VERIFIED_PASS) |
+| Action Taken | Operator ran step 11 (Python 3.10.6, 179 passed; old-ID guard and secret scan CLEAN, scan last), committed R6 as `0487e68` (template, parameter file, README, tests, decision record, register, worklog, `evidence_v2/R6/`) and confirmed in session. R6 ticked in `plans/aws_redeployment_tickets.md`; `evidence_v2/R6/VERIFICATION.md` done conditions completed. R7 handoff written. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R6/VERIFICATION.md` (every criterion PASS, no N/A), `R6_11_pytest.txt`, `R6_11_old-id-guard.txt`, `R6_11_secret-scan.txt` |
+| Verification Result | R6 DONE. |
+| Next Action | Frontier: R7 (handoff `plans/aws_redeployment_r7_handoff_2026-10-26.md`), R8, R12a, R9, R9e, R10. R11 waits on R7 and R8. Operator: "Close R6" commit (tickets file, VERIFICATION, worklog, R7 handoff). |

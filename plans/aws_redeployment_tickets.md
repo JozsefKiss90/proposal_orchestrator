@@ -225,9 +225,9 @@ key policy, not through an IAM side grant.
 
 **Blocked by:** R5.
 
-- [ ] Rotation is on, and the alias resolves to the new key.
-- [ ] The key policy names the runtime role. No IAM policy grants that role Decrypt separately.
-- [ ] DC-18 and DC-19 are evidenced.
+- [x] Rotation is on, and the alias resolves to the new key. (`evidence_v2/R6/R6_08_rotation-status.json`: on, 365 days; `R6_08_describe-by-alias.json`, `R6_08_aliases-of-key.json`.)
+- [x] The key policy names the runtime role. No IAM policy grants that role Decrypt separately. (`R6_08_key-policy.json`, equal to the template by script; `R6_08_runtime-role-attached.json`/`-inline.json` unchanged, `R6_08_key-grants.json` `[]`, `R6_09_deny-kms-identity-grant.json` `implicitDeny`.)
+- [x] DC-18 and DC-19 are evidenced. (DC-18 VERIFIED_PASS; DC-19 VERIFIED_PASS at policy level, grants exercised in R7 and R8/R11 — `aws-redeployment-r6-kms_2026-10-26` R6-D9; stack `proposal-orchestrator-kms`, commit `0487e68`.)
 
 ## R7 Audit and storage stack
 
