@@ -1,0 +1,82 @@
+﻿{
+    "PolicyVersion": {
+        "Document": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": [
+                        "bedrock:CreateModelCustomizationJob",
+                        "bedrock:CreateProvisionedModelThroughput",
+                        "bedrock:DeleteModelInvocationLoggingConfiguration",
+                        "bedrock:PutModelInvocationLoggingConfiguration",
+                        "bedrock:CreateGuardrail",
+                        "bedrock:DeleteGuardrail",
+                        "bedrock:TagResource",
+                        "bedrock:UntagResource"
+                    ],
+                    "Resource": "*",
+                    "Effect": "Deny",
+                    "Sid": "DenyBedrockAdministration"
+                },
+                {
+                    "Action": [
+                        "iam:*",
+                        "ec2:*",
+                        "lambda:*",
+                        "sqs:*",
+                        "sns:*",
+                        "dynamodb:*"
+                    ],
+                    "Resource": "*",
+                    "Effect": "Deny",
+                    "Sid": "DenyOtherServices"
+                },
+                {
+                    "Action": [
+                        "bedrock:InvokeModel",
+                        "bedrock:InvokeModelWithResponseStream"
+                    ],
+                    "Effect": "Deny",
+                    "Sid": "DenyNonClaudeAndNonEuProfiles",
+                    "NotResource": [
+                        "arn:aws:bedrock:*:797661577394:inference-profile/eu.anthropic.claude-*",
+                        "arn:aws:bedrock:*::foundation-model/anthropic.claude-*"
+                    ]
+                },
+                {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Sid": "DenyS3OutsideDeployBundles",
+                    "NotResource": [
+                        "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+                        "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/*"
+                    ]
+                },
+                {
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:RequestedRegion": [
+                                "eu-north-1",
+                                "eu-west-3",
+                                "eu-south-1",
+                                "eu-south-2",
+                                "eu-west-1",
+                                "eu-central-1"
+                            ]
+                        }
+                    },
+                    "Action": [
+                        "bedrock:InvokeModel",
+                        "bedrock:InvokeModelWithResponseStream"
+                    ],
+                    "Resource": "*",
+                    "Effect": "Deny",
+                    "Sid": "DenyInvokeOutsideApprovedRegions"
+                }
+            ]
+        },
+        "VersionId": "v1",
+        "IsDefaultVersion": true,
+        "CreateDate": "2026-10-25T21:14:32+00:00"
+    }
+}

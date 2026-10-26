@@ -1,0 +1,64 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "s3:PutObject",
+            "EvalResourceName": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/orchestrator.tar.gz",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [
+                "bedrock:InferenceProfileArn",
+                "s3:prefix"
+            ],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": false
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/orchestrator.tar.gz",
+                    "EvalResourceDecision": "implicitDeny",
+                    "MissingContextValues": [
+                        "bedrock:InferenceProfileArn",
+                        "s3:prefix"
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": false
+                    }
+                }
+            ]
+        },
+        {
+            "EvalActionName": "s3:DeleteObject",
+            "EvalResourceName": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/orchestrator.tar.gz",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [
+                "bedrock:InferenceProfileArn",
+                "s3:prefix"
+            ],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": false
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/orchestrator.tar.gz",
+                    "EvalResourceDecision": "implicitDeny",
+                    "MissingContextValues": [
+                        "bedrock:InferenceProfileArn",
+                        "s3:prefix"
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": false
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -241,3 +241,28 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R4/VERIFICATION.md` (all criteria PASS), `R4_10_secret-scan.txt`, `R4_10_old-id-guard.txt` |
 | Verification Result | R4 DONE. |
 | Next Action | Frontier: R5 (IAM stack; OD7 lists as parameters; imports nothing from R4 but its policies may name the deploy bucket by derived name), R12a (collector; add the default-SG check, R4-D2), R9, R9e, R10. R7 waits on R6; R11 on R5–R8. R5 handoff written: `plans/aws_redeployment_r5_handoff_2026-10-24.md`. Operator: "Close R4" commit (tickets file, VERIFICATION, RUNLOG, worklog, R5 handoff). |
+
+### 2026-10-25 — R5: IAM template filled, decisions recorded, step sheet written
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-25T14:50:00Z |
+| Control ID | DC-09, DC-10, DC-11, DC-12, DC-13, DC-16 (preparation; nothing created yet) |
+| Action Taken | Operator settled the R5 handoff §4 points in session ('1-9 a opció'); recorded as `docs/tier4_orchestration_state/decision_log/aws-redeployment-r5-iam_2026-10-25.json` (R5-D1 lasting rule `bundles/` prefix; R5-D2 S3 deny outside it; R5-D3 invoke conditions corrected for cross-Region inference, F-R5-2; R5-D4 lasting rule flow-log group `/proposal-orchestrator/vpc-flow-logs`; R5-D5 fixed names; R5-D6 no GenerateDataKey, ViaService in R6; R5-D7 SSM actions from evidence; R5-D8 guard and tests; R5-D9 register statuses). Round 1 read-only lookups run by the operator (`R5_01`–`R5_03`). `deploy/aws/templates/20-iam.yaml` filled (nine resources, seven contract outputs); `tools/aws_template_guard.py` UNTAGGABLE_TYPES += ManagedPolicy, InstanceProfile; `tests/test_aws_iam_template.py` (24 tests); guard test extended; `deploy/aws/README.md` updated. `evidence_v2/R5/STEPS.md` written. |
+| Evidence Requested | `R5_01`–`R5_11`, `R5_outputs.json` per `STEPS.md` |
+| Evidence Received | `R5_01`–`R5_03` (all PASS; 03d criterion corrected, F-R5-5). Agent checks: cfn-lint 1.57.2 exit 0; template guard CLEAN (6); old-ID guard CLEAN; 146 passed over the five AWS test files. |
+| Verification Result | Round 1 PASS; template ready for the change set. |
+| Next Action | Operator: steps 04–05; both read `R5_05_change-set.json` before execution. |
+
+### 2026-10-25 — R5: IAM stack created and verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-25T21:55:00Z |
+| Control ID | DC-10, DC-11, DC-12, DC-13 (VERIFIED_PASS); DC-09, DC-16 (IN_PROGRESS) |
+| Action Taken | Operator ran steps 04–05 (lint, guards, 146 passed; change set `r5-create-01`, nine `Add`, `CAPABILITY_NAMED_IAM`), gave the go, ran steps 06–11 and `STEPS_fix1.md` steps 12–13. Stack `proposal-orchestrator-iam` `CREATE_COMPLETE`. Three step-sheet errors of the agent, each recorded and corrected without editing evidence: 05 criterion asked for a field `describe-change-set` does not return; 09 left seven cases without `aws:RequestedRegion`, so the organization's SCP decided them (re-run as step 12); 11 and the first step 13 wrote pattern names into the scanned folder (re-collected; step 13 revised). |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R5/` (`VERIFICATION.md`: every criterion PASS, seven superseded step-09 files N/A); `R5_outputs.json`; `R5_11_pytest.txt` 168 passed; secret scan and old-ID guard CLEAN. Credits 199.99 USD before and after. |
+| Verification Result | PASS; ticket criteria 1–4 PASS. Register v2 rows DC-09–DC-13, DC-16 updated. |
+| Next Action | Operator: commit R5 and confirm in session; agent then ticks R5. Frontier then: R6 (imports `RuntimeRoleArn`), R12a, R9, R9e, R10. R6 handoff written: `plans/aws_redeployment_r6_handoff_2026-10-25.md`. |
+

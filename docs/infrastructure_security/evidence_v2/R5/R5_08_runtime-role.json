@@ -1,0 +1,39 @@
+﻿{
+    "Role": {
+        "Path": "/",
+        "RoleName": "proposal-orchestrator-runtime-role",
+        "RoleId": "AROA3TOCVYCZB44AZX5NL",
+        "Arn": "arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role",
+        "CreateDate": "2026-10-25T21:14:51+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Ec2Only",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "ec2.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "Description": "The proposal-orchestrator host's runtime identity, with the permission boundary and the explicit deny attached.",
+        "MaxSessionDuration": 3600,
+        "PermissionsBoundary": {
+            "PermissionsBoundaryType": "Policy",
+            "PermissionsBoundaryArn": "arn:aws:iam::797661577394:policy/proposal-orchestrator-boundary"
+        },
+        "Tags": [
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            },
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-runtime-role"
+            }
+        ],
+        "RoleLastUsed": {}
+    }
+}

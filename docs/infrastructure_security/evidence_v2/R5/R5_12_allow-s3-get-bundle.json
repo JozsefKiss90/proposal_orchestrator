@@ -1,0 +1,54 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "s3:GetObject",
+            "EvalResourceName": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/orchestrator.tar.gz",
+            "EvalDecision": "allowed",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "proposal-orchestrator-deploy-bucket-read",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 1,
+                        "Column": 370
+                    },
+                    "EndPosition": {
+                        "Line": 1,
+                        "Column": 510
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": true
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/orchestrator.tar.gz",
+                    "EvalResourceDecision": "allowed",
+                    "MatchedStatements": [
+                        {
+                            "SourcePolicyId": "proposal-orchestrator-deploy-bucket-read",
+                            "SourcePolicyType": "IAM Policy",
+                            "StartPosition": {
+                                "Line": 1,
+                                "Column": 370
+                            },
+                            "EndPosition": {
+                                "Line": 1,
+                                "Column": 510
+                            }
+                        }
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": true
+                    }
+                }
+            ]
+        }
+    ]
+}

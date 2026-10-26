@@ -1,0 +1,64 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "bedrock:InvokeModel",
+            "EvalResourceName": "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [
+                "bedrock:InferenceProfileArn",
+                "s3:prefix"
+            ],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": true
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1",
+                    "EvalResourceDecision": "implicitDeny",
+                    "MissingContextValues": [
+                        "bedrock:InferenceProfileArn",
+                        "s3:prefix"
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": true
+                    }
+                }
+            ]
+        },
+        {
+            "EvalActionName": "bedrock:InvokeModelWithResponseStream",
+            "EvalResourceName": "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [
+                "bedrock:InferenceProfileArn",
+                "s3:prefix"
+            ],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": true
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1",
+                    "EvalResourceDecision": "implicitDeny",
+                    "MissingContextValues": [
+                        "bedrock:InferenceProfileArn",
+                        "s3:prefix"
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": true
+                    }
+                }
+            ]
+        }
+    ]
+}

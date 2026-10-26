@@ -70,13 +70,18 @@ FORBIDDEN_RESOURCE_TYPES = frozenset(
     }
 )
 
-# Resource types that have no Tags property in CloudFormation.
+# Resource types that have no Tags property in CloudFormation. The two IAM
+# types were checked on their reference pages (aws-resource-iam-managedpolicy,
+# aws-resource-iam-instanceprofile) on 2026-10-24 and 2026-10-25
+# (aws-redeployment-r5-iam_2026-10-25, F-R5-3).
 UNTAGGABLE_TYPES = frozenset(
     {
         "AWS::CloudFormation::WaitConditionHandle",
         "AWS::EC2::SecurityGroupEgress",
         "AWS::EC2::SecurityGroupIngress",
         "AWS::EC2::SubnetRouteTableAssociation",
+        "AWS::IAM::InstanceProfile",
+        "AWS::IAM::ManagedPolicy",
         "AWS::KMS::Alias",
         "AWS::S3::BucketPolicy",
         "AWS::SecretsManager::ResourcePolicy",

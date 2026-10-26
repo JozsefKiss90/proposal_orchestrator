@@ -1,0 +1,147 @@
+﻿{
+    "Changes": [
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "BedrockInvokePolicy",
+                "ResourceType": "AWS::IAM::ManagedPolicy",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "DeployBucketReadPolicy",
+                "ResourceType": "AWS::IAM::ManagedPolicy",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "ExplicitDenyPolicy",
+                "ResourceType": "AWS::IAM::ManagedPolicy",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "FlowLogsRole",
+                "ResourceType": "AWS::IAM::Role",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "FlowLogsWritePolicy",
+                "ResourceType": "AWS::IAM::ManagedPolicy",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "PermissionBoundary",
+                "ResourceType": "AWS::IAM::ManagedPolicy",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "RuntimeInstanceProfile",
+                "ResourceType": "AWS::IAM::InstanceProfile",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "RuntimeRole",
+                "ResourceType": "AWS::IAM::Role",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "SupportingServicesPolicy",
+                "ResourceType": "AWS::IAM::ManagedPolicy",
+                "Scope": [],
+                "Details": []
+            }
+        }
+    ],
+    "ChangeSetName": "r5-create-01",
+    "ChangeSetId": "arn:aws:cloudformation:eu-north-1:797661577394:changeSet/r5-create-01/13adfcde-dbce-47ab-9c69-f7ba41521c59",
+    "StackId": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-iam/5f4e7820-d082-11f1-bc3e-0effc55a7525",
+    "StackName": "proposal-orchestrator-iam",
+    "Description": null,
+    "Parameters": [
+        {
+            "ParameterKey": "FoundationModelArns",
+            "ParameterValue": "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-sonnet-4-6"
+        },
+        {
+            "ParameterKey": "RoutedRegions",
+            "ParameterValue": "eu-north-1,eu-west-3,eu-south-1,eu-south-2,eu-west-1,eu-central-1"
+        },
+        {
+            "ParameterKey": "ProjectName",
+            "ParameterValue": "proposal-orchestrator"
+        },
+        {
+            "ParameterKey": "ExpectedAccountId",
+            "ParameterValue": "797661577394"
+        },
+        {
+            "ParameterKey": "InferenceProfileArns",
+            "ParameterValue": "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6"
+        },
+        {
+            "ParameterKey": "ExpectedRegion",
+            "ParameterValue": "eu-north-1"
+        }
+    ],
+    "CreationTime": "2026-10-25T14:42:58.972000+00:00",
+    "ExecutionStatus": "AVAILABLE",
+    "Status": "CREATE_COMPLETE",
+    "StatusReason": null,
+    "NotificationARNs": [],
+    "RollbackConfiguration": {},
+    "Capabilities": [
+        "CAPABILITY_NAMED_IAM"
+    ],
+    "Tags": [
+        {
+            "Key": "project",
+            "Value": "proposal-orchestrator"
+        }
+    ],
+    "ParentChangeSetId": null,
+    "IncludeNestedStacks": false,
+    "RootChangeSetId": null,
+    "OnStackFailure": null,
+    "ImportExistingResources": null,
+    "StackDriftStatus": null,
+    "DeploymentMode": null
+}

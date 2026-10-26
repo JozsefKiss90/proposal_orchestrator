@@ -5,7 +5,7 @@ Description: >-
   boundary, the explicit deny, an invoke policy naming the OD7 inference
   profiles and every foundation model they route to (F2), the
   supporting-services policy and a deploy-bucket read scoped to its prefixes;
-  plus the flow-logs role. Skeleton written in R3. Free of hourly cost.
+  plus the flow-logs role. Free of hourly cost.
   See deploy/aws/README.md.
 
 Metadata:
@@ -15,6 +15,7 @@ Metadata:
     FilledBy: R5
     Contract: deploy/aws/outputs_contract.json
     Decision: aws-redeployment-od6-stack-layout-r3_2026-10-22
+    FillDecision: aws-redeployment-r5-iam_2026-10-25
 
 Parameters:
   ProjectName:
@@ -58,15 +59,413 @@ Rules:
         AssertDescription: The stack is not being created in ExpectedRegion.
 
 Resources:
-  # R3 skeleton only. R5 replaces this no-cost placeholder with the IAM
-  # resources and adds the outputs named in deploy/aws/outputs_contract.json.
-  # The Metadata block references every parameter, so the skeleton lints
-  # without unused-parameter warnings.
-  SkeletonPlaceholder:
-    Type: AWS::CloudFormation::WaitConditionHandle
-    Metadata:
-      SkeletonParameters:
-        ProjectName: !Ref ProjectName
-        InferenceProfileArns: !Ref InferenceProfileArns
-        FoundationModelArns: !Ref FoundationModelArns
-        RoutedRegions: !Ref RoutedRegions
+  # DC-12 (OD2 a): the permission boundary of the runtime role. It allows
+  # exactly what the host needs and nothing else: invoke on the OD7 resources,
+  # the runtime secret, KMS decrypt (granted by R6's key policy, not here:
+  # a boundary limits resource-based grants to a role ARN as well), caller
+  # identity, the SSM Agent's actions, and read on the deploy bucket's
+  # bundles/ prefix (R5-D1).
+  PermissionBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${ProjectName}-boundary"
+      Path: /
+      Description: >-
+        Permission boundary of the proposal-orchestrator runtime role: the
+        most the role can ever do.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: BedrockInvokeProfiles
+            Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: !Ref InferenceProfileArns
+          - Sid: BedrockInvokeRoutedModels
+            Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: !Ref FoundationModelArns
+          - Sid: RuntimeSecretRead
+            Effect: Allow
+            Action: secretsmanager:GetSecretValue
+            Resource: !Sub "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${ProjectName}/env-config-*"
+          - Sid: KmsDecryptThroughKeyPolicy
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+            Resource: !Sub "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*"
+          - Sid: CallerIdentity
+            Effect: Allow
+            Action: sts:GetCallerIdentity
+            Resource: "*"
+          - Sid: SsmAgentCore
+            Effect: Allow
+            Action:
+              - ssm:DescribeAssociation
+              - ssm:GetDeployablePatchSnapshotForInstance
+              - ssm:GetDocument
+              - ssm:DescribeDocument
+              - ssm:GetManifest
+              - ssm:GetParameter
+              - ssm:GetParameters
+              - ssm:ListAssociations
+              - ssm:ListInstanceAssociations
+              - ssm:PutInventory
+              - ssm:PutComplianceItems
+              - ssm:PutConfigurePackageResult
+              - ssm:UpdateAssociationStatus
+              - ssm:UpdateInstanceAssociationStatus
+              - ssm:UpdateInstanceInformation
+            Resource: "*"
+          - Sid: SsmAgentMessages
+            Effect: Allow
+            Action:
+              - ssmmessages:CreateControlChannel
+              - ssmmessages:CreateDataChannel
+              - ssmmessages:OpenControlChannel
+              - ssmmessages:OpenDataChannel
+            Resource: "*"
+          - Sid: SsmAgentEc2Messages
+            Effect: Allow
+            Action:
+              - ec2messages:AcknowledgeMessage
+              - ec2messages:DeleteMessage
+              - ec2messages:FailMessage
+              - ec2messages:GetEndpoint
+              - ec2messages:GetMessages
+              - ec2messages:SendReply
+            Resource: "*"
+          - Sid: DeployBucketBundlesRead
+            Effect: Allow
+            Action:
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}"
+          - Sid: DeployBucketBundlesObjects
+            Effect: Allow
+            Action: s3:GetObject
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}/bundles/*"
+
+  # DC-10 (F2): invoke on the OD7 inference profiles, requested in this
+  # Region, and on the foundation models they route to, only through those
+  # profiles and only in the routed Regions. Bedrock authorises the model in
+  # each destination Region separately, with that Region as
+  # aws:RequestedRegion (R5-D3); a condition of this Region alone on the
+  # models would refuse every routed call.
+  BedrockInvokePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${ProjectName}-bedrock-invoke"
+      Path: /
+      Description: >-
+        Invoke the OD7 inference profiles and, through them only, the
+        foundation models they route to.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: InvokeOd7Profiles
+            Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: !Ref InferenceProfileArns
+            Condition:
+              StringEquals:
+                aws:RequestedRegion: !Ref "AWS::Region"
+          - Sid: InvokeRoutedModelsThroughOd7Profiles
+            Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: !Ref FoundationModelArns
+            Condition:
+              StringEquals:
+                bedrock:InferenceProfileArn: !Ref InferenceProfileArns
+                aws:RequestedRegion: !Ref RoutedRegions
+
+  # DC-11 (and DC-16): explicit denies that no Allow can override.
+  ExplicitDenyPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${ProjectName}-explicit-deny"
+      Path: /
+      Description: >-
+        Explicit denies of the proposal-orchestrator runtime role: Bedrock
+        administration, other services, non-Claude and non-eu profiles, S3
+        outside the deploy bundles, and invoke outside the approved Regions.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyBedrockAdministration
+            Effect: Deny
+            Action:
+              - bedrock:CreateModelCustomizationJob
+              - bedrock:CreateProvisionedModelThroughput
+              - bedrock:DeleteModelInvocationLoggingConfiguration
+              - bedrock:PutModelInvocationLoggingConfiguration
+              - bedrock:CreateGuardrail
+              - bedrock:DeleteGuardrail
+              - bedrock:TagResource
+              - bedrock:UntagResource
+            Resource: "*"
+          - Sid: DenyOtherServices
+            Effect: Deny
+            Action:
+              - iam:*
+              - ec2:*
+              - lambda:*
+              - sqs:*
+              - sns:*
+              - dynamodb:*
+            Resource: "*"
+          # OD7-global: only eu. profiles and Claude foundation models; global.,
+          # us. and application inference profiles are denied.
+          - Sid: DenyNonClaudeAndNonEuProfiles
+            Effect: Deny
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            NotResource:
+              - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/eu.anthropic.claude-*"
+              - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/anthropic.claude-*"
+          # R5-D2: every S3 resource except the deploy bucket and its bundles/.
+          - Sid: DenyS3OutsideDeployBundles
+            Effect: Deny
+            Action: s3:*
+            NotResource:
+              - !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}"
+              - !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}/bundles/*"
+          # DC-16 (R5-D3): invoke only in the OD1 Region and the Regions the
+          # OD7 profiles route to. Also refuses global. routing.
+          - Sid: DenyInvokeOutsideApprovedRegions
+            Effect: Deny
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: "*"
+            Condition:
+              StringNotEquals:
+                aws:RequestedRegion: !Ref RoutedRegions
+
+  # The SSM Agent's actions, copied verbatim from AmazonSSMManagedInstanceCore
+  # default version v2 (evidence_v2/R5/R5_03_ssm-core-policy.json, decision
+  # R5-D7). Not attached as the AWS managed policy: the copy is pinned to
+  # evidence, and the boundary must list the same actions anyway.
+  # The SSM Agent, caller identity and the runtime secret. No kms:Decrypt:
+  # R6's key policy grants it (ticket R6, "not through an IAM side grant").
+  SupportingServicesPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${ProjectName}-supporting-services"
+      Path: /
+      Description: >-
+        SSM Agent core actions, caller identity and read of the runtime
+        secret for the proposal-orchestrator runtime role.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: SsmAgentCore
+            Effect: Allow
+            Action:
+              - ssm:DescribeAssociation
+              - ssm:GetDeployablePatchSnapshotForInstance
+              - ssm:GetDocument
+              - ssm:DescribeDocument
+              - ssm:GetManifest
+              - ssm:GetParameter
+              - ssm:GetParameters
+              - ssm:ListAssociations
+              - ssm:ListInstanceAssociations
+              - ssm:PutInventory
+              - ssm:PutComplianceItems
+              - ssm:PutConfigurePackageResult
+              - ssm:UpdateAssociationStatus
+              - ssm:UpdateInstanceAssociationStatus
+              - ssm:UpdateInstanceInformation
+            Resource: "*"
+          - Sid: SsmAgentMessages
+            Effect: Allow
+            Action:
+              - ssmmessages:CreateControlChannel
+              - ssmmessages:CreateDataChannel
+              - ssmmessages:OpenControlChannel
+              - ssmmessages:OpenDataChannel
+            Resource: "*"
+          - Sid: SsmAgentEc2Messages
+            Effect: Allow
+            Action:
+              - ec2messages:AcknowledgeMessage
+              - ec2messages:DeleteMessage
+              - ec2messages:FailMessage
+              - ec2messages:GetEndpoint
+              - ec2messages:GetMessages
+              - ec2messages:SendReply
+            Resource: "*"
+          - Sid: CallerIdentity
+            Effect: Allow
+            Action: sts:GetCallerIdentity
+            Resource: "*"
+          - Sid: RuntimeSecretRead
+            Effect: Allow
+            Action: secretsmanager:GetSecretValue
+            Resource: !Sub "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${ProjectName}/env-config-*"
+
+  # F7 second belt (R4-D3 is the first, R7's bucket policy the third):
+  # read-only on the deploy bucket's bundles/ prefix (R5-D1).
+  DeployBucketReadPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${ProjectName}-deploy-bucket-read"
+      Path: /
+      Description: >-
+        Read-only access to the bundles/ prefix of the proposal-orchestrator
+        deploy bucket.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ListBundlesPrefix
+            Effect: Allow
+            Action: s3:ListBucket
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}"
+            Condition:
+              StringLike:
+                s3:prefix: bundles/*
+          - Sid: BucketLocation
+            Effect: Allow
+            Action: s3:GetBucketLocation
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}"
+          - Sid: GetBundles
+            Effect: Allow
+            Action: s3:GetObject
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${ProjectName}-deploy-${AWS::AccountId}/bundles/*"
+
+  # DC-09, DC-12, DC-13 (OD2 a, F1): the one host role, itself hardened.
+  RuntimeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-runtime-role"
+      Path: /
+      Description: >-
+        The proposal-orchestrator host's runtime identity, with the
+        permission boundary and the explicit deny attached.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: Ec2Only
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      PermissionsBoundary: !Ref PermissionBoundary
+      ManagedPolicyArns:
+        - !Ref BedrockInvokePolicy
+        - !Ref SupportingServicesPolicy
+        - !Ref DeployBucketReadPolicy
+        - !Ref ExplicitDenyPolicy
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-runtime-role"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # DC-09 (DC-14 in R11): the instance profile holding that one role.
+  RuntimeInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub "${ProjectName}-runtime-profile"
+      Path: /
+      Roles:
+        - !Ref RuntimeRole
+
+  # DC-08 (used by R7): write to the one flow-log group (R5-D4).
+  FlowLogsWritePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${ProjectName}-flow-logs-write"
+      Path: /
+      Description: >-
+        Write VPC flow logs to the proposal-orchestrator flow-log group.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: FlowLogGroupWrite
+            Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ProjectName}/vpc-flow-logs:*"
+
+  # Trusted by the flow-logs service only, for flow logs of this account in
+  # this Region (confused-deputy condition, VPC user guide "IAM role for
+  # publishing flow logs to CloudWatch Logs").
+  FlowLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-flow-logs-role"
+      Path: /
+      Description: >-
+        Lets VPC Flow Logs publish the proposal-orchestrator flow logs to
+        CloudWatch Logs.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: VpcFlowLogsOnly
+            Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref "AWS::AccountId"
+              ArnLike:
+                aws:SourceArn: !Sub "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:vpc-flow-log/*"
+      ManagedPolicyArns:
+        - !Ref FlowLogsWritePolicy
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-flow-logs-role"
+        - Key: project
+          Value: !Ref ProjectName
+
+Outputs:
+  RuntimeRoleName:
+    Description: The hardened runtime role (OD2 a).
+    Value: !Ref RuntimeRole
+    Export:
+      Name: proposal-orchestrator-iam-RuntimeRoleName
+  RuntimeRoleArn:
+    Description: The runtime role's ARN; R6, R7, R8 and R11 name it.
+    Value: !GetAtt RuntimeRole.Arn
+    Export:
+      Name: proposal-orchestrator-iam-RuntimeRoleArn
+  InstanceProfileName:
+    Description: The host's instance profile (R11).
+    Value: !Ref RuntimeInstanceProfile
+    Export:
+      Name: proposal-orchestrator-iam-InstanceProfileName
+  InstanceProfileArn:
+    Description: The host's instance profile ARN (R11).
+    Value: !GetAtt RuntimeInstanceProfile.Arn
+    Export:
+      Name: proposal-orchestrator-iam-InstanceProfileArn
+  PermissionBoundaryArn:
+    Description: The runtime role's permission boundary (DC-12).
+    Value: !Ref PermissionBoundary
+    Export:
+      Name: proposal-orchestrator-iam-PermissionBoundaryArn
+  ExplicitDenyPolicyArn:
+    Description: The runtime role's explicit-deny policy (DC-11, DC-16).
+    Value: !Ref ExplicitDenyPolicy
+    Export:
+      Name: proposal-orchestrator-iam-ExplicitDenyPolicyArn
+  FlowLogsRoleArn:
+    Description: The flow-logs role (R7, DC-08).
+    Value: !GetAtt FlowLogsRole.Arn
+    Export:
+      Name: proposal-orchestrator-iam-FlowLogsRoleArn

@@ -1,0 +1,32 @@
+﻿{
+    "InstanceProfile": {
+        "Path": "/",
+        "InstanceProfileName": "proposal-orchestrator-runtime-profile",
+        "InstanceProfileId": "AIPA3TOCVYCZECEP4R3JE",
+        "Arn": "arn:aws:iam::797661577394:instance-profile/proposal-orchestrator-runtime-profile",
+        "CreateDate": "2026-10-25T21:15:11+00:00",
+        "Roles": [
+            {
+                "Path": "/",
+                "RoleName": "proposal-orchestrator-runtime-role",
+                "RoleId": "AROA3TOCVYCZB44AZX5NL",
+                "Arn": "arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role",
+                "CreateDate": "2026-10-25T21:14:51+00:00",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Ec2Only",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "ec2.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                }
+            }
+        ],
+        "Tags": []
+    }
+}

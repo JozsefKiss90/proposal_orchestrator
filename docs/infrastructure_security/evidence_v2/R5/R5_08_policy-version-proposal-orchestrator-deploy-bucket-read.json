@@ -1,0 +1,35 @@
+﻿{
+    "PolicyVersion": {
+        "Document": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Condition": {
+                        "StringLike": {
+                            "s3:prefix": "bundles/*"
+                        }
+                    },
+                    "Action": "s3:ListBucket",
+                    "Resource": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+                    "Effect": "Allow",
+                    "Sid": "ListBundlesPrefix"
+                },
+                {
+                    "Action": "s3:GetBucketLocation",
+                    "Resource": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+                    "Effect": "Allow",
+                    "Sid": "BucketLocation"
+                },
+                {
+                    "Action": "s3:GetObject",
+                    "Resource": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/*",
+                    "Effect": "Allow",
+                    "Sid": "GetBundles"
+                }
+            ]
+        },
+        "VersionId": "v1",
+        "IsDefaultVersion": true,
+        "CreateDate": "2026-10-25T21:14:32+00:00"
+    }
+}

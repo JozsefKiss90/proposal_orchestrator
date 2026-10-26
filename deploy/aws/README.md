@@ -32,7 +32,9 @@ R3 wrote every template as a **skeleton**: parameters, the `DeployTarget` rule a
 replaces the placeholder with the real resources and adds the outputs.
 
 Filled so far: `10-network.yaml` (R4, `aws-redeployment-r4-network_2026-10-24`; its shape is pinned by
-`tests/test_aws_network_template.py`).
+`tests/test_aws_network_template.py`); `20-iam.yaml` (R5, `aws-redeployment-r5-iam_2026-10-25`; pinned by
+`tests/test_aws_iam_template.py`, which also refuses wildcard grants and compares the SSM Agent's actions
+with `evidence_v2/R5/R5_03_ssm-core-policy.json`).
 
 ## Rules every template keeps
 
@@ -105,7 +107,7 @@ Each run:
 .\.venv-lint\Scripts\cfn-lint.exe --regions eu-north-1 -- deploy/aws/templates/*.yaml
 py -3.10 -m tools.aws_template_guard deploy/aws/templates
 py -3.10 -m tools.old_id_guard
-py -3.10 -m pytest tests/test_aws_iac_contract.py tests/test_aws_template_guard.py tests/test_aws_network_template.py tests/test_old_id_guard.py
+py -3.10 -m pytest tests/test_aws_iac_contract.py tests/test_aws_template_guard.py tests/test_aws_network_template.py tests/test_aws_iam_template.py tests/test_old_id_guard.py
 ```
 
 `cfn-lint` exits 0 when it finds nothing. A ticket's step sheet saves this output as evidence.

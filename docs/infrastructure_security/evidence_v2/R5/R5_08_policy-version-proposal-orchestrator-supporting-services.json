@@ -1,0 +1,70 @@
+﻿{
+    "PolicyVersion": {
+        "Document": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": [
+                        "ssm:DescribeAssociation",
+                        "ssm:GetDeployablePatchSnapshotForInstance",
+                        "ssm:GetDocument",
+                        "ssm:DescribeDocument",
+                        "ssm:GetManifest",
+                        "ssm:GetParameter",
+                        "ssm:GetParameters",
+                        "ssm:ListAssociations",
+                        "ssm:ListInstanceAssociations",
+                        "ssm:PutInventory",
+                        "ssm:PutComplianceItems",
+                        "ssm:PutConfigurePackageResult",
+                        "ssm:UpdateAssociationStatus",
+                        "ssm:UpdateInstanceAssociationStatus",
+                        "ssm:UpdateInstanceInformation"
+                    ],
+                    "Resource": "*",
+                    "Effect": "Allow",
+                    "Sid": "SsmAgentCore"
+                },
+                {
+                    "Action": [
+                        "ssmmessages:CreateControlChannel",
+                        "ssmmessages:CreateDataChannel",
+                        "ssmmessages:OpenControlChannel",
+                        "ssmmessages:OpenDataChannel"
+                    ],
+                    "Resource": "*",
+                    "Effect": "Allow",
+                    "Sid": "SsmAgentMessages"
+                },
+                {
+                    "Action": [
+                        "ec2messages:AcknowledgeMessage",
+                        "ec2messages:DeleteMessage",
+                        "ec2messages:FailMessage",
+                        "ec2messages:GetEndpoint",
+                        "ec2messages:GetMessages",
+                        "ec2messages:SendReply"
+                    ],
+                    "Resource": "*",
+                    "Effect": "Allow",
+                    "Sid": "SsmAgentEc2Messages"
+                },
+                {
+                    "Action": "sts:GetCallerIdentity",
+                    "Resource": "*",
+                    "Effect": "Allow",
+                    "Sid": "CallerIdentity"
+                },
+                {
+                    "Action": "secretsmanager:GetSecretValue",
+                    "Resource": "arn:aws:secretsmanager:eu-north-1:797661577394:secret:proposal-orchestrator/env-config-*",
+                    "Effect": "Allow",
+                    "Sid": "RuntimeSecretRead"
+                }
+            ]
+        },
+        "VersionId": "v1",
+        "IsDefaultVersion": true,
+        "CreateDate": "2026-10-25T21:14:32+00:00"
+    }
+}

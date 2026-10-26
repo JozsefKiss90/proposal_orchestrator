@@ -1,0 +1,164 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r5-iam_2026-10-25",
+  "date": "2026-10-25",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R5 of plans/aws_redeployment_tickets.md (IAM stack: the hardened role is the runtime role)",
+  "supersedes": "Nothing. Applies the R0 decision OD2 (a), OD7-resources and OD7-global, OD1-r1 and aws-redeployment-od6-stack-layout-r3_2026-10-22 to the IAM stack; settles the eight points of plans/aws_redeployment_r5_handoff_2026-10-24.md section 4 plus one added point (SSM actions); corrects one statement of that handoff (R5-D3); adds two lasting rules (R5-D1 deploy-bucket prefix, R5-D4 flow-log group name).",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-25 on the agent's R5 proposals. Execution aid for infrastructure work (CLAUDE.md section 10.2). Closes no gate, adds no runtime gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-25 ('1-9 a opció', ~14:15 UTC), accepting option (a) of each of the nine points the agent put to them; point 10 (commit of the R4 close remainder) answered 'commitolva'.",
+  "decision": "The IAM stack (deploy/aws/templates/20-iam.yaml) creates one runtime role trusted by EC2 only, with a permission boundary and four managed policies (Bedrock invoke, supporting services, deploy-bucket read, explicit deny), one instance profile holding it, and a flow-logs role with its write policy; all names fixed. The invoke policy conditions the inference profiles on this Region and the routed foundation models on bedrock:InferenceProfileArn and the routed Regions; the explicit deny refuses invoke outside the routed Regions (DC-16).",
+  "why": "OD2 (a) makes the hardened identity the runtime identity (F1); the OD7 lists come in as parameters (F2); each section-4 point had one answer that keeps the role no wider than the host needs and gives the IAM simulation an explicit deny to show.",
+  "inputs": [
+    "plans/aws_redeployment_r5_handoff_2026-10-24.md sections 1, 3 and 4",
+    "plans/aws_redeployment_tickets.md R5, R6, R7, R8, R11, R12b, R15",
+    "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F1, F2, F7), section 5 (OD2, OD7, OD8), sections 7 and 7a",
+    "aws-redeployment-od7-model-set_2026-10-21 (OD7-resources, OD7-global); aws-redeployment-r4-network_2026-10-24 (R4-D3)",
+    "docs/infrastructure_security/evidence/02_iam/ v1 policy documents and IAM_Least_Privilege_logs.txt, as history (old account, us. prefix)",
+    "docs/infrastructure_security/evidence_v2/R5/R5_03_*.json (round 1 read-only lookups, 2026-10-25)",
+    "AWS documentation read 2026-10-25: Amazon Bedrock user guide 'Geographic cross-Region inference'; AWS ML blog 'Securing Amazon Bedrock cross-Region inference: Geographic and global' (2026-01-13); VPC user guide 'IAM role for publishing flow logs to CloudWatch Logs'; CloudFormation reference AWS::IAM::ManagedPolicy and AWS::IAM::InstanceProfile"
+  ],
+  "findings": [
+    {
+      "id": "F-R5-1",
+      "declared_status": "Confirmed",
+      "finding": "AmazonSSMManagedInstanceCore's default version is v2 (created 2019-05-23): three Allow statements on Resource '*' with 15 ssm:, 4 ssmmessages: and 6 ec2messages: actions, 25 in all. These are copied verbatim into the boundary and the supporting-services policy.",
+      "basis": "docs/infrastructure_security/evidence_v2/R5/R5_03_ssm-core-policy-meta.json, R5_03_ssm-core-policy.json."
+    },
+    {
+      "id": "F-R5-2",
+      "declared_status": "Inferred",
+      "finding": "In geographic cross-Region inference Bedrock authorises the inference profile (with the source Region), the foundation model in the source Region and the foundation model in each destination Region; for the foundation-model evaluations aws:RequestedRegion is the destination Region and bedrock:InferenceProfileArn is set. An Allow on the routed models conditioned on aws:RequestedRegion = the source Region alone would therefore refuse every routed call. This contradicts the R5 handoff's sections 3 and 4 ('the routed Regions appear as resources, not as requested Regions').",
+      "basis": "Bedrock user guide 'Geographic cross-Region inference' (an SCP restricting Regions must allow all destination Regions or exempt them by bedrock:InferenceProfileArn; the profile evaluation carries the source Region and no bedrock:InferenceProfileArn); AWS ML blog 2026-01-13 (example policy: models in all destination Regions, conditioned on bedrock:InferenceProfileArn). Corroborated by v1 history: the v1 invoke policy already matched arn:aws:bedrock:*::foundation-model/anthropic.claude-* but carried aws:RequestedRegion in {eu-west-1, us-east-1}, and the call to a profile routing to us-east-2 succeeded only after an unconditioned policy named the us-east-2 model (evidence/02_iam/IAM_Least_Privilege_logs.txt). Not provable by IAM simulation, where the context is supplied by the caller; shown by R11's live call."
+    },
+    {
+      "id": "F-R5-3",
+      "declared_status": "Confirmed",
+      "finding": "AWS::IAM::ManagedPolicy (properties Description, Groups, ManagedPolicyName, Path, PolicyDocument, Roles, Users; Ref returns the ARN) and AWS::IAM::InstanceProfile (InstanceProfileName, Path, Roles; Ref returns the name, GetAtt Arn) take no Tags. Both join UNTAGGABLE_TYPES in tools/aws_template_guard.py. AWS::IAM::Role takes Tags and carries Name and project.",
+      "basis": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-iam-managedpolicy.html and aws-resource-iam-instanceprofile.html, read 2026-10-24 (R5 handoff) and again 2026-10-25; cfn-lint 1.57.2 exit 0 on the filled template."
+    },
+    {
+      "id": "F-R5-4",
+      "declared_status": "Confirmed",
+      "finding": "Before R5 the account holds no customer-managed policy and no instance profile, and no role named proposal-orchestrator-*: thirteen roles, three AWS-managed under /managed/ (AccountFullAccessRole, AWSManagedAccountManagementAccessRole, AWSManagedAdvancedFeaturesActivationRole) and ten AWS service-linked roles under /aws-service-role/. Every fixed name R5 uses is free, and no policy named or described as temporary or validation exists.",
+      "basis": "docs/infrastructure_security/evidence_v2/R5/R5_03_local-policies-before.json, R5_03_roles-before.json, R5_03_instance-profiles-before.json."
+    },
+    {
+      "id": "F-R5-5",
+      "declared_status": "Confirmed",
+      "finding": "The AWS CLI v2 returns exit status 254 when the service answers with an error (here DescribeStacks ValidationError 'Stack with id proposal-orchestrator-iam does not exist'); the step sheet's criterion had said 255. Windows PowerShell also wraps the error text at the console width inside the file. The R5 step 03 criterion is corrected in STEPS.md with a dated note; the evidence is unchanged.",
+      "basis": "docs/infrastructure_security/evidence_v2/R5/R5_03_iam-stack-before.txt."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R5-D1",
+      "question": "Deploy-bucket prefix for the runtime role (plans/aws_redeployment_r5_handoff_2026-10-24.md section 4, point 1)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Lasting rule: one prefix, bundles/, read-only for the runtime role. s3:ListBucket on the bucket with Condition StringLike s3:prefix = bundles/*; s3:GetBucketLocation on the bucket; s3:GetObject on bundles/*. Bucket name derived as ${ProjectName}-deploy-${AWS::AccountId}. The R4 S3 gateway endpoint policy stays as it is.",
+      "reason": "Operator's answer '1a'. The narrowest read the AN12 tarball and its .sha256 need (F7).",
+      "consequence": "R7's bucket policy and R15's runbook use the same prefix; R15 uploads to bundles/. R7 and R15 inherit this rule."
+    },
+    {
+      "id": "R5-D2",
+      "question": "How S3 appears in the explicit deny (point 2)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Deny s3:* with NotResource = the deploy bucket and its bundles/* objects. Every other S3 resource is explicitly denied; inside the bucket, writes are implicitly denied (no Allow grants them).",
+      "reason": "Operator's answer '2a'. Exit condition 2 asks for an explicit deny of S3 outside the policy, which IAM simulation shows as explicitDeny.",
+      "consequence": "Step 09 expects explicitDeny for s3:GetObject on another in-account bucket and implicitDeny for s3:PutObject on bundles/. If R11 shows that Run Command needs the SSM Agent's regional buckets, both R4-D3's endpoint policy and this deny gain a statement by UPDATE change set, with a successor record."
+    },
+    {
+      "id": "R5-D3",
+      "question": "DC-16: where the Region condition lives (point 3), corrected by F-R5-2",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "The invoke policy has two statements: (i) the inference-profile ARNs with StringEquals aws:RequestedRegion = ${AWS::Region}; (ii) the foundation-model ARNs with StringEquals bedrock:InferenceProfileArn in InferenceProfileArns and aws:RequestedRegion in RoutedRegions. The explicit deny refuses the two invoke actions when aws:RequestedRegion is not in RoutedRegions (DC-16); this also refuses global. routing, whose Region is 'unspecified'.",
+      "reason": "Operator's answer '3a' to the agent's corrected proposal. The handoff's proposal (models allowed only for aws:RequestedRegion = eu-north-1) would refuse every routed call (F-R5-2). The bedrock:InferenceProfileArn condition is AWS's recommended pattern and admits the models only through the OD7 profiles.",
+      "consequence": "Step 09's allowed foundation-model cases supply two context entries (aws:RequestedRegion = the model's Region, bedrock:InferenceProfileArn = its profile); a model case without the profile context is expected implicitDeny. R11's live call is the proof of F-R5-2; R11's Bedrock endpoint policy must admit the same resources. R12b's DC-17 negative test hits the region deny."
+    },
+    {
+      "id": "R5-D4",
+      "question": "Flow-log group name (point 4)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Lasting rule: the flow-log group is /${ProjectName}/vpc-flow-logs, ARN arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${ProjectName}/vpc-flow-logs:*. The flow-logs role may write only there (logs:CreateLogStream, PutLogEvents, DescribeLogGroups, DescribeLogStreams), and its trust policy admits vpc-flow-logs.amazonaws.com only with aws:SourceAccount = ${AWS::AccountId} and aws:SourceArn like arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:vpc-flow-log/*.",
+      "reason": "Operator's answer '4a'. R5's role and R6's key policy must scope to the group R7 creates; the confused-deputy condition is the one the VPC user guide recommends.",
+      "consequence": "R7 creates the group under exactly this name; R6 scopes CloudWatch Logs to the prefix /${ProjectName}/."
+    },
+    {
+      "id": "R5-D5",
+      "question": "Names (point 5)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "Fixed names under Path /: ${ProjectName}-runtime-role, -runtime-profile, -boundary, -explicit-deny, -bedrock-invoke, -supporting-services, -deploy-bucket-read, -flow-logs-role, -flow-logs-write. All policies are managed policies; no inline policy.",
+      "reason": "Operator's answer '5a'. Stable ARNs for R6, R8, R11 and the evidence commands; each policy has an ARN for get-policy-version.",
+      "consequence": "The change set needs --capabilities CAPABILITY_NAMED_IAM. A name change replaces the resource."
+    },
+    {
+      "id": "R5-D6",
+      "question": "kms:GenerateDataKey* and kms:ViaService (point 6)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "No kms:GenerateDataKey* (the role writes nothing encrypted). The boundary allows kms:Decrypt and kms:DescribeKey on this account's keys in this Region; no identity policy grants them. A kms:ViaService condition, if any, goes into R6's key-policy grant, not into the boundary.",
+      "reason": "Operator's answer '6a'. One place for the KMS narrowing; the boundary stays simple.",
+      "consequence": "R6 decides ViaService in its key policy, built with ${AWS::Region}."
+    },
+    {
+      "id": "R5-D7",
+      "question": "SSM Agent actions (point 7, added by the agent)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "The full action list of AmazonSSMManagedInstanceCore v2 (F-R5-1), copied verbatim into the boundary and the supporting-services policy. The AWS managed policy is not attached.",
+      "reason": "Operator's answer '7a'. A trimmed list could break Run Command, which only R11 would show; the copy is pinned to evidence.",
+      "consequence": "tests/test_aws_iam_template.py compares both lists with R5_03_ssm-core-policy.json. If AWS publishes a new default version, a successor record decides whether to follow it."
+    },
+    {
+      "id": "R5-D8",
+      "question": "Guard and tests (point 8)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) AWS::IAM::ManagedPolicy and AWS::IAM::InstanceProfile join UNTAGGABLE_TYPES (F-R5-3), with a guard test; the two ManagedPolicy fixtures lose their Tags. (b) tests/test_aws_iam_template.py pins the stack's shape. (c) The wildcard-grant check is an R5 test, not a guard rule: no Allow of Action '*' or 'service:*', and Resource '*' only for the SSM Agent's actions and sts:GetCallerIdentity.",
+      "reason": "Operator's answer '8a'. The wildcard check's exceptions are IAM-specific.",
+      "consequence": "deploy/aws/README.md lists the IAM template test with the others."
+    },
+    {
+      "id": "R5-D9",
+      "question": "Register v2 statuses (point 9)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "On a PASS verification: DC-10, DC-11, DC-12 and DC-13 VERIFIED_PASS (policy-level criteria evidenced on the runtime role; DC-10 noted 'live routed call: R11'); DC-09 IN_PROGRESS (that the host uses the profile is shown in R11, DC-14); DC-16 IN_PROGRESS (condition in place; negative test R12b, DC-17). DC-08 untouched (R7).",
+      "reason": "Operator's answer '9a'.",
+      "consequence": "R11 closes DC-09 with DC-14; R12b closes DC-16."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "R5-D3",
+      "declared_status": "Inferred",
+      "gap": "F-R5-2 is shown only by a live routed call (R11). If a routed call is refused, R11 stops and a successor to this record changes the invoke policy by UPDATE change set; no policy named or described as temporary is created."
+    },
+    {
+      "decision": "R5-D2",
+      "declared_status": "Inferred",
+      "gap": "Whether the SSM Agent on the R11 host needs its regional S3 buckets (shared with R4-D3's known gap)."
+    },
+    {
+      "decision": "R5-D4",
+      "declared_status": "Inferred",
+      "gap": "Whether logs:DescribeLogGroups scoped to the one group's ARN is enough for flow-log delivery (the VPC guide's example uses Resource '*'; v1 used the scoped form). R7 shows it by delivered flow logs."
+    }
+  ],
+  "not_evidence_of": [
+    "Any IAM resource in account 797661577394: this record precedes the first R5 change set.",
+    "The IAM simulation results of step 09."
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account.",
+    "basis": "Template structure, policy actions, the new account's id, AWS documentation references and evidence paths only."
+  }
+}

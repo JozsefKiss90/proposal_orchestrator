@@ -1,0 +1,64 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "bedrock:InvokeModel",
+            "EvalResourceName": "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [
+                "bedrock:InferenceProfileArn",
+                "s3:prefix"
+            ],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": false
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+                    "EvalResourceDecision": "implicitDeny",
+                    "MissingContextValues": [
+                        "bedrock:InferenceProfileArn",
+                        "s3:prefix"
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": false
+                    }
+                }
+            ]
+        },
+        {
+            "EvalActionName": "bedrock:InvokeModelWithResponseStream",
+            "EvalResourceName": "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [
+                "bedrock:InferenceProfileArn",
+                "s3:prefix"
+            ],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": false
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+                    "EvalResourceDecision": "implicitDeny",
+                    "MissingContextValues": [
+                        "bedrock:InferenceProfileArn",
+                        "s3:prefix"
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": false
+                    }
+                }
+            ]
+        }
+    ]
+}

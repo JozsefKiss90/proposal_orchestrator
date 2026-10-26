@@ -1,0 +1,32 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "s3:ListBucket",
+            "EvalResourceName": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [
+                "bedrock:InferenceProfileArn"
+            ],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": true
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+                    "EvalResourceDecision": "implicitDeny",
+                    "MissingContextValues": [
+                        "bedrock:InferenceProfileArn"
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": true
+                    }
+                }
+            ]
+        }
+    ]
+}

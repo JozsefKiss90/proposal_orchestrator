@@ -1,0 +1,60 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "sts:GetCallerIdentity",
+            "EvalResourceName": "*",
+            "EvalDecision": "allowed",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "proposal-orchestrator-supporting-services",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 1,
+                        "Column": 937
+                    },
+                    "EndPosition": {
+                        "Line": 1,
+                        "Column": 1027
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": true
+            }
+        },
+        {
+            "EvalActionName": "ssm:UpdateInstanceInformation",
+            "EvalResourceName": "*",
+            "EvalDecision": "explicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": false
+            }
+        },
+        {
+            "EvalActionName": "ssmmessages:OpenControlChannel",
+            "EvalResourceName": "*",
+            "EvalDecision": "explicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": false
+            }
+        },
+        {
+            "EvalActionName": "ec2messages:GetMessages",
+            "EvalResourceName": "*",
+            "EvalDecision": "explicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": false
+            }
+        }
+    ]
+}

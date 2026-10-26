@@ -1,0 +1,56 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "ec2:DescribeInstances",
+            "EvalResourceName": "*",
+            "EvalDecision": "explicitDeny",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "proposal-orchestrator-explicit-deny",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 1,
+                        "Column": 395
+                    },
+                    "EndPosition": {
+                        "Line": 1,
+                        "Column": 521
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": false
+            }
+        },
+        {
+            "EvalActionName": "ec2:RunInstances",
+            "EvalResourceName": "*",
+            "EvalDecision": "explicitDeny",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "proposal-orchestrator-explicit-deny",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 1,
+                        "Column": 395
+                    },
+                    "EndPosition": {
+                        "Line": 1,
+                        "Column": 521
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": false
+            }
+        }
+    ]
+}

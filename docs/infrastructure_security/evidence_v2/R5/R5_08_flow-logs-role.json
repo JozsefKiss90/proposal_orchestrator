@@ -1,0 +1,43 @@
+﻿{
+    "Role": {
+        "Path": "/",
+        "RoleName": "proposal-orchestrator-flow-logs-role",
+        "RoleId": "AROA3TOCVYCZP4SUDWJ2W",
+        "Arn": "arn:aws:iam::797661577394:role/proposal-orchestrator-flow-logs-role",
+        "CreateDate": "2026-10-25T21:14:51+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "VpcFlowLogsOnly",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "vpc-flow-logs.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole",
+                    "Condition": {
+                        "StringEquals": {
+                            "aws:SourceAccount": "797661577394"
+                        },
+                        "ArnLike": {
+                            "aws:SourceArn": "arn:aws:ec2:eu-north-1:797661577394:vpc-flow-log/*"
+                        }
+                    }
+                }
+            ]
+        },
+        "Description": "Lets VPC Flow Logs publish the proposal-orchestrator flow logs to CloudWatch Logs.",
+        "MaxSessionDuration": 3600,
+        "Tags": [
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            },
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-flow-logs-role"
+            }
+        ],
+        "RoleLastUsed": {}
+    }
+}

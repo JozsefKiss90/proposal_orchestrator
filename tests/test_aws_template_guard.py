@@ -96,9 +96,11 @@ PLANTED = {
     Type: AWS::IAM::ManagedPolicy
     Properties:
       ManagedPolicyName: !Sub "${ProjectName}-validation-invoke"
-      Tags:
-        - Key: project
-          Value: proposal-orchestrator
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:GetCallerIdentity
+            Resource: "*"
 """,
     "region-literal": """\
   Profile:
@@ -110,9 +112,6 @@ PLANTED = {
           - Effect: Allow
             Action: bedrock:InvokeModel
             Resource: !Sub "arn:aws:bedrock:eu-west-1::foundation-model/x"
-      Tags:
-        - Key: project
-          Value: proposal-orchestrator
 """,
     "account-literal": """\
   Key:
@@ -179,6 +178,38 @@ def test_route_resource_is_refused_even_to_a_prefix_list(tmp_path: Path) -> None
 """
 
     assert {f.check for f in guard.check_template(_write(tmp_path, CLEAN_RESOURCES + body))} == {"forbidden-type"}
+
+
+def test_iam_managed_policy_and_instance_profile_take_no_tags(tmp_path: Path) -> None:
+    """R5 (F-R5-3): both types have no Tags property; an IAM role does and must carry the tag."""
+    body = """\
+  Boundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${ProjectName}-boundary"
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:GetCallerIdentity
+            Resource: "*"
+  Profile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref Role
+"""
+    role = """\
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: {}
+"""
+
+    assert {"AWS::IAM::ManagedPolicy", "AWS::IAM::InstanceProfile"} <= guard.UNTAGGABLE_TYPES
+    assert "AWS::IAM::Role" not in guard.UNTAGGABLE_TYPES
+    assert guard.check_template(_write(tmp_path, CLEAN_RESOURCES + body)) == []
+    findings = guard.check_template(_write(tmp_path, CLEAN_RESOURCES + body + role))
+    assert [(f.check, f.where) for f in findings] == [("project-tag", "Resources.Role")]
 
 
 def test_temporary_in_a_description_is_refused(tmp_path: Path) -> None:

@@ -1,0 +1,36 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "kms:Decrypt",
+            "EvalResourceName": "arn:aws:kms:eu-north-1:797661577394:key/00000000-0000-0000-0000-000000000000",
+            "EvalDecision": "implicitDeny",
+            "MatchedStatements": [],
+            "MissingContextValues": [
+                "aws:RequestedRegion",
+                "bedrock:InferenceProfileArn",
+                "s3:prefix"
+            ],
+            "OrganizationsDecisionDetail": {
+                "AllowedByOrganizations": true
+            },
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": true
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:kms:eu-north-1:797661577394:key/00000000-0000-0000-0000-000000000000",
+                    "EvalResourceDecision": "implicitDeny",
+                    "MissingContextValues": [
+                        "aws:RequestedRegion",
+                        "bedrock:InferenceProfileArn",
+                        "s3:prefix"
+                    ],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": true
+                    }
+                }
+            ]
+        }
+    ]
+}

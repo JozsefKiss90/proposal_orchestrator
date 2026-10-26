@@ -1,0 +1,44 @@
+﻿[
+    {
+        "OutputKey": "FlowLogsRoleArn",
+        "OutputValue": "arn:aws:iam::797661577394:role/proposal-orchestrator-flow-logs-role",
+        "Description": "The flow-logs role (R7, DC-08).",
+        "ExportName": "proposal-orchestrator-iam-FlowLogsRoleArn"
+    },
+    {
+        "OutputKey": "InstanceProfileName",
+        "OutputValue": "proposal-orchestrator-runtime-profile",
+        "Description": "The host's instance profile (R11).",
+        "ExportName": "proposal-orchestrator-iam-InstanceProfileName"
+    },
+    {
+        "OutputKey": "ExplicitDenyPolicyArn",
+        "OutputValue": "arn:aws:iam::797661577394:policy/proposal-orchestrator-explicit-deny",
+        "Description": "The runtime role's explicit-deny policy (DC-11, DC-16).",
+        "ExportName": "proposal-orchestrator-iam-ExplicitDenyPolicyArn"
+    },
+    {
+        "OutputKey": "PermissionBoundaryArn",
+        "OutputValue": "arn:aws:iam::797661577394:policy/proposal-orchestrator-boundary",
+        "Description": "The runtime role's permission boundary (DC-12).",
+        "ExportName": "proposal-orchestrator-iam-PermissionBoundaryArn"
+    },
+    {
+        "OutputKey": "RuntimeRoleArn",
+        "OutputValue": "arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role",
+        "Description": "The runtime role's ARN; R6, R7, R8 and R11 name it.",
+        "ExportName": "proposal-orchestrator-iam-RuntimeRoleArn"
+    },
+    {
+        "OutputKey": "InstanceProfileArn",
+        "OutputValue": "arn:aws:iam::797661577394:instance-profile/proposal-orchestrator-runtime-profile",
+        "Description": "The host's instance profile ARN (R11).",
+        "ExportName": "proposal-orchestrator-iam-InstanceProfileArn"
+    },
+    {
+        "OutputKey": "RuntimeRoleName",
+        "OutputValue": "proposal-orchestrator-runtime-role",
+        "Description": "The hardened runtime role (OD2 a).",
+        "ExportName": "proposal-orchestrator-iam-RuntimeRoleName"
+    }
+]

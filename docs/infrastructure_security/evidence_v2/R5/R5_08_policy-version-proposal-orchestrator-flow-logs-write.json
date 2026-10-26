@@ -1,0 +1,23 @@
+﻿{
+    "PolicyVersion": {
+        "Document": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": [
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams"
+                    ],
+                    "Resource": "arn:aws:logs:eu-north-1:797661577394:log-group:/proposal-orchestrator/vpc-flow-logs:*",
+                    "Effect": "Allow",
+                    "Sid": "FlowLogGroupWrite"
+                }
+            ]
+        },
+        "VersionId": "v1",
+        "IsDefaultVersion": true,
+        "CreateDate": "2026-10-25T21:14:31+00:00"
+    }
+}
