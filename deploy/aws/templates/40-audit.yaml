@@ -2,10 +2,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
   proposal-orchestrator audit and storage stack (filled by ticket R7): the
   trail bucket and the deploy bucket, both named with the account id as
-  suffix, versioned, blocked from public access and encrypted with the CMK;
-  the trail with log-file integrity checking and the CMK; the flow-log group
-  (CMK, 90-day retention) and flow logs on every subnet. Bedrock model
-  invocation logging stays unset. Skeleton written in R3. Free of hourly cost.
+  suffix, versioned, blocked from public access, owner-enforced and encrypted
+  with the CMK; the trail with log-file integrity checking and the CMK; the
+  flow-log group (CMK, 90-day retention) and one flow log on the VPC, which
+  covers every subnet. Bedrock model invocation logging stays unset. Free of
+  hourly cost; storage, log ingestion and KMS requests are billed by usage.
   See deploy/aws/README.md.
 
 Metadata:
@@ -15,6 +16,7 @@ Metadata:
     FilledBy: R7
     Contract: deploy/aws/outputs_contract.json
     Decision: aws-redeployment-od6-stack-layout-r3_2026-10-22
+    FillDecision: aws-redeployment-r7-audit_2026-10-26
 
 Parameters:
   ProjectName:
@@ -42,15 +44,313 @@ Rules:
         AssertDescription: The stack is not being created in ExpectedRegion.
 
 Resources:
-  # R3 skeleton only. R7 replaces this no-cost placeholder with the buckets,
-  # the trail and the flow logs, and adds the outputs named in
-  # deploy/aws/outputs_contract.json. Bucket names are derived, not passed:
-  #   !Sub "${ProjectName}-deploy-${AWS::AccountId}"
-  #   !Sub "${ProjectName}-cloudtrail-${AWS::AccountId}"
-  SkeletonPlaceholder:
-    Type: AWS::CloudFormation::WaitConditionHandle
-    Metadata:
-      SkeletonParameters:
-        ProjectName: !Ref ProjectName
-        DeployBucketName: !Sub "${ProjectName}-deploy-${AWS::AccountId}"
-        TrailBucketName: !Sub "${ProjectName}-cloudtrail-${AWS::AccountId}"
+  # --- Trail bucket (DC-25, DC-27) ------------------------------------------
+  # R7-D1: default SSE-KMS with the CMK and no S3 Bucket Key (R6-D10: the key
+  # grants CloudTrail no Decrypt). R7-D4: audit data outlives the stack.
+  TrailBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub "${ProjectName}-cloudtrail-${AWS::AccountId}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !ImportValue proposal-orchestrator-kms-KeyArn
+            BucketKeyEnabled: false
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      # R7-D7: v1 rule with the new names.
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub "${ProjectName}-cloudtrail-lifecycle"
+            Status: Enabled
+            Prefix: !Sub "cloudtrail/${ProjectName}/"
+            Transitions:
+              - TransitionInDays: 90
+                StorageClass: GLACIER_IR
+            ExpirationInDays: 365
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-cloudtrail-${AWS::AccountId}"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # The v1 policy with new ARNs (ticket R7; R7-D2 2a). CloudTrail is scoped to
+  # the one trail by aws:SourceArn (R6-D2).
+  TrailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref TrailBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AWSCloudTrailAclCheck
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:GetBucketAcl
+            Resource: !GetAtt TrailBucket.Arn
+            Condition:
+              StringEquals:
+                aws:SourceArn: !Sub "arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${ProjectName}-bedrock-trail"
+          - Sid: AWSCloudTrailWrite
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${TrailBucket.Arn}/cloudtrail/${ProjectName}/AWSLogs/${AWS::AccountId}/*"
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
+                aws:SourceArn: !Sub "arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${ProjectName}-bedrock-trail"
+          - Sid: DenyUnencryptedObjects
+            Effect: Deny
+            Principal: "*"
+            Action: s3:PutObject
+            Resource: !Sub "${TrailBucket.Arn}/*"
+            Condition:
+              StringNotEquals:
+                s3:x-amz-server-side-encryption: aws:kms
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt TrailBucket.Arn
+              - !Sub "${TrailBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+
+  # --- Trail (DC-23, DC-24) -------------------------------------------------
+  # R7-D6: single-Region, home eu-north-1, management events (default
+  # selectors), integrity digests on, the CMK (R6-D2). Goes with the stack.
+  Trail:
+    Type: AWS::CloudTrail::Trail
+    DependsOn: TrailBucketPolicy
+    Properties:
+      TrailName: !Sub "${ProjectName}-bedrock-trail"
+      S3BucketName: !Ref TrailBucket
+      S3KeyPrefix: !Sub "cloudtrail/${ProjectName}"
+      KMSKeyId: !ImportValue proposal-orchestrator-kms-KeyArn
+      EnableLogFileValidation: true
+      IncludeGlobalServiceEvents: true
+      IsMultiRegionTrail: false
+      IsLogging: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-bedrock-trail"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # --- Deploy bucket (ticket R7; R5-D1) -------------------------------------
+  # R7-D3: SSE-KMS with the CMK and an S3 Bucket Key; the runtime role decrypts
+  # through S3 (R6-D3). R7-D13: noncurrent versions and stale uploads expire.
+  DeployBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub "${ProjectName}-deploy-${AWS::AccountId}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !ImportValue proposal-orchestrator-kms-KeyArn
+            BucketKeyEnabled: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub "${ProjectName}-deploy-lifecycle"
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-deploy-${AWS::AccountId}"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # Deny-only policy (R7-D3 b): same-account reads come from R5's identity
+  # policy; this policy narrows them independently of IAM.
+  DeployBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref DeployBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt DeployBucket.Arn
+              - !Sub "${DeployBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+          - Sid: DenyPrincipalsOutsideAccount
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt DeployBucket.Arn
+              - !Sub "${DeployBucket.Arn}/*"
+            Condition:
+              StringNotEquals:
+                aws:PrincipalAccount: !Ref "AWS::AccountId"
+          # R7-D2 2b (b): a PUT without encryption headers gets the bucket
+          # default (the CMK); a PUT with headers must name aws:kms and the CMK.
+          # Without a key id, S3 would use the AWS managed key (S3 user guide,
+          # "Using server-side encryption with AWS KMS keys").
+          - Sid: DenyEncryptionHeaderOtherThanKms
+            Effect: Deny
+            Principal: "*"
+            Action: s3:PutObject
+            Resource: !Sub "${DeployBucket.Arn}/*"
+            Condition:
+              "Null":
+                s3:x-amz-server-side-encryption: "false"
+              StringNotEquals:
+                s3:x-amz-server-side-encryption: aws:kms
+          - Sid: DenyKmsHeaderWithoutKeyId
+            Effect: Deny
+            Principal: "*"
+            Action: s3:PutObject
+            Resource: !Sub "${DeployBucket.Arn}/*"
+            Condition:
+              "Null":
+                s3:x-amz-server-side-encryption: "false"
+                s3:x-amz-server-side-encryption-aws-kms-key-id: "true"
+          - Sid: DenyKmsKeyOtherThanProjectKey
+            Effect: Deny
+            Principal: "*"
+            Action: s3:PutObject
+            Resource: !Sub "${DeployBucket.Arn}/*"
+            Condition:
+              "Null":
+                s3:x-amz-server-side-encryption-aws-kms-key-id: "false"
+              StringNotEquals:
+                s3:x-amz-server-side-encryption-aws-kms-key-id: !ImportValue proposal-orchestrator-kms-KeyArn
+          # The runtime role: read under bundles/ only (R5-D1), bucket-side.
+          - Sid: DenyRuntimeRoleExceptBundlesRead
+            Effect: Deny
+            Principal: "*"
+            NotAction:
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource:
+              - !GetAtt DeployBucket.Arn
+              - !Sub "${DeployBucket.Arn}/*"
+            Condition:
+              ArnEquals:
+                aws:PrincipalArn: !ImportValue proposal-orchestrator-iam-RuntimeRoleArn
+          - Sid: DenyRuntimeRoleGetOutsideBundles
+            Effect: Deny
+            Principal: "*"
+            Action: s3:GetObject
+            NotResource: !Sub "${DeployBucket.Arn}/bundles/*"
+            Condition:
+              ArnEquals:
+                aws:PrincipalArn: !ImportValue proposal-orchestrator-iam-RuntimeRoleArn
+          - Sid: DenyRuntimeRoleListOutsideBundles
+            Effect: Deny
+            Principal: "*"
+            Action: s3:ListBucket
+            Resource: !GetAtt DeployBucket.Arn
+            Condition:
+              ArnEquals:
+                aws:PrincipalArn: !ImportValue proposal-orchestrator-iam-RuntimeRoleArn
+              StringNotLike:
+                s3:prefix: bundles/*
+
+  # --- Flow logs (DC-08, DC-30) ---------------------------------------------
+  # R5-D4: exactly this name; the flow-logs role writes only here. R7-D4:
+  # retained with the buckets.
+  FlowLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub "/${ProjectName}/vpc-flow-logs"
+      RetentionInDays: 90
+      KmsKeyId: !ImportValue proposal-orchestrator-kms-KeyArn
+      Tags:
+        - Key: Name
+          Value: !Sub "/${ProjectName}/vpc-flow-logs"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # R7-D5: one flow log on the VPC covers every subnet, present and future.
+  VpcFlowLog:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      ResourceType: VPC
+      ResourceId: !ImportValue proposal-orchestrator-network-VpcId
+      TrafficType: ALL
+      LogDestinationType: cloud-watch-logs
+      LogGroupName: !Ref FlowLogGroup
+      DeliverLogsPermissionArn: !ImportValue proposal-orchestrator-iam-FlowLogsRoleArn
+      MaxAggregationInterval: 600
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-vpc-flow-log"
+        - Key: project
+          Value: !Ref ProjectName
+
+Outputs:
+  TrailBucketName:
+    Description: The trail bucket (DC-25, R12a).
+    Value: !Ref TrailBucket
+    Export:
+      Name: proposal-orchestrator-audit-TrailBucketName
+  DeployBucketName:
+    Description: The deploy bucket; R15 uploads to its bundles/ prefix.
+    Value: !Ref DeployBucket
+    Export:
+      Name: proposal-orchestrator-audit-DeployBucketName
+  TrailArn:
+    Description: The trail's ARN (DC-23, R12a).
+    Value: !GetAtt Trail.Arn
+    Export:
+      Name: proposal-orchestrator-audit-TrailArn
+  FlowLogGroupName:
+    Description: The flow-log group (DC-08, DC-30).
+    Value: !Ref FlowLogGroup
+    Export:
+      Name: proposal-orchestrator-audit-FlowLogGroupName
+  FlowLogGroupArn:
+    Description: The flow-log group's ARN as CloudFormation returns it (ends with ":*").
+    Value: !GetAtt FlowLogGroup.Arn
+    Export:
+      Name: proposal-orchestrator-audit-FlowLogGroupArn
+  FlowLogId:
+    Description: The VPC flow log (DC-08).
+    Value: !Ref VpcFlowLog
+    Export:
+      Name: proposal-orchestrator-audit-FlowLogId

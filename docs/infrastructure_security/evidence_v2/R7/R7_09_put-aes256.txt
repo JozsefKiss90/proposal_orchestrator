@@ -1,0 +1,11 @@
+﻿aws : 
+At line:10 char:5
++ & { aws s3api put-object --profile po-r1 --region eu-north-1 --bucket ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+aws: [ERROR]: An error occurred (AccessDenied) when calling the PutObject operation: User: arn:aws:sts::797661577394:assumed-role/AccountFullAccessRole/641844f8-60f
+1-708d-5d78-5cf047462512 is not authorized to perform: s3:PutObject on resource: "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/r7-sse-test-aes256.
+txt" with an explicit deny in a resource-based policy
+exit=254

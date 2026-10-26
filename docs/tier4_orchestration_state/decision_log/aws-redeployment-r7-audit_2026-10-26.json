@@ -1,0 +1,285 @@
+{
+ "record_type": "decision_record",
+ "id": "aws-redeployment-r7-audit_2026-10-26",
+ "date": "2026-10-26",
+ "branch": "msca-dn-pre-eval",
+ "milestone": "AWS private-network redeployment",
+ "ticket": "R7 of plans/aws_redeployment_tickets.md (audit and storage stack: trail bucket, deploy bucket, trail, flow-log group and flow logs; invocation logging confirmed unset)",
+ "supersedes": "Nothing. Applies OD6-r3 (layout, derived bucket names, outputs contract), R4-D3 (unchanged), R5-D1, R5-D2, R5-D4, R6-D2, R6-D3, R6-D5 and R6-D10 to the audit stack and settles the ten points of plans/aws_redeployment_r7_handoff_2026-10-26.md section 4 and six points the agent added (11-16). Per OD6-r3-outputs, the outputs contract changes in this ticket: proposal-orchestrator-network-VpcId gains R7 as consumer and proposal-orchestrator-network-PrivateSubnetId loses it (R7-D11).",
+ "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-26 on the agent's R7 proposals. Execution aid for infrastructure work (CLAUDE.md section 10.2). Closes no gate, adds no runtime gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+ "review_state": "operator_decided",
+ "decided_by": "the operator, in session on 2026-10-26 ('1-16 a, 2 = 2a igen + 2b (b), 3 (b), 5 (a) 600 s', ~17:19 UTC), accepting the agent's proposal on each of the sixteen points with the variants named. Point 17 (test uploads to the deploy bucket, added by the agent after writing the policy) answered '17 a' (~17:39 UTC), together with the go for executing change set r7-create-01. Point 18 (DC-08 without traffic, added by the agent after round 2) answered '18a' (~17:55 UTC).",
+ "decision": "The audit stack (deploy/aws/templates/40-audit.yaml) creates two retained, versioned, public-access-blocked, owner-enforced buckets encrypted by default with the imported CMK: the trail bucket (no S3 Bucket Key, the v1 bucket policy with new ARNs, lifecycle 90 days to GLACIER_IR, expiry 365 days, noncurrent versions 30 days) and the deploy bucket (S3 Bucket Key, a deny-only policy: insecure transport, principals outside the account, encryption headers other than the CMK, and the runtime role outside bundles/ read; noncurrent versions 30 days, incomplete uploads 7 days). It creates the trail proposal-orchestrator-bedrock-trail (single-Region, eu-north-1, global service events, log-file integrity digests, the CMK, management events by default) after the trail bucket policy, the retained flow-log group /proposal-orchestrator/vpc-flow-logs (CMK, 90 days) and one flow log on the VPC (ALL, 600 s, the R5 flow-logs role). It imports the key ARN, the VPC id, the flow-logs role ARN and the runtime role ARN, and exports the six contract outputs.",
+ "why": "Ticket R7 and its exit conditions; every service grant on the R6 key and the R5 flow-logs role is exercised by exactly the resource it was scoped to; the deploy bucket narrows the runtime role's access on the bucket side, independently of IAM (F7, R5-D1).",
+ "inputs": [
+  "plans/aws_redeployment_r7_handoff_2026-10-26.md sections 1, 3 and 4",
+  "plans/aws_redeployment_tickets.md inherited constraints, R7, R11, R12b, R15",
+  "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F7, F8, F10), section 6 (R7), sections 7, 7a and 9",
+  "aws-redeployment-r6-kms_2026-10-26 (R6-D2, R6-D3, R6-D5, R6-D10); aws-redeployment-r5-iam_2026-10-25 (R5-D1, R5-D2, R5-D4); aws-redeployment-r4-network_2026-10-24 (R4-D3); aws-redeployment-od6-stack-layout-r3_2026-10-22",
+  "docs/infrastructure_security/evidence/06_cloudtrail/trail_bucket_policy.json, lifecycle_policy.json, CT-E01-trail-configuration.json, CT-E05-event-selectors.json, EV-CT-002-trail-status.json, CG6_steps.txt; evidence/07_cloudwatch/ — as history only (old account, us-east-1)",
+  "docs/infrastructure_security/evidence_v2/R7/R7_01_*.json, R7_02_caller-identity.json, R7_03_* (round 1 read-only lookups, 2026-10-26)",
+  "AWS documentation read 2026-10-26: CloudFormation template reference AWS::CloudTrail::Trail, AWS::EC2::FlowLog, AWS::Logs::LogGroup, AWS::S3::Bucket, AWS::S3::Bucket Rule, AWS::S3::Bucket ServerSideEncryptionRule; CloudTrail user guide 'Amazon S3 bucket policy for CloudTrail'; S3 user guide 'Using server-side encryption with AWS KMS keys (SSE-KMS)' and 'Controlling ownership of objects and disabling ACLs for your bucket'"
+ ],
+ "findings": [
+  {
+   "id": "F-R7-1",
+   "declared_status": "Confirmed",
+   "finding": "Before R7, in account 797661577394 / eu-north-1: both bucket names answer HeadBucket 404 (free, not owned by another account); the account has no S3 bucket; no trail is visible (shadow trails included); no log group exists at all, so none under /proposal-orchestrator/ or /aws/bedrock; no flow log exists; the project VPC vpc-0f33f9ced5a78b09f has exactly one subnet, subnet-018cd285bbe5cbdaf (eu-north-1a, 10.60.0.0/25); get-model-invocation-logging-configuration returns no configuration (exit 0, no loggingConfig); the stack proposal-orchestrator-audit does not exist (exit 254). Credits 199.99 USD; budget spend 0.006 of 10.0; three notifications OK.",
+   "basis": "evidence_v2/R7/R7_01_*.json, R7_02_caller-identity.json, R7_03_head-trail-bucket.txt, R7_03_head-deploy-bucket.txt, R7_03_buckets-before.json, R7_03_trails-before.json, R7_03_log-groups-*.json, R7_03_flow-logs-before.json, R7_03_subnets.json, R7_03_invocation-logging-before.txt, R7_03_audit-stack-before.txt."
+  },
+  {
+   "id": "F-R7-2",
+   "declared_status": "Confirmed",
+   "finding": "The key arn:aws:kms:eu-north-1:797661577394:key/4ccc45a1-f205-4775-aa0b-195290bf1561 is Enabled, customer-managed, symmetric and single-Region, and its key policy equals the R6 policy statement by statement (five Sids). The 17 base exports exist (7 network, 7 iam, 3 kms, no audit); the four values R7 imports equal R4_outputs.json, R5_outputs.json and R6_outputs.json.",
+   "basis": "evidence_v2/R7/R7_03_key-before.json, R7_03_key-policy-before.json (compared by script with R6/R6_08_key-policy.json), R7_03_exports.json."
+  },
+  {
+   "id": "F-R7-3",
+   "declared_status": "Confirmed",
+   "finding": "AWS::CloudTrail::Trail: IsLogging and S3BucketName required; the key property is spelled KMSKeyId; TrailName change requires replacement; EnableLogFileValidation and IsMultiRegionTrail default false; takes Tags; the page is inconsistent on what Ref returns, so the TrailArn output uses Fn::GetAtt Arn; no DependsOn note (the template sets DependsOn on the bucket policy, as CloudTrail must be able to write when the trail is created). AWS::EC2::FlowLog: ResourceId and ResourceType (VPC allowed) required; MaxAggregationInterval 60 or 600, default 600; DeliverLogsPermissionArn required for cloud-watch-logs; every property but Tags requires replacement; takes Tags; Ref returns the flow-log id. AWS::Logs::LogGroup: KmsKeyId is a key or alias ARN; RetentionInDays 90 allowed; LogGroupName change requires replacement; takes Tags; Fn::GetAtt Arn ends with ':*'. AWS::S3::Bucket: takes Tags; BucketName change requires replacement; only empty buckets delete; KMSMasterKeyID should be a full key ARN. AWS::S3::BucketPolicy is already in UNTAGGABLE_TYPES, so the template guard is unchanged.",
+   "basis": "CloudFormation template reference pages for the five types and for S3 Rule and ServerSideEncryptionRule, read 2026-10-26; tools/aws_template_guard.py."
+  },
+  {
+   "id": "F-R7-4",
+   "declared_status": "Confirmed",
+   "finding": "S3: a PutObject that sends x-amz-server-side-encryption: aws:kms without x-amz-server-side-encryption-aws-kms-key-id is encrypted with the AWS managed key; the condition key s3:x-amz-server-side-encryption-aws-kms-key-id takes a key ARN of the form arn:aws:kms:region:acct-id:key/key-id; a PUT without encryption headers gets the bucket's default encryption.",
+   "basis": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html and the ServerSideEncryptionRule reference page, read 2026-10-26."
+  },
+  {
+   "id": "F-R7-5",
+   "declared_status": "Confirmed",
+   "finding": "S3 Object Ownership: new buckets are BucketOwnerEnforced by default; with ACLs disabled the bucket still accepts PUTs that specify the bucket-owner-full-control canned ACL. CloudTrail's recommended single-account bucket policy is the v1 AclCheck and Write statements (aws:SourceArn; s3:x-amz-acl bucket-owner-full-control; resource <bucket>/<prefix>/AWSLogs/<account>/*); the CloudTrail page does not mention Object Ownership or SSE-KMS deny statements.",
+   "basis": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html and https://docs.aws.amazon.com/awscloudtrail/latest/userguide/create-s3-bucket-policy-for-cloudtrail.html, read 2026-10-26."
+  },
+  {
+   "id": "F-R7-6",
+   "declared_status": "Inferred",
+   "finding": "The v1 trail delivered log files and digest files under the same DenyUnencryptedObjects statement (LatestDeliveryTime and LatestDigestDeliveryTime set), so CloudTrail sends the aws:kms encryption header with a trail key; v1 granted CloudTrail no kms:Decrypt.",
+   "basis": "evidence/06_cloudtrail/EV-CT-002-trail-status.json, trail_bucket_policy.json, CG6_steps.txt (history, old account)."
+  },
+  {
+   "id": "F-R7-7",
+   "declared_status": "Confirmed",
+   "finding": "The IAM SimulatePrincipalPolicy reference states 'Simulation of resource-based policies isn't supported for IAM roles'. A simulation of the runtime role against the deploy bucket policy is therefore not used as R7 evidence; the bucket-side limits on the runtime role are evidenced by the policy read back (step 08) and exercised by live calls from the host (R11, R12b).",
+   "basis": "https://docs.aws.amazon.com/IAM/latest/APIReference/API_SimulatePrincipalPolicy.html, read 2026-10-26."
+  },
+  {
+   "id": "F-R7-8",
+   "declared_status": "Confirmed",
+   "finding": "Round 2 (2026-10-26, ~17:44-17:47 UTC): the stack proposal-orchestrator-audit was created without rollback; the trail was created and started logging with a key policy that grants CloudTrail no kms:Decrypt and a trail bucket without an S3 Bucket Key (R6-D10 holds at creation); S3 accepted the deploy bucket policy with NotResource; both bucket policies read back equal the resolved template; the flow log on the VPC is ACTIVE with DeliverLogsStatus SUCCESS; a header-less PUT to bundles/ was encrypted with the CMK and the Bucket Key, while PUTs with AES256 and with aws:kms but no key id were refused by an explicit deny in the bucket policy (S3 does not fill the encryption condition keys from the bucket default); S3 reports BlockedEncryptionTypes SSE-C on both buckets as its own default.",
+   "basis": "evidence_v2/R7/R7_06_*, R7_07_*, R7_outputs.json, R7_08_*, R7_09_*, R7_10_plan-state-after.json."
+  },
+  {
+   "id": "F-R7-9",
+   "declared_status": "Confirmed",
+   "finding": "Round 3 (2026-10-26, ~18:57 and ~19:35 UTC): the trail delivers log files about every five minutes and hourly digests under cloudtrail/proposal-orchestrator/AWSLogs/797661577394/, all SSE-KMS with the CMK and no S3 Bucket Key, with no delivery error; the trail's opening digest (17:44:09Z) covers no log file; validate-logs over 17:44:09Z-18:44:09Z reports 2/2 digest files and 12/12 log files valid. The flow log stays ACTIVE / SUCCESS with no log stream, as the VPC has no network interface yet.",
+   "basis": "evidence_v2/R7/R7_11_*, R7_11b_trail-status.json, R7_11b_validate-logs.txt."
+  }
+ ],
+ "decisions": [
+  {
+   "id": "R7-D1",
+   "question": "Trail bucket encryption (handoff section 4, point 1)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "Default encryption SSE-KMS with the imported KeyArn and BucketKeyEnabled false (R6-D10); the trail's own KMSKeyId is the same KeyArn.",
+   "reason": "Operator's answer '1a'. 'The bucket shows the CMK' then holds for the bucket configuration and for every object.",
+   "consequence": "Without a Bucket Key every trail object costs KMS requests (paid from credits; R14 counts them)."
+  },
+  {
+   "id": "R7-D2",
+   "question": "Deny unencrypted objects (point 2)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "2a: the trail bucket keeps the v1 DenyUnencryptedObjects statement (deny s3:PutObject when s3:x-amz-server-side-encryption is not aws:kms). 2b (b): the deploy bucket refuses a PUT whose encryption header is not aws:kms, a PUT that names aws:kms without a key id, and a PUT that names another key id than KeyArn; a PUT without encryption headers is not refused and gets the bucket default (the CMK).",
+   "reason": "Operator's answer '2 = 2a igen + 2b (b)'. F-R7-4: without a key id S3 would use the AWS managed key, so the v1 form on the deploy bucket would push uploads to the wrong key.",
+   "consequence": "R15 uploads to bundles/ without encryption headers (or with --sse aws:kms and --sse-kms-key-id KeyArn)."
+  },
+  {
+   "id": "R7-D3",
+   "question": "Deploy bucket policy (point 3)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(b): deny-only. DenyInsecureTransport; DenyPrincipalsOutsideAccount (aws:PrincipalAccount); the three encryption denies of R7-D2; for the runtime role (ArnEquals aws:PrincipalArn = the imported RuntimeRoleArn) DenyRuntimeRoleExceptBundlesRead (NotAction GetObject, ListBucket, GetBucketLocation), DenyRuntimeRoleGetOutsideBundles (NotResource bundles/*) and DenyRuntimeRoleListOutsideBundles (StringNotLike s3:prefix bundles/*). No Allow statement. BucketKeyEnabled true.",
+   "reason": "Operator's answer '3 (b)'. In the same account a bucket-policy Allow would duplicate R5's identity policy; the denies make 'access limited to the runtime role's prefixes' true on the bucket side, independently of IAM.",
+   "consequence": "The admin role keeps full in-account access through IAM; any AWS service that would need the bucket would be refused by DenyPrincipalsOutsideAccount and needs a successor record."
+  },
+  {
+   "id": "R7-D4",
+   "question": "Retention (point 4)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "DeletionPolicy and UpdateReplacePolicy Retain on both buckets and the flow-log group; the trail, the flow log and the two bucket policies go with the stack.",
+   "reason": "Operator's answer '4a'. Audit data must outlive the stack; a non-empty bucket blocks deletion anyway.",
+   "consequence": "The audit stack is not deleted: recreating it would collide with the retained names. Retiring a bucket or the group is a manual step with a successor record."
+  },
+  {
+   "id": "R7-D5",
+   "question": "Flow-log scope (point 5)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a): one flow log on the VPC (ResourceType VPC, the imported VpcId), TrafficType ALL, LogDestinationType cloud-watch-logs to the group, DeliverLogsPermissionArn the imported FlowLogsRoleArn, default record format, MaxAggregationInterval 600.",
+   "reason": "Operator's answer '5 (a) 600 s'. One flow log covers every subnet, present and future, and matches the contract's single FlowLogId.",
+   "consequence": "DC-08 ('on every subnet') is evidenced by describe-flow-logs on the VPC together with the VPC's subnet list."
+  },
+  {
+   "id": "R7-D6",
+   "question": "Trail settings (point 6)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "Trail ${ProjectName}-bedrock-trail, single-Region with home eu-north-1, IncludeGlobalServiceEvents true, EnableLogFileValidation true, IsLogging true, S3KeyPrefix cloudtrail/${ProjectName}, KMSKeyId the imported KeyArn, no EventSelectors or AdvancedEventSelectors (default: management events, read and write, no data events), DependsOn the trail bucket policy.",
+   "reason": "Operator's answer '6a'; R6-D2 fixes name, ARN and home Region; v1 had no custom selectors.",
+   "consequence": "Whether eu. profile Converse calls appear as management events is DC-26, shown by R11."
+  },
+  {
+   "id": "R7-D7",
+   "question": "Trail-bucket lifecycle (point 7)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "One rule on prefix cloudtrail/${ProjectName}/: transition after 90 days to GLACIER_IR, expiration after 365 days, noncurrent versions expire 30 days after becoming noncurrent.",
+   "reason": "Operator's answer '7a'; the v1 rule with new names.",
+   "consequence": "In the versioned bucket, expiration adds a delete marker; the object version is removed 30 days later, about 395 days after delivery."
+  },
+  {
+   "id": "R7-D8",
+   "question": "Tests and guard (point 8)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "tests/test_aws_audit_template.py pins the stack's shape (resources, retention, encryption, public access, versioning, ownership, both lifecycles, both bucket policies statement by statement, trail, group, flow log, imports against the contract, tags, outputs). The template guard is unchanged (F-R7-3).",
+   "reason": "Operator's answer '8a'.",
+   "consequence": "deploy/aws/README.md lists the audit template test with the others."
+  },
+  {
+   "id": "R7-D9",
+   "question": "Evidence (point 9)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "Both buckets: get-bucket-encryption, get-public-access-block, get-bucket-versioning, get-bucket-ownership-controls, get-bucket-policy (compared with the template by script), get-bucket-lifecycle-configuration, get-bucket-tagging; describe-trails, get-trail-status, get-event-selectors; describe-log-groups; describe-flow-logs; the invocation-logging configuration and the /aws/bedrock prefix after. Delivery (trail objects and digests under the prefix, validate-logs, the flow-log stream and DeliverLogsStatus) may come in a later session.",
+   "reason": "Operator's answer '9a'.",
+   "consequence": "A flow-log DeliverLogsStatus FAILED is the R5-D4 known gap: stop, successor record, UPDATE of the iam stack."
+  },
+  {
+   "id": "R7-D10",
+   "question": "Register v2 statuses (point 10)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "On a PASS verification with delivery shown: DC-08, DC-23, DC-24, DC-25, DC-27, DC-28, DC-29 and DC-30 VERIFIED_PASS; DC-19's note records the CloudTrail and CloudWatch Logs grants as exercised in R7; DC-26 stays with R11.",
+   "reason": "Operator's answer '10a'.",
+   "consequence": "Without delivery evidence the delivery-dependent rows (DC-08, DC-23, DC-24) wait for round 3."
+  },
+  {
+   "id": "R7-D11",
+   "question": "VpcId import and the outputs contract (point 11)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "The audit stack imports proposal-orchestrator-network-VpcId; outputs_contract.json names R7 among VpcId's consumers and no longer among PrivateSubnetId's (R7 does not import the subnet under R7-D5). The audit test asserts that the stack's imports equal the exports whose consumers name R7.",
+   "reason": "Operator's answer '11a'; OD6-r3-outputs: a contract change happens in the ticket that needs it.",
+   "consequence": "While the audit stack imports VpcId, the network stack cannot change that export."
+  },
+  {
+   "id": "R7-D12",
+   "question": "Object Ownership (point 12)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "Both buckets set OwnershipControls ObjectOwnership BucketOwnerEnforced explicitly.",
+   "reason": "Operator's answer '12a'; F-R7-5: the default for new buckets, and PUTs with bucket-owner-full-control (CloudTrail's) are still accepted.",
+   "consequence": "get-bucket-ownership-controls is part of the evidence."
+  },
+  {
+   "id": "R7-D13",
+   "question": "Deploy-bucket lifecycle (point 13)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "One rule on the whole bucket: noncurrent versions expire after 30 days; incomplete multipart uploads abort after 7 days; current versions do not expire.",
+   "reason": "Operator's answer '13a'.",
+   "consequence": "A replaced bundle stays recoverable for 30 days."
+  },
+  {
+   "id": "R7-D14",
+   "question": "DC-30 scope (point 14)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "DC-30 covers every log group in eu-north-1; before R7 there is none (F-R7-1), after R7 exactly the flow-log group.",
+   "reason": "Operator's answer '14a'.",
+   "consequence": "A log group created later by a service (for example a CloudFormation or SSM default group) falls under DC-30 and needs the CMK and at most 90-day retention, or a register note."
+  },
+  {
+   "id": "R7-D15",
+   "question": "DC-24 evidence (point 15)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "Besides LogFileValidationEnabled and LatestDigestDeliveryTime, one aws cloudtrail validate-logs run by the admin role over the delivered files in the delivery round.",
+   "reason": "Operator's answer '15a'.",
+   "consequence": "Needs at least one digest file (hourly), so it belongs to round 3."
+  },
+  {
+   "id": "R7-D16",
+   "question": "Key id pinned on the trail bucket (point 16)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "No: the trail bucket keeps the v1 statement only; it does not require a specific kms key id.",
+   "reason": "Operator's answer '16a'. The format in which CloudTrail sends the key id header is not documented on the pages read; a wrong pin would stop delivery silently.",
+   "consequence": "The trail's KMSKeyId and the trail bucket's default encryption name the CMK; evidence shows both."
+  },
+  {
+   "id": "R7-D17",
+   "question": "Test the deploy bucket's encryption denies before R15 (point 17, added by the agent)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "Yes. In round 2 the admin role puts three small objects with a fixed test text under bundles/: without encryption headers (expected: accepted, SSE-KMS with KeyArn and the Bucket Key), with --server-side-encryption AES256 and with --server-side-encryption aws:kms without a key id (both expected: AccessDenied). The accepted object's version is then deleted by version id, leaving no object and no delete marker.",
+   "reason": "Operator's answer '17 a'. Closes the R7-D2 known gap (whether S3 fills the encryption condition keys from the bucket default for a header-less PUT) before R15 depends on it.",
+   "consequence": "A refused header-less upload or an accepted AES256 / key-less upload is a FAIL: successor record and an UPDATE change set of the deploy bucket policy."
+  },
+  {
+   "id": "R7-D18",
+   "question": "DC-08 before the VPC has any network interface (point 18, added by the agent)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a): DC-08 is VERIFIED_PASS on configuration: one flow log on the VPC (covering its one subnet), TrafficType ALL, to the CMK-encrypted /proposal-orchestrator/vpc-flow-logs group, FlowLogStatus ACTIVE and DeliverLogsStatus SUCCESS. The register note states that delivered flow-log records are shown by R11.",
+   "reason": "Operator's answer '18a'. Before R11 the VPC has no network interface, so no flow-log record or log stream can exist; waiting would hold R7 open on a condition only R11 creates.",
+   "consequence": "R11 evidences a flow-log stream and records; the R5-D4 known gap (scoped logs:DescribeLogGroups) closes there, and a FAILED delivery there leads to a successor record and an UPDATE of the iam stack."
+  }
+ ],
+ "known_gaps": [
+  {
+   "decision": "R7-D1",
+   "declared_status": "Inferred",
+   "gap": "That the trail is created and delivers without a CloudTrail kms:Decrypt grant when the bucket has no S3 Bucket Key (R6-D10 known gap; F-R7-6 supports it). A refusal at creation stops R7: successor record, UPDATE of the kms stack first."
+  },
+  {
+   "decision": "R7-D2",
+   "declared_status": "Inferred",
+   "gap": "Whether S3 fills the encryption condition keys from the bucket's default encryption for a PUT that sends no encryption header. If it fills s3:x-amz-server-side-encryption but not the key id, DenyKmsHeaderWithoutKeyId would refuse header-less uploads. Shown by the round-2 test uploads (R7-D17); a refusal leads to a successor record and an UPDATE. Closed in round 2 (F-R7-8)."
+  },
+  {
+   "decision": "R7-D3",
+   "declared_status": "Inferred",
+   "gap": "That S3 accepts NotResource in a bucket policy statement whose NotResource lies inside the bucket. A refusal at PutBucketPolicy fails the stack creation; the two retained buckets may then remain and need a follow-up step sheet. Closed in round 2: the policy was accepted (F-R7-8)."
+  },
+  {
+   "decision": "R7-D3",
+   "declared_status": "Inferred",
+   "gap": "That the runtime-role denies of the deploy bucket policy refuse writes and reads outside bundles/ in practice (F-R7-7: not simulated). Shown by live calls from the host in R11/R12b."
+  },
+  {
+   "decision": "R7-D5",
+   "declared_status": "Inferred",
+   "gap": "Whether logs:DescribeLogGroups scoped to the one group's ARN suffices for flow-log delivery (R5-D4 known gap). Shown by DeliverLogsStatus and a log stream. Not shown in R7: no network interface exists before R11 (R7-D18); R11 shows it."
+  },
+  {
+   "decision": "R7-D1",
+   "declared_status": "Unresolved",
+   "gap": "The AWS-managed organization's RCPs, which can apply to S3 and KMS, are not visible from the member account (OD11-r2 known gap). A restriction shows as an explicit deny at the change set or at creation."
+  }
+ ],
+ "not_evidence_of": [
+  "That the deploy bucket's runtime-role denies hold for live calls from the host (R11, R12b; F-R7-7).",
+  "That flow-log records are delivered (R11; R7-D18).",
+  "That Bedrock Converse calls appear in the trail (DC-26, R11)."
+ ],
+ "privacy": {
+  "declared_status": "Confirmed",
+  "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account.",
+  "basis": "Template structure, policy actions, the new account's ids, AWS documentation references and evidence paths only."
+ }
+}

@@ -314,3 +314,27 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R6/VERIFICATION.md` (every criterion PASS, no N/A), `R6_11_pytest.txt`, `R6_11_old-id-guard.txt`, `R6_11_secret-scan.txt` |
 | Verification Result | R6 DONE. |
 | Next Action | Frontier: R7 (handoff `plans/aws_redeployment_r7_handoff_2026-10-26.md`), R8, R12a, R9, R9e, R10. R11 waits on R7 and R8. Operator: "Close R6" commit (tickets file, VERIFICATION, worklog, R7 handoff). |
+
+### 2026-10-26 — R7: audit template filled, decisions recorded, change set ready
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-26T17:37:00Z |
+| Control ID | DC-08, DC-23, DC-24, DC-25, DC-27, DC-28, DC-29, DC-30 (preparation; nothing created yet) |
+| Action Taken | Operator settled the R7 handoff §4 points and the agent's points 11–16 in session ('1–16 a, 2 = 2a igen + 2b (b), 3 (b), 5 (a) 600 s'); recorded as `docs/tier4_orchestration_state/decision_log/aws-redeployment-r7-audit_2026-10-26.json` (R7-D1 to R7-D16). Round 1 read-only lookups run by the operator (`R7_01`–`R7_03`). Agent read the CloudFormation reference pages of the five resource types and the S3 / CloudTrail guides (F-R7-3 to F-R7-5), filled `deploy/aws/templates/40-audit.yaml` (two buckets with policies, trail, flow-log group, VPC flow log, six contract outputs), changed `outputs_contract.json` (`VpcId` consumer R7, `PrivateSubnetId` no longer R7; R7-D11), wrote `tests/test_aws_audit_template.py` (20 tests) and updated `deploy/aws/README.md`. `evidence_v2/R7/STEPS.md` steps 01–05 written. Round 1b run by the operator. |
+| Evidence Requested | `R7_01`–`R7_12`, `R7_outputs.json` per `STEPS.md` |
+| Evidence Received | `R7_01`–`R7_05` (all PASS). Change set `r7-create-01`: seven `Add`, no capability. Agent checks: cfn-lint 1.57.2 exit 0; template guard CLEAN (6); old-ID guard CLEAN; 177 passed (agent Python 3.10.12, operator Python 3.10.6); secret scan of `evidence_v2/R7` CLEAN. |
+| Verification Result | Rounds 1 and 1b PASS; change set ready for the operator's go. |
+| Next Action | Operator: go on `R7_05_change-set.json`; point 17 (test uploads). |
+
+### 2026-10-26 — R7: audit stack created and verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-26T19:40:00Z |
+| Control ID | DC-08, DC-23, DC-24, DC-25, DC-27, DC-28, DC-29, DC-30 (VERIFIED_PASS); DC-19 (note) |
+| Action Taken | Operator gave the go and point 17 ('17 a, go 06') and ran steps 06–10; later point 18 ('18a') and steps 11 and 11b. Stack `proposal-orchestrator-audit` `CREATE_COMPLETE` (trail logging since 17:44:09Z). Agent verified every file by script and compared both live bucket policies with the resolved template (equal); added R7-D17, R7-D18 and findings F-R7-6 to F-R7-8 to the decision record; dropped a planned simulation of the runtime role against the bucket policy (F-R7-7). |
+| Evidence Requested | `R7_12_*` (tests, old-ID guard, secret scan last) |
+| Evidence Received | `evidence_v2/R7/R7_06`–`R7_11b`, `R7_outputs.json` (`VERIFICATION.md`: every criterion PASS except step 12, pending). Both buckets CMK-encrypted (Bucket Key off on the trail bucket, on on the deploy bucket), BPA, versioning, owner-enforced; policies as the template; trail delivering SSE-KMS log and digest objects without a CloudTrail decrypt grant (R6-D10 holds); `validate-logs` 2/2 digests and 12/12 log files valid; one log group (CMK, 90 days); VPC flow log ACTIVE / SUCCESS, no records before R11; invocation logging unset, no `/aws/bedrock` group; deploy bucket refused `AES256` and key-less `aws:kms` uploads and accepted a header-less one with the CMK. Credits 199.99 USD before and after. |
+| Verification Result | Rounds 1–3 PASS; ticket criteria 1–5 PASS. Register v2 rows DC-08, DC-23, DC-24, DC-25, DC-27, DC-28, DC-29, DC-30 updated; DC-19 note updated (R7-D10, R7-D18). |
+| Next Action | Operator: step 12 (tests `-q`, old-ID guard, secret scan last), commit R7 and confirm in session; agent then completes `VERIFICATION.md` and ticks R7. R11 then waits only on R8. |

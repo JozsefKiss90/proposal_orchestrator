@@ -1,0 +1,38 @@
+﻿[
+    {
+        "OutputKey": "FlowLogGroupArn",
+        "OutputValue": "arn:aws:logs:eu-north-1:797661577394:log-group:/proposal-orchestrator/vpc-flow-logs:*",
+        "Description": "The flow-log group's ARN as CloudFormation returns it (ends with \":*\").",
+        "ExportName": "proposal-orchestrator-audit-FlowLogGroupArn"
+    },
+    {
+        "OutputKey": "FlowLogGroupName",
+        "OutputValue": "/proposal-orchestrator/vpc-flow-logs",
+        "Description": "The flow-log group (DC-08, DC-30).",
+        "ExportName": "proposal-orchestrator-audit-FlowLogGroupName"
+    },
+    {
+        "OutputKey": "DeployBucketName",
+        "OutputValue": "proposal-orchestrator-deploy-797661577394",
+        "Description": "The deploy bucket; R15 uploads to its bundles/ prefix.",
+        "ExportName": "proposal-orchestrator-audit-DeployBucketName"
+    },
+    {
+        "OutputKey": "TrailBucketName",
+        "OutputValue": "proposal-orchestrator-cloudtrail-797661577394",
+        "Description": "The trail bucket (DC-25, R12a).",
+        "ExportName": "proposal-orchestrator-audit-TrailBucketName"
+    },
+    {
+        "OutputKey": "FlowLogId",
+        "OutputValue": "fl-018e0a5b5610c35c7",
+        "Description": "The VPC flow log (DC-08).",
+        "ExportName": "proposal-orchestrator-audit-FlowLogId"
+    },
+    {
+        "OutputKey": "TrailArn",
+        "OutputValue": "arn:aws:cloudtrail:eu-north-1:797661577394:trail/proposal-orchestrator-bedrock-trail",
+        "Description": "The trail's ARN (DC-23, R12a).",
+        "ExportName": "proposal-orchestrator-audit-TrailArn"
+    }
+]
