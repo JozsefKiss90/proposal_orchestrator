@@ -184,8 +184,9 @@ class TestBedrockEuDevelopmentPreset:
 class TestBedrockEuProductionPreset:
     """BEDROCK_EU_PRODUCTION preset values."""
 
-    def test_production_suitable(self):
-        assert BEDROCK_EU_PRODUCTION.production_suitable is True
+    def test_not_production_suitable(self):
+        """F6 (R9): the mantle backend has no VPC endpoint. Replaces test_production_suitable."""
+        assert BEDROCK_EU_PRODUCTION.production_suitable is False
 
     def test_has_production_notes(self):
         notes_text = " ".join(BEDROCK_EU_PRODUCTION.notes)
@@ -460,3 +461,42 @@ class TestPresetBedrockModelValidation:
         with patch.dict(os.environ, env, clear=True):
             config = resolve_provider_config_from_preset("BEDROCK_EU_DEVELOPMENT")
         assert config.model == "anthropic.claude-3-5-sonnet-20240620-v1:0"
+
+
+class TestConversePresetRegion:
+    """F4 (R9): a Converse preset's ``default_region`` applies outside production mode.
+
+    Before R9 the preset path never read the Region for ``bedrock_converse``; a
+    preset's ``default_region`` took effect only when it happened to equal the
+    backend's own default. No test here fixes which Region a preset names
+    (R9e criterion 2): each compares with the preset's own attribute.
+    """
+
+    @staticmethod
+    def _converse_presets():
+        return sorted(n for n, p in PRESET_REGISTRY.items()
+                      if p.backend_name == "bedrock_converse" and p.default_region)
+
+    def test_there_is_a_converse_preset_with_a_default_region(self):
+        assert self._converse_presets()
+
+    def test_default_region_applies_when_aws_region_is_unset(self):
+        for name in self._converse_presets():
+            with patch.dict(os.environ, {}, clear=True):
+                config = resolve_provider_config_from_preset(name)
+            assert config.region == PRESET_REGISTRY[name].default_region, name
+
+    def test_aws_region_overrides_the_default_region(self):
+        for name in self._converse_presets():
+            with patch.dict(os.environ, {"AWS_REGION": "zz-test-1"}, clear=True):
+                config = resolve_provider_config_from_preset(name)
+            assert config.region == "zz-test-1", name
+
+    def test_non_converse_presets_carry_no_region(self):
+        for name, preset in PRESET_REGISTRY.items():
+            if preset.backend_name != "bedrock_converse":
+                env = {"ORCHESTRATOR_TRANSPORT_API_KEY": "fake-key",
+                       "ORCHESTRATOR_TRANSPORT_ENDPOINT": "http://localhost:1/v1"}
+                with patch.dict(os.environ, env, clear=True):
+                    config = resolve_provider_config_from_preset(name)
+                assert config.region is None, name

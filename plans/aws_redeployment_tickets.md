@@ -138,12 +138,22 @@ The deployment guide names `ORCHESTRATOR_TRANSPORT_MODEL`, not `SKILL_MODEL`. F6
 decided: either the `bedrock` backend leaves the production set, or the guide states that only
 `bedrock_converse` is valid on the private host. Code only.
 
+**Done 2026-10-27** (`docs/infrastructure_security/evidence_v2/R9/VERIFICATION.md`; decision record
+`aws-redeployment-r9-runtime-config_2026-10-27`; operator confirmed in session).
+
 **Blocked by:** R0.
 
-- [ ] A test shows that production mode with no `AWS_REGION` is refused.
-- [ ] A test shows that the launcher exports the configured values without logging any of them.
-- [ ] The F6 decision is in a test or in the guide, and the decision log records which.
-- [ ] The full suite shows no new failures.
+- [x] A test shows that production mode with no `AWS_REGION` is refused.
+- [x] A test shows that the launcher exports the configured values without logging any of them.
+- [x] The F6 decision is in a test or in the guide, and the decision log records which.
+      (In tests, R9-D7.)
+- [x] The full suite shows no new failures.
+
+Note (R9, decision record `aws-redeployment-r9-runtime-config_2026-10-27`, F-R9-1 / R9-D21): the full
+suite makes outbound HTTP requests on the workstation (a harness `.env.harness` load leaks into
+`os.environ` and the cached provider; the OpenAI-compatible transport tests reach real hosts). Proposed
+follow-up, outside R9: test isolation (an autouse fixture restoring `os.environ` and resetting the
+transport caches; network guards in those tests). R9e also inherits the list in that record's `for_r9e`.
 
 ## R9e EU region support
 

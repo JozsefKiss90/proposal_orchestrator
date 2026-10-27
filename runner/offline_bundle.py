@@ -607,10 +607,14 @@ def _transport(environ: Mapping[str, str]) -> dict[str, Any]:
 
 
 def _region_setting(environ: Mapping[str, str]) -> Optional[tuple[str, str]]:
-    for var in ("AWS_REGION", "AWS_DEFAULT_REGION"):
-        if environ.get(var):
-            return var, environ[var]
-    return None
+    """``("AWS_REGION", value)``, or ``None`` when it is unset or empty.
+
+    Only ``AWS_REGION`` counts: it is the variable the Converse backend reads,
+    and production mode refuses to run without it (R9, F4). ``AWS_DEFAULT_REGION``
+    alone does not satisfy the check.
+    """
+    value = (environ.get("AWS_REGION") or "").strip()
+    return ("AWS_REGION", value) if value else None
 
 
 def _region(environ: Mapping[str, str]) -> dict[str, Any]:
@@ -618,7 +622,8 @@ def _region(environ: Mapping[str, str]) -> dict[str, Any]:
 
     setting = _region_setting(environ)
     if setting is None:
-        return _check("region", False, "neither AWS_REGION nor AWS_DEFAULT_REGION is set")
+        alone = " (AWS_DEFAULT_REGION alone does not count)" if environ.get("AWS_DEFAULT_REGION") else ""
+        return _check("region", False, f"AWS_REGION is not set{alone}")
     var, region = setting
     return _check("region", region in ALLOWED_REGIONS,
                   f"{var}={region}; ADR-001 allows {list(ALLOWED_REGIONS)}")

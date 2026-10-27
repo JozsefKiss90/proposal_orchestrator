@@ -1,0 +1,28 @@
+﻿Python 3.10.6
+============================= test session starts =============================
+platform win32 -- Python 3.10.6, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Code\proposal_demo\proposal_orchestrator
+configfile: pyproject.toml
+plugins: anyio-4.7.0
+collected 303 items
+
+tests\test_host_env_launcher.py ......................................   [ 12%]
+tests\test_production_mode.py .......................................... [ 26%]
+............                                                             [ 30%]
+tests\test_transport_presets.py ...F.................................... [ 43%]
+.............                                                            [ 47%]
+tests\test_transport_config.py ...............................           [ 58%]
+tests\test_bedrock_env_readiness.py ................                     [ 63%]
+tests\test_persistence_policy.py ....................................... [ 76%]
+.                                                                        [ 76%]
+tests\runner\test_offline_bundle.py .................................... [ 88%]
+...................................                                      [100%]
+
+================================== FAILURES ===================================
+E   AssertionError: assert 7 == 6
+     +  where 7 = len({'BEDROCK_CONVERSE_US': TransportPreset(name='BEDROCK_CONVERSE_US', backend_name='bedrock_converse', description='Nati...('Uses the local claude CLI via subscription.', 'Not closed-network; prompts transit Anthropic infrastructure.')), ...})
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_transport_presets.py:90: AssertionError: assert 7 == 6
+=========================== short test summary info ===========================
+FAILED tests/test_transport_presets.py::TestPresetRegistry::test_registry_count
+================== 1 failed, 302 passed in 69.59s (0:01:09) ===================
+exit=1

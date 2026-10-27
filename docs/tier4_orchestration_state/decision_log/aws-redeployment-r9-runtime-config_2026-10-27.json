@@ -1,0 +1,325 @@
+{
+ "record_type": "decision_record",
+ "id": "aws-redeployment-r9-runtime-config_2026-10-27",
+ "date": "2026-10-27",
+ "branch": "msca-dn-pre-eval",
+ "milestone": "AWS private-network redeployment",
+ "ticket": "R9 of plans/aws_redeployment_tickets.md (runtime configuration from the secret; F4, F6)",
+ "supersedes": "Nothing. Applies OD1-r1, OD7-orchestrator, OD8 (a), OD12, R5 RuntimeSecretRead, R6-D3, R8-D2, R8-D3, R8-D7, R8-D13 and F-R8-8 to the transport configuration and the host launcher, and settles the twelve points of plans/aws_redeployment_r9_handoff_2026-10-27.md section 4 and eleven points the agent added (13-23).",
+ "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-27 on the agent's R9 proposals. Execution aid for infrastructure work (CLAUDE.md section 10.2). The transport layer is the configured runtime transport of section 17.5.2; R9 changes how it is configured and adds a launcher outside the scheduler, agent and skill stack. It changes no call graph (17.1), result contract (17.4) or failure semantics (17.3), closes no gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+ "review_state": "operator_decided",
+ "decided_by": "the operator, in session on 2026-10-27 ('1-20 a', ~16:34 UTC; '21-23 a', ~17:00 UTC), accepting the agent's proposal on each point.",
+ "decision": "A launcher, runner/host_env.py (python -m runner.host_env --region R --secret-id NAME -- COMMAND), reads the runtime secret with one GetSecretValue call, accepts only a JSON object of exactly the five agreed string keys with production mode true and diagnostic level metadata, its AWS_REGION equal to --region and a production-suitable Converse preset, refuses a caller environment that disagrees, and execs COMMAND with the five variables plus AWS_DEFAULT_REGION, printing nothing on success and only failure kinds, key names and error codes on failure. Production mode refuses a missing or empty AWS_REGION at resolution (both paths), at build and in the launcher; AWS_DEFAULT_REGION alone does not count; outside production mode a Converse preset's default_region applies. F6 is decided in code: bedrock leaves PRODUCTION_BACKENDS, BEDROCK_EU_PRODUCTION becomes production_suitable=False, and the preset path checks the backend set too. offline_bundle verify requires AWS_REGION. No document changes in R9.",
+ "why": "Ticket R9 and its four exit conditions; F4 (no code read the secret, and the Converse Region silently defaulted to us-east-1) and F6 (a production-allowed backend with no VPC endpoint). OD8 (a) makes the secret the host's configuration source; OD1-r1 puts the host in eu-north-1, where a silent us-east-1 default would send calls out of the Region.",
+ "inputs": [
+  "plans/aws_redeployment_r9_handoff_2026-10-27.md sections 1-7",
+  "plans/aws_redeployment_tickets.md inherited constraints, R9, R9e, R10, R12b, R13, R15",
+  "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F4, F6, F9), section 5 (OD8), section 6 (R9), sections 7 and 7a",
+  "aws-redeployment-operator-decisions_2026-10-21 (OD8, OD12); aws-redeployment-od1-region-r1_2026-10-21; aws-redeployment-od7-model-set_2026-10-21; aws-redeployment-r5-iam_2026-10-25; aws-redeployment-r6-kms_2026-10-26; aws-redeployment-r8-secret_2026-10-26",
+  "docs/infrastructure_security/evidence_v2/R8/VERIFICATION.md (Notes for later tickets), R8_outputs.json",
+  "runner/transport/config.py, runner/transport/bedrock_converse.py, runner/offline_bundle.py, runner/anonymisation_rewrite.py, runner/skill_runtime.py, runner/semantic_dispatch.py, runner/__main__.py, harness/judge.py, harness/commands/_common.py, harness/commands/converse_smoke.py, tools/env_config_digest.py, tools/evidence_secret_scan.py",
+  "tests/test_production_mode.py, tests/test_transport_presets.py, tests/test_transport_config.py, tests/runner/test_offline_bundle.py, tests/test_persistence_policy.py",
+  "docs/infrastructure_security/deployment_guide.md sections 1, 3.5, 6 and plans/msca_dn_an12_host_runbook.md Part 2 step 7, read as state to be corrected",
+  "docs/infrastructure_security/evidence_v2/R9/R9_01_* (baseline on 8c20087)"
+ ],
+ "findings": [
+  {
+   "id": "F-R9-1",
+   "declared_status": "Confirmed",
+   "finding": "The full suite makes outbound HTTP requests on the workstation. In the baseline run about 49 skill invocations reached an OpenAI-compatible provider that refused them with 401 in Groq's error format, and tests of tests/test_transport_openai_compatible.py reached example.com (405) and another provider (401). Likely mechanism: a harness command called in a test runs load_harness_env(), which loads .env.harness (an OpenAI-compatible endpoint and key) with override=True into os.environ; the value persists and runner.skill_runtime caches the resolved provider, so later runner tests use the real endpoint. The requests carried test-fixture prompts; all were refused. The baseline is therefore order-dependent. Not caused or fixed by R9 (point 21).",
+   "basis": "docs/infrastructure_security/evidence_v2/R9/R9_01_baseline-pytest.txt (tracebacks of tests/runner/* and tests/test_transport_openai_compatible.py); harness/commands/_common.py load_harness_env; runner/skill_runtime.py _resolve_transport_backend cache; names of the keys in .env.harness (values not read)."
+  },
+  {
+   "id": "F-R9-2",
+   "declared_status": "Confirmed",
+   "finding": "tests/test_transport_presets.py::TestPresetRegistry::test_registry_count expects 6 presets; the registry has 7 since BEDROCK_CONVERSE_US. It fails in the baseline and R9 does not change the count (point 22).",
+   "basis": "R9_01_baseline-pytest.txt line 'assert 7 == 6'; runner/transport/config.py PRESET_REGISTRY."
+  },
+  {
+   "id": "F-R9-3",
+   "declared_status": "Confirmed",
+   "finding": "Before R9, _enforce_production_backend was never called, and the preset path checked only production_suitable, so a preset flagged suitable could carry any backend into production mode.",
+   "basis": "grep over runner/, harness/, tools/ (2026-10-27); runner/transport/config.py."
+  },
+  {
+   "id": "F-R9-4",
+   "declared_status": "Confirmed",
+   "finding": "runner/transport/config.py and runner/__main__.py call load_dotenv() at import (override=False). The workstation .env sets ORCHESTRATOR_TRANSPORT_PRESET; .env is not among the bundle roots, so the host has none unless created there. The launcher snapshots the caller's environment before importing config.",
+   "basis": "runner/transport/config.py, runner/__main__.py, deploy/offline_bundle.json roots; .env key names only."
+  },
+  {
+   "id": "F-R9-5",
+   "declared_status": "Confirmed",
+   "finding": "The second of the four patterns of tools/evidence_secret_scan.py is case-insensitive, so it also matches the standard AWS access-key environment variable name, which tests/runner/test_offline_bundle.py already contains; an evidence file that prints that test's source would be refused. The agent's own first draft of STEPS.md was refused for naming the pattern itself.",
+   "basis": "tools/evidence_secret_scan.py FORBIDDEN_PATTERNS; RUNLOG.md settling row."
+  },
+  {
+   "id": "F-R9-6",
+   "declared_status": "Confirmed",
+   "finding": "tests/test_persistence_policy.py::TestSkillRuntimeDiagnosticPolicy::test_production_metadata_skips_response_file mocks provider resolution and the transport, so it does not reach build_converse_backend; it passes on the device VM before and after R9 and was not amended. Its workstation failure in the baseline is consistent with F-R9-1.",
+   "basis": "Agent's runs on the device VM (Python 3.10.12, boto3 1.42.68) over the HEAD archive and the working tree, 2026-10-27."
+  },
+  {
+   "id": "F-R9-7",
+   "declared_status": "Confirmed",
+   "finding": "harness/commands/converse_smoke.py still takes the Region from AWS_REGION or AWS_DEFAULT_REGION and checks ALLOWED_REGIONS; it is a harness smoke, not the production transport path, and is left to R9e with the region list.",
+   "basis": "harness/commands/converse_smoke.py lines 33 and 173."
+  }
+ ],
+ "decisions": [
+  {
+   "id": "R9-D1",
+   "question": "Launcher form (point 1)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) Python module runner/host_env.py, run as python -m runner.host_env --region R --secret-id NAME -- COMMAND; one GetSecretValue through boto3 (imported at run time, client injectable); validates; sets the variables in a copy of the environment; os.execvpe. No value passes through a shell, a file, argv or stdout.",
+   "reason": "Operator's '1a'. Runs under the bundle's Python 3.11 with its pinned boto3; unit-testable.",
+   "consequence": "R12b evidences DC-33 to DC-35 through it on the host; R9e replaces the runbook's step 7 exports with it."
+  },
+  {
+   "id": "R9-D2",
+   "question": "The launcher's own Region and secret id (point 2)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) Both required arguments, no default; after the read the launcher refuses unless the secret's AWS_REGION equals --region. The secret is named (proposal-orchestrator/env-config, export proposal-orchestrator-secret-SecretName).",
+   "reason": "Operator's '2a'. IAM matches the name against .../env-config-* as it matches the ARN.",
+   "consequence": "No IMDS dependency."
+  },
+  {
+   "id": "R9-D3",
+   "question": "What the launcher accepts (point 3)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) Exactly the five keys of R8-D2, all non-empty strings; ORCHESTRATOR_PRODUCTION_MODE = true and ORCHESTRATOR_DIAGNOSTIC_LEVEL = metadata (case-sensitive); credential-shaped key names (KEY, SECRET, TOKEN, PASSWORD) refused; the preset must resolve and be production-suitable with a backend in PRODUCTION_BACKENDS before exec.",
+   "reason": "Operator's '3a'. Fail early, on the host, before any phase.",
+   "consequence": "R8-D3 dependency: the launcher refuses the real secret until R9e adds BEDROCK_CONVERSE_EU; tests/test_host_env_launcher.py holds on both sides of R9e."
+  },
+  {
+   "id": "R9-D4",
+   "question": "Precedence over the caller's environment (point 4)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(b) Refuse when the caller sets one of the five keys, or AWS_DEFAULT_REGION, to a different value; equal values are accepted. AWS_DEFAULT_REGION is set to the AWS_REGION value.",
+   "reason": "Operator's '4a'. A disagreement between an SSM command and the secret is a configuration error to surface.",
+   "consequence": "Variables outside the five (for example ORCHESTRATOR_TRANSPORT_BACKEND) pass through; the transport layer already refuses a backend that conflicts with the preset."
+  },
+  {
+   "id": "R9-D5",
+   "question": "What 'without logging' covers (point 5)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "Nothing printed on success. On failure one stderr line: the failure kind and key names, or the boto3 error code, or an exception class name; never a value, the response object, parser text or raw exception text. No logging configuration; no value in argv. Exit codes 2 refused, 3 read failed, 4 command could not be started (4 added in implementation for a failed exec).",
+   "reason": "Operator's '5a'; exit code 4 is an implementation detail inside the agreed scope.",
+   "consequence": "tests/test_host_env_launcher.py asserts with sentinel values that none reaches stdout, stderr, logging records or the exec'd argv."
+  },
+  {
+   "id": "R9-D6",
+   "question": "Where a missing AWS_REGION is refused (point 6)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a)+(c) In resolve_provider_config on both paths for bedrock_converse under production mode (so runner/__main__.py returns 3 before any phase), in build_converse_backend whatever the config carries, and in the launcher. Empty or blank counts as missing; AWS_DEFAULT_REGION alone does not count. ProviderConfig gains an additive region field. Outside production mode: AWS_REGION, else the preset's default_region, else NON_PRODUCTION_CONVERSE_REGION (us-east-1, the pre-R9 behaviour).",
+   "reason": "Operator's '6a'. Fixes F4 (1)-(3).",
+   "consequence": "Exit condition 1: tests/test_production_mode.py TestProductionRequiresAwsRegion and test_startup_returns_3_when_production_has_no_aws_region."
+  },
+  {
+   "id": "R9-D7",
+   "question": "F6 (point 7)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) Decided in code and test: PRODUCTION_BACKENDS = {bedrock_converse}; BEDROCK_EU_PRODUCTION keeps its name, becomes production_suitable=False with a note citing F6; the production-mode error message no longer suggests it.",
+   "reason": "Operator's '7a'. The only form a test can enforce; the mantle host has no VPC endpoint (R11 creates none).",
+   "consequence": "Exit condition 3: the decision is in tests (tests/test_production_mode.py TestProductionBackendsConstant, TestF6OnBothPaths, test_production_mode_rejects_*; tests/test_transport_presets.py test_not_production_suitable), not in the guide. BEDROCK_EU_PRODUCTION is used outside tests only in runner/transport/config.py; two documents mention it (R13 list)."
+  },
+  {
+   "id": "R9-D8",
+   "question": "offline_bundle verify (point 8)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) The region check requires AWS_REGION; AWS_DEFAULT_REGION alone fails it with a detail saying so. ALLOWED_REGIONS is unchanged (R9e).",
+   "reason": "Operator's '8a'. One Region rule for production mode across the transport and the bundle check.",
+   "consequence": "tests/runner/test_offline_bundle.py test_aws_default_region_alone_does_not_satisfy_the_region_check."
+  },
+  {
+   "id": "R9-D9",
+   "question": "Deployment guide (point 9)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(b) R9 changes no document; the corrections are listed for R13 below.",
+   "reason": "Operator's '9a'. R13's draft-and-approve rule covers the guide.",
+   "consequence": "See for_r13."
+  },
+  {
+   "id": "R9-D10",
+   "question": "Tests and names (point 10)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "tests/test_host_env_launcher.py (new); additions and amendments in tests/test_production_mode.py, tests/test_transport_presets.py, tests/runner/test_offline_bundle.py. The value field's name is assembled at run time and a test asserts it is absent from runner/host_env.py (F-R8-8). No test fixes eu-north-1; test Regions are sentinels or preset attributes.",
+   "reason": "Operator's '10a'.",
+   "consequence": "R9e criterion 2 is not made harder."
+  },
+  {
+   "id": "R9-D11",
+   "question": "Evidence (point 11)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) evidence_v2/R9/ with STEPS.md, RUNLOG.md, R9_<NN>_*.txt, VERIFICATION.md; register v2 notes on DC-33 to DC-35 only; a worklog entry.",
+   "reason": "Operator's '11a'.",
+   "consequence": "No register status changes in R9."
+  },
+  {
+   "id": "R9-D12",
+   "question": "Order with R10 and R9e (point 12)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "R9 lands first and changes only what its exit conditions need; R10 and R9e rebase on it.",
+   "reason": "Operator's '12a'.",
+   "consequence": "See for_r9e."
+  },
+  {
+   "id": "R9-D13",
+   "question": "Baseline commit (point 13)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) The baseline runs on 8c20087 ('starting R9'), which differs from 273cb7a ('Close R8') only by the R9 handoff file.",
+   "reason": "Operator's '13a'.",
+   "consequence": "R9_01_commit.txt."
+  },
+  {
+   "id": "R9-D14",
+   "question": "F6 on the preset path (point 14)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) resolve_provider_config_from_preset calls _enforce_production_backend under production mode (F-R9-3); the explicit path uses the same function.",
+   "reason": "Operator's '14a'.",
+   "consequence": "test_a_preset_flagged_suitable_cannot_carry_a_non_production_backend; test_every_production_suitable_preset_uses_a_production_backend."
+  },
+  {
+   "id": "R9-D15",
+   "question": "Existing tests amended on purpose (point 15)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "tests/test_production_mode.py: test_production_mode_accepts_bedrock_converse and test_production_mode_accepts_bedrock_converse_us_preset (AWS_REGION added); test_production_mode_accepts_bedrock_mantle replaced by test_production_mode_rejects_bedrock_mantle; test_production_mode_accepts_bedrock_eu_production_preset replaced by test_production_mode_rejects_bedrock_eu_production_preset; TestProductionBackendsConstant::test_bedrock_is_production replaced by test_bedrock_is_not_production. tests/test_transport_presets.py: TestBedrockEuProductionPreset::test_production_suitable replaced by test_not_production_suitable. tests/test_persistence_policy.py is not amended (F-R9-6).",
+   "reason": "Operator's '15a'.",
+   "consequence": "Exit condition 4 compares by id; these ids are amended, not new failures."
+  },
+  {
+   "id": "R9-D16",
+   "question": "load_dotenv at import (point 16)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "No change to dotenv loading; the launcher takes an explicit environment mapping and snapshots os.environ before importing runner.transport.config; its tests never read os.environ.",
+   "reason": "Operator's '16a'. F-R9-4.",
+   "consequence": "None on the host while no .env exists in the app root."
+  },
+  {
+   "id": "R9-D17",
+   "question": "Scan trap (point 17)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "R9 tests use sentinel names that match none of the scan's patterns; evidence pytest runs use -q --tb=line -rfE.",
+   "reason": "Operator's '17a'. F-R9-5.",
+   "consequence": "STEPS.md commands."
+  },
+  {
+   "id": "R9-D18",
+   "question": "Exec on Windows (point 18)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "exec is injectable; no test performs a real exec; the launcher is for the Linux host.",
+   "reason": "Operator's '18a'.",
+   "consequence": "The real exec is first exercised on the host (R12b)."
+  },
+  {
+   "id": "R9-D19",
+   "question": "BedrockConverseBackend default Region (point 19)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "region_name is required, no default (F4 (4)); all three callers pass it.",
+   "reason": "Operator's '19a'.",
+   "consequence": "test_the_backend_has_no_default_region."
+  },
+  {
+   "id": "R9-D20",
+   "question": "AWS_REGION differing from the preset's default_region in production (point 20)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "Allowed, not refused.",
+   "reason": "Operator's '20a'. eu. profiles answer from any EU source Region, and the private host has endpoints only in eu-north-1, so a wrong Region fails closed there.",
+   "consequence": "None."
+  },
+  {
+   "id": "R9-D21",
+   "question": "Outbound HTTP in the test suite (point 21)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) Recorded as F-R9-1; a separate follow-up ticket is proposed (test isolation: an autouse fixture restoring os.environ and resetting the transport caches, and real-network guards in the OpenAI-compatible tests); R9's own tests are isolated (clear=True, explicit environ); comparison by id. The operator checks whether the .env.harness key needs revoking.",
+   "reason": "Operator's '21a'. Fixing it would touch many tests outside R9's scope.",
+   "consequence": "The follow-up is listed in plans/aws_redeployment_tickets.md under R9 as a note, not as an R9 criterion."
+  },
+  {
+   "id": "R9-D22",
+   "question": "test_registry_count (point 22)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) Not touched by R9; it stays in the baseline set and R9e, which adds the next preset, updates it.",
+   "reason": "Operator's '22a'. F-R9-2.",
+   "consequence": "See for_r9e."
+  },
+  {
+   "id": "R9-D23",
+   "question": "How exit condition 4 is judged (point 23)",
+   "answer_kind": "operator_adopted_default",
+   "declared_status": "Confirmed",
+   "answer": "(a) PASS when the set of failing ids after R9 is a subset of the baseline set (R9_01), except the ids amended under R9-D15, which must pass. A baseline failure that passes afterwards is recorded, not counted against R9 (order dependence, F-R9-1).",
+   "reason": "Operator's '23a'.",
+   "consequence": "VERIFICATION.md compares by script."
+  }
+ ],
+ "for_r9e": [
+  "Add BEDROCK_CONVERSE_EU (backend bedrock_converse, default Region eu-north-1, eu. profiles, production_suitable) per R8-D3, with the test that the name stored by 50-secret.yaml exists; the launcher then accepts the real secret.",
+  "Update tests/test_transport_presets.py::TestPresetRegistry::test_registry_count (F-R9-2).",
+  "Widen ALLOWED_REGIONS in runner/anonymisation_rewrite.py for eu-north-1; align harness/commands/converse_smoke.py's Region source with AWS_REGION only (F-R9-7).",
+  "AN12 runbook Part 2 step 7: replace the export lines with python -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config -- ...; the runbook guard test follows.",
+  "The AN1c guard must know the host's drafter model from ORCHESTRATOR_TRANSPORT_MODEL (OD7-assessor)."
+ ],
+ "for_r13": [
+  "deployment_guide.md section 1 'Production Environment Variables', section 3.5 and every section 6 block and SSM command: AWS_DEFAULT_REGION -> AWS_REGION; SKILL_MODEL -> ORCHESTRATOR_TRANSPORT_MODEL; BEDROCK_CONVERSE_US -> the secret's preset; on the host, export lines -> the launcher (values come from the secret, R8-D2); ids from stack outputs.",
+  "deployment_guide.md: state that only bedrock_converse is a production backend (F6, R9-D7) and that production mode refuses to run without AWS_REGION (R9-D6).",
+  "docs/backend/transport_presets.md and plans/reports/security_compliance_brief.md: BEDROCK_EU_PRODUCTION is no longer production-suitable (R9-D7)."
+ ],
+ "known_gaps": [
+  {
+   "decision": "R9-D1",
+   "declared_status": "Unresolved",
+   "gap": "The real GetSecretValue through the secretsmanager interface endpoint, the real exec and the role's access are first exercised on the host (R11, R12b)."
+  },
+  {
+   "decision": "R9-D3",
+   "declared_status": "Unresolved",
+   "gap": "Until R9e adds BEDROCK_CONVERSE_EU, the launcher refuses the real secret (R8-D3)."
+  },
+  {
+   "decision": "R9-D21",
+   "declared_status": "Inferred",
+   "gap": "Which harness test loads .env.harness into the process is not pinned down; the mechanism is inferred from the code and the tracebacks (F-R9-1)."
+  }
+ ],
+ "not_evidence_of": [
+  "That the runtime role can read the secret (R11).",
+  "That DC-33 to DC-35 hold on the host (R12b).",
+  "That the real secret's preset resolves (R9e)."
+ ],
+ "unblocks_when_recorded": [
+  "R9 round 2 (steps 03-05), commit and confirmation",
+  "After R9 is ticked: R9e; R12b once R11 and R12a are also done; R10 rebases on R9"
+ ],
+ "stays_blocked": [
+  "R9e until R9 is ticked",
+  "R12b until R9, R11 and R12a are ticked"
+ ],
+ "privacy": {
+  "declared_status": "Confirmed",
+  "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account. The five configuration values appear only as already present in the repository's template and parameter file; tests use sentinel values; .env and .env.harness were read for key names only (and the one preset name in .env).",
+  "basis": "Code, test names, decision text and evidence paths only."
+ }
+}

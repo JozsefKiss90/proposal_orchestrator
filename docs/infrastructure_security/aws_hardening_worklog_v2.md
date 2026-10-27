@@ -386,3 +386,28 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R8/VERIFICATION.md`, `R8_11_pytest.txt`, `R8_11_old-id-guard.txt`, `R8_11_secret-scan.txt` |
 | Verification Result | R8 DONE. |
 | Next Action | Frontier: R12a, R9, R9e, R10; R11 is unblocked and needs the operator's explicit go (first hourly cost). Open for R9e: the `BEDROCK_CONVERSE_EU` preset (R8-D3). Open for R11: the runtime role's first read of the secret (DC-19, DC-20, DC-21 runtime half). |
+
+### 2026-10-27 — R9: runtime configuration from the secret — verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-27T17:50:00Z |
+| Control ID | DC-33–DC-35 (notes); F4, F6 |
+| Action Taken | Operator settled the R9 handoff points 1–12 and agent points 13–20 ('1–20 a') and, after the baseline, points 21–23 ('21–23 a'). Operator ran step 01 (baseline on `8c20087`: 202 failed, 8890 passed, 86 skipped). Agent wrote the launcher `runner/host_env.py`, the production-mode Region refusal and F6 in `runner/transport/config.py`, the required Region in `runner/transport/bedrock_converse.py`, the `AWS_REGION` rule in `runner/offline_bundle.py`, `tests/test_host_env_launcher.py` and additions in three test modules, and decision record `aws-redeployment-r9-runtime-config_2026-10-27` (R9-D1 to R9-D23, F-R9-1 to F-R9-7). Operator ran steps 03–05. Agent error recorded in `RUNLOG.md`: a `git stash` in the connected folder left a lock file (renamed) and a temporary object; no change lost. |
+| Evidence Requested | `R9_01_*`, `R9_03_*`, `R9_04_full-pytest.txt`, `R9_05_*` |
+| Evidence Received | `evidence_v2/R9/`: R9 and transport tests 1 failed (baseline `test_registry_count`), 302 passed; full suite 201 failed, all in the baseline set, 8954 passed; old-ID guard and secret scan CLEAN (scan last). |
+| Verification Result | Every `VERIFICATION.md` criterion PASS; ticket criteria 1–4 PASS. F-R9-1: the test suite makes outbound HTTP requests (follow-up proposed, outside R9). |
+| Next Action | Operator: confirm in session; agent then ticks R9 and re-runs the scan; operator commits ("Close R9") and deletes `.git/stale-index-lock-r9-20261027` and `.git/objects/09/tmp_obj_pEjQci`; operator checks whether the `.env.harness` key needs revoking. Then R9e (preset `BEDROCK_CONVERSE_EU`, `for_r9e`), R10 rebases on R9; R12b needs R11 and R12a. |
+
+### 2026-10-27 — R9: runtime configuration from the secret — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-27T17:50:00Z |
+| Control ID | DC-33–DC-35 (notes); F4, F6 |
+| Action Taken | Operator confirmed in session ("Zárd le az R9-et"). Agent ticked R9 in `plans/aws_redeployment_tickets.md` and completed `evidence_v2/R9/VERIFICATION.md` (every criterion PASS). |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R9/VERIFICATION.md`, `R9_04_full-pytest.txt`, `R9_05_old-id-guard.txt`, `R9_05_secret-scan.txt` |
+| Verification Result | R9 DONE. |
+| Next Action | Operator: commit "Close R9"; delete `.git/stale-index-lock-r9-20261027` and `.git/objects/09/tmp_obj_pEjQci`; check the `.env.harness` key (F-R9-1). Frontier: R9e (unblocked; `for_r9e` in the R9 record), R10 (rebases on R9), R12a; R11 needs the operator's explicit go (first hourly cost). |
+

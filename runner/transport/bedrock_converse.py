@@ -60,7 +60,8 @@ class BedrockConverseBackend:
         Examples: ``us.anthropic.claude-sonnet-4-6``,
         ``us.anthropic.claude-haiku-4-5-20251001-v1:0``.
     region_name:
-        AWS region.  Default ``us-east-1``.
+        AWS Region.  Required, no default (F4, R9): the caller states the
+        Region, so a call never silently goes to a default one.
     temperature:
         Sampling temperature.  Default ``0.0``.
     max_tokens:
@@ -74,7 +75,7 @@ class BedrockConverseBackend:
         self,
         *,
         model_id: str,
-        region_name: str = "us-east-1",
+        region_name: str,
         temperature: float = 0.0,
         max_tokens: int = 4096,
         tools: list[dict[str, Any]] | None = None,

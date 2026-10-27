@@ -27,7 +27,13 @@ Environment variables:
     ``ORCHESTRATOR_TRANSPORT_MODEL``
         Model identifier override.
     ``AWS_REGION``
-        AWS region for Bedrock URL construction (default: ``eu-west-1``).
+        AWS Region.  For ``bedrock`` it builds the mantle URL (default
+        ``eu-west-1``).  For ``bedrock_converse`` it is the Region of the
+        ``bedrock-runtime`` client; under ``ORCHESTRATOR_PRODUCTION_MODE=true``
+        it is required (``AWS_DEFAULT_REGION`` does not count), so a call can
+        never silently go to a default Region.  Outside production mode a
+        Converse preset's ``default_region`` applies when it is unset
+        (decision record ``aws-redeployment-r9-runtime-config_2026-10-27``).
 
 Constitutional authority:
     Subordinate to CLAUDE.md.  This module resolves configuration only.
@@ -67,9 +73,13 @@ VALID_BACKENDS: frozenset[str] = frozenset({
 })
 
 #: Backends allowed when ORCHESTRATOR_PRODUCTION_MODE=true.
+#:
+#: Only ``bedrock_converse``: the private host reaches Bedrock through the
+#: ``bedrock-runtime`` interface endpoint only.  The ``bedrock`` backend
+#: (bedrock-mantle) has no VPC endpoint and left this set in R9 (F6,
+#: decision record ``aws-redeployment-r9-runtime-config_2026-10-27``).
 PRODUCTION_BACKENDS: frozenset[str] = frozenset({
     "bedrock_converse",
-    "bedrock",
 })
 
 #: Default Bedrock model (Claude Sonnet 4 on Bedrock).
@@ -77,6 +87,11 @@ DEFAULT_BEDROCK_MODEL: str = "anthropic.claude-sonnet-4-20250514-v1:0"
 
 #: Default AWS region for Bedrock.
 DEFAULT_AWS_REGION: str = "eu-west-1"
+
+#: Region the Converse backend falls back to outside production mode when
+#: neither ``AWS_REGION`` nor a preset ``default_region`` supplies one (the
+#: behaviour before R9).  Never used under production mode.
+NON_PRODUCTION_CONVERSE_REGION: str = "us-east-1"
 
 #: Bedrock mantle URL template.
 BEDROCK_URL_TEMPLATE: str = "https://bedrock-mantle.{region}.api.aws/v1"
@@ -195,8 +210,11 @@ BEDROCK_EU_PRODUCTION = TransportPreset(
     default_region="eu-west-1",
     capabilities=CAPABILITIES_REGISTRY["bedrock"],
     intended_use="EU institutional deployment",
-    production_suitable=True,
+    production_suitable=False,
     notes=(
+        "Not production-suitable since R9 (F6): the bedrock (mantle) backend has no VPC "
+        "endpoint, so it cannot run on the private host. The name is kept for continuity; "
+        "decision record aws-redeployment-r9-runtime-config_2026-10-27.",
         "Production use requires region and model availability validation in the Bedrock console.",
         "Configure VPC endpoint via PrivateLink for closed-network operation.",
         "Enable CloudTrail logging for Bedrock API calls.",
@@ -304,6 +322,8 @@ class ProviderConfig:
     ----------
     backend_name:
         One of :data:`VALID_BACKENDS`.
+    region:
+        AWS Region for ``bedrock_converse``; ``None`` otherwise.
     base_url:
         The base URL for OpenAI-compatible backends.  ``None`` for ``claude_cli``.
     api_key_set:
@@ -321,6 +341,10 @@ class ProviderConfig:
     model: str | None
     capabilities: ProviderCapabilities
     preset_name: str | None = None
+    #: AWS Region for ``bedrock_converse`` (``None`` for other backends):
+    #: ``AWS_REGION``, else (outside production mode only) the preset's
+    #: ``default_region`` or :data:`NON_PRODUCTION_CONVERSE_REGION`.
+    region: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -351,22 +375,62 @@ def is_production_mode() -> bool:
     return os.environ.get("ORCHESTRATOR_PRODUCTION_MODE", "").lower() == "true"
 
 
-def _enforce_production_backend(config: ProviderConfig) -> None:
+def _enforce_production_backend(backend_name: str) -> None:
     """Reject non-production backends when production mode is active.
+
+    Called on both resolution paths (explicit backend and preset), so a
+    preset can never carry a backend outside :data:`PRODUCTION_BACKENDS`
+    into production mode, whatever its ``production_suitable`` flag says.
 
     Raises
     ------
     ValueError
-        If the resolved backend is not in :data:`PRODUCTION_BACKENDS`.
+        If *backend_name* is not in :data:`PRODUCTION_BACKENDS`.
     """
-    if config.backend_name not in PRODUCTION_BACKENDS:
+    if backend_name not in PRODUCTION_BACKENDS:
         raise ValueError(
             f"ORCHESTRATOR_PRODUCTION_MODE=true but backend "
-            f"{config.backend_name!r} is not production-suitable. "
+            f"{backend_name!r} is not production-suitable. "
             f"Production-allowed backends: {sorted(PRODUCTION_BACKENDS)}. "
             f"Set ORCHESTRATOR_TRANSPORT_PRESET or "
             f"ORCHESTRATOR_TRANSPORT_BACKEND to a production backend."
         )
+
+
+def _aws_region_env() -> str | None:
+    """``AWS_REGION`` stripped, or ``None`` when unset or empty."""
+    value = os.environ.get("AWS_REGION", "").strip()
+    return value or None
+
+
+def _require_production_region() -> str:
+    """Return ``AWS_REGION`` or refuse: production mode never defaults the Region.
+
+    ``AWS_DEFAULT_REGION`` alone does not satisfy production mode: the
+    Converse backend is built from ``AWS_REGION``.
+
+    Raises
+    ------
+    ValueError
+        If ``AWS_REGION`` is unset or empty.
+    """
+    region = _aws_region_env()
+    if region is None:
+        raise ValueError(
+            "ORCHESTRATOR_PRODUCTION_MODE=true but AWS_REGION is not set. "
+            "The bedrock_converse backend never defaults the Region in "
+            "production mode (AWS_DEFAULT_REGION alone does not count). "
+            "Start the process through the host launcher (python -m "
+            "runner.host_env), which exports AWS_REGION from the runtime secret."
+        )
+    return region
+
+
+def _converse_region(preset_default: str | None) -> str:
+    """The Region for ``bedrock_converse``: production requires ``AWS_REGION``."""
+    if is_production_mode():
+        return _require_production_region()
+    return _aws_region_env() or preset_default or NON_PRODUCTION_CONVERSE_REGION
 
 
 # ---------------------------------------------------------------------------
@@ -429,8 +493,10 @@ def resolve_provider_config_from_preset(preset_name: str) -> ProviderConfig:
             f"ORCHESTRATOR_PRODUCTION_MODE=true but preset "
             f"{preset_name!r} is not production-suitable "
             f"(production_suitable=False). Use a production preset "
-            f"(e.g. BEDROCK_CONVERSE_US, BEDROCK_EU_PRODUCTION)."
+            f"(e.g. BEDROCK_CONVERSE_US)."
         )
+    if is_production_mode():
+        _enforce_production_backend(preset.backend_name)
 
     # Safety: reject conflicting backend override.
     explicit_backend = os.environ.get("ORCHESTRATOR_TRANSPORT_BACKEND")
@@ -478,6 +544,14 @@ def resolve_provider_config_from_preset(preset_name: str) -> ProviderConfig:
             f"Set the environment variable before using this preset."
         )
 
+    # Converse Region: AWS_REGION; outside production mode the preset's
+    # default_region applies when it is unset (F4).
+    region = (
+        _converse_region(preset.default_region)
+        if preset.backend_name == "bedrock_converse"
+        else None
+    )
+
     return ProviderConfig(
         backend_name=preset.backend_name,
         base_url=resolved_endpoint,
@@ -485,6 +559,7 @@ def resolve_provider_config_from_preset(preset_name: str) -> ProviderConfig:
         model=resolved_model,
         capabilities=preset.capabilities,
         preset_name=preset_name,
+        region=region,
     )
 
 
@@ -528,14 +603,8 @@ def resolve_provider_config() -> ProviderConfig:
         )
 
     # Production mode: reject non-production backends early.
-    if production_mode and backend not in PRODUCTION_BACKENDS:
-        raise ValueError(
-            f"ORCHESTRATOR_PRODUCTION_MODE=true but backend "
-            f"{backend!r} is not production-suitable. "
-            f"Production-allowed backends: {sorted(PRODUCTION_BACKENDS)}. "
-            f"Set ORCHESTRATOR_TRANSPORT_PRESET or "
-            f"ORCHESTRATOR_TRANSPORT_BACKEND to a production backend."
-        )
+    if production_mode:
+        _enforce_production_backend(backend)
 
     endpoint = os.environ.get("ORCHESTRATOR_TRANSPORT_ENDPOINT")
     api_key = os.environ.get("ORCHESTRATOR_TRANSPORT_API_KEY")
@@ -609,14 +678,18 @@ def _resolve_bedrock_converse(
     model: str | None,
     capabilities: ProviderCapabilities,
 ) -> ProviderConfig:
-    """Resolve native Bedrock Converse configuration."""
-    region = os.environ.get("AWS_REGION", "us-east-1")
+    """Resolve native Bedrock Converse configuration.
+
+    The Region is ``AWS_REGION``; under production mode a missing one is
+    refused here, before any phase runs (F4).
+    """
     return ProviderConfig(
         backend_name="bedrock_converse",
         base_url=None,
         api_key_set=False,
         model=model,
         capabilities=capabilities,
+        region=_converse_region(None),
     )
 
 
@@ -771,6 +844,17 @@ def build_converse_backend(
         Sampling temperature.
     max_tokens:
         Maximum completion tokens.
+
+    The Region is ``AWS_REGION``.  Under production mode a missing
+    ``AWS_REGION`` is refused (no default, whatever *config* carries).
+    Outside production mode it falls back to ``config.region``, then to
+    :data:`NON_PRODUCTION_CONVERSE_REGION`.
+
+    Raises
+    ------
+    ValueError
+        If the backend is not ``bedrock_converse``, the model is missing, or
+        production mode is on and ``AWS_REGION`` is not set.
     """
     if config.backend_name != "bedrock_converse":
         raise ValueError(
@@ -780,9 +864,9 @@ def build_converse_backend(
     if config.model is None:
         raise ValueError("model is required for bedrock_converse backend")
 
-    from runner.transport.bedrock_converse import BedrockConverseBackend
+    region = _converse_region(config.region)
 
-    region = os.environ.get("AWS_REGION", "us-east-1")
+    from runner.transport.bedrock_converse import BedrockConverseBackend
 
     return BedrockConverseBackend(
         model_id=config.model,

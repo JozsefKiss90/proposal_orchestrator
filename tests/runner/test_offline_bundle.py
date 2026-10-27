@@ -527,6 +527,16 @@ class TestTheHostVerification:
         record = ob.verify(installed, environ=env, facts=_facts())
         assert {"region", "private_endpoint"} <= _failed(record)
 
+    def test_aws_default_region_alone_does_not_satisfy_the_region_check(self, installed, monkeypatch):
+        """R9 (F4): the Converse backend reads AWS_REGION, so verify requires it too."""
+        monkeypatch.setattr(ob, "_resolve", lambda host: ["10.0.0.10"])
+        env = {k: v for k, v in HOST_ENV.items() if k != "AWS_REGION"}
+        env["AWS_DEFAULT_REGION"] = HOST_ENV["AWS_REGION"]
+        record = ob.verify(installed, environ=env, facts=_facts())
+        assert {"region", "private_endpoint"} <= _failed(record)
+        region = next(c for c in record["checks"] if c["check"] == "region")
+        assert "AWS_DEFAULT_REGION alone does not count" in region["detail"]
+
     def test_the_record_holds_no_environment_value_but_the_ones_it_checks(self, installed):
         env = {**HOST_ENV, "AWS_SECRET_ACCESS_KEY": "s3cr3t", "SOME_TOKEN": "t0k3n"}
         record = ob.verify(installed, environ=env, facts=_facts(), probe=("pypi.org", 443),
