@@ -350,3 +350,39 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R7/VERIFICATION.md` (every criterion PASS, no N/A), `R7_12_pytest.txt`, `R7_12_old-id-guard.txt`, `R7_12_secret-scan.txt` |
 | Verification Result | R7 DONE. |
 | Next Action | Frontier: R8, R12a, R9, R9e, R10. R11 waits only on R8. Operator: "Close R7" commit (tickets file, VERIFICATION, worklog). Open for R11: flow-log records and the R5-D4 gap (R7-D18), DC-26, the deploy bucket's runtime-role denies by live calls (F-R7-7). |
+
+### 2026-10-26 — R8: secret template filled, decisions recorded, change set ready
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-26T22:20:00Z |
+| Control ID | DC-20, DC-21, DC-22 (planned: NOT_APPLICABLE, R8-D14); DC-19, DC-33–DC-35 (notes) |
+| Action Taken | Operator settled the R8 handoff points 1–10 and agent points 11–16 ('1-16a') and ran round 1 (steps 01–03, read-only). Agent verified the files by script, then filled `50-secret.yaml` (retained secret with the imported KeyArn, five non-credential values built in the template, preset `BEDROCK_CONVERSE_EU`; deny-only resource policy with `BlockPublicPolicy` and a lockout-safe admin exception), wrote `tests/test_aws_env_config_template.py`, `tools/env_config_digest.py` and decision record `aws-redeployment-r8-secret_2026-10-26`, updated the README and ticket R9e (R8-D3), and added steps 04–05. |
+| Evidence Requested | `R8_04_*` (lint, guards, tests), `R8_05_*` (change set `r8-create-01`, scan) |
+| Evidence Received | `evidence_v2/R8/R8_01`–`R8_03`: name free, no secret in the Region (scheduled deletions included), no secret stack, key Enabled with the R6 policy, admin role `/managed/AccountFullAccessRole`, 23 exports equal to the outputs files; eu-north-1 prices 0.40 USD per secret-month and 0.05 USD per 10,000 requests (Price List API). Credits 199.99 USD. |
+| Verification Result | Round 1 PASS; secret scan and old-ID guard CLEAN. Agent's run: cfn-lint exit 0, template guard CLEAN (6), 196 passed. |
+| Next Action | Operator: steps 04–05, then the go on `R8_05_change-set.json` (exactly two `Add`). |
+
+### 2026-10-27 — R8: secret stack created and verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-27T16:05:00Z |
+| Control ID | DC-20, DC-21 (VERIFIED_PASS); DC-22 (NOT_APPLICABLE); DC-19, DC-33–DC-35 (notes) |
+| Action Taken | Operator gave the go ('go') and ran steps 06–10; a first attempt of 07–10 ran before step 06 and step 06 was repeated before the in-order re-run (both recorded in `RUNLOG.md`; point 17 '17a', R8-D17). Stack `proposal-orchestrator-secret` `CREATE_COMPLETE` 15:56:29Z. Agent verified every file by script, compared the live resource policy with the resolved template (equal), wrote `VERIFICATION.md`, updated register v2 and the decision record (F-R8-9, R8-D17). |
+| Evidence Requested | `R8_11_*` (tests, old-ID guard, secret scan last) |
+| Evidence Received | `evidence_v2/R8/R8_06`–`R8_10`, `R8_outputs.json`: secret `…/env-config-KTsWow` with the R6 `KeyArn`, one `AWSCURRENT` version, no rotation or replica; deny-only policy as the template; the admin role's digest read `MATCH` (five keys) and not denied. Credits 199.99 → 199.98 USD. |
+| Verification Result | Rounds 1–2 PASS (step 06 exit file by substitute evidence, R8-D17); ticket criteria 1–3 PASS, the final scan pending. Register v2 rows DC-20, DC-21, DC-22 updated; DC-19 and DC-33–DC-35 notes. |
+| Next Action | Operator: step 11 (tests `-q`, old-ID guard, secret scan last), commit R8 and confirm in session; agent then completes `VERIFICATION.md` and ticks R8. R11 is then unblocked (explicit go for hourly cost). |
+
+### 2026-10-27 — R8: runtime secret — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-27T16:15:00Z |
+| Control ID | DC-20, DC-21 (VERIFIED_PASS); DC-22 (NOT_APPLICABLE); DC-19, DC-33–DC-35 (notes) |
+| Action Taken | Operator ran step 11 (Python 3.10.6, 196 passed; old-ID guard and secret scan CLEAN, scan last) and confirmed in session ("Zárd le az R8-at és commitolok"). Agent completed `evidence_v2/R8/VERIFICATION.md` (every criterion PASS; step 06's exit file on substitute evidence, R8-D17), re-ran the scan and the old-ID guard after the edit (CLEAN), and ticked R8 in `plans/aws_redeployment_tickets.md`. The operator commits R8 and this closing together. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R8/VERIFICATION.md`, `R8_11_pytest.txt`, `R8_11_old-id-guard.txt`, `R8_11_secret-scan.txt` |
+| Verification Result | R8 DONE. |
+| Next Action | Frontier: R12a, R9, R9e, R10; R11 is unblocked and needs the operator's explicit go (first hourly cost). Open for R9e: the `BEDROCK_CONVERSE_EU` preset (R8-D3). Open for R11: the runtime role's first read of the secret (DC-19, DC-20, DC-21 runtime half). |

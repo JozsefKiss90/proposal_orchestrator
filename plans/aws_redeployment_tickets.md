@@ -155,6 +155,10 @@ the runbook. If OD1 keeps us-east-1, the ticket closes as N/A with that reason.
 **Blocked by:** R0, R9.
 
 - [ ] An EU Converse preset exists and is tested.
+      The preset is named `BEDROCK_CONVERSE_EU` (backend `bedrock_converse`, default Region eu-north-1,
+      `eu.` profiles): the R8 secret stores that name (decision record
+      `aws-redeployment-r8-secret_2026-10-26`, R8-D3). A test asserts that the preset name stored by
+      `deploy/aws/templates/50-secret.yaml` exists in `runner/transport/config.py`.
 - [ ] No transport test fixes the region.
 - [ ] The runbook guard test passes on the edited runbook.
 - [ ] Or: the ticket is closed N/A, with OD1 cited. (Closed N/A 2026-10-21, **reopened** the same day: OD1 is now eu-north-1, decision record `aws-redeployment-od1-region-r1_2026-10-21`.)
@@ -258,11 +262,14 @@ production mode on, diagnostic level `metadata`, `AWS_REGION` and the transport 
 the ticket evidences the root-owned env file design instead, and DC-20 and DC-21 are restated in
 register v2.
 
+**Done 2026-10-27** (`docs/infrastructure_security/evidence_v2/R8/VERIFICATION.md`; decision record
+`aws-redeployment-r8-secret_2026-10-26`; operator confirmed in session).
+
 **Blocked by:** R5, R6.
 
-- [ ] The secret uses the CMK, and its policy names no principal outside the allowed set.
-- [ ] Evidence records the key names and metadata only. The E0 scan passes on the folder.
-- [ ] DC-20 and DC-21 are evidenced or restated.
+- [x] The secret uses the CMK, and its policy names no principal outside the allowed set.
+- [x] Evidence records the key names and metadata only. The E0 scan passes on the folder.
+- [x] DC-20 and DC-21 are evidenced or restated.
 
 ## R11 Endpoints and host: first PrivateLink call
 

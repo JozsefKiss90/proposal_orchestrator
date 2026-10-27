@@ -1,0 +1,10 @@
+﻿aws : 
+At line:2 char:5
++ & { aws cloudformation execute-change-set --profile po-r1 --region eu ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+aws: [ERROR]: An error occurred (InvalidChangeSetStatus) when calling the ExecuteChangeSet operation: ChangeSet [arn:aws:cloudformation:eu-north-1:797661577394:chan
+geSet/r8-create-01/3085580e-027a-4f2f-b301-4e2f2bf10f21] cannot be executed in its current execution status of [EXECUTE_COMPLETE]
+execute exit=254

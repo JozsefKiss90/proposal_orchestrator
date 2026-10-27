@@ -1,0 +1,71 @@
+﻿{
+    "Changes": [
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "EnvConfigSecretPolicy",
+                "ResourceType": "AWS::SecretsManager::ResourcePolicy",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "EnvConfigSecret",
+                "ResourceType": "AWS::SecretsManager::Secret",
+                "Scope": [],
+                "Details": []
+            }
+        }
+    ],
+    "ChangeSetName": "r8-create-01",
+    "ChangeSetId": "arn:aws:cloudformation:eu-north-1:797661577394:changeSet/r8-create-01/3085580e-027a-4f2f-b301-4e2f2bf10f21",
+    "StackId": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-secret/4d31a620-d21d-11f1-9658-06fffe490b4b",
+    "StackName": "proposal-orchestrator-secret",
+    "Description": null,
+    "Parameters": [
+        {
+            "ParameterKey": "TransportModelId",
+            "ParameterValue": "eu.anthropic.claude-opus-4-6-v1"
+        },
+        {
+            "ParameterKey": "ProjectName",
+            "ParameterValue": "proposal-orchestrator"
+        },
+        {
+            "ParameterKey": "ExpectedAccountId",
+            "ParameterValue": "797661577394"
+        },
+        {
+            "ParameterKey": "AdminRoleArn",
+            "ParameterValue": "arn:aws:iam::797661577394:role/managed/AccountFullAccessRole"
+        },
+        {
+            "ParameterKey": "ExpectedRegion",
+            "ParameterValue": "eu-north-1"
+        }
+    ],
+    "CreationTime": "2026-10-27T15:44:31.679000+00:00",
+    "ExecutionStatus": "AVAILABLE",
+    "Status": "CREATE_COMPLETE",
+    "StatusReason": null,
+    "NotificationARNs": [],
+    "RollbackConfiguration": {},
+    "Capabilities": [],
+    "Tags": [
+        {
+            "Key": "project",
+            "Value": "proposal-orchestrator"
+        }
+    ],
+    "ParentChangeSetId": null,
+    "IncludeNestedStacks": false,
+    "RootChangeSetId": null,
+    "OnStackFailure": null,
+    "ImportExistingResources": null,
+    "StackDriftStatus": null,
+    "DeploymentMode": null
+}
