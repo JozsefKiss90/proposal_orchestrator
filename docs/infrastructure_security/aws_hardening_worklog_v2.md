@@ -435,3 +435,28 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R9e/VERIFICATION.md`, `R9e_04_full-pytest.txt`, `R9e_05_old-id-guard.txt`, `R9e_05_secret-scan.txt` |
 | Verification Result | R9e DONE. |
 | Next Action | Operator: commit the tick, VERIFICATION, RUNLOG and worklog. Frontier: R10, R12a; R11 needs the operator's explicit go (first hourly cost); R15 needs R11 and R12b; R13 (after R12b) has the R9e record's `for_r13` list. |
+
+### 2026-10-28 — R10: Phase 8 drafter through the transport layer (F5) — verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-28T18:15:00Z |
+| Control ID | DC-35 (note), DC-38 (note; deferred, OD12); F5 |
+| Action Taken | Operator settled the R10 handoff points 1–12 and agent points 13–21 ('1–21 a') and ran step 01 (baseline on `265f88d`, no `starting R10` commit, R10-D13: 200 failed, 8997 passed, 86 skipped). Agent showed the criterion-1 tests failing on the start commit (`R10_02`), then, on the operator's go, routed `runner/decomposed_drafting.py::_default_claude_drafter` through `resolve_provider_config()` (CLI for `claude_cli`, the tool loop for Converse and other tool-calling backends, Read/Glob confined to the grounding inputs), raised `_DRAFTER_MAX_TOKENS` to 32000, made an exhausted or empty loop fail closed, gated the drafter's capture by the diagnostic level, added a production-mode refusal to `runner/claude_transport.invoke_claude_text`, added 19 tests and amended two, and wrote decision record `aws-redeployment-r10-drafter-transport_2026-10-28`. |
+| Evidence Requested | `R10_01_*`, `R10_02_head-criterion1.txt`, `R10_03_*`, `R10_04_full-pytest.txt`, `R10_05_*` |
+| Evidence Received | `evidence_v2/R10/`: criterion-1 tests 7 failed on `265f88d`; R10 tests and touched modules 478 passed, 1 failed (baseline id); full suite 200 failed, all in the baseline set, 9016 passed; old-ID guard and secret scan CLEAN (scan last). |
+| Verification Result | Every `VERIFICATION.md` criterion PASS; ticket criteria 1–3 PASS. F-R10-1 (skill runtime failure reason, DC-35-adjacent), F-R10-2 (Converse throttling, no retry), F-R10-3 (baseline equals R9e). |
+| Next Action | Operator: confirm in session and commit ("close R10"); agent then ticks R10. Frontier: R12a; R11 needs the operator's explicit go; R16 stays deferred (OD12); R12b's DC-35 evidence can cite the drafter. |
+
+### 2026-10-28 — R10: Phase 8 drafter through the transport layer (F5) — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-28T18:20:00Z |
+| Control ID | DC-35 (note), DC-38 (note; deferred, OD12); F5 |
+| Action Taken | Operator confirmed in session ("zárd le az R10-et"). Agent ticked R10 in `plans/aws_redeployment_tickets.md` (criteria 1–3) and set `evidence_v2/R10/VERIFICATION.md` to DONE, before the commit: the R10 change, its evidence and these closing edits go into one commit. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R10/VERIFICATION.md`, `R10_04_full-pytest.txt`, `R10_05_old-id-guard.txt`, `R10_05_secret-scan.txt` |
+| Verification Result | R10 DONE. |
+| Next Action | Operator: commit ("close R10"). Frontier: R12a; R11 needs the operator's explicit go (first hourly cost); R15 needs R11 and R12b; R16 stays deferred (OD12); F-R10-1 for R12b or a new ticket, F-R10-2 for R11/R16. |
+

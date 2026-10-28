@@ -385,6 +385,25 @@ class TestProductionDrafterPromptHardening:
     directive (request-side hardening for the run-30a60152 class; acceptance
     is unchanged — a broken reply still fails closed)."""
 
+    @pytest.fixture(autouse=True)
+    def _non_production_cli_env(self) -> Any:
+        """R10: the drafter now resolves its provider through the transport
+        layer, so these tests pin a non-production ``claude_cli`` environment
+        (``clear=True``): neither the workstation ``.env`` nor a leaked
+        ``.env.harness`` (F-R9-1) can route them to another backend."""
+        import os
+        from unittest import mock
+
+        from runner import persistence_policy
+
+        persistence_policy.reset_diagnostic_level_cache()
+        with mock.patch.dict(
+            os.environ, {"ORCHESTRATOR_TRANSPORT_PRESET": "CLAUDE_REFERENCE"},
+            clear=True,
+        ):
+            yield
+        persistence_policy.reset_diagnostic_level_cache()
+
     def test_prompts_carry_strict_json_quote_directive(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

@@ -73,6 +73,39 @@ class ClaudeCLIUnavailableError(ClaudeTransportError):
     """Raised when the ``claude`` executable cannot be found."""
 
 
+class ClaudeCLIProductionModeError(ClaudeCLIUnavailableError):
+    """Raised when the CLI transport is invoked under production mode.
+
+    Under ``ORCHESTRATOR_PRODUCTION_MODE=true`` only the backends in
+    ``runner.transport.config.PRODUCTION_BACKENDS`` are allowed, and the
+    ``claude`` CLI is not one of them.  The skill runtime, semantic dispatch
+    and the decomposed drafter refuse a CLI configuration at provider
+    resolution; this is the transport's own fail-closed backstop, so a caller
+    that bypasses resolution still never spawns the CLI (R10, decision record
+    ``aws-redeployment-r10-drafter-transport_2026-10-28``).  A subclass of
+    :class:`ClaudeCLIUnavailableError`, so callers treat it as an absent CLI:
+    not retried, classified ``CLI_UNAVAILABLE``.
+    """
+
+
+#: The production-mode switch.  Read here with the same rule as
+#: ``runner.transport.config.is_production_mode`` rather than importing that
+#: module, so a refusal check never runs its ``.env`` load (F-R9-4) as a side
+#: effect.
+_PRODUCTION_MODE_ENV_VAR: str = "ORCHESTRATOR_PRODUCTION_MODE"
+
+
+def _refuse_under_production_mode() -> None:
+    """Raise :class:`ClaudeCLIProductionModeError` under production mode."""
+    if os.environ.get(_PRODUCTION_MODE_ENV_VAR, "").lower() == "true":
+        raise ClaudeCLIProductionModeError(
+            "ORCHESTRATOR_PRODUCTION_MODE=true: the Claude CLI transport is not "
+            "a production backend and is never invoked under production mode. "
+            "Configure a production backend (bedrock_converse) through "
+            "runner.transport.config."
+        )
+
+
 class ClaudeCLIRateLimitError(ClaudeTransportError):
     """Raised when the ``claude`` CLI refuses a call due to a usage limit.
 
@@ -867,6 +900,9 @@ def invoke_claude_text(
 
     Raises
     ------
+    ClaudeCLIProductionModeError
+        ``ORCHESTRATOR_PRODUCTION_MODE=true``: refused before the executable
+        is resolved or anything is spawned (R10).
     ClaudeCLIUnavailableError
         The ``claude`` executable is not on PATH, or ``ORCHESTRATOR_CLAUDE_CLI_PATH``
         pins a missing or unspawnable file (see :func:`resolve_claude_cli`).
@@ -875,6 +911,8 @@ def invoke_claude_text(
     ClaudeTransportError
         Non-zero exit code, empty stdout, or other transport failure.
     """
+    _refuse_under_production_mode()
+
     # Build the command.  stream-json output (which requires --verbose in
     # print mode) lets the transport reassemble the FULL assistant response
     # from every turn of the session; the default text mode prints only the

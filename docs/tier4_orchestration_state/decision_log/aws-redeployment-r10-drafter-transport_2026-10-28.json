@@ -1,0 +1,271 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r10-drafter-transport_2026-10-28",
+  "date": "2026-10-28",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R10 of plans/aws_redeployment_tickets.md (Phase 8 drafter through the transport layer, F5)",
+  "supersedes": "Nothing. Applies OD12, OD7-orchestrator, F-R2-2, R9-D6, R9-D7, R9-D15, R9-D21-D23, F-R9-1, F-R9-4, F-R9-5, R9e-D8, R9e-D10, R9e-D18 and F-R9e-1, and settles the points of plans/aws_redeployment_r10_handoff_2026-10-28.md section 4 (1-12) and nine points the agent added (13-21).",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-28 on the agent's R10 proposals. Execution aid for infrastructure work (CLAUDE.md section 10.2). R10 changes how a node body's Claude call resolves its configured runtime transport (17.5.2) and what the drafter writes to runtime execution memory (9.2). It changes no call graph (17.1), result contract (17.4) or failure semantics (17.3), closes no gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-28 ('1-21 a', ~16:51 UTC; 'jóváhagyom', ~17:21 UTC, for the code after the baseline), accepting the agent's proposal on each point.",
+  "decision": "runner/decomposed_drafting.py::_default_claude_drafter resolves its provider through runner.transport.config.resolve_provider_config(): claude_cli keeps the Claude CLI transport with _DRAFTER_MODEL; bedrock_converse and the other tool-calling backends draft through run_tool_loop with the resolved model, Read/Glob confined to _GROUNDING_INPUTS; under ORCHESTRATOR_PRODUCTION_MODE=true a non-production backend is refused at resolution, so the drafter never reaches the CLI. _DRAFTER_MAX_TOKENS becomes 32000. An exhausted or empty tool loop fails closed. The drafter's diagnostic capture honours the diagnostic level (DC-35): at metadata only a content-free response_meta.json, and no response excerpt in error messages. runner/claude_transport.invoke_claude_text refuses under production mode with ClaudeCLIProductionModeError before anything is resolved or spawned.",
+  "why": "Ticket R10 and its three criteria; F5 (handoff 2026-10-21 section 4): the drafter imported invoke_claude_text directly with no provider resolution, the one known production-mode bypass; the same function wrote raw responses whatever the diagnostic level (found 2026-10-28).",
+  "inputs": [
+    "plans/aws_redeployment_r10_handoff_2026-10-28.md sections 1-7",
+    "plans/aws_redeployment_tickets.md inherited constraints, R10, R16",
+    "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F5), section 5 (OD12), section 6 (R10)",
+    "aws-redeployment-operator-decisions_2026-10-21 (OD12); aws-redeployment-od7-model-set_2026-10-21; aws-redeployment-r9-runtime-config_2026-10-27; aws-redeployment-r9e-eu-region_2026-10-27",
+    "runner/decomposed_drafting.py, runner/agent_runtime.py (~1298), runner/skill_runtime.py (_resolve_transport_backend, TAPM branches, _write_transport_failure_diagnostics, response capture), runner/semantic_dispatch.py, runner/claude_transport.py, runner/transport/config.py, runner/transport/tool_loop.py, runner/transport/tool_executor.py, runner/transport/bedrock_converse.py, runner/persistence_policy.py, runner/benchmark/transport_hook.py, harness/commands/_subscription_judge.py",
+    "tests/runner/test_excellence_decomposed_drafting.py, tests/runner/test_impact_implementation_decomposed_drafting.py, tests/runner/test_agent_runtime.py, tests/runner/test_e2e_msca_pf_run.py, tests/runner/test_section_extra_fields.py, tests/runner/test_preseed_suppression_scheduler.py, tests/test_production_mode.py, tests/test_persistence_policy.py, tests/harness/test_converse_judge.py",
+    "docs/infrastructure_security/evidence_v2/R10/R10_01_* (baseline on 265f88d) and R10_02_head-criterion1.txt",
+    "docs/infrastructure_security/evidence_v2/R9e/R9e_04_full-pytest.txt (comparison set)"
+  ],
+  "findings": [
+    {
+      "id": "F-R10-1",
+      "declared_status": "Confirmed",
+      "finding": "runner/skill_runtime.py (~line 2097) puts 'Head: response_text[:300]' into SkillResult.failure_reason on an unparseable response whatever the diagnostic level, and that reason reaches run_summary.json; the same DC-35-adjacent gap R10-D17 closes in the drafter. Not fixed in R10 (run_skill untouched).",
+      "basis": "Code read 2026-10-28.",
+      "for": "R12b's DC-35 evidence, or a separate ticket"
+    },
+    {
+      "id": "F-R10-2",
+      "declared_status": "Inferred",
+      "finding": "BedrockConverseBackend runs with retries max_attempts 0 and the account has 5 requests per minute for Opus 4.6 (F-R2-2); a TAPM drafting call is many Converse rounds in quick succession, so on the host a ThrottlingException can end a sub-section, and the node, as a transport error (fail closed, no retry, 17.5.4). The skill runtime's TAPM path has the same property.",
+      "basis": "runner/transport/bedrock_converse.py; aws-redeployment-od7-model-set_2026-10-21 F-R2-2; tests TestConverseToolLoop::test_transport_error_is_reraised_unchanged.",
+      "for": "R11 (quota) and R16 (Phase 8 on the host)"
+    },
+    {
+      "id": "F-R10-3",
+      "declared_status": "Confirmed",
+      "finding": "The R10 baseline (265f88d, 200 failed) equals the R9e after-run set (R9e_04, 200) id for id. Of the modules R10 touches, one id is in it: tests/runner/test_claude_transport.py::TestCliPathResolution::test_unset_pin_uses_absolute_path_search_result.",
+      "basis": "R10_01_baseline-pytest.txt and R9e_04_full-pytest.txt compared by id."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R10-D1",
+      "question": "Where the routing lives (point 1)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) In runner/decomposed_drafting.py only. _default_claude_drafter resolves resolve_provider_config(); claude_cli keeps runner.claude_transport.invoke_claude_text; bedrock_converse builds build_converse_backend(config, tools=[READ_TOOL_SCHEMA, GLOB_TOOL_SCHEMA], temperature=0.0, max_tokens=_DRAFTER_MAX_TOKENS); other backends build_openai_backend with the same tools; both drive run_tool_loop. runner/skill_runtime.py (run_skill) is not touched.",
+      "reason": "Operator's '1a'. The ticket's 'as the skill runtime does', with run_skill untouched so criterion 3 holds by construction.",
+      "consequence": "runner/decomposed_drafting.py; the diff names no other runner/ module except runner/claude_transport.py (R10-D6)."
+    },
+    {
+      "id": "R10-D2",
+      "question": "Which backends (point 2)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The skill runtime's set: claude_cli, bedrock_converse, and the OpenAI-compatible tool-calling backends. A backend whose capabilities have tool_calling False is refused with DecomposedDraftingError ('does not support tool calling'), because TAPM needs tools.",
+      "reason": "Operator's '2a'. Parity with the skill runtime; production mode narrows the set to bedrock_converse anyway (PRODUCTION_BACKENDS).",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestConverseToolLoop::test_backend_without_tool_calling_is_refused."
+    },
+    {
+      "id": "R10-D3",
+      "question": "Model, limits, timeout (point 3)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Non-CLI backends draft with ProviderConfig.model (build_converse_backend / build_openai_backend refuse a missing one with ValueError 'model is required'); the CLI path keeps _DRAFTER_MODEL (claude-opus-4-8). Timeout _DRAFTER_TIMEOUT_SECONDS (1800 s) is the tool loop's wall-clock budget; max_rounds stays the loop default (25). max_tokens: R10-D15.",
+      "reason": "Operator's '3a'. On the host the model is the runtime secret's ORCHESTRATOR_TRANSPORT_MODEL (OD7-orchestrator), which AN1c already counts under production mode (R9e-D8).",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestProductionModeNeverReachesTheCli::test_production_converse_drafts_without_the_cli (modelId is the sentinel model); TestConverseToolLoop::test_missing_model_is_refused; TestNonProductionCliPathUnchanged."
+    },
+    {
+      "id": "R10-D4",
+      "question": "TAPM boundary (point 4)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) run_tool_loop(allowed_prefixes=list(_GROUNDING_INPUTS)): the Python tool executor refuses a Read or Glob outside the declared grounding inputs. The CLI path keeps its existing behaviour (the CLI has no such sandbox).",
+      "reason": "Operator's '4a'. The executor's declared-input boundary is the same one the skill runtime uses for reads_from.",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestConverseToolLoop::test_read_outside_the_grounding_inputs_is_refused."
+    },
+    {
+      "id": "R10-D5",
+      "question": "Resolution caching (point 5)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Resolved once per _default_claude_drafter(...) call (one per section), no process cache. The backend is built in the same place, so a resolution or configuration error (production-mode refusal, missing model, no tool calling) raises before draft_section_decomposed removes prior drafts.",
+      "reason": "Operator's '5a'. A process cache would carry a configuration across tests (the F-R9-1 trap) and across runs in one process.",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestProductionModeNeverReachesTheCli::test_production_refusal_leaves_prior_drafts_intact."
+    },
+    {
+      "id": "R10-D6",
+      "question": "Defence in depth in the CLI transport (point 6)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) runner.claude_transport.invoke_claude_text calls _refuse_under_production_mode() first: under ORCHESTRATOR_PRODUCTION_MODE=true it raises ClaudeCLIProductionModeError (R10-D21) before resolve_claude_cli or any subprocess. The variable is read with is_production_mode's rule inside the transport, not by importing runner.transport.config, so the check never triggers that module's .env load (F-R9-4).",
+      "reason": "Operator's '6a'. A future caller that bypasses provider resolution still fails closed. Checked before the change: every production-mode test that reaches the CLI transport mocks it (tests/test_persistence_policy.py patches runner.skill_runtime.invoke_claude_text); the only real CLI caller under production mode would be harness/commands/_subscription_judge.py, which must fail closed on the host (no CLI there).",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestCliTransportRefusesUnderProductionMode::test_invoke_claude_text_refuses_before_resolving_the_cli."
+    },
+    {
+      "id": "R10-D7",
+      "question": "The DC-35 gap in the drafter's capture (point 7)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Content capture honours runner.persistence_policy: at level full the drafter writes <sub>.response.txt and, on a transport failure, <sub>.transport_failure.txt (stdout/stderr) as before; at level metadata (always under production mode) it writes only <sub>.response_meta.json: sub_section_id, backend, model, diagnostic_level, response_chars, tool-loop rounds, files_read count, exhausted_rounds, and on failure exception_class and sanitize_error_message(str(exc)).",
+      "reason": "Operator's '7a'. Same function, same production path; DC-35 says metadata level writes no prompt or response content.",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestDiagnosticLevel (four tests: metadata success, metadata parse failure, metadata transport failure, full)."
+    },
+    {
+      "id": "R10-D8",
+      "question": "The criterion-1 test (point 8)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) New tests/runner/test_decomposed_drafting_transport.py: production mode with BEDROCK_CONVERSE_EU, a sentinel Region and model, boto3.client replaced by a scripted fake Converse client (tests/harness/test_converse_judge.py pattern), and invoke_claude_text and resolve_claude_cli replaced by tripwires; production mode with a claude_cli configuration (backend, preset CLAUDE_REFERENCE, backend unset) refused with a production-mode ValueError before any CLI call; the same through draft_section_decomposed; a direct invoke_claude_text call refused. Every test pins os.environ with clear=True and resets the diagnostic-level cache.",
+      "reason": "Operator's '8a'. Shown failing on the start commit before the change: evidence_v2/R10/R10_02_head-criterion1.txt (7 failed: six 'the Claude CLI transport was called', one 'the claude executable was resolved').",
+      "consequence": "Criterion 1 of R10."
+    },
+    {
+      "id": "R10-D9",
+      "question": "Existing tests amended on purpose (point 9)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) TestProductionDrafterPromptHardening in tests/runner/test_excellence_decomposed_drafting.py gains an autouse fixture pinning a non-production claude_cli environment (ORCHESTRATOR_TRANSPORT_PRESET=CLAUDE_REFERENCE, clear=True) and resetting the diagnostic-level cache; the test bodies are unchanged. See amended_test_ids.",
+      "reason": "Operator's '9a'. The two tests patch invoke_claude_text and rely on the drafter reaching it; the drafter now resolves first, so an unpinned environment (a leaked .env.harness, F-R9-1) could route them elsewhere.",
+      "consequence": "amended_test_ids (as R9-D15)."
+    },
+    {
+      "id": "R10-D10",
+      "question": "Criterion 3 as evidence (point 10)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The working-tree diff names runner/decomposed_drafting.py, runner/claude_transport.py, tests/runner/test_excellence_decomposed_drafting.py and the new test file only; runner/agent_runtime.py, runner/dag_scheduler.py, runner/gate_evaluator.py, runner/skill_runtime.py, the manifest and the node states are unchanged. Step 03 records the diff stat.",
+      "reason": "Operator's '10a'. CLAUDE.md section 17: R10 changes which configured runtime transport a node body's Claude call goes through (17.5.2), not the call graph (17.1), the contracts (17.4) or the failure semantics (17.3): a resolution or transport failure still raises out of draft_section_decomposed and becomes an agent-body failure in run_agent (~1298).",
+      "consequence": "evidence_v2/R10/R10_03_diff-stat.txt."
+    },
+    {
+      "id": "R10-D11",
+      "question": "Evidence (point 11)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) evidence_v2/R10/ as R9e: STEPS.md, RUNLOG.md, R10_<NN>_*, VERIFICATION.md; baseline on the start commit; R10 tests and touched modules; full suite after, compared by id (R9-D23); old-ID guard; secret scan last. Register v2: notes on DC-35 and DC-38, statuses unchanged.",
+      "reason": "Operator's '11a'.",
+      "consequence": "STEPS.md round 2."
+    },
+    {
+      "id": "R10-D12",
+      "question": "Scope (point 12)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) R10 does not dispatch Phase 8 on the host (R16, deferred, OD12), does not change the drafter's prompts, quotas or retry behaviour (17.5.4), does not instrument the drafter for benchmarks (R10-D19) and does not fix F-R9-1.",
+      "reason": "Operator's '12a'.",
+      "consequence": "DC-38 stays deferred."
+    },
+    {
+      "id": "R10-D13",
+      "question": "Baseline commit (point 13)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) There is no 'starting R10' commit: the R10 handoff went into 265f88d 'tick R9e'. The baseline ran on 265f88d; recorded as a deviation from handoff section 5 step 1. No commit in round 1.",
+      "reason": "Operator's '13a'. The tree of 265f88d is the start tree; 47a32d4..265f88d touches no runner/, harness/ or tests/ path (R10_01_commit.txt).",
+      "consequence": "R10_01_*."
+    },
+    {
+      "id": "R10-D14",
+      "question": "Line endings (point 14)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) runner/decomposed_drafting.py, runner/claude_transport.py and tests/runner/test_excellence_decomposed_drafting.py are CRLF in the working copy (git ls-files --eol: i/lf w/crlf; the handoff said LF). Each edited file kept its endings (exact-match, all-or-nothing read-modify-write, R9e-D18); the new test file is written CRLF like its neighbours; this record is LF like the other records.",
+      "reason": "Operator's '14a'.",
+      "consequence": "No line-ending churn in the diff under the workstation's core.autocrlf."
+    },
+    {
+      "id": "R10-D15",
+      "question": "max_tokens (point 15)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) _DRAFTER_MAX_TOKENS becomes 32000 (was 8000). The claude -p transport ignores max_tokens (its ceiling is _MAX_OUTPUT_TOKENS_DEFAULT, 32000, via CLAUDE_CODE_MAX_OUTPUT_TOKENS), so the CLI path is unchanged in effect; Converse and the OpenAI-compatible backends enforce it.",
+      "reason": "Operator's '15a'. 8000 on Converse would cut a long sub-section reply mid-object (the run 0395b136 class: ~30.7k chars, ~8k tokens) and fail the node closed for a reason the CLI never had.",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::...::test_production_converse_drafts_without_the_cli asserts maxTokens 32000. Risk kept, not changed: BedrockConverseBackend's read_timeout is 600 s per request."
+    },
+    {
+      "id": "R10-D16",
+      "question": "Empty or exhausted tool loop (point 16)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) run_tool_loop signals its round limit or wall-clock deadline with exhausted_rounds=True and possibly empty text, not an exception. The drafter raises DecomposedDraftingError when exhausted_rounds is True or the text is empty, after writing the metadata record.",
+      "reason": "Operator's '16a'. Text from a loop that did not finish is not a final reply; fail closed (17.5.4).",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestConverseToolLoop::test_exhausted_tool_loop_fails_closed, test_empty_final_reply_fails_closed."
+    },
+    {
+      "id": "R10-D17",
+      "question": "Response excerpt in the error message (point 17)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) _parse_drafter_response gains include_excerpt (default True); the drafter passes False at level metadata, so the parse-failure message carries the response length but no excerpt. The message reaches AgentResult.failure_reason and run_summary.json, which are written at every level.",
+      "reason": "Operator's '17a'.",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestDiagnosticLevel::test_metadata_level_parse_failure_carries_no_excerpt; the existing _parse_drafter_response tests (default) unchanged."
+    },
+    {
+      "id": "R10-D18",
+      "question": "The same gap in the skill runtime (point 18)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Not fixed in R10: run_skill is untouched (criterion 3). Recorded as F-R10-1.",
+      "reason": "Operator's '18a'.",
+      "consequence": "F-R10-1."
+    },
+    {
+      "id": "R10-D19",
+      "question": "Benchmark instrumentation (point 19)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The drafter stays uninstrumented, as before R10 (it never went through runner.benchmark.transport_hook).",
+      "reason": "Operator's '19a'. No behaviour change beyond provider resolution.",
+      "consequence": "None."
+    },
+    {
+      "id": "R10-D20",
+      "question": "Throttling (point 20)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Not R10. Recorded as F-R10-2.",
+      "reason": "Operator's '20a'; 17.5.4 forbids a retry in the runtime.",
+      "consequence": "F-R10-2."
+    },
+    {
+      "id": "R10-D21",
+      "question": "Error type of the CLI refusal (point 21)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) ClaudeCLIProductionModeError(ClaudeCLIUnavailableError) in runner/claude_transport.py; its message names ORCHESTRATOR_PRODUCTION_MODE=true. harness/commands/_subscription_judge.py does not retry ClaudeCLIUnavailableError; runner/skill_runtime.py classifies it CLI_UNAVAILABLE.",
+      "reason": "Operator's '21a'. A plain ClaudeTransportError would be retried twice by the subscription judge.",
+      "consequence": "tests/runner/test_decomposed_drafting_transport.py::TestCliTransportRefusesUnderProductionMode (asserts the type and the base class)."
+    }
+  ],
+  "amended_test_ids": [
+    "tests/runner/test_excellence_decomposed_drafting.py::TestProductionDrafterPromptHardening::test_prompts_carry_strict_json_quote_directive (autouse non-production claude_cli environment)",
+    "tests/runner/test_excellence_decomposed_drafting.py::TestProductionDrafterPromptHardening::test_prompt_covers_declaration_derived_facts (autouse non-production claude_cli environment)"
+  ],
+  "new_test_module": "tests/runner/test_decomposed_drafting_transport.py",
+  "known_gaps": [
+    {
+      "decision": "R10-D1",
+      "declared_status": "Unresolved",
+      "gap": "The Converse drafting path is exercised only against a fake client; its first real run is Phase 8 on the host (R16, deferred, OD12)."
+    },
+    {
+      "decision": "R10-D15",
+      "declared_status": "Inferred",
+      "gap": "A sub-section reply near 32000 tokens may exceed BedrockConverseBackend's 600 s per-request read timeout; it then fails closed as a transport error."
+    }
+  ],
+  "not_evidence_of": [
+    "That Phase 8 drafting succeeds on the host (R16; DC-38 stays deferred, OD12).",
+    "That the runtime role can invoke the eu. profiles (R11, R12b).",
+    "That the skill runtime honours DC-35 in its failure reasons (F-R10-1)."
+  ],
+  "unblocks_when_recorded": [
+    "R10 round 2 (steps 03-05), commit and confirmation",
+    "R12b's DC-35 evidence can cite the drafter"
+  ],
+  "stays_blocked": [
+    "R16 (deferred, OD12)"
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account. Tests use sentinel Region and model values and a fake Converse client.",
+    "basis": "Code, test names, decision text and evidence paths only."
+  }
+}

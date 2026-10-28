@@ -183,13 +183,19 @@ skill runtime and semantic dispatch already do. Under production mode, it reache
 backend or refuses with a production-mode error. It never reaches the Claude CLI transport. This
 closes the one known production-mode bypass, whether or not DC-38 is in scope.
 
+**Done 2026-10-28** (`docs/infrastructure_security/evidence_v2/R10/VERIFICATION.md`; decision record
+`aws-redeployment-r10-drafter-transport_2026-10-28`; operator confirmed in session). Findings for
+later tickets: F-R10-1 (the skill runtime's failure reason carries a response head at any diagnostic
+level; R12b or a new ticket), F-R10-2 (Converse throttling with no retry; R11, R16).
+
 **Blocked by:** None — can start immediately. OD12 only sets its priority.
 
-- [ ] A test that fails on today's code: under `ORCHESTRATOR_PRODUCTION_MODE=true`, the drafter never
-      calls the Claude CLI transport.
-- [ ] The existing Phase 8 drafting tests still pass on the workstation's non-production path.
-- [ ] Phase 8 dispatch is untouched apart from provider resolution. The gates, scheduler and node
-      states are unchanged.
+- [x] A test that fails on today's code: under `ORCHESTRATOR_PRODUCTION_MODE=true`, the drafter never
+      calls the Claude CLI transport. (`tests/runner/test_decomposed_drafting_transport.py`; failing on
+      `265f88d`, `evidence_v2/R10/R10_02_head-criterion1.txt`.)
+- [x] The existing Phase 8 drafting tests still pass on the workstation's non-production path.
+- [x] Phase 8 dispatch is untouched apart from provider resolution. The gates, scheduler and node
+      states are unchanged. (`R10_03_diff-stat.txt`.)
 
 ## R4 Network base stack
 

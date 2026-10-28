@@ -1,0 +1,44 @@
+﻿Python 3.10.6
+============================= test session starts =============================
+platform win32 -- Python 3.10.6, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Code\proposal_demo\proposal_orchestrator
+configfile: pyproject.toml
+plugins: anyio-4.7.0
+collected 483 items
+
+tests\runner\test_decomposed_drafting_transport.py ...................   [  3%]
+tests\runner\test_excellence_decomposed_drafting.py ...................  [  7%]
+tests\runner\test_impact_implementation_decomposed_drafting.py ......... [  9%]
+.............                                                            [ 12%]
+tests\runner\test_agent_runtime.py ..................................... [ 20%]
+.....................................................                    [ 31%]
+tests\runner\test_e2e_msca_pf_run.py ........ssss                        [ 33%]
+tests\runner\test_section_extra_fields.py .......                        [ 34%]
+tests\runner\test_preseed_suppression_scheduler.py ..................... [ 39%]
+..............................                                           [ 45%]
+tests\runner\test_claude_transport.py .................................. [ 52%]
+........................F..........................                      [ 63%]
+tests\runner\test_claude_transport_treekill.py .....                     [ 64%]
+tests\test_production_mode.py .......................................... [ 72%]
+............                                                             [ 75%]
+tests\test_persistence_policy.py ....................................... [ 83%]
+.                                                                        [ 83%]
+tests\harness\test_converse_judge.py ................................... [ 90%]
+............................................                             [100%]
+
+================================== FAILURES ===================================
+E   AssertionError: assert ClaudeCLIReso...source='path') == ClaudeCLIReso...source='path')
+      
+      Omitting 1 identical items, use -vv to show
+      Differing attributes:
+      ['path']
+      
+      Drill down into differing attribute path:
+        path: 'C:\\usr\\local\\bin\\claude' != '\\usr\\local\\bin\\claude'...
+      
+      ...Full output truncated (4 lines hidden), use '-vv' to show
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_claude_transport.py:718: AssertionError: assert ClaudeCLIReso...source='path') == ClaudeCLIReso...source='path')
+=========================== short test summary info ===========================
+FAILED tests/runner/test_claude_transport.py::TestCliPathResolution::test_unset_pin_uses_absolute_path_search_result
+================== 1 failed, 478 passed, 4 skipped in 39.71s ==================
+exit=1

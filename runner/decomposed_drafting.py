@@ -80,9 +80,19 @@ SLUG_CRITERION: dict[str, str] = {
 #: generous (soft caps lifted, D5): each call drafts a single sub-section, so
 #: the monolithic ~20 KB whole-section ceiling no longer binds.
 #: Switched from ``claude-sonnet-4-6`` on 2026-08-13, in step with
-#: ``skill_runtime.SKILL_MODEL``.
+#: ``skill_runtime.SKILL_MODEL``.  ``_DRAFTER_MODEL`` applies to the
+#: ``claude_cli`` backend only: every other backend drafts with the resolved
+#: ``ProviderConfig.model`` (on the host, the runtime secret's
+#: ``ORCHESTRATOR_TRANSPORT_MODEL``, OD7-orchestrator; R10).
 _DRAFTER_MODEL: str = "claude-opus-4-8"
-_DRAFTER_MAX_TOKENS: int = 8000
+#: Output-token ceiling.  The ``claude -p`` transport does not enforce it (its
+#: own ceiling is ``claude_transport._MAX_OUTPUT_TOKENS_DEFAULT``, 32000), but
+#: the Converse and OpenAI-compatible backends do, and 8000 would cut a long
+#: sub-section reply mid-object (the run 0395b136 class: ~30.7k chars, ~8k
+#: tokens).  Raised from 8000 on 2026-10-28 so every backend has the CLI's
+#: effective ceiling (R10; decision record
+#: ``aws-redeployment-r10-drafter-transport_2026-10-28``).
+_DRAFTER_MAX_TOKENS: int = 32000
 
 #: TAPM timeout for a grounded per-sub-section drafting call.  Each call reads
 #: the declared grounding inputs from disk and drafts a full sub-section, so it
@@ -243,6 +253,13 @@ def _derive_overall_status(drafts: list[dict[str, Any]]) -> str:
 #: truncated response is diagnosable after the fact; run 511325a3/c622b352
 #: failures were undiagnosable because the drafter path (unlike the skill
 #: runtime) kept no diagnostic bundle.
+#:
+#: Content capture honours the diagnostic level (DC-35, R10): only at level
+#: ``full`` are the response text and the transport's stdout/stderr written.
+#: At ``metadata`` (always, under production mode) the drafter writes a
+#: ``<sub_section_id>.response_meta.json`` record instead — sizes, backend,
+#: tool-loop rounds, exception class and the sanitised error text, never
+#: prompt or response content (``runner.persistence_policy``).
 _RESPONSE_CAPTURE_ROOT_REL: str = ".claude/logs/decomposed_drafting"
 
 
@@ -268,6 +285,65 @@ def _capture_raw_response(
         return None
 
 
+def _content_capture_allowed() -> bool:
+    """Whether the diagnostic level allows response content on disk (DC-35)."""
+    from runner.persistence_policy import allows_content_persistence
+
+    return allows_content_persistence()
+
+
+def _capture_metadata(
+    repo_root: Path,
+    run_id: str,
+    slug: str,
+    sub_id: str,
+    meta: dict[str, Any],
+) -> Optional[Path]:
+    """Persist a content-free ``<sub_id>.response_meta.json`` record; never raise."""
+    return _capture_raw_response(
+        repo_root, run_id, slug, f"{sub_id}.response_meta.json",
+        json.dumps(meta, indent=2, sort_keys=True) + "\n",
+    )
+
+
+def _record_transport_failure(
+    repo_root: Path,
+    run_id: str,
+    slug: str,
+    sub_id: str,
+    exc: BaseException,
+    meta: dict[str, Any],
+    content_allowed: bool,
+) -> None:
+    """Record a transport failure at the diagnostic level in force; never raise.
+
+    At ``full``, whatever the transport buffered (a CLI timeout or non-zero
+    exit often still carries partial stdout+stderr) goes to
+    ``<sub_id>.transport_failure.txt``.  At ``metadata``, only the exception
+    class and the sanitised message go to the metadata record.
+    """
+    if content_allowed:
+        _stdout = getattr(exc, "stdout", None)
+        _stderr = getattr(exc, "stderr", None)
+        _capture_raw_response(
+            repo_root, run_id, slug, f"{sub_id}.transport_failure.txt",
+            f"exception: {type(exc).__name__}: {exc}\n"
+            f"--- stdout ---\n{_stdout or ''}\n"
+            f"--- stderr ---\n{_stderr or ''}\n",
+        )
+        return
+    from runner.persistence_policy import sanitize_error_message
+
+    _capture_metadata(
+        repo_root, run_id, slug, sub_id,
+        {
+            **meta,
+            "exception_class": type(exc).__name__,
+            "error": sanitize_error_message(str(exc)),
+        },
+    )
+
+
 def _snippet(text: str, limit: int = 240) -> str:
     """Whitespace-collapsed head+tail excerpt of *text* for error messages."""
     collapsed = " ".join(text.split())
@@ -282,6 +358,21 @@ def _default_claude_drafter(
     slug: str = "",
 ) -> SubSectionDrafter:
     """Build the production per-sub-section drafter (wraps the transport).
+
+    The provider is resolved through the transport layer
+    (:func:`runner.transport.config.resolve_provider_config`), as the skill
+    runtime and semantic dispatch do (R10, F5).  ``claude_cli`` drafts through
+    the Claude CLI transport with ``_DRAFTER_MODEL``; ``bedrock_converse`` and
+    the other tool-calling backends draft through the Python tool loop
+    (:func:`runner.transport.tool_loop.run_tool_loop`) with the resolved model,
+    the tool executor confining Read/Glob to ``_GROUNDING_INPUTS``.  Under
+    ``ORCHESTRATOR_PRODUCTION_MODE=true`` resolution refuses any non-production
+    backend (``claude_cli`` included) and a missing ``AWS_REGION`` with a
+    ``ValueError`` here, before any call, so production drafting never reaches
+    the CLI.  Resolution happens once per drafter (per section) with no process
+    cache, and a configuration error (missing model, a backend without tool
+    calling) also fails here, before ``draft_section_decomposed`` removes any
+    prior draft.
 
     Each call drafts a single sub-section in **TAPM mode**: the drafter is told
     which grounding inputs to Read from disk (Tier 3 project data, the Phase 1-3
@@ -301,7 +392,53 @@ def _default_claude_drafter(
         Assumed pre-assembly and W1 can verify the mapping.  The drafter never
         self-declares an Assumed value.
     """
-    from runner.claude_transport import invoke_claude_text
+    from runner.transport.config import resolve_provider_config
+
+    # R10 (F5): resolve through the transport layer.  Under production mode a
+    # non-production backend or a missing AWS_REGION raises ValueError here
+    # (R9-D6, R9-D7).
+    provider_config = resolve_provider_config()
+    backend_name = provider_config.backend_name
+    use_cli = backend_name == "claude_cli"
+
+    invoke_claude_text: Optional[Callable[..., str]] = None
+    loop_backend: Any = None
+    if use_cli:
+        from runner.claude_transport import invoke_claude_text
+    else:
+        # TAPM needs tool calling: without it the drafter cannot read its
+        # grounding inputs (the skill runtime's F.4 rule).
+        if not provider_config.capabilities.tool_calling:
+            raise DecomposedDraftingError(
+                f"backend {backend_name!r} does not support tool calling; "
+                "cannot run the TAPM drafter"
+            )
+        from runner.transport.tool_executor import (
+            GLOB_TOOL_SCHEMA,
+            READ_TOOL_SCHEMA,
+        )
+
+        tool_schemas = [READ_TOOL_SCHEMA, GLOB_TOOL_SCHEMA]
+        if backend_name == "bedrock_converse":
+            from runner.transport.config import build_converse_backend
+
+            loop_backend = build_converse_backend(
+                provider_config,
+                tools=tool_schemas,
+                temperature=0.0,
+                max_tokens=_DRAFTER_MAX_TOKENS,
+            )
+        else:
+            from runner.transport.config import build_openai_backend
+
+            loop_backend = build_openai_backend(
+                provider_config,
+                tools=tool_schemas,
+                timeout_seconds=_DRAFTER_TIMEOUT_SECONDS,
+                temperature=0.0,
+                max_tokens=_DRAFTER_MAX_TOKENS,
+            )
+    model_used = _DRAFTER_MODEL if use_cli else (provider_config.model or "")
 
     grounding_list = "\n".join(f"- {p}" for p in _GROUNDING_INPUTS)
 
@@ -440,32 +577,82 @@ def _default_claude_drafter(
               "typographic quotes in names exactly as the source writes them "
               "(never converted to ASCII quotes)."
         )
-        try:
-            raw = invoke_claude_text(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                model=_DRAFTER_MODEL,
-                max_tokens=_DRAFTER_MAX_TOKENS,
-                timeout_seconds=_DRAFTER_TIMEOUT_SECONDS,
-                tools=["Read", "Glob"],
+        content_allowed = _content_capture_allowed()
+        meta: dict[str, Any] = {
+            "sub_section_id": sub_id,
+            "backend": backend_name,
+            "model": model_used,
+            "diagnostic_level": "full" if content_allowed else "metadata",
+        }
+        if use_cli:
+            assert invoke_claude_text is not None
+            try:
+                raw = invoke_claude_text(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    model=_DRAFTER_MODEL,
+                    max_tokens=_DRAFTER_MAX_TOKENS,
+                    timeout_seconds=_DRAFTER_TIMEOUT_SECONDS,
+                    tools=["Read", "Glob"],
+                )
+            except Exception as exc:
+                # Record the failure at the diagnostic level in force, then
+                # re-raise unchanged (§17.5.4 — no retry).
+                _record_transport_failure(
+                    repo_root, run_id, slug, sub_id, exc, meta, content_allowed
+                )
+                raise
+        else:
+            from runner.transport.tool_loop import run_tool_loop
+
+            try:
+                loop_result = run_tool_loop(
+                    backend=loop_backend,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    repo_root=repo_root,
+                    allowed_prefixes=list(_GROUNDING_INPUTS),
+                    timeout_seconds=float(_DRAFTER_TIMEOUT_SECONDS),
+                )
+            except Exception as exc:
+                _record_transport_failure(
+                    repo_root, run_id, slug, sub_id, exc, meta, content_allowed
+                )
+                raise
+            raw = loop_result.text or ""
+            meta.update(
+                rounds=loop_result.rounds,
+                files_read=len(loop_result.files_read),
+                exhausted_rounds=loop_result.exhausted_rounds,
+                response_chars=len(raw),
             )
-        except Exception as exc:
-            # Persist whatever the transport buffered (a timeout / non-zero
-            # exit still often carries partial stdout+stderr) so the failure
-            # is diagnosable, then re-raise unchanged (§17.5.4 — no retry).
-            _stdout = getattr(exc, "stdout", None)
-            _stderr = getattr(exc, "stderr", None)
-            _capture_raw_response(
-                repo_root, run_id, slug, f"{sub_id}.transport_failure.txt",
-                f"exception: {type(exc).__name__}: {exc}\n"
-                f"--- stdout ---\n{_stdout or ''}\n"
-                f"--- stderr ---\n{_stderr or ''}\n",
+            # The loop signals its round limit or wall-clock deadline with
+            # exhausted_rounds rather than an exception; text from a loop that
+            # did not finish is not a final reply.  Fail closed (§17.5.4).
+            if loop_result.exhausted_rounds or not raw.strip():
+                _capture_metadata(repo_root, run_id, slug, sub_id, meta)
+                raise DecomposedDraftingError(
+                    f"drafter tool loop for {sub_id!r} "
+                    + (
+                        "was exhausted (round limit or timeout)"
+                        if loop_result.exhausted_rounds
+                        else "returned an empty reply"
+                    )
+                    + f" after {loop_result.rounds} round(s), "
+                    f"{len(loop_result.files_read)} file(s) read "
+                    f"(backend {backend_name!r}); no draft produced"
+                )
+        meta["response_chars"] = len(raw)
+        if content_allowed:
+            capture_path = _capture_raw_response(
+                repo_root, run_id, slug, f"{sub_id}.response.txt", raw
             )
-            raise
-        capture_path = _capture_raw_response(
-            repo_root, run_id, slug, f"{sub_id}.response.txt", raw
+        else:
+            _capture_metadata(repo_root, run_id, slug, sub_id, meta)
+            capture_path = None
+        parsed = _parse_drafter_response(
+            raw, sub_id, capture_path=capture_path, include_excerpt=content_allowed
         )
-        parsed = _parse_drafter_response(raw, sub_id, capture_path=capture_path)
         return parsed
 
     return _drafter
@@ -475,6 +662,8 @@ def _parse_drafter_response(
     raw: str,
     sub_id: str,
     capture_path: Optional[Path] = None,
+    *,
+    include_excerpt: bool = True,
 ) -> dict[str, Any]:
     """Parse a live drafter response into a draft dict (fail-closed).
 
@@ -494,6 +683,10 @@ def _parse_drafter_response(
     mirroring the skill runtime's Phase-D.6 normalisation — the model sometimes
     wraps the draft object instead of returning it directly.  Raises
     :class:`DecomposedDraftingError` on any unparseable response.
+
+    *include_excerpt* is ``False`` at diagnostic level ``metadata``: the error
+    message reaches the agent result and ``run_summary.json``, so it then
+    carries the response length but no response content (DC-35, R10).
     """
     # Local import: avoids any module-load import cycle and keeps a single
     # source of truth for JSON extraction across the runtime.
@@ -507,7 +700,7 @@ def _parse_drafter_response(
             f"response length {len(raw)} chars"
             + (f", raw response captured at {capture_path}" if capture_path
                else "")
-            + f"; excerpt: {_snippet(raw)!r}"
+            + (f"; excerpt: {_snippet(raw)!r}" if include_excerpt else "")
         )
     # Unwrap a SkillResult-shaped success envelope if the model wrapped the
     # draft payload instead of returning the draft object directly.  The draft

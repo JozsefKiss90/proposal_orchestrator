@@ -1,0 +1,37 @@
+# R10 step 02 (agent, device VM): criterion-1 tests on the start commit, before any R10 change
+# copy: git archive 265f88d (tick R9e) + git init -q; only tests/runner/test_decomposed_drafting_transport.py added
+Python 3.10.12
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.2.0, pluggy-1.7.0
+rootdir: /sessions/rcw-01ctgey3lg2zzob57qdmmc4u/r10head
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collected 7 items
+
+tests/runner/test_decomposed_drafting_transport.py FFFFFFF               [100%]
+
+=================================== FAILURES ===================================
+E   AssertionError: the Claude CLI transport was called
+/sessions/rcw-01ctgey3lg2zzob57qdmmc4u/r10head/tests/runner/test_decomposed_drafting_transport.py:106: AssertionError: the Claude CLI transport was called
+E   AssertionError: the Claude CLI transport was called
+/sessions/rcw-01ctgey3lg2zzob57qdmmc4u/r10head/tests/runner/test_decomposed_drafting_transport.py:106: AssertionError: the Claude CLI transport was called
+E   AssertionError: the Claude CLI transport was called
+/sessions/rcw-01ctgey3lg2zzob57qdmmc4u/r10head/tests/runner/test_decomposed_drafting_transport.py:106: AssertionError: the Claude CLI transport was called
+E   AssertionError: the Claude CLI transport was called
+/sessions/rcw-01ctgey3lg2zzob57qdmmc4u/r10head/tests/runner/test_decomposed_drafting_transport.py:106: AssertionError: the Claude CLI transport was called
+E   AssertionError: the Claude CLI transport was called
+/sessions/rcw-01ctgey3lg2zzob57qdmmc4u/r10head/tests/runner/test_decomposed_drafting_transport.py:106: AssertionError: the Claude CLI transport was called
+E   AssertionError: the Claude CLI transport was called
+/sessions/rcw-01ctgey3lg2zzob57qdmmc4u/r10head/tests/runner/test_decomposed_drafting_transport.py:106: AssertionError: the Claude CLI transport was called
+E   AssertionError: the claude executable was resolved
+/sessions/rcw-01ctgey3lg2zzob57qdmmc4u/r10head/tests/runner/test_decomposed_drafting_transport.py:289: AssertionError: the claude executable was resolved
+=========================== short test summary info ============================
+FAILED tests/runner/test_decomposed_drafting_transport.py::TestProductionModeNeverReachesTheCli::test_production_converse_drafts_without_the_cli
+FAILED tests/runner/test_decomposed_drafting_transport.py::TestProductionModeNeverReachesTheCli::test_production_cli_configuration_is_refused_before_any_call[backend-claude_cli]
+FAILED tests/runner/test_decomposed_drafting_transport.py::TestProductionModeNeverReachesTheCli::test_production_cli_configuration_is_refused_before_any_call[preset-CLAUDE_REFERENCE]
+FAILED tests/runner/test_decomposed_drafting_transport.py::TestProductionModeNeverReachesTheCli::test_production_cli_configuration_is_refused_before_any_call[backend-default]
+FAILED tests/runner/test_decomposed_drafting_transport.py::TestProductionModeNeverReachesTheCli::test_draft_section_decomposed_in_production_mode_uses_converse
+FAILED tests/runner/test_decomposed_drafting_transport.py::TestProductionModeNeverReachesTheCli::test_production_refusal_leaves_prior_drafts_intact
+FAILED tests/runner/test_decomposed_drafting_transport.py::TestCliTransportRefusesUnderProductionMode::test_invoke_claude_text_refuses_before_resolving_the_cli
+============================== 7 failed in 0.21s ===============================
+exit=1
