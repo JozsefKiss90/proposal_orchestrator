@@ -1,0 +1,1553 @@
+﻿Python 3.10.6
+============================= test session starts =============================
+platform win32 -- Python 3.10.6, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Code\proposal_demo\proposal_orchestrator
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.7.0
+collected 9283 items
+
+tests\harness\test_acceptance_lane.py .................................. [  0%]
+..................................                                       [  0%]
+tests\harness\test_authority_matrix.py ................................. [  1%]
+..........................................                               [  1%]
+tests\harness\test_blind_assessment.py ................................. [  1%]
+......                                                                   [  1%]
+tests\harness\test_blind_baseline.py ................................... [  2%]
+.....................................................                    [  2%]
+tests\harness\test_blind_document_subsections.py ......................  [  3%]
+tests\harness\test_blind_leakage.py ......................               [  3%]
+tests\harness\test_boundary.py ...................                       [  3%]
+tests\harness\test_calibration.py .........................              [  3%]
+tests\harness\test_candidate_provenance.py ............................. [  4%]
+....................                                                     [  4%]
+tests\harness\test_claim_ledger.py ..................................... [  4%]
+.........................                                                [  5%]
+tests\harness\test_commands.py .............                             [  5%]
+tests\harness\test_comparison_diff.py .......................            [  5%]
+tests\harness\test_converse_judge.py ................................... [  5%]
+............................................                             [  6%]
+tests\harness\test_converse_smoke.py ...............                     [  6%]
+tests\harness\test_criterion_scoring.py ................................ [  6%]
+..                                                                       [  6%]
+tests\harness\test_dataset_dispositions.py .............                 [  6%]
+tests\harness\test_deferral_register.py ................................ [  7%]
+...........................                                              [  7%]
+tests\harness\test_dev_graph_t03_end_to_end.py ...........               [  7%]
+tests\harness\test_esr_comparison.py ................................... [  8%]
+...........................................................              [  8%]
+tests\harness\test_evidence_pack.py ...................................  [  9%]
+tests\harness\test_evidence_preflight.py ............................... [  9%]
+.............                                                            [  9%]
+tests\harness\test_execution_receipt.py ................................ [  9%]
+........................................................................ [ 10%]
+.....................................................................    [ 11%]
+tests\harness\test_expectation_coverage.py .................             [ 11%]
+tests\harness\test_expectation_grounding.py ............................ [ 11%]
+                                                                         [ 11%]
+tests\harness\test_expectations.py ....................................s [ 12%]
+.                                                                        [ 12%]
+tests\harness\test_faithfulness.py ..........                            [ 12%]
+tests\harness\test_gold_set.py .............................ssss         [ 12%]
+tests\harness\test_grounding_scope.py .................................. [ 13%]
+.......                                                                  [ 13%]
+tests\harness\test_historical_profile.py .....................           [ 13%]
+tests\harness\test_integrity_audit.py .................................. [ 13%]
+........................................................................ [ 14%]
+.....................                                                    [ 14%]
+tests\harness\test_jsonl_log.py .....                                    [ 14%]
+tests\harness\test_judge.py ...................................          [ 15%]
+tests\harness\test_materiality.py ...........................            [ 15%]
+tests\harness\test_measure_ledger_granularity.py sssss                   [ 15%]
+tests\harness\test_msca_dn_profile.py .................................. [ 15%]
+.....                                                                    [ 16%]
+tests\harness\test_operator_review.py .................................. [ 16%]
+...............................................                          [ 16%]
+tests\harness\test_profile.py .......................                    [ 17%]
+tests\harness\test_provenance.py .....................                   [ 17%]
+tests\harness\test_regression.py .....................................   [ 17%]
+tests\harness\test_regression_golden.py ssss                             [ 17%]
+tests\harness\test_report.py ........                                    [ 17%]
+tests\harness\test_response_cache.py ................................... [ 18%]
+.                                                                        [ 18%]
+tests\harness\test_ria_profile.py ............................           [ 18%]
+tests\harness\test_routing.py ...........                                [ 18%]
+tests\harness\test_rubric_report.py .................................... [ 19%]
+......ss                                                                 [ 19%]
+tests\harness\test_rubric_run.py ...............................         [ 19%]
+tests\harness\test_rubrics.py ..........................                 [ 19%]
+tests\harness\test_semantic_adjudications.py ........................... [ 20%]
+                                                                         [ 20%]
+tests\harness\test_status_calibration.py .................               [ 20%]
+tests\harness\test_status_faithfulness.py ....................s......... [ 20%]
+....................................                                     [ 20%]
+tests\harness\test_subscription_judge.py ............................... [ 21%]
+.......                                                                  [ 21%]
+tests\harness\test_verdict.py ...............................            [ 21%]
+tests\runner\benchmark\test_analytics.py ............................... [ 22%]
+...                                                                      [ 22%]
+tests\runner\benchmark\test_cli.py .......................               [ 22%]
+tests\runner\benchmark\test_context.py ....                              [ 22%]
+tests\runner\benchmark\test_formatters.py .............................. [ 22%]
+..                                                                       [ 22%]
+tests\runner\benchmark\test_integration.py ....                          [ 22%]
+tests\runner\benchmark\test_ledger.py .............                      [ 22%]
+tests\runner\benchmark\test_models.py ............                       [ 23%]
+tests\runner\benchmark\test_phase_b_integration.py sssssssssssssssss     [ 23%]
+tests\runner\benchmark\test_phase_c_integration.py ssssssssssssssss      [ 23%]
+tests\runner\benchmark\test_provider_projection.py ..................... [ 23%]
+....                                                                     [ 23%]
+tests\runner\benchmark\test_report_builder.py ...............            [ 23%]
+tests\runner\benchmark\test_routing_analyzer.py ............             [ 23%]
+tests\runner\benchmark\test_timing.py ...........................        [ 24%]
+tests\runner\benchmark\test_token_estimator.py ...........               [ 24%]
+tests\runner\benchmark\test_transport_hook.py .......................... [ 24%]
+.                                                                        [ 24%]
+tests\runner\predicates\test_coverage_predicates.py .................... [ 24%]
+.........................................................                [ 25%]
+tests\runner\predicates\test_cycle_predicates.py ....................... [ 25%]
+.......                                                                  [ 25%]
+tests\runner\predicates\test_file_predicates.py ........................ [ 26%]
+...............................                                          [ 26%]
+tests\runner\predicates\test_gate_pass_predicates.py ...........         [ 26%]
+tests\runner\predicates\test_phase8_section_predicates.py .............. [ 26%]
+....................                                                     [ 26%]
+tests\runner\predicates\test_schema_predicates.py ...................... [ 27%]
+....................................................................     [ 27%]
+tests\runner\predicates\test_source_ref_predicates.py .................. [ 28%]
+..........                                                               [ 28%]
+tests\runner\predicates\test_timeline_predicates.py .................... [ 28%]
+................................................                         [ 28%]
+tests\runner\test_agent_runtime.py ..................................... [ 29%]
+.....................................................                    [ 29%]
+tests\runner\test_agnosticism_lint.py ...........................        [ 30%]
+tests\runner\test_agnosticism_second_instance.py ....                    [ 30%]
+tests\runner\test_anonymisation_acceptance.py .......................... [ 30%]
+..............................                                           [ 30%]
+tests\runner\test_anonymisation_attack.py .........................      [ 31%]
+tests\runner\test_anonymisation_fidelity.py ............................ [ 31%]
+........................                                                 [ 31%]
+tests\runner\test_anonymisation_intake.py .............................. [ 31%]
+.............                                                            [ 32%]
+tests\runner\test_anonymisation_leak_scan.py ........................... [ 32%]
+..................................................                       [ 32%]
+tests\runner\test_anonymisation_matching.py ............................ [ 33%]
+................                                                         [ 33%]
+tests\runner\test_anonymisation_policy.py .............................. [ 33%]
+....................                                                     [ 33%]
+tests\runner\test_anonymisation_redaction.py ........................... [ 34%]
+...........................................                              [ 34%]
+tests\runner\test_anonymisation_rewrite.py ............................. [ 34%]
+.............                                                            [ 35%]
+tests\runner\test_anonymisation_table.py ............................... [ 35%]
+...........................                                              [ 35%]
+tests\runner\test_assembled_traceability.py ............................ [ 36%]
+.....                                                                    [ 36%]
+tests\runner\test_assumption_applier.py ...................              [ 36%]
+tests\runner\test_atomic_write.py ........                               [ 36%]
+tests\runner\test_bootstrap_freshness.py ..............                  [ 36%]
+tests\runner\test_budget_request.py .................................... [ 36%]
+                                                                         [ 36%]
+tests\runner\test_budget_validation_artifact.py .............FFFFF.F.FF. [ 37%]
+......                                                                   [ 37%]
+tests\runner\test_call_slicer.py ................                        [ 37%]
+tests\runner\test_caller_context.py ............F...F.                   [ 37%]
+tests\runner\test_checkpoint_publisher.py .................              [ 37%]
+tests\runner\test_claude_transport.py .................................. [ 38%]
+........................F..........................                      [ 38%]
+tests\runner\test_claude_transport_treekill.py .....                     [ 38%]
+tests\runner\test_consortium_composition.py ..............               [ 38%]
+tests\runner\test_constitutional_compliance_check_tapm.py .............. [ 39%]
+..........FFFFF..                                                        [ 39%]
+tests\runner\test_content_staleness.py ...........                       [ 39%]
+tests\runner\test_contextual_descriptor.py ................              [ 39%]
+tests\runner\test_continuation_gate_consistency.py ..................... [ 39%]
+.                                                                        [ 39%]
+tests\runner\test_cross_section_artifact_checks.py ..................... [ 40%]
+......                                                                   [ 40%]
+tests\runner\test_dag_full_run.py ...................................... [ 40%]
+.................                                                        [ 40%]
+tests\runner\test_dag_scheduler.py ..................................... [ 41%]
+........................................................................ [ 41%]
+.......................                                                  [ 42%]
+tests\runner\test_dependency_normalizer.py ...............               [ 42%]
+tests\runner\test_deterministic_components.py ................           [ 42%]
+tests\runner\test_dev_graph_documents.py ............................... [ 42%]
+...............                                                          [ 42%]
+tests\runner\test_dev_graph_gate_invariants.py ..........                [ 43%]
+tests\runner\test_dev_graph_impact.py .........................          [ 43%]
+tests\runner\test_dev_graph_intake.py .................                  [ 43%]
+tests\runner\test_dev_graph_packages.py ................................ [ 43%]
+.........................                                                [ 44%]
+tests\runner\test_dev_graph_revisions.py ............................... [ 44%]
+......                                                                   [ 44%]
+tests\runner\test_dev_graph_scenarios.py ............................... [ 44%]
+..................................................                       [ 45%]
+tests\runner\test_dev_graph_shadow.py .................................. [ 45%]
+                                                                         [ 45%]
+tests\runner\test_dev_graph_snapshot.py ...............................  [ 46%]
+tests\runner\test_dispatch_integration.py .....................          [ 46%]
+tests\runner\test_docx_exporter.py ............                          [ 46%]
+tests\runner\test_dod1e_checkpoint_close.py FsFF.                        [ 46%]
+tests\runner\test_drafting_skill_hygiene.py .........FFF...              [ 46%]
+tests\runner\test_dry_import.py ........................................ [ 47%]
+...................                                                      [ 47%]
+tests\runner\test_e2e_msca_pf_run.py ........ssss                        [ 47%]
+tests\runner\test_evaluator_review_tapm.py ............................. [ 47%]
+                                                                         [ 47%]
+tests\runner\test_excellence_decomposed_drafting.py ...................  [ 47%]
+tests\runner\test_external_proposal.py .........................         [ 48%]
+tests\runner\test_final_export_writer.py ........................        [ 48%]
+tests\runner\test_freshness_scope.py .................                   [ 48%]
+tests\runner\test_gate09_instrument_conditional.py ......                [ 48%]
+tests\runner\test_gate10d_consistency_fix.py ................F.......... [ 49%]
+.                                                                        [ 49%]
+tests\runner\test_gate_evaluator.py .................................... [ 49%]
+...............                                                          [ 49%]
+tests\runner\test_gate_library.py ............................           [ 49%]
+tests\runner\test_gate_result_schema_id.py ......................        [ 50%]
+tests\runner\test_gate_scenarios.py ...........................          [ 50%]
+tests\runner\test_graph_canonical_pack.py ..........ss..                 [ 50%]
+tests\runner\test_graph_claim_verifier.py ...................s...s       [ 50%]
+tests\runner\test_graph_compiler.py .....................sssss....       [ 51%]
+tests\runner\test_graph_compiler_part_b.py ............................. [ 51%]
+.ss                                                                      [ 51%]
+tests\runner\test_graph_config.py ...............................        [ 51%]
+tests\runner\test_graph_determinism_check.py .......................s... [ 52%]
+s                                                                        [ 52%]
+tests\runner\test_graph_projector.py ......................sss....       [ 52%]
+tests\runner\test_graph_schema.py ...................................... [ 52%]
+......................................                                   [ 53%]
+tests\runner\test_impact_cc06_cc09_fix.py ..........................     [ 53%]
+tests\runner\test_impact_implementation_decomposed_drafting.py ......... [ 53%]
+.............                                                            [ 53%]
+tests\runner\test_impact_metric_loss_fix.py ...................          [ 53%]
+tests\runner\test_implementation_drafting_consistency_spec.py .......... [ 54%]
+......................                                                   [ 54%]
+tests\runner\test_instrument_profile.py .....................            [ 54%]
+tests\runner\test_interface_contract.py ........................         [ 54%]
+tests\runner\test_json_extract.py ..............                         [ 54%]
+tests\runner\test_leakage_scan.py ............FF........................ [ 55%]
+.........                                                                [ 55%]
+tests\runner\test_manifest_artifact_registry.py ..                       [ 55%]
+tests\runner\test_manifest_graph.py .................................... [ 55%]
+......................                                                   [ 56%]
+tests\runner\test_manifest_predicate_refs_fix.py ..................      [ 56%]
+tests\runner\test_manifest_reader.py ...................                 [ 56%]
+tests\runner\test_n08d_assembly_fixes.py .........................       [ 56%]
+tests\runner\test_node_resolver.py ..................................... [ 57%]
+........................................................................ [ 57%]
+......                                                                   [ 57%]
+tests\runner\test_node_scope_resume_evidence.py ........................ [ 58%]
+....                                                                     [ 58%]
+tests\runner\test_node_scoped_execution.py ............................. [ 58%]
+                                                                         [ 58%]
+tests\runner\test_offline_bundle.py .................................... [ 59%]
+....................................                                     [ 59%]
+tests\runner\test_output_contract_routing.py FFFFFFFFFFFFFF.FFFF         [ 59%]
+tests\runner\test_phase2_artifact_production.py FF.FFF.......FF....      [ 59%]
+tests\runner\test_phase2_summary_coverage.py ..............              [ 59%]
+tests\runner\test_phase3_execution_fixes.py FF.FF........FF              [ 60%]
+tests\runner\test_phase4_artifact_production.py FFFFFFF........          [ 60%]
+tests\runner\test_phase5_decomposition.py ......FFF......FFF............ [ 60%]
+..                                                                       [ 60%]
+tests\runner\test_phase5_tapm_migration.py ............FFF.............. [ 60%]
+...FFFF                                                                  [ 61%]
+tests\runner\test_phase6_field_production.py .........FFFFFF..FFFFF..... [ 61%]
+.FFFF.......F..FF                                                        [ 61%]
+tests\runner\test_phase6_tapm_migration.py ..........FFFFF.............. [ 61%]
+                                                                         [ 61%]
+tests\runner\test_phase7_budget_gate.py ...............                  [ 61%]
+tests\runner\test_phase8_artifact_pipeline.py .........................  [ 62%]
+tests\runner\test_phase8_canonicalization.py ........F.................. [ 62%]
+................................                                         [ 62%]
+tests\runner\test_phase8_consistency_layer.py .......................... [ 63%]
+...............FFF..................................                     [ 63%]
+tests\runner\test_phase8_gate_content.py ............................... [ 64%]
+..................FF....                                                 [ 64%]
+tests\runner\test_phase8_integration.py ................................ [ 64%]
+.......                                                                  [ 64%]
+tests\runner\test_phase8_preseed.py ..................................   [ 65%]
+tests\runner\test_phase8_refactor.py ................................... [ 65%]
+............                                                             [ 65%]
+tests\runner\test_phase8_reuse.py ...................................... [ 65%]
+........................................................................ [ 66%]
+.....                                                                    [ 66%]
+tests\runner\test_phase8_reuse_gate_integration.py ...........           [ 66%]
+tests\runner\test_phase8_reuse_ownership.py ............................ [ 67%]
+.............................                                            [ 67%]
+tests\runner\test_phase8_skip_binding.py ...............                 [ 67%]
+tests\runner\test_phase_continuation_bootstrap.py ...................... [ 67%]
+.                                                                        [ 67%]
+tests\runner\test_phase_scoped_execution.py ......................       [ 68%]
+tests\runner\test_preseed_suppression_scheduler.py ..................... [ 68%]
+..............................                                           [ 68%]
+tests\runner\test_promote_graph_staging.py ......ssss                    [ 68%]
+tests\runner\test_review_packet_traceability.py ........................ [ 69%]
+.............                                                            [ 69%]
+tests\runner\test_risk_register_builder_completion.py ....FFFFF...F...FF [ 69%]
+                                                                         [ 69%]
+tests\runner\test_run_context.py ..........................              [ 69%]
+tests\runner\test_run_id_rule.py ........................                [ 69%]
+tests\runner\test_runtime_full_run.py .................................. [ 70%]
+..........                                                               [ 70%]
+tests\runner\test_runtime_models.py ........................             [ 70%]
+tests\runner\test_section_assembler.py ................................. [ 71%]
+.                                                                        [ 71%]
+tests\runner\test_section_extra_fields.py .......                        [ 71%]
+tests\runner\test_semantic_dispatch.py ................................. [ 71%]
+..................................                                       [ 71%]
+tests\runner\test_skill_applicability.py .....FF...F.....                [ 72%]
+tests\runner\test_skill_catalog_spec_consistency.py .................... [ 72%]
+.......                                                                  [ 72%]
+tests\runner\test_skill_runtime.py FFFF....FFFFFFFFFF..FFFFFF........... [ 72%]
+.............FFFFFFFFFFFFF.F..FF.F....FF.......FF.                       [ 73%]
+tests\runner\test_skill_runtime_enrich.py FFFFFFFFFFFFF...               [ 73%]
+tests\runner\test_skill_runtime_tapm.py ........................FFFFF..F [ 73%]
+FF.                                                                      [ 73%]
+tests\runner\test_skill_runtime_tool_loop.py ........                    [ 73%]
+tests\runner\test_skill_spec_guards.py ..............                    [ 74%]
+tests\runner\test_source_index.py ...................................... [ 74%]
+.......                                                                  [ 74%]
+tests\runner\test_unit_cost_budget.py .......................            [ 74%]
+tests\runner\test_vault_reader.py .............................sssssss   [ 75%]
+tests\runner\test_vault_scaffold.py ...............                      [ 75%]
+tests\runner\test_w1_assumed_claims.py ............                      [ 75%]
+tests\runner\test_w2_declared_not_inferred.py ..........                 [ 75%]
+tests\runner\test_working_assumptions.py ............................... [ 75%]
+..                                                                       [ 75%]
+tests\test_anonymisation_fixture.py ............................         [ 76%]
+tests\test_anonymisation_host_runbook.py .............................   [ 76%]
+tests\test_anonymisation_host_smoke.py ..............                    [ 76%]
+tests\test_aws_audit_template.py ....................                    [ 76%]
+tests\test_aws_env_config_template.py .....................              [ 77%]
+tests\test_aws_iac_contract.py ......................................... [ 77%]
+.................                                                        [ 77%]
+tests\test_aws_iam_template.py ........................                  [ 78%]
+tests\test_aws_kms_template.py ............                              [ 78%]
+tests\test_aws_network_template.py ...............                       [ 78%]
+tests\test_aws_template_guard.py ................                        [ 78%]
+tests\test_bedrock_env_readiness.py ................                     [ 78%]
+tests\test_demo_architecture_seeds.py ...............................s.. [ 79%]
+.......................................F................                 [ 79%]
+tests\test_demo_candidate_blind_baseline.py ............................ [ 79%]
+......................................F.......                           [ 80%]
+tests\test_demo_change_scenarios.py .................................... [ 80%]
+.....................                                                    [ 81%]
+tests\test_demo_concept.py ............................................. [ 81%]
+...F........                                                             [ 81%]
+tests\test_demo_consortium.py .................F........................ [ 82%]
+...................................                                      [ 82%]
+tests\test_demo_dev_graph_run_records.py .....................           [ 82%]
+tests\test_demo_dev_graph_snapshot.py .........................F         [ 83%]
+tests\test_demo_fictional_budget_override.py ........................... [ 83%]
+................F.                                                       [ 83%]
+tests\test_demo_part_b_candidate_builder.py ............................ [ 83%]
+....................                                                     [ 84%]
+tests\test_demo_phase7_budget_gate.py ..............................F... [ 84%]
+........                                                                 [ 84%]
+tests\test_demo_phase8_ria_criterion_binding.py .........                [ 84%]
+tests\test_demo_report.py ................F.                             [ 84%]
+tests\test_demo_runner_phase_costs.py ..........................         [ 85%]
+tests\test_demo_sources.py ..................................F.          [ 85%]
+tests\test_dev_graph_demo_scope.py ............                          [ 85%]
+tests\test_evidence_protocol_scaffold.py ......................          [ 85%]
+tests\test_extraction_environment.py .............................       [ 86%]
+tests\test_host_env_launcher.py ......................................   [ 86%]
+tests\test_msca_dn_anonymised_derivative.py ............................ [ 86%]
+................................                                         [ 87%]
+tests\test_msca_dn_approved_dispositions.py ............................ [ 87%]
+.........                                                                [ 87%]
+tests\test_msca_dn_authority_matrix.py ................................. [ 87%]
+..............................................                           [ 88%]
+tests\test_msca_dn_declaration_drafts.py ............................... [ 88%]
+.....................................F.............                      [ 89%]
+tests\test_msca_dn_deferral_register.py ................................ [ 89%]
+...                                                                      [ 89%]
+tests\test_msca_dn_dry_import.py ....................................... [ 90%]
+..................                                                       [ 90%]
+tests\test_msca_dn_fidelity_declarations.py ............................ [ 90%]
+......................                                                   [ 90%]
+tests\test_msca_dn_historical_profile.py .............................   [ 91%]
+tests\test_msca_dn_import.py ........................................... [ 91%]
+........................................................................ [ 92%]
+..............................                                           [ 92%]
+tests\test_msca_dn_original_import_route.py ............................ [ 92%]
+........................................................................ [ 93%]
+...................................                                      [ 94%]
+tests\test_msca_dn_pe09_runbook.py ...................                   [ 94%]
+tests\test_msca_dn_successor_dispositions.py ........................... [ 94%]
+.......                                                                  [ 94%]
+tests\test_msca_dn_workspace.py .....................                    [ 94%]
+tests\test_old_id_guard.py ................................              [ 95%]
+tests\test_paths.py .......s.........                                    [ 95%]
+tests\test_persistence_policy.py ....................................... [ 95%]
+.                                                                        [ 95%]
+tests\test_preserve_run_manifests.py ........                            [ 95%]
+tests\test_production_mode.py .......................................... [ 96%]
+............                                                             [ 96%]
+tests\test_sandbox_hardening.py .......................................  [ 96%]
+tests\test_tier1_tier2a_ria_coverage.py ................................ [ 97%]
+.............                                                            [ 97%]
+tests\test_tier2b_biodiv_intake.py ..................................... [ 97%]
+.....F...F.                                                              [ 97%]
+tests\test_transport_capabilities.py ...............                     [ 98%]
+tests\test_transport_config.py ...............................           [ 98%]
+tests\test_transport_errors.py ..................                        [ 98%]
+tests\test_transport_openai_compatible.py ................FFFFFFFFFF...  [ 98%]
+tests\test_transport_presets.py ........................................ [ 99%]
+......................                                                   [ 99%]
+tests\test_transport_tool_executor.py ...........s......s...             [ 99%]
+tests\test_transport_tool_loop.py ..........                             [100%]
+
+================================== FAILURES ===================================
+E   AssertionError: Skill 'budget-interface-validation': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+      
+    assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_budget_validation_artifact.py:342: AssertionError: Skill 'budget-interface-validation': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_the_validation_file_carri0\\docs\\integrations\\lump_sum_budget_planner\\validation\\budget_validation_response.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_the_validation_file_carri0\\docs\\integrations\\lump_sum_budget_planner\\validation\\budget_validation_response.json'
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_the_assessment_still_carr0\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\budget_gate_assessment.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_the_assessment_still_carr0\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\budget_gate_assessment.json'
+E   assert 0 == 1
+     +  where 0 = len([])
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_budget_validation_artifact.py:395: assert 0 == 1
+E   assert 'validation_id' in (('Skill \'budget-interface-validation\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'))
+     +  where 'Skill \'budget-interface-validation\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'budget-interface-val... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_budget_validation_artifact.py:414: assert 'validation_id' in (('Skill \'budget-interface-validation\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'))
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_budget_validation_artifact.py:457: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   KeyError: 'prompt'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_budget_validation_artifact.py:494: KeyError: 'prompt'
+E   KeyError: 'prompt'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_budget_validation_artifact.py:527: KeyError: 'prompt'
+E   assert 0 == 1
+     +  where 0 = len([])
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_caller_context.py:375: assert 0 == 1
+E   assert 0 == 1
+     +  where 0 = len([])
+------------------------------ Captured log call ------------------------------
+WARNING  runner.agent_runtime:agent_runtime.py:1624 Skill topic-scope-check not invoked (caller context unavailable): Declared caller context for skill 'topic-scope-check' is unavailable: none of its declared context sources could be read (docs/tier3_project_instantiation/project_brief/concept_note.md, docs/tier3_project_instantiation/project_brief/strategic_positioning.md, docs/tier3_project_instantiation/project_brief/project_summary.json). The skill requires this content and must not synthesise it from its other inputs
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_caller_context.py:615: assert 0 == 1
+E   AssertionError: assert ClaudeCLIReso...source='path') == ClaudeCLIReso...source='path')
+      
+      Omitting 1 identical items, use -vv to show
+      Differing attributes:
+      ['path']
+      
+      Drill down into differing attribute path:
+        path: 'C:\\usr\\local\\bin\\claude' != '\\usr\\local\\bin\\claude'...
+      
+      ...Full output truncated (4 lines hidden), use '-vv' to show
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_claude_transport.py:718: AssertionError: assert ClaudeCLIReso...source='path') == ClaudeCLIReso...source='path')
+E   AssertionError: Got: Skill 'constitutional-compliance-check': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+      
+    assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_constitutional_compliance_check_tapm.py:338: AssertionError: Got: Skill 'constitutional-compliance-check': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_constitutional_compliance_check_tapm.py:347: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_constitutional_compliance_check_tapm.py:356: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_constitutional_compliance_check_tapm.py:368: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AssertionError: Got: Skill 'constitutional-compliance-check': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+      
+    assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_constitutional_compliance_check_tapm.py:387: AssertionError: Got: Skill 'constitutional-compliance-check': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+E   AssertionError: assert 'import uuid;...uuid.uuid4())' == 'msca-pf-graph-01'
+      
+      - msca-pf-graph-01
+      + import uuid; print(uuid.uuid4())
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_dod1e_checkpoint_close.py:75: AssertionError: assert 'import uuid;...uuid.uuid4())' == 'msca-pf-graph-01'
+E   AssertionError: a cross-run checkpoint must record the provenance quad
+    assert None is not None
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_dod1e_checkpoint_close.py:114: AssertionError: a cross-run checkpoint must record the provenance quad
+E   AssertionError: assert [] == ['gate_09_budget_consistency']
+      
+      Right contains one more item: 'gate_09_budget_consistency'
+      Use -v to get more diff
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_dod1e_checkpoint_close.py:140: AssertionError: assert [] == ['gate_09_budget_consistency']
+E   AssertionError: excellence-section-drafting.md is 9279 chars, limit is 8000
+    assert 9279 <= 8000
+     +  where 9279 = len('---\nskill_id: excellence-section-drafting\npurpose_summary: >\n  Draft the Excellence section of the RIA/IA Part B. ...proposal_sections/` if not present.\n- Write to `docs/tier5_deliverables/proposal_sections/excellence_section.json`.\n')
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_drafting_skill_hygiene.py:79: AssertionError: excellence-section-drafting.md is 9279 chars, limit is 8000
+E   AssertionError: impact-section-drafting.md is 14135 chars, limit is 8000
+    assert 14135 <= 8000
+     +  where 14135 = len('---\nskill_id: impact-section-drafting\npurpose_summary: >\n  Draft the Impact section of the RIA/IA Part B from Phas...les/proposal_sections/` if not present.\n- Write to `docs/tier5_deliverables/proposal_sections/impact_section.json`.\n')
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_drafting_skill_hygiene.py:79: AssertionError: impact-section-drafting.md is 14135 chars, limit is 8000
+E   AssertionError: implementation-section-drafting.md is 14449 chars, limit is 10000
+    assert 14449 <= 10000
+     +  where 14449 = len('---\nskill_id: implementation-section-drafting\npurpose_summary: >\n  Draft the Implementation section (Quality and e...osal_sections/` if not present.\n- Write to `docs/tier5_deliverables/proposal_sections/implementation_section.json`.\n')
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_drafting_skill_hygiene.py:79: AssertionError: implementation-section-drafting.md is 14449 chars, limit is 10000
+E   KeyError: 'short_name'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_gate10d_consistency_fix.py:347: KeyError: 'short_name'
+E   AssertionError: [leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-od1-region-r1_2026-10-21.json:59: [identity_noun] 'ELTE' Ś "reason": "It is the only Region this account can build in on the Free plan, so OD10 (no upgrade before ELTE approval) stands. eu. profiles keep processing inside the EU. The models the workloads need are available there (F-OD1r1-5), which answers R0's reason for us-east-1. The alternative, activating advanced features to keep us-east-1, needs the paid plan now and cannot be reversed.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-od11-admin-identity_2026-10-21.json:30: [identity_noun] 'ELTE' Ś "finding": "Enabling Identity Center for account access would therefore put the account into an organization and upgrade it to the paid plan, which OD10 reserves to the operator after the ELTE IK financial office approves the reimbursement route. It would also make DC-40 (SCP) applicable.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:37: [identity_noun] 'ELTE' Ś "consequence": "Proposal data processed through Bedrock leaves the EU: us. profiles route within US regions (F2). The transfer rests on the EU-US Data Privacy Framework and the AWS DPA with SCCs, as data_flow_document.md section 4.3 already states; R13 restates it for the new account. R9e closes N/A citing OD1. The AN12 runbook's region lines stand unchanged. R9 still exports AWS_REGION (F4), because the default-region fallback must not be what selects the region. If ELTE's DPO or the funding terms later require EU-only processing, OD1 is reopened and R9e with it."
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:116: [identity_noun] 'ELTE' Ś "answer": "Upgrade only after the ELTE IK financial office approves the reimbursement route, entering ELTE's billing details at the same moment. Only the operator does this.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:116: [identity_noun] 'ELTE' Ś "answer": "Upgrade only after the ELTE IK financial office approves the reimbursement route, entering ELTE's billing details at the same moment. Only the operator does this.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:167: [identity_noun] 'ELTE' Ś "gap": "No ELTE DPO or funding-term requirement for EU-only processing is known. If one appears, OD1 is reopened."
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:173: [identity_noun] 'ELTE' Ś "Approval of the funding or reimbursement route by the ELTE IK financial office."
+        docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json:64: [identity_noun] 'FIELDWISE' Ś "question": "Run the FIELDWISE pilot first?",
+        docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json:101: [identity_noun] 'FIELDWISE' Ś "The fellow's agreement to a FIELDWISE pilot."
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:10: [pre-existing] 'FIELDWISE' Ś "why": "The FIELDWISE proposal (MSCA-PF, submitted 2026-09-07, ESR round two 2026-09-09) is closed. The operator wants a clean, reusable engine to instantiate a new project. Every artifact that exists only because FIELDWISE existed is removed; every call- or instrument-level source, the engine, the constitutional configuration and the directory skeleton stay.",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:10: [pre-existing] 'FIELDWISE' Ś "why": "The FIELDWISE proposal (MSCA-PF, submitted 2026-09-07, ESR round two 2026-09-09) is closed. The operator wants a clean, reusable engine to instantiate a new project. Every artifact that exists only because FIELDWISE existed is removed; every call- or instrument-level source, the engine, the constitutional configuration and the directory skeleton stay.",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:13: [pre-existing] 'fieldwise' Ś "tag": "fieldwise-final-2026-09-22 (annotated, on ESR e56ede2)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:15: [pre-existing] 'fieldwise' Ś "branches": "ESR and fieldwise-run-01/02/03 are NOT deleted; that is a separate operator step."
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:19: [pre-existing] 'FIELDWISE' Ś "A_tier3": "All of docs/tier3_project_instantiation/ except .gitkeep and working_assumptions.example.json; plus the FIELDWISE-filled Part B form copy misfiled in Tier 2A (ž13.11).",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:22: [pre-existing] 'FIELDWISE' Ś "D_plans": "All FIELDWISE plans, tickets, prompts and reports, incl. the 2026-08-11 partial-purge precedent (plans/fieldwise_tickets.md ticket 1, plans/fieldwise_reinstantiation_plan.md ž2.1; both recoverable from the tag).",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:26: [pre-existing] 'FIELDWISE' Ś "H_code": "FIELDWISE-only tools (Part B-1 builders, annotator, open-decisions exporter, vault authoring seed) and their tests; the five test_fieldwise_* modules; prose scrub of CONTEXT.md, the operator manual, one skill example and three runner docstrings."
+      Instance two is anonymised: no organisation name, person name, place, web address, grant or project identifier from instance one may appear in Tier 3, Tier 4, Tier 5 or the vault. Replace the noun with its pseudonym.
+    assert False
+     +  where False = LeakageReport(scanned_files=('docs/tier3_project_instantiation/architecture_inputs/impacts.json', 'docs/tier3_project_...T.md, the operator manual, one skill example and three runner docstrings."', kind='identity_noun', pre_existing=True))).ok
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_leakage_scan.py:138: AssertionError: [leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):
+E   assert 'NOT CLEAN' in '[leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):\n  do...t identifier from instance one may appear in Tier 3, Tier 4, Tier 5 or the vault. Replace the noun with its pseudonym.'
+     +  where '[leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):\n  do...t identifier from instance one may appear in Tier 3, Tier 4, Tier 5 or the vault. Replace the noun with its pseudonym.' = format()
+     +    where format = LeakageReport(scanned_files=('docs/tier3_project_instantiation/architecture_inputs/impacts.json', 'docs/tier3_project_...T.md, the operator manual, one skill example and three runner docstrings."', kind='identity_noun', pre_existing=True))).format
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_leakage_scan.py:148: assert 'NOT CLEAN' in '[leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):\n  do...t identifier from instance one may appear in Tier 3, Tier 4, Tier 5 or the vault. Replace the noun with its pseudonym.'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:216: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:253: AssertionError: assert 'failure' == 'success'
+E   assert 'gate_id' in 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'gate-enforcement\': ... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:282: assert 'gate_id' in 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:307: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:335: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:364: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:397: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:477: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:547: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:564: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:589: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:605: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   assert 'deterministic_predicates' in 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'gate-enforcement\': ... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:621: assert 'deterministic_predicates' in 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:636: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   assert 'gate_id' in 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'gate-enforcement\': ... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:658: assert 'gate_id' in 'Skill \'gate-enforcement\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   AssertionError: Expected success but got failure: Skill 'gate-enforcement': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+      
+    assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:820: AssertionError: Expected success but got failure: Skill 'gate-enforcement': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:849: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_output_contract_routing.py:942: AssertionError: assert 'failure' == 'success'
+E   AssertionError: Skill 'concept-alignment-check': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+      
+    assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase2_artifact_production.py:325: AssertionError: Skill 'concept-alignment-check': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase2_artifact_production.py:349: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase2_artifact_production.py:386: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: Skill 'concept-call-binding-derivation': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+      
+    assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase2_artifact_production.py:407: AssertionError: Skill 'concept-call-binding-derivation': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase2_artifact_production.py:447: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase2_artifact_production.py:894: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase2_artifact_production.py:908: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MISSING_INPUT'
+      
+      - MISSING_INPUT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase3_execution_fixes.py:121: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MISSING_INPUT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'CONSTITUTIONAL_HALT'
+      
+      - CONSTITUTIONAL_HALT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase3_execution_fixes.py:136: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'CONSTITUTIONAL_HALT'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase3_execution_fixes.py:162: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase3_execution_fixes.py:175: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase3_execution_fixes.py:335: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MISSING_INPUT'
+      
+      - MISSING_INPUT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase3_execution_fixes.py:431: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MISSING_INPUT'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase4_artifact_production.py:329: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase4_artifact_production.py:351: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase4_artifact_production.py:363: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase4_artifact_production.py:375: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase4_artifact_production.py:387: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase4_artifact_production.py:401: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase4_artifact_production.py:422: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_decomposition.py:233: AssertionError: assert 'failure' == 'success'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_decomposition.py:256: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_decomposition.py:266: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_decomposition.py:331: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_decomposition.py:361: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_decomposition.py:387: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_tapm_migration.py:201: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_tapm_migration.py:208: AssertionError: assert 'failure' == 'success'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_tapm_migration.py:218: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_tapm_migration.py:416: AssertionError: assert 'failure' == 'success'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_tapm_migration.py:426: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_tapm_migration.py:436: AssertionError: assert 'failure' == 'success'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase5_tapm_migration.py:449: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:197: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:216: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:235: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:324: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:344: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:363: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:604: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:621: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:652: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:713: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:740: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:1049: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:1078: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:1098: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:1117: AssertionError: assert 'failure' == 'success'
+E   AssertionError: Neither WPL-WP9 nor MGR-WPL-WP9 found in management_roles; available role_ids: ['MR-COORD', 'MR-SCITECH', 'MR-DATA', 'MR-OMICS', 'MR-ANALYTICS', 'MR-DEMO-TERR', 'MR-DEMO-FRESH', 'MR-DEMO-MARINE', 'MR-SOFTWARE', 'MR-EXPLOIT', 'MR-POLICY', 'MR-PROTOCOL', 'WPL-WP1', 'WPL-WP2', 'WPL-WP3', 'WPL-WP4', 'WPL-WP5', 'WPL-WP6', 'WPL-WP7']
+    assert None is not None
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:1249: AssertionError: Neither WPL-WP9 nor MGR-WPL-WP9 found in management_roles; available role_ids: ['MR-COORD', 'MR-SCITECH', 'MR-DATA', 'MR-OMICS', 'MR-ANALYTICS', 'MR-DEMO-TERR', 'MR-DEMO-FRESH', 'MR-DEMO-MARINE', 'MR-SOFTWARE', 'MR-EXPLOIT', 'MR-POLICY', 'MR-PROTOCOL', 'WPL-WP1', 'WPL-WP2', 'WPL-WP3', 'WPL-WP4', 'WPL-WP5', 'WPL-WP6', 'WPL-WP7']
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:1350: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_field_production.py:1408: AssertionError: assert 'failure' == 'success'
+E   AssertionError: Expected success, got: Skill 'risk-register-builder': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+      
+    assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_tapm_migration.py:259: AssertionError: Expected success, got: Skill 'risk-register-builder': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_tapm_migration.py:267: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_tapm_migration.py:275: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_tapm_migration.py:317: AssertionError: assert 'failure' == 'success'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase6_tapm_migration.py:324: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AssertionError: assert 'component keyword' not in '---\nskill_...ion.json`.\n'
+      
+      'component keyword' is contained here:
+        canonical component keywords
+          (engine, architecture, decentralised). Short references without a WP ID
+          are acceptable in flowing prose.
+        
+        ### 3. Canonical Copying Rules...
+      
+      ...Full output truncated (66 lines hidden), use '-vv' to show
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase8_canonicalization.py:97: AssertionError: assert 'component keyword' not in '---\nskill_...ion.json`.\n'
+E   AssertionError: excellence-section-drafting.md is 9279 chars, limit is 9000
+    assert 9279 <= 9000
+     +  where 9279 = len('---\nskill_id: excellence-section-drafting\npurpose_summary: >\n  Draft the Excellence section of the RIA/IA Part B. ...proposal_sections/` if not present.\n- Write to `docs/tier5_deliverables/proposal_sections/excellence_section.json`.\n')
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase8_consistency_layer.py:1116: AssertionError: excellence-section-drafting.md is 9279 chars, limit is 9000
+E   AssertionError: impact-section-drafting.md is 14135 chars, limit is 8000
+    assert 14135 <= 8000
+     +  where 14135 = len('---\nskill_id: impact-section-drafting\npurpose_summary: >\n  Draft the Impact section of the RIA/IA Part B from Phas...les/proposal_sections/` if not present.\n- Write to `docs/tier5_deliverables/proposal_sections/impact_section.json`.\n')
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase8_consistency_layer.py:1116: AssertionError: impact-section-drafting.md is 14135 chars, limit is 8000
+E   AssertionError: implementation-section-drafting.md is 14449 chars, limit is 10500
+    assert 14449 <= 10500
+     +  where 14449 = len('---\nskill_id: implementation-section-drafting\npurpose_summary: >\n  Draft the Implementation section (Quality and e...osal_sections/` if not present.\n- Write to `docs/tier5_deliverables/proposal_sections/implementation_section.json`.\n')
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase8_consistency_layer.py:1116: AssertionError: implementation-section-drafting.md is 14449 chars, limit is 10500
+E   AssertionError: Unexpected assumed claims: ['P02_participation', 'P10_participation', 'P03_participation', 'demonstration_case_realms', 'P12_participation', 'P05_participation', 'project_scale', 'project_duration', 'kpi_targets', 'P09_participation', 'P01_participation']
+    assert 11 == 0
+     +  where 11 = len(['P02_participation', 'P10_participation', 'P03_participation', 'demonstration_case_realms', 'P12_participation', 'P05_participation', ...])
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase8_gate_content.py:703: AssertionError: Unexpected assumed claims: ['P02_participation', 'P10_participation', 'P03_participation', 'demonstration_case_realms', 'P12_participation', 'P05_participation', 'project_scale', 'project_duration', 'kpi_targets', 'P09_participation', 'P01_participation']
+E   AssertionError: Expected confirmed/inferred, got assumed
+    assert 'assumed' in ('confirmed', 'inferred')
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_phase8_gate_content.py:707: AssertionError: Expected confirmed/inferred, got assumed
+E   AssertionError: Expected success, got failure: Skill 'risk-register-builder': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+      
+    assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_risk_register_builder_completion.py:198: AssertionError: Expected success, got failure: Skill 'risk-register-builder': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_risk_register_builder_completion.py:221: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_risk_register_builder_completion.py:239: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_risk_register_builder_completion.py:255: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_risk_register_builder_completion.py:271: AssertionError: assert 'failure' == 'success'
+E   assert 'MISSING_INPUT' in (('INCOMPLETE_OUTPUT'))
+     +  where 'INCOMPLETE_OUTPUT' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'risk-register-builde... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_category
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_risk_register_builder_completion.py:349: assert 'MISSING_INPUT' in (('INCOMPLETE_OUTPUT'))
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_risk_register_builder_completion.py:412: AssertionError: assert 'failure' == 'success'
+E   assert 'schema_id mismatch' in 'skill \'risk-register-builder\': openai-compatible transport failed: http 401: {"error":{"message":"invalid api key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'skill \'risk-register-builder\': openai-compatible transport failed: http 401: {"error":{"message":"invalid api key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = <built-in method lower of str object at 0x0000018423E02F70>()
+     +    where <built-in method lower of str object at 0x0000018423E02F70> = ('Skill \'risk-register-builder\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n').lower
+     +      where 'Skill \'risk-register-builder\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'risk-register-builde... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_risk_register_builder_completion.py:444: assert 'schema_id mismatch' in 'skill \'risk-register-builder\': openai-compatible transport failed: http 401: {"error":{"message":"invalid api key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+------------------------------ Captured log call ------------------------------
+WARNING  runner.agent_runtime:agent_runtime.py:1624 Skill topic-scope-check not invoked (caller context unavailable): Declared caller context for skill 'topic-scope-check' is unavailable: none of its declared context sources could be read (docs/tier3_project_instantiation/project_brief/concept_note.md, docs/tier3_project_instantiation/project_brief/strategic_positioning.md, docs/tier3_project_instantiation/project_brief/project_summary.json). The skill requires this content and must not synthesise it from its other inputs
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_applicability.py:330: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+------------------------------ Captured log call ------------------------------
+WARNING  runner.agent_runtime:agent_runtime.py:1624 Skill topic-scope-check not invoked (caller context unavailable): Declared caller context for skill 'topic-scope-check' is unavailable: none of its declared context sources could be read (docs/tier3_project_instantiation/project_brief/concept_note.md, docs/tier3_project_instantiation/project_brief/strategic_positioning.md, docs/tier3_project_instantiation/project_brief/project_summary.json). The skill requires this content and must not synthesise it from its other inputs
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_applicability.py:368: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+------------------------------ Captured log call ------------------------------
+WARNING  runner.agent_runtime:agent_runtime.py:1624 Skill topic-scope-check not invoked (caller context unavailable): Declared caller context for skill 'topic-scope-check' is unavailable: none of its declared context sources could be read (docs/tier3_project_instantiation/project_brief/concept_note.md, docs/tier3_project_instantiation/project_brief/strategic_positioning.md, docs/tier3_project_instantiation/project_brief/project_summary.json). The skill requires this content and must not synthesise it from its other inputs
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_applicability.py:523: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:226: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:241: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:256: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:270: AssertionError: assert 'failure' == 'success'
+E   assert 'timed out' in 'Skill \'test-skill\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'Skill \'test-skill\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'test-skill\': OpenAI... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:348: assert 'timed out' in 'Skill \'test-skill\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   assert '.claude/skill_diag/' in 'Skill \'test-skill\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'Skill \'test-skill\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'test-skill\': OpenAI... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:355: assert '.claude/skill_diag/' in 'Skill \'test-skill\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   AssertionError: assert False
+     +  where False = exists()
+     +    where exists = WindowsPath('C:/Users/jozse/AppData/Local/Temp/pytest-of-jozse/pytest-3099/test_timeout_writes_transport_0/.claude/skill_diag/test-skill_run-001_transport_diag.json').exists
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:367: AssertionError: assert False
+E   AssertionError: assert False
+     +  where False = exists()
+     +    where exists = WindowsPath('C:/Users/jozse/AppData/Local/Temp/pytest-of-jozse/pytest-3099/test_timeout_writes_prompt_fil0/.claude/skill_diag/test-skill_run-001_system_prompt.txt').exists
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:399: AssertionError: assert False
+E   AssertionError: assert False
+     +  where False = exists()
+     +    where exists = WindowsPath('C:/Users/jozse/AppData/Local/Temp/pytest-of-jozse/pytest-3099/test_timeout_writes_stdout_std0/.claude/skill_diag/test-skill_run-001_stdout.txt').exists
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:412: AssertionError: assert False
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_timeout_with_node_id0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_timeout_with_node_id0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+E   AssertionError: assert False
+     +  where False = exists()
+     +    where exists = WindowsPath('C:/Users/jozse/AppData/Local/Temp/pytest-of-jozse/pytest-3099/test_generic_transport_error_w0/.claude/skill_diag/test-skill_run-001_transport_diag.json').exists
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:443: AssertionError: assert False
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_nonzero_exit_classified_c0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_nonzero_exit_classified_c0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_empty_output_classified_c0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_empty_output_classified_c0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_rate_limit_classified_cor0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_rate_limit_classified_cor0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_prompt_size_metadata_in_d0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_prompt_size_metadata_in_d0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:569: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:583: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:597: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:616: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:635: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:986: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1007: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1023: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1039: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1140: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1176: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1200: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1217: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1229: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   assert 'transport_diag.json' in 'Skill \'test-skill-tapm\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'Skill \'test-skill-tapm\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'test-skill-tapm\': O... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1253: assert 'transport_diag.json' in 'Skill \'test-skill-tapm\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_tapm_diagnostic_includes_0\\.claude\\skill_diag\\test-skill-tapm_run-002_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_tapm_diagnostic_includes_0\\.claude\\skill_diag\\test-skill-tapm_run-002_transport_diag.json'
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_tapm_diagnostic_includes_1\\.claude\\skill_diag\\test-skill-tapm_run-002_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_tapm_diagnostic_includes_1\\.claude\\skill_diag\\test-skill-tapm_run-002_transport_diag.json'
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_tapm_diagnostic_includes_2\\.claude\\skill_diag\\test-skill-tapm_run-002_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_tapm_diagnostic_includes_2\\.claude\\skill_diag\\test-skill-tapm_run-002_transport_diag.json'
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_cliprompt_diagnostic_has_0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\pathlib.py:1119: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jozse\\AppData\\Local\\Temp\\pytest-of-jozse\\pytest-3099\\test_cliprompt_diagnostic_has_0\\.claude\\skill_diag\\test-skill_run-001_transport_diag.json'
+E   AssertionError: assert False
+     +  where False = <MagicMock name='invoke_claude_text' id='1666985633888'>.called
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1428: AssertionError: assert False
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1457: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1558: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1679: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1709: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+------------------------------ Captured log call ------------------------------
+INFO     runner.skill_runtime:skill_runtime.py:1524   skill START  id=multi-skill  mode=cli-prompt  node=-  run=run-001
+INFO     runner.skill_runtime:skill_runtime.py:1833   skill INVOKE id=multi-skill  sys=837  user=1109  timeout=300s  backend=openai_compatible
+INFO     runner.skill_runtime:skill_runtime.py:1988   skill FAIL   id=multi-skill  category=INCOMPLETE_OUTPUT  elapsed=0.1s  backend=openai_compatible  error=HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1798: AssertionError: assert 'failure' == 'success'
+E   assert 'contract=multi_artifact' in '  skill FAIL   id=multi-skill  category=INCOMPLETE_OUTPUT  elapsed=0.1s  backend=openai_compatible  error=HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+------------------------------ Captured log call ------------------------------
+INFO     runner.skill_runtime:skill_runtime.py:1524   skill START  id=multi-skill  mode=cli-prompt  node=-  run=run-001
+INFO     runner.skill_runtime:skill_runtime.py:1833   skill INVOKE id=multi-skill  sys=837  user=1109  timeout=300s  backend=openai_compatible
+INFO     runner.skill_runtime:skill_runtime.py:1988   skill FAIL   id=multi-skill  category=INCOMPLETE_OUTPUT  elapsed=0.1s  backend=openai_compatible  error=HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime.py:1822: assert 'contract=multi_artifact' in '  skill FAIL   id=multi-skill  category=INCOMPLETE_OUTPUT  elapsed=0.1s  backend=openai_compatible  error=HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:235: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:258: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:274: AssertionError: assert 'failure' == 'success'
+E   assert None is not None
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:297: assert None is not None
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:317: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:329: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:341: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:364: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MISSING_INPUT'
+      
+      - MISSING_INPUT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:386: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MISSING_INPUT'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:419: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   assert 'non-JSON' in 'Skill \'test-enricher\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'Skill \'test-enricher\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'test-enricher\': Ope... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:436: assert 'non-JSON' in 'Skill \'test-enricher\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:444: AssertionError: assert 'failure' == 'success'
+E   assert 'model-signaled failure' in 'Skill \'test-enricher\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+     +  where 'Skill \'test-enricher\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n' = SkillResult(status='failure', outputs_written=[], validation_report=None, failure_reason='Skill \'test-enricher\': Ope... Key","type":"invalid_request_error","code":"invalid_api_key"}}\n', failure_category='INCOMPLETE_OUTPUT', payload=None).failure_reason
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_enrich.py:457: assert 'model-signaled failure' in 'Skill \'test-enricher\': OpenAI-compatible transport failed: HTTP 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}\n'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_tapm.py:472: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_tapm.py:482: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_tapm.py:495: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_tapm.py:508: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_tapm.py:515: AssertionError: assert 'failure' == 'success'
+E   AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+      
+      - MALFORMED_ARTIFACT
+      + INCOMPLETE_OUTPUT
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_tapm.py:556: AssertionError: assert 'INCOMPLETE_OUTPUT' == 'MALFORMED_ARTIFACT'
+E   AttributeError: 'NoneType' object has no attribute 'kwargs'
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_tapm.py:569: AttributeError: 'NoneType' object has no attribute 'kwargs'
+E   AssertionError: assert 'failure' == 'success'
+      
+      - success
+      + failure
+C:\Code\proposal_demo\proposal_orchestrator\tests\runner\test_skill_runtime_tapm.py:577: AssertionError: assert 'failure' == 'success'
+E   AssertionError: ['docs/tier4_orchestration_state/decision_log/aws-redeployment-od1-region-r1_2026-10-21.json:59 "reason": "It is the o...ap": "No ELTE DPO or funding-term requirement for EU-only processing is known. If one appears, OD1 is reopened."', ...]
+    assert False
+     +  where False = LeakageReport(scanned_files=('docs/tier3_project_instantiation/architecture_inputs/impacts.json', 'docs/tier3_project_...T.md, the operator manual, one skill example and three runner docstrings."', kind='identity_noun', pre_existing=True))).ok
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_demo_architecture_seeds.py:1004: AssertionError: ['docs/tier4_orchestration_state/decision_log/aws-redeployment-od1-region-r1_2026-10-21.json:59 "reason": "It is the o...ap": "No ELTE DPO or funding-term requirement for EU-only processing is known. If one appears, OD1 is reopened."', ...]
+E   AssertionError: the report states a file count the scan no longer produces (442); a Tier 4 file was added or removed after the report was written
+    assert 'over 442 files' in 'Anonymity: py -3.10 -m runner.leakage_scan over 350 files in Tier 3, Tier 4, Tier 5 and the vault, this report and it...vision priorities and decision record (five Tier 4 records); the scan was re-run over all 350 and reports no new leak.'
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_demo_candidate_blind_baseline.py:1073: AssertionError: the report states a file count the scan no longer produces (442); a Tier 4 file was added or removed after the report was written
+E   assert False
+     +  where False = LeakageReport(scanned_files=('docs/tier3_project_instantiation/architecture_inputs/impacts.json', 'docs/tier3_project_...T.md, the operator manual, one skill example and three runner docstrings."', kind='identity_noun', pre_existing=True))).ok
+     +    where LeakageReport(scanned_files=('docs/tier3_project_instantiation/architecture_inputs/impacts.json', 'docs/tier3_project_...T.md, the operator manual, one skill example and three runner docstrings."', kind='identity_noun', pre_existing=True))) = scan_tree(WindowsPath('C:/Code/proposal_demo/proposal_orchestrator'))
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_demo_concept.py:582: assert False
+E   AssertionError: [leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-od1-region-r1_2026-10-21.json:59: [identity_noun] 'ELTE' Ś "reason": "It is the only Region this account can build in on the Free plan, so OD10 (no upgrade before ELTE approval) stands. eu. profiles keep processing inside the EU. The models the workloads need are available there (F-OD1r1-5), which answers R0's reason for us-east-1. The alternative, activating advanced features to keep us-east-1, needs the paid plan now and cannot be reversed.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-od11-admin-identity_2026-10-21.json:30: [identity_noun] 'ELTE' Ś "finding": "Enabling Identity Center for account access would therefore put the account into an organization and upgrade it to the paid plan, which OD10 reserves to the operator after the ELTE IK financial office approves the reimbursement route. It would also make DC-40 (SCP) applicable.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:37: [identity_noun] 'ELTE' Ś "consequence": "Proposal data processed through Bedrock leaves the EU: us. profiles route within US regions (F2). The transfer rests on the EU-US Data Privacy Framework and the AWS DPA with SCCs, as data_flow_document.md section 4.3 already states; R13 restates it for the new account. R9e closes N/A citing OD1. The AN12 runbook's region lines stand unchanged. R9 still exports AWS_REGION (F4), because the default-region fallback must not be what selects the region. If ELTE's DPO or the funding terms later require EU-only processing, OD1 is reopened and R9e with it."
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:116: [identity_noun] 'ELTE' Ś "answer": "Upgrade only after the ELTE IK financial office approves the reimbursement route, entering ELTE's billing details at the same moment. Only the operator does this.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:116: [identity_noun] 'ELTE' Ś "answer": "Upgrade only after the ELTE IK financial office approves the reimbursement route, entering ELTE's billing details at the same moment. Only the operator does this.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:167: [identity_noun] 'ELTE' Ś "gap": "No ELTE DPO or funding-term requirement for EU-only processing is known. If one appears, OD1 is reopened."
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:173: [identity_noun] 'ELTE' Ś "Approval of the funding or reimbursement route by the ELTE IK financial office."
+        docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json:64: [identity_noun] 'FIELDWISE' Ś "question": "Run the FIELDWISE pilot first?",
+        docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json:101: [identity_noun] 'FIELDWISE' Ś "The fellow's agreement to a FIELDWISE pilot."
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:10: [pre-existing] 'FIELDWISE' Ś "why": "The FIELDWISE proposal (MSCA-PF, submitted 2026-09-07, ESR round two 2026-09-09) is closed. The operator wants a clean, reusable engine to instantiate a new project. Every artifact that exists only because FIELDWISE existed is removed; every call- or instrument-level source, the engine, the constitutional configuration and the directory skeleton stay.",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:10: [pre-existing] 'FIELDWISE' Ś "why": "The FIELDWISE proposal (MSCA-PF, submitted 2026-09-07, ESR round two 2026-09-09) is closed. The operator wants a clean, reusable engine to instantiate a new project. Every artifact that exists only because FIELDWISE existed is removed; every call- or instrument-level source, the engine, the constitutional configuration and the directory skeleton stay.",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:13: [pre-existing] 'fieldwise' Ś "tag": "fieldwise-final-2026-09-22 (annotated, on ESR e56ede2)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:15: [pre-existing] 'fieldwise' Ś "branches": "ESR and fieldwise-run-01/02/03 are NOT deleted; that is a separate operator step."
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:19: [pre-existing] 'FIELDWISE' Ś "A_tier3": "All of docs/tier3_project_instantiation/ except .gitkeep and working_assumptions.example.json; plus the FIELDWISE-filled Part B form copy misfiled in Tier 2A (ž13.11).",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:22: [pre-existing] 'FIELDWISE' Ś "D_plans": "All FIELDWISE plans, tickets, prompts and reports, incl. the 2026-08-11 partial-purge precedent (plans/fieldwise_tickets.md ticket 1, plans/fieldwise_reinstantiation_plan.md ž2.1; both recoverable from the tag).",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:26: [pre-existing] 'FIELDWISE' Ś "H_code": "FIELDWISE-only tools (Part B-1 builders, annotator, open-decisions exporter, vault authoring seed) and their tests; the five test_fieldwise_* modules; prose scrub of CONTEXT.md, the operator manual, one skill example and three runner docstrings."
+      Instance two is anonymised: no organisation name, person name, place, web address, grant or project identifier from instance one may appear in Tier 3, Tier 4, Tier 5 or the vault. Replace the noun with its pseudonym.
+    assert False
+     +  where False = LeakageReport(scanned_files=('docs/tier3_project_instantiation/architecture_inputs/impacts.json', 'docs/tier3_project_...T.md, the operator manual, one skill example and three runner docstrings."', kind='identity_noun', pre_existing=True))).ok
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_demo_consortium.py:240: AssertionError: [leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):
+E   assert False
+     +  where False = LeakageReport(scanned_files=('docs/tier3_project_instantiation/architecture_inputs/impacts.json', 'docs/tier3_project_...T.md, the operator manual, one skill example and three runner docstrings."', kind='identity_noun', pre_existing=True))).ok
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_demo_dev_graph_snapshot.py:329: assert False
+E   UnicodeDecodeError: 'utf-8' codec can't decode byte 0x93 in position 10: invalid start byte
+C:\Users\jozse\AppData\Local\Programs\Python\Python310\lib\encodings\utf_8_sig.py:69: UnicodeDecodeError: 'utf-8' codec can't decode byte 0x93 in position 10: invalid start byte
+E   AssertionError: assert not [WindowsPath('C:/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase8_drafting.../proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json'), ...]
+     +  where [WindowsPath('C:/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase8_drafting.../proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json'), ...] = list(<generator object Path.glob at 0x0000018426B1A030>)
+     +    where <generator object Path.glob at 0x0000018426B1A030> = glob('*.json')
+     +      where glob = WindowsPath('C:/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review').glob
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_demo_phase7_budget_gate.py:410: AssertionError: assert not [WindowsPath('C:/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase8_drafting.../proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json'), ...]
+E   assert 'over 442 files' in "# Dev Graph demo report: instance two on HORIZON-CL6-2027-01-BIODIV-01\n\nBranch `dev_graph_demo`, written 2026-10-03...nscope record listed. The demo's own red tests are the three stale pins in M26 and the fictional-label\ntest of M20.\n"
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_demo_report.py:195: assert 'over 442 files' in "# Dev Graph demo report: instance two on HORIZON-CL6-2027-01-BIODIV-01\n\nBranch `dev_graph_demo`, written 2026-10-03...nscope record listed. The demo's own red tests are the three stale pins in M26 and the fictional-label\ntest of M20.\n"
+E   AssertionError: [leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-od1-region-r1_2026-10-21.json:59: [identity_noun] 'ELTE' Ś "reason": "It is the only Region this account can build in on the Free plan, so OD10 (no upgrade before ELTE approval) stands. eu. profiles keep processing inside the EU. The models the workloads need are available there (F-OD1r1-5), which answers R0's reason for us-east-1. The alternative, activating advanced features to keep us-east-1, needs the paid plan now and cannot be reversed.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-od11-admin-identity_2026-10-21.json:30: [identity_noun] 'ELTE' Ś "finding": "Enabling Identity Center for account access would therefore put the account into an organization and upgrade it to the paid plan, which OD10 reserves to the operator after the ELTE IK financial office approves the reimbursement route. It would also make DC-40 (SCP) applicable.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:37: [identity_noun] 'ELTE' Ś "consequence": "Proposal data processed through Bedrock leaves the EU: us. profiles route within US regions (F2). The transfer rests on the EU-US Data Privacy Framework and the AWS DPA with SCCs, as data_flow_document.md section 4.3 already states; R13 restates it for the new account. R9e closes N/A citing OD1. The AN12 runbook's region lines stand unchanged. R9 still exports AWS_REGION (F4), because the default-region fallback must not be what selects the region. If ELTE's DPO or the funding terms later require EU-only processing, OD1 is reopened and R9e with it."
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:116: [identity_noun] 'ELTE' Ś "answer": "Upgrade only after the ELTE IK financial office approves the reimbursement route, entering ELTE's billing details at the same moment. Only the operator does this.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:116: [identity_noun] 'ELTE' Ś "answer": "Upgrade only after the ELTE IK financial office approves the reimbursement route, entering ELTE's billing details at the same moment. Only the operator does this.",
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:167: [identity_noun] 'ELTE' Ś "gap": "No ELTE DPO or funding-term requirement for EU-only processing is known. If one appears, OD1 is reopened."
+        docs/tier4_orchestration_state/decision_log/aws-redeployment-operator-decisions_2026-10-21.json:173: [identity_noun] 'ELTE' Ś "Approval of the funding or reimbursement route by the ELTE IK financial office."
+        docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json:64: [identity_noun] 'FIELDWISE' Ś "question": "Run the FIELDWISE pilot first?",
+        docs/tier4_orchestration_state/decision_log/msca-dn-anonymisation-operator-decisions_2026-10-14.json:101: [identity_noun] 'FIELDWISE' Ś "The fellow's agreement to a FIELDWISE pilot."
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:10: [pre-existing] 'FIELDWISE' Ś "why": "The FIELDWISE proposal (MSCA-PF, submitted 2026-09-07, ESR round two 2026-09-09) is closed. The operator wants a clean, reusable engine to instantiate a new project. Every artifact that exists only because FIELDWISE existed is removed; every call- or instrument-level source, the engine, the constitutional configuration and the directory skeleton stay.",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:10: [pre-existing] 'FIELDWISE' Ś "why": "The FIELDWISE proposal (MSCA-PF, submitted 2026-09-07, ESR round two 2026-09-09) is closed. The operator wants a clean, reusable engine to instantiate a new project. Every artifact that exists only because FIELDWISE existed is removed; every call- or instrument-level source, the engine, the constitutional configuration and the directory skeleton stay.",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:13: [pre-existing] 'fieldwise' Ś "tag": "fieldwise-final-2026-09-22 (annotated, on ESR e56ede2)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:14: [pre-existing] 'fieldwise' Ś "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:15: [pre-existing] 'fieldwise' Ś "branches": "ESR and fieldwise-run-01/02/03 are NOT deleted; that is a separate operator step."
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:19: [pre-existing] 'FIELDWISE' Ś "A_tier3": "All of docs/tier3_project_instantiation/ except .gitkeep and working_assumptions.example.json; plus the FIELDWISE-filled Part B form copy misfiled in Tier 2A (ž13.11).",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:22: [pre-existing] 'FIELDWISE' Ś "D_plans": "All FIELDWISE plans, tickets, prompts and reports, incl. the 2026-08-11 partial-purge precedent (plans/fieldwise_tickets.md ticket 1, plans/fieldwise_reinstantiation_plan.md ž2.1; both recoverable from the tag).",
+        docs/tier4_orchestration_state/decision_log/project-purge-clean-engine-base_2026-09-22.json:26: [pre-existing] 'FIELDWISE' Ś "H_code": "FIELDWISE-only tools (Part B-1 builders, annotator, open-decisions exporter, vault authoring seed) and their tests; the five test_fieldwise_* modules; prose scrub of CONTEXT.md, the operator manual, one skill example and three runner docstrings."
+      Instance two is anonymised: no organisation name, person name, place, web address, grant or project identifier from instance one may appear in Tier 3, Tier 4, Tier 5 or the vault. Replace the noun with its pseudonym.
+    assert False
+     +  where False = LeakageReport(scanned_files=('docs/tier3_project_instantiation/architecture_inputs/impacts.json', 'docs/tier3_project_...T.md, the operator manual, one skill example and three runner docstrings."', kind='identity_noun', pre_existing=True))).ok
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_demo_sources.py:516: AssertionError: [leakage-scan] FAIL Ś 9 new instance-one leak(s) (442 file(s) scanned in Tier 3, Tier 4, Tier 5 and the vault):
+E   AssertionError: assert ['docs/tier4_...checklist.md'] == []
+      
+      Left contains 2 more items, first extra item: 'docs/tier4_orchestration_state/msca_dn/declarations/draft_sanitised_v1.json'
+      Use -v to get more diff
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_msca_dn_declaration_drafts.py:686: AssertionError: assert ['docs/tier4_...checklist.md'] == []
+E   AssertionError: Tier 2B extracted/ no longer carries the MSCA-era files. Finding I1 of tier2b-biodiv-intake_2026-09-29.json is closed and should be struck from the report.
+    assert []
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_tier2b_biodiv_intake.py:514: AssertionError: Tier 2B extracted/ no longer carries the MSCA-era files. Finding I1 of tier2b-biodiv-intake_2026-09-29.json is closed and should be struck from the report.
+E   AssertionError: call_constraints.json
+    assert 'HORIZON-CL6...01-BIODIV-01' not in '{\n  "const...   }\n  ]\n}'
+      
+      'HORIZON-CL6-2027-01-BIODIV-01' is contained here:
+        cument": "HORIZON-CL6-2027-01-BIODIV-01.json",
+              "status": "Confirmed"
+            },
+            {
+              "constraint_id": "CC-02",...
+      
+      ...Full output truncated (80 lines hidden), use '-vv' to show
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_tier2b_biodiv_intake.py:570: AssertionError: call_constraints.json
+E   runner.transport.errors.OpenAICompatAuthError: HTTP 401: {"error":{"code":"invalid_api_key","message":"Invalid bearer token","param":null,"type":"permission_denied_error"}}
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatAuthError: HTTP 401: {"error":{"code":"invalid_api_key","message":"Invalid bearer token","param":null,"type":"permission_denied_error"}}
+E   runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+E   runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+E   runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+E   runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+E   runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+E   AssertionError: assert <ErrorCategor...WN: 'unknown'> == <ErrorCategor...rmed_request'>
+      
+      - malformed_request
+      + unknown
+C:\Code\proposal_demo\proposal_orchestrator\tests\test_transport_openai_compatible.py:425: AssertionError: assert <ErrorCategor...WN: 'unknown'> == <ErrorCategor...rmed_request'>
+E   runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+E   runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+E   runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+C:\Code\proposal_demo\proposal_orchestrator\runner\transport\openai_compatible.py:219: runner.transport.errors.OpenAICompatTransportError: HTTP 405: <!doctype html><html lang="en"><head><title>Example Domain</title><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.o
+============================== warnings summary ===============================
+tests/harness/test_dev_graph_t03_end_to_end.py::test_t03_scenario_end_to_end
+tests/runner/test_dev_graph_gate_invariants.py::TestGateEvaluatorCallSites::test_exactly_two_call_sites_both_in_the_scheduler
+  C:\Code\proposal_demo\proposal_orchestrator\harness\materiality_calibration.py:1: DeprecationWarning: invalid escape sequence '\ '
+    """
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/runner/test_budget_validation_artifact.py::TestOneResponseWritesBothFiles::test_both_canonical_paths_are_written
+FAILED tests/runner/test_budget_validation_artifact.py::TestOneResponseWritesBothFiles::test_the_validation_file_carries_its_own_fields_only
+FAILED tests/runner/test_budget_validation_artifact.py::TestOneResponseWritesBothFiles::test_the_assessment_still_carries_its_metadata
+FAILED tests/runner/test_budget_validation_artifact.py::TestOneResponseWritesBothFiles::test_the_directory_now_holds_a_json_file_for_the_disk_check
+FAILED tests/runner/test_budget_validation_artifact.py::TestAnIncompleteResponseFailsRatherThanLandingHalf::test_a_response_without_the_validation_fields_fails
+FAILED tests/runner/test_budget_validation_artifact.py::TestItRefusesArtifactStatusRatherThanDroppingIt::test_the_response_is_rejected
+FAILED tests/runner/test_budget_validation_artifact.py::TestThePromptNamesBothAnchorFields::test_both_anchors_appear_in_the_assembled_prompt
+FAILED tests/runner/test_budget_validation_artifact.py::TestThePromptNamesBothAnchorFields::test_the_directive_asks_for_no_metadata_field
+FAILED tests/runner/test_caller_context.py::TestCliPromptCallerContext::test_context_merged_into_prompt
+FAILED tests/runner/test_caller_context.py::TestFailClosedAbsentSources::test_run_agent_passes_none_when_sources_absent
+FAILED tests/runner/test_claude_transport.py::TestCliPathResolution::test_unset_pin_uses_absolute_path_search_result
+FAILED tests/runner/test_constitutional_compliance_check_tapm.py::TestConstitutionalComplianceCheckTapmInvocation::test_tapm_invocation_passes_tools
+FAILED tests/runner/test_constitutional_compliance_check_tapm.py::TestConstitutionalComplianceCheckTapmInvocation::test_tapm_timeout_uses_1200s
+FAILED tests/runner/test_constitutional_compliance_check_tapm.py::TestConstitutionalComplianceCheckTapmInvocation::test_tapm_prompt_not_cli_prompt
+FAILED tests/runner/test_constitutional_compliance_check_tapm.py::TestConstitutionalComplianceCheckTapmInvocation::test_prompt_size_bounded_at_runtime
+FAILED tests/runner/test_constitutional_compliance_check_tapm.py::TestConstitutionalComplianceCheckTapmInvocation::test_phase6_does_not_require_tier5
+FAILED tests/runner/test_dod1e_checkpoint_close.py::test_real_checkpoint_published
+FAILED tests/runner/test_dod1e_checkpoint_close.py::test_real_checkpoint_records_gate09_quad_verbatim
+FAILED tests/runner/test_dod1e_checkpoint_close.py::test_real_checkpoint_predicate_passes_directly
+FAILED tests/runner/test_drafting_skill_hygiene.py::TestSizeLimits::test_under_size_limit[excellence-section-drafting.md]
+FAILED tests/runner/test_drafting_skill_hygiene.py::TestSizeLimits::test_under_size_limit[impact-section-drafting.md]
+FAILED tests/runner/test_drafting_skill_hygiene.py::TestSizeLimits::test_under_size_limit[implementation-section-drafting.md]
+FAILED tests/runner/test_gate10d_consistency_fix.py::TestImplementationPartnerLegalNames::test_partners_json_has_correct_legal_names
+FAILED tests/runner/test_leakage_scan.py::TestTheTreeScan::test_no_new_leak
+FAILED tests/runner/test_leakage_scan.py::TestTheTreeScan::test_the_branch_is_not_clean_and_says_so
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementPayloadValidation::test_valid_gate_pass_response_accepted
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementPayloadValidation::test_skillresult_shaped_success_envelope_unwrapped
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementPayloadValidation::test_wrapped_envelope_with_incomplete_payload_still_fails
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementPayloadValidation::test_valid_gate_fail_response_accepted
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementPayloadValidation::test_decision_log_entry_extracted_and_written
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementPayloadValidation::test_no_canonical_artifact_written_to_phase_outputs
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementPayloadValidation::test_response_not_validated_against_unrelated_schemas
+FAILED tests/runner/test_output_contract_routing.py::TestMultiArtifactNotTriggeredByInputs::test_single_artifact_with_many_inputs
+FAILED tests/runner/test_output_contract_routing.py::TestTrueMultiArtifactStillWorks::test_multi_artifact_explicit_declaration_works
+FAILED tests/runner/test_output_contract_routing.py::TestTrueMultiArtifactStillWorks::test_missing_sub_artifact_fails
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementFailClosed::test_missing_gate_id_fails
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementFailClosed::test_missing_overall_status_fails
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementFailClosed::test_missing_deterministic_predicates_fails
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementFailClosed::test_run_id_mismatch_fails
+FAILED tests/runner/test_output_contract_routing.py::TestGateEnforcementFailClosed::test_multiple_missing_fields_all_reported
+FAILED tests/runner/test_output_contract_routing.py::TestPhase3NoRegression::test_gate_enforcement_succeeds_in_phase3_context
+FAILED tests/runner/test_output_contract_routing.py::TestPhase3NoRegression::test_wp_normalization_still_works_as_single_artifact
+FAILED tests/runner/test_output_contract_routing.py::TestDefaultOutputContract::test_default_contract_uses_single_artifact
+FAILED tests/runner/test_phase2_artifact_production.py::TestSummarySkillWrite::test_summary_artifact_written
+FAILED tests/runner/test_phase2_artifact_production.py::TestSummarySkillWrite::test_summary_output_path_correct
+FAILED tests/runner/test_phase2_artifact_production.py::TestSummarySkillWrite::test_missing_rationale_fails
+FAILED tests/runner/test_phase2_artifact_production.py::TestCallBindingSkillWrite::test_both_tier3_artifacts_written
+FAILED tests/runner/test_phase2_artifact_production.py::TestCallBindingSkillWrite::test_binding_output_paths_correct
+FAILED tests/runner/test_phase2_artifact_production.py::TestCallBindingFailClosed::test_missing_mappings_in_response_fails
+FAILED tests/runner/test_phase2_artifact_production.py::TestCallBindingFailClosed::test_missing_compliance_fields_in_response_fails
+FAILED tests/runner/test_phase3_execution_fixes.py::TestSkillResultInterception::test_missing_input_failure_intercepted
+FAILED tests/runner/test_phase3_execution_fixes.py::TestSkillResultInterception::test_constitutional_halt_intercepted
+FAILED tests/runner/test_phase3_execution_fixes.py::TestSkillResultInterception::test_valid_artifact_not_intercepted
+FAILED tests/runner/test_phase3_execution_fixes.py::TestSkillResultInterception::test_success_status_not_intercepted
+FAILED tests/runner/test_phase3_execution_fixes.py::TestDecisionLogWriteWindows::test_timestamp_colons_sanitized_in_decision_log
+FAILED tests/runner/test_phase3_execution_fixes.py::TestPhase3SkillSequenceIntegration::test_instrument_failure_does_not_block_as_malformed
+FAILED tests/runner/test_phase4_artifact_production.py::TestGanttScheduleBuilderArtifactProduction::test_valid_response_writes_gantt_json
+FAILED tests/runner/test_phase4_artifact_production.py::TestGanttScheduleBuilderArtifactProduction::test_response_missing_run_id_rejected
+FAILED tests/runner/test_phase4_artifact_production.py::TestGanttScheduleBuilderArtifactProduction::test_response_wrong_schema_id_rejected
+FAILED tests/runner/test_phase4_artifact_production.py::TestGanttScheduleBuilderArtifactProduction::test_response_with_artifact_status_rejected
+FAILED tests/runner/test_phase4_artifact_production.py::TestGanttScheduleBuilderArtifactProduction::test_response_missing_required_field_rejected
+FAILED tests/runner/test_phase4_artifact_production.py::TestGanttScheduleBuilderArtifactProduction::test_valid_response_without_milestone_dependency_fields
+FAILED tests/runner/test_phase4_artifact_production.py::TestGanttScheduleBuilderArtifactProduction::test_cross_wp_depends_on_tasks_accepted_by_schema
+FAILED tests/runner/test_phase5_decomposition.py::TestCoreBuilderExecution::test_writes_partial_artifact
+FAILED tests/runner/test_phase5_decomposition.py::TestCoreBuilderExecution::test_uses_tapm_tools
+FAILED tests/runner/test_phase5_decomposition.py::TestCoreBuilderExecution::test_uses_600s_timeout
+FAILED tests/runner/test_phase5_decomposition.py::TestDecEnricherExecution::test_writes_complete_artifact
+FAILED tests/runner/test_phase5_decomposition.py::TestDecEnricherExecution::test_preserves_pathways_and_kpis
+FAILED tests/runner/test_phase5_decomposition.py::TestFullSequence::test_sequential_execution_produces_complete_artifact
+FAILED tests/runner/test_phase5_tapm_migration.py::TestPhase5ArtifactProductionPath::test_tapm_invocation_passes_tools
+FAILED tests/runner/test_phase5_tapm_migration.py::TestPhase5ArtifactProductionPath::test_canonical_artifact_written
+FAILED tests/runner/test_phase5_tapm_migration.py::TestPhase5ArtifactProductionPath::test_tapm_timeout_uses_1200s
+FAILED tests/runner/test_phase5_tapm_migration.py::TestDecCheckTapmInvocation::test_tapm_invocation_passes_tools
+FAILED tests/runner/test_phase5_tapm_migration.py::TestDecCheckTapmInvocation::test_tapm_timeout_uses_1200s
+FAILED tests/runner/test_phase5_tapm_migration.py::TestDecCheckTapmInvocation::test_validation_report_written
+FAILED tests/runner/test_phase5_tapm_migration.py::TestDecCheckTapmInvocation::test_no_input_serialization_in_prompt
+FAILED tests/runner/test_phase6_field_production.py::TestGovernanceModelBuilderFieldProduction::test_output_contains_ethics_assessment
+FAILED tests/runner/test_phase6_field_production.py::TestGovernanceModelBuilderFieldProduction::test_output_contains_instrument_sections
+FAILED tests/runner/test_phase6_field_production.py::TestGovernanceModelBuilderFieldProduction::test_risk_register_is_placeholder
+FAILED tests/runner/test_phase6_field_production.py::TestRiskRegisterBuilderFieldPreservation::test_ethics_assessment_preserved_after_risk_enrichment
+FAILED tests/runner/test_phase6_field_production.py::TestRiskRegisterBuilderFieldPreservation::test_instrument_sections_preserved_after_risk_enrichment
+FAILED tests/runner/test_phase6_field_production.py::TestRiskRegisterBuilderFieldPreservation::test_risk_register_is_populated
+FAILED tests/runner/test_phase6_field_production.py::TestTraceabilityFooterProduction::test_traceability_footer_written_to_artifact
+FAILED tests/runner/test_phase6_field_production.py::TestTraceabilityFooterProduction::test_traceability_footer_contains_tier1_paths
+FAILED tests/runner/test_phase6_field_production.py::TestTraceabilityFooterProduction::test_traceability_footer_uses_full_paths
+FAILED tests/runner/test_phase6_field_production.py::TestTraceabilityFooterProduction::test_traceability_footer_preserved_after_risk_enrichment
+FAILED tests/runner/test_phase6_field_production.py::TestTraceabilityFooterProduction::test_existing_fields_preserved_with_traceability_footer
+FAILED tests/runner/test_phase6_field_production.py::TestGenderDimensionTraceability::test_violating_response_detectable_in_artifact
+FAILED tests/runner/test_phase6_field_production.py::TestGenderDimensionTraceability::test_safe_wording_has_no_violating_phrase
+FAILED tests/runner/test_phase6_field_production.py::TestGenderDimensionTraceability::test_safe_wording_contains_tier2b_deferral
+FAILED tests/runner/test_phase6_field_production.py::TestGenderDimensionTraceability::test_tier2b_backed_assertion_is_permitted
+FAILED tests/runner/test_phase6_field_production.py::TestComplianceProfileDerivativeLabeling::test_current_artifact_wp9_cites_tier2b_for_ai_on_demand
+FAILED tests/runner/test_phase6_field_production.py::TestComplianceProfileDerivativeLabeling::test_response_with_compliance_only_mandate_is_detectable
+FAILED tests/runner/test_phase6_field_production.py::TestComplianceProfileDerivativeLabeling::test_response_with_tier2b_backed_open_science_is_valid
+FAILED tests/runner/test_phase6_tapm_migration.py::TestRiskRegisterBuilderTapmInvocation::test_tapm_invocation_passes_tools
+FAILED tests/runner/test_phase6_tapm_migration.py::TestRiskRegisterBuilderTapmInvocation::test_tapm_timeout_uses_1200s
+FAILED tests/runner/test_phase6_tapm_migration.py::TestRiskRegisterBuilderTapmInvocation::test_tapm_path_invoked_not_cli_prompt
+FAILED tests/runner/test_phase6_tapm_migration.py::TestGovernanceModelBuilderTapmInvocation::test_tapm_invocation_passes_tools
+FAILED tests/runner/test_phase6_tapm_migration.py::TestGovernanceModelBuilderTapmInvocation::test_tapm_timeout_uses_1200s
+FAILED tests/runner/test_phase8_canonicalization.py::TestSpecLeanness::test_impact_no_component_keyword_scan
+FAILED tests/runner/test_phase8_consistency_layer.py::TestDraftingSkillHygiene::test_under_size_limit[excellence-section-drafting.md]
+FAILED tests/runner/test_phase8_consistency_layer.py::TestDraftingSkillHygiene::test_under_size_limit[impact-section-drafting.md]
+FAILED tests/runner/test_phase8_consistency_layer.py::TestDraftingSkillHygiene::test_under_size_limit[implementation-section-drafting.md]
+FAILED tests/runner/test_phase8_gate_content.py::TestCurrentArtifactState::test_excellence_no_assumed_claims
+FAILED tests/runner/test_phase8_gate_content.py::TestCurrentArtifactState::test_excellence_overall_status_not_assumed
+FAILED tests/runner/test_risk_register_builder_completion.py::TestRiskRegisterBuilderCompletion::test_completes_with_non_empty_risk_register
+FAILED tests/runner/test_risk_register_builder_completion.py::TestRiskRegisterBuilderCompletion::test_ethics_assessment_preserved
+FAILED tests/runner/test_risk_register_builder_completion.py::TestRiskRegisterBuilderCompletion::test_instrument_sections_preserved
+FAILED tests/runner/test_risk_register_builder_completion.py::TestRiskRegisterBuilderCompletion::test_governance_matrix_preserved
+FAILED tests/runner/test_risk_register_builder_completion.py::TestRiskRegisterBuilderCompletion::test_management_roles_preserved
+FAILED tests/runner/test_risk_register_builder_completion.py::TestRiskRegisterBuilderConstraints::test_base_artifact_missing_fails
+FAILED tests/runner/test_risk_register_builder_completion.py::TestRiskRegisterBuilderSchemaValidation::test_merged_artifact_has_all_required_fields
+FAILED tests/runner/test_risk_register_builder_completion.py::TestRiskRegisterBuilderSchemaValidation::test_schema_id_mismatch_in_patch_fails
+FAILED tests/runner/test_skill_applicability.py::TestPhase2SkillSkipped::test_traceability_skipped_in_phase2
+FAILED tests/runner/test_skill_applicability.py::TestPhase2SkillSkipped::test_traceability_skip_does_not_block_other_skills
+FAILED tests/runner/test_skill_applicability.py::TestOtherSkillsUnaffected::test_non_tier5_skills_always_invoked
+FAILED tests/runner/test_skill_runtime.py::TestRunSkillSuccess::test_success_with_valid_inputs
+FAILED tests/runner/test_skill_runtime.py::TestRunSkillSuccess::test_run_id_propagated_to_written_artifact
+FAILED tests/runner/test_skill_runtime.py::TestRunSkillSuccess::test_artifact_status_absent_in_written_artifact
+FAILED tests/runner/test_skill_runtime.py::TestRunSkillSuccess::test_schema_id_in_written_artifact
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_timeout_returns_failure_result
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_timeout_failure_reason_includes_diag_path
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_timeout_writes_transport_diag_json
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_timeout_writes_prompt_files
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_timeout_writes_stdout_stderr_files
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_timeout_with_node_id
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_generic_transport_error_writes_diagnostic
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_nonzero_exit_classified_correctly
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_empty_output_classified_correctly
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_rate_limit_classified_correctly
+FAILED tests/runner/test_skill_runtime.py::TestTransportFailureDiagnostics::test_prompt_size_metadata_in_diagnostic
+FAILED tests/runner/test_skill_runtime.py::TestRunSkillSchemaValidation::test_missing_run_id_in_response
+FAILED tests/runner/test_skill_runtime.py::TestRunSkillSchemaValidation::test_wrong_run_id_in_response
+FAILED tests/runner/test_skill_runtime.py::TestRunSkillSchemaValidation::test_artifact_status_present_in_response
+FAILED tests/runner/test_skill_runtime.py::TestCanonicalInputBinding::test_file_input_resolved_from_disk
+FAILED tests/runner/test_skill_runtime.py::TestCanonicalInputBinding::test_caller_provided_inputs_override_disk
+FAILED tests/runner/test_skill_runtime.py::TestMultiArtifactCanonicalPathKeys::test_canonical_path_keyed_response
+FAILED tests/runner/test_skill_runtime.py::TestMultiArtifactCanonicalPathKeys::test_flat_shape_still_works
+FAILED tests/runner/test_skill_runtime.py::TestMultiArtifactCanonicalPathKeys::test_basename_keyed_still_works
+FAILED tests/runner/test_skill_runtime.py::TestMultiArtifactCanonicalPathKeys::test_stem_keyed_still_works
+FAILED tests/runner/test_skill_runtime.py::TestMultiTargetWritesTo::test_flat_mixed_response_both_written
+FAILED tests/runner/test_skill_runtime.py::TestMultiTargetWritesTo::test_nested_keyed_multi_field_target
+FAILED tests/runner/test_skill_runtime.py::TestMultiTargetWritesTo::test_missing_field_in_multi_field_target
+FAILED tests/runner/test_skill_runtime.py::TestMultiTargetWritesTo::test_missing_second_target_fails
+FAILED tests/runner/test_skill_runtime.py::TestMultiTargetWritesTo::test_missing_first_target_fails
+FAILED tests/runner/test_skill_runtime.py::TestTapmTransportFailureDiagnostics::test_tapm_timeout_writes_diagnostic
+FAILED tests/runner/test_skill_runtime.py::TestTapmTransportFailureDiagnostics::test_tapm_diagnostic_includes_tools_metadata
+FAILED tests/runner/test_skill_runtime.py::TestTapmTransportFailureDiagnostics::test_tapm_diagnostic_includes_prompt_sizes
+FAILED tests/runner/test_skill_runtime.py::TestTapmTransportFailureDiagnostics::test_tapm_diagnostic_includes_declared_inputs
+FAILED tests/runner/test_skill_runtime.py::TestTapmTransportFailureDiagnostics::test_cliprompt_diagnostic_has_no_tapm_tools
+FAILED tests/runner/test_skill_runtime.py::TestOptionalReadsFrom::test_optional_present_is_resolved
+FAILED tests/runner/test_skill_runtime.py::TestOptionalReadsFrom::test_no_optional_field_means_empty_list
+FAILED tests/runner/test_skill_runtime.py::TestExcellenceOutputRobustness::test_valid_concise_excellence_json_writes_correctly
+FAILED tests/runner/test_skill_runtime.py::TestPhase8FileLevelArtifactWrite::test_impact_section_writes_to_exact_path
+FAILED tests/runner/test_skill_runtime.py::TestPhase8FileLevelArtifactWrite::test_implementation_section_writes_to_exact_path
+FAILED tests/runner/test_skill_runtime.py::TestMultiArtifactLogging::test_success_logs_an_ok_line
+FAILED tests/runner/test_skill_runtime.py::TestMultiArtifactLogging::test_validation_failure_logs_a_fail_line
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactSuccess::test_enrichment_merges_patch_into_base
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactSuccess::test_base_fields_preserved
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactSuccess::test_all_seven_fields_present_in_merged
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactSuccess::test_gate_sees_nonnull_dec_fields
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactValidation::test_schema_id_mismatch_rejected
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactValidation::test_run_id_mismatch_rejected
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactValidation::test_artifact_status_in_patch_rejected
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactValidation::test_merged_result_missing_required_field_rejected
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactMissingInputs::test_missing_base_artifact
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactMissingInputs::test_missing_catalog_config
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactResponseFormat::test_non_json_response_rejected
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactResponseFormat::test_compact_valid_json_accepted
+FAILED tests/runner/test_skill_runtime_enrich.py::TestEnrichArtifactResponseFormat::test_model_signaled_failure_intercepted
+FAILED tests/runner/test_skill_runtime_tapm.py::TestRunSkillTapmMode::test_default_mode_is_cli_prompt
+FAILED tests/runner/test_skill_runtime_tapm.py::TestRunSkillTapmMode::test_tapm_mode_passes_tools
+FAILED tests/runner/test_skill_runtime_tapm.py::TestRunSkillTapmMode::test_tapm_mode_skips_resolve_inputs
+FAILED tests/runner/test_skill_runtime_tapm.py::TestRunSkillTapmMode::test_tapm_mode_skips_skill_prompt_assembly
+FAILED tests/runner/test_skill_runtime_tapm.py::TestRunSkillTapmMode::test_tapm_mode_writes_artifact
+FAILED tests/runner/test_skill_runtime_tapm.py::TestRunSkillTapmMode::test_tapm_mode_schema_validation_failure
+FAILED tests/runner/test_skill_runtime_tapm.py::TestRunSkillTapmMode::test_node_id_forwarded_to_tapm_prompt
+FAILED tests/runner/test_skill_runtime_tapm.py::TestRunSkillTapmMode::test_node_id_none_works_for_tapm
+FAILED tests/test_demo_architecture_seeds.py::TestAnonymity::test_the_branch_is_no_less_ok_than_before
+FAILED tests/test_demo_candidate_blind_baseline.py::TestTheReportsNumbersAreTheArtifactsOwn::test_the_leakage_scan_file_count_is_re_derivable
+FAILED tests/test_demo_concept.py::TestAnonymity::test_the_brief_adds_no_new_leak_to_the_branch
+FAILED tests/test_demo_consortium.py::TestAnonymity::test_the_leakage_scan_is_clean_over_tiers_3_to_5_and_the_vault
+FAILED tests/test_demo_dev_graph_snapshot.py::TestAnonymity::test_the_new_artifacts_are_scanned_and_carry_no_new_leak
+FAILED tests/test_demo_fictional_budget_override.py::TestThePhase7DispatchReachedTheGate::test_tier_5_content_carries_the_fictional_label
+FAILED tests/test_demo_phase7_budget_gate.py::TestTheHardBlockIsIntact::test_no_phase_8_output_exists
+FAILED tests/test_demo_report.py::TestTheBlindLaneFigures::test_the_scan_count_is_the_scans_own
+FAILED tests/test_demo_sources.py::TestAnonymity::test_the_branch_is_no_less_ok_than_before
+FAILED tests/test_msca_dn_declaration_drafts.py::TestDeterminismAndTheCommittedArtifacts::test_the_committed_artifacts_are_reproducible
+FAILED tests/test_tier2b_biodiv_intake.py::TestStaleExtractedFinding::test_the_extracted_files_still_belong_to_another_call
+FAILED tests/test_tier2b_biodiv_intake.py::TestTierBoundaries::test_phase_1_still_owns_tier_2b_extracted
+FAILED tests/test_transport_openai_compatible.py::TestResponseParsing::test_call_sends_post_and_returns_parsed
+FAILED tests/test_transport_openai_compatible.py::TestResponseParsing::test_tool_calls_round_trip
+FAILED tests/test_transport_openai_compatible.py::TestErrorHandling::test_429_raises_rate_limit_error
+FAILED tests/test_transport_openai_compatible.py::TestErrorHandling::test_403_raises_auth_error
+FAILED tests/test_transport_openai_compatible.py::TestErrorHandling::test_500_raises_provider_error
+FAILED tests/test_transport_openai_compatible.py::TestErrorHandling::test_503_raises_provider_error
+FAILED tests/test_transport_openai_compatible.py::TestErrorHandling::test_400_raises_malformed_request
+FAILED tests/test_transport_openai_compatible.py::TestErrorHandling::test_404_raises_model_not_found
+FAILED tests/test_transport_openai_compatible.py::TestErrorHandling::test_timeout_raises_timeout_error
+FAILED tests/test_transport_openai_compatible.py::TestErrorHandling::test_connection_error_raises_provider_error
+==== 200 failed, 8997 passed, 86 skipped, 2 warnings in 769.49s (0:12:49) =====
+exit=1

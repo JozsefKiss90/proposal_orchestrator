@@ -33,6 +33,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from runner import host_env
+from runner.transport.config import PRESET_REGISTRY, PRODUCTION_BACKENDS
 from tools import aws_template_guard as guard
 from tools import env_config_digest
 
@@ -205,12 +207,30 @@ def test_value_holds_no_credential_shaped_key() -> None:
 
 
 def test_preset_name_is_the_lasting_r9e_rule() -> None:
-    # R8-D3: the name is fixed here; R9e adds it to runner/transport/config.py.
-    # Until then the launcher fails closed on the unknown preset. Once R9e
-    # lands, its own test asserts the preset exists.
+    # R8-D3: the name is fixed here; R9e added it to runner/transport/config.py
+    # (decision record aws-redeployment-r9e-eu-region_2026-10-27, point 2).
     obj = env_config_digest.expected_object(TEMPLATE, PARAMETERS, "eu-north-1")
     assert obj["ORCHESTRATOR_TRANSPORT_PRESET"] == "BEDROCK_CONVERSE_EU"
-    assert "BEDROCK_CONVERSE_US" in CONFIG.read_text(encoding="utf-8")
+
+
+def test_the_stored_preset_exists_and_is_production_suitable() -> None:
+    # R9e criterion 1: the preset name the template stores exists in
+    # runner/transport/config.py, and the launcher's production rule holds.
+    name = env_config_digest.expected_object(TEMPLATE, PARAMETERS, "eu-north-1")[
+        "ORCHESTRATOR_TRANSPORT_PRESET"]
+    assert name in PRESET_REGISTRY
+    preset = PRESET_REGISTRY[name]
+    assert preset.production_suitable is True
+    assert preset.backend_name in PRODUCTION_BACKENDS
+    assert f'name="{name}"' in CONFIG.read_text(encoding="utf-8")
+
+
+def test_the_launcher_accepts_the_templates_value() -> None:
+    # The value the stack stores, resolved for the parameter file's Region,
+    # passes the launcher's validation for that Region (R9-D3, R8-D3).
+    region = _parameters()["ExpectedRegion"]
+    obj = env_config_digest.expected_object(TEMPLATE, PARAMETERS, region)
+    assert host_env.validate(obj, region) == obj
 
 
 def test_digest_is_canonical_and_order_independent() -> None:

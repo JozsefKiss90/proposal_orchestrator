@@ -294,6 +294,36 @@ BEDROCK_CONVERSE_US = TransportPreset(
     ),
 )
 
+#: The host's preset (R9e). The runtime secret stores this name
+#: (deploy/aws/templates/50-secret.yaml; decision record
+#: aws-redeployment-r8-secret_2026-10-26, R8-D3), so the host launcher
+#: (runner.host_env) accepts the secret only while it exists here. No default
+#: model: the model is the secret's ORCHESTRATOR_TRANSPORT_MODEL (R8-D2), and
+#: without one build_converse_backend refuses, so no preset default can go
+#: stale silently (decision record aws-redeployment-r9e-eu-region_2026-10-27).
+BEDROCK_CONVERSE_EU = TransportPreset(
+    name="BEDROCK_CONVERSE_EU",
+    backend_name="bedrock_converse",
+    description="Native Bedrock Converse API via boto3, EU (eu-north-1), IAM auth",
+    default_endpoint=None,
+    default_model=None,
+    requires_api_key=False,
+    default_region="eu-north-1",
+    capabilities=CAPABILITIES_REGISTRY["bedrock_converse"],
+    intended_use="The private host in eu-north-1, with eu. inference profiles",
+    production_suitable=True,
+    notes=(
+        "Region per OD1-r1 (decision record aws-redeployment-od1-region-r1_2026-10-21). "
+        "Under production mode AWS_REGION is required and default_region does not apply (R9-D6).",
+        "Model ids are eu. system-defined inference profiles (e.g. "
+        "eu.anthropic.claude-opus-4-6-v1); global. profiles are excluded and denied (OD7-global).",
+        "No default model: set ORCHESTRATOR_TRANSPORT_MODEL (on the host the runtime secret "
+        "supplies it, R8-D2).",
+        "The runtime secret stores this preset name (R8-D3).",
+        "Uses boto3 with IAM credentials (instance profile on the host); no API key.",
+    ),
+)
+
 #: Registry of all available presets, keyed by name.
 PRESET_REGISTRY: dict[str, TransportPreset] = {
     p.name: p
@@ -305,6 +335,7 @@ PRESET_REGISTRY: dict[str, TransportPreset] = {
         OLLAMA_LOCAL,
         GENERIC_OPENAI_COMPATIBLE,
         BEDROCK_CONVERSE_US,
+        BEDROCK_CONVERSE_EU,
     )
 }
 
@@ -493,7 +524,7 @@ def resolve_provider_config_from_preset(preset_name: str) -> ProviderConfig:
             f"ORCHESTRATOR_PRODUCTION_MODE=true but preset "
             f"{preset_name!r} is not production-suitable "
             f"(production_suitable=False). Use a production preset "
-            f"(e.g. BEDROCK_CONVERSE_US)."
+            f"(e.g. BEDROCK_CONVERSE_EU)."
         )
     if is_production_mode():
         _enforce_production_backend(preset.backend_name)

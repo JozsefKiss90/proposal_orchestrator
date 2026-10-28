@@ -629,3 +629,57 @@ class TestJudgeIndependenceOnASharedProvider:
         """Canonicalisation strips only Bedrock's wrapping, so other ids stay distinct."""
         assert hj.canonical_model_id(model) != "claude-opus-4-8"
         assert JudgeConfig(model=model, version=VERSION).model == model
+
+
+# --------------------------------------------------------------------------- #
+# AN1c on the private host (R9e point 8)
+# --------------------------------------------------------------------------- #
+
+
+class TestTheHostsEnvironment:
+    """The environment the launcher builds from the runtime secret.
+
+    ``runner.host_env`` exports the five values the stack stores
+    (``deploy/aws/templates/50-secret.yaml`` with ``deploy/aws/parameters/secret.json``),
+    production mode among them. There the drafter is the secret's
+    ``ORCHESTRATOR_TRANSPORT_MODEL``, which the AN1c guard counts, and the
+    assessor of OD7-assessor runs. Decision record
+    ``aws-redeployment-r9e-eu-region_2026-10-27``.
+    """
+
+    @pytest.fixture
+    def host_env(self, monkeypatch) -> dict[str, str]:
+        from tools import env_config_digest
+
+        parameters = Path("deploy") / "aws" / "parameters" / "secret.json"
+        template = Path("deploy") / "aws" / "templates" / "50-secret.yaml"
+        values = {e["ParameterKey"]: e["ParameterValue"]
+                  for e in json.loads(parameters.read_text(encoding="utf-8-sig"))}
+        secret = env_config_digest.expected_object(template, parameters, values["ExpectedRegion"])
+        for name in ("ORCHESTRATOR_TRANSPORT_BACKEND", "ORCHESTRATOR_TRANSPORT_ENDPOINT",
+                     "ORCHESTRATOR_TRANSPORT_API_KEY", "AWS_DEFAULT_REGION"):
+            monkeypatch.delenv(name, raising=False)
+        for name, value in secret.items():
+            monkeypatch.setenv(name, value)
+        monkeypatch.setattr("harness.commands._common.load_harness_env", lambda: None)
+        return secret
+
+    def test_the_hosts_drafter_is_a_drafter(self, host_env):
+        assert host_env["ORCHESTRATOR_TRANSPORT_MODEL"] in hj.drafter_models()
+
+    def test_the_drafter_cannot_assess_in_any_id_form(self, host_env, client):
+        drafter = host_env["ORCHESTRATOR_TRANSPORT_MODEL"]
+        bare = drafter.split(".", 1)[1]
+        for form in (drafter, bare):
+            with pytest.raises(hj.JudgeIndependenceError):
+                JudgeConfig(model=form, version=VERSION)
+        assert client.requests == []
+
+    def test_the_od7_assessor_runs_over_converse_in_the_secrets_region(self, host_env, client, tmp_path):
+        judge, _wrapper = cj.build_converse_judge(
+            JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl",
+            log=lambda _m: None,
+        )
+        assert judge.raw_invoke("s", "u")
+        assert client.requests[0]["modelId"] == PIN
+        assert client.client_kwargs["region_name"] == host_env["AWS_REGION"]

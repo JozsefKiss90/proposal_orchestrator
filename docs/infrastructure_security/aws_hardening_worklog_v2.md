@@ -411,3 +411,15 @@ Each entry records the same fields as v1:
 | Verification Result | R9 DONE. |
 | Next Action | Operator: commit "Close R9"; delete `.git/stale-index-lock-r9-20261027` and `.git/objects/09/tmp_obj_pEjQci`; check the `.env.harness` key (F-R9-1). Frontier: R9e (unblocked; `for_r9e` in the R9 record), R10 (rebases on R9), R12a; R11 needs the operator's explicit go (first hourly cost). |
 
+
+### 2026-10-28 — R9e: EU region support — verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-27T23:35:00Z |
+| Control ID | none (no register row, R9e-D10); F9 for the code, the transport tests and the AN12 runbook |
+| Action Taken | Operator settled the R9e handoff points 1–11 and agent points 12–18 ('1–18 a') and, after the baseline, points 19–20 ('19–20 a'). Operator ran step 01 (baseline on `d1e767b`, handoff staged: 202 failed, 8953 passed, 86 skipped; deviation R9e-D19) and committed the handoff (`175441e starting R9e`). Agent added the preset `BEDROCK_CONVERSE_EU` to `runner/transport/config.py`, eu-north-1 to `ALLOWED_REGIONS`, the host's drafter model to the AN1c guard under production mode (`harness/judge.py`), the `AWS_REGION`-only rule to `harness/commands/converse_smoke.py`, the launcher, Region and id rule to `plans/msca_dn_an12_host_runbook.md`, the tests in 10 test modules, and decision record `aws-redeployment-r9e-eu-region_2026-10-27`. |
+| Evidence Requested | `R9e_01_*`, `R9e_03_*`, `R9e_04_full-pytest.txt`, `R9e_05_*` |
+| Evidence Received | `evidence_v2/R9e/`: R9e tests and touched modules 573 passed; full suite 200 failed, all in the baseline set, 8997 passed; old-ID guard and secret scan CLEAN (scan last). |
+| Verification Result | Every `VERIFICATION.md` criterion PASS; ticket criteria 1–3 PASS (4 N/A, superseded). F-R9e-1: a transient Windows file lock failed one baseline test that writes into Tier 4. |
+| Next Action | Operator: confirm in session; agent then ticks R9e and re-runs the scan; operator commits ("close R9e"). Then R15 needs R11 and R12b; R13 has the record's `for_r13` list. |

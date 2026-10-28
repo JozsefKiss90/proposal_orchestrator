@@ -1,0 +1,285 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r9e-eu-region_2026-10-27",
+  "date": "2026-10-27",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R9e of plans/aws_redeployment_tickets.md (EU region support; F9 for the code, the transport tests and the AN12 runbook)",
+  "supersedes": "Nothing. Applies OD1-r1, OD7-orchestrator, OD7-an12, OD7-assessor, OD7-global, R8-D2, R8-D3 and the for_r9e list of aws-redeployment-r9-runtime-config_2026-10-27 (R9-D3, R9-D6, R9-D7, R9-D17, R9-D21-D23; F-R9-1, F-R9-2, F-R9-5, F-R9-7), and settles the points of plans/aws_redeployment_r9e_handoff_2026-10-27.md section 4 (1-11) and nine points the agent added (12-20). The 2026-10-21 N/A closing of R9e (evidence_v2/R9e/VERIFICATION.md) was already superseded when OD1 was revised.",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-27 on the agent's R9e proposals. Execution aid for infrastructure work (CLAUDE.md section 10.2). R9e changes configuration data (a transport preset), a Region list, the AN1c guard's input, a harness smoke's Region source, one runbook and tests. It changes no call graph (17.1), result contract (17.4) or failure semantics (17.3), closes no gate, dispatches no phase, touches no Tier 1-3 source and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-27 ('1-18 a', ~19:03 UTC; '19-20 a', ~20:24 UTC), accepting the agent's proposal on each point.",
+  "decision": "runner/transport/config.py gains BEDROCK_CONVERSE_EU (backend bedrock_converse, default Region eu-north-1, no default model, production-suitable, notes citing OD1-r1, OD7-global and R8-D3), so the host launcher accepts the runtime secret the stack stores. ALLOWED_REGIONS becomes (eu-north-1, eu-west-1, us-east-1) on OD1-r1's authority until ADR-001 A2. harness.judge.drafter_models() counts ORCHESTRATOR_TRANSPORT_MODEL under production mode only. harness/commands/converse_smoke.py takes the Region from AWS_REGION only. The AN12 runbook runs every host command through python -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config --, with no export lines, eu-north-1 Region lines, the eu.-profile id rule and an eu-north-1 assessor tag; its guard test parses the launcher prefix with the launcher's own parser. No transport test fixes a Region.",
+  "why": "Ticket R9e and its three criteria; OD1-r1 put the host in eu-north-1, where the secret names BEDROCK_CONVERSE_EU (R8-D3), which did not exist, so the launcher refused the real secret (R9-D3); ALLOWED_REGIONS held no eu-north-1, so AN12 on the host (R15) could not run; the runbook exported us-east-1 by hand (F9); the AN1c guard did not see the host's drafter model (OD7-assessor).",
+  "inputs": [
+    "plans/aws_redeployment_r9e_handoff_2026-10-27.md sections 1-7",
+    "plans/aws_redeployment_tickets.md inherited constraints, R9 (note), R9e, R13, R15",
+    "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F9), section 6 (R9)",
+    "aws-redeployment-od1-region-r1_2026-10-21; aws-redeployment-od7-model-set_2026-10-21; aws-redeployment-r8-secret_2026-10-26; aws-redeployment-r9-runtime-config_2026-10-27",
+    "docs/infrastructure_security/evidence_v2/R9/ (STEPS.md, RUNLOG.md, R9_01_baseline-pytest.txt, R9_04_full-pytest.txt)",
+    "runner/transport/config.py, runner/host_env.py, runner/anonymisation_rewrite.py, runner/anonymisation_attack.py, runner/offline_bundle.py, runner/model_ids.py, harness/judge.py, harness/commands/_converse_judge.py, harness/commands/converse_smoke.py, harness/commands/_common.py, tools/anonymisation_host_smoke.py, tools/env_config_digest.py, deploy/aws/templates/50-secret.yaml, deploy/aws/parameters/secret.json, deploy/offline_bundle.json",
+    "plans/msca_dn_an12_host_runbook.md and tests/test_anonymisation_host_runbook.py",
+    "tests/test_transport_presets.py, tests/test_transport_config.py, tests/test_bedrock_env_readiness.py, tests/test_production_mode.py, tests/test_host_env_launcher.py, tests/test_aws_env_config_template.py, tests/harness/test_judge.py, tests/harness/test_converse_judge.py, tests/harness/test_converse_smoke.py, tests/runner/test_anonymisation_rewrite.py, tests/runner/test_offline_bundle.py",
+    "docs/infrastructure_security/evidence_v2/R9e/R9e_01_* (baseline on d1e767b)",
+    ".env and .env.harness read for key names only (no value)"
+  ],
+  "findings": [
+    {
+      "id": "F-R9e-1",
+      "declared_status": "Confirmed",
+      "finding": "The R9e baseline has one failure that no R9 run had: tests/test_demo_change_scenarios.py::TestTheAdvisoryIsNotConsumed::test_the_input_fingerprint_is_the_same_with_an_advisory_present[n08a_excellence_drafting], with a Windows PermissionError (WinError 32, the file is in use by another process) on a plan.json under docs/tier4_orchestration_state/dev_graph/change_scenarios/ that the test writes into the repository. A transient file lock on the workstation, not code; it stays in the baseline set (point 20).",
+      "basis": "R9e_01_baseline-pytest.txt (traceback line and FAILED line); R9_01 and R9_04 failure sets compared by id."
+    },
+    {
+      "id": "F-R9e-2",
+      "declared_status": "Confirmed",
+      "finding": "tests/test_anonymisation_host_runbook.py took the first '-m MODULE' of a line, so a line prefixed by python -m runner.host_env ... -- would have been read as the launcher, not in PARSERS, and dropped silently.",
+      "basis": "the test's _commands() before R9e."
+    },
+    {
+      "id": "F-R9e-3",
+      "declared_status": "Confirmed",
+      "finding": "The runbook's steps 12 and 13 had lost their line continuation ('converse       --receipt'); the lines ran in bash but read as a formatting error.",
+      "basis": "plans/msca_dn_an12_host_runbook.md before R9e."
+    },
+    {
+      "id": "F-R9e-4",
+      "declared_status": "Confirmed",
+      "finding": "Of the runbook's host commands, runner.offline_bundle verify reads production mode, diagnostic level, the preset or backend and AWS_REGION; harness.commands.converse_smoke prepare and assess need AWS_REGION and a Converse configuration (build_converse_judge refuses another backend), and AN1c needs production mode; converse_smoke check and tools.anonymisation_host_smoke read none (Region and models are flags). Neither .env nor .env.harness sets ORCHESTRATOR_PRODUCTION_MODE, and .env.harness is not among the bundle roots.",
+      "basis": "code read 2026-10-27; deploy/offline_bundle.json roots; key names of .env and .env.harness."
+    },
+    {
+      "id": "F-R9e-5",
+      "declared_status": "Confirmed",
+      "finding": "No transport test asserted a Converse Region literal before R9e. The only us-east-1 literals in tests were two mantle endpoint-override pairs (an explicit URL echoed back) in tests/test_transport_config.py and tests/test_transport_presets.py.",
+      "basis": "grep over tests/ for us-east-1, eu-west-1, eu-central-1, eu-north-1 (2026-10-27)."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R9e-D1",
+      "question": "Preset definition and default model (point 1)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) BEDROCK_CONVERSE_EU has default_model None; the model comes only from ORCHESTRATOR_TRANSPORT_MODEL. backend bedrock_converse, default_region eu-north-1, no endpoint, no API key, capabilities CAPABILITIES_REGISTRY['bedrock_converse'], production_suitable True; notes cite OD1-r1, OD7-global, R8-D2, R8-D3.",
+      "reason": "Operator's '1a'. The model is the secret's (R8-D2) and will change (OD7 target Opus 5); a preset default would go stale silently. Without a model build_converse_backend refuses.",
+      "consequence": "tests/test_transport_presets.py TestBedrockConverseEuPreset."
+    },
+    {
+      "id": "R9e-D2",
+      "question": "The secret-name test (point 2)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) tests/test_aws_env_config_template.py: test_the_stored_preset_exists_and_is_production_suitable (the name resolved from the template is in PRESET_REGISTRY, production-suitable, backend in PRODUCTION_BACKENDS) and test_the_launcher_accepts_the_templates_value (runner.host_env.validate accepts the resolved value for the parameter file's Region); test_preset_name_is_the_lasting_r9e_rule no longer checks for BEDROCK_CONVERSE_US.",
+      "reason": "Operator's '2a'. Ticket criterion 1.",
+      "consequence": "The launcher's acceptance of the real secret is tested from the template itself."
+    },
+    {
+      "id": "R9e-D3",
+      "question": "test_registry_count (point 3)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Replaced by TestPresetRegistry::test_registry_is_exactly_the_named_presets, which asserts the exact set of eight names.",
+      "reason": "Operator's '3a'. F-R9-2.",
+      "consequence": "The baseline id test_registry_count no longer exists after R9e (amended, not a new failure)."
+    },
+    {
+      "id": "R9e-D4",
+      "question": "What 'no transport test fixes the region' covers (point 4)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) No test asserts that a Converse Region, or the Region the production path uses, is a literal; tests read Regions from a preset's attribute, the deployment parameters, or sentinels. The two mantle endpoint-override tests use SENTINEL_MANTLE_URL (Region zz-sentinel-1). Assertions about the mantle presets' own eu-west-1 values stay (they test a preset's attribute, not the transport's Region). TestBedrockConverseEuPreset::test_definition states the preset's eu-north-1, which is the ticket's definition of the preset.",
+      "reason": "Operator's '4a'. Ticket criterion 2; F-R9e-5.",
+      "consequence": "tests/test_transport_config.py TestBedrockConfig::test_bedrock_with_explicit_endpoint and tests/test_transport_presets.py TestEnvOverrides::test_endpoint_override amended."
+    },
+    {
+      "id": "R9e-D5",
+      "question": "ALLOWED_REGIONS (point 5)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) ('eu-north-1', 'eu-west-1', 'us-east-1'), the comment citing OD1-r1; the code runs ahead of ADR-001's text on that record's authority.",
+      "reason": "Operator's '5a'. Unblocks R15 without changing every eu-west-1 test.",
+      "consequence": "ADR-001 A2 (R13) states the Region and decides whether to narrow the list (for_r13)."
+    },
+    {
+      "id": "R9e-D6",
+      "question": "Runbook step 7 and the launcher (point 6)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Every host python -m line (steps 7, 8, 10, 11, 12, 13) runs as ../python/bin/python3 -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config -- ../python/bin/python3 -m ...; the export lines, including ORCHESTRATOR_TRANSPORT_BACKEND, are removed (the preset supplies the backend).",
+      "reason": "Operator's '6a'. One rule the guard test enforces; no value in a shell (R9-D1); F-R9e-4.",
+      "consequence": "R15 runs the runbook as written."
+    },
+    {
+      "id": "R9e-D7",
+      "question": "Runbook Region lines and id rule (point 7)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) --region eu-north-1; id rule: eu.anthropic.claude-* system-defined profiles in eu-north-1, never global. (OD7-global), no bare ids; the invoke policy (R5) allows exactly the two OD7 profiles; OD7-an12 (A3 Sonnet 4.6, A5 Opus 4.6) and OD7-assessor (Sonnet 4.6) named in the text, placeholders in the commands; assessor tag bedrock-converse-eu-north-1@<YYYY-MM-DD>.",
+      "reason": "Operator's '7a'. Ticket criterion 3; F9.",
+      "consequence": "plans/msca_dn_an12_host_runbook.md Parts 2-4."
+    },
+    {
+      "id": "R9e-D8",
+      "question": "AN1c guard on the host (point 8)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) drafter_models() adds ORCHESTRATOR_TRANSPORT_MODEL (stripped, when non-empty) only when ORCHESTRATOR_PRODUCTION_MODE is 'true' (case-insensitive, the transport's rule, read without importing runner.transport.config, whose import loads .env).",
+      "reason": "Operator's '8a'. On the host the launcher sets production mode and the secret's drafter model (OD7-assessor); on the workstation .env.harness puts the judge's model in that variable and never sets production mode (F-R9e-4).",
+      "consequence": "tests/harness/test_judge.py TestDrafterModelsOnTheHost; tests/harness/test_converse_judge.py TestTheHostsEnvironment (the template's own values: the drafter is refused as assessor in eu. and bare form, the OD7 assessor runs in the secret's Region)."
+    },
+    {
+      "id": "R9e-D9",
+      "question": "converse_smoke Region source (point 9)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) AWS_REGION only; AWS_DEFAULT_REGION alone is refused with a detail saying so; the docstring no longer says 'ADR-001's two'; the example tag in harness/commands/_converse_judge.py names eu-north-1.",
+      "reason": "Operator's '9a'. F-R9-7; one Region rule with R9-D6 and R9-D8.",
+      "consequence": "tests/harness/test_converse_smoke.py test_aws_default_region_alone_is_refused, test_the_hosts_region_is_accepted."
+    },
+    {
+      "id": "R9e-D10",
+      "question": "Evidence (point 10)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) evidence_v2/R9e/ with STEPS.md, RUNLOG.md, R9e_<NN>_*.txt; VERIFICATION.md replaced, the 2026-10-21 N/A text kept as a history section; pytest -q --tb=line -rfE; comparison by id as R9-D23; no register row, no DC-16 note.",
+      "reason": "Operator's '10a'.",
+      "consequence": "STEPS.md rounds 1 and 2."
+    },
+    {
+      "id": "R9e-D11",
+      "question": "Scope (point 11)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) R9e changes no document but the AN12 runbook (R13), not the evidence collector's Region (R12a), not test isolation (F-R9-1), not the drafter path (R10).",
+      "reason": "Operator's '11a'.",
+      "consequence": "See for_r13."
+    },
+    {
+      "id": "R9e-D12",
+      "question": "Baseline commit (point 12)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The handoff file is committed as 'starting R9e'.",
+      "reason": "Operator's '12a'.",
+      "consequence": "See R9e-D19 for how the baseline actually ran."
+    },
+    {
+      "id": "R9e-D13",
+      "question": "Outbound HTTP in the full suite (point 13)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The suite runs as in R9 with .env.harness in place; the key is no longer valid (the baseline's OpenAI-compatible calls are again refused with 401 'Invalid API Key').",
+      "reason": "Operator's '13a'. F-R9-1 stays its own follow-up.",
+      "consequence": "R9e_01 and R9e_04 run under the same condition."
+    },
+    {
+      "id": "R9e-D14",
+      "question": "Runbook guard test and the launcher prefix (point 14)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The test splits a line at the launcher's ' -- ', parses the prefix with runner.host_env's parser; Part 2-4 lines must carry it with the secret id proposal-orchestrator/env-config and the Region of deploy/aws/parameters/secret.json (ExpectedRegion), Part 1 lines must not; a line's --region and its assessor tag's Region equal the launcher's; no export of the five keys, AWS_DEFAULT_REGION or ORCHESTRATOR_TRANSPORT_BACKEND; no us-east-1, us. or global. id; at least one eu.anthropic.claude- id.",
+      "reason": "Operator's '14a'. F-R9e-2.",
+      "consequence": "tests/test_anonymisation_host_runbook.py (existing tests kept, run over the same lines)."
+    },
+    {
+      "id": "R9e-D15",
+      "question": "TestTheRealSecretsPreset (point 15)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Unconditional: test_the_real_secrets_preset_is_accepted replaces test_the_real_secrets_preset_is_accepted_only_once_it_exists.",
+      "reason": "Operator's '15a'. Removing the preset must fail.",
+      "consequence": "Amended id."
+    },
+    {
+      "id": "R9e-D16",
+      "question": "Production-preset error message (point 16)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The refusal of a non-production preset suggests BEDROCK_CONVERSE_EU; BEDROCK_CONVERSE_US is unchanged (production_suitable stays True, R9-D20).",
+      "reason": "Operator's '16a'.",
+      "consequence": "test_the_production_refusal_suggests_this_preset."
+    },
+    {
+      "id": "R9e-D17",
+      "question": "Runbook steps 12-13 (point 17)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Line continuation restored.",
+      "reason": "Operator's '17a'. F-R9e-3.",
+      "consequence": "None beyond the runbook."
+    },
+    {
+      "id": "R9e-D18",
+      "question": "Line endings (point 18)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Each edited file keeps its working-copy line endings (CRLF for the runbook, _converse_judge.py, test_converse_judge.py, test_judge.py, test_transport_config.py; LF elsewhere); new files are LF.",
+      "reason": "Operator's '18a'. R9 handoff lesson.",
+      "consequence": "git may still print 'LF will be replaced by CRLF' for files that were already LF in the working copy (as in R9)."
+    },
+    {
+      "id": "R9e-D19",
+      "question": "The baseline ran before the 'starting R9e' commit (point 19)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Recorded as a deviation; the baseline stands: it ran on d1e767b with the handoff file staged, the code tree equal to d1e767b. The operator commits 'starting R9e' before round 2.",
+      "reason": "Operator's '19a'. A rerun would measure the same tree.",
+      "consequence": "Step 03 records HEAD and the diff against d1e767b."
+    },
+    {
+      "id": "R9e-D20",
+      "question": "The transient file-lock failure (point 20)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) It stays in the baseline set and is recorded as F-R9e-1; if it passes afterwards it is recorded, not counted (R9-D23). Before the after-run the operator closes files open under docs/tier4_orchestration_state/dev_graph.",
+      "reason": "Operator's '20a'.",
+      "consequence": "Step 04 note."
+    }
+  ],
+  "amended_test_ids": [
+    "tests/test_transport_presets.py::TestPresetRegistry::test_registry_count -> test_registry_is_exactly_the_named_presets",
+    "tests/test_transport_presets.py::TestEnvOverrides::test_endpoint_override (sentinel URL)",
+    "tests/test_transport_config.py::TestBedrockConfig::test_bedrock_with_explicit_endpoint (sentinel URL)",
+    "tests/test_host_env_launcher.py::TestTheRealSecretsPreset::test_the_real_secrets_preset_is_accepted_only_once_it_exists -> test_the_real_secrets_preset_is_accepted",
+    "tests/test_aws_env_config_template.py::test_preset_name_is_the_lasting_r9e_rule",
+    "tests/test_anonymisation_host_runbook.py (parametrised ids follow the edited runbook lines)"
+  ],
+  "for_r13": [
+    "ADR-001 amendment A2: state eu-north-1 (OD1-r1) and the routed EU Regions of the eu. profiles; decide whether ALLOWED_REGIONS in runner/anonymisation_rewrite.py narrows to eu-north-1 (R9e-D5).",
+    "deployment_guide.md and docs/backend/transport_presets.md: the host's preset is BEDROCK_CONVERSE_EU (no default model; the secret supplies ORCHESTRATOR_TRANSPORT_MODEL); host commands run through runner.host_env, as the AN12 runbook now does.",
+    "plans/reports/security_compliance_brief.md and other documents naming us-east-1 as the host Region (F9), per R13's list."
+  ],
+  "for_r15": [
+    "Run plans/msca_dn_an12_host_runbook.md as written: every host command through runner.host_env with --region eu-north-1; A3 eu.anthropic.claude-sonnet-4-6, A5 eu.anthropic.claude-opus-4-6-v1, assessor eu.anthropic.claude-sonnet-4-6, tag bedrock-converse-eu-north-1@<date> (OD7)."
+  ],
+  "known_gaps": [
+    {
+      "decision": "R9e-D6",
+      "declared_status": "Unresolved",
+      "gap": "The launcher's real GetSecretValue and exec, and the bundle's commands under it, are first exercised on the host (R12b, R15)."
+    },
+    {
+      "decision": "R9e-D8",
+      "declared_status": "Inferred",
+      "gap": "The guard counts the transport model only under production mode; a host session started without the launcher has neither production mode nor the secret's model, and the Converse judge then refuses for lack of a Converse configuration (build_converse_judge), so the gap fails closed rather than open."
+    }
+  ],
+  "not_evidence_of": [
+    "That the runtime role can read the secret or invoke the eu. profiles (R11, R12b).",
+    "That AN12 passes on the host (R15).",
+    "That ADR-001 permits eu-north-1 in its text (R13, A2)."
+  ],
+  "unblocks_when_recorded": [
+    "R9e round 2 (steps 03-05), commit and confirmation",
+    "After R9e is ticked: R15 once R11 and R12b are also done; R13 has its list"
+  ],
+  "stays_blocked": [
+    "R15 until R11 and R12b"
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account. Configuration values appear only as already present in the repository's template and parameter file; tests use sentinel values or read the template; .env and .env.harness were read for key names only.",
+    "basis": "Code, test names, decision text and evidence paths only."
+  }
+}

@@ -528,3 +528,28 @@ class TestConverseBuilder:
         with pytest.raises(rw.RewriteRefused, match="region"):
             rw.build_converse_backend(model_id=MODEL, region="eu-central-1",
                                       max_output_tokens=1000)
+
+    def test_the_hosts_region_is_allowed(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """R9e: the Region of the host's preset (OD1-r1) is in ALLOWED_REGIONS,
+        and both A3 and A5 build their backend there (decision record
+        aws-redeployment-r9e-eu-region_2026-10-27)."""
+        from runner import anonymisation_attack as atk
+        from runner.transport import bedrock_converse
+        from runner.transport.config import BEDROCK_CONVERSE_EU
+
+        region = BEDROCK_CONVERSE_EU.default_region
+        assert region in rw.ALLOWED_REGIONS
+        seen: list[str] = []
+
+        class Recorder:
+            def __init__(self, **kwargs: Any) -> None:
+                seen.append(kwargs["region_name"])
+
+        monkeypatch.setattr(bedrock_converse, "BedrockConverseBackend", Recorder)
+        rw.build_converse_backend(model_id=MODEL, region=region, max_output_tokens=1000)
+        atk.build_converse_backend(model_id=MODEL, region=region, max_output_tokens=1000)
+        assert seen == [region, region]
+
+    def test_the_earlier_regions_stay_allowed(self) -> None:
+        # Point 5 (a): widened, not narrowed; ADR-001 A2 (R13) decides that.
+        assert {"eu-west-1", "us-east-1"} <= set(rw.ALLOWED_REGIONS)

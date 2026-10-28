@@ -20,6 +20,7 @@ Covers:
     - resolve_provider_config delegates to preset path when env var is set
     - get_transport_preset raises on unknown name
     - list_transport_presets returns all presets
+    - BEDROCK_CONVERSE_EU, the host's preset (R9e)
 
 All tests use environment variable patching.  No real backends are contacted.
 """
@@ -32,9 +33,11 @@ from unittest.mock import patch
 import pytest
 
 from runner.transport.config import (
+    BEDROCK_CONVERSE_EU,
     BEDROCK_EU_DEVELOPMENT,
     BEDROCK_EU_PRODUCTION,
     BEDROCK_URL_TEMPLATE,
+    PRODUCTION_BACKENDS,
     CLAUDE_REFERENCE,
     DEFAULT_BEDROCK_MODEL,
     GENERIC_OPENAI_COMPATIBLE,
@@ -42,11 +45,17 @@ from runner.transport.config import (
     PRESET_REGISTRY,
     TOGETHER_VALIDATION,
     TransportPreset,
+    build_converse_backend,
     get_transport_preset,
     list_transport_presets,
     resolve_provider_config,
     resolve_provider_config_from_preset,
 )
+
+
+#: An explicit endpoint echoed back by the override tests. Its Region is a
+#: sentinel: no transport test fixes a Region (R9e criterion 2).
+SENTINEL_MANTLE_URL = BEDROCK_URL_TEMPLATE.format(region="zz-sentinel-1")
 
 
 # ---------------------------------------------------------------------------
@@ -86,8 +95,13 @@ class TestPresetRegistry:
     def test_all_required_presets_exist(self):
         assert self.REQUIRED_PRESETS <= set(PRESET_REGISTRY.keys())
 
-    def test_registry_count(self):
-        assert len(PRESET_REGISTRY) == 6
+    def test_registry_is_exactly_the_named_presets(self):
+        # R9e (point 3): the exact set, not a count, so the next preset
+        # changes one line that names it (replaces test_registry_count, F-R9-2).
+        assert set(PRESET_REGISTRY) == self.REQUIRED_PRESETS | {
+            "BEDROCK_CONVERSE_US",
+            "BEDROCK_CONVERSE_EU",
+        }
 
     def test_preset_name_matches_registry_key(self):
         for key, preset in PRESET_REGISTRY.items():
@@ -295,12 +309,12 @@ class TestEnvOverrides:
     def test_endpoint_override(self):
         env = {
             "ORCHESTRATOR_TRANSPORT_API_KEY": "key",
-            "ORCHESTRATOR_TRANSPORT_ENDPOINT": "https://bedrock-mantle.us-east-1.api.aws/v1",
+            "ORCHESTRATOR_TRANSPORT_ENDPOINT": SENTINEL_MANTLE_URL,
         }
         with patch.dict(os.environ, env, clear=True):
             config = resolve_provider_config_from_preset("BEDROCK_EU_DEVELOPMENT")
 
-        assert config.base_url == "https://bedrock-mantle.us-east-1.api.aws/v1"
+        assert config.base_url == SENTINEL_MANTLE_URL
 
     def test_region_override_when_no_explicit_endpoint(self):
         env = {
@@ -500,3 +514,73 @@ class TestConversePresetRegion:
                 with patch.dict(os.environ, env, clear=True):
                     config = resolve_provider_config_from_preset(name)
                 assert config.region is None, name
+
+
+class TestBedrockConverseEuPreset:
+    """R9e: the host's preset, whose name the runtime secret stores (R8-D3).
+
+    Decision record ``aws-redeployment-r9e-eu-region_2026-10-27``. The tests
+    compare Regions with the preset's own attribute or with sentinels; only
+    ``test_definition`` states the preset's value, which is what the ticket
+    defines (default Region eu-north-1, OD1-r1).
+    """
+
+    def test_definition(self):
+        preset = get_transport_preset("BEDROCK_CONVERSE_EU")
+        assert preset is BEDROCK_CONVERSE_EU
+        assert preset.backend_name == "bedrock_converse"
+        assert preset.default_region == "eu-north-1"
+        assert preset.default_endpoint is None
+        assert preset.requires_api_key is False
+        assert preset.capabilities == PRESET_REGISTRY["BEDROCK_CONVERSE_US"].capabilities
+
+    def test_production_suitable_with_a_production_backend(self):
+        assert BEDROCK_CONVERSE_EU.production_suitable is True
+        assert BEDROCK_CONVERSE_EU.backend_name in PRODUCTION_BACKENDS
+
+    def test_no_default_model(self):
+        # Point 1: the model is the secret's (R8-D2); a default would go stale.
+        assert BEDROCK_CONVERSE_EU.default_model is None
+
+    def test_notes_exclude_global_profiles(self):
+        notes = " ".join(BEDROCK_CONVERSE_EU.notes)
+        assert "eu." in notes and "global." in notes and "OD7-global" in notes
+        assert "R8-D3" in notes and "OD1-r1" in notes
+
+    def test_outside_production_the_default_region_applies(self):
+        with patch.dict(os.environ, {"ORCHESTRATOR_TRANSPORT_MODEL": "zz.model-sentinel"}, clear=True):
+            config = resolve_provider_config_from_preset("BEDROCK_CONVERSE_EU")
+        assert config.backend_name == "bedrock_converse"
+        assert config.region == BEDROCK_CONVERSE_EU.default_region
+        assert config.model == "zz.model-sentinel"
+        assert config.preset_name == "BEDROCK_CONVERSE_EU"
+
+    def test_under_production_mode_aws_region_is_used(self):
+        env = {"ORCHESTRATOR_PRODUCTION_MODE": "true", "AWS_REGION": "zz-sentinel-1",
+               "ORCHESTRATOR_TRANSPORT_PRESET": "BEDROCK_CONVERSE_EU",
+               "ORCHESTRATOR_TRANSPORT_MODEL": "zz.model-sentinel"}
+        with patch.dict(os.environ, env, clear=True):
+            config = resolve_provider_config()
+        assert config.backend_name == "bedrock_converse"
+        assert config.region == "zz-sentinel-1"
+        assert config.model == "zz.model-sentinel"
+
+    def test_under_production_mode_a_missing_aws_region_is_refused(self):
+        env = {"ORCHESTRATOR_PRODUCTION_MODE": "true", "ORCHESTRATOR_TRANSPORT_PRESET": "BEDROCK_CONVERSE_EU",
+               "ORCHESTRATOR_TRANSPORT_MODEL": "zz.model-sentinel"}
+        with patch.dict(os.environ, env, clear=True):
+            with pytest.raises(ValueError, match="AWS_REGION"):
+                resolve_provider_config()
+
+    def test_without_a_model_the_backend_is_not_built(self):
+        with patch.dict(os.environ, {}, clear=True):
+            config = resolve_provider_config_from_preset("BEDROCK_CONVERSE_EU")
+            assert config.model is None
+            with pytest.raises(ValueError, match="model is required"):
+                build_converse_backend(config)
+
+    def test_the_production_refusal_suggests_this_preset(self):
+        with patch.dict(os.environ, {"ORCHESTRATOR_PRODUCTION_MODE": "true"}, clear=True):
+            with pytest.raises(ValueError) as exc_info:
+                resolve_provider_config_from_preset("CLAUDE_REFERENCE")
+        assert "BEDROCK_CONVERSE_EU" in str(exc_info.value)

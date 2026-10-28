@@ -102,8 +102,12 @@ CHECKPOINT_DIR = "checkpoints"
 MAX_PASSAGE_CHARS = 3000
 #: Tokens a Converse request may add to its message bytes (roles, framing).
 REQUEST_OVERHEAD_TOKENS = 64
-#: ADR-001: Bedrock only in these regions.
-ALLOWED_REGIONS: tuple[str, ...] = ("eu-west-1", "us-east-1")
+#: ADR-001: Bedrock only in these regions. eu-north-1 is the host's Region
+#: under OD1-r1 (decision record aws-redeployment-od1-region-r1_2026-10-21);
+#: the code runs ahead of ADR-001's text on that record's authority until
+#: amendment A2 (ticket R13) states the Region and decides whether to narrow
+#: this list (decision record aws-redeployment-r9e-eu-region_2026-10-27).
+ALLOWED_REGIONS: tuple[str, ...] = ("eu-north-1", "eu-west-1", "us-east-1")
 #: The policy reserves these categories for the operator.
 UNFLAGGABLE: frozenset[str] = frozenset({"identifying_figure"})
 

@@ -432,6 +432,27 @@ class TestTheHostVerification:
         assert _failed(record) == set()
         assert {c["check"] for c in record["checks"]} == set(ob.CHECKS)
 
+    def test_the_launchers_environment_passes_every_check(self, installed):
+        """R9e: the five values the runtime secret stores, as the launcher
+        exports them (with AWS_DEFAULT_REGION), satisfy every environment check:
+        the preset BEDROCK_CONVERSE_EU resolves to the host backend and the
+        secret's Region is in ALLOWED_REGIONS (decision record
+        aws-redeployment-r9e-eu-region_2026-10-27)."""
+        from tools import env_config_digest
+
+        repo = Path(__file__).resolve().parents[2]
+        parameters = repo / "deploy" / "aws" / "parameters" / "secret.json"
+        region = {e["ParameterKey"]: e["ParameterValue"] for e in
+                  json.loads(parameters.read_text(encoding="utf-8-sig"))}["ExpectedRegion"]
+        secret = env_config_digest.expected_object(
+            repo / "deploy" / "aws" / "templates" / "50-secret.yaml", parameters, region)
+        environ = {**secret, "AWS_DEFAULT_REGION": secret["AWS_REGION"]}
+        record = ob.verify(installed, environ=environ, facts=_facts(),
+                           probe=("pypi.org", 443), connect=_refused)
+        assert record["passed"], record["checks"]
+        endpoint = next(c for c in record["checks"] if c["check"] == "private_endpoint")
+        assert f"bedrock-runtime.{region}.amazonaws.com" in endpoint["detail"]
+
     def test_the_record_binds_the_manifest(self, installed):
         record = ob.verify(installed, environ=HOST_ENV, facts=_facts())
         manifest = (installed / ob.MANIFEST_FILE).read_bytes()

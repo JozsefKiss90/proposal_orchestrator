@@ -24,6 +24,7 @@ from unittest.mock import patch
 import pytest
 
 from runner.transport.config import (
+    BEDROCK_URL_TEMPLATE,
     DEFAULT_AWS_REGION,
     DEFAULT_BEDROCK_MODEL,
     DEFAULT_OLLAMA_URL,
@@ -33,6 +34,11 @@ from runner.transport.config import (
     resolve_provider_config,
     validate_bedrock_model_id,
 )
+
+
+#: An explicit endpoint echoed back by the override test. Its Region is a
+#: sentinel: no transport test fixes a Region (R9e criterion 2).
+SENTINEL_MANTLE_URL = BEDROCK_URL_TEMPLATE.format(region="zz-sentinel-1")
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +106,7 @@ class TestBedrockConfig:
     def test_bedrock_with_explicit_endpoint(self):
         env = {
             "ORCHESTRATOR_TRANSPORT_BACKEND": "bedrock",
-            "ORCHESTRATOR_TRANSPORT_ENDPOINT": "https://bedrock-mantle.us-east-1.api.aws/v1",
+            "ORCHESTRATOR_TRANSPORT_ENDPOINT": SENTINEL_MANTLE_URL,
             "ORCHESTRATOR_TRANSPORT_API_KEY": "br-key-123",
             "ORCHESTRATOR_TRANSPORT_MODEL": "anthropic.claude-sonnet-4-20250514-v1:0",
         }
@@ -108,7 +114,7 @@ class TestBedrockConfig:
             config = resolve_provider_config()
 
         assert config.backend_name == "bedrock"
-        assert config.base_url == "https://bedrock-mantle.us-east-1.api.aws/v1"
+        assert config.base_url == SENTINEL_MANTLE_URL
         assert config.model == "anthropic.claude-sonnet-4-20250514-v1:0"
         assert config.api_key_set is True
 

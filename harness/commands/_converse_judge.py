@@ -156,7 +156,7 @@ def build_converse_judge(
             f"HARNESS_JUDGE_VERSION is {cfg.version!r}, which does not name this "
             f"transport. The report records model@version and nothing else about "
             f"the assessor, so the tag must contain {TRANSPORT_TAG!r} (e.g. "
-            f"'{TRANSPORT_TAG}-eu-west-1@2026-10-14'); pass --assessor-version."
+            f"'{TRANSPORT_TAG}-eu-north-1@2026-10-27'); pass --assessor-version."
         )
     provider = resolve_provider_config()
     if provider.backend_name != _BACKEND_NAME:

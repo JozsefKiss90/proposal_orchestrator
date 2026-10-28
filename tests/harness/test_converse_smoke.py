@@ -170,6 +170,23 @@ class TestRefusals:
         assert _prepare(tmp_path / "smoke") == cs.EXIT_REFUSED
         assert not (tmp_path / "smoke" / "world").exists()
 
+    def test_aws_default_region_alone_is_refused(self, converse_env, client, tmp_path,
+                                                 monkeypatch):
+        # R9e point 9 (F-R9-7): only AWS_REGION counts, as in production mode.
+        monkeypatch.delenv("AWS_REGION", raising=False)
+        monkeypatch.setenv("AWS_DEFAULT_REGION", "eu-west-1")
+        assert _prepare(tmp_path / "smoke") == cs.EXIT_REFUSED
+        assert not (tmp_path / "smoke" / "world").exists()
+        with pytest.raises(cs.SmokeRefused, match="AWS_DEFAULT_REGION alone"):
+            cs._region()
+
+    def test_the_hosts_region_is_accepted(self, monkeypatch):
+        from runner.transport.config import BEDROCK_CONVERSE_EU
+
+        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.setenv("AWS_REGION", BEDROCK_CONVERSE_EU.default_region)
+        assert cs._region() == BEDROCK_CONVERSE_EU.default_region
+
     def test_an_existing_world_is_refused(self, converse_env, client, tmp_path):
         root = tmp_path / "smoke"
         (root / "world").mkdir(parents=True)

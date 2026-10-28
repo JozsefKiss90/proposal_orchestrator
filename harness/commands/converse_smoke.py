@@ -30,9 +30,12 @@ Three steps
 The region
 ----------
 The report does not record the region the client targeted. The draft takes
-it from ``AWS_REGION`` or ``AWS_DEFAULT_REGION``, the variables the runner's
-Converse transport reads, and both ``prepare`` and ``assess`` refuse one
-outside ADR-001's two before any call.
+it from ``AWS_REGION``, the variable the runner's Converse transport reads
+(``AWS_DEFAULT_REGION`` alone does not count, as in production mode and in
+``offline_bundle verify``), and both ``prepare`` and ``assess`` refuse one
+outside ``ALLOWED_REGIONS`` before any call. On the host the launcher
+(``python -m runner.host_env``) sets it from the runtime secret
+(decision record ``aws-redeployment-r9e-eu-region_2026-10-27``).
 
 Advisory output only.  The harness is never a runtime gate.
 """
@@ -170,9 +173,13 @@ def write_synthetic_profile(root: Path) -> Path:
 
 
 def _region() -> str:
-    region = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or ""
+    region = (os.environ.get("AWS_REGION") or "").strip()
+    if not region:
+        alone = " (AWS_DEFAULT_REGION alone does not count)" if os.environ.get("AWS_DEFAULT_REGION") else ""
+        raise SmokeRefused(f"AWS_REGION is not set{alone}; start the command through "
+                           f"python -m runner.host_env, which sets it from the runtime secret")
     if region not in ALLOWED_REGIONS:
-        raise SmokeRefused(f"region {region or '(unset)'!r} is outside ADR-001's "
+        raise SmokeRefused(f"region {region!r} is outside ADR-001's "
                            f"{list(ALLOWED_REGIONS)}; set AWS_REGION")
     return region
 

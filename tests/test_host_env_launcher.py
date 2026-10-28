@@ -33,9 +33,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 VALUE_FIELD = "Secret" + "String"
 SECRET_ID = "proposal-orchestrator/env-config"
 
-#: A production-suitable Converse preset that exists today. The real secret's
-#: preset (BEDROCK_CONVERSE_EU) arrives with R9e (R8-D3); see
-#: test_the_real_secrets_preset_is_accepted_only_once_it_exists.
+#: A production-suitable Converse preset (the first by name). The real
+#: secret's preset, BEDROCK_CONVERSE_EU (R8-D3), is tested by name in
+#: TestTheRealSecretsPreset.
 PRESET = next(
     name for name, p in sorted(PRESET_REGISTRY.items())
     if p.production_suitable and p.backend_name in PRODUCTION_BACKENDS
@@ -319,17 +319,14 @@ class TestArguments:
 
 
 class TestTheRealSecretsPreset:
-    def test_the_real_secrets_preset_is_accepted_only_once_it_exists(self):
-        """R8-D3: the secret stores BEDROCK_CONVERSE_EU, which R9e adds.
+    def test_the_real_secrets_preset_is_accepted(self):
+        """R8-D3: the secret stores BEDROCK_CONVERSE_EU, which R9e added.
 
-        Until then the launcher refuses the real secret (fail closed); once
-        the preset exists and is production-suitable it is accepted. The
-        test holds on both sides of R9e.
+        Unconditional since R9e (decision record
+        ``aws-redeployment-r9e-eu-region_2026-10-27``, point 15): removing the
+        preset, or making it unsuitable for production, fails here.
         """
         name = "BEDROCK_CONVERSE_EU"
         run, code = _run(json.dumps(_value(ORCHESTRATOR_TRANSPORT_PRESET=name)))
-        preset = PRESET_REGISTRY.get(name)
-        if preset is not None and preset.production_suitable and preset.backend_name in PRODUCTION_BACKENDS:
-            assert code == 0 and len(run.execs) == 1
-        else:
-            assert code == host_env.EXIT_REFUSED and run.execs == []
+        assert code == 0 and len(run.execs) == 1
+        assert run.execs[0][2]["ORCHESTRATOR_TRANSPORT_PRESET"] == name

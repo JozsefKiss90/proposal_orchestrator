@@ -2,7 +2,9 @@
 
 This runbook covers ticket AN12 of `.scratch/msca-dn-anonymisation/tickets.md`. The operator performs every step below. The code is in `runner/offline_bundle.py`, `tools/anonymisation_host_smoke.py` and `harness/commands/converse_smoke.py`. The decision record is `docs/tier4_orchestration_state/decision_log/msca-dn-an12-offline-bundle_2026-10-16.json`.
 
-`tests/test_anonymisation_host_runbook.py` parses every `python -m` line here against its command's parser.
+`tests/test_anonymisation_host_runbook.py` parses every `python -m` line here against its command's parser, including the launcher in front of each host command.
+
+The host is in eu-north-1 (decision record `docs/tier4_orchestration_state/decision_log/aws-redeployment-od1-region-r1_2026-10-21.json`). Its configuration comes from the runtime secret through the launcher `runner/host_env.py`, not from `export` lines (ticket R9e; decision record `docs/tier4_orchestration_state/decision_log/aws-redeployment-r9e-eu-region_2026-10-27.json`).
 
 ## What changed from the deployment guide
 
@@ -53,19 +55,18 @@ Work in an SSM session as `ssm-user`. Keep every output under a private working 
 
    The script checks `SHA256SUMS`, extracts the interpreter, installs the wheels offline and verifies every installed file against `bundle_manifest.json`. It ends with `INSTALL_COMPLETE`.
 
-7. Load the production environment, then verify the install. This record is the evidence for criterion 1.
+7. Verify the install under the production configuration. This record is the evidence for criterion 1.
 
    ```bash
-   export ORCHESTRATOR_PRODUCTION_MODE=true
-   export ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata
-   export ORCHESTRATOR_TRANSPORT_BACKEND=bedrock_converse
-   export AWS_REGION=us-east-1
    cd /opt/msca-dn-anonymisation/app
-   ../python/bin/python3 -m runner.offline_bundle verify --probe-no-internet pypi.org:443 \
+   ../python/bin/python3 -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config -- \
+     ../python/bin/python3 -m runner.offline_bundle verify --probe-no-internet pypi.org:443 \
      --record /home/ssm-user/an12/verification.json
    ```
 
-   Exit status 0 means every check passed. The probe passes only when `pypi.org:443` is unreachable. Without `--probe-no-internet` the route is not measured, and the record does not pass.
+   Every host command in this runbook starts the same way. The launcher reads the runtime secret `proposal-orchestrator/env-config` once, checks it, and starts the command after `--` with the secret's five values: `ORCHESTRATOR_TRANSPORT_PRESET` (`BEDROCK_CONVERSE_EU`), `ORCHESTRATOR_PRODUCTION_MODE=true`, `ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata`, `AWS_REGION` and `ORCHESTRATOR_TRANSPORT_MODEL`, plus `AWS_DEFAULT_REGION`. Do not export any of them yourself: the launcher refuses a session that sets one to a different value. `--region` must equal the secret's `AWS_REGION`. It prints nothing on success. Exit status 2 means the configuration was refused, 3 that the secret could not be read, 4 that the command could not be started; the one stderr line names the reason and key names, never a value.
+
+   Exit status 0 of `verify` means every check passed. The probe passes only when `pypi.org:443` is unreachable. Without `--probe-no-internet` the route is not measured, and the record does not pass.
 
    The `private_endpoint` check resolves `bedrock-runtime.<region>.amazonaws.com` and passes only when every address is private. That is the VPC endpoint of ADR-001 DC-02.
 
@@ -73,13 +74,14 @@ Work in an SSM session as `ssm-user`. Keep every output under a private working 
 
 ## Part 3: the pipeline on the synthetic fixture (criterion 2)
 
-The A3 and A5 models are the operator's O2 choice, and A5 must be a different Claude model from A3. Use `us.anthropic.claude-*` inference profiles or bare `anthropic.claude-*` ids in `us-east-1`. The host's only Bedrock endpoint is in `us-east-1` (DC-01), and the invoke policy allows only those two id forms (DC-10). The token budgets are also the operator's choice. Each model stage stops when its budget is reached, and the status file records the tokens each stage used.
+The A3 and A5 models are the operator's O2 choice, and A5 must be a different Claude model from A3. Use `eu.anthropic.claude-*` system-defined inference profiles in `eu-north-1`; never `global.` profiles, which may route outside the EU and are denied (OD7-global), and no bare ids. The host's only Bedrock endpoint is in `eu-north-1`, and the invoke policy (ticket R5) allows exactly the two profiles of OD7: `eu.anthropic.claude-sonnet-4-6` and `eu.anthropic.claude-opus-4-6-v1`. OD7-an12 sets A3 to `eu.anthropic.claude-sonnet-4-6` and A5 to `eu.anthropic.claude-opus-4-6-v1` (decision record `docs/tier4_orchestration_state/decision_log/aws-redeployment-od7-model-set_2026-10-21.json`). The token budgets are also the operator's choice. Each model stage stops when its budget is reached, and the status file records the tokens each stage used.
 
 8. Run the automatic stages:
 
    ```bash
-   ../python/bin/python3 -m tools.anonymisation_host_smoke --root /home/ssm-user/an12/pipeline \
-     --region us-east-1 --a3-model <A3-model-id> --a5-model <A5-model-id> \
+   ../python/bin/python3 -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config -- \
+     ../python/bin/python3 -m tools.anonymisation_host_smoke --root /home/ssm-user/an12/pipeline \
+     --region eu-north-1 --a3-model <A3-model-id> --a5-model <A5-model-id> \
      --max-output-tokens 2000 --a3-token-budget 100000 --a5-token-budget 200000
    ```
 
@@ -92,8 +94,9 @@ The A3 and A5 models are the operator's O2 choice, and A5 must be a different Cl
 10. The run then writes `operator/acceptance_input_template.json`, with the derivative's hash and the bundle's revision filled in. Copy it, attest, sign and fill the export rule, then rerun step 8 with both flags:
 
     ```bash
-    ../python/bin/python3 -m tools.anonymisation_host_smoke --root /home/ssm-user/an12/pipeline \
-      --region us-east-1 --a3-model <A3-model-id> --a5-model <A5-model-id> \
+    ../python/bin/python3 -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config -- \
+      ../python/bin/python3 -m tools.anonymisation_host_smoke --root /home/ssm-user/an12/pipeline \
+      --region eu-north-1 --a3-model <A3-model-id> --a5-model <A5-model-id> \
       --max-output-tokens 2000 --a3-token-budget 100000 --a5-token-budget 200000 \
       --figure-review <review-copy> --acceptance-input <acceptance-copy>
     ```
@@ -104,13 +107,14 @@ The policy the run uses is a synthetic successor that sets the research-group th
 
 ## Part 4: the Converse blind pass (criterion 3)
 
-The assessor model must not be the drafter's model in any id form (AN1c). Its version tag must name `bedrock-converse`.
+The assessor model must not be the drafter's model in any id form (AN1c). On the host the drafter is the secret's `ORCHESTRATOR_TRANSPORT_MODEL` (`eu.anthropic.claude-opus-4-6-v1`, OD7-orchestrator); the guard counts it because the launcher turns production mode on. OD7-assessor sets the assessor to `eu.anthropic.claude-sonnet-4-6`. Its version tag must name `bedrock-converse` and the Region.
 
 11. Prepare the pass. This step makes no model call:
 
     ```bash
-    ../python/bin/python3 -m harness.commands.converse_smoke prepare --root /home/ssm-user/an12/converse \
-      --assessor-model <assessor-model-id> --assessor-version bedrock-converse-us-east-1@<YYYY-MM-DD>
+    ../python/bin/python3 -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config -- \
+      ../python/bin/python3 -m harness.commands.converse_smoke prepare --root /home/ssm-user/an12/converse \
+      --assessor-model <assessor-model-id> --assessor-version bedrock-converse-eu-north-1@<YYYY-MM-DD>
     ```
 
     It builds the synthetic world, runs the preflight and writes `receipt_draft.json`. The draft holds the request the assessor will send, built by the transport's own builder. Everything you attest is left as a `<placeholder>`.
@@ -118,7 +122,9 @@ The assessor model must not be the drafter's model in any id form (AN1c). Its ve
 12. Copy the draft outside the install and fill every placeholder. Then run the pass:
 
     ```bash
-    ../python/bin/python3 -m harness.commands.converse_smoke assess --root /home/ssm-user/an12/converse       --receipt /home/ssm-user/an12/readiness_receipt.json
+    ../python/bin/python3 -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config -- \
+      ../python/bin/python3 -m harness.commands.converse_smoke assess --root /home/ssm-user/an12/converse \
+      --receipt /home/ssm-user/an12/readiness_receipt.json
     ```
 
     The command refuses before any model call unless the receipt is green, as V13 requires before a private run. It then assesses, writes the checkpoint the receipt names, freezes, and reads the receipt against the blind report. Exit status 0 (`receipt green`) closes criterion 3. Exit status 1 lists each finding, and exit status 2 is a refusal.
@@ -126,7 +132,9 @@ The assessor model must not be the drafter's model in any id form (AN1c). Its ve
 13. To read the receipt again later, run the same command with `check` in place of `assess`:
 
     ```bash
-    ../python/bin/python3 -m harness.commands.converse_smoke check --root /home/ssm-user/an12/converse       --receipt /home/ssm-user/an12/readiness_receipt.json
+    ../python/bin/python3 -m runner.host_env --region eu-north-1 --secret-id proposal-orchestrator/env-config -- \
+      ../python/bin/python3 -m harness.commands.converse_smoke check --root /home/ssm-user/an12/converse \
+      --receipt /home/ssm-user/an12/readiness_receipt.json
     ```
 
 The blind pass has no token budget of its own. Its size is fixed by the synthetic world: three criteria at the command's default sample counts.

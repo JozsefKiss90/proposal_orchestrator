@@ -90,6 +90,61 @@ class TestJudgeConfig:
         assert "claude-opus-4-8" in drafter_models()
 
 
+class TestDrafterModelsOnTheHost:
+    """AN1c on the private host (R9e point 8; OD7-assessor).
+
+    Under production mode the pipeline drafts with ``ORCHESTRATOR_TRANSPORT_MODEL``
+    (the runtime secret's), so the guard must count it; outside production mode
+    it must not, because the workstation's ``.env.harness`` puts the judge's own
+    model there. Decision record ``aws-redeployment-r9e-eu-region_2026-10-27``.
+    """
+
+    HOST_DRAFTER = "zz.sentinel.drafter-model-v1"
+
+    @pytest.fixture
+    def env(self, monkeypatch):
+        for name in ("ORCHESTRATOR_PRODUCTION_MODE", "ORCHESTRATOR_TRANSPORT_MODEL"):
+            monkeypatch.delenv(name, raising=False)
+        return monkeypatch
+
+    def test_production_mode_counts_the_transport_model(self, env):
+        env.setenv("ORCHESTRATOR_PRODUCTION_MODE", "true")
+        env.setenv("ORCHESTRATOR_TRANSPORT_MODEL", self.HOST_DRAFTER)
+        assert self.HOST_DRAFTER in drafter_models()
+        assert "claude-opus-4-8" in drafter_models()
+
+    def test_production_mode_is_case_insensitive_like_the_transport(self, env):
+        from runner.transport.config import is_production_mode
+
+        for value in ("TRUE", "True", "true", "yes", "1", ""):
+            env.setenv("ORCHESTRATOR_PRODUCTION_MODE", value)
+            env.setenv("ORCHESTRATOR_TRANSPORT_MODEL", self.HOST_DRAFTER)
+            assert (self.HOST_DRAFTER in drafter_models()) is is_production_mode(), value
+
+    def test_a_judge_on_the_host_drafters_model_is_refused_in_any_id_form(self, env):
+        env.setenv("ORCHESTRATOR_PRODUCTION_MODE", "true")
+        env.setenv("ORCHESTRATOR_TRANSPORT_MODEL", "eu.zzvendor.sentinel-model-9-v1")
+        for form in ("eu.zzvendor.sentinel-model-9-v1", "zzvendor.sentinel-model-9-v1",
+                     "arn:aws:bedrock:zz-sentinel-1::foundation-model/zzvendor.sentinel-model-9-v1"):
+            with pytest.raises(JudgeIndependenceError, match="independence"):
+                _cfg(model=form)
+
+    def test_outside_production_the_transport_model_is_not_a_drafter(self, env):
+        # The workstation: .env.harness names the judge's model here.
+        env.setenv("ORCHESTRATOR_TRANSPORT_MODEL", NON_DRAFTER)
+        assert NON_DRAFTER not in drafter_models()
+        assert _cfg(model=NON_DRAFTER).model == NON_DRAFTER
+
+    @pytest.mark.parametrize("blank", ["", "   "])
+    def test_production_mode_with_no_transport_model_keeps_the_constants(self, env, blank):
+        env.setenv("ORCHESTRATOR_PRODUCTION_MODE", "true")
+        env.setenv("ORCHESTRATOR_TRANSPORT_MODEL", blank)
+        from runner.semantic_dispatch import AGENT_MODEL
+        from runner.skill_runtime import SKILL_MODEL
+
+        assert drafter_models() == frozenset({SKILL_MODEL, AGENT_MODEL})
+
+
 class TestResolveJudgeConfig:
     def test_from_env(self, monkeypatch):
         monkeypatch.setenv("HARNESS_JUDGE_MODEL", NON_DRAFTER)

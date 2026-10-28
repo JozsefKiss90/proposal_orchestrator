@@ -103,6 +103,15 @@ class JudgeResponseError(JudgeError):
 # --------------------------------------------------------------------------- #
 
 
+def _production_mode() -> bool:
+    """``ORCHESTRATOR_PRODUCTION_MODE`` is ``true`` (case-insensitive).
+
+    The same rule as ``runner.transport.config.is_production_mode``, read here
+    without importing that module, whose import loads ``.env``.
+    """
+    return os.environ.get("ORCHESTRATOR_PRODUCTION_MODE", "").lower() == "true"
+
+
 def drafter_models() -> frozenset[str]:
     """Return the models the judge must NOT be — the drafter + in-run reviewer.
 
@@ -110,11 +119,26 @@ def drafter_models() -> frozenset[str]:
     ``semantic_dispatch.AGENT_MODEL``) so the independence guard tracks whatever
     the pipeline actually drafts/reviews with.  Imported lazily to keep this
     module cheap to import.
+
+    Under ``ORCHESTRATOR_PRODUCTION_MODE=true`` (the private host, started
+    through ``runner.host_env``) the pipeline drafts through the transport
+    with ``ORCHESTRATOR_TRANSPORT_MODEL`` from the runtime secret, so that
+    model is a drafter too (AN1c; decision records
+    ``aws-redeployment-od7-model-set_2026-10-21`` OD7-assessor and
+    ``aws-redeployment-r9e-eu-region_2026-10-27``).  Outside production mode
+    the variable is not read: on the workstation ``.env.harness`` puts the
+    *judge's* model there, and counting it would make every workstation judge
+    fail its own independence check.
     """
     from runner.semantic_dispatch import AGENT_MODEL
     from runner.skill_runtime import SKILL_MODEL
 
-    return frozenset({SKILL_MODEL, AGENT_MODEL})
+    models = {SKILL_MODEL, AGENT_MODEL}
+    if _production_mode():
+        transport_model = os.environ.get("ORCHESTRATOR_TRANSPORT_MODEL", "").strip()
+        if transport_model:
+            models.add(transport_model)
+    return frozenset(models)
 
 
 def _default_clock() -> str:

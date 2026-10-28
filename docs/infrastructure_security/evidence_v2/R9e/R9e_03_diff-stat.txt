@@ -1,0 +1,63 @@
+﻿175441e96524aa22a5655cc398cd48ef2f5d1a05 starting R9e
+d1e767ba0df92c9a2ea36444f029dccbf872ab5e close R9
+ plans/aws_redeployment_r9e_handoff_2026-10-27.md | 90 ++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
+--- working tree ---
+git : warning: in the working copy of 'harness/commands/converse_smoke.py', LF will be replaced by CRLF the next time Git touches it
+At line:2 char:88
++ ...  --stat d1e767b HEAD; "--- working tree ---"; git diff --stat; "--- s ...
++                                                   ~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+warning: in the working copy of 'harness/judge.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'runner/anonymisation_rewrite.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'runner/transport/config.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/harness/test_converse_smoke.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/runner/test_anonymisation_rewrite.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/runner/test_offline_bundle.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_anonymisation_host_runbook.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_aws_env_config_template.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_host_env_launcher.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_transport_presets.py', LF will be replaced by CRLF the next time Git touches it
+ harness/commands/_converse_judge.py        |   2 +-
+ harness/commands/converse_smoke.py         |  17 +++--
+ harness/judge.py                           |  26 ++++++-
+ plans/msca_dn_an12_host_runbook.md         |  44 +++++++-----
+ runner/anonymisation_rewrite.py            |   8 ++-
+ runner/transport/config.py                 |  33 ++++++++-
+ tests/harness/test_converse_judge.py       |  54 ++++++++++++++
+ tests/harness/test_converse_smoke.py       |  17 +++++
+ tests/harness/test_judge.py                |  55 +++++++++++++++
+ tests/runner/test_anonymisation_rewrite.py |  25 +++++++
+ tests/runner/test_offline_bundle.py        |  21 ++++++
+ tests/test_anonymisation_host_runbook.py   | 109 +++++++++++++++++++++++++----
+ tests/test_aws_env_config_template.py      |  28 ++++++--
+ tests/test_host_env_launcher.py            |  23 +++---
+ tests/test_transport_config.py             |  10 ++-
+ tests/test_transport_presets.py            |  92 ++++++++++++++++++++++--
+ 16 files changed, 501 insertions(+), 63 deletions(-)
+--- status ---
+ M harness/commands/_converse_judge.py
+ M harness/commands/converse_smoke.py
+ M harness/judge.py
+ M plans/msca_dn_an12_host_runbook.md
+ M runner/anonymisation_rewrite.py
+ M runner/transport/config.py
+ M tests/harness/test_converse_judge.py
+ M tests/harness/test_converse_smoke.py
+ M tests/harness/test_judge.py
+ M tests/runner/test_anonymisation_rewrite.py
+ M tests/runner/test_offline_bundle.py
+ M tests/test_anonymisation_host_runbook.py
+ M tests/test_aws_env_config_template.py
+ M tests/test_host_env_launcher.py
+ M tests/test_transport_config.py
+ M tests/test_transport_presets.py
+?? docs/infrastructure_security/evidence_v2/R9e/R9e_01_baseline-pytest.txt
+?? docs/infrastructure_security/evidence_v2/R9e/R9e_01_commit.txt
+?? docs/infrastructure_security/evidence_v2/R9e/R9e_01_versions.txt
+?? docs/infrastructure_security/evidence_v2/R9e/R9e_03_diff-stat.txt
+?? docs/infrastructure_security/evidence_v2/R9e/RUNLOG.md
+?? docs/infrastructure_security/evidence_v2/R9e/STEPS.md
+?? docs/tier4_orchestration_state/decision_log/aws-redeployment-r9e-eu-region_2026-10-27.json
