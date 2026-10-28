@@ -6,7 +6,7 @@
 | Step sheet | `STEPS.md` |
 | Decision record | `docs/tier4_orchestration_state/decision_log/aws-redeployment-r9e-eu-region_2026-10-27.json` |
 | Verified by | agent (Claude), device shell, files read as `utf-8-sig`, failure sets compared by script |
-| Status | **All criteria PASS; awaiting the operator's confirmation in session** |
+| Status | **All criteria PASS; operator confirmed in session 2026-10-28 ("zárd le a R9e-t", ~16:29 UTC); R9e DONE** |
 
 ## Round 1 — step 01 (baseline)
 

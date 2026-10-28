@@ -162,15 +162,18 @@ that region with `eu.` profiles. It parameterises the transport tests that fix `
 updates the AN12 runbook's region lines and its id rule, together with the guard test that parses
 the runbook. If OD1 keeps us-east-1, the ticket closes as N/A with that reason.
 
+**Done 2026-10-28** (`docs/infrastructure_security/evidence_v2/R9e/VERIFICATION.md`; decision record
+`aws-redeployment-r9e-eu-region_2026-10-27`; operator confirmed in session).
+
 **Blocked by:** R0, R9.
 
-- [ ] An EU Converse preset exists and is tested.
+- [x] An EU Converse preset exists and is tested.
       The preset is named `BEDROCK_CONVERSE_EU` (backend `bedrock_converse`, default Region eu-north-1,
       `eu.` profiles): the R8 secret stores that name (decision record
       `aws-redeployment-r8-secret_2026-10-26`, R8-D3). A test asserts that the preset name stored by
       `deploy/aws/templates/50-secret.yaml` exists in `runner/transport/config.py`.
-- [ ] No transport test fixes the region.
-- [ ] The runbook guard test passes on the edited runbook.
+- [x] No transport test fixes the region.
+- [x] The runbook guard test passes on the edited runbook.
 - [ ] Or: the ticket is closed N/A, with OD1 cited. (Closed N/A 2026-10-21, **reopened** the same day: OD1 is now eu-north-1, decision record `aws-redeployment-od1-region-r1_2026-10-21`.)
 
 ## R10 Phase 8 drafter through the transport layer (F5)

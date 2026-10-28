@@ -423,3 +423,15 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R9e/`: R9e tests and touched modules 573 passed; full suite 200 failed, all in the baseline set, 8997 passed; old-ID guard and secret scan CLEAN (scan last). |
 | Verification Result | Every `VERIFICATION.md` criterion PASS; ticket criteria 1–3 PASS (4 N/A, superseded). F-R9e-1: a transient Windows file lock failed one baseline test that writes into Tier 4. |
 | Next Action | Operator: confirm in session; agent then ticks R9e and re-runs the scan; operator commits ("close R9e"). Then R15 needs R11 and R12b; R13 has the record's `for_r13` list. |
+
+### 2026-10-28 — R9e: EU region support — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-28T16:35:00Z |
+| Control ID | none; F9 (code, transport tests, AN12 runbook) |
+| Action Taken | Operator confirmed in session ("zárd le a R9e-t") and committed the R9e change and evidence (`47a32d4 close r9e`). Agent then ticked R9e in `plans/aws_redeployment_tickets.md` and set `evidence_v2/R9e/VERIFICATION.md` to DONE (every criterion PASS). |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R9e/VERIFICATION.md`, `R9e_04_full-pytest.txt`, `R9e_05_old-id-guard.txt`, `R9e_05_secret-scan.txt` |
+| Verification Result | R9e DONE. |
+| Next Action | Operator: commit the tick, VERIFICATION, RUNLOG and worklog. Frontier: R10, R12a; R11 needs the operator's explicit go (first hourly cost); R15 needs R11 and R12b; R13 (after R12b) has the R9e record's `for_r13` list. |
