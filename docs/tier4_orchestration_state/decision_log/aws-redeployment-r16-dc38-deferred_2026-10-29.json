@@ -1,0 +1,72 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r16-dc38-deferred_2026-10-29",
+  "date": "2026-10-29",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R16 of plans/aws_redeployment_tickets.md (orchestrator bundle and DC-38), second criterion",
+  "supersedes": "Nothing. Applies OD12 (aws-redeployment-operator-decisions_2026-10-21) and R10's scope note on DC-38; point 14 of plans/aws_redeployment_r12a_handoff_2026-10-28.md section 4 (R12a-D14: asked after R12a).",
+  "authority": "Agent-authored under CLAUDE.md, recording a decision the operator gave in session on 2026-10-29. Execution aid for infrastructure work (CLAUDE.md section 10.2). It changes one register v2 row and the ticket list; no code, no AWS call, no Tier 1-3 source, no runner phase, no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-29 ('14 a', ~11:00 UTC), accepting the agent's proposal.",
+  "decision": "DC-38 is marked DEFERRED in register v2 now, with OD12 cited, without waiting for R11. R16's second criterion is met; R16 stays open as deferred, as OD12's consequence says, and is reopened only by a successor to OD12.",
+  "why": "OD12 answered 'No. DC-38 stays deferred, but F5 is fixed anyway (R10)' and set the consequence 'R16 stays open as deferred with OD12 cited, and register v2 marks DC-38 DEFERRED when R16 is closed that way.' Marking the deferral needs nothing from R9, R10 or R11 in substance: it creates no resource and no cost and asserts no host behaviour. R11 is held by the operator because of its hourly cost (2026-10-28), so waiting would leave DC-38 NOT_STARTED in register v2 for no reason.",
+  "inputs": [
+    "plans/aws_redeployment_tickets.md R16 (Blocked by: R9, R10, R11)",
+    "aws-redeployment-operator-decisions_2026-10-21 OD12",
+    "docs/infrastructure_security/aws_hardening_control_register_v2.md DC-38 (NOT_STARTED, R10 scope note)",
+    "aws-redeployment-r10-drafter-transport_2026-10-28 (F5 closed)",
+    "plans/aws_redeployment_r12a_handoff_2026-10-28.md section 4 point 14; aws-redeployment-r12a-collector_2026-10-28 R12a-D14"
+  ],
+  "decisions": [
+    {
+      "id": "R16-D1",
+      "question": "May R16's deferral branch close before R11 (point 14)?",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Yes: a recorded override of the dependency 'Blocked by: R9, R10, R11' for the second criterion only. The first criterion (a full DAG run under production configuration on the host) keeps every blocker.",
+      "reason": "Operator's '14a'. The deferral is a register entry, not host evidence; R9 and R10 are done; R11 adds nothing to it.",
+      "consequence": "R16's second criterion ticked; R16 'open as deferred (OD12)' in the ticket list."
+    },
+    {
+      "id": "R16-D2",
+      "question": "Register v2 entry",
+      "answer_kind": "agent_proposal_adopted",
+      "declared_status": "Confirmed",
+      "answer": "DC-38: status DEFERRED; evidence `evidence_v2/R16/` (`VERIFICATION.md`); notes cite OD12 verbatim, this record, and keep R10's scope note (F5 closed). 'Still deferred (OD12, R16)' is dropped as now redundant.",
+      "reason": "Register v2 rule: DEFERRED with a documented reason; tests/test_evidence_protocol_scaffold.py requires a non-empty note for DEFERRED.",
+      "consequence": "One row changes; the Summary table is not touched (F-R12a-1, R12b)."
+    },
+    {
+      "id": "R16-D3",
+      "question": "Ticket state",
+      "answer_kind": "agent_proposal_adopted",
+      "declared_status": "Confirmed",
+      "answer": "R16 is not DONE: it stays open as deferred, per OD12's consequence and R16's own text ('the ticket stays open as deferred with that reason'). The ticket list marks it so and ticks the second criterion.",
+      "reason": "OD12 consequence; ticket R16 text.",
+      "consequence": "R11 does not unblock R16's first criterion unless a successor to OD12 puts DC-38 in scope."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "R16-D1",
+      "declared_status": "Unresolved",
+      "gap": "DC-38 has no host evidence: no Phase 8 run under production configuration on the host exists (R10 tested the drafter against a fake Converse client only)."
+    }
+  ],
+  "not_evidence_of": [
+    "That a full DAG run succeeds under production configuration (DC-38 is deferred, not verified)."
+  ],
+  "unblocks_when_recorded": [
+    "R16 step 01 (register checks, guard, scan), confirmation and commit"
+  ],
+  "stays_blocked": [
+    "R16 first criterion until a successor to OD12",
+    "R12b until R11"
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account.",
+    "basis": "Decision text and paths only."
+  }
+}
