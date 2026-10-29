@@ -1,0 +1,333 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r12a-collector_2026-10-28",
+  "date": "2026-10-28",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R12a of plans/aws_redeployment_tickets.md (parameterised evidence collector)",
+  "supersedes": "Nothing. Replaces, as the collector of the redeployment, the v1 docs/infrastructure_security/evidence/11_audit_package/collect_evidence.ps1, which stays unchanged as history. Applies OD1-r1, OD6-r3, OD7, OD12, R8-D7, F-R8-8, R9-D23, F-R9-1, F-R9-5, R9e-D18, F-R9e-1, R10-D13 and settles the points of plans/aws_redeployment_r12a_handoff_2026-10-28.md section 4.",
+  "authority": "Agent-authored under CLAUDE.md, recording decisions the operator gave in session on 2026-10-28 on the agent's R12a proposals. Execution aid for infrastructure work (CLAUDE.md section 10.2). tools/ is outside runner/, so section 17 does not govern the collector; sections 9.4 and 12 govern its evidence. R12a changes no Tier 1-3 source, dispatches no runner phase and amends no constitutional rule.",
+  "review_state": "operator_decided",
+  "decided_by": "the operator, in session on 2026-10-28 ('1-21 a', ~21:24 UTC; 'jóváhagyom, 22–26 a', ~22:51 UTC, for the code after the baseline and for points 22-26 found while writing it, recorded as R12a-D23 to R12a-D27), accepting the agent's proposal on each point.",
+  "decision": "tools/collect_evidence_v2.py collects the register v2 evidence from the workstation with the AWS CLI, taking the account, the Region and every resource id from the stack outputs files the contract names, the parameter files and deploy/aws/collector_inputs.json; host checks run as fixed scripts (tools/collector_host_checks/) through SSM Run Command; it writes only into a new evidence_v2/<ticket>/<ticket>_<NN>_collector/ folder and refuses the v1 tree before any AWS call; it ends with a manifest, the secret scan and the old-ID guard. R12a writes and tests the code only; the first real run is R12b.",
+  "why": "Ticket R12a and its three criteria; F8 and F9 (handoff 2026-10-21 section 4): the v1 collector hard-coded the old account, its resource ids and its Region and wrote into the baseline tree; its host tests only worked when it ran on the host itself. R12b must re-evidence every register row, add the F7 and in-host DC-15 tests, and re-assess DC-40.",
+  "inputs": [
+    "plans/aws_redeployment_r12a_handoff_2026-10-28.md sections 1-7",
+    "plans/aws_redeployment_tickets.md inherited constraints, R3, R11, R12a, R12b, R13, R16",
+    "plans/aws_redeployment_handoff_2026-10-21.md section 4 (F7, F8, F9), section 6 (R12), sections 7, 7a, 10",
+    "deploy/aws/outputs_contract.json, deploy/aws/README.md, deploy/aws/parameters/*.json, deploy/aws/templates/50-secret.yaml, deploy/aws/templates/90-host.yaml (header)",
+    "tools/old_id_guard.py, tools/evidence_secret_scan.py, tools/env_config_digest.py, runner/host_env.py",
+    "tests/test_aws_iac_contract.py, tests/test_old_id_guard.py, tests/test_evidence_protocol_scaffold.py",
+    "docs/infrastructure_security/aws_hardening_control_register_v2.md (41 rows); evidence_v2/README.md; evidence_v2/R1/R1_00_organization.json, R1_24_scp-probe.json; the step sheets of R4-R8 (verification commands, R5 step 09 simulations); evidence_v2/R4-R8/<ticket>_outputs.json",
+    "docs/infrastructure_security/evidence/11_audit_package/collect_evidence.ps1 (read only, history)",
+    "docs/infrastructure_security/evidence_v2/R12a/R12a_01_* (baseline on 215727b) and R12a_02_head-criteria.txt",
+    "docs/infrastructure_security/evidence_v2/R10/R10_04_full-pytest.txt (comparison set)"
+  ],
+  "findings": [
+    {
+      "id": "F-R12a-1",
+      "declared_status": "Confirmed",
+      "finding": "Register v2's Summary table still shows 40 NOT_STARTED and 1 IN_PROGRESS, while 19 rows are VERIFIED_PASS or NOT_APPLICABLE and several IN_PROGRESS. Not changed in R12a (no register change, R12a-D21).",
+      "basis": "Register v2 read 2026-10-28.",
+      "next": "R12b, when it updates every row."
+    },
+    {
+      "id": "F-R12a-2",
+      "declared_status": "Inferred",
+      "finding": "The DC-26 lookup-events check runs right after the host Converse call; CloudTrail usually delivers management events within minutes, so the first answer may not yet hold the call.",
+      "basis": "lookup-events reads delivered events; R7 saw delivery after minutes.",
+      "next": "R12b's step sheet repeats lookup-events (or a second collector run) after a wait."
+    },
+    {
+      "id": "F-R12a-3",
+      "declared_status": "Unresolved",
+      "finding": "Two R12b inputs have no owner yet: the orchestrator bundle on the host before R15 (R12a-D19) and the outside bucket with its presigned PUT URL (R12a-D17).",
+      "basis": "Tickets R12b, R15.",
+      "next": "R12b's settling."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R12a-D1",
+      "question": "Language and shape (point 1)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) A Python module tools/collect_evidence_v2.py with a CLI (py -3.10 -m tools.collect_evidence_v2). Every AWS call goes through one injected runner that runs the AWS CLI with --profile and --output json; tests replace it with a fake.",
+      "reason": "Operator's '1a'. pytest-testable (criteria 1-2), one language with tools/, and the evidence keeps the CLI JSON shape of R4-R8.",
+      "consequence": "tools/collect_evidence_v2.py (Runner, subprocess_runner, Command.argv)."
+    },
+    {
+      "id": "R12a-D2",
+      "question": "Inputs (point 2)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Ids only from the outputs files the contract names (stack -> ticket -> evidence_v2/<ticket>/<ticket>_outputs.json); account and Region from every parameter file's ExpectedAccountId/ExpectedRegion, refused when the files disagree and checked at run time against sts get-caller-identity; OD7 profiles, models and routed Regions from iam.json, the transport model from secret.json. No id or Region literal in the module.",
+      "reason": "Operator's '2a'. outputs_contract.json outputs_file_rule.",
+      "consequence": "load_context(); TestCriterion1; test_the_host_scripts_and_the_module_hold_no_id."
+    },
+    {
+      "id": "R12a-D3",
+      "question": "Per-session host stack (point 3)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Host-dependent checks run only with --host-outputs (without a path: the contract's R11_outputs.json; with one: a later session's file). Without it they are 'not collected: host stack outputs absent'. With it the host stack's live outputs must equal the file, or the run is refused as stale.",
+      "reason": "Operator's '3a'. The host stack is deleted and recreated per session (OD5), so its ids change.",
+      "consequence": "Check.needs_host; Collector._preflight; test_without_host_outputs_the_host_checks_are_not_collected, test_stale_stack_outputs_are_refused, test_a_deleted_host_stack_is_refused."
+    },
+    {
+      "id": "R12a-D4",
+      "question": "Host checks (point 4)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) From the workstation through SSM Run Command: send-command with AWS-RunShellScript, a fixed script from tools/collector_host_checks/ preceded only by 'export PO_...' lines, then get-command-invocation polled until a terminal status (InvocationDoesNotExist counts as pending; --host-timeout, default 180 s). The evidence file is the get-command-invocation answer (Status, StandardOutputContent), as handoff 2026-10-21 section 7a asks.",
+      "reason": "Operator's '4a'. R11's criterion already proves Run Command.",
+      "consequence": "Collector._run_host; TestHostChecks."
+    },
+    {
+      "id": "R12a-D5",
+      "question": "F7 and DC-15 (point 5)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Written now as host checks with offline tests (f7_presigned_put.sh, dc15_no_long_term_keys.sh); first run in R12b.",
+      "reason": "Operator's '5a'. R12b's ticket expects them collected; R12a is the code ticket.",
+      "consequence": "tools/collector_host_checks/."
+    },
+    {
+      "id": "R12a-D6",
+      "question": "Output location and the v1 refusal (point 6)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The output path is resolved (symlinks followed) and refused before any AWS call when it is inside the v1 tree (evidence/, audit_package/, register and worklog v1), outside evidence_v2/, not the derived folder of point 20, already existing, or when the ticket folder is missing. Files: one per check, summary.json, MANIFEST.sha256 written last.",
+      "reason": "Operator's '6a'. E0: no file in the v1 tree changes.",
+      "consequence": "resolve_output_dir(); TestCriterion2 (one test per refusal)."
+    },
+    {
+      "id": "R12a-D7",
+      "question": "Coverage map (point 7)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) CHECKS, one declarative table: name, controls, scope (region/global/host), the references it uses (out:<stack>.<OutputKey>, param:<stack>.<ParameterKey>, input:<name>, runtime:<name>), and how it builds its commands; a check that reads an undeclared reference fails. NON_COMMAND holds DC-22 (N/A, R8-D14), DC-38 (R16, OD12) and DC-39 (document review). DC-40 is a command check (R12a-D18); DC-36 is covered by get-inference-profile and the host Converse call. A test ties the map to register v2's 41 rows.",
+      "reason": "Operator's '7a'.",
+      "consequence": "CHECKS, NON_COMMAND, coverage_map(); test_every_register_row_is_covered_or_has_a_reason."
+    },
+    {
+      "id": "R12a-D8",
+      "question": "Read-only by construction (point 8)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Workstation operations are describe-/get-/list-/lookup- or simulate-principal-policy only, plus ssm send-command/get-command-invocation as the host transport; never get-secret-value. The host scripts are read-only except the F7 PUT, which must be refused; the secret on the host only as key names and SHA-256 through the R9 launcher; the Converse reply is compared on the host and only 'reply_equals_test_string=yes|no' is printed.",
+      "reason": "Operator's '8a'.",
+      "consequence": "TestReadOnly."
+    },
+    {
+      "id": "R12a-D9",
+      "question": "Criterion 1's test (point 9)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Synthetic fixtures of the real shapes (tests/tools/fixtures/collector/); the fake runner records every argv, including the SSM parameters with each host script; every id-shaped token (12-digit account, Region, ec2-style id, UUID, model id, fx-orch name) must be an atom of the fixtures (the fake SSM command ids aside), and 'proposal-orchestrator' appears only as a contract stack name. A second test rewrites every fixture id and shows the commands follow; a third shows no fixture value equals a value of the real R4-R8 outputs or parameter files, and a fourth that no real value reaches a fixture run.",
+      "reason": "Operator's '9a'.",
+      "consequence": "TestCriterion1."
+    },
+    {
+      "id": "R12a-D10",
+      "question": "After a run (point 10)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The collector runs the evidence secret scan and the old-ID guard over its run folder after writing the manifest and exits 1 on a finding, editing nothing; exit 1 on any AWS error a check does not declare as expected (per check, no global regex); the per-control summary in summary.json is collected, partial, not_collected, error or non_command.",
+      "reason": "Operator's '10a'.",
+      "consequence": "_scans_clean(); TestAfterRun."
+    },
+    {
+      "id": "R12a-D11",
+      "question": "Criterion 3 and the guard (point 11)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The guard's DEFAULT_SCOPE gains tools/collect_evidence_v2.py, tools/collector_host_checks and tests/tools/fixtures/collector (deploy/aws/collector_inputs.json is already under deploy/aws). tests/test_old_id_guard.py::test_default_scope_is_the_v2_side_only is amended to the new tuple.",
+      "reason": "Operator's '11a'. Every later guard run covers the collector.",
+      "consequence": "tools/old_id_guard.py, tests/test_old_id_guard.py; test_old_id_guard_is_clean_over_the_collector."
+    },
+    {
+      "id": "R12a-D12",
+      "question": "Evidence (point 12)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) evidence_v2/R12a/ (STEPS.md, RUNLOG.md, R12a_<NN>_*, VERIFICATION.md); comparison by id (R9-D23); no register row change.",
+      "reason": "Operator's '12a'.",
+      "consequence": "evidence_v2/R12a/."
+    },
+    {
+      "id": "R12a-D13",
+      "question": "Scope (point 13)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) No AWS call (not even read-only), the old collector and the v1 tree untouched, no register row change, no F-R10-1 or F-R9-1 fix.",
+      "reason": "Operator's '13a'.",
+      "consequence": "R12a_03_diff-stat.txt."
+    },
+    {
+      "id": "R12a-D14",
+      "question": "R16 without R11 (point 14)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Asked after R12a; not part of it.",
+      "reason": "Operator's '14a'.",
+      "consequence": "None in R12a."
+    },
+    {
+      "id": "R12a-D15",
+      "question": "Inputs outside the outputs and parameters (point 15)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) deploy/aws/collector_inputs.json, each value with its source: negative_region, deny_probe_global_profile_ids, deny_probe_non_claude_model_ids, deny_probe_other_profile_ids, bundle_object_key, bundle_prefix (the R5 step 09 cases), bedrock_log_group_prefix, dns_services, egress_probe_hosts, converse_test_string, dc15_home_dirs, dc15_env_files. A missing value or source, or a negative Region among the routed ones, is refused.",
+      "reason": "Operator's '15a'. The negative Region is the operator's choice (R12a-D23).",
+      "consequence": "REQUIRED_INPUTS; test_the_real_inputs_file_is_complete_and_sourced, test_a_negative_region_among_the_routed_ones_is_refused."
+    },
+    {
+      "id": "R12a-D16",
+      "question": "Scan patterns in the host scripts (point 16)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) The scripts assemble the access-key variable and file-key names and the long-term key-id prefix at run time and print counts or yes/no; the evidence keeps get-command-invocation and each script's SHA-256 (LF line endings, so a CRLF checkout gives the same digest), never the send-command answer; error texts that could echo the parameters are masked.",
+      "reason": "Operator's '16a'.",
+      "consequence": "host_script_sha256(); test_the_host_scripts_and_the_module_pass_the_secret_scan_and_the_guard, test_the_script_digest_ignores_crlf_checkouts, test_a_send_command_error_text_is_masked."
+    },
+    {
+      "id": "R12a-D17",
+      "question": "F7 outside bucket (point 17)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) --f7-url-file names a file holding one https S3 URL (a short-lived presigned PUT from an account the operator controls). The URL goes only into the send-command parameters; the evidence and the console show the HTTP status, the S3 error code and whether the message names a VPC endpoint policy; --plan masks it. Who provides the bucket is decided in R12b.",
+      "reason": "Operator's '17a'.",
+      "consequence": "f7_presigned_put.sh; test_the_f7_url_never_reaches_the_evidence_or_the_console."
+    },
+    {
+      "id": "R12a-D18",
+      "question": "DC-40 (point 18)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) organizations describe-organization with a --query that keeps Id, Arn, FeatureSet, MasterAccountId and AvailablePolicyTypes (no management e-mail), and organizations list-policies --filter SERVICE_CONTROL_POLICY with AccessDeniedException declared as expected. Re-assessment is R12b.",
+      "reason": "Operator's '18a'. evidence_v2/R1/R1_00_organization.json: the account is a member of an Organization with SCPs enabled.",
+      "consequence": "test_the_dc40_access_denied_is_an_expected_error, test_the_organization_query_leaves_out_the_management_email."
+    },
+    {
+      "id": "R12a-D19",
+      "question": "DC-33 to DC-35 through the R9 launcher (point 19)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) --host-bundle-dir (and --host-bundle-python, default python3) add the launcher check: python -m runner.host_env --region --secret-id <SecretName> -- <child> prints the five key names (runner.host_env.CONFIG_KEYS, passed in) and the SHA-256 of their canonical JSON; the collector derives the expected digest from deploy/aws/templates/50-secret.yaml and secret.json with tools.env_config_digest, and the script prints sha256_matches_template. Without a bundle: not collected.",
+      "reason": "Operator's '19a'. How the bundle reaches the host is R12b's question.",
+      "consequence": "dc33_35_launcher_config.sh; test_the_launcher_check_uses_the_launchers_keys_and_the_templates_digest."
+    },
+    {
+      "id": "R12a-D20",
+      "question": "Folder shape (point 20)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) evidence_v2/<ticket>/<ticket>_<NN>_collector/ from --ticket and --step; files <control>_<check>.json (.txt for an error), 00_caller-identity.json and 00_stack-outputs-<stack>.json from the preflight, summary.json, MANIFEST.sha256 last.",
+      "reason": "Operator's '20a'.",
+      "consequence": "resolve_output_dir(); test_a_full_run_writes_one_file_per_check_a_summary_and_a_manifest."
+    },
+    {
+      "id": "R12a-D21",
+      "question": "Register v2 summary table (point 21)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "(a) Not touched in R12a; finding F-R12a-1.",
+      "reason": "Operator's '21a'.",
+      "consequence": "F-R12a-1."
+    },
+    {
+      "id": "R12a-D22",
+      "question": "Baseline commit (deviation)",
+      "answer_kind": "recorded_deviation",
+      "declared_status": "Confirmed",
+      "answer": "There is no 'close R10' commit: the R10 change, its evidence and decision record, register and worklog v2, the R10 tick and the R12a handoff are all in 215727b 'starting R12a' (21 files). The baseline ran on 215727b; recorded as a deviation from handoff section 5 step 1, no rerun.",
+      "reason": "The tree of 215727b is the start tree (R12a_01_commit.txt); the operator may skip a commit (R10-D13).",
+      "consequence": "R12a_01_*."
+    },
+    {
+      "id": "R12a-D23",
+      "question": "The value of negative_region (point 15)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "us-east-1: the Region R5 step 09 used for deny-unapproved-region, outside RoutedRegions.",
+      "reason": "Point 15 left the value to the operator; the agent proposed the R5 value so that the DC-16 simulation repeats R5's case. Operator's '22a' (raised as point 22), 2026-10-28 ~22:51 UTC.",
+      "consequence": "deploy/aws/collector_inputs.json."
+    },
+    {
+      "id": "R12a-D24",
+      "question": "Global services (found while writing)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "iam and organizations commands carry no --region (as R5's step sheet); every other command carries the parameters' Region; sts get-caller-identity uses the Region too.",
+      "reason": "R5 ran every iam command without --region; the account's SCPs refuse most services outside eu-north-1 (R1). Operator's '23a' (raised as point 23), 2026-10-28 ~22:51 UTC.",
+      "consequence": "GLOBAL_SERVICES; test_every_workstation_command_is_a_read."
+    },
+    {
+      "id": "R12a-D25",
+      "question": "Ids taken from live answers (found while writing)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "The only id a command takes from an earlier answer is the SSM CommandId (send-command -> get-command-invocation). Policy documents come from iam get-account-authorization-details --filter LocalManagedPolicy instead of get-policy-version with listed ARNs, so no policy ARN or version id is chained; the flow-logs role's name is the last path segment of the FlowLogsRoleArn output.",
+      "reason": "Criterion 1: every id from the outputs. Operator's '24a' (raised as point 24), 2026-10-28 ~22:51 UTC.",
+      "consequence": "local-policies, flow-logs-role checks; FAKE_COMMAND_IDS in TestCriterion1."
+    },
+    {
+      "id": "R12a-D26",
+      "question": "Base-stack staleness (found while writing)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "The preflight compares the live outputs of every base stack too (cloudformation describe-stacks --query Stacks[0].Outputs) with its outputs file and refuses on a difference, and saves each answer as 00_stack-outputs-<stack>.json.",
+      "reason": "Point 2's cross-check, extended from the account to the outputs: an outputs file that no longer matches would make every id in the run wrong. Operator's '25a' (raised as point 25), 2026-10-28 ~22:51 UTC.",
+      "consequence": "Collector._preflight; test_stale_stack_outputs_are_refused."
+    },
+    {
+      "id": "R12a-D27",
+      "question": "--plan (found while writing)",
+      "answer_kind": "operator_adopted_default",
+      "declared_status": "Confirmed",
+      "answer": "--plan prints every command (and each host script's digest and exports, the F7 URL masked) without calling anything or writing anything; it still validates the output path except that the run folder may exist. Round 2 saves a --plan run over the repository's real files as evidence that the collector reads them (R12a_03_collector-plan.txt).",
+      "reason": "A step sheet can show the exact commands before R12b's sign-in. Operator's '26a' (raised as point 26), 2026-10-28 ~22:51 UTC.",
+      "consequence": "Collector.plan(); test_plan_calls_nothing_and_writes_nothing, test_the_real_files_load_and_plan."
+    }
+  ],
+  "amended_test_ids": [
+    "tests/test_old_id_guard.py::test_default_scope_is_the_v2_side_only (DEFAULT_SCOPE gains the three collector paths, R12a-D11)"
+  ],
+  "new_test_module": "tests/tools/test_collect_evidence_v2.py",
+  "known_gaps": [
+    {
+      "decision": "R12a-D1",
+      "declared_status": "Unresolved",
+      "gap": "The collector has run only against a fake AWS CLI. The real CLI's handling of the inline --parameters JSON on Windows, the global routing of iam and organizations, the describe-organization --query and the get-command-invocation polling are first exercised in R12b."
+    },
+    {
+      "decision": "R12a-D4",
+      "declared_status": "Unresolved",
+      "gap": "The host scripts were syntax-checked (bash -n) and their output contract is tested through the fake runner; none has run on AL2023. First run in R12b (after R11)."
+    },
+    {
+      "decision": "R12a-D6",
+      "declared_status": "Inferred",
+      "gap": "test_a_symlink_into_the_v1_tree_is_refused is skipped on the workstation (Windows refuses to create a symlink without the privilege; R12a_03_pytest.txt '1 skipped') and passes on the device VM (Linux). The refusal itself resolves the path with Path.resolve() on both systems."
+    }
+  ],
+  "not_evidence_of": [
+    "That any control passes in the new account: R12a collects nothing (R12b).",
+    "That F7 is closed or the DC-15 in-host tests pass (R12b).",
+    "That DC-33 to DC-35 read correctly on the host (R12b, through the R9 launcher)."
+  ],
+  "unblocks_when_recorded": [
+    "R12a round 2 (steps 03-05), commit and confirmation",
+    "R12b, together with R11 (held by the operator) and R9"
+  ],
+  "stays_blocked": [
+    "R12b until R11",
+    "R16 (deferred, OD12)"
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content, and no identifier of the old account. The tests use synthetic fixture ids; the collector inputs file holds public model ids, public host names and the fixed test string.",
+    "basis": "Code, test names, decision text and evidence paths only."
+  }
+}

@@ -1,0 +1,15 @@
+# R12a step 02 (agent, device VM): the R12a tests on a git-archive copy of 215727b (starting R12a), before the change
+# Python 3.10.12
+# Copied into the copy: tests/tools/test_collect_evidence_v2.py, tests/tools/fixtures/collector/ and the amended tests/test_old_id_guard.py (no module, no host scripts, no inputs file, guard unchanged)
+## tests/tools/test_collect_evidence_v2.py
+collected 0 items / 1 error
+E   ImportError: cannot import name 'collect_evidence_v2' from 'tools' (unknown location)
+ERROR tests/tools/test_collect_evidence_v2.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.12s ===============================
+exit=2
+## tests/test_old_id_guard.py
+E   AssertionError: assert ('deploy/aws'...yment-*.json') == ('deploy/aws'...e_v2.py', ...)
+FAILED tests/test_old_id_guard.py::test_default_scope_is_the_v2_side_only - A...
+========================= 1 failed, 31 passed in 0.61s =========================
+exit=1

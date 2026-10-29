@@ -15,13 +15,16 @@ The default scope is the v2 side of the work only:
 - ``deploy/aws/`` (templates, parameters, contract, README);
 - ``docs/infrastructure_security/evidence_v2/``;
 - control register v2 and worklog v2;
-- the ``aws-redeployment-*`` records in the Tier 4 decision log.
+- the ``aws-redeployment-*`` records in the Tier 4 decision log;
+- the R12a evidence collector: ``tools/collect_evidence_v2.py``, its host
+  scripts (``tools/collector_host_checks/``) and its synthetic test fixtures
+  (``tests/tools/fixtures/collector/``), so that every later guard run covers
+  it (decision record ``aws-redeployment-r12a-collector_2026-10-28``).
 
 The v1 tree (``evidence/``, ``audit_package/``, register and worklog v1), the
 old deployment guide (rewritten in R13) and ``plans/`` (whose handoffs list
 the old ids on purpose) are out of scope. Other paths can be passed
-explicitly; R12a runs the guard over its evidence collector that way, and R13
-over the amended documents.
+explicitly; R13 runs the guard over the amended documents that way.
 
 The old ids are assembled at import time from fragments, so that this file is
 never itself a finding when it is passed to the guard. A finding reports the
@@ -85,6 +88,9 @@ DEFAULT_SCOPE: tuple[str, ...] = (
     "docs/infrastructure_security/aws_hardening_control_register_v2.md",
     "docs/infrastructure_security/aws_hardening_worklog_v2.md",
     "docs/tier4_orchestration_state/decision_log/aws-redeployment-*.json",
+    "tools/collect_evidence_v2.py",
+    "tools/collector_host_checks",
+    "tests/tools/fixtures/collector",
 )
 
 

@@ -1,0 +1,69 @@
+{
+  "schema": "proposal-orchestrator-collector-inputs/1",
+  "purpose": "Synthetic fixture for tests/tools/test_collect_evidence_v2.py; no value is real.",
+  "inputs": {
+    "negative_region": {
+      "value": "ap-east-9",
+      "source": "fixture"
+    },
+    "deny_probe_global_profile_ids": {
+      "value": [
+        "global.anthropic.claude-fx-gamma"
+      ],
+      "source": "fixture"
+    },
+    "deny_probe_non_claude_model_ids": {
+      "value": [
+        "amazon.fx-other-v1"
+      ],
+      "source": "fixture"
+    },
+    "deny_probe_other_profile_ids": {
+      "value": [
+        "eu.anthropic.claude-fx-delta-v1"
+      ],
+      "source": "fixture"
+    },
+    "bundle_object_key": {
+      "value": "fxbundles/fx.tar.gz",
+      "source": "fixture"
+    },
+    "bundle_prefix": {
+      "value": "fxbundles/",
+      "source": "fixture"
+    },
+    "bedrock_log_group_prefix": {
+      "value": "/fx/bedrock",
+      "source": "fixture"
+    },
+    "dns_services": {
+      "value": [
+        "fx-runtime",
+        "fx-sts"
+      ],
+      "source": "fixture"
+    },
+    "egress_probe_hosts": {
+      "value": [
+        "egress-probe.fx.invalid"
+      ],
+      "source": "fixture"
+    },
+    "converse_test_string": {
+      "value": "FX_OK",
+      "source": "fixture"
+    },
+    "dc15_home_dirs": {
+      "value": [
+        "/fxhome/a"
+      ],
+      "source": "fixture"
+    },
+    "dc15_env_files": {
+      "value": [
+        "/fxetc/environment"
+      ],
+      "source": "fixture"
+    }
+  }
+}

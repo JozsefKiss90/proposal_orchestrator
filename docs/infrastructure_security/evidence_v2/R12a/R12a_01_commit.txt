@@ -1,0 +1,26 @@
+﻿215727b5c66d34365a6bea95df0db9589fbef77d starting R12a
+265f88d54f5e5017b04d98ce5faa38f8687bc000 tick R9e
+ .../aws_hardening_control_register_v2.md           |    4 +-
+ .../aws_hardening_worklog_v2.md                    |   25 +
+ .../evidence_v2/R10/R10_01_baseline-pytest.txt     | 1553 +++++++++++++++++++
+ .../evidence_v2/R10/R10_01_commit.txt              |   10 +
+ .../evidence_v2/R10/R10_01_versions.txt            |    5 +
+ .../evidence_v2/R10/R10_02_head-criterion1.txt     |   37 +
+ .../evidence_v2/R10/R10_03_diff-stat.txt           |   53 +
+ .../evidence_v2/R10/R10_03_pytest.txt              |   44 +
+ .../evidence_v2/R10/R10_04_full-pytest.txt         | 1554 ++++++++++++++++++++
+ .../evidence_v2/R10/R10_05_old-id-guard.txt        |    2 +
+ .../evidence_v2/R10/R10_05_secret-scan.txt         |    2 +
+ .../evidence_v2/R10/RUNLOG.md                      |   37 +
+ .../evidence_v2/R10/STEPS.md                       |  194 +++
+ .../evidence_v2/R10/VERIFICATION.md                |  247 ++++
+ ...eployment-r10-drafter-transport_2026-10-28.json |  271 ++++
+ plans/aws_redeployment_r12a_handoff_2026-10-28.md  |   92 ++
+ plans/aws_redeployment_tickets.md                  |   16 +-
+ runner/claude_transport.py                         |   38 +
+ runner/decomposed_drafting.py                      |  247 +++-
+ tests/runner/test_decomposed_drafting_transport.py |  492 +++++++
+ .../runner/test_excellence_decomposed_drafting.py  |   19 +
+ 21 files changed, 4908 insertions(+), 34 deletions(-)
+--- status ---
+?? docs/infrastructure_security/evidence_v2/R12a/

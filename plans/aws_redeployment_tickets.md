@@ -119,12 +119,21 @@ account, the region and every resource id from saved stack outputs, and it write
 evidence tree. Running it against the old tree is impossible by construction. This ticket is code
 only; it collects nothing yet.
 
+Done 2026-10-29: `tools/collect_evidence_v2.py`, `tools/collector_host_checks/`,
+`deploy/aws/collector_inputs.json` (decision record `aws-redeployment-r12a-collector_2026-10-28`;
+evidence `docs/infrastructure_security/evidence_v2/R12a/`). Findings for R12b: F-R12a-1 (register v2
+summary table stale), F-R12a-2 (DC-26 may be early right after the Converse call), F-R12a-3 (host bundle
+and outside bucket have no owner yet).
+
 **Blocked by:** E0, R3.
 
-- [ ] A test runs the collector against fixture stack outputs and confirms that every id it uses
-      comes from them.
-- [ ] A test confirms that the collector refuses an output path inside the v1 tree.
-- [ ] The R3 old-ID test passes over the collector.
+- [x] A test runs the collector against fixture stack outputs and confirms that every id it uses
+      comes from them. (`tests/tools/test_collect_evidence_v2.py::TestCriterion1`, fixtures in
+      `tests/tools/fixtures/collector/`; failing on `215727b`, `evidence_v2/R12a/R12a_02_head-criteria.txt`.)
+- [x] A test confirms that the collector refuses an output path inside the v1 tree.
+      (`TestCriterion2`; `R12a_03_pytest.txt`, `R12a_04_full-pytest.txt`.)
+- [x] The R3 old-ID test passes over the collector. (`R12a_03_old-id-guard-collector.txt`; the guard's
+      default scope now covers the collector.)
 
 ## R9 Runtime configuration from the secret (F4, F6)
 

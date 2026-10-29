@@ -146,6 +146,10 @@ def test_default_scope_is_the_v2_side_only() -> None:
         "docs/infrastructure_security/aws_hardening_control_register_v2.md",
         "docs/infrastructure_security/aws_hardening_worklog_v2.md",
         "docs/tier4_orchestration_state/decision_log/aws-redeployment-*.json",
+        # R12a: the evidence collector, its host scripts and its fixtures.
+        "tools/collect_evidence_v2.py",
+        "tools/collector_host_checks",
+        "tests/tools/fixtures/collector",
     )
 
 

@@ -95,6 +95,15 @@ aws cloudformation describe-stacks --region eu-north-1 --stack-name <stack> --qu
 
 Later step sheets and the R12a evidence collector take ids only from these files.
 
+## Evidence collector inputs
+
+`collector_inputs.json` holds the few values the evidence collector (`tools/collect_evidence_v2.py`,
+R12a) needs that no stack output and no parameter file holds: the unapproved Region of the negative
+tests, the deny-probe model ids of R5 step 09, the public egress probe hosts, the fixed test string and
+the host paths of the DC-15 tests. Each value carries its source. The collector takes every account,
+Region and resource id of the deployment from the outputs files and the parameter files, never from
+here (`aws-redeployment-r12a-collector_2026-10-28`).
+
 ## Lint (workstation)
 
 `cfn-lint` runs in its own virtual environment, which keeps its dependencies out of the `py -3.10`

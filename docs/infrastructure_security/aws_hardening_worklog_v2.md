@@ -460,3 +460,27 @@ Each entry records the same fields as v1:
 | Verification Result | R10 DONE. |
 | Next Action | Operator: commit ("close R10"). Frontier: R12a; R11 needs the operator's explicit go (first hourly cost); R15 needs R11 and R12b; R16 stays deferred (OD12); F-R10-1 for R12b or a new ticket, F-R10-2 for R11/R16. |
 
+### 2026-10-29 — R12a: parameterised evidence collector — verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-28T23:58:00Z |
+| Control ID | none (no register row changes); prepares the R12b re-evidence of all 41 rows, F7, the DC-15 in-host tests and DC-40 |
+| Action Taken | Operator settled the R12a handoff points 1–14 and agent points 15–21 ('1–21 a') and ran step 01 (baseline on `215727b`; no `close R10` commit, R12a-D22: 200 failed, 9016 passed, 86 skipped, ids equal `R10_04`). Agent showed the R12a tests failing on the start commit (`R12a_02`), then wrote `tools/collect_evidence_v2.py` (ids only from the contract's outputs files, the parameter files and the new `deploy/aws/collector_inputs.json`; caller account and live stack outputs checked first; output only into a new `evidence_v2/<ticket>/<ticket>_<NN>_collector/`, the v1 tree refused before any AWS call; read verbs only; manifest, secret scan and old-ID guard after each run; `--plan`), nine host scripts in `tools/collector_host_checks/` run through SSM Run Command (DC-02, DC-14, DC-15, DC-17, DC-31, DC-32, DC-33–35 through the R9 launcher, DC-37, F7), synthetic fixtures and 65 tests, and widened the old-ID guard's default scope to the collector. Operator approved the code and points 22–26 ('jóváhagyom, 22–26 a'; R12a-D23–D27) and ran steps 03–05. No AWS call in R12a. |
+| Evidence Requested | `R12a_01_*`, `R12a_02_head-criteria.txt`, `R12a_03_*`, `R12a_04_full-pytest.txt`, `R12a_05_*` |
+| Evidence Received | `evidence_v2/R12a/`: R12a tests fail on `215727b`; with the change 230 passed, 1 skipped (the symlink case on Windows; passes on the device VM); guard over the collector CLEAN; plan over the real files with every id from the outputs, parameter and inputs files; full suite 200 failed, all in the baseline set, 9080 passed; old-ID guard (default scope) and secret scan CLEAN (scan last). |
+| Verification Result | Every `VERIFICATION.md` criterion PASS; ticket criteria 1–3 PASS. F-R12a-1 (register v2 summary table stale), F-R12a-2 (DC-26 may be early right after the Converse call), F-R12a-3 (host bundle and outside bucket have no owner yet) — all for R12b. |
+| Next Action | Operator: confirm in session; agent then ticks R12a; one commit ("close R12a") with the change, the evidence and the tick. Frontier: R12b needs R11 (held by the operator: hourly cost); then R14, R15, R13; R16 per OD12 (point 14 of the R12a settling: to be asked). |
+
+### 2026-10-29 — R12a: parameterised evidence collector — closed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-29T00:04:00Z |
+| Control ID | none (no register row changes) |
+| Action Taken | Operator confirmed in session ("zárd le az R12a-t"). Agent ticked R12a in `plans/aws_redeployment_tickets.md` (criteria 1–3) and set `evidence_v2/R12a/VERIFICATION.md` to DONE, before the commit: the R12a change, its evidence and these closing edits go into one commit. |
+| Evidence Requested | — |
+| Evidence Received | `evidence_v2/R12a/VERIFICATION.md`, `R12a_04_full-pytest.txt`, `R12a_05_old-id-guard.txt`, `R12a_05_secret-scan.txt` |
+| Verification Result | R12a DONE. |
+| Next Action | Operator: commit ("close R12a"). Frontier: R12b needs R11 (held by the operator: hourly cost); R14, R15, R13 follow R11/R12b; R16 per OD12 (R12a point 14: to be asked now); F-R12a-1–3 for R12b. |
+

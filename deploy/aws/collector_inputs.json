@@ -1,0 +1,56 @@
+{
+  "schema": "proposal-orchestrator-collector-inputs/1",
+  "project": "proposal-orchestrator",
+  "decision": "aws-redeployment-r12a-collector_2026-10-28",
+  "purpose": "The values the R12a evidence collector (tools/collect_evidence_v2.py) needs that no stack output and no parameter file holds. Every account, Region, resource id and model of the deployment itself comes from the outputs files and the parameter files, never from here. Checked by tests/tools/test_collect_evidence_v2.py.",
+  "inputs": {
+    "negative_region": {
+      "value": "us-east-1",
+      "source": "R12a point 15 (operator's choice): a Region outside RoutedRegions, the one R5 step 09 used for deny-unapproved-region (evidence_v2/R5/R5_09_deny-unapproved-region.json). DC-16 simulation and the DC-17 host test."
+    },
+    "deny_probe_global_profile_ids": {
+      "value": ["global.anthropic.claude-sonnet-4-5-20250929-v1:0"],
+      "source": "R5 step 09 deny-global-profile (OD7-global: global. profiles denied). DC-11 simulation."
+    },
+    "deny_probe_non_claude_model_ids": {
+      "value": ["amazon.nova-pro-v1:0"],
+      "source": "R5 step 09 deny-non-claude-model (evidence_v2/R5/R5_03_non-claude-models.json). DC-11 simulation."
+    },
+    "deny_probe_other_profile_ids": {
+      "value": ["eu.anthropic.claude-haiku-4-5-20251001-v1:0"],
+      "source": "R5 step 09 deny-eu-profile-not-od7: an eu. Claude profile outside OD7. DC-11 simulation."
+    },
+    "bundle_object_key": {
+      "value": "bundles/orchestrator.tar.gz",
+      "source": "R5 step 09 allow-s3-get-bundle and deny-s3-put-bundle (R5-D2: read only under bundles/). DC-11, DC-12 simulations."
+    },
+    "bundle_prefix": {
+      "value": "bundles/",
+      "source": "R5 step 09 allow-s3-list-bundles (R5-D2). DC-12 simulation."
+    },
+    "bedrock_log_group_prefix": {
+      "value": "/aws/bedrock",
+      "source": "DC-29 requirement (register v2): no /aws/bedrock log group; R7 step 08."
+    },
+    "dns_services": {
+      "value": ["bedrock-runtime", "sts", "secretsmanager", "ssm", "ssmmessages", "ec2messages"],
+      "source": "The six interface endpoints of ticket R11, each with private DNS. DC-02 host test."
+    },
+    "egress_probe_hosts": {
+      "value": ["api.anthropic.com", "pypi.org"],
+      "source": "DC-32: public endpoints the host must not reach; the first is the one v1 probed, the second the package index a host install would use. Host test."
+    },
+    "converse_test_string": {
+      "value": "DEPLOY_OK",
+      "source": "Handoff 2026-10-21 §7a: the fixed test string the evidence may hold. DC-37 and DC-17 host tests."
+    },
+    "dc15_home_dirs": {
+      "value": ["/root", "/home/ec2-user", "/home/ssm-user"],
+      "source": "DC-15: the AL2023 host's root, default and Session Manager users (OD9). DC-15 and DC-31 host tests."
+    },
+    "dc15_env_files": {
+      "value": ["/etc/environment", "/etc/profile", "/etc/bashrc"],
+      "source": "DC-15: the system-wide environment files of AL2023. DC-15 host test."
+    }
+  }
+}
