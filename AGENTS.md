@@ -595,3 +595,17 @@ The following runtime-layer constraints supplement the general prohibitions in S
 *Repository constitution. In force from creation. Amendments require explicit human instruction per Section 14.*
 
 ## Imported Claude Cowork project instructions
+
+## Agent skills
+
+### Issue tracker
+
+Local markdown under `.scratch/<effort>/` (overhaul effort: `.scratch/overhaul-2026-11/`); external PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) on each issue's `Status:` line. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Multi-context: `CONTEXT-MAP.md` → root `CONTEXT.md` (proposal vocabulary), `runner/CONTEXT.md` (runtime) and `harness/CONTEXT.md` (evaluation harness); module map in `plans/reports/RUNTIME_MAP.md`. See `docs/agents/domain.md`.

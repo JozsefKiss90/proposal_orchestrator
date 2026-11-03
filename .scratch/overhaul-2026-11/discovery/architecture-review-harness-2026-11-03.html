@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Architecture review — proposal_orchestrator / harness</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+</script>
+<style>
+  .seam { border-style: dashed !important; }
+  .deep { background: linear-gradient(135deg, #0f172a, #1e293b); color: #f8fafc; }
+  .lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
+  .diag { min-height: 300px; }
+</style>
+</head>
+<body class="bg-stone-50 text-slate-900 font-sans">
+<main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+
+<header class="space-y-3">
+  <p class="lbl text-slate-500">proposal_orchestrator · branch harness_overhaul @ d1e8527f · 2026-11-03</p>
+  <h1 class="font-serif text-4xl">Deepening opportunities in <span class="font-mono">harness/</span></h1>
+  <div class="flex flex-wrap gap-4 text-xs text-slate-600">
+    <span class="flex items-center gap-2"><span class="inline-block w-5 h-4 border-2 border-slate-500"></span>module</span>
+    <span class="flex items-center gap-2"><span class="inline-block w-6 border-t-2 border-dashed border-slate-500"></span>seam</span>
+    <span class="flex items-center gap-2"><span class="inline-block w-6 border-t-2 border-red-600"></span>leakage</span>
+    <span class="flex items-center gap-2"><span class="inline-block w-5 h-4 deep"></span>deep module</span>
+  </div>
+  <p class="text-xs text-slate-500">Vocabulary: domain terms from <span class="font-mono">harness/CONTEXT.md</span>; architecture terms from codebase-design. Scale surveyed: 57 modules, ~35k lines; <span class="font-mono">harness.judge</span> has 21 importers.</p>
+</header>
+
+<section id="candidates" class="space-y-10">
+
+<!-- A -->
+<article id="a" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">A · Deepen the judge call: one ask, parser in, verdict out</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">Strong</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">in-process</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F5 · DN critical path</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>harness/judge.py — Judge.raw_invoke, Judge.evaluate, _discard_last_response</li>
+    <li>harness/criterion_scoring.py — _draw_sample redraw loop, _parse_sample</li>
+    <li>harness/claim_ledger.py — decompose_chunk, parse_assertions_payload, own ProvenanceRecord</li>
+    <li>harness/commands/blind_assessment.py — salvage path, cache.discard_last</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before</p>
+      <pre class="mermaid">
+flowchart TB
+  CS[criterion scoring] -->|raw_invoke| J[Judge]
+  CL[claim ledger] -->|raw_invoke| J
+  EV[Judge.evaluate] --> J
+  SV[salvage cmd] -->|cache| RC[response checkpoint]
+  CS -.reaches into.-> RC
+  CS -.own redraw + DiscardedDraw.-> CS
+  CL -.own provenance.-> PL[provenance log]
+  J --> RC
+  classDef leak stroke:#dc2626,stroke-width:2px;
+  class CS,CL,SV leak
+      </pre>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <pre class="mermaid">
+flowchart TB
+  CS[criterion scoring] -->|ask prompt, parser| J
+  CL[claim ledger] -->|ask prompt, parser| J
+  SV[salvage cmd] -->|replay| J
+  subgraph J[Judge — deep]
+    direction TB
+    a[checkpoint take/record] --> b[strict parse]
+    b --> c[discard + bounded redraw]
+    c --> d[provenance]
+  end
+  classDef deep fill:#0f172a,color:#f8fafc;
+  class J deep
+      </pre>
+    </div>
+  </div>
+  <p><b>Problem.</b> <span class="font-mono">raw_invoke</span> returns text, so every caller that cannot fit the default verdict schema rebuilds strict parsing, checkpoint discard, redraw and provenance itself. They have already drifted: criterion scoring discards and redraws, while claim-ledger decomposition does neither, so a resumed run would replay a malformed draw and fail on it again.</p>
+  <p><b>Solution.</b> Give the judge one interface that takes the prompt and a strict parser and returns a parsed value with provenance. Checkpointing, discarding, bounded redraws and provenance move inside the judge.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Locality: the redraw policy lives in one place</li>
+    <li>Leverage: one interface, every assessor task</li>
+    <li>Closes the latent claim-ledger replay gap</li>
+    <li>Tests: one fake backend covers all callers</li>
+    <li>Deletes the reach-in <span class="font-mono">getattr(judge,"response_cache")</span></li>
+  </ul>
+</article>
+
+<!-- B -->
+<article id="b" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">B · One place that builds a judge and states independence</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">Strong</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">ports &amp; adapters</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F5</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>harness/judge.py — build_judge_backend, resolve_judge_config, JudgeConfig</li>
+    <li>harness/commands/_converse_judge.py — build_converse_judge</li>
+    <li>harness/commands/_subscription_judge.py — build_subscription_judge, sandbox check</li>
+    <li>harness/commands/faithfulness_calibration.py — _paced_judge</li>
+    <li>harness/commands/freeze_grounding_baselines.py — paced judge builder</li>
+    <li>harness/commands/blind_assessment.py — _live_judge route switch</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before — five builders, three independence rules</p>
+      <div class="space-y-2 text-xs">
+        <div class="border-2 border-red-500 rounded p-2">Judge() default — lazy backend, refuses claude_cli <span class="text-slate-500">(injected backends: unchecked)</span></div>
+        <div class="border-2 border-red-500 rounded p-2">_paced_judge — copy of the claude_cli refusal + PacedRetryingBackend</div>
+        <div class="border-2 border-red-500 rounded p-2">freeze_grounding — second copy of the refusal + pacing</div>
+        <div class="border-2 border-slate-400 rounded p-2">converse — goes through build_judge_backend + retry wrapper</div>
+        <div class="border-2 border-slate-400 rounded p-2">subscription — <i>uses</i> the Claude CLI, guarded by a sandbox working-dir check</div>
+        <p class="text-slate-500">The JudgeConfig model guard applies everywhere. Transport independence depends on which route you took.</p>
+      </div>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="deep rounded-lg p-4 space-y-2">
+        <p class="lbl">Judge factory — deep</p>
+        <p class="text-sm">build(pin, route, pacing) → Judge</p>
+        <div class="grid grid-cols-3 gap-2 text-[11px]">
+          <div class="border border-slate-500 rounded p-1 opacity-80">independence policy per route</div>
+          <div class="border border-slate-500 rounded p-1 opacity-80">pacing / retry</div>
+          <div class="border border-slate-500 rounded p-1 opacity-80">provenance log</div>
+        </div>
+      </div>
+      <div class="mt-3 grid grid-cols-3 gap-2 text-[11px]">
+        <div class="seam border-2 border-slate-400 rounded p-2">adapter: OpenAI-compatible</div>
+        <div class="seam border-2 border-slate-400 rounded p-2">adapter: Bedrock Converse</div>
+        <div class="seam border-2 border-slate-400 rounded p-2">adapter: Claude CLI (sandboxed)</div>
+      </div>
+      <p class="text-xs text-slate-500 mt-2">Tests: an in-memory adapter. A real seam: three production adapters plus one fake.</p>
+    </div>
+  </div>
+  <p><b>Problem.</b> The grader–generator independence rule is what makes harness output trustworthy, yet it is enforced in four places with different logic, and an injected backend skips the transport check entirely.</p>
+  <p><b>Solution.</b> One factory owns route selection, the per-route independence policy, pacing and provenance wiring. Commands name a route and never assemble backends themselves.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Locality: the independence policy is in one module</li>
+    <li>Leverage: commands shrink to one call</li>
+    <li>No unchecked injected path</li>
+    <li>Tests: policy table, one adapter fake</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">Overlaps with <span class="font-mono">runner/transport/*</span>: the factory stays in harness/ (one-way import rule). Don't move transport adapters across that seam.</div>
+</article>
+
+<!-- C -->
+<article id="c" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">C · One resume checkpoint, bound to content</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">Strong</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">local-substitutable (tmp dir)</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F6 known bug</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>harness/commands/rubric_grading_run.py — run_meta, save_checkpoint / load_checkpoint (pickle)</li>
+    <li>harness/response_cache.py — ResponseCache, CacheBinding</li>
+    <li>harness/blind_assessment.py — candidate_hash</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before — two resume modules</p>
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <div class="border-2 border-red-500 rounded p-2 space-y-1">
+          <p class="lbl">rubric grading (E5f)</p>
+          <p>pickle {meta, cells, verdict_cache}</p>
+          <p>meta = judge pin, rubric fingerprint, budgets, n, <b>sections_dir (a path string)</b></p>
+          <p class="text-red-700">A section replaced in place still resumes.</p>
+        </div>
+        <div class="border-2 border-slate-500 rounded p-2 space-y-1">
+          <p class="lbl">blind assessment</p>
+          <p>JSONL response checkpoint</p>
+          <p>binding = <b>candidate hash</b>, profile version, assessor pin, pack-set hash, n</p>
+          <p class="text-emerald-700">Refuses a moved binding, naming every field.</p>
+        </div>
+      </div>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="deep rounded-lg p-4 space-y-2 text-sm">
+        <p class="lbl">Response checkpoint — deep</p>
+        <p>open(path, binding, resume) · take · record · discard_last · stats</p>
+        <p class="text-xs opacity-80">The binding always carries a content hash of what is graded.</p>
+      </div>
+      <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+        <div class="border-2 border-slate-400 rounded p-2">rubric grading: binding = candidate hash + rubric fingerprint + budgets</div>
+        <div class="border-2 border-slate-400 rounded p-2">blind assessment: unchanged</div>
+      </div>
+      <p class="text-xs text-slate-500 mt-2">The pickle and the verdict_cache dict are deleted.</p>
+    </div>
+  </div>
+  <p><b>Problem.</b> Rubric grading keys its resume on a directory path rather than the bytes it graded, so a replaced section is silently mixed with verdicts drawn on the old text. Blind assessment already solved this with a second, better resume module.</p>
+  <p><b>Solution.</b> Rubric grading resumes through the response checkpoint, with a binding that includes the content hash of the sections. One resume module, one refusal rule.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Fixes the F6 bug by construction</li>
+    <li>Locality: one resume module</li>
+    <li>Deletes the pickle scratch format</li>
+    <li>Tests: tmp-dir checkpoint, swapped section</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">Rubric grading is E5f. The DN blind assessment already has the correct behaviour, so this is integrity hygiene, not DN-path work.</div>
+</article>
+
+<!-- D -->
+<article id="d" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">D · The DN pre-evaluation record chain as one module</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">Worth exploring</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">local-substitutable (tmp dir)</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F6 deepening</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>harness/evidence_preflight.py · blind_assessment.py · blind_baseline.py · integrity_audit.py</li>
+    <li>harness/esr_comparison.py · operator_review.py · comparison_diff.py</li>
+    <li>next_report_path / next_markdown_path / next_checkpoint_path · _expect_sha · _bind · load_*</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before — each record re-implements its link</p>
+      <pre class="mermaid">
+flowchart LR
+  P[preflight] --> R[blind report] --> B[blind baseline] --> A[integrity audit] --> C[ESR comparison] --> V[operator review]
+  C --> D[comparison diff]
+  R -. own hash check .-> R
+  B -. own hash check .-> B
+  C -. checks type only .-> C
+  V -. _expect_sha .-> V
+  D -. _bind nested fields .-> D
+  classDef leak stroke:#dc2626,stroke-width:2px;
+  class C,D leak
+      </pre>
+      <p class="text-xs text-slate-500">7 record types · 21 numbered-path sites · ~109 hash references in four modules.</p>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="deep rounded-lg p-4 space-y-2 text-sm">
+        <p class="lbl">Record chain — deep</p>
+        <p>write(record, out_dir) → path, sha</p>
+        <p>load(path, kind) → record, with every predecessor re-hashed</p>
+        <p class="text-xs opacity-80">Inside: record_type and advisory/blocking checks, numbered naming, atomic write, transitive binding.</p>
+      </div>
+      <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
+        <span class="border border-slate-400 rounded px-2 py-1">preflight</span><span class="border border-slate-400 rounded px-2 py-1">report</span><span class="border border-slate-400 rounded px-2 py-1">baseline</span><span class="border border-slate-400 rounded px-2 py-1">audit</span><span class="border border-slate-400 rounded px-2 py-1">comparison</span><span class="border border-slate-400 rounded px-2 py-1">review</span><span class="border border-slate-400 rounded px-2 py-1">diff</span>
+      </div>
+      <p class="text-xs text-slate-500 mt-2">Record modules keep their meaning and declare only their kind and predecessors.</p>
+    </div>
+  </div>
+  <p><b>Problem.</b> Every link in the chain that ends in Stage A/B re-implements loading, type checks, numbered naming and predecessor re-hashing, with different strictness: <span class="font-mono">load_comparison</span> checks shape but does not re-hash its baseline, while the operator review does.</p>
+  <p><b>Solution.</b> One module owns how a DN record is written and how it is loaded against its predecessors. Each record module declares its predecessors and keeps its own vocabulary.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Locality: one binding rule for the whole chain</li>
+    <li>Uniform strictness at every link</li>
+    <li>Tests: one tamper suite for all 7 kinds</li>
+    <li>Interface shrinks; 3 path helpers deleted</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">Conflicts with the documented decision in <span class="font-mono">record_binding.py</span> not to share fail-closed field readers. Reopen only the <i>chain</i> (write/load/bind), not the readers: their per-record exception types stay. Probably over the 400-line admission limit, so split it or route it through wayfinder. Touches PE-09, so admission rule 5 applies.</div>
+</article>
+
+<!-- E -->
+<article id="e" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">E · One content-hash module, one hash format</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">Worth exploring</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">in-process</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F6</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>profile.canonical_hash · regression._canonical_artifact_sha256 · rubrics.rubric_fingerprint</li>
+    <li>record_binding.file_sha256 · evidence_preflight.file_sha256 · blind_baseline._sha256_bytes</li>
+    <li>gold_set_hash · materiality_set_hash · ledger_granularity._sha256</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before — a wide surface, a thin implementation</p>
+      <div class="flex items-end gap-6 h-56">
+        <div class="flex flex-col items-center gap-1"><div class="w-24 h-44 border-2 border-red-500 rounded flex items-center justify-center text-[11px] text-center p-1">9 hash functions<br/>2 formats</div><span class="lbl">interface</span></div>
+        <div class="flex flex-col items-center gap-1"><div class="w-24 h-48 border-2 border-slate-400 rounded flex items-center justify-center text-[11px]">sha256 + json.dumps</div><span class="lbl">implementation</span></div>
+      </div>
+      <p class="text-xs text-red-700">The <span class="font-mono">sha256:</span>-prefixed and bare-hex formats leak to callers: comparison_diff slices candidate hashes at <span class="font-mono">[:19]</span> and others at <span class="font-mono">[:12]</span>.</p>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="flex items-end gap-6 h-56">
+        <div class="flex flex-col items-center gap-1"><div class="w-24 h-12 deep rounded flex items-center justify-center text-[11px] text-center">value · bytes · file</div><span class="lbl">interface</span></div>
+        <div class="flex flex-col items-center gap-1"><div class="w-24 h-48 border-2 border-slate-500 rounded flex items-center justify-center text-[11px] text-center p-1">canonical JSON rule, one prefix rule, short display form</div><span class="lbl">implementation</span></div>
+      </div>
+      <p class="text-xs text-slate-500">Set hashes (gold set, materiality) keep their field selection and call the module.</p>
+    </div>
+  </div>
+  <p><b>Problem.</b> The rule for canonical JSON is written three times and the file hash twice, in two output formats. Whether a hash is prefixed leaks into every record that stores or displays one.</p>
+  <p><b>Solution.</b> One module states the canonical form and the prefix rule once; every record calls it.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Locality: one canonical-JSON rule</li>
+    <li>Display slicing stops leaking</li>
+    <li>Natural first step for D</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">Already-written records carry today's formats. The module must read both forms, and must not re-stamp frozen baselines. Keep it separate from <span class="font-mono">runner/fingerprints.py</span> (gate freshness), because the one-way import rule leaves the runner unable to depend on it.</div>
+</article>
+
+</section>
+
+<section id="top-recommendation" class="rounded-xl deep p-8 space-y-3">
+  <p class="lbl opacity-70">Top recommendation</p>
+  <h2 class="font-serif text-3xl"><a href="#a" class="underline decoration-emerald-400">A · Deepen the judge call</a></h2>
+  <p class="text-slate-200">Every DN assessor call already goes through it, and the 2026-10-06 incident, where a trailing comma lost a 45-call run, shows it is the fragile path. Today the redraw-and-discard fix lives in one caller and is missing from another. Making it the judge's job raises DN reliability before 10 Nov at one seam, without touching the §17 call graph. <a href="#c" class="underline">C</a> is the quickest separate win: a small ticket that closes the known F6 bug.</p>
+</section>
+
+</main>
+</body>
+</html>

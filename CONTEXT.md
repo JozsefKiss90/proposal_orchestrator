@@ -1,11 +1,13 @@
 # Proposal Orchestration — Project Vocabulary
 
 Ubiquitous language for the proposal currently instantiated in Tier 3. Constitutional
-meanings live in `CLAUDE.md`; this file only pins vocabulary. The runtime module map is
-`plans/reports/CONTEXT.md`.
+meanings live in `CLAUDE.md`; this file only pins vocabulary. The other contexts (runtime, evaluation harness)
+are listed in `CONTEXT-MAP.md`.
 
-No project is instantiated. Tier 3 is empty. Populate this file when you seed a project:
-add one entry per term the team uses that a newcomer could misread, in the form below.
+Tier 3 currently holds the dev-graph demo instantiation for HORIZON-CL6-2027-01-BIODIV-01 (RIA).
+The 2026 MSCA DN proposal is not a Tier 3 project in this repository: it reaches the harness as an
+**imported candidate** (see `harness/CONTEXT.md`). Add one entry per term a newcomer could misread,
+in the form below.
 
 ## Language
 

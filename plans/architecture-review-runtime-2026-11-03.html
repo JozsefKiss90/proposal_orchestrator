@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Architecture review — proposal_orchestrator / runtime slice</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+</script>
+<style>
+  .seam { border-style: dashed !important; }
+  .deep { background: linear-gradient(135deg, #0f172a, #1e293b); color: #f8fafc; }
+  .lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
+  .diag { min-height: 300px; }
+</style>
+</head>
+<body class="bg-stone-50 text-slate-900 font-sans">
+<main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+
+<header class="space-y-3">
+  <p class="lbl text-slate-500">proposal_orchestrator · branch harness_overhaul @ d1e8527f · 2026-11-03</p>
+  <h1 class="font-serif text-4xl">Deepening opportunities in the runtime slice</h1>
+  <p class="font-mono text-sm text-slate-600">runner/skill_runtime.py (2739) · agent_runtime.py (2206) · claude_transport.py (1141) · semantic_dispatch.py (863) · runner/transport/* (2.6k)</p>
+  <div class="flex flex-wrap gap-4 text-xs text-slate-600">
+    <span class="flex items-center gap-2"><span class="inline-block w-5 h-4 border-2 border-slate-500"></span>module</span>
+    <span class="flex items-center gap-2"><span class="inline-block w-6 border-t-2 border-dashed border-slate-500"></span>seam</span>
+    <span class="flex items-center gap-2"><span class="inline-block w-6 border-t-2 border-red-600"></span>leakage</span>
+    <span class="flex items-center gap-2"><span class="inline-block w-5 h-4 deep"></span>deep module</span>
+  </div>
+  <div class="rounded bg-sky-50 border border-sky-200 text-sky-900 text-sm p-3">
+    <b>Shape of this slice.</b> The skill runtime and the agent runtime are already deep at their external interface (2 and 3 public names). The friction is <i>inside</i> them: <span class="font-mono">run_skill</span> is one 1,305-line function and <span class="font-mono">run_agent</span> is 1,053 lines, with no internal seams. Every candidate below adds an internal seam or an internal module and leaves the §17 call graph (scheduler → agent runtime → skill runtime → transport) unchanged.
+  </div>
+</header>
+
+<section id="candidates" class="space-y-10">
+
+<!-- A -->
+<article id="a" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">A · One model-invocation module behind the transport seam</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">Strong</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">ports &amp; adapters</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F4 · F5 · transport/ → admission rule 5</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>runner/skill_runtime.py — run_skill, provider switch in the TAPM branch and in the cli-prompt branch</li>
+    <li>runner/semantic_dispatch.py — _invoke_via_backend</li>
+    <li>runner/claude_transport.py — invoke_claude_text</li>
+    <li>runner/transport/config.py — build_openai_backend, build_converse_backend · tool_loop.run_tool_loop</li>
+    <li>runner/benchmark/transport_hook.py — InstrumentedBackend / instrumented_invoke</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before — the provider switch, written out three times</p>
+      <div class="grid grid-cols-3 gap-2 text-[11px] text-center">
+        <div class="lbl col-span-3 text-left text-slate-500">run_skill · TAPM</div>
+        <div class="border-2 border-red-500 rounded p-1">claude_cli</div><div class="border-2 border-red-500 rounded p-1">converse + tool loop</div><div class="border-2 border-red-500 rounded p-1">openai + tool loop</div>
+        <div class="lbl col-span-3 text-left text-slate-500 mt-2">run_skill · cli-prompt</div>
+        <div class="border-2 border-red-500 rounded p-1">claude_cli</div><div class="border-2 border-red-500 rounded p-1">converse</div><div class="border-2 border-red-500 rounded p-1">openai</div>
+        <div class="lbl col-span-3 text-left text-slate-500 mt-2">semantic_dispatch</div>
+        <div class="border-2 border-red-500 rounded p-1">claude_cli</div><div class="border-2 border-red-500 rounded p-1">converse</div><div class="border-2 border-red-500 rounded p-1">openai</div>
+      </div>
+      <p class="text-xs text-slate-500 mt-3">Each block: build → instrument → call → map errors → empty-text check. Each copies benchmark tags, timeouts and the error class.</p>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="flex gap-2 text-[11px] mb-3">
+        <div class="border-2 border-slate-400 rounded p-2 flex-1 text-center">skill runtime</div>
+        <div class="border-2 border-slate-400 rounded p-2 flex-1 text-center">semantic dispatch</div>
+      </div>
+      <div class="deep rounded-lg p-4 space-y-2 text-sm">
+        <p class="lbl">Model invocation — deep</p>
+        <p>invoke(request) → response</p>
+        <p class="text-xs opacity-80">request: system, user, tools?, allowed prefixes, timeout, bench tags<br/>response: text, files read, rounds exhausted · one failure type</p>
+      </div>
+      <div class="mt-3 grid grid-cols-4 gap-2 text-[11px] text-center">
+        <div class="seam border-2 border-slate-400 rounded p-1">claude CLI</div>
+        <div class="seam border-2 border-slate-400 rounded p-1">Bedrock Converse</div>
+        <div class="seam border-2 border-slate-400 rounded p-1">OpenAI-compat.</div>
+        <div class="seam border-2 border-emerald-500 rounded p-1">in-memory (tests)</div>
+      </div>
+    </div>
+  </div>
+  <p><b>Problem.</b> Choosing and calling a backend is written out about nine times across two callers, so a fix to one path (timeouts, the empty-content check, tool-loop exhaustion) does not reach the others. Tests mostly stub <span class="font-mono">invoke_claude_text</span> (16 patches), which leaves the Converse/OpenAI branches inside <span class="font-mono">run_skill</span> with one 8-test file.</p>
+  <p><b>Solution.</b> One module takes a provider-neutral request and returns text plus tool-loop facts. The skill runtime and semantic dispatch call it, and map its one failure type to their own categories.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Locality: one place per backend</li>
+    <li>Leverage: two callers, one interface</li>
+    <li>Real seam: three adapters plus a fake</li>
+    <li>run_skill loses roughly 450 lines</li>
+    <li>Tests stop patching module internals</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">Stays inside the §17.1.3 rule: the skill runtime still calls Claude only through the configured transport, and this module <i>is</i> that transport. It touches <span class="font-mono">transport/</span>, so a PE-09 acceptance lane run is required. The harness judge builders (harness review, candidate B) could later take this as their adapter, but harness → runner is the only permitted direction.</div>
+</article>
+
+<!-- B -->
+<article id="b" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">B · Skill response contract: parse, validate, write</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">Strong</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">local-substitutable (tmp dir)</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F4 · plan item 6</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>runner/skill_runtime.py — run_skill Phases D/D.5/E (~lines 2040–2739), _extract_json_response, _validate_skill_output, _atomic_write</li>
+    <li>runner/decomposed_drafting.py — imports the private <span class="text-red-700">skill_runtime._extract_json_response</span></li>
+    <li>runner/json_extract.py — extract_first_json_object (a second extraction policy)</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before — cross-section of run_skill</p>
+      <div class="space-y-1 text-[11px]">
+        <div class="h-8 border-l-4 border-slate-400 bg-slate-50 pl-2 flex items-center">A · mode + capability gating</div>
+        <div class="h-8 border-l-4 border-slate-400 bg-slate-50 pl-2 flex items-center">B · prompt assembly (TAPM / cli-prompt)</div>
+        <div class="h-8 border-l-4 border-slate-400 bg-slate-50 pl-2 flex items-center">C · invoke (×6 backend blocks)</div>
+        <div class="h-8 border-l-4 border-red-500 bg-red-50 pl-2 flex items-center">D · extract JSON (largest-object, truncation guard)</div>
+        <div class="h-8 border-l-4 border-red-500 bg-red-50 pl-2 flex items-center">D.5 · envelope unwrap, run_id / artifact_status rules</div>
+        <div class="h-8 border-l-4 border-red-500 bg-red-50 pl-2 flex items-center">E1 · canonical single write</div>
+        <div class="h-8 border-l-4 border-red-500 bg-red-50 pl-2 flex items-center">E2 · enrich_artifact merge</div>
+        <div class="h-8 border-l-4 border-red-500 bg-red-50 pl-2 flex items-center">E3 · multi-artifact write</div>
+      </div>
+      <p class="text-xs text-slate-500 mt-2">Red bands are reachable only by driving a fake Claude through all of run_skill.</p>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="space-y-1 text-[11px]">
+        <div class="h-8 border-l-4 border-slate-400 bg-slate-50 pl-2 flex items-center">A · B · C (run_skill)</div>
+      </div>
+      <div class="deep rounded-lg p-4 mt-2 space-y-2 text-sm">
+        <p class="lbl">Skill response contract — deep</p>
+        <p>apply(response text, skill entry, schemas, run_id) → SkillResult</p>
+        <div class="grid grid-cols-3 gap-2 text-[11px] opacity-80">
+          <div class="border border-slate-500 rounded p-1">single</div>
+          <div class="border border-slate-500 rounded p-1">enrich</div>
+          <div class="border border-slate-500 rounded p-1">multi-artifact</div>
+        </div>
+        <p class="text-xs opacity-80">The extraction policy is public, so decomposed drafting calls it through the interface.</p>
+      </div>
+    </div>
+  </div>
+  <p><b>Problem.</b> The "no silent repair" rules (§17.5.4, §17.6.5) and the three output-contract write modes sit at the tail of a 1,305-line function, so every test of them has to stage a whole skill invocation. Decomposed drafting reaches past the interface to borrow the private extractor.</p>
+  <p><b>Solution.</b> Move everything after the transport returns text into one module that takes the response and the skill's catalog entry and returns a SkillResult, writing artifacts atomically.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Interface is the test surface: text in</li>
+    <li>Locality for the §17.6.5 rules</li>
+    <li>Ends the private-function import</li>
+    <li>run_skill loses roughly 700 lines</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">There are two JSON-extraction policies in the runtime: the skill runtime's (largest object wins, front-truncation fails closed) and the shared helper (first object, no truncation guard), which semantic dispatch and the harness judge use. Unifying them changes behaviour, so it is a separate decision. Note it, don't fold it in.</div>
+</article>
+
+<!-- C -->
+<article id="c" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">C · Caller context: one module per skill binding</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">Worth exploring</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">in-process</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F4</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>runner/agent_runtime.py — _build_caller_context (registry), the fail-closed "no context" guard, and inline injections inside run_agent's skill loop</li>
+    <li>inline: invocation_mode (budget-interface-validation), gate_id (gate-enforcement), resolved_instrument_type (instrument-schema-normalization), artifact_path + Tier-5 applicability skip (constitutional-compliance-check, proposal-section-traceability-check)</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before</p>
+      <pre class="mermaid">
+flowchart TB
+  L[run_agent skill loop] --> R[_build_caller_context registry]
+  L --> G[fail-closed guard]
+  L -.if budget-validation.-> I1[invocation_mode]
+  L -.if gate-enforcement.-> I2[gate_id]
+  L -.if instrument-normalization.-> I3[instrument type]
+  L -.if compliance / traceability.-> I4[artifact_path + skip]
+  classDef leak stroke:#dc2626,stroke-width:2px;
+  class I1,I2,I3,I4 leak
+      </pre>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="border-2 border-slate-400 rounded p-2 text-[11px] mb-3">run_agent skill loop</div>
+      <div class="deep rounded-lg p-4 space-y-2 text-sm">
+        <p class="lbl">Caller context — deep</p>
+        <p>context_for(skill, node, resolved inputs, outputs so far) → context | not applicable | missing</p>
+        <p class="text-xs opacity-80">One table of bindings. The fail-closed rule and the applicability skip live here.</p>
+      </div>
+    </div>
+  </div>
+  <p><b>Problem.</b> What context a skill receives is decided in two places, a registry plus four skill-name special cases inside the loop. The fail-closed guard covers only the registry half.</p>
+  <p><b>Solution.</b> One module answers "what does this skill get here?" with three outcomes: context, not applicable, or missing. The loop only acts on the answer.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Fail-closed rule covers every binding</li>
+    <li>Adding a skill means one table row</li>
+    <li>Tests: pure function, no Claude</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">This is the area of the 2026-08-13 fail-closed guard and the Phase 3 g04_p07 missing-binding failure. Characterisation tests must pin today's behaviour for all five special-cased skills before anything moves.</div>
+</article>
+
+<!-- D -->
+<article id="d" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">D · Node-body plan as a pure function</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">Worth exploring</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">in-process</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">F4</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>runner/agent_runtime.py — run_agent: preseed/reuse skip, deterministic-component placement, pre-gate agent split, gate-enforcement-last rule, n03 sub-agent extraction, idempotent draft reuse</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before — decide and do, interleaved</p>
+      <div class="space-y-1 text-[11px]">
+        <div class="border-2 border-red-500 rounded p-1">decide skip set → run components → decide pre-gate skills → run them</div>
+        <div class="border-2 border-red-500 rounded p-1">reorder (gate-enforcement last) → pull sub-agent skills → loop: build context, run, maybe run sub-agent</div>
+        <div class="border-2 border-red-500 rounded p-1">run leftover sub-agent skills → inspect disk → AgentResult</div>
+      </div>
+      <p class="text-xs text-slate-500 mt-2">Ordering rules can only be observed by running skills.</p>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="deep rounded-lg p-4 space-y-2 text-sm">
+        <p class="lbl">Node-body plan — deep</p>
+        <p>plan(node, manifest, prompt spec, skip set) → ordered steps</p>
+        <p class="text-xs opacity-80">steps: component · skill · sub-agent skill · gate-enforcement (always last)</p>
+      </div>
+      <div class="border-2 border-slate-400 rounded p-2 text-[11px] mt-3">run_agent: execute the steps, collect results, inspect disk</div>
+    </div>
+  </div>
+  <p><b>Problem.</b> The rules that decide what a node body runs, and in what order, are spread through a 1,053-line executor and can only be tested by executing it.</p>
+  <p><b>Solution.</b> Compute the node-body plan up front as data, then execute it. The ordering rules become assertions on a list.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Ordering rules tested without Claude</li>
+    <li>Locality: one place for sequencing</li>
+    <li>Dry-run of a node becomes possible</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">Likely over 400 lines. It has no DN-pre-evaluation value before 23 Nov, so defer it unless discovery shows a sequencing bug.</div>
+</article>
+
+<!-- E -->
+<article id="e" class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+  <h2 class="font-serif text-2xl">E · Retire cli-prompt mode (TAPM only)</h2>
+  <div class="flex gap-2 text-xs">
+    <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-semibold">Speculative — operator decision</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">in-process</span>
+    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">§17 banner (plan §6)</span>
+  </div>
+  <ul class="font-mono text-sm text-slate-700">
+    <li>.claude/workflows/system_orchestration/skill_catalog.yaml — execution_mode on every entry</li>
+    <li>runner/skill_runtime.py — cli-prompt branch, _resolve_inputs, _validate_skill_inputs, _assemble_skill_prompt</li>
+  </ul>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">Before</p>
+      <div class="flex items-end gap-6 h-56">
+        <div class="flex flex-col items-center gap-1"><div class="w-28 h-40 border-2 border-slate-500 rounded flex items-center justify-center text-[11px] text-center p-1">TAPM path<br/>24/24 catalog entries</div><span class="lbl">used</span></div>
+        <div class="flex flex-col items-center gap-1"><div class="w-28 h-36 border-2 border-red-500 rounded flex items-center justify-center text-[11px] text-center p-1">cli-prompt path<br/>0 catalog entries<br/>(only the default when a mode is omitted)</div><span class="lbl">dormant</span></div>
+      </div>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-3 diag">
+      <p class="lbl text-slate-500 mb-2">After</p>
+      <div class="deep rounded-lg p-4 h-40 flex items-center justify-center text-sm text-center">One prompt mode<br/>a missing execution_mode fails closed</div>
+      <p class="text-xs text-slate-500 mt-2">Halves candidate A's adapter matrix and removes about 250 more lines.</p>
+    </div>
+  </div>
+  <p><b>Problem.</b> Every skill that declares a mode declares <span class="font-mono">tapm</span>, yet the constitution still says the migration is in progress, and a second, dormant prompt path doubles every transport branch.</p>
+  <p><b>Solution.</b> If you confirm the migration is done, close the §17 amendment record. A separate ticket then removes cli-prompt mode.</p>
+  <ul class="text-sm list-disc pl-5 space-y-0.5">
+    <li>Answers the plan §6 TAPM question with evidence</li>
+    <li>Interface shrinks; one mode to test</li>
+  </ul>
+  <div class="rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm p-2">Needs your explicit amendment of §17 (§14.5), so it is not a Fable ticket. Check the benchmark harness and tests for cli-prompt reliance first. Many runtime tests omit execution_mode and rely on the default.</div>
+</article>
+
+</section>
+
+<section id="top-recommendation" class="rounded-xl deep p-8 space-y-3">
+  <p class="lbl opacity-70">Top recommendation</p>
+  <h2 class="font-serif text-2xl"><a href="#b" class="underline decoration-emerald-400">B · Skill response contract</a></h2>
+  <p class="text-slate-200">It is plan item 6 exactly: one internal extraction, transport untouched, no change to the §17 call graph or to the DN pre-evaluation code, so no PE-09 run is needed, and it fits one session. It turns the no-silent-repair rules into something testable with text in and files out. <a href="#a" class="underline">A</a> has the bigger payoff, but it touches transport/ (PE-09 lane run) and becomes much smaller if you settle <a href="#e" class="underline">E</a> first.</p>
+</section>
+
+</main>
+</body>
+</html>

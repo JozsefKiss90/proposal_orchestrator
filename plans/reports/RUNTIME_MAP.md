@@ -1,13 +1,14 @@
-# CONTEXT.md — runtime module map
+# RUNTIME_MAP.md — runtime module map
 
-Mental model of the `runner/` runtime, for fast orientation when debugging. Authoritative source is
+Mental model of the `runner/` runtime, for fast orientation when debugging. Vocabulary lives in
+`runner/CONTEXT.md` (runtime) and `harness/CONTEXT.md` (evaluation harness); see `CONTEXT-MAP.md`.
+Refreshed 2026-11-03. Authoritative source is
 `CLAUDE.md` §17 (Runtime Execution Architecture) — this file is a navigation aid, not a contract.
 Check the decision logs in `docs/tier4_orchestration_state/decision_log/` for ADRs in any area you touch.
 
-> **Migration in flight (do not be surprised):** the Hybrid/TAPM migration (`backend_migration_plan.md`)
-> is transitioning input-heavy skill calls from full-prompt serialization to **Tool-Augmented Prompt
-> Mode** (`claude -p --tools "Read,Glob"`) plus a deterministic **Call Slicer** (Step 0). Scheduler,
-> gates, artifact validation, and fail-closed semantics are unchanged. §17 as written remains in force.
+> **TAPM banner:** `CLAUDE.md` §17 still marks the Hybrid/TAPM migration (`backend_migration_plan.md`)
+> as IN PROGRESS. Whether it is done is an open operator decision (`plans/overhaul_2026-11_plan.md` §6).
+> Until §17 is amended, §17 as written remains in force.
 
 ## Execution stack (three layers + gate evaluator)
 One caller per layer — violating the call graph is a constitutional violation (§17.1), so a "bug" that
@@ -31,16 +32,11 @@ Node dispatch is a fixed 5-step contract (§17.2): set `running` → entry gate 
 classified by exactly one `failure_origin` ∈ {`entry_gate`,`agent_body`,`exit_gate`}. Metadata persists
 via `runner/run_context.py` (`RunContext`) into `run_summary.json`.
 
-## Where the current residuals live (see the kickoff brief for the debugging plan)
-- **Transport hang (4.2):** `runner/claude_transport.py` — the `subprocess` call + timeout handling.
-- **Preseed suppression (4.5a):** `runner/dag_scheduler.py` (preseed-mode node filtering) with
-  `runner/phase8_preseed.py`; interacts with the deterministic composition components below.
-- **Gate-result `schema_id` (4.5b):** `runner/gate_evaluator.py` (the writer) + `tools/backfill_gate_result_schema_id.py`.
-  Runtime must **not silently repair** a missing/incorrect `schema_id` — it is a validation failure (§17.6.5).
-- **gate_10b predicate (§3):** `runner/predicates/phase8_section_predicates.py` (`_appositive_is_other_entity`).
-- **checkpoint-publish run_id (§2):** a **contract decision**, not a runtime bug — bootstrapped gate
-  results legitimately carry the prior `run_id`; the `checkpoint-publish` skill's current-run_id
-  requirement is what conflicts. Provenance is load-bearing (do not re-stamp).
+## Residuals
+The July 2026 residual list (4.2 transport hang, 4.5a preseed suppression, 4.5b gate-result
+`schema_id`, gate_10b appositive predicate, checkpoint-publish run_id) was removed on 2026-11-03.
+4.2 was fixed in `5570857f`; the others are unverified here. Current open work is tracked in
+`.scratch/overhaul-2026-11/` and `plans/overhaul_2026-11_plan.md`.
 
 ## Deterministic, Claude-free components (§17.5.3) — not skills
 Invoked inside the node body by the agent runtime; each guarantees byte-equal replay / pure lookup and
@@ -66,4 +62,5 @@ evaluator; agents never evaluate gates (§17.6.2).
 - Debug plan: `plans/DEBUG_KICKOFF_phase8_calibration.md` (lane assignment + loops + prompts).
 - Thread state: `HANDOFF_phase8_m2t10_2026-07-22.md`.
 - Decisions/ADRs: `docs/tier4_orchestration_state/decision_log/`.
-- Eval/calibration: `tickets_eval_harness.md`, `EVALUATION_HARNESS_STRATEGY.md`.
+- Eval/calibration: `harness/HARNESS.md`, `harness/ACCEPTANCE_LANE.md`, `plans/harness_plan/`.
+- DN pre-evaluation: `plans/msca_dn_pre_evaluation_spec.md`, `plans/msca_dn_pe09_runbook.md`.

@@ -484,3 +484,15 @@ Each entry records the same fields as v1:
 | Verification Result | R12a DONE. |
 | Next Action | Operator: commit ("close R12a"). Frontier: R12b needs R11 (held by the operator: hourly cost); R14, R15, R13 follow R11/R12b; R16 per OD12 (R12a point 14: to be asked now); F-R12a-1–3 for R12b. |
 
+### 2026-10-29 — R16: DC-38 deferred per OD12 — verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-10-29T17:45:00Z |
+| Control ID | DC-38 (NOT_STARTED → DEFERRED, OD12) |
+| Action Taken | Operator chose "14 a" (R16-D1: record the deferral now, overriding R16's R11 dependency for the second criterion only). Agent changed the DC-38 row of register v2 (DEFERRED, OD12 cited verbatim, R10 scope note kept) and wrote `aws-redeployment-r16-dc38-deferred_2026-10-29` (R16-D1–D3); the operator committed it with the step sheet, run log and handoff as `d1e8527f starting R16`, then ran step 01 (first line adapted to the committed change; deviation in `RUNLOG.md`). No AWS call, no cost. |
+| Evidence Requested | `R16_01_diff-stat.txt`, `R16_01_pytest.txt`, `R16_01_old-id-guard.txt`, `R16_01_secret-scan.txt` |
+| Evidence Received | `evidence_v2/R16/`: `e0d9da6..HEAD` exactly the 5 R16 files, the register a 1-line change; tree clean; register and guard tests 118 passed, 1 skipped (the R12a symlink case), `exit=0`; old-ID guard (default scope) and secret scan CLEAN (scan re-run by the agent after `VERIFICATION.md`: CLEAN). |
+| Verification Result | Ticket criterion 2 PASS; criterion 1 N/A (deferred per OD12, not attempted). R16 open as deferred (OD12), not DONE (R16-D3). |
+| Next Action | Operator: confirm in session; agent then ticks only R16's second criterion and marks R16 "open as deferred (OD12)"; operator commits the rest (e.g. `R16 DC-38 deferred`). Frontier: R11 held by the operator (hourly cost); R12b after R11 (F-R12a-1–3); R14, R15, R13 follow. R16's first criterion only with a successor to OD12. |
+
