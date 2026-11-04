@@ -41,9 +41,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from runner.json_extract import extract_first_json_object
-from runner.model_ids import canonical_model_id
 from harness.provenance import ProvenanceLog, ProvenanceRecord, prompt_hash
-from harness.response_cache import ResponseCache
 from harness.verdict import (
     MIN_MAJORITY_SAMPLES,
     MajorityVerdict,
@@ -61,8 +59,6 @@ __all__ = [
     "JudgeResult",
     "MajorityJudgeResult",
     "Judge",
-    "build_judge_backend",
-    "canonical_model_id",
     "drafter_models",
     "resolve_judge_config",
 ]
@@ -103,15 +99,6 @@ class JudgeResponseError(JudgeError):
 # --------------------------------------------------------------------------- #
 
 
-def _production_mode() -> bool:
-    """``ORCHESTRATOR_PRODUCTION_MODE`` is ``true`` (case-insensitive).
-
-    The same rule as ``runner.transport.config.is_production_mode``, read here
-    without importing that module, whose import loads ``.env``.
-    """
-    return os.environ.get("ORCHESTRATOR_PRODUCTION_MODE", "").lower() == "true"
-
-
 def drafter_models() -> frozenset[str]:
     """Return the models the judge must NOT be — the drafter + in-run reviewer.
 
@@ -119,26 +106,11 @@ def drafter_models() -> frozenset[str]:
     ``semantic_dispatch.AGENT_MODEL``) so the independence guard tracks whatever
     the pipeline actually drafts/reviews with.  Imported lazily to keep this
     module cheap to import.
-
-    Under ``ORCHESTRATOR_PRODUCTION_MODE=true`` (the private host, started
-    through ``runner.host_env``) the pipeline drafts through the transport
-    with ``ORCHESTRATOR_TRANSPORT_MODEL`` from the runtime secret, so that
-    model is a drafter too (AN1c; decision records
-    ``aws-redeployment-od7-model-set_2026-10-21`` OD7-assessor and
-    ``aws-redeployment-r9e-eu-region_2026-10-27``).  Outside production mode
-    the variable is not read: on the workstation ``.env.harness`` puts the
-    *judge's* model there, and counting it would make every workstation judge
-    fail its own independence check.
     """
     from runner.semantic_dispatch import AGENT_MODEL
     from runner.skill_runtime import SKILL_MODEL
 
-    models = {SKILL_MODEL, AGENT_MODEL}
-    if _production_mode():
-        transport_model = os.environ.get("ORCHESTRATOR_TRANSPORT_MODEL", "").strip()
-        if transport_model:
-            models.add(transport_model)
-    return frozenset(models)
+    return frozenset({SKILL_MODEL, AGENT_MODEL})
 
 
 def _default_clock() -> str:
@@ -157,9 +129,8 @@ class JudgeConfig:
     Attributes
     ----------
     model:
-        The judge model identifier.  Must not name a drafter model
-        (:func:`drafter_models`) in any form, compared by
-        :func:`canonical_model_id`.
+        The judge model identifier.  Must not be a drafter model
+        (:func:`drafter_models`).
     version:
         A pinned version tag (non-empty).  Recorded on every provenance record;
         changing it re-opens E1.5's advisory-only state.
@@ -190,9 +161,7 @@ class JudgeConfig:
                 f"robustness); got {self.temperature!r}."
             )
         drafters = drafter_models()
-        # By the model named, not the string: on Bedrock one model has several
-        # ids, and the drafter and the assessor share the provider (AN1c).
-        if canonical_model_id(self.model) in {canonical_model_id(d) for d in drafters}:
+        if self.model in drafters:
             raise JudgeIndependenceError(
                 f"Judge model {self.model!r} is a drafter/in-run model "
                 f"({sorted(drafters)}). Grader–generator independence requires a "
@@ -222,44 +191,6 @@ def resolve_judge_config() -> JudgeConfig:
     max_tokens_raw = os.environ.get("HARNESS_JUDGE_MAX_TOKENS")
     max_tokens = int(max_tokens_raw) if max_tokens_raw else DEFAULT_JUDGE_MAX_TOKENS
     return JudgeConfig(model=model, version=version, max_tokens=max_tokens)
-
-
-# --------------------------------------------------------------------------- #
-# Backend construction
-# --------------------------------------------------------------------------- #
-
-
-def build_judge_backend(provider: Any, config: JudgeConfig) -> Backend:
-    """Build the real judge backend for a resolved provider configuration.
-
-    The judge model is pinned authoritatively from *config*, whatever model
-    the environment names.  Temperature and the token limit come from *config*
-    too.  A ``bedrock_converse`` provider builds the native Converse backend,
-    which needs no base URL (AN1a); every other non-CLI provider builds the
-    OpenAI-compatible HTTP backend, as before.
-
-    Raises
-    ------
-    JudgeIndependenceError
-        If *provider* is the ``claude_cli`` drafter transport.
-    """
-    from runner.transport.config import build_converse_backend, build_openai_backend
-
-    if provider.backend_name == "claude_cli":
-        raise JudgeIndependenceError(
-            "The independent judge requires a non-drafter API transport "
-            "(OpenAI-compatible or Bedrock Converse), but the resolved backend "
-            "is 'claude_cli' (the drafter transport). "
-            "Set ORCHESTRATOR_TRANSPORT_PRESET / ORCHESTRATOR_TRANSPORT_BACKEND "
-            "to a non-Claude backend for grader–generator independence."
-        )
-    provider = dataclasses.replace(provider, model=config.model)
-    build = (
-        build_converse_backend
-        if provider.backend_name == "bedrock_converse"
-        else build_openai_backend
-    )
-    return build(provider, temperature=config.temperature, max_tokens=config.max_tokens)
 
 
 # --------------------------------------------------------------------------- #
@@ -340,10 +271,9 @@ class Judge:
         :class:`~runner.transport.tool_loop.ToolLoopBackend` shape).  When
         supplied, no network or ``httpx`` is touched — the path used by tests
         and by callers that wire their own transport.  When ``None``, a real
-        backend is built lazily from ``resolve_provider_config()`` on first use
-        (:func:`build_judge_backend`): native Converse for ``bedrock_converse``,
-        OpenAI-compatible otherwise, and a ``claude_cli`` transport is rejected
-        for independence.  Note: the *transport*-independence check
+        OpenAI-compatible backend is built lazily from
+        ``resolve_provider_config()`` on first use, and a ``claude_cli`` transport
+        is rejected for independence.  Note: the *transport*-independence check
         (non-``claude_cli``) applies only to the default-built backend — the
         judge cannot introspect an arbitrary injected callable's transport, so
         on the injected path transport independence is the caller's
@@ -355,11 +285,6 @@ class Judge:
     clock:
         Optional callable returning an ISO-8601 timestamp for provenance
         (injectable for reproducible tests).
-    response_cache:
-        Optional :class:`~harness.response_cache.ResponseCache`.  When present,
-        every raw response is checkpointed as it arrives, and a cache opened in
-        resume mode serves the calls it already holds instead of spawning them
-        again.  A long run then survives a failure in its last call.
     """
 
     def __init__(
@@ -369,50 +294,11 @@ class Judge:
         backend: Backend | None = None,
         provenance_log: ProvenanceLog | None = None,
         clock: Clock | None = None,
-        response_cache: ResponseCache | None = None,
     ) -> None:
         self.config = config
         self._backend = backend
         self._provenance_log = provenance_log
         self._clock = clock or _default_clock
-        self._response_cache = response_cache
-
-    @property
-    def clock(self) -> Clock:
-        """The timestamp source provenance records carry (read-only).
-
-        Exposed for the same reason as :attr:`provenance_log`: a caller that
-        drives :meth:`raw_invoke` for a verdict the default schema cannot carry
-        (a 0-5 criterion score, say) hand-builds its provenance with the same
-        clock the judge would have used, so its trail stays comparable.
-        """
-        return self._clock
-
-    @property
-    def response_cache(self) -> ResponseCache | None:
-        """The attached response checkpoint, if any (read-only).
-
-        Every assessor call this judge makes passes through
-        :meth:`raw_invoke`, so the cache attached here covers the whole run:
-        the cells, the criterion samples and anything else a caller drives.
-        """
-        return self._response_cache
-
-    def attach_response_cache(self, cache: ResponseCache) -> None:
-        """Attach a checkpoint to a judge built elsewhere.
-
-        The live assessors are built by their own builders
-        (``build_paced_judge``, ``build_subscription_judge``), so a command
-        that wants a checkpoint attaches it after the fact.  A second cache is
-        refused: two caches would each hold half a run and neither would
-        replay it.
-        """
-        if self._response_cache is not None:
-            raise JudgeError(
-                f"this judge already writes to checkpoint "
-                f"{self._response_cache.path}; a second one would split the run."
-            )
-        self._response_cache = cache
 
     @property
     def provenance_log(self) -> ProvenanceLog | None:
@@ -432,31 +318,30 @@ class Judge:
         if self._backend is not None:
             return self._backend
 
-        from runner.transport.config import resolve_provider_config
+        from runner.transport.config import build_openai_backend, resolve_provider_config
 
-        self._backend = build_judge_backend(resolve_provider_config(), self.config)
+        provider = resolve_provider_config()
+        if provider.backend_name == "claude_cli":
+            raise JudgeIndependenceError(
+                "The independent judge requires an OpenAI-compatible transport, "
+                "but the resolved backend is 'claude_cli' (the drafter transport). "
+                "Set ORCHESTRATOR_TRANSPORT_PRESET / ORCHESTRATOR_TRANSPORT_BACKEND "
+                "to a non-Claude backend for grader–generator independence."
+            )
+        # Pin the judge model authoritatively, independent of the env model.
+        provider = dataclasses.replace(provider, model=self.config.model)
+        self._backend = build_openai_backend(
+            provider,
+            temperature=self.config.temperature,
+            max_tokens=self.config.max_tokens,
+        )
         return self._backend
 
     def raw_invoke(self, system_prompt: str, user_prompt: str) -> str:
         """Send one chat request and return the raw content string.
 
         Raises :class:`JudgeResponseError` if the backend returns no content.
-
-        This is the single seam every assessor call passes through, so it is
-        where the response checkpoint lives
-        (:mod:`harness.response_cache`).  With a cache attached in resume
-        mode, a call the checkpoint covers is served from it and no
-        subprocess is spawned; otherwise the live response is checkpointed
-        verbatim before it is returned to the caller that will parse it.
-        Replay is byte-faithful: the same response text, through the same
-        parsers, never a repaired or regenerated one.
         """
-        cache = self._response_cache
-        key = prompt_hash(system_prompt, user_prompt) if cache is not None else ""
-        if cache is not None:
-            replayed = cache.take(key)
-            if replayed is not None:
-                return replayed
         backend = self._get_backend()
         result = backend(
             [
@@ -467,20 +352,7 @@ class Judge:
         content = result.get("content") if isinstance(result, dict) else None
         if not content or not str(content).strip():
             raise JudgeResponseError("Judge backend returned empty content.")
-        if cache is not None:
-            cache.record(key, str(content))
         return str(content)
-
-    def _discard_last_response(self, reason: str) -> None:
-        """Tell the checkpoint that the last response was unusable, if one is attached.
-
-        The cache sits below the parsers and cannot tell a good response from a
-        bad one; this is how it is told.  A discarded response stays in the
-        file but is never replayed, so a resumed run redraws that call instead
-        of failing on the same bytes again.
-        """
-        if self._response_cache is not None:
-            self._response_cache.discard_last(reason)
 
     # -- verdicts --------------------------------------------------------- #
 
@@ -503,16 +375,11 @@ class Judge:
         raw = self.raw_invoke(system_prompt, user_prompt)
         payload = extract_first_json_object(raw)
         if payload is None:
-            reason = (
-                f"no parseable JSON object for {metric!r}/{property_key!r}: {raw[:200]!r}"
+            raise JudgeResponseError(
+                f"Judge returned no parseable JSON object for {metric!r}/"
+                f"{property_key!r}: {raw[:200]!r}"
             )
-            self._discard_last_response(reason)
-            raise JudgeResponseError(f"Judge returned {reason}")
-        try:
-            verdict = _verdict_from_payload(payload, metric=metric, property_key=property_key)
-        except JudgeResponseError as exc:
-            self._discard_last_response(str(exc))
-            raise
+        verdict = _verdict_from_payload(payload, metric=metric, property_key=property_key)
         if sample_index is not None:
             verdict = dataclasses.replace(verdict, sample_index=sample_index)
 
