@@ -75,6 +75,18 @@ The deterministic pre-Claude pass that bounds call inputs to the selected call b
 A skill invocation in which Claude reads its declared inputs from disk instead of receiving them in
 the prompt.
 
+**Caller context**:
+The values an agent hands a skill for one invocation, beyond its declared inputs. For a given skill at a
+given point in a node body it is either available, not applicable (the skill is skipped), or missing
+(the skill fails closed without being invoked).
+_Avoid_: extra inputs, injection
+
+**Skill response contract**:
+What happens to a skill's response after the transport returns it: extract the JSON, validate it
+without silent repair, and write it in the mode its output contract names (single artifact, multi
+artifact, enrich artifact, or payload).
+_Avoid_: post-processing, parser
+
 ### Artifacts and honesty
 
 **Canonical pack**:
