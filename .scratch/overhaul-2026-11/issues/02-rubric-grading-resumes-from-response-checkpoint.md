@@ -41,8 +41,7 @@ binding includes a content hash of the graded sections. The pickle checkpoint is
   spending the stopped run's draws again.
 - **Report.** The rubric report and the E4 rubric baseline carry the candidate hash and the
   replayed / live draw counts. This is additive.
-- **Stale pickle.** The existing `harness/rubric_reports/rubric_run_checkpoint.pkl` is not migrated.
-  It is already known to be stale. The operator deletes it.
+- **Stale pickle.** No checkpoint file exists in this tree (checked 2026-11-05): `harness/rubric_reports/` holds only `.gitkeep`, and the pickle path is gitignored, so it was never committed. The 2026-08-10 checkpoint lived in another working tree. There is nothing to migrate or delete.
 
 ## Acceptance criteria
 
