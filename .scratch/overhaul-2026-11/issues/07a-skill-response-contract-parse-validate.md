@@ -89,3 +89,8 @@ Record: no decision-log entry (no orchestration interpretation changes)
   object, no front-truncation guard) is used by `semantic_dispatch` and the harness judge. Unifying the
   two policies changes behaviour, so it is a separate operator decision.
 - The write modes (07b). Transport and backend selection (09).
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06): runner skill runtime, off the DN path (W03 §1, §4). Plan §4 item 6 admits a runtime extraction only if it blocks testability; it does not.
+- Wave 2a (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.

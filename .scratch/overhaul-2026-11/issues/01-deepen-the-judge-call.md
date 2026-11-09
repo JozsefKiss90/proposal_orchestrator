@@ -86,3 +86,8 @@ Record: no decision-log entry needed (harness is out-of-band; no orchestration i
 - Making the two JSON-extraction rules consistent (runtime review cross-finding).
 - Judge construction and the independence policy (harness candidate B).
 - Any freeze check on redraw counts.
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06) until after V16. It is the only candidate that changes assessment output, and W05 locks V14 and V16 to one bundle from the 10 Nov freeze commit; today's behaviour already fails closed and resumes cheaply. Finding 5 (replays recorded as live draws) moved to ticket 15. Revisit after V16, together with 02 and 03.
+- Wave 2a (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.

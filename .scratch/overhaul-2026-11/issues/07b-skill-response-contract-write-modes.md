@@ -76,3 +76,8 @@ Record: no decision-log entry (no orchestration interpretation changes)
 
 - Changing which mode a skill uses, or any `skill_catalog.yaml` edit.
 - Unifying the JSON-extraction policies (see 07a).
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06): as 07a. Blocked by 07a.
+- Wave 2b (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.

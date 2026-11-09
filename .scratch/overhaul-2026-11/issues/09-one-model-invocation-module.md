@@ -102,3 +102,6 @@ Record: no decision-log entry unless a failure category mapping changes
 - Unifying the JSON-extraction policies.
 - Harness judge builders adopting this module (harness ticket 03).
 - Changing model or CLI pins.
+
+- Deferred at Step 3 (2026-11-06): as 07a; must leave SKILL_MODEL / AGENT_MODEL importable where harness/judge.py reads them. Blocked by 07a, 07b.
+- Wave 2c (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.

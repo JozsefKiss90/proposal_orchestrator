@@ -39,18 +39,50 @@ left to decide before the scope cut and the operator sessions.
 ## Decisions so far
 
 <!-- one line per resolved ticket: [title](issues/NN-slug.md) — gist -->
+- [04 — Does AN15 ride in the V14 session?](issues/04-does-an15-ride-in-the-v14-session.md) — skipped by the operator (2026-11-06): AN15 does not ride; AN12a not must-land; AN chain deferred past 23 Nov.
+- [03 — V14/V16 run path and on-route tickets](issues/03-v14-v16-run-path-and-on-route-tickets.md) — transport is an operator call (host not built; runbook says claude-cli); 03's misroute is off route; only 01 changes assessment output; lane RED at HEAD (stale declaration drafts); V02c done.
+- [01 — Import route for the 2026 candidate](issues/01-import-route-for-the-2026-candidate.md) — not with today's code: the importer's document set is closed; must-land W-1 declares a fourth submitted-document config (~60–80 lines); every other step is config only.
+- [02 — Profile applicability for stage B](issues/02-profile-applicability-for-stage-b.md) — sourced via the V09 index (all 2026 hashes match) and the derived scorecard, not in the profile file; confirm with one operator applicability record (call binding, form v2.2 Inferred); no code. WP deadline is 24 Nov 2026.
+- [05 — V14 timing and locked revision](issues/05-v14-timing-and-code-revision-lock.md) — Converse on the host; one bundle from the 10 Nov freeze commit for V14 and V16, nothing lands between; AN12 criteria 1 + 3 only; 10 Nov bundle → 11 R11 → 12 AN12 → 13–15 V14 → ~19–20 V16 → 24 Nov.
+- [06 — How V16 may read V14's gap](issues/06-how-v16-may-read-v14s-gap.md) — prose caveat in the operator's review only; no harness support.
+
+## The must-land list (assembled 2026-11-06; the map's destination)
+
+All six map tickets are resolved. What must be true for a frozen, audited, advisory V16 that states what it
+did not assess:
+
+**Code, in the 10 Nov freeze-commit bundle (Step 3 candidates; the cut decides which of the optional ones fit):**
+
+| Item | Source | Status for the cut |
+|------|--------|--------------------|
+| W-1 — declare the 2026 resubmission as its own document in the importer (~60–80 lines) | W01 | **must land**: without it V16 cannot import its candidate |
+| UR-A, UR-B, UR-C — refusals before the first paid call, resume binding covers the inference configuration, receipt guard anchored on this repository | ultrareview slice 1 | on path, no output change; recommended keeps |
+| UR-E — the integrity audit never loses or overwrites a DC project | ultrareview slice 2 | on path (audit); recommended keep |
+| UR-D — the acceptance lane is GREEN only when the run proved it | ultrareview slice 2 | the rule-5 gate itself; recommended keep |
+| Ticket 01 — deepen the judge call | harness review | on path and **the only output-changing item**: by 10 Nov or after V16 (W05 Q1) |
+| Slice-2 findings 1 and 2 (profile CLI sixth check; provenance fallback) | ultrareview slice 2 | small; optional |
+
+Off route: ticket 03 (its misroute does not reach the blind assessment), 02, 04–06 (no output value before the
+runs), 07a–09 (runner side).
+
+**Before any rule-5 ticket:** re-render the declaration drafts (`py -3.10 -m tools.draft_fidelity_declarations`,
+then `--check`); the PE-09 acceptance lane is RED at HEAD until then (W03 §5.1).
+
+**Docs and records (may follow the lock; they change no bundled behaviour):** the PE-09 runbook's Converse
+delta (V14/V16 command lines, version-tag rule, receipt section, the stage-B `--document` id); the Stage B
+profile-applicability decision record (W02); the ledger edit relaxing V16's blocker from V15 to V14 (§9.4).
+
+**Operator schedule:** see ticket 05 (Q3).
 
 ## Not yet specified
 
-- **The must-land list itself.** It assembles once tickets 01–06 resolve. It may graduate into Step 3
-  candidate tickets (new harness fixes) rather than map tickets.
-- **The V16 operator runbook delta.** What changes in the PE-09 runbook for a Stage B candidate beyond §7:
-  revision entry, register, profile flag, receipt. Depends on 01 and 02.
+- **The V16 operator runbook delta**, now scoped above (Converse lines + stage-B document id); its text is
+  still to be written.
 - **V16 criterion 1** (human-approved changes land in authoritative inputs, each with its human
   confirmation). Is any of it harness-checkable, or is it purely a drafting-process attestation?
 - **The ledger edit** relaxing V16's blocker to V14: when, and in which successor record (§9.4).
-- **Repeatability vs time budget.** Whether V14's sample plan fits the operator's time before 23 Nov
-  twice over (V14 + V16, plus AN15 if it rides along).
+- **Repeatability vs time budget.** AN15 no longer rides (W04). Whether V14's sample plan fits Fri 13–Sun 15
+  is measured on the host by AN12 criterion 3's synthetic Converse pass (Thu 12).
 
 ## Out of scope
 

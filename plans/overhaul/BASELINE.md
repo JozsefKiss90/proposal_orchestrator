@@ -4,10 +4,9 @@ Plan: `plans/overhaul_2026-11_plan.md` §2, Step 0(b). This is the red line no S
 targeted tests and the full suite must end **at or above** these numbers, judged **by node id** (no new
 failure, no passing test turned red), not by totals alone.
 
-> **Provisional: Linux run. The Windows run is still owed.** The plan asks for `py -3.10 -m pytest -q`
-> on Windows. This run was made from a Linux VM on the operator's machine against the same working tree,
-> because no Windows shell was available to the agent. Fill in §4 after the Windows run; the Windows
-> numbers then become the binding baseline and this run stays as the cross-check.
+> **Binding baseline = the Windows run (§4): 43 failed, 9,237 passed, 87 skipped, 900 s.** The plan's
+> command, `py -3.10 -m pytest -q`, run by the operator on 2026-11-05. The Linux run (§1–3) is kept as a
+> cross-check: 32 failures are common to both runs; the rest are platform-specific (§4).
 
 ## 1. Run
 
@@ -129,9 +128,8 @@ Windows run.
 
 Notes for the overhaul:
 
-- **DN path.** The 8 `test_blind_baseline.py` failures sit in blind-assessment code (admission rule 5).
-  They fail here only because a Windows path is checked against a Linux repo root; confirm they pass on
-  Windows before any rule-5 ticket starts, or that ticket cannot show "at or above baseline".
+- **DN path.** The 8 `test_blind_baseline.py` failures are Linux-only; they **pass on Windows** (§4), so
+  rule-5 tickets start from a green blind-baseline suite.
 - **`httpx`.** `test_bedrock_env_readiness` imports it, but `requirements.txt` does not list it.
 - **Side effect of this run.** Tests that rewrite records left 17 `*.tmp` files in `docs/` because the
   sandbox blocked their cleanup; they were deleted afterwards. No tracked file changed.
@@ -156,19 +154,73 @@ Notes for the overhaul:
 | 1 | Tier 2A states no maximum work package count for RIA |
 | 1 | Windows-specific reserved name test |
 
-## 4. Windows run (to fill in)
+## 4. Windows run (binding)
 
-From a clean tree at the commit above (or note the new one):
-
-```powershell
-py -3.10 -m pytest -q -rfEs | Tee-Object -FilePath $HOME\baseline-windows.txt
-```
+Raw output: `plans/overhaul/baseline-windows.txt` (UTF-16, from `Tee-Object`).
 
 | Field | Value |
 |-------|-------|
-| Commit | |
-| Python / pytest | |
-| Passed / Failed / Errors / Skipped | |
-| Wall time | |
-| Failures not listed in §3 | |
-| §3 failures that pass on Windows | |
+| Commit | `1bfe147e` ("created baseline.md"; code identical to `09baceac`) |
+| Platform | win32, Python 3.10.6, pytest 9.0.2 |
+| Passed / Failed / Errors / Skipped | **9,237 / 43 / 0 / 87** (9,367 total) |
+| Wall time | **900.20 s (15:00)**, single process |
+| Failures common to both runs | 32 (the "repo state" groups in §3) |
+| §3 failures that pass on Windows | 18: all 18 listed as sandbox-caused, incl. the 8 DN `test_blind_baseline.py` tests |
+| Failures only on Windows | 11, below |
+
+### Failures only on Windows
+
+- **`tests/test_transport_openai_compatible.py`, 10 tests: they make real network calls.** On Windows the
+  requests reach `example.com` (HTTP 405 HTML page) instead of a mock, so the expected error categories
+  come back as `unknown`. Most likely the tests patch a fallback transport path that is only used when
+  `httpx` is absent (the Linux venv has no `httpx`, and there all 10 pass). This is a test-isolation defect
+  in `transport/` tests: any rule-5 ticket touching `runner/transport/` must not count these as its own
+  regressions, and should not run them offline expecting a pass.
+- **`tests/runner/test_claude_transport.py::TestCliPathResolution::test_unset_pin_uses_absolute_path_search_result`**:
+  the resolved `claude` path differs, which points to the operator's machine environment (CLI on `PATH`).
+
+### All 43 Windows failures (the red line, by node id)
+
+- `tests/runner/test_caller_context.py::TestFailClosedAbsentSources::test_run_agent_passes_none_when_sources_absent`
+- `tests/runner/test_claude_transport.py::TestCliPathResolution::test_unset_pin_uses_absolute_path_search_result`
+- `tests/runner/test_dod1e_checkpoint_close.py::test_real_checkpoint_predicate_passes_directly`
+- `tests/runner/test_dod1e_checkpoint_close.py::test_real_checkpoint_published`
+- `tests/runner/test_dod1e_checkpoint_close.py::test_real_checkpoint_records_gate09_quad_verbatim`
+- `tests/runner/test_drafting_skill_hygiene.py::TestSizeLimits::test_under_size_limit[excellence-section-drafting.md]`
+- `tests/runner/test_drafting_skill_hygiene.py::TestSizeLimits::test_under_size_limit[impact-section-drafting.md]`
+- `tests/runner/test_drafting_skill_hygiene.py::TestSizeLimits::test_under_size_limit[implementation-section-drafting.md]`
+- `tests/runner/test_gate10d_consistency_fix.py::TestImplementationPartnerLegalNames::test_partners_json_has_correct_legal_names`
+- `tests/runner/test_leakage_scan.py::TestTheTreeScan::test_no_new_leak`
+- `tests/runner/test_leakage_scan.py::TestTheTreeScan::test_the_branch_is_not_clean_and_says_so`
+- `tests/runner/test_phase6_field_production.py::TestComplianceProfileDerivativeLabeling::test_current_artifact_wp9_cites_tier2b_for_ai_on_demand`
+- `tests/runner/test_phase8_canonicalization.py::TestSpecLeanness::test_impact_no_component_keyword_scan`
+- `tests/runner/test_phase8_consistency_layer.py::TestDraftingSkillHygiene::test_under_size_limit[excellence-section-drafting.md]`
+- `tests/runner/test_phase8_consistency_layer.py::TestDraftingSkillHygiene::test_under_size_limit[impact-section-drafting.md]`
+- `tests/runner/test_phase8_consistency_layer.py::TestDraftingSkillHygiene::test_under_size_limit[implementation-section-drafting.md]`
+- `tests/runner/test_phase8_gate_content.py::TestCurrentArtifactState::test_excellence_no_assumed_claims`
+- `tests/runner/test_phase8_gate_content.py::TestCurrentArtifactState::test_excellence_overall_status_not_assumed`
+- `tests/runner/test_skill_applicability.py::TestOtherSkillsUnaffected::test_non_tier5_skills_always_invoked`
+- `tests/runner/test_skill_applicability.py::TestPhase2SkillSkipped::test_traceability_skip_does_not_block_other_skills`
+- `tests/runner/test_skill_applicability.py::TestPhase2SkillSkipped::test_traceability_skipped_in_phase2`
+- `tests/test_demo_architecture_seeds.py::TestAnonymity::test_the_branch_is_no_less_ok_than_before`
+- `tests/test_demo_candidate_blind_baseline.py::TestTheReportsNumbersAreTheArtifactsOwn::test_the_leakage_scan_file_count_is_re_derivable`
+- `tests/test_demo_concept.py::TestAnonymity::test_the_brief_adds_no_new_leak_to_the_branch`
+- `tests/test_demo_consortium.py::TestAnonymity::test_the_leakage_scan_is_clean_over_tiers_3_to_5_and_the_vault`
+- `tests/test_demo_dev_graph_snapshot.py::TestAnonymity::test_the_new_artifacts_are_scanned_and_carry_no_new_leak`
+- `tests/test_demo_fictional_budget_override.py::TestThePhase7DispatchReachedTheGate::test_tier_5_content_carries_the_fictional_label`
+- `tests/test_demo_phase7_budget_gate.py::TestTheHardBlockIsIntact::test_no_phase_8_output_exists`
+- `tests/test_demo_report.py::TestTheBlindLaneFigures::test_the_scan_count_is_the_scans_own`
+- `tests/test_demo_sources.py::TestAnonymity::test_the_branch_is_no_less_ok_than_before`
+- `tests/test_msca_dn_declaration_drafts.py::TestDeterminismAndTheCommittedArtifacts::test_the_committed_artifacts_are_reproducible`
+- `tests/test_tier2b_biodiv_intake.py::TestStaleExtractedFinding::test_the_extracted_files_still_belong_to_another_call`
+- `tests/test_tier2b_biodiv_intake.py::TestTierBoundaries::test_phase_1_still_owns_tier_2b_extracted`
+- `tests/test_transport_openai_compatible.py::TestErrorHandling::test_400_raises_malformed_request`
+- `tests/test_transport_openai_compatible.py::TestErrorHandling::test_403_raises_auth_error`
+- `tests/test_transport_openai_compatible.py::TestErrorHandling::test_404_raises_model_not_found`
+- `tests/test_transport_openai_compatible.py::TestErrorHandling::test_429_raises_rate_limit_error`
+- `tests/test_transport_openai_compatible.py::TestErrorHandling::test_500_raises_provider_error`
+- `tests/test_transport_openai_compatible.py::TestErrorHandling::test_503_raises_provider_error`
+- `tests/test_transport_openai_compatible.py::TestErrorHandling::test_connection_error_raises_provider_error`
+- `tests/test_transport_openai_compatible.py::TestErrorHandling::test_timeout_raises_timeout_error`
+- `tests/test_transport_openai_compatible.py::TestResponseParsing::test_call_sends_post_and_returns_parsed`
+- `tests/test_transport_openai_compatible.py::TestResponseParsing::test_tool_calls_round_trip`

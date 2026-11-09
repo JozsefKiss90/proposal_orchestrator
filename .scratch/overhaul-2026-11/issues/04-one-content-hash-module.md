@@ -78,3 +78,8 @@ Do not touch: runner/fingerprints.py, any frozen record on disk, the set-hash fi
 Tests first: characterisation (byte-identical hashes), then the two numbering/short-form failing tests
 Size: ~150–250 changed non-test lines, mostly deletions and call-site swaps
 ```
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06): on the path but byte-identical by design, so no value for V14/V16 before the deadline; touches freeze inputs two days before the bundle. Revisit after V16.
+- Wave 2a (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.

@@ -2,7 +2,7 @@
 
 Status: needs-triage
 Type: task
-Blocked by: 01
+Blocked by: 01, 03
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate C. Grill skipped by the
 operator on 2026-11-03; every recommendation below was accepted as the decision.
 Findings: F6 (known bug) · E5f · not on the DN path
@@ -76,3 +76,8 @@ Size: small–medium; removes more than it adds
 Admission rule 5: does not apply (no blind_*/evidence_*/execution_receipt/anonymisation_*/transport changes);
       run the PE-09 acceptance lane anyway if the response checkpoint module changes beyond the additive fields
 ```
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06): rubric lane, off the V14/V16 path (W03 §4). Still blocked by 01.
+- Wave 2c (2026-11-06): also after 03, because both edit rubric grading (collision edge, not a functional dependency).

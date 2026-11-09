@@ -2,7 +2,7 @@
 
 Status: needs-triage
 Type: task
-Blocked by: 05
+Blocked by: 05, 01
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate D (contract half). Not
 grilled; written on operator request 2026-11-03.
 Findings: F6 deepening
@@ -57,3 +57,8 @@ Do not touch: freeze conditions / BASELINE_CHECKS, record formats, per-record re
 Tests first: characterise each link's current refusal behaviour before migrating it
 Size: ~250–350 changed non-test lines, net negative
 ```
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06): as 05. Blocked by 05.
+- Wave 2c (2026-11-06): also after 01, because both edit the blind-report module (collision edge, not a functional dependency).

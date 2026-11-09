@@ -99,3 +99,8 @@ Record: decision-log entry only if a node's outcome changes
 - Node-body plan and ordering (candidate D, deferred past 23 Nov).
 - Tightening the registry guard from "none resolved" to "any missing".
 - How `run_skill` puts caller context into the prompt (TAPM and cli-prompt).
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06): as 07a.
+- Wave 2a (2026-11-06): its area has 4 baseline failures (`test_caller_context` ×1, `test_skill_applicability` ×3). Characterise them first and record whether this ticket fixes them or leaves them as they are; brief reads "at or above BASELINE.md §5".

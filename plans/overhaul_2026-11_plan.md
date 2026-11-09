@@ -75,20 +75,37 @@ A candidate becomes a ticket only if **all** of these hold:
 
 ---
 
-## 4. Likely ticket shortlist (to be confirmed in step 3)
+## 4. Ticket list (decided at the Step 3 scope cut, 2026-11-06)
 
-Priority order, given the 23 Nov DN use:
+Decided: `.scratch/overhaul-2026-11/discovery/scope-cut-2026-11-06.md`. Seven tickets, all `ready-for-agent`,
+in execution order: **10** the acceptance lane is GREEN only when proven (UR-D) · **11** declare the 2026
+resubmission in the importer (W-1) · **12** refuse a bad configuration before the first assessor call (UR-A)
+· **13** receipt guard anchored on this repository (UR-C) · **14** the integrity audit keeps every DC project
+(UR-E) · **15** a resume is honest (UR-B, + finding 5) · **16** profile check in full, provenance never borrows
+a revision (UR-F).
 
-1. **Content fingerprint in run checkpoints (F6, bug).** Per-artifact sha256 in the rubric checkpoint meta; resume refuses on mismatch. Small, high integrity value.
-2. **One bind-by-hash module (F6, deepening).** Only if discovery confirms duplicated hashing/canonicalisation. A deep `binding` module that the receipt, baseline, pointer and provenance code call.
-3. **One judge-backend seam (F5, deepening).** A single place that builds judge backends and enforces drafter refusal / non-Claude independence; `response_format=json_object` where the provider supports it; salvage kept only as fallback.
-4. **Small harness gaps (F7).** Calibration None-guard; V02c stale synthetic contracts.
-5. **Whatever wayfinder marks as on the DN critical path.** Most likely X01 (imported-source grounding) and the Stage B (V16) machinery, *not* the operator-run parts (V14/V15).
-6. **Runtime extraction (F4).** At most **one** internal extraction (e.g. TAPM prompt assembly or response validation out of `skill_runtime.py`), and only if discovery shows it blocks testability. Otherwise defer past 23 Nov.
+The boundary comes from wayfinder W05: V14 and V16 run on Bedrock Converse on the private host from **one
+bundle built from the 10 Nov freeze commit**, with nothing landing between them. So every kept ticket lands
+by Mon 9, and none changes assessment output.
 
-Explicitly **out of scope** this window: E7b/E8 (behind M2-T10), E9 Ragas, Milestone 2 graph tickets, AWS R11+, refactoring `tools/author_*` one-offs (F8 is classification only: live / one-off / archive).
+This replaces the earlier hypotheses as follows:
+- the content fingerprint (old item 1) is the rubric lane (ticket 02, deferred); the DN resume gap is ticket 15;
+- bind-by-hash (item 2) is tickets 04–06, deferred;
+- the judge-backend seam (item 3) is tickets 01 and 03, deferred until after V16;
+- the small harness gaps (item 4) are out per the F7 map;
+- the wayfinder must-lands (item 5) are ticket 11 plus operator records;
+- runtime extraction (item 6) is tickets 07a–09, deferred.
 
----
+The out-of-scope list is unchanged.
+
+**After the freeze:** nothing lands between the freeze and V16. The nine deferred tickets (01–09) form
+**wave 2, from ~25 Nov**:
+- 2a: 01 ∥ 04 ∥ 07a ∥ 08;
+- 2b: 03 ∥ 05 ∥ 07b;
+- 2c: 02 ∥ 06 ∥ 09.
+
+The harness chains take priority if time is short. Wave 2 starts with a re-baseline (`BASELINE.md` §5).
+Order and edges are in `scope-cut-2026-11-06.md`, under "Implementation order".
 
 ## 5. Briefing template for each Fable + Ultracode session
 
@@ -105,8 +122,13 @@ Record: decision-log entry if the change affects interpretation (§9.4).
 
 ---
 
-## 6. Open decisions for you
+## 6. Decisions (formerly open)
 
-- **§17 TAPM banner.** Is the migration actually done? If so, the amendment record should be closed (your instruction is required). If not, say what's left. Either way the stale banner misleads every runtime session.
-- **Trunk.** Which branch becomes the long-lived base after 10 Nov (`main` is far behind)? Proposed: merge `msca-dn-pre-eval` → `main` after the freeze and archive the rest by tag.
-- **Ultrareview scope.** One run on the October harness/anonymisation diff is proposed. More runs only if the first yields confirmed defects.
+- **§17 TAPM banner:** not yet. The banner stays; see `.scratch/overhaul-2026-11/discovery/decision-E-tapm-banner-2026-11-04.md`.
+- **Ultrareview scope:** three slices, with anonymisation excluded. Slices 1 and 2 ran (the free runs are used
+  up). Slice 3 gets a local `code-review` instead.
+- **DN run venue and transport:** Bedrock Converse on the private eu-north-1 host, with one bundle for V14
+  and V16 (wayfinder W05). R11 is on the critical path on Wed 11 Nov.
+- **Deadline:** WP 2026–2027 states **24 Nov 2026** for HORIZON-MSCA-2026-DN-01 (p. 12).
+- **Still open — trunk:** which branch becomes the long-lived base after 10 Nov. The proposal is unchanged:
+  merge `msca-dn-pre-eval` → `main` after the freeze and archive the rest by tag.

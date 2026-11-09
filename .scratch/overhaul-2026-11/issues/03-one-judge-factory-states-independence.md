@@ -102,3 +102,8 @@ Record: no decision-log entry needed
 - Moving transport adapters across the harness/runner seam (runtime candidate A is the runner-side counterpart).
 - New `--transport` flags for commands that don't have one.
 - Making the two JSON-extraction rules consistent.
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06): its misroute does not reach the blind assessment on either transport (W03 §3); ticket 12 gives the DN path an up-front refusal for an omitted --transport. Revisit after 01.
+- Wave 2b (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.

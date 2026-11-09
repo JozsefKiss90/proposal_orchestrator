@@ -81,3 +81,8 @@ Do not touch: record formats on disk, per-record field readers and vocabularies,
 Tests first: the four failing tests above (tdd)
 Size: ~250–350 changed non-test lines
 ```
+
+## Comments
+
+- Deferred at Step 3 (2026-11-06): record-chain refactor, refusals only, no value for V14/V16 before the deadline. Blocked by 04.
+- Wave 2b (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.
