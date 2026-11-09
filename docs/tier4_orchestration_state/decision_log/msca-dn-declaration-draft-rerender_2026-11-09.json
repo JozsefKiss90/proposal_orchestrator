@@ -1,0 +1,42 @@
+{
+  "record_type": "decision",
+  "id": "msca-dn-declaration-draft-rerender_2026-11-09",
+  "date": "2026-11-09",
+  "branch": "harness_overhaul",
+  "milestone": "November 2026 overhaul, Step 3 scope cut (.scratch/overhaul-2026-11/discovery/scope-cut-2026-11-06.md): the re-render that makes the PE-09 acceptance lane green before the wave-1 tickets, found by wayfinder W03 (.scratch/overhaul-2026-11-f7-wayfinder/W03-findings.md, item 5.1).",
+  "authority": "CLAUDE.md §9.4 (a decision that affects future interpretation is written to Tier 4), §12.1 (an output names its inputs), §15 (documented state governs). Operator's in-session instruction of 2026-11-06 to re-render the declaration drafts. Not a constitutional amendment.",
+  "succeeds": "docs/tier4_orchestration_state/decision_log/msca-dn-declaration-draft-rerender_2026-10-13.json. That record is left exactly as written; its hashes for the two files below are superseded by the hashes recorded here. Its predecessors' hash for draft_resolved_fixes.json still describes the committed file.",
+  "decision": "Two artifacts under docs/tier4_orchestration_state/msca_dn/declarations/ were re-rendered from the tool's own rendering (tools.draft_fidelity_declarations.render_all). Their bytes changed and the new hashes are recorded below. draft_resolved_fixes.json was not re-rendered and its bytes are unchanged.",
+  "how": "The tool's write step could not complete in the agent's sandbox (its atomic replace needs a delete the sandbox refused), so the rendered bytes were written in place. The result is byte-identical to the tool's output: py -3.10 -m tools.draft_fidelity_declarations --check reports up to date.",
+  "why": "The drafts' adoption-cost scan is coupled to the repository tree. A plan committed after the 2026-10-13 re-render names the sanitised revision's register, so the scan found one further dependent and the enumeration moved. The committed drafts no longer matched their rendering, which failed the acceptance-lane test tests/test_msca_dn_declaration_drafts.py::TestDeterminismAndTheCommittedArtifacts::test_the_committed_artifacts_are_reproducible (plans/overhaul/BASELINE.md §4).",
+  "what_made_them_stale": {
+    "declared_status": "Confirmed",
+    "basis": "the re-render diff, measured on this checkout",
+    "new_dependents_found": [
+      "plans/msca_dn_anonymisation_handoff_2026-10-14.md (names the sanitised revision's register by path)"
+    ]
+  },
+  "hashes": {
+    "algorithm": "sha256 over the file bytes as committed",
+    "docs/tier4_orchestration_state/msca_dn/declarations/draft_sanitised_v1.json": {
+      "before": "add68afa99dce225b7cd1be46af9830396d831c067f12fe9056569a717fdbd36",
+      "after": "51bbcd454371fc0e2a0fa3863766ad54947479bf628d0d50a9ed20aa7006982d"
+    },
+    "docs/tier4_orchestration_state/msca_dn/declarations/review_checklist.md": {
+      "before": "4d25709d6039869ae568ec47285aa0d63eec0cf57f9bcdc1827645f3b3808851",
+      "after": "256fbaba0029e5ec3ce17be7218102d37012a263fa24a70e8e8b60bffc5b85fb",
+      "note": "No record pins this file as evidence, so its movement breaks no binding. It is the operator's reading of the drafts and has to match them."
+    }
+  },
+  "unchanged": [
+    "docs/tier4_orchestration_state/msca_dn/declarations/draft_resolved_fixes.json.",
+    "Both fidelity registers, their bytes and their hashes.",
+    "Every approval record, disposition and committed integrity audit."
+  ],
+  "the_cycle_and_how_it_is_cut": {
+    "rule": "As in the 2026-10-13 record: this record cites the drafts and the new dependent by path, and names no register path and no register hash, so the scan does not see it.",
+    "asserted_by": "tests/test_msca_dn_declaration_drafts.py::TestTheRerenderRecordAgreesWithTheDrafts and ::TestDeterminismAndTheCommittedArtifacts."
+  },
+  "verification": "py -3.10 -m tools.draft_fidelity_declarations --check exits 0 after this record is written.",
+  "does_not_close": "Nothing. Housekeeping forced by the coupling; no declared fact moved."
+}
