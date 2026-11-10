@@ -110,6 +110,7 @@ __all__ = [
     "ESR_SEGMENT",
     "IMPORT_MANIFESTS_REL",
     "PreflightMismatch",
+    "PreflightUnassessable",
     "PackParams",
     "RealisedPack",
     "RealisedPackSet",
@@ -165,6 +166,15 @@ def file_sha256(path: Path | str) -> str:
 
 class PreflightMismatch(BlindAssessmentError):
     """The preflight on disk does not describe the evidence about to be assessed."""
+
+
+class PreflightUnassessable(BlindAssessmentError):
+    """The preflight describes evidence the assessment could not build.
+
+    A rubric whose declared anchor is absent from a present section has no pack.
+    The preflight reports it and still writes; ``assess`` would raise building
+    that pack after paying for the cells before it, so it refuses up front.
+    """
 
 
 # --------------------------------------------------------------------------- #
@@ -926,6 +936,9 @@ def check_preflight(
     import manifest, when the preflight pinned one, and the same snapshot, package
     and policy, when *evidence* is given).  Otherwise raises
     :class:`PreflightMismatch` naming **every** field that moved, pack by pack.
+    A preflight that matches but records a declared anchor missing from a
+    present section raises :class:`PreflightUnassessable`, naming each anchor:
+    that pack cannot be built, and finding out mid-run costs every cell before it.
 
     The declared grounding scope is compared too, and it is deliberately not
     inside the pack-set hash: declaring a scope changes no evidence, so it
@@ -973,6 +986,17 @@ def check_preflight(
             "the preflight does not describe the evidence about to be assessed; "
             f"{len(moved)} field(s) moved:\n  - " + "\n  - ".join(moved)
             + "\nRe-run the preflight with the parameters you will assess with."
+        )
+    unbuildable = [
+        f"{p.expectation_key}/{p.section_id} lacks {', '.join(p.missing_anchors)}"
+        for p in realised.packs
+        if p.missing_anchors
+    ]
+    if unbuildable:
+        raise PreflightUnassessable(
+            "the candidate lacks declared rubric anchor(s), so their packs cannot be "
+            f"built: {'; '.join(unbuildable)}. Restore the anchor sub-section(s) or "
+            "assess under a profile that does not declare them."
         )
     return str(data["pack_set_hash"])
 

@@ -146,8 +146,9 @@ def build_converse_judge(
     Raises
     ------
     ConverseJudgeError
-        If the version tag does not name this transport, or the environment
-        does not resolve to ``bedrock_converse``.
+        If the version tag does not name this transport, the environment
+        does not resolve to ``bedrock_converse``, or the transport refuses the
+        configuration or cannot build the backend.
     """
     from runner.transport.config import resolve_provider_config
 
@@ -158,7 +159,13 @@ def build_converse_judge(
             f"the assessor, so the tag must contain {TRANSPORT_TAG!r} (e.g. "
             f"'{TRANSPORT_TAG}-eu-north-1@2026-10-27'); pass --assessor-version."
         )
-    provider = resolve_provider_config()
+    # The transport refuses a misconfiguration with a plain ValueError (no Region
+    # in production mode, a backend production mode does not allow, no model).
+    # Converted here so the command fails closed with one line, not a traceback.
+    try:
+        provider = resolve_provider_config()
+    except ValueError as exc:
+        raise ConverseJudgeError(f"the Converse configuration is refused: {exc}") from exc
     if provider.backend_name != _BACKEND_NAME:
         raise ConverseJudgeError(
             f"--transport {TRANSPORT_TAG} needs the environment to resolve to "
@@ -166,7 +173,10 @@ def build_converse_judge(
             f"ORCHESTRATOR_TRANSPORT_BACKEND={_BACKEND_NAME} (or a Converse preset) "
             f"so the report names the transport it spoke."
         )
-    inner = build_judge_backend(provider, cfg)
+    try:
+        inner = build_judge_backend(provider, cfg)
+    except (ValueError, ImportError) as exc:
+        raise ConverseJudgeError(f"the Converse backend cannot be built: {exc}") from exc
     # No pacing: an infinite token budget and no request floor.
     wrapper = ConverseRetryingBackend(
         inner, tpm_budget=float("inf"), rpm_budget=0, max_retries=max_retries, log=log

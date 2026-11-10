@@ -978,6 +978,13 @@ def assess_candidate(
         raise BlindAssessmentError(
             f"n must be at least {MIN_MAJORITY_SAMPLES} (the majority rule); got {n}."
         )
+    # Checked here, not only in grade_criterion: that guard fires after every
+    # cell call has been paid for.
+    if criterion_samples is not None and criterion_samples < MIN_MAJORITY_SAMPLES:
+        raise BlindAssessmentError(
+            f"criterion_samples must be at least {MIN_MAJORITY_SAMPLES} (the majority rule); "
+            f"got {criterion_samples}."
+        )
     if (candidate_dir is None) == (evidence is None):
         raise BlindAssessmentError("give exactly one of candidate_dir or evidence.")
     _check_intake(intake, evidence)
