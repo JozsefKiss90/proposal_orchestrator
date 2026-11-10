@@ -789,6 +789,9 @@ def grade_criterion(
             judge_version=judge.config.version,
             prompt_hash=digest,
             timestamp=judge.clock(),
+            # The last call was the draw that parsed; a replayed one already
+            # has its live record from the run that drew it.
+            replayed=judge.last_call_replayed,
         )
         judge.provenance_log.append(record)
         samples.append(sample)

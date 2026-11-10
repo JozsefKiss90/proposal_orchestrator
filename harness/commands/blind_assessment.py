@@ -173,7 +173,7 @@ from harness.evidence_preflight import (
 from harness.criterion_scoring import DEFAULT_CRITERION_SAMPLES, CriterionScoringError
 from harness.expectation_coverage import CoverageError
 from harness.expectations import ExpectationError
-from harness.judge import Judge, JudgeError
+from harness.judge import Judge, JudgeConfig, JudgeError
 from harness.profile import ProfileError
 from harness.routing import DeterministicCoverageError
 from harness.rubrics import ProfileBundle, RubricError, load_profile_bundle
@@ -236,7 +236,7 @@ def _judge_config(args: argparse.Namespace):
     import dataclasses
 
     from harness.commands._common import load_harness_env
-    from harness.judge import JudgeConfig, resolve_judge_config
+    from harness.judge import resolve_judge_config
 
     load_harness_env()
     if args.assessor_model and args.assessor_version:
@@ -963,6 +963,7 @@ def _cache_binding(
     *,
     digest: str,
     pin: str,
+    config: JudgeConfig,
     profile_version: str,
     preflight_hash: str,
     params: PackParams,
@@ -971,7 +972,9 @@ def _cache_binding(
 
     One builder for both commands: a checkpoint salvage writes must equal the
     one the assess run computes, or the resume is refused.  Two copies of this
-    expression would be two chances to disagree.
+    expression would be two chances to disagree.  *config* is the assessor's
+    own configuration, so the temperature and token limit bound are the ones
+    the run draws under.
     """
     return CacheBinding(
         candidate_hash=digest,
@@ -981,6 +984,8 @@ def _cache_binding(
         include_claims=params.include_claims,
         n=args.n,
         criterion_samples=None if args.skip_criterion_scores else args.criterion_n,
+        temperature=config.temperature,
+        max_tokens=config.max_tokens,
     )
 
 
@@ -990,6 +995,7 @@ def _open_checkpoint(
     repo_root: Path,
     digest: str,
     pin: str,
+    config: JudgeConfig,
     profile_version: str,
     preflight_hash: str,
     params: PackParams,
@@ -1012,6 +1018,7 @@ def _open_checkpoint(
         args,
         digest=digest,
         pin=pin,
+        config=config,
         profile_version=profile_version,
         preflight_hash=preflight_hash,
         params=params,
@@ -1178,6 +1185,7 @@ def _salvage(
         args,
         digest=digest,
         pin=pin,
+        config=cfg,
         profile_version=bundle.version,
         preflight_hash=preflight_hash,
         params=params,
@@ -1351,6 +1359,7 @@ def main(
             repo_root=repo_root,
             digest=candidate_hash(candidate),
             pin=assessor_pin(assessor),
+            config=assessor.config,
             profile_version=bundle.version,
             preflight_hash=preflight_hash,
             params=params,

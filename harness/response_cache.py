@@ -33,7 +33,8 @@ Refusals, all fail-closed
 * A checkpoint is never silently reused: opening an existing file without
   ``resume=True`` is refused, and resuming a missing one is refused.
 * A checkpoint carries the binding it was drawn under — candidate hash, profile
-  version, assessor pin, preflight pack-set hash and the sampling parameters.
+  version, assessor pin, preflight pack-set hash, the sample counts and the
+  inference configuration (temperature and token limit).
   Resuming into a different binding is refused, naming every field that moved.
   Replaying one candidate's responses into another candidate's report would be
   fabrication, and the binding check is what makes that impossible.
@@ -81,6 +82,10 @@ _CHECKPOINT_NAME_RE = re.compile(
 )
 
 
+#: Binding fields a pre-ticket-15 checkpoint does not carry.
+_INFERENCE_FIELDS: tuple[str, ...] = ("temperature", "max_tokens")
+
+
 class ResponseCacheError(Exception):
     """A checkpoint could not be opened, read or resumed as asked."""
 
@@ -115,7 +120,13 @@ class CacheBinding:
     mean.  The candidate hash and profile version decide the text and the
     rubrics; the assessor pin decides who answered; the preflight pack-set hash
     decides what each cell was shown; the sample counts and ``include_claims``
-    decide how many prompts there are and what they carry.
+    decide how many prompts there are and what they carry.  The temperature
+    and the token limit are the inference configuration: replay is keyed by
+    prompt hash alone, so without them a resume under another configuration
+    would mix two configurations in one report.
+
+    ``None`` for either means a checkpoint written before they were recorded;
+    :class:`ResponseCache` refuses to resume one.
     """
 
     candidate_hash: str = ""
@@ -125,6 +136,8 @@ class CacheBinding:
     include_claims: bool = True
     n: int = 0
     criterion_samples: int | None = None
+    temperature: float | None = None
+    max_tokens: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -135,6 +148,8 @@ class CacheBinding:
             "include_claims": self.include_claims,
             "n": self.n,
             "criterion_samples": self.criterion_samples,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
         }
 
     @classmethod
@@ -151,6 +166,10 @@ class CacheBinding:
             criterion_samples=(
                 None if data.get("criterion_samples") is None else int(data["criterion_samples"])
             ),
+            temperature=(
+                None if data.get("temperature") is None else float(data["temperature"])
+            ),
+            max_tokens=None if data.get("max_tokens") is None else int(data["max_tokens"]),
         )
 
     def differences(self, other: "CacheBinding") -> list[str]:
@@ -199,6 +218,7 @@ class ResponseCache:
         self._clock = clock or _utc_now
         self._pending: dict[str, deque[str]] = {}
         self._last: tuple[str, str] | None = None
+        self._last_replayed = False
         self.replayed = 0
         self.live = 0
         self.discarded = 0
@@ -238,6 +258,17 @@ class ResponseCache:
         """Responses still queued for replay (0 once the checkpoint is spent)."""
         return sum(len(q) for q in self._pending.values())
 
+    @property
+    def last_was_replay(self) -> bool:
+        """``True`` when the response just served came from the checkpoint.
+
+        Read through :attr:`harness.judge.Judge.last_call_replayed`: a
+        replayed response already has the live record of the run that drew
+        it, so its new record is marked replayed rather than counted as a
+        second draw.
+        """
+        return self._last_replayed
+
     def stats(self) -> dict[str, Any]:
         """What a report records about this checkpoint."""
         return {
@@ -264,6 +295,7 @@ class ResponseCache:
         self.replayed += 1
         response = queue.popleft()
         self._last = (prompt_hash, response)
+        self._last_replayed = True
         return response
 
     def record(self, prompt_hash: str, response: str) -> None:
@@ -275,6 +307,7 @@ class ResponseCache:
         """
         self.live += 1
         self._last = (prompt_hash, response)
+        self._last_replayed = False
         self._log.append_dict(
             {
                 "record_type": CHECKPOINT_RESPONSE_RECORD_TYPE,
@@ -340,6 +373,18 @@ class ResponseCache:
                 f"{CHECKPOINT_FORMAT_VERSION}."
             )
         recorded = CacheBinding.from_dict(header.get("binding", {}))
+        unrecorded = [
+            name
+            for name in _INFERENCE_FIELDS
+            if getattr(recorded, name) is None and getattr(self._binding, name) is not None
+        ]
+        if unrecorded:
+            raise ResponseCacheError(
+                f"checkpoint {self._path} was written before the inference "
+                f"configuration was recorded ({', '.join(unrecorded)} not recorded), so "
+                f"it cannot be shown to match this run. Start a new run instead of "
+                f"resuming it."
+            )
         moved = recorded.differences(self._binding)
         if moved:
             raise ResponseCacheError(

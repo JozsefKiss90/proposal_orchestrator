@@ -99,6 +99,12 @@ class ProvenanceRecord:
         Optional ISO-8601 string.  Injected by the caller (kept out of the
         required set and defaulting to ``None`` so records stay reproducible in
         tests); the judge stamps it from an injectable clock.
+    replayed:
+        ``True`` when the verdict was parsed from a response the checkpoint
+        replayed (:mod:`harness.response_cache`), not from a live draw.  The
+        run that drew it already logged the live record, so this one must not
+        count as a second draw.  Serialized only when ``True``, so a live
+        record keeps its shape.
     """
 
     judge_model: str
@@ -112,6 +118,7 @@ class ProvenanceRecord:
     sample_index: int | None = None
     evidence_type: str = EVIDENCE_TYPE_INFERRED
     timestamp: str | None = None
+    replayed: bool = False
 
     def __post_init__(self) -> None:
         if self.evidence_type != EVIDENCE_TYPE_INFERRED:
@@ -140,6 +147,7 @@ class ProvenanceRecord:
         judge_version: str,
         prompt_hash: str,
         timestamp: str | None = None,
+        replayed: bool = False,
     ) -> "ProvenanceRecord":
         """Build a record from a :class:`~harness.verdict.Verdict` + judge identity.
 
@@ -159,6 +167,7 @@ class ProvenanceRecord:
             sample_index=verdict.sample_index,
             evidence_type=verdict.evidence_type,
             timestamp=timestamp,
+            replayed=replayed,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -166,7 +175,7 @@ class ProvenanceRecord:
 
         The five :data:`REQUIRED_PROVENANCE_FIELDS` are always present.
         """
-        return {
+        record = {
             "judge_model": self.judge_model,
             "judge_version": self.judge_version,
             "prompt_hash": self.prompt_hash,
@@ -179,6 +188,9 @@ class ProvenanceRecord:
             "evidence_type": self.evidence_type,
             "timestamp": self.timestamp,
         }
+        if self.replayed:
+            record["replayed"] = True
+        return record
 
 
 class ProvenanceLog(JsonlLog):
