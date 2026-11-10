@@ -323,6 +323,21 @@ class TestFindAndResolve:
         found = cp.find_import_manifest(tmp_path, document_id="DOC-1")
         assert found is not None and found.name == "DOC-1.json"
 
+    def test_a_named_node_that_matches_nothing_is_not_found(self, tmp_path):
+        """A node id names a revision; one that is absent never borrows another."""
+        _world(tmp_path, node_id="DOC-1@aaaa")
+        found = cp.find_import_manifest(tmp_path, node_id="DOC-1@bbbb", document_id="DOC-1")
+        assert found is None
+
+    def test_resolving_a_named_node_that_matches_nothing_borrows_no_reason(self, tmp_path):
+        _world(tmp_path, node_id="DOC-1@aaaa")
+        p = cp.resolve_provenance(
+            repo_root=tmp_path, graph_root=tmp_path, node_id="DOC-1@bbbb", document_id="DOC-1"
+        )
+        assert p.grounding_cause == cp.CAUSE_UNSTATED
+        assert p.sources == ()
+        assert any("no import manifest was found for DOC-1@bbbb" in f for f in p.flags)
+
     def test_an_absent_imports_directory_is_not_an_error(self, tmp_path):
         assert cp.find_import_manifest(tmp_path, document_id="DOC-1") is None
 

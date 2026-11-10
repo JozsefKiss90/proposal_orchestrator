@@ -22,14 +22,14 @@ Two checks that should refuse, refuse:
 
 Failing tests first:
 
-- [ ] The command runs all six checks; a profile with a status the matrix cannot carry fails from the command.
-- [ ] A lookup with a `node_id` that matches nothing returns not-found even when exactly one manifest has the `document_id`.
-- [ ] A lookup with only a `document_id` and one manifest still resolves it, as today.
+- [x] The command runs all six checks; a profile with a status the matrix cannot carry fails from the command.
+- [x] A lookup with a `node_id` that matches nothing returns not-found even when exactly one manifest has the `document_id`.
+- [x] A lookup with only a `document_id` and one manifest still resolves it, as today.
 
 Then:
 - [ ] **PE-09 acceptance lane green**, run with ticket 10's lane (admission rule 5).
 - [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md` (no new failure by node id against §4's 43).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
 

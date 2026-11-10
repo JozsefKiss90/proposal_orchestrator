@@ -456,11 +456,12 @@ def find_import_manifest(
 
     Every manifest under the graph root's imports directory is read and matched
     on ``document.node_id`` first, because one document has one manifest per
-    revision and only the node id names a revision.  A match on
-    ``document.document_id`` is the fallback for a caller holding no node id;
-    with more than one revision's manifest present that is ambiguous, so
-    ``None`` is returned rather than a guess.  Returns ``None`` when the
-    directory is absent or nothing matches.
+    revision and only the node id names a revision.  A *node_id* that matches
+    nothing returns ``None``: the caller named a revision, and another
+    revision's manifest is not it.  A match on ``document.document_id`` is
+    used only by a caller holding no node id; with more than one revision's
+    manifest present that is ambiguous, so ``None`` is returned rather than a
+    guess.  Returns ``None`` when the directory is absent or nothing matches.
     """
     directory = Path(graph_root) / IMPORT_MANIFESTS_REL
     if not directory.is_dir():
@@ -481,8 +482,8 @@ def find_import_manifest(
             by_node[node] = path
         if doc:
             by_document.setdefault(doc, []).append(path)
-    if node_id and node_id in by_node:
-        return by_node[node_id]
+    if node_id:
+        return by_node.get(node_id)
     if document_id:
         candidates = by_document.get(document_id) or []
         if len(candidates) == 1:
@@ -676,10 +677,10 @@ def resolve_provenance(
 
     *manifest_path* is read when given, and a path that does not resolve is a
     refusal, not a fallback.  Otherwise the graph root's imports directory is
-    searched for the manifest of *node_id* (or of *document_id* when only one
-    revision's manifest is present).  Nothing found: :data:`UNSTATED_PROVENANCE`
-    with a flag saying no record was read, so the run says what it does not
-    know instead of borrowing a reason.
+    searched for the manifest of *node_id* (or, when no node id is given, of
+    *document_id* when only one revision's manifest is present).  Nothing
+    found: :data:`UNSTATED_PROVENANCE` with a flag saying no record was read,
+    so the run says what it does not know instead of borrowing a reason.
     """
     if manifest_path is not None:
         return provenance_from_manifest(manifest_path, repo_root=repo_root)
