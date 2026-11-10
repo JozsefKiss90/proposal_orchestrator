@@ -390,6 +390,9 @@ class Outcome:
     skipped: int
     failures: tuple[str, ...]
     skips: tuple[tuple[str, str], ...]
+    #: Every JUnit ``classname`` the report carries, so a reader can tell which
+    #: modules the run actually reached.
+    classnames: frozenset[str] = frozenset()
 
     @property
     def passed(self) -> int:
@@ -414,7 +417,9 @@ def parse_junit(xml_text: str) -> Outcome:
         skipped += int(suite.get("skipped", 0))
     failures: list[str] = []
     skips: list[tuple[str, str]] = []
+    classnames: set[str] = set()
     for case in root.iter("testcase"):
+        classnames.add(case.get("classname", ""))
         ident = node_id(case.get("classname", ""), case.get("name", ""))
         if case.find("failure") is not None or case.find("error") is not None:
             failures.append(ident)
@@ -428,6 +433,7 @@ def parse_junit(xml_text: str) -> Outcome:
         skipped=skipped,
         failures=tuple(failures),
         skips=tuple(skips),
+        classnames=frozenset(classnames),
     )
 
 
@@ -438,13 +444,22 @@ class Reconciliation:
     unexplained_failures: tuple[str, ...] = ()
     undeclared_skips: tuple[str, ...] = ()
     declared_but_absent: tuple[str, ...] = ()
+    #: Lane modules the report never mentions: checks this run did not reach.
+    missing_modules: tuple[str, ...] = ()
+    #: ``(reported, declared)`` when the run skipped a different number of
+    #: cases than the declaration accounts for.
+    skip_count_mismatch: tuple[int, int] | None = None
 
     @property
     def green(self) -> bool:
-        """Zero unexplained failures, every exception enumerated, and no
-        enumerated exception left unobserved."""
+        """Zero unexplained failures, every exception enumerated, no
+        enumerated exception left unobserved, and every module reached."""
         return not (
-            self.unexplained_failures or self.undeclared_skips or self.declared_but_absent
+            self.unexplained_failures
+            or self.undeclared_skips
+            or self.declared_but_absent
+            or self.missing_modules
+            or self.skip_count_mismatch is not None
         )
 
     def lines(self, exclusion_document: str = "the exclusion document") -> tuple[str, ...]:
@@ -456,7 +471,24 @@ class Reconciliation:
             out.append(f"UNDECLARED SKIP      {ident}  (add it to {exclusion_document})")
         for ident in self.declared_but_absent:
             out.append(f"STALE EXCLUSION      {ident}  (declared, and the run did not report it)")
+        for module in self.missing_modules:
+            out.append(f"MISSING MODULE       {module}  (in the lane, and absent from the report)")
+        if self.skip_count_mismatch is not None:
+            reported, declared = self.skip_count_mismatch
+            out.append(f"SKIP COUNT           {reported} skipped, declared {declared}")
         return tuple(out)
+
+    def narrowed(self) -> "Reconciliation":
+        """The findings a narrowed run can stand behind.
+
+        A narrowed run cannot tell a stale exclusion, a missing module or a
+        short skip count from one simply out of scope, so only failures and
+        undeclared skips survive.
+        """
+        return Reconciliation(
+            unexplained_failures=self.unexplained_failures,
+            undeclared_skips=self.undeclared_skips,
+        )
 
 
 def _declares(exclusion: Exclusion, ident: str) -> bool:
@@ -468,12 +500,32 @@ def _declares(exclusion: Exclusion, ident: str) -> bool:
     return ident == exclusion.check or ident.startswith(exclusion.check + "::")
 
 
-def reconcile(outcome: Outcome, exclusions: Sequence[Exclusion]) -> Reconciliation:
-    """Read *outcome* against *exclusions*.
+def _reported(module: str, classnames: frozenset[str]) -> bool:
+    """Whether the repository-relative *module* has a case among *classnames*.
+
+    pytest spells a module ``tests/harness/test_x.py`` as the classname
+    ``tests.harness.test_x``, followed by any class path.
+    """
+    dotted = module.removesuffix(".py").replace("/", ".")
+    return any(c == dotted or c.startswith(dotted + ".") for c in classnames)
+
+
+def reconcile(
+    outcome: Outcome,
+    exclusions: Sequence[Exclusion],
+    modules: Sequence[str] = (),
+    declared_skips: int | None = None,
+) -> Reconciliation:
+    """Read *outcome* against *exclusions*, and against the lane's *modules*.
 
     A failure is never explained by an exclusion: an excluded check skips. So
     every failure is unexplained, which is what makes "zero unexplained
     failures" a check an operator can run rather than a sentence in a report.
+
+    A module in *modules* with no case in the report is missing: a report
+    that covers less than the lane cannot reconcile green. With
+    *declared_skips*, the number of skips must equal it: a row standing for
+    four checks still matches when only three of them skip.
     """
     observed = [ident for ident, _reason in outcome.skips]
     undeclared = tuple(
@@ -486,6 +538,12 @@ def reconcile(outcome: Outcome, exclusions: Sequence[Exclusion]) -> Reconciliati
         unexplained_failures=tuple(outcome.failures),
         undeclared_skips=undeclared,
         declared_but_absent=absent,
+        missing_modules=tuple(m for m in modules if not _reported(m, outcome.classnames)),
+        skip_count_mismatch=(
+            (len(observed), declared_skips)
+            if declared_skips is not None and len(observed) != declared_skips
+            else None
+        ),
     )
 
 

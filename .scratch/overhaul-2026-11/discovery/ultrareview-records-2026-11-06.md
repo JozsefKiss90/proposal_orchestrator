@@ -46,6 +46,10 @@ integrity audit; the historical-profile check (`:181`) runs before V14 loads its
 All new UR tickets change `harness/` DN code, so rule 5 applies: PE-09 acceptance lane green, which for
 UR-D means the lane checks itself (write UR-D's failing tests to run outside the lane command first).
 
+**Finding 7 deferred (ticket 10, 2026-11-10).** Findings 3, 4 and 8 are fixed. Finding 7 did not fit:
+a report does not record the extraction build that produced it. A `--from-junit` re-read now prints
+NOT CERTIFIED and exits 2 at best. Taking certification from the producing build stays open.
+
 ## Slice 3 (ESR side) — operator decision
 
 Not run. ESR comparison, operator review, comparison diff, deferral register and authority matrix are used
