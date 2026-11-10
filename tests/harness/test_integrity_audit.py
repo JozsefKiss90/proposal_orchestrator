@@ -1160,9 +1160,12 @@ SANITISED_REGISTER = {
 
 
 def write_import_records(root: Path, *, document_id: str = "CAND-1", register: dict | None = None,
-                         declared_status: str = "Unresolved") -> Path:
+                         declared_status: str = "Unresolved", node_id: str | None = None) -> Path:
     """The import manifest and fidelity register the audit derives its wording
-    from, written under *root* as both the repo root and the graph root."""
+    from, written under *root* as both the repo root and the graph root.
+
+    *node_id* names the revision the manifest records, as a real import does;
+    the document route finds the manifest by that node id (ticket 16)."""
     register_rel = "docs/tier3_project_instantiation/source_materials/register.json"
     atomic_write_json(register if register is not None else SANITISED_REGISTER, root / register_rel)
     manifest = root / cp.IMPORT_MANIFESTS_REL / f"{document_id}.json"
@@ -1170,7 +1173,7 @@ def write_import_records(root: Path, *, document_id: str = "CAND-1", register: d
         "record_type": "external_proposal_import_manifest",
         "candidate": {"fidelity_register": register_rel},
         "claims": {"declared_status": declared_status},
-        "document": {"document_id": document_id},
+        "document": {"document_id": document_id, **({"node_id": node_id} if node_id else {})},
     }, manifest)
     return manifest
 
@@ -1179,9 +1182,9 @@ def write_import_records(root: Path, *, document_id: str = "CAND-1", register: d
 def world(tmp_path: Path) -> Path:
     root = tmp_path / "repo"
     shutil.copytree(FIXTURE, root)
-    import_document(root, CANDIDATE)
+    candidate = import_document(root, CANDIDATE)
     import_document(root, ESR_DOC, state="submitted")
-    write_import_records(root)
+    write_import_records(root, node_id=candidate.id)
     return root
 
 
