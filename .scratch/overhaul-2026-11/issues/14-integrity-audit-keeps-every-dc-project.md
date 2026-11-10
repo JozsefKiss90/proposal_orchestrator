@@ -1,6 +1,6 @@
 # 14 — The integrity audit never loses or overwrites a DC project (UR-E)
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 10
 Source: `discovery/ultrareview-records-2026-11-06.md` findings 5, 6
@@ -32,15 +32,15 @@ Part B states, or reports why it cannot. Today two parsing defects lose one sile
 
 Failing tests first (synthetic Part B prose, no private content):
 
-- [ ] Two blocks with the same DC number: a duplicate finding naming both; no silent replacement.
-- [ ] A "Contribution to the Network" heading followed by zero or two paragraphs: the next DC project is still parsed.
-- [ ] The same for the second consume-next site.
-- [ ] A well-formed Part B audits exactly as today (existing integrity-audit tests unchanged).
+- [x] Two blocks with the same DC number: a duplicate finding naming both; no silent replacement.
+- [x] A "Contribution to the Network" heading followed by zero or two paragraphs: the next DC project is still parsed.
+- [x] The same for the second consume-next site.
+- [x] A well-formed Part B audits exactly as today (existing integrity-audit tests unchanged).
 
 Then:
-- [ ] **PE-09 acceptance lane green**, run with ticket 10's lane (admission rule 5).
-- [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md` (no new failure by node id against §4's 43).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] **PE-09 acceptance lane green**, run with ticket 10's lane (admission rule 5).
+- [x] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md` (no new failure by node id against §4's 43).
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
 
@@ -55,3 +55,7 @@ Skills: diagnosing-bugs, then tdd
 Size: ~60–120 changed non-test lines
 Record: none
 ```
+
+## Comments
+
+**2026-11-10, done.** Merged into `harness_overhaul` as `bebe0075`. Verified in the main tree after merge: full suite at `5ec834a8`: 42 failed, all in BASELINE.md §4, none new; PE-09 lane GREEN at `5ec834a8` (3,513 passed, 17 declared exclusions, exit 0). DC parsing not restricted to §1.1 (operator accepted): a stray DC mention elsewhere raises the duplicate finding instead of silently replacing the project.

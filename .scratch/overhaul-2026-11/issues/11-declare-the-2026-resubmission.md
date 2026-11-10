@@ -1,6 +1,6 @@
 # 11 — Declare the 2026 resubmission as its own document in the importer (W-1)
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: None — can start immediately
 Source: `../overhaul-2026-11-f7-wayfinder/W01-findings.md` (must-land for V16); W02 confirms the Part B structure
@@ -36,18 +36,18 @@ as for the original.
 
 Failing tests first:
 
-- [ ] `--document <new id>` is accepted by the importer and the dry import (today refused as unknown).
-- [ ] The new document refuses an import until a configuration input completes it, naming the missing fields.
-- [ ] A configuration input for the new document completes it; one naming the 2025 original does not.
-- [ ] A 2026 revision cannot supersede a 2025 revision, and a revision id cannot belong to both documents.
-- [ ] The existing original-route, dry-import and import tests pass parametrised over both submitted documents.
+- [x] `--document <new id>` is accepted by the importer and the dry import (today refused as unknown).
+- [x] The new document refuses an import until a configuration input completes it, naming the missing fields.
+- [x] A configuration input for the new document completes it; one naming the 2025 original does not.
+- [x] A 2026 revision cannot supersede a 2025 revision, and a revision id cannot belong to both documents.
+- [x] The existing original-route, dry-import and import tests pass parametrised over both submitted documents.
 
 Then:
 
-- [ ] The dry import, the V18 register renderer and the receipt validator work for the new document on synthetic config.
-- [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md` (no new failure by node id against §4's 43).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
-- [ ] Acceptance lane stays green (the import tests are lane modules); rule 5 does not apply.
+- [x] The dry import, the V18 register renderer and the receipt validator work for the new document on synthetic config.
+- [x] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md` (no new failure by node id against §4's 43).
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] Acceptance lane stays green (the import tests are lane modules); rule 5 does not apply.
 
 ## Session brief
 
@@ -68,3 +68,7 @@ Record: decision-log entry for the new document's identity (§9.4), as AN10 did 
 
 - The runbook's stage-B section (written with the Converse delta on Mon 9).
 - The Stage B profile-applicability record (W02; operator authoring).
+
+## Comments
+
+**2026-11-10, done.** Merged into `harness_overhaul` as `14a13e0a`. Verified in the main tree after merge: full suite at `4e82430e`: 42 failed, all in BASELINE.md §4 (the drafts-reproducibility failure is gone after the `b7c2b9f9` re-render); PE-09 lane GREEN at `4e82430e` (3,491 passed, 17 declared exclusions, exit 0). Open for the operator before V16: the V18 register renderer writes "the ESR evaluated this text" for every submitted document, false for 2026 (recorded Unresolved in `msca-dn-resubmission-2026-identity_2026-11-10.json`). Title wording chosen by the session, marked Inferred.

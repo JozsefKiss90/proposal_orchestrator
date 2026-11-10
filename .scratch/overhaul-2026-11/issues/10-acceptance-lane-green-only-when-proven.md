@@ -1,6 +1,6 @@
 # 10 — The acceptance lane is GREEN only when this run proved it (UR-D)
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: None — can start immediately (after the declaration-drafts re-render, an operator step)
 Source: `discovery/ultrareview-records-2026-11-06.md`, findings 3, 4, 8 (7 if cheap)
@@ -39,19 +39,19 @@ Every rule-5 ticket in this cut (12–16) cites "lane green", so this lands firs
 
 Failing tests first (they exercise the lane module and command directly, not through the lane):
 
-- [ ] A stale report at the `--junit` path with pytest writing nothing: not GREEN, names the stale file.
-- [ ] Pytest exits with a collection/usage error: not GREEN, regardless of the report.
-- [ ] A report missing one lane module: not GREEN, names the module.
-- [ ] A skip not in `declared_skips`: not GREEN (characterise first; it may already hold).
-- [ ] `--area` or `-k`: exit code is not 0, output says "not an acceptance result".
-- [ ] A full, fresh, passing run on fixtures: GREEN and certified exactly as today.
+- [x] A stale report at the `--junit` path with pytest writing nothing: not GREEN, names the stale file.
+- [x] Pytest exits with a collection/usage error: not GREEN, regardless of the report.
+- [x] A report missing one lane module: not GREEN, names the module.
+- [x] A skip not in `declared_skips`: not GREEN (characterise first; it may already hold).
+- [x] `--area` or `-k`: exit code is not 0, output says "not an acceptance result".
+- [x] A full, fresh, passing run on fixtures: GREEN and certified exactly as today.
 
 Then:
 
-- [ ] `harness/ACCEPTANCE_LANE.md` states the four conditions.
-- [ ] One real lane run at the end of the session on HEAD: GREEN (requires the drafts re-render).
-- [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md` (no new failure by node id against §4's 43).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] `harness/ACCEPTANCE_LANE.md` states the four conditions.
+- [x] One real lane run at the end of the session on HEAD: GREEN (requires the drafts re-render).
+- [x] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md` (no new failure by node id against §4's 43).
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
 
@@ -72,3 +72,7 @@ Record: no decision-log entry (out-of-band harness); note the stricter rule in A
 
 - Changing the lane's module set, exclusions or declared skips.
 - Duplicate `one_line` helper (finding 9).
+
+## Comments
+
+**2026-11-10, done.** Merged into `harness_overhaul` as `4e82430e`. Verified in the main tree after merge: full suite at `4e82430e`: 42 failed, all in BASELINE.md §4 (the drafts-reproducibility failure is gone after the `b7c2b9f9` re-render); PE-09 lane GREEN at `4e82430e` (3,491 passed, 17 declared exclusions, exit 0). Finding 7 (`--from-junit` cannot prove which run wrote the report) is deferred and recorded in `harness/ACCEPTANCE_LANE.md`; such a re-read prints NOT CERTIFIED.
