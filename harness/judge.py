@@ -482,6 +482,10 @@ class Judge:
         if self._response_cache is not None:
             self._response_cache.discard_last(reason)
 
+    def _last_call_replayed(self) -> bool:
+        """Whether the last :meth:`raw_invoke` was served from the checkpoint."""
+        return self._response_cache is not None and self._response_cache.last_was_replay
+
     # -- verdicts --------------------------------------------------------- #
 
     def evaluate(
@@ -522,6 +526,7 @@ class Judge:
             judge_version=self.config.version,
             prompt_hash=prompt_hash(system_prompt, user_prompt),
             timestamp=self._clock(),
+            replayed=self._last_call_replayed(),
         )
         if self._provenance_log is not None:
             self._provenance_log.append(record)

@@ -53,6 +53,8 @@ BINDING = CacheBinding(
     include_claims=False,
     n=3,
     criterion_samples=5,
+    temperature=0.0,
+    max_tokens=2048,
 )
 
 
@@ -69,9 +71,11 @@ class CountingBackend:
         return {"content": out}
 
 
-def _judge(tmp_path: Path, backend, cache: ResponseCache | None = None) -> Judge:
+def _judge(
+    tmp_path: Path, backend, cache: ResponseCache | None = None, *, max_tokens: int = 2048
+) -> Judge:
     return Judge(
-        JudgeConfig(model="fake-assessor", version="pin-7"),
+        JudgeConfig(model="fake-assessor", version="pin-7", max_tokens=max_tokens),
         backend=backend,
         provenance_log=ProvenanceLog(tmp_path / "provenance.jsonl"),
         clock=lambda: FROZEN,
@@ -189,6 +193,8 @@ class TestRefusals:
             ("include_claims", True),
             ("n", 5),
             ("criterion_samples", 3),
+            ("temperature", 0.7),
+            ("max_tokens", 4096),
         ],
     )
     def test_a_moved_binding_is_refused_and_named(self, tmp_path, field, value):
@@ -726,3 +732,172 @@ def bundle_and_input(tmp_path):
     candidate = load_candidate(_candidate(tmp_path / "cand"), bundle.profile)
     cid = bundle.profile.criterion_ids[0]
     return bundle, cs.build_criterion_input(bundle, candidate, cid)
+
+
+
+# --------------------------------------------------------------------------- #
+# 7. A resume is honest (ticket 15): one inference configuration per report,
+#    and a replay is never recorded as a live draw
+# --------------------------------------------------------------------------- #
+
+
+def _provenance(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+
+
+def _command_world(tmp_path: Path):
+    """A preflighted ``assess`` argv over the synthetic blind-assessment world."""
+    from tests.harness._preflight import preflighted
+    from tests.harness.test_blind_assessment import (
+        _candidate as blind_candidate,
+        _synthetic_world as blind_world,
+    )
+    from harness.rubrics import load_profile_bundle
+
+    repo = tmp_path / "repo"
+    world = blind_world(repo)
+    bundle = load_profile_bundle(str(world), repo_root=repo)
+    out = tmp_path / "reports"
+    argv = preflighted(
+        TestTheCommandResumes._args(bundle, blind_candidate(tmp_path, bundle), out, repo),
+        clock=lambda: FROZEN,
+    )
+    return argv, repo
+
+
+class TestAResumeIsHonest:
+    @pytest.mark.parametrize(
+        "field,recorded,now",
+        [("temperature", 0.0, 0.7), ("max_tokens", 2048, 4096)],
+    )
+    def test_a_moved_inference_configuration_is_refused_naming_both_values(
+        self, tmp_path, field, recorded, now
+    ):
+        import dataclasses
+
+        path = tmp_path / "ck.jsonl"
+        ResponseCache(path, dataclasses.replace(BINDING, **{field: recorded}), clock=lambda: FROZEN)
+        with pytest.raises(ResponseCacheError) as excinfo:
+            ResponseCache(path, dataclasses.replace(BINDING, **{field: now}), resume=True)
+        message = str(excinfo.value)
+        assert f"{field}: checkpoint {recorded!r} != this run {now!r}" in message
+
+    def test_the_binding_records_the_inference_configuration(self, tmp_path):
+        cache = ResponseCache(tmp_path / "ck.jsonl", BINDING, clock=lambda: FROZEN)
+        header = json.loads(cache.path.read_text(encoding="utf-8").splitlines()[0])
+        assert header["binding"]["temperature"] == 0.0
+        assert header["binding"]["max_tokens"] == 2048
+
+    def test_an_identical_configuration_replays_as_before(self, tmp_path):
+        path = tmp_path / "ck.jsonl"
+        _judge(tmp_path, CountingBackend("recorded"), ResponseCache(path, BINDING)).raw_invoke(
+            "system", "user"
+        )
+        resumed = ResponseCache(path, BINDING, resume=True)
+        backend = CountingBackend("must not be asked")
+        assert _judge(tmp_path, backend, resumed).raw_invoke("system", "user") == "recorded"
+        assert backend.calls == 0 and resumed.replayed == 1
+
+    def test_a_pre_change_checkpoint_opens_but_its_resume_is_refused(self, tmp_path):
+        """A header written before ticket 15 carries no inference fields."""
+        old = {
+            k: v for k, v in BINDING.to_dict().items() if k not in ("temperature", "max_tokens")
+        }
+        path = tmp_path / "ck.jsonl"
+        path.write_text(
+            json.dumps(
+                {
+                    "record_type": CHECKPOINT_HEADER_RECORD_TYPE,
+                    "format_version": CHECKPOINT_FORMAT_VERSION,
+                    "opened_at": FROZEN,
+                    "binding": old,
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        # It still opens: the header reads, with the configuration unrecorded.
+        read = CacheBinding.from_dict(old)
+        assert read.temperature is None and read.max_tokens is None
+        with pytest.raises(ResponseCacheError, match="not recorded"):
+            ResponseCache(path, BINDING, resume=True)
+
+    def test_a_replayed_verdict_is_marked_in_the_provenance_log(self, tmp_path):
+        path = tmp_path / "ck.jsonl"
+        first = _judge(
+            tmp_path / "a",
+            CountingBackend('{"passed": true, "rationale": "r"}'),
+            ResponseCache(path, BINDING),
+        )
+        first.evaluate("system", "user", metric="m", property_key="p")
+        (live,) = _provenance(tmp_path / "a" / "provenance.jsonl")
+        assert "replayed" not in live
+
+        resumed = ResponseCache(path, BINDING, resume=True)
+        backend = CountingBackend('{"passed": false, "rationale": "live"}')
+        judge = _judge(tmp_path / "b", backend, resumed)
+        judge.evaluate("system", "user", metric="m", property_key="p")
+        judge.evaluate("system", "user", metric="m", property_key="p")
+        replayed, fresh = _provenance(tmp_path / "b" / "provenance.jsonl")
+        assert replayed["replayed"] is True
+        assert "replayed" not in fresh
+        assert backend.calls == 1
+
+    def test_a_replayed_criterion_sample_is_marked_in_the_provenance_log(
+        self, tmp_path, bundle_and_input
+    ):
+        bundle, criterion_input = bundle_and_input
+        path = tmp_path / "ck.jsonl"
+        first = _judge(tmp_path / "a", CountingBackend(_score_json(4.0)), ResponseCache(path, BINDING))
+        cs.grade_criterion(first, bundle, criterion_input, n=3)
+        assert all("replayed" not in r for r in _provenance(tmp_path / "a" / "provenance.jsonl"))
+
+        resumed = ResponseCache(path, BINDING, resume=True)
+        backend = CountingBackend(_score_json(3.0))
+        second = _judge(tmp_path / "b", backend, resumed)
+        cs.grade_criterion(second, bundle, criterion_input, n=3)
+        records = _provenance(tmp_path / "b" / "provenance.jsonl")
+        assert len(records) == 3 and all(r.get("replayed") is True for r in records)
+        assert backend.calls == 0
+
+    def test_a_resumed_command_run_holds_no_unmarked_replay_records(self, tmp_path):
+        import harness.commands.blind_assessment as cmd
+        from tests.harness.test_blind_assessment import DualBackend
+
+        argv, repo = _command_world(tmp_path)
+        assert cmd.main(argv, judge=_judge(tmp_path / "a", DualBackend()), clock=lambda: FROZEN) == 0
+        first = _provenance(tmp_path / "a" / "provenance.jsonl")
+        assert first and all("replayed" not in r for r in first)
+        (checkpoint,) = list((repo / ".harness" / "checkpoints").glob("*.jsonl"))
+
+        backend = DualBackend()
+        code = cmd.main(
+            argv + ["--resume", str(checkpoint)],
+            judge=_judge(tmp_path / "b", backend),
+            clock=lambda: FROZEN,
+        )
+        assert code == 0 and backend.calls == 0
+        records = _provenance(tmp_path / "b" / "provenance.jsonl")
+        assert len(records) == len(first)
+        assert all(r.get("replayed") is True for r in records)
+
+    def test_the_command_refuses_a_resume_under_another_token_limit(self, tmp_path, capsys):
+        import harness.commands.blind_assessment as cmd
+        from tests.harness.test_blind_assessment import DualBackend
+
+        argv, repo = _command_world(tmp_path)
+        judge = _judge(tmp_path / "a", DualBackend(), max_tokens=2048)
+        assert cmd.main(argv, judge=judge, clock=lambda: FROZEN) == 0
+        (checkpoint,) = list((repo / ".harness" / "checkpoints").glob("*.jsonl"))
+        capsys.readouterr()
+
+        backend = DualBackend()
+        code = cmd.main(
+            argv + ["--resume", str(checkpoint)],
+            judge=_judge(tmp_path / "b", backend, max_tokens=4096),
+            clock=lambda: FROZEN,
+        )
+        assert code == 2 and backend.calls == 0
+        assert "max_tokens: checkpoint 2048 != this run 4096" in capsys.readouterr().err

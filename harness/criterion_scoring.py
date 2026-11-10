@@ -773,6 +773,7 @@ def grade_criterion(
     samples: list[CriterionSample] = []
     records: list[ProvenanceRecord] = []
     discarded: list[DiscardedDraw] = []
+    cache = getattr(judge, "response_cache", None)
     for i in range(n):
         sample, thrown = _draw_sample(judge, system, user, scoring, i)
         discarded.extend(thrown)
@@ -789,6 +790,9 @@ def grade_criterion(
             judge_version=judge.config.version,
             prompt_hash=digest,
             timestamp=judge.clock(),
+            # The last call was the draw that parsed; a replayed one already
+            # has its live record from the run that drew it.
+            replayed=cache is not None and cache.last_was_replay,
         )
         judge.provenance_log.append(record)
         samples.append(sample)
