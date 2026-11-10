@@ -262,9 +262,10 @@ class ResponseCache:
     def last_was_replay(self) -> bool:
         """``True`` when the response just served came from the checkpoint.
 
-        Read by the provenance writers: a replayed response already has the
-        live record of the run that drew it, so its new record is marked
-        replayed rather than counted as a second draw.
+        Read through :attr:`harness.judge.Judge.last_call_replayed`: a
+        replayed response already has the live record of the run that drew
+        it, so its new record is marked replayed rather than counted as a
+        second draw.
         """
         return self._last_replayed
 
@@ -375,7 +376,7 @@ class ResponseCache:
         unrecorded = [
             name
             for name in _INFERENCE_FIELDS
-            if name not in header["binding"] and getattr(self._binding, name) is not None
+            if getattr(recorded, name) is None and getattr(self._binding, name) is not None
         ]
         if unrecorded:
             raise ResponseCacheError(

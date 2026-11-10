@@ -353,6 +353,7 @@ def decompose_chunk(
                 property_key=chunk.chunk_id,
                 passed=None,
                 timestamp=(clock or _default_clock)(),
+                replayed=judge.last_call_replayed,
             )
         )
     return texts

@@ -824,6 +824,38 @@ class TestAResumeIsHonest:
         with pytest.raises(ResponseCacheError, match="not recorded"):
             ResponseCache(path, BINDING, resume=True)
 
+    @pytest.mark.parametrize("header_binding", ["null-fields", "no-binding"])
+    def test_an_unrecorded_configuration_is_refused_not_crashed_on(
+        self, tmp_path, header_binding
+    ):
+        header = {
+            "record_type": CHECKPOINT_HEADER_RECORD_TYPE,
+            "format_version": CHECKPOINT_FORMAT_VERSION,
+            "opened_at": FROZEN,
+        }
+        if header_binding == "null-fields":
+            header["binding"] = {**BINDING.to_dict(), "temperature": None, "max_tokens": None}
+        path = tmp_path / "ck.jsonl"
+        path.write_text(json.dumps(header) + "\n", encoding="utf-8")
+        with pytest.raises(ResponseCacheError, match="not recorded"):
+            ResponseCache(path, BINDING, resume=True)
+
+    def test_a_replayed_decomposition_is_marked_in_the_provenance_log(self, tmp_path):
+        import harness.claim_ledger as cl
+
+        path = tmp_path / "ck.jsonl"
+        piece = cl.ProseChunk(sub_section_id="1.1", chunk_index=0, text="Some passage.")
+        payload = '{"assertions": ["one assertion"]}'
+        first = _judge(tmp_path / "a", CountingBackend(payload), ResponseCache(path, BINDING))
+        cl.decompose_chunk(first, piece, clock=lambda: FROZEN)
+        assert all("replayed" not in r for r in _provenance(tmp_path / "a" / "provenance.jsonl"))
+
+        backend = CountingBackend(payload)
+        second = _judge(tmp_path / "b", backend, ResponseCache(path, BINDING, resume=True))
+        cl.decompose_chunk(second, piece, clock=lambda: FROZEN)
+        (record,) = _provenance(tmp_path / "b" / "provenance.jsonl")
+        assert record["replayed"] is True and backend.calls == 0
+
     def test_a_replayed_verdict_is_marked_in_the_provenance_log(self, tmp_path):
         path = tmp_path / "ck.jsonl"
         first = _judge(

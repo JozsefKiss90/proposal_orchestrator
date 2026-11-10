@@ -392,7 +392,10 @@ every write, §9/§17.5.3). It is an **out-of-band artifact** — not a Tier 4 g
 result, and nothing in `runner` reads it. Every record carries the guardrail
 five (`judge_model, judge_version, prompt_hash, score, rationale`) plus
 supplementary context (metric, property_key, passed, sample_index, evidence_type,
-timestamp).
+timestamp). A record parsed from a checkpoint replay also carries
+`"replayed": true`. The run that drew the response already logged its live
+record, so a replayed record never counts as a second draw. A live record omits
+the key.
 
 ## E1.5 — Judge-reliability calibration (the advisory → gating mechanism)
 
@@ -1548,9 +1551,12 @@ rendered as `[NOT a fresh draw]` whenever anything was replayed.
 
 Refusals, all fail-closed: an existing checkpoint is never appended to without
 `--resume`; a checkpoint names the candidate hash, profile version, assessor
-pin, preflight pack-set hash, `include_claims` and both sample counts, and
-resuming into a binding that moved is refused with every moved field named; an
-edited response (sha256 mismatch) is refused, not read.
+pin, preflight pack-set hash, `include_claims`, both sample counts and the
+inference configuration (temperature and token limit), and resuming into a
+binding that moved is refused with every moved field named and both values; a
+checkpoint written before the inference configuration was recorded still reads,
+but resuming it is refused as "not recorded"; an edited response (sha256
+mismatch) is refused, not read.
 
 **A response the parsers rejected is kept and never replayed.** The cache sits
 below the parsers and cannot tell a usable response from an unusable one, so

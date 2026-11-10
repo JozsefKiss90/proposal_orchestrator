@@ -482,8 +482,14 @@ class Judge:
         if self._response_cache is not None:
             self._response_cache.discard_last(reason)
 
-    def _last_call_replayed(self) -> bool:
-        """Whether the last :meth:`raw_invoke` was served from the checkpoint."""
+    @property
+    def last_call_replayed(self) -> bool:
+        """Whether the last :meth:`raw_invoke` was served from the checkpoint.
+
+        Every provenance writer reads it: a replayed response already has the
+        live record of the run that drew it, so its new record is marked
+        replayed rather than counted as a second draw.
+        """
         return self._response_cache is not None and self._response_cache.last_was_replay
 
     # -- verdicts --------------------------------------------------------- #
@@ -526,7 +532,7 @@ class Judge:
             judge_version=self.config.version,
             prompt_hash=prompt_hash(system_prompt, user_prompt),
             timestamp=self._clock(),
-            replayed=self._last_call_replayed(),
+            replayed=self.last_call_replayed,
         )
         if self._provenance_log is not None:
             self._provenance_log.append(record)
