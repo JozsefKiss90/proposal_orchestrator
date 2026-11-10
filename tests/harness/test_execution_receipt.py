@@ -1216,6 +1216,65 @@ class TestTheCommand:
         assert code == 2
         assert "inside the repository" in capsys.readouterr().out
 
+    def test_a_receipt_inside_the_repository_is_refused_from_another_directory(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: Any
+    ) -> None:
+        """Ticket 13: the guard measures this repository, not the working directory."""
+        profile = hp.discover_declarations(REPO_ROOT)[0]
+        monkeypatch.chdir(tmp_path)
+        code = command.main(
+            [
+                "--receipt",
+                str(REPO_ROOT / "harness" / "execution_receipt_template.json"),
+                "--expect-candidate",
+                CANDIDATE,
+                "--expect-profile",
+                str(profile),
+            ]
+        )
+        assert code == 2
+        assert "inside the repository" in capsys.readouterr().out
+
+    def test_a_receipt_inside_the_repository_is_refused_under_a_narrower_root(
+        self, capsys: Any
+    ) -> None:
+        """Ticket 13: a --repo-root below the receipt does not let it through."""
+        profile = hp.discover_declarations(REPO_ROOT)[0]
+        code = command.main(
+            [
+                "--receipt",
+                str(REPO_ROOT / "harness" / "execution_receipt_template.json"),
+                "--expect-candidate",
+                CANDIDATE,
+                "--expect-profile",
+                profile.name,
+                "--repo-root",
+                str(profile.parent),
+            ]
+        )
+        assert code == 2
+        assert "inside the repository" in capsys.readouterr().out
+
+    def test_a_receipt_outside_the_repository_is_accepted_from_another_directory(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: Any
+    ) -> None:
+        path, _ = _bound_to_this_trees_profile(tmp_path)
+        profile = hp.discover_declarations(REPO_ROOT)[0]
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        monkeypatch.chdir(elsewhere)
+        code = command.main(
+            [
+                "--receipt",
+                str(path),
+                "--expect-candidate",
+                CANDIDATE,
+                "--expect-profile",
+                str(profile),
+            ]
+        )
+        assert code == 0, capsys.readouterr().out
+
     def test_a_named_profile_that_is_not_here_exits_two(
         self, tmp_path: Path, capsys: Any
     ) -> None:

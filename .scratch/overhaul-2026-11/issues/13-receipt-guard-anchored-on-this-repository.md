@@ -19,14 +19,14 @@ correctly; this command does the same.
 
 Failing tests first:
 
-- [ ] A receipt inside the repository is refused when the command runs with a different working directory.
-- [ ] Same with `--repo-root` pointed at a subdirectory (e.g. the profiles directory).
-- [ ] A receipt outside the repository is accepted exactly as today.
+- [x] A receipt inside the repository is refused when the command runs with a different working directory.
+- [x] Same with `--repo-root` pointed at a subdirectory (e.g. the profiles directory).
+- [x] A receipt outside the repository is accepted exactly as today.
 
 Then:
 - [ ] **PE-09 acceptance lane green**, run with ticket 10's lane (admission rule 5).
 - [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md` (no new failure by node id against §4's 43).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
 

@@ -7,7 +7,8 @@ bound to a candidate or a profile other than the intended pair. Given the run's
 blind report, it also refuses a receipt for another transport.
 
 The receipt stays in the private environment. This command refuses one stored
-inside the repository, and writes nothing anywhere.
+inside this repository, measured against the repository itself rather than the
+working directory or ``--repo-root``, and writes nothing anywhere.
 
 Advisory. It closes no gate, runs no assessment and spends no quota.
 """
@@ -23,6 +24,7 @@ from harness import execution_receipt as er
 from harness.blind_assessment import BLIND_REPORT_RECORD_TYPE
 from harness import historical_profile as hp
 from harness.record_binding import file_sha256
+from runner.original_configuration import THIS_REPOSITORY
 
 def _intended(
     repo_root: Path, candidate: str, profile: str
@@ -105,7 +107,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "transport the report's run spoke. Omit it before the run."
         ),
     )
-    parser.add_argument("--repo-root", default=".", help="repository root (default: .)")
+    parser.add_argument(
+        "--repo-root",
+        default=".",
+        help=(
+            "root the profile is found under (default: .). The receipt is always "
+            "measured against this repository, wherever this runs."
+        ),
+    )
     args = parser.parse_args(argv)
 
     repo_root = Path(args.repo_root)
@@ -115,7 +124,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
 
     try:
-        receipt_path = er.receipt_path_outside(Path(args.receipt), repo_root)
+        receipt_path = er.receipt_path_outside(Path(args.receipt), THIS_REPOSITORY)
         receipt = er.load_receipt(receipt_path)
     except er.ReceiptError as exc:
         print(f"refused: {exc}")
