@@ -373,6 +373,183 @@ class TestReconcile:
 
 
 # --------------------------------------------------------------------------- #
+# The command: GREEN only when this run proved it (overhaul ticket 10)
+# --------------------------------------------------------------------------- #
+
+
+def _dotted(module: str) -> str:
+    return module[: -len(".py")].replace("/", ".")
+
+
+def _module_named(lane: lanes.Lane, basename: str) -> str:
+    return next(m for m in lane.modules() if m.rsplit("/", 1)[-1] == basename)
+
+
+def _report(lane: lanes.Lane, modules: list[str], *, drop_skip: int = 0, extra_skip: bool = False) -> str:
+    """A JUnit report of a clean run over *modules*: one pass per module, and
+    every declared exclusion inside them reported as its declared number of
+    skips."""
+    cases = [f'<testcase classname="{_dotted(m)}" name="test_passes"/>' for m in modules]
+    skips = []
+    for exclusion in lane.exclusions:
+        basename, *rest = exclusion.check.split("::")
+        module = _module_named(lane, basename)
+        if module not in modules:
+            continue
+        if exclusion.checks == 1 and rest and rest[-1].startswith("test_"):
+            names = [(rest[:-1], rest[-1])]
+        else:
+            names = [(rest, f"test_x{i}") for i in range(exclusion.checks)]
+        for parts, name in names:
+            classname = ".".join([_dotted(module), *parts])
+            skips.append(
+                f'<testcase classname="{classname}" name="{name}">'
+                '<skipped message="EXCLUDED (not a pass)"/></testcase>'
+            )
+    skips = skips[drop_skip:]
+    if extra_skip:
+        skips.append(
+            f'<testcase classname="{_dotted(modules[0])}" name="test_unlisted">'
+            '<skipped message="nobody declared this"/></testcase>'
+        )
+    body = "".join(cases + skips)
+    return (
+        '<?xml version="1.0" encoding="utf-8"?><testsuites>'
+        f'<testsuite name="pytest" errors="0" failures="0" skipped="{len(skips)}" '
+        f'tests="{len(cases) + len(skips)}">{body}</testsuite></testsuites>'
+    )
+
+
+class _FakePytest:
+    """Stands in for the pytest subprocess: writes a report for exactly the
+    modules it is handed, or none, and returns a chosen exit code."""
+
+    def __init__(self, lane: lanes.Lane) -> None:
+        self.lane = lane
+        self.returncode = 0
+        self.writes = True
+        self.drop_module: str | None = None
+        self.drop_skip = 0
+        self.extra_skip = False
+
+    def __call__(self, modules: list[str], junit: Path, keyword: str | None) -> int:
+        if self.writes:
+            kept = [m for m in modules if m != self.drop_module]
+            junit.write_text(
+                _report(self.lane, kept, drop_skip=self.drop_skip, extra_skip=self.extra_skip),
+                encoding="utf-8",
+            )
+        return self.returncode
+
+
+@pytest.fixture()
+def fake_pytest(monkeypatch: pytest.MonkeyPatch, lane: lanes.Lane) -> _FakePytest:
+    from harness.commands import acceptance_lane as command
+
+    fake = _FakePytest(lane)
+    monkeypatch.setattr(command, "_run_pytest", fake)
+    monkeypatch.setattr(command.extraction, "cannot_reproduce_reason", lambda: None)
+    monkeypatch.setattr(command.extraction, "describe_environment", lambda: "pinned build")
+    return fake
+
+
+def _run(argv: list[str], capsys: pytest.CaptureFixture[str]) -> tuple[int, str]:
+    from harness.commands import acceptance_lane as command
+
+    code = command.main(argv)
+    captured = capsys.readouterr()
+    return code, captured.out + captured.err
+
+
+def _said_green(out: str) -> bool:
+    return any(line.startswith("GREEN:") for line in out.splitlines())
+
+
+class TestTheCommandGreensOnlyWhatThisRunProved:
+    """Findings 3, 4, 7 and 8 of the 2026-11-06 ultrareview, driven through
+    ``main`` with the pytest subprocess replaced, so the lane checks itself
+    without running itself."""
+
+    def test_a_stale_report_at_the_junit_path_is_refused_and_named(
+        self, fake_pytest: _FakePytest, lane: lanes.Lane, tmp_path: Path, capsys
+    ) -> None:
+        stale = tmp_path / "lane.xml"
+        stale.write_text(_report(lane, list(lane.modules())), encoding="utf-8")
+        fake_pytest.writes = False
+        code, out = _run(["--junit", str(stale)], capsys)
+        assert code != 0
+        assert not _said_green(out)
+        assert str(stale) in out
+
+    def test_a_pytest_usage_or_collection_error_is_never_green(
+        self, fake_pytest: _FakePytest, tmp_path: Path, capsys
+    ) -> None:
+        fake_pytest.returncode = 4
+        code, out = _run(["--junit", str(tmp_path / "lane.xml")], capsys)
+        assert code != 0
+        assert not _said_green(out)
+        assert "pytest exited 4" in out
+
+    def test_a_report_missing_one_lane_module_is_not_green_and_names_it(
+        self, fake_pytest: _FakePytest, lane: lanes.Lane, tmp_path: Path, capsys
+    ) -> None:
+        dropped = lane.modules()[0]
+        fake_pytest.drop_module = dropped
+        code, out = _run(["--junit", str(tmp_path / "lane.xml")], capsys)
+        assert code == 1
+        assert not _said_green(out)
+        assert f"MISSING MODULE       {dropped}" in out
+
+    def test_a_skip_not_declared_is_not_green(
+        self, fake_pytest: _FakePytest, tmp_path: Path, capsys
+    ) -> None:
+        fake_pytest.extra_skip = True
+        code, out = _run(["--junit", str(tmp_path / "lane.xml")], capsys)
+        assert code == 1
+        assert "UNDECLARED SKIP" in out
+        assert not _said_green(out)
+
+    def test_a_skip_count_short_of_the_declared_count_is_not_green(
+        self, fake_pytest: _FakePytest, lane: lanes.Lane, tmp_path: Path, capsys
+    ) -> None:
+        """A class row standing for four checks still matches when only three
+        skip, so the count is checked against ``declared_skips`` as well."""
+        gold = next(i for i, e in enumerate(lane.exclusions) if e.checks > 1)
+        fake_pytest.drop_skip = sum(e.checks for e in lane.exclusions[:gold]) + 1
+        code, out = _run(["--junit", str(tmp_path / "lane.xml")], capsys)
+        assert code == 1
+        assert f"declared {lane.declared_skips}" in out
+        assert not _said_green(out)
+
+    @pytest.mark.parametrize("narrowing", [["--area", "importer"], ["-k", "test_passes"]])
+    def test_a_narrowed_run_does_not_exit_0_and_says_why(
+        self, fake_pytest: _FakePytest, tmp_path: Path, capsys, narrowing: list[str]
+    ) -> None:
+        code, out = _run(["--junit", str(tmp_path / "lane.xml"), *narrowing], capsys)
+        assert code not in (0, 1, 2)
+        assert "not an acceptance result" in out
+        assert not _said_green(out)
+
+    def test_a_re_read_report_is_not_certified(
+        self, fake_pytest: _FakePytest, lane: lanes.Lane, tmp_path: Path, capsys
+    ) -> None:
+        recorded = tmp_path / "recorded.xml"
+        recorded.write_text(_report(lane, list(lane.modules())), encoding="utf-8")
+        code, out = _run(["--from-junit", str(recorded)], capsys)
+        assert code != 0
+        assert "NOT CERTIFIED" in out
+
+    def test_a_full_fresh_passing_run_is_green_and_certified(
+        self, fake_pytest: _FakePytest, lane: lanes.Lane, tmp_path: Path, capsys
+    ) -> None:
+        code, out = _run(["--junit", str(tmp_path / "lane.xml")], capsys)
+        assert code == 0, out
+        assert f"GREEN: {len(lane.modules()):,} passed" in out
+        assert f"{lane.declared_skips} declared exclusions" in out
+        assert "NOT CERTIFIED" not in out
+
+
+# --------------------------------------------------------------------------- #
 # The lane's own documentation
 # --------------------------------------------------------------------------- #
 

@@ -10,6 +10,32 @@ It runs every module the declaration names, then reads the run back against that
 Pass `--list` to print the declaration and run nothing. Pass `--area NAME` or `-k EXPR` to narrow the
 run. Both stamp the result PARTIAL, because a narrowed run is a diagnostic.
 
+## GREEN means this run proved it
+
+The lane reports GREEN only when four conditions hold. Each closes a way a green result could be
+produced without the run behind it (overhaul ticket 10).
+
+1. **The evidence is fresh.** A `--junit` path that already exists is refused, so an earlier run's
+   report cannot be read as this one's. Pytest must exit 0, or exit 1 with the failures named in the
+   report. Any other exit code means the report does not record a complete run.
+2. **The coverage is checked.** Every lane module must have a case in the report. A module the
+   report never mentions is printed as a MISSING MODULE.
+3. **The skips are exactly the declared ones.** Every skip is a declared exclusion, every declared
+   exclusion is reported, and the number of skips equals `declared_skips`.
+4. **A narrowed run is never an acceptance result.** `--area` and `-k` exit 3 when the run raises no
+   finding, and 1 when it raises one. They never exit 0.
+
+`--from-junit PATH` re-reads an earlier report. The report does not record the extraction build that
+produced it, so a re-read is stamped NOT CERTIFIED and exits 2 at best. Taking certification from the
+producing build is deferred (finding 7 of the 2026-11-06 ultrareview).
+
+| Exit | Meaning |
+|---:|---|
+| 0 | GREEN and certified |
+| 1 | not green: a finding is printed above the result |
+| 2 | refused before running, or green and NOT CERTIFIED |
+| 3 | a narrowed run with no finding: not an acceptance result |
+
 The declaration is data, not code: `harness/acceptance_lanes/msca_dn_historical.json` holds the areas,
 the exclusions and the audit baseline, and `harness/acceptance_lane.py` reads it. The reader carries no
 instrument name, which is the same separation `harness/profile.py` keeps from its profiles, and which

@@ -8,15 +8,21 @@ The lane is read from ``harness/acceptance_lanes/``. With one declaration in the
 tree it is chosen; with several, ``--lane NAME`` names one and an unqualified
 run refuses rather than guessing.
 
-The command exits 0 only when all four of these hold:
+The command exits 0 only when all of these hold:
 
+* this run wrote the report it reads. A path that already exists is refused.
+  Pytest must exit 0, or 1 with the failures named in the report;
 * no failure and no setup error;
-* every skip the run reported is a declared exclusion;
-* every declared exclusion the run was expected to report, it reported;
+* every lane module has a case in the report;
+* the skips are exactly the declared ones: each is a declared exclusion, each
+  declared exclusion was reported, and their number is ``declared_skips``;
 * every declared exclusion is also named in the exclusion document, and no
   exclusion sits in an area the run depends on;
 * the extraction environment is one measured to reproduce the committed import
   artifacts.
+
+Exit codes: 0 GREEN and certified; 1 not green; 2 refused, or green and NOT
+CERTIFIED; 3 a narrowed run with no finding, which is never an acceptance result.
 
 The last is fail-closed rather than advisory. A build that cannot reproduce the
 candidate derives a different document identity, so a green importer area under
@@ -28,14 +34,17 @@ Flags
 -----
 ``--lane NAME``                  which declaration to run.
 ``--list``                       print the declaration and exit, running nothing.
-``--junit PATH``                 where to write the JUnit report (default: a
-                                 temporary file, read and then deleted).
+``--junit PATH``                 where to write the JUnit report; must not exist
+                                 yet (default: a temporary file, read and then
+                                 deleted).
 ``--from-junit PATH``            reconcile a report from an earlier run; runs no
-                                 tests, so a recorded result can be re-read.
+                                 tests, so a recorded result can be re-read. The
+                                 report does not record its build, so a re-read
+                                 is NOT CERTIFIED.
 ``--allow-unreproducing-build``  run off a reproducing build, uncertified.
-``-k EXPR`` / ``--area NAME``    narrow the run. Both stamp ``PARTIAL``: a
-                                 narrowed run is a diagnostic, never an
-                                 acceptance result.
+``-k EXPR`` / ``--area NAME``    narrow the run. Both stamp ``PARTIAL`` and exit
+                                 3 at best: a narrowed run is a diagnostic,
+                                 never an acceptance result.
 
 What a green lane does not say is printed with every result, and spelled out in
 the declaration's own documentation.
@@ -120,7 +129,7 @@ def _modules(lane: lanes.Lane, areas: list[str]) -> list[str]:
     return [m for a in lane.areas if a.name in areas for m in a.modules]
 
 
-def _run_pytest(modules: list[str], junit: Path, keyword: str | None) -> None:
+def _run_pytest(modules: list[str], junit: Path, keyword: str | None) -> int:
     command = [
         sys.executable,
         "-m",
@@ -136,7 +145,21 @@ def _run_pytest(modules: list[str], junit: Path, keyword: str | None) -> None:
     if keyword:
         command += ["-k", keyword]
     print("$ " + " ".join(command), flush=True)
-    subprocess.run(command, cwd=REPO_ROOT, check=False)
+    return subprocess.run(command, cwd=REPO_ROOT, check=False).returncode
+
+
+def _pytest_exit_problem(returncode: int | None, outcome: lanes.Outcome) -> str | None:
+    """Why pytest's own exit code forbids GREEN, or ``None``.
+
+    Exit 1 is test failures, which the report names case by case. Any other
+    non-zero code (interrupted, internal, usage, nothing collected) means the
+    report does not record a complete run, whatever it contains.
+    """
+    if returncode is None or returncode == 0:
+        return None
+    if returncode == 1 and outcome.failures:
+        return None
+    return f"pytest exited {returncode}; the report does not record a complete run"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -191,10 +214,28 @@ def main(argv: list[str] | None = None) -> int:
 
     partial = bool(args.area or args.keyword)
     scratch: Path | None = None
+    returncode: int | None = None
     if args.from_junit is not None:
         report = args.from_junit
+        # The extraction build was measured on this machine, not on the one
+        # that produced the report, so a re-read carries no certification
+        # (finding 7, deferred: the report does not record its build).
+        reread = (
+            f"re-read from {report}; the report does not record the "
+            "extraction build that produced it"
+        )
+        cannot = reread if cannot is None else f"{reread}; {cannot}"
     elif args.junit is not None:
         report = args.junit
+        # A report already at the path could be read back as this run's when
+        # pytest writes none, so the evidence must be new.
+        if report.exists():
+            print(
+                f"REFUSED: {report} already exists; a lane run writes a new report. "
+                "Name a fresh path, or re-read the old one with --from-junit.",
+                file=sys.stderr,
+            )
+            return 2
         report.parent.mkdir(parents=True, exist_ok=True)
     else:
         scratch = Path(tempfile.mkdtemp(prefix="acceptance-lane-"))
@@ -202,7 +243,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         if args.from_junit is None:
-            _run_pytest(_modules(lane, args.area), report, args.keyword)
+            returncode = _run_pytest(_modules(lane, args.area), report, args.keyword)
         if not report.is_file():
             print(f"\nno JUnit report at {report}", file=sys.stderr)
             return 2
@@ -211,30 +252,26 @@ def main(argv: list[str] | None = None) -> int:
         if scratch is not None:
             shutil.rmtree(scratch, ignore_errors=True)
 
-    result = lanes.reconcile(outcome, lane.exclusions)
+    result = lanes.reconcile(outcome, lane.exclusions, lane.modules(), lane.declared_skips)
 
     print()
     for line in lanes.baseline_reconciliation(lane, outcome):
         print(line)
     print()
 
-    # A narrowed run cannot tell a stale exclusion from one simply out of
-    # scope, so that finding is dropped from the typed field rather than
-    # filtered out of the rendered text.
-    findings = (
-        lanes.Reconciliation(
-            unexplained_failures=result.unexplained_failures,
-            undeclared_skips=result.undeclared_skips,
-        )
-        if partial
-        else result
-    )
+    # Dropped from the typed field rather than filtered out of the rendered
+    # text. A narrowed run still exits non-zero.
+    findings = result.narrowed() if partial else result
     for line in findings.lines(lane.exclusion_document):
         print(line)
+    exit_problem = _pytest_exit_problem(returncode, outcome)
+    if exit_problem is not None:
+        print(f"PYTEST EXIT          {exit_problem}")
+    green = findings.green and exit_problem is None
 
     if partial:
         print("PARTIAL: a narrowed run is a diagnostic, not an acceptance result.")
-    elif findings.green:
+    elif green:
         print(
             f"GREEN: {outcome.passed:,} passed, 0 failed, 0 errors, "
             f"{outcome.skipped} declared exclusions."
@@ -248,8 +285,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"This result is {claim}.")
     print(f"Exclusions and the work that lifts each: {lane.exclusion_document}")
 
-    if not findings.green:
+    if not green:
         return 1
+    if partial:
+        return 3
     return 0 if cannot is None else 2
 
 
