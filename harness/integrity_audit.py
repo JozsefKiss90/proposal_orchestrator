@@ -1029,23 +1029,18 @@ def _parse_wp_blocks(prose: Sequence[Paragraph]) -> tuple[WpBlock, ...]:
             )
         state.absorb(head, collapsed=True)
         j = i + 1
-        while j < n:
+        while _continues_block(prose, j, state.where):
             para = prose[j]
-            if (
-                para.where.section_id != state.where.section_id
-                or para.where.sub_section_id != state.where.sub_section_id
-            ):
-                break
             folded = fold_ligatures(para.text)
-            if _RE_TABLE_CAPTION.match(folded) or _RE_DC_HEADING.match(folded):
-                break
             fields = split_header_fields(para.text)
-            if any(f.field == FIELD_NUMBER for f in fields):
-                break
             if fields:
                 state.absorb(fields, collapsed=False)
                 tail = fields[-1]
-                if not tail.value and j + 1 < n and not _looks_like_label(prose[j + 1].text):
+                if (
+                    not tail.value
+                    and _continues_block(prose, j + 1, state.where)
+                    and not _looks_like_label(prose[j + 1].text)
+                ):
                     state.set(tail.field, prose[j + 1].text.strip())
                     j += 1
             else:
@@ -1057,6 +1052,23 @@ def _parse_wp_blocks(prose: Sequence[Paragraph]) -> tuple[WpBlock, ...]:
         blocks.append(state.build())
         i = j
     return tuple(blocks)
+
+
+def _continues_block(prose: Sequence[Paragraph], j: int, where: Where) -> bool:
+    """Whether paragraph *j* belongs to the block opened at *where*.
+
+    It does when it sits in the same sub-section and opens nothing of its own:
+    not a DC project heading, a work-package block or a table caption.
+    """
+    if j >= len(prose):
+        return False
+    para = prose[j]
+    if (para.where.section_id, para.where.sub_section_id) != (where.section_id, where.sub_section_id):
+        return False
+    folded = fold_ligatures(para.text)
+    return not (
+        _RE_DC_HEADING.match(folded) or _RE_TABLE_CAPTION.match(folded) or _opens_wp_block(para.text)
+    )
 
 
 def _looks_like_label(text: str) -> bool:
@@ -1095,13 +1107,9 @@ def _parse_dc_projects(prose: Sequence[Paragraph]) -> tuple[DcProject, ...]:
         bullets = 0
         in_secondments = False
         j = i + 1
-        while j < n:
+        while _continues_block(prose, j, where):
             para = Folded.of(prose[j].text)
             t = para.text
-            if _RE_DC_HEADING.match(t) or _opens_wp_block(prose[j].text) or _RE_TABLE_CAPTION.match(t):
-                break
-            if prose[j].where.section_id != where.section_id or prose[j].where.sub_section_id != where.sub_section_id:
-                break
             host_line = _RE_HOST.match(t)
             if host_line and host is None:
                 host = para.cut(host_line.start("value"), host_line.end("value"))
@@ -1117,7 +1125,10 @@ def _parse_dc_projects(prose: Sequence[Paragraph]) -> tuple[DcProject, ...]:
             elif in_secondments and not _RE_BULLET.match(t):
                 in_secondments = False
             if _RE_CONTRIBUTION.match(t):
-                j += 2  # the heading and its one paragraph close the project
+                # The heading and its one paragraph close the project. A heading
+                # with no paragraph of its own closes it alone, so whatever
+                # follows is read as the next block, never swallowed.
+                j += 2 if _continues_block(prose, j + 1, where) else 1
                 break
             j += 1
         projects.append(
@@ -1442,25 +1453,43 @@ def _check_dcs(parsed: ParsedTables, provenance: CandidateProvenance) -> CheckRe
     findings: list[Finding] = []
     compared = 0
     table = _dcs(parsed)
-    projects = {p.number: p for p in parsed.dc_projects}
+    by_number: dict[int, list[DcProject]] = {}
+    for p in parsed.dc_projects:
+        by_number.setdefault(p.number, []).append(p)
+    # A number two blocks carry is compared with neither: either could be the
+    # project the table means, so the duplicate is the finding.
+    unambiguous = {number: ps[0] for number, ps in by_number.items() if len(ps) == 1}
     in_table = {d["number"] for d in table}
     wp_ends = [b.window[1] for b in parsed.wp_blocks if b.window is not None]
     latest_wp_end = max(wp_ends) if wp_ends else None
     appointments_read = 0
     identities_compared = 0
     outlasting: list[tuple[str, int]] = []
-    if table or projects:
+    if table or by_number:
         compared += 1
-        if in_table != set(projects):
+        if in_table != set(by_number):
             findings.append(Finding(
                 cid, KIND_INCONSISTENCY, "DC set",
-                f"the DC table lists {sorted(in_table)}; section 1.1 describes projects for {sorted(projects)}",
-                tuple(d["row"].where[0] for d in table[:1]) + tuple(p.where for p in list(projects.values())[:1]),
-                (), {"table": sorted(in_table), "projects": sorted(projects)},
+                f"the DC table lists {sorted(in_table)}; section 1.1 describes projects for {sorted(by_number)}",
+                tuple(d["row"].where[0] for d in table[:1]) + tuple(p.where for p in parsed.dc_projects[:1]),
+                (), {"table": sorted(in_table), "projects": sorted(by_number)},
             ))
+    for number, ps in sorted(by_number.items()):
+        if len(ps) < 2:
+            continue
+        compared += 1
+        at = " and ".join(
+            f"{p.where.section_id} {p.where.sub_section_id} paragraph {p.where.paragraph_index}" for p in ps
+        )
+        findings.append(Finding(
+            cid, KIND_INCONSISTENCY, f"DC{number}",
+            f"DC{number}: {len(ps)} project blocks carry this number, at {at}; "
+            f"{'neither' if len(ps) == 2 else 'none'} is compared with the DC table",
+            tuple(p.where for p in ps), (), {"projects": [p.where.to_dict() for p in ps]},
+        ))
     for d in table:
         subject, row = d["id"], d["row"]
-        p = projects.get(d["number"])
+        p = unambiguous.get(d["number"])
         if p is None:
             continue
         compared += 1
@@ -1530,7 +1559,7 @@ def _check_dcs(parsed: ParsedTables, provenance: CandidateProvenance) -> CheckRe
     notes: tuple[str, ...] = ()
     if not table:
         notes += ("no DC table found; the check compared nothing",)
-    if not projects:
+    if not by_number:
         notes += ("no DC project blocks found in prose; the check compared nothing",)
     if identities_compared:
         notes += (

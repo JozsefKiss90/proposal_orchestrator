@@ -195,17 +195,23 @@ def _claims(section_id: str, n: int, status: str = "unresolved", source_ref: str
     ]
 
 
-def write_candidate(root: Path, world: dict[str, list[str]], *, claims: dict[str, list[dict]] | None = None) -> Path:
-    """Materialise *world* as section artifacts the way the blind lane does."""
+def write_candidate(root: Path, world: dict[str, list[str] | dict[str, list[str]]], *, claims: dict[str, list[dict]] | None = None) -> Path:
+    """Materialise *world* as section artifacts the way the blind lane does.
+
+    A section given as a list is one sub-section; a section given as a mapping
+    of sub-section id to paragraphs carries those sub-sections in order.
+    """
     cand = root / "candidate"
     cand.mkdir(parents=True, exist_ok=True)
     sub_ids = {"S1": "1.1", "S2": "2.1", "S3": "3.1"}
     for sid, paras in world.items():
         ledger = (claims or {}).get(sid, _claims(sid, 2))
+        subs = paras if isinstance(paras, dict) else {sub_ids[sid]: paras}
         artifact = {
             "section_id": sid,
             "document": "CAND-X@0000",
-            "sub_sections": [{"sub_section_id": sub_ids[sid], "title": sid, "content": "\n\n".join(paras)}],
+            "sub_sections": [{"sub_section_id": ssid, "title": ssid, "content": "\n\n".join(ps)}
+                             for ssid, ps in subs.items()],
             "validation_status": {"claim_statuses": ledger},
         }
         atomic_write_json(artifact, cand / f"{sid}.json")
@@ -691,6 +697,94 @@ class TestCheckDcs:
         (x,) = [x for x in f if x.subject == "DC1" and x.kind == ia.KIND_NOT_COMPARABLE]
         assert x.context == {"recruiting_participant": "Beneficiary A",
                              "host_line": "A university with expertise (WP1, WP2)"}
+
+
+class TestEveryDcProjectIsAccountedFor:
+    """Ticket 14: the audit accounts for every DC project the Part B states, or
+    says why it cannot. A duplicated number is a finding naming both blocks; a
+    paragraph is consumed only when it belongs to the block that consumes it."""
+
+    def _parsed(self, tmp_path, profile, world) -> ia.ParsedTables:
+        return ia.parse_candidate(load_candidate(write_candidate(tmp_path, world), profile.profile))
+
+    def test_two_blocks_with_one_number_are_a_finding_naming_both(self, tmp_path, profile):
+        world = consistent_world()
+        world["S1"] = world["S1"][:-1] + _dc_project(2, "A second second project", "WP1") + world["S1"][-1:]
+        parsed = self._parsed(tmp_path, profile, world)
+        assert [p.number for p in parsed.dc_projects] == [1, 2, 2]
+        first, second = parsed.dc_projects[1].where, parsed.dc_projects[2].where
+        f = _findings(_audit(tmp_path, profile, world), "dc_table_vs_projects")
+        (x,) = [x for x in f if x.subject == "DC2"]
+        assert x.kind == ia.KIND_INCONSISTENCY
+        assert x.where == (first, second)
+        assert x.detail == (
+            "DC2: 2 project blocks carry this number, at S1 1.1 paragraph 10 and S1 1.1 paragraph 19; "
+            "neither is compared with the DC table"
+        )
+        assert x.context == {"projects": [p.where.to_dict() for p in parsed.dc_projects[1:]]}
+        # neither block won: no comparison ran against either one
+        assert not [y for y in f if y.subject == "DC2" and y is not x]
+
+    def test_a_block_outside_1_1_is_a_duplicate_not_a_replacement(self, tmp_path, profile):
+        """Characterises the scan over every section (ticket 14 decision): a
+        stray ``DC<n> - ...`` paragraph elsewhere is reported, never silently
+        taken in place of the 1.1 project."""
+        world = consistent_world()
+        world["S3"] = ["DC2 – co-supervises the validation trials."] + world["S3"]
+        f = _findings(_audit(tmp_path, profile, world), "dc_table_vs_projects")
+        (x,) = [x for x in f if x.subject == "DC2"]
+        assert "at S1 1.1 paragraph 10 and S3 3.1 paragraph 0" in x.detail
+
+    @pytest.mark.parametrize("after", [(), ("Provides a foundation.", "And a second paragraph.")])
+    def test_a_contribution_heading_not_followed_by_one_paragraph_loses_no_project(
+        self, tmp_path, profile, after
+    ):
+        world = consistent_world()
+        dc1 = _dc_project(1, "First project", "WP1, WP2")[:-1] + list(after)
+        world["S1"] = ["Intro paragraph with no claim.", *dc1, *_dc_project(2, "Second project", "WP2"),
+                       "Pertinence of the programme"]
+        parsed = self._parsed(tmp_path, profile, world)
+        assert [p.number for p in parsed.dc_projects] == [1, 2]
+        f = _findings(_audit(tmp_path / "audit", profile, world), "dc_table_vs_projects")
+        assert not [x for x in f if x.subject == "DC set"]
+
+    def test_a_contribution_heading_ending_its_sub_section_loses_no_project(self, tmp_path, profile):
+        world = consistent_world()
+        dc1 = _dc_project(1, "First project", "WP1, WP2")[:-1]
+        world["S1"] = {
+            "1.1": ["Intro paragraph with no claim.", *dc1],
+            "1.2": [*_dc_project(2, "Second project", "WP2"), "Pertinence of the programme"],
+        }
+        parsed = self._parsed(tmp_path, profile, world)
+        assert [(p.number, p.where.sub_section_id) for p in parsed.dc_projects] == [(1, "1.1"), (2, "1.2")]
+
+    def test_a_valueless_header_label_takes_no_value_from_the_next_sub_section(self, tmp_path, profile):
+        """The second consume-next site: a header label whose value sits on the
+        next paragraph reads it only from its own sub-section."""
+        world = consistent_world()
+        wp2 = _wp_block(2, "Validation", 6, 36, "Beneficiary B", "1,2", ("Trials",))
+        wp2[2] = "Lead participant"
+        start = world["S3"].index(wp2[0])
+        rest = world["S3"][start + len(wp2):]
+        world["S3"] = {
+            "3.1": world["S3"][:start] + wp2[:3],
+            "3.2": ["Beneficiary Z coordinates outreach.", *wp2[3:], *rest],
+        }
+        parsed = self._parsed(tmp_path, profile, world)
+        assert parsed.wp(2).lead is None
+
+    @pytest.mark.parametrize("after, objectives", [((), None), (("Do the work.", "And more."), "Do the work.")])
+    def test_a_valueless_header_label_not_followed_by_one_paragraph_loses_no_block(
+        self, tmp_path, profile, after, objectives
+    ):
+        world = consistent_world()
+        wp1 = _wp_block(1, "Methods", 1, 24, "Beneficiary A", "1", ())
+        wp1[-1] = "Objectives"
+        rest = world["S3"][len(_wp_block(1, "Methods", 1, 24, "Beneficiary A", "1", ("Analysis", "Design"))):]
+        world["S3"] = [*wp1, *after, *rest]
+        parsed = self._parsed(tmp_path, profile, world)
+        assert parsed.wp(1).objectives == objectives
+        assert [b.number for b in parsed.wp_blocks] == [1, 2]
 
 
 # --------------------------------------------------------------------------- #
