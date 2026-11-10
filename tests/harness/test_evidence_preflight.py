@@ -732,6 +732,79 @@ class TestCommand:
         assert undeclared.grounding_scope.declared is None
         assert declared.grounding_scope.measured == undeclared.grounding_scope.measured
 
+    def test_assess_refuses_a_preflight_with_a_missing_anchor_before_any_call(
+        self, world, tmp_path, capsys
+    ):
+        """Ticket 12, finding 2: the preflight flags a missing anchor and still
+        writes; ``assess`` must then refuse, naming the anchor, before the
+        assessor is called, not crash building that pack mid-run."""
+        root, _ = world
+        out = tmp_path / "reports"
+        args = _evidence_args(world, _candidate(root, drop_anchor="F.2"), out)
+        assert cmd.main(["preflight", *args], clock=lambda: FROZEN) == 1
+        (preflight_path,) = list(out.iterdir())
+        judge = _judge(tmp_path)
+        code = cmd.main(["assess", *args, "--preflight", str(preflight_path)],
+                        judge=judge, clock=lambda: FROZEN)
+        assert code == 2
+        err = capsys.readouterr().err
+        assert "F.2" in err and "feas-plan" in err
+        assert judge._backend.calls == 0
+        assert not [p for p in out.iterdir() if p.name.startswith("blind_")]
+
+    def test_check_preflight_names_a_missing_anchor(self, world):
+        root, bundle = world
+        cand = _candidate(root, drop_anchor="F.2")
+        report = _preflight(world, cand)
+        candidate = ba.load_candidate(cand, bundle.profile)
+        realised = pf.realise_pack_set(bundle, candidate, _params())
+        with pytest.raises(pf.PreflightUnassessable, match="F.2"):
+            pf.check_preflight(
+                report.to_dict(), bundle=bundle, candidate=candidate,
+                realised=realised, params=_params(),
+            )
+
+    def test_a_missing_section_is_still_a_partial_assessment(self, world, tmp_path):
+        """A section the candidate lacks is reported partial (exit 1), as before:
+        only an anchor missing from a present section is refused."""
+        root, _ = world
+        out = tmp_path / "reports"
+        args = _evidence_args(world, _candidate(root, drop_section="feasibility_section"), out)
+        cmd.main(["preflight", *args], clock=lambda: FROZEN)
+        (preflight_path,) = list(out.iterdir())
+        code = cmd.main(["assess", *args, "--preflight", str(preflight_path)],
+                        judge=_judge(tmp_path), clock=lambda: FROZEN)
+        assert code == 1
+
+    def test_a_criterion_n_below_the_minimum_is_refused_before_any_call(
+        self, world, tmp_path, capsys
+    ):
+        """Ticket 12, finding 3: ``--criterion-n`` was checked only after every
+        cell call, and the checkpoint then bound the wrong value."""
+        root, _ = world
+        out = tmp_path / "reports"
+        args = _evidence_args(world, _candidate(root), out)
+        assert cmd.main(["preflight", *args], clock=lambda: FROZEN) == 0
+        (preflight_path,) = list(out.iterdir())
+        judge = _judge(tmp_path)
+        checkpoints = tmp_path / "ckpt.jsonl"
+        code = cmd.main(
+            ["assess", *args, "--preflight", str(preflight_path), "--criterion-n", "2",
+             "--checkpoint", str(checkpoints)],
+            judge=judge, clock=lambda: FROZEN,
+        )
+        assert code == 2
+        assert "--criterion-n" in capsys.readouterr().err
+        assert judge._backend.calls == 0
+        assert not checkpoints.exists()
+
+    def test_the_library_refuses_a_low_criterion_sample_count_before_any_call(self, world, tmp_path):
+        root, bundle = world
+        judge = _judge(tmp_path)
+        with pytest.raises(ba.BlindAssessmentError, match="criterion_samples"):
+            ba.assess_candidate(judge, bundle, _candidate(root), criterion_samples=2, clock=lambda: FROZEN)
+        assert judge._backend.calls == 0
+
     def test_the_library_default_still_takes_no_preflight(self, world, tmp_path):
         root, bundle = world
         report = ba.assess_candidate(_judge(tmp_path), bundle, _candidate(root), clock=lambda: FROZEN)

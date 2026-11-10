@@ -58,7 +58,10 @@ Exit codes.  ``assess``: ``0`` complete assessment written (or report
 verified); ``1`` partial assessment written — the candidate lacks
 profile-required sections, named in the report (advisory); ``2`` the
 assessment could not run or the report or preflight was rejected
-(fail-closed; nothing written).  ``preflight``: ``0`` written with no flag;
+(fail-closed; nothing written).  A run that could not finish is refused
+before the first assessor call: a preflight recording a missing anchor, a
+sample count below the majority minimum, a Converse configuration the
+transport refuses, or an omitted ``--transport`` over a Converse environment.  ``preflight``: ``0`` written with no flag;
 ``1`` written with flags the operator should read (a missing anchor, a
 truncated pack, an incomplete package, a leak); ``2`` could not run.
 ``freeze``: ``0`` frozen; ``2`` refused, naming every failed condition,
@@ -249,6 +252,37 @@ def _judge_config(args: argparse.Namespace):
     return cfg
 
 
+def _transport(args: argparse.Namespace) -> str:
+    """The transport name the run speaks: the parsed ``--transport`` (whose
+    default is ``HARNESS_ASSESSOR_TRANSPORT``), else :data:`TRANSPORT_OPENAI`."""
+    return args.transport or TRANSPORT_OPENAI
+
+
+def _refuse_an_omitted_converse_transport() -> None:
+    """Refuse an omitted ``--transport`` over a Converse environment.
+
+    The default builds the OpenAI-compatible backend, which a Converse
+    environment cannot serve: it used to end in a raw ``base_url`` error.  No
+    route is inferred from the environment; the refusal names the flag.  Loads
+    ``.env.harness`` first, so it sees the environment the backend would.
+    """
+    from harness.commands._common import load_harness_env
+    from harness.commands._converse_judge import _BACKEND_NAME
+    from runner.transport.config import resolve_provider_config
+
+    load_harness_env()
+    try:
+        backend = resolve_provider_config().backend_name
+    except ValueError as exc:
+        raise BlindAssessmentError(f"the assessor transport configuration is refused: {exc}") from exc
+    if backend == _BACKEND_NAME:
+        raise BlindAssessmentError(
+            f"no --transport was given and the environment resolves to 'bedrock_converse'; "
+            f"the default {TRANSPORT_OPENAI!r} cannot speak it. Pass "
+            f"--transport {TRANSPORT_BEDROCK_CONVERSE} to both preflight and assess."
+        )
+
+
 def _live_judge(args: argparse.Namespace, repo_root: Path) -> Judge:
     """The live assessor: the ``.env.harness`` pin over the chosen transport.
 
@@ -361,10 +395,13 @@ def _add_evidence_args(p: argparse.ArgumentParser) -> None:
     p.add_argument(
         "--transport",
         choices=[TRANSPORT_OPENAI, TRANSPORT_CLAUDE_CLI, TRANSPORT_BEDROCK_CONVERSE],
-        default=os.environ.get("HARNESS_ASSESSOR_TRANSPORT", TRANSPORT_OPENAI),
+        default=os.environ.get("HARNESS_ASSESSOR_TRANSPORT"),
         help=(
-            "assessor transport. %(default)s by default: a non-drafter model at "
-            "a non-Claude endpoint, which is the independent path. "
+            f"assessor transport. {TRANSPORT_OPENAI} by default (or "
+            "HARNESS_ASSESSOR_TRANSPORT): a non-drafter model at "
+            "a non-Claude endpoint, which is the independent path. An omitted "
+            "transport over an environment that resolves to bedrock_converse is "
+            "refused, naming the flag to pass. "
             f"'{TRANSPORT_CLAUDE_CLI}' speaks the Max subscription instead and "
             "needs no API key, at the cost of transport and vendor "
             "independence; HARNESS_JUDGE_MODEL must then be a Claude pin and "
@@ -664,7 +701,7 @@ def _pack_params(args: argparse.Namespace) -> PackParams:
     per-minute token cap is the OpenAI-compatible provider's; the CLI and
     Converse have none, so there the operator's budget alone governs.
     """
-    uncapped = args.transport in _UNCAPPED_TRANSPORTS
+    uncapped = _transport(args) in _UNCAPPED_TRANSPORTS
     token_budget = args.budget
     if token_budget is None:
         token_budget = UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET if uncapped else DEFAULT_PACK_TOKEN_BUDGET
@@ -675,6 +712,20 @@ def _pack_params(args: argparse.Namespace) -> PackParams:
         include_claims=not args.no_claims,
         criterion_token_budget=args.criterion_budget,
     )
+
+
+def _check_sample_counts(args: argparse.Namespace) -> None:
+    """Refuse a sample count below the majority minimum before any work.
+
+    The library refuses one too, but only after the judge and the checkpoint
+    exist; a checkpoint bound to the wrong count could never be resumed with
+    the corrected one.
+    """
+    rule = f"must be at least {MIN_MAJORITY_SAMPLES} (the majority rule)"
+    if args.n < MIN_MAJORITY_SAMPLES:
+        raise BlindAssessmentError(f"--n {rule}; got {args.n}.")
+    if not args.skip_criterion_scores and args.criterion_n < MIN_MAJORITY_SAMPLES:
+        raise BlindAssessmentError(f"--criterion-n {rule}; got {args.criterion_n}.")
 
 
 def _build_evidence(
@@ -1237,6 +1288,8 @@ def main(
         # Before the snapshot, the packs or the assessor: a scope nothing could
         # make true costs no work and no quota to refuse.
         check_declarable(args.grounding_scope)
+        if args.command == "assess":
+            _check_sample_counts(args)
         evidence = _build_evidence(args, bundle, graph_root, out_dir)
 
         if args.command == "preflight":
@@ -1256,8 +1309,13 @@ def main(
             print(f"\npreflight -> {path}")
             return 1 if preflight.flags else 0
 
-        # assess: the preflight is re-bound before the assessor exists.  A
-        # mismatch names what moved and spends no quota.
+        # assess: an omitted transport over a Converse environment is refused
+        # first, so the operator reads the flag to pass, not the pack-budget
+        # mismatch a Converse preflight would otherwise report.
+        if args.command == "assess" and judge is None and args.transport is None:
+            _refuse_an_omitted_converse_transport()
+        # The preflight is re-bound before the assessor exists.  A mismatch
+        # names what moved and spends no quota.
         preflight_data = load_preflight(args.preflight)
         candidate = load_candidate(
             evidence.candidate_dir if evidence is not None else args.candidate, bundle.profile
@@ -1320,7 +1378,7 @@ def main(
             criterion_token_budget=params.criterion_token_budget,
             preflight_hash=preflight_hash,
             preflight_report=Path(args.preflight).as_posix(),
-            assessor_transport=args.transport,
+            assessor_transport=_transport(args),
             grounding_scope=args.grounding_scope,
         )
         # Read after the pass: a backend that measures its requests (Converse)

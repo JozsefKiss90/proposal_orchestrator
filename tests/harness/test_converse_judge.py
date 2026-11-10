@@ -215,11 +215,16 @@ class TestTheCommand:
         )
         assert args.transport == cj.TRANSPORT_TAG == "bedrock-converse"
 
-    def test_the_default_transport_is_unchanged(self):
+    def test_the_default_transport_is_unchanged(self, monkeypatch):
+        """Omitted, the transport still resolves to openai-compatible and its
+        capped pack; only the parser records that nobody chose it (ticket 12)."""
+        monkeypatch.delenv("HARNESS_ASSESSOR_TRANSPORT", raising=False)
         args = cmd._parser().parse_args(
             ["assess", "--candidate", "x", "--preflight", "x", "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED]
         )
-        assert args.transport == cmd.TRANSPORT_OPENAI
+        assert args.transport is None
+        assert cmd._transport(args) == cmd.TRANSPORT_OPENAI
+        assert cmd._pack_params(args).max_token_budget is not None
 
     def test_the_converse_transport_is_uncapped(self):
         """Converse carries the same Claude context as the CLI; no per-minute
@@ -263,6 +268,97 @@ class TestTheCommand:
         assert {r["modelId"] for r in client.requests} == {PIN}
         assert all("toolConfig" not in r for r in client.requests)
         assert all(r["inferenceConfig"]["temperature"] == 0.0 for r in client.requests)
+
+
+class TestABadConfigurationIsRefusedBeforeTheFirstCall:
+    """Ticket 12: each configuration that cannot finish exits 2 with one line,
+    no traceback, and no request reaches the Converse client."""
+
+    def _assess(self, world: Path, *, transport: bool = True, model: bool = True) -> int:
+        bundle = load_profile_bundle(_graph_profile(world), repo_root=world)
+        argv = [
+            "assess", "--document", "CAND-1", "--graph-root", str(world),
+            "--out-dir", str(world / "reports"), "--repo-root", str(world),
+            "--profile", str(bundle.profile.source_path),
+            "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED,
+            "--assessor-version", VERSION, "--no-checkpoint",
+        ]
+        if transport:
+            argv += ["--transport", cmd.TRANSPORT_BEDROCK_CONVERSE]
+        if model:
+            argv += ["--assessor-model", PIN]
+        return cmd.main(preflighted(argv, clock=lambda: FROZEN), clock=lambda: FROZEN)
+
+    @staticmethod
+    def _one_line(capsys) -> str:
+        err = capsys.readouterr().err.strip()
+        assert "Traceback" not in err
+        assert len(err.splitlines()) == 1, err
+        return err
+
+    def test_production_mode_without_a_region(self, converse_env, client, world, monkeypatch, capsys):
+        monkeypatch.setenv("ORCHESTRATOR_PRODUCTION_MODE", "true")
+        monkeypatch.delenv("AWS_REGION", raising=False)
+        assert self._assess(world) == 2
+        assert "AWS_REGION" in self._one_line(capsys)
+        assert client.requests == []
+
+    def test_a_backend_production_mode_does_not_allow(self, converse_env, client, world, monkeypatch, capsys):
+        monkeypatch.setenv("ORCHESTRATOR_PRODUCTION_MODE", "true")
+        monkeypatch.setenv("ORCHESTRATOR_TRANSPORT_BACKEND", "ollama")
+        assert self._assess(world) == 2
+        assert "production" in self._one_line(capsys)
+        assert client.requests == []
+
+    def test_no_assessor_model(self, converse_env, client, world, monkeypatch, capsys):
+        monkeypatch.delenv("HARNESS_JUDGE_MODEL", raising=False)
+        monkeypatch.delenv("HARNESS_JUDGE_VERSION", raising=False)
+        assert self._assess(world, model=False) == 2
+        assert "HARNESS_JUDGE_MODEL" in self._one_line(capsys)
+        assert client.requests == []
+
+    def test_a_backend_that_cannot_be_built_is_a_converse_refusal(self, converse_env, client, monkeypatch, tmp_path):
+        """A ValueError from the transport's builder is a configuration refusal,
+        not a traceback."""
+        def _refuse(*_a, **_k):
+            raise ValueError("model is required for bedrock_converse backend")
+
+        monkeypatch.setattr(cj, "build_judge_backend", _refuse)
+        with pytest.raises(cj.ConverseJudgeError, match="model is required"):
+            cj.build_converse_judge(JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "p.jsonl")
+
+    def test_an_omitted_transport_on_a_converse_environment_names_the_flag(
+        self, converse_env, client, world, monkeypatch, capsys
+    ):
+        """W03 §3: on the host an omitted --transport fell to openai-compatible
+        and ended in a raw base_url error. No route is inferred: the refusal
+        names the flag to pass."""
+        monkeypatch.delenv("HARNESS_ASSESSOR_TRANSPORT", raising=False)
+        assert self._assess(world, transport=False) == 2
+        assert "--transport bedrock-converse" in self._one_line(capsys)
+        assert client.requests == []
+
+    def test_the_flag_is_named_even_after_a_converse_preflight(
+        self, converse_env, client, world, monkeypatch, capsys
+    ):
+        """The preflight ran with the flag, assess without it: the refusal
+        still names the flag, not the pack-budget mismatch."""
+        monkeypatch.delenv("HARNESS_ASSESSOR_TRANSPORT", raising=False)
+        bundle = load_profile_bundle(_graph_profile(world), repo_root=world)
+        argv = [
+            "assess", "--document", "CAND-1", "--graph-root", str(world),
+            "--out-dir", str(world / "reports"), "--repo-root", str(world),
+            "--profile", str(bundle.profile.source_path),
+            "--grounding-scope", gs.SCOPE_CONTENT_FOCUSED,
+            "--transport", cmd.TRANSPORT_BEDROCK_CONVERSE,
+            "--assessor-model", PIN, "--assessor-version", VERSION, "--no-checkpoint",
+        ]
+        bound = preflighted(argv, clock=lambda: FROZEN)
+        i = bound.index("--transport")
+        del bound[i:i + 2]
+        assert cmd.main(bound, clock=lambda: FROZEN) == 2
+        assert "--transport bedrock-converse" in self._one_line(capsys)
+        assert client.requests == []
 
 
 # --------------------------------------------------------------------------- #

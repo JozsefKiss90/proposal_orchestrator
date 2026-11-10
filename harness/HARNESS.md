@@ -939,6 +939,21 @@ On a match the blind report carries `preflight_pack_set_hash` and
 `preflight_report`. The library function `assess_candidate` takes the hash as an
 optional stamp and does not check it; the command does.
 
+**A run that cannot finish is refused before the first assessor call** (ticket
+12). Each refusal exits 2 with one line and writes nothing:
+
+- A preflight that matches but records a declared anchor missing from a present
+  section (`PreflightUnassessable`, naming each anchor). The preflight itself
+  still writes and exits 1. A missing *section* is still a partial assessment.
+- `--n` or `--criterion-n` below the majority minimum, refused before the
+  checkpoint opens, so no checkpoint binds the wrong count.
+- A Converse configuration the transport refuses: no `AWS_REGION` in production
+  mode, a backend production mode does not allow, or a backend that cannot be
+  built.
+- No `--transport` (and no `HARNESS_ASSESSOR_TRANSPORT`) over an environment
+  that resolves to `bedrock_converse`. No route is inferred; the refusal names
+  `--transport bedrock-converse`.
+
 **Immutability.** The writer never overwrites: a rerun writes the next
 sequence number for the same candidate hash and earlier reports stay
 byte-identical. `BlindAssessmentReport` enforces `advisory=True,

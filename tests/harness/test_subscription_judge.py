@@ -378,11 +378,12 @@ class TestModelPinGuard:
 
 
 class TestCommandWiring:
-    def test_the_default_transport_is_still_the_independent_one(self):
-        from harness.commands.blind_assessment import TRANSPORT_OPENAI, _parser
+    def test_the_default_transport_is_still_the_independent_one(self, monkeypatch):
+        from harness.commands.blind_assessment import TRANSPORT_OPENAI, _parser, _transport
 
+        monkeypatch.delenv("HARNESS_ASSESSOR_TRANSPORT", raising=False)
         args = _parser().parse_args(["assess", "--candidate", "x", "--preflight", "x", "--grounding-scope", CONTENT_FOCUSED])
-        assert args.transport == TRANSPORT_OPENAI
+        assert _transport(args) == TRANSPORT_OPENAI
 
     def test_the_pin_flags_beat_the_harness_env_file(self, monkeypatch, tmp_path):
         """``load_harness_env`` loads with ``override=True``, so an exported
