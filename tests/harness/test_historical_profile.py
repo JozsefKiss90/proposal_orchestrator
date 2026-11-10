@@ -18,6 +18,7 @@ from typing import Any
 import pytest
 
 from harness import historical_profile as hp
+from harness.commands import historical_profile as command
 
 
 def _sha(path: Path) -> str:
@@ -299,6 +300,46 @@ class TestTheFindings:
         profile, rows = world(declared_status="Assumed")
         report = hp.check(profile, rows, world.root, matrix_status="Inferred")
         assert not report.status_the_matrix_cannot_carry
+
+
+# --------------------------------------------------------------------------- #
+# The command
+# --------------------------------------------------------------------------- #
+
+
+class TestTheCommand:
+    """The runbook runs the command, so the command must run all six checks."""
+
+    def _run(self, world, capsys) -> tuple[int, str]:
+        code = command.main(
+            ["--profile", "profiles/historical.json", "--repo-root", str(world.root)]
+        )
+        return code, capsys.readouterr().out
+
+    def test_a_green_profile_checks_green(self, world, capsys) -> None:
+        world()
+        code, out = self._run(world, capsys)
+        assert code == 0, out
+        assert "profile check: green" in out
+
+    def test_a_status_the_matrix_cannot_carry_fails_from_the_command(
+        self, world, capsys
+    ) -> None:
+        world(declared_status="Confirmed")
+        code, out = self._run(world, capsys)
+        assert code == 1, out
+        assert "STATUS THE MATRIX CANNOT CARRY" in out
+
+    def test_a_matrix_declaring_no_status_is_refused(self, world, capsys) -> None:
+        world()
+        matrix = world.paths["matrix"]
+        doc = json.loads(matrix.read_text(encoding="utf-8"))
+        del doc["declared_status"]
+        matrix.write_text(json.dumps(doc), encoding="utf-8")
+        code, out = self._run(world, capsys)
+        assert code == 2, out
+        assert "refused:" in out
+        assert "declared_status is None" in out
 
 
 # --------------------------------------------------------------------------- #

@@ -10,14 +10,35 @@ Advisory. It closes no gate and runs no assessment.
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 from typing import Optional, Sequence
 
 from harness import historical_profile as hp
+from harness.record_binding import STATUSES
 
 
 def _reading_path(profile_path: Path) -> Path:
     return profile_path.with_suffix(".md")
+
+
+def _matrix_status(path: Path) -> str:
+    """The status the matrix declares for its own reading.
+
+    The check for a status the matrix cannot carry compares the profile's
+    status with this one. A matrix that declares none would let that check pass
+    without running, so it is refused.
+    """
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as exc:
+        raise hp.HistoricalProfileError(f"{path.as_posix()}: not readable JSON ({exc})") from exc
+    status = raw.get("declared_status") if isinstance(raw, dict) else None
+    if status not in STATUSES:
+        raise hp.HistoricalProfileError(
+            f"{path.as_posix()}: declared_status is {status!r}, not one of {', '.join(STATUSES)}"
+        )
+    return status
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -64,6 +85,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
     try:
         rows = hp.load_matrix_rows(repo_root / matrix_pin.path)
+        matrix_status = _matrix_status(repo_root / matrix_pin.path)
     except hp.HistoricalProfileError as exc:
         print(f"refused: {exc}")
         return 2
@@ -83,7 +105,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         reading_path.write_bytes(reading)
         print(f"wrote: {reading_path.as_posix()}")
 
-    report = hp.check(profile, rows, repo_root)
+    report = hp.check(profile, rows, repo_root, matrix_status=matrix_status)
     print(
         f"{profile.profile_id}: {len(profile.sourced)} sourced element(s), "
         f"{len(profile.limitations)} declared limitation(s), "
