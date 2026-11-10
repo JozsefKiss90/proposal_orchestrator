@@ -17,6 +17,10 @@ Acceptance, from ``plans/msca_dn_historical_validation_tickets.md`` V08:
 6. The private original PDF and its derived text are not committed to this
    repository.
 
+Ticket 11 adds the 2026 resubmission, a submitted document of the original's
+kind, so every test that reads a submitted document runs once per document
+(the ``submitted`` fixture).
+
 The ticket's verification runs the dry import on a non-sensitive fixture
 document. This file builds that fixture with pymupdf in a temporary directory
 outside the repository, which is also the only place the tool will write for
@@ -28,6 +32,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -42,11 +47,37 @@ from tools import dry_import_original as dio  # noqa: E402
 from tools import import_external_proposal as ie  # noqa: E402
 
 REPO = find_repo_root()
-ORIGINAL = ie.OFFICIAL_ORIGINAL
 PROCEDURE = REPO / "plans/msca_dn_v08_original_dry_import_procedure.md"
 
-SUBMISSION_ID = "MSCA-DN-2025-FIXTURE-NOT-THE-REAL-NUMBER"
-CALL_ID = "HORIZON-MSCA-2025-DN-01"
+#: The fixture values each submitted document owns (ticket 11). The module
+#: runs once per document: the 2025 original and the 2026 resubmission.
+_SUBMITTED: dict[str, dict[str, str]] = {
+    "official_original": {
+        "submission_id": "MSCA-DN-2025-FIXTURE-NOT-THE-REAL-NUMBER",
+        "call_id": "HORIZON-MSCA-2025-DN-01",
+        "esr_availability": "unknown",
+    },
+    "resubmission_2026": {
+        "submission_id": "MSCA-DN-2026-FIXTURE-NOT-THE-REAL-NUMBER",
+        "call_id": "HORIZON-MSCA-2026-DN-01",
+        "esr_availability": "not_applicable",
+    },
+}
+
+
+@dataclass(frozen=True)
+class Submitted:
+    """One submitted document and the fixture values that are its own."""
+
+    config: ie.DocumentConfig
+    submission_id: str
+    call_id: str
+    esr_availability: str
+
+
+@pytest.fixture(scope="module", params=sorted(_SUBMITTED))
+def submitted(request: pytest.FixtureRequest) -> Submitted:
+    return Submitted(config=ie.document_by_id(request.param), **_SUBMITTED[request.param])
 
 
 def _draw_gantt(page: Any, y0: float) -> None:
@@ -90,7 +121,9 @@ def sha256(pdf: Path) -> str:
 
 
 @pytest.fixture(scope="module")
-def out(pdf: Path, sha256: str, tmp_path_factory: pytest.TempPathFactory) -> Path:
+def out(
+    pdf: Path, sha256: str, submitted: Submitted, tmp_path_factory: pytest.TempPathFactory
+) -> Path:
     """One dry import of the fixture, run once for the whole module."""
     target = tmp_path_factory.mktemp("v08_out")
     code = dio.main(
@@ -98,8 +131,10 @@ def out(pdf: Path, sha256: str, tmp_path_factory: pytest.TempPathFactory) -> Pat
             "--pdf", str(pdf),
             "--expect-sha256", sha256,
             "--out", str(target),
-            "--submission-id", SUBMISSION_ID,
-            "--call-id", CALL_ID,
+            "--document", submitted.config.config_id,
+            "--submission-id", submitted.submission_id,
+            "--call-id", submitted.call_id,
+            "--esr-availability", submitted.esr_availability,
         ]
     )
     assert code == 0
@@ -121,8 +156,8 @@ def provenance(out: Path) -> dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def intake(out: Path) -> dict[str, Any]:
-    return _read(out, f"{ORIGINAL.intake_id}.json")
+def intake(out: Path, submitted: Submitted) -> dict[str, Any]:
+    return _read(out, f"{submitted.config.intake_id}.json")
 
 
 # --------------------------------------------------------------------------- #
@@ -131,7 +166,9 @@ def intake(out: Path) -> dict[str, Any]:
 
 
 class TestTheDryImportMode:
-    def test_it_writes_the_six_files_and_nothing_else(self, out: Path) -> None:
+    def test_it_writes_the_six_files_and_nothing_else(
+        self, out: Path, submitted: Submitted
+    ) -> None:
         assert sorted(p.name for p in out.iterdir()) == sorted(
             [
                 dio.INVENTORY_FILE,
@@ -139,7 +176,7 @@ class TestTheDryImportMode:
                 dio.ACCEPTANCE_FILE,
                 dio.LIMITATIONS_FILE,
                 dio.WORKSHEET_FILE,
-                f"{ORIGINAL.intake_id}.json",
+                f"{submitted.config.intake_id}.json",
             ]
         )
 
@@ -203,12 +240,15 @@ class TestTheDryImportMode:
         assert dio._count(0, "page") == "0 pages"
         assert dio._count(84, "page") == "84 pages"
 
-    def test_rerunning_it_replays(self, pdf: Path, sha256: str, tmp_path: Path) -> None:
+    def test_rerunning_it_replays(
+        self, pdf: Path, sha256: str, tmp_path: Path, submitted: Submitted
+    ) -> None:
         argv = [
             "--pdf", str(pdf),
             "--expect-sha256", sha256,
-            "--submission-id", SUBMISSION_ID,
-            "--call-id", CALL_ID,
+            "--document", submitted.config.config_id,
+            "--submission-id", submitted.submission_id,
+            "--call-id", submitted.call_id,
         ]
         first, second = tmp_path / "a", tmp_path / "b"
         assert dio.main([*argv, "--out", str(first)]) == 0
@@ -248,17 +288,19 @@ class TestTheProvenanceRecords:
         assert provenance["intake"]["intake_id"] == intake["intake_id"]
 
     def test_the_intake_is_the_originals_own_and_not_the_copys(
-        self, intake
+        self, intake, submitted: Submitted
     ) -> None:
-        assert intake["intake_id"] == ORIGINAL.intake_id
+        assert intake["intake_id"] == submitted.config.intake_id
         assert intake["intake_id"] != ie.SANITISED_DERIVATIVE.intake_id
-        assert intake["document_id"] == ORIGINAL.document_id
+        assert intake["document_id"] == submitted.config.document_id
         assert intake["document_id"] != ie.SANITISED_DERIVATIVE.document_id
 
-    def test_the_intake_carries_only_operator_declarations(self, intake) -> None:
-        assert intake["submission_id"] == SUBMISSION_ID
-        assert intake["call_id"] == CALL_ID
-        assert intake["esr_availability"] == "unknown"
+    def test_the_intake_carries_only_operator_declarations(
+        self, intake, submitted: Submitted
+    ) -> None:
+        assert intake["submission_id"] == submitted.submission_id
+        assert intake["call_id"] == submitted.call_id
+        assert intake["esr_availability"] == submitted.esr_availability
         assert intake["esr_reference"] is None
 
     def test_the_intake_validates_against_its_schema(self, out: Path, intake) -> None:
@@ -276,11 +318,11 @@ class TestTheProvenanceRecords:
         assert "refuses" in record["authentication"]
 
     def test_the_provenance_names_the_document_as_the_submitted_text(
-        self, provenance
+        self, provenance, submitted: Submitted
     ) -> None:
         assert provenance["document"]["is_submitted_document"] is True
-        assert provenance["document"]["config_id"] == ORIGINAL.config_id
-        assert provenance["document"]["title"] == ORIGINAL.title
+        assert provenance["document"]["config_id"] == submitted.config.config_id
+        assert provenance["document"]["title"] == submitted.config.title
 
     def test_the_provenance_states_that_nothing_is_stored_here(
         self, provenance
@@ -293,17 +335,19 @@ class TestTheProvenanceRecords:
         assert storage["basis"].startswith("measured")
 
     def test_the_storage_flags_follow_the_paths_and_not_the_role(
-        self, pdf: Path, sha256: str, tmp_path: Path
+        self, pdf: Path, sha256: str, tmp_path: Path, submitted: Submitted
     ) -> None:
         from dataclasses import replace
 
-        copy_like = replace(ORIGINAL, is_submitted_document=False)
+        copy_like = replace(submitted.config, is_submitted_document=False)
         dio.dry_import(
             copy_like,
             pdf=pdf,
             out_dir=tmp_path,
             expected_sha256=sha256,
-            declarations=dio.Declarations(submission_id=SUBMISSION_ID, call_id=CALL_ID),
+            declarations=dio.Declarations(
+                submission_id=submitted.submission_id, call_id=submitted.call_id
+            ),
         )
         storage = _read(tmp_path, dio.PROVENANCE_FILE)["storage"]
         assert storage["pdf_stored_in_this_repository"] is False
@@ -331,40 +375,41 @@ class TestTheProvenanceRecords:
             assert block["sha256"] == hashlib.sha256((out / name).read_bytes()).hexdigest()
 
     def test_it_refuses_a_hash_the_bytes_do_not_match(
-        self, pdf: Path, tmp_path: Path
+        self, pdf: Path, tmp_path: Path, submitted: Submitted
     ) -> None:
         code = dio.main(
             [
                 "--pdf", str(pdf),
                 "--expect-sha256", "0" * 64,
                 "--out", str(tmp_path),
-                "--submission-id", SUBMISSION_ID,
-                "--call-id", CALL_ID,
+                "--document", submitted.config.config_id,
+                "--submission-id", submitted.submission_id,
+                "--call-id", submitted.call_id,
             ]
         )
         assert code == 1
         assert list(tmp_path.iterdir()) == []
 
     def test_it_refuses_a_hash_that_is_not_a_hash(
-        self, pdf: Path, tmp_path: Path
+        self, pdf: Path, tmp_path: Path, submitted: Submitted
     ) -> None:
         with pytest.raises(di.DryImportRefused, match="sha256"):
             dio.dry_import(
-                ORIGINAL,
+                submitted.config,
                 pdf=pdf,
                 out_dir=tmp_path,
                 expected_sha256="not-a-hash",
                 declarations=dio.Declarations(
-                    submission_id=SUBMISSION_ID, call_id=CALL_ID
+                    submission_id=submitted.submission_id, call_id=submitted.call_id
                 ),
             )
 
     def test_it_refuses_a_document_whose_identity_is_undeclared(
-        self, pdf: Path, tmp_path: Path, sha256: str
+        self, pdf: Path, tmp_path: Path, sha256: str, submitted: Submitted
     ) -> None:
         from dataclasses import replace
 
-        nameless = replace(ORIGINAL, title=None, short_name="")
+        nameless = replace(submitted.config, title=None, short_name="")
         with pytest.raises(ie.ImportRefused) as exc:
             dio.dry_import(
                 nameless,
@@ -372,16 +417,18 @@ class TestTheProvenanceRecords:
                 out_dir=tmp_path,
                 expected_sha256=sha256,
                 declarations=dio.Declarations(
-                    submission_id=SUBMISSION_ID, call_id=CALL_ID
+                    submission_id=submitted.submission_id, call_id=submitted.call_id
                 ),
             )
         assert "title" in str(exc.value) and "short_name" in str(exc.value)
 
-    def test_the_official_original_is_dry_importable_as_declared(self) -> None:
+    def test_the_submitted_document_is_dry_importable_as_declared(
+        self, submitted: Submitted
+    ) -> None:
         """V07 left it refusing an import for want of a page map. A dry import
         is how the page map is arrived at, so it must not need one."""
-        assert ORIGINAL.missing_fields()
-        assert ORIGINAL.dry_import_missing_fields() == ()
+        assert submitted.config.missing_fields()
+        assert submitted.config.dry_import_missing_fields() == ()
 
 
 # --------------------------------------------------------------------------- #
@@ -552,16 +599,16 @@ class TestTheLimitationsRecord:
 
 class TestNothingPrivateIsCommitted:
     def test_the_tool_refuses_an_output_directory_inside_the_repository(
-        self, pdf: Path, sha256: str
+        self, pdf: Path, sha256: str, submitted: Submitted
     ) -> None:
         with pytest.raises(di.DryImportRefused, match="inside this repository"):
             dio.dry_import(
-                ORIGINAL,
+                submitted.config,
                 pdf=pdf,
                 out_dir=REPO / "workspaces" / "msca_dn" / "v08_scratch",
                 expected_sha256=sha256,
                 declarations=dio.Declarations(
-                    submission_id=SUBMISSION_ID, call_id=CALL_ID
+                    submission_id=submitted.submission_id, call_id=submitted.call_id
                 ),
             )
         assert not (REPO / "workspaces" / "msca_dn" / "v08_scratch").exists()
@@ -576,34 +623,38 @@ class TestNothingPrivateIsCommitted:
         assert "repo_root" not in inspect.signature(dio.dry_import).parameters
         assert "repo-root" not in inspect.getsource(dio.main)
 
-    def test_the_tool_refuses_a_pdf_inside_the_repository(self, tmp_path: Path) -> None:
+    def test_the_tool_refuses_a_pdf_inside_the_repository(
+        self, tmp_path: Path, submitted: Submitted
+    ) -> None:
         stored = REPO / ie.REVISION_ORIGINAL.pdf_rel
         if not stored.is_file():  # pragma: no cover - the copy is committed
             pytest.skip("the sanitised candidate is not stored in this checkout")
         with pytest.raises(di.DryImportRefused, match="inside this repository"):
             dio.dry_import(
-                ORIGINAL,
+                submitted.config,
                 pdf=stored,
                 out_dir=tmp_path,
                 expected_sha256=hashlib.sha256(stored.read_bytes()).hexdigest(),
                 declarations=dio.Declarations(
-                    submission_id=SUBMISSION_ID, call_id=CALL_ID
+                    submission_id=submitted.submission_id, call_id=submitted.call_id
                 ),
             )
 
-    def test_the_originals_graph_root_stays_undeclared(self) -> None:
-        assert ORIGINAL.workspace_rel is None
+    def test_the_originals_graph_root_stays_undeclared(self, submitted: Submitted) -> None:
+        assert submitted.config.workspace_rel is None
 
-    def test_no_intake_record_for_the_original_is_committed(self) -> None:
-        matches = list(REPO.rglob(f"{ORIGINAL.intake_id}.json"))
+    def test_no_intake_record_for_the_original_is_committed(self, submitted: Submitted) -> None:
+        matches = list(REPO.rglob(f"{submitted.config.intake_id}.json"))
         assert matches == [], matches
 
-    def test_no_document_record_for_the_original_is_committed(self) -> None:
-        assert ORIGINAL.document_id is not None
+    def test_no_document_record_for_the_original_is_committed(
+        self, submitted: Submitted
+    ) -> None:
+        assert submitted.config.document_id is not None
         matches = [
             p
             for p in REPO.glob("**/dev_graph/documents/*")
-            if p.name == ORIGINAL.document_id
+            if p.name == submitted.config.document_id
         ]
         assert matches == [], matches
 
@@ -646,11 +697,13 @@ class TestTheDeclaredDocumentId:
         intake = read_esr_intake(REPO / config.workspace_rel, config.intake_id)
         assert config.document_id == intake.document_id
 
-    def test_the_two_documents_declare_different_ids(self) -> None:
-        assert ie.SANITISED_DERIVATIVE.document_id != ORIGINAL.document_id
+    def test_the_two_documents_declare_different_ids(self, submitted: Submitted) -> None:
+        assert ie.SANITISED_DERIVATIVE.document_id != submitted.config.document_id
 
-    def test_the_originals_id_carries_none_of_the_copys_vocabulary(self) -> None:
-        assert ORIGINAL.document_id is not None
-        lowered = ORIGINAL.document_id.lower()
+    def test_the_originals_id_carries_none_of_the_copys_vocabulary(
+        self, submitted: Submitted
+    ) -> None:
+        assert submitted.config.document_id is not None
+        lowered = submitted.config.document_id.lower()
         for word in ("sanitis", "sanitiz", "derivative", "84"):
             assert word not in lowered

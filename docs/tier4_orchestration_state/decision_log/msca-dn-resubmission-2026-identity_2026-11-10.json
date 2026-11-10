@@ -1,0 +1,61 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-resubmission-2026-identity_2026-11-10",
+  "date": "2026-11-10",
+  "branch": "ticket/11-resubmission-2026",
+  "base_commit": "b7c2b9f9",
+  "milestone": "November 2026 overhaul, wave 1",
+  "ticket": "11 of .scratch/overhaul-2026-11/issues/11-declare-the-2026-resubmission.md (W-1, finding F7, must-land for V16)",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket 11. The identity names are the operator's, confirmed in session. One declared document in an authoring tool. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The operator confirmed the four identity names on 2026-11-10, before implementation. The scope-cut grill of 2026-11-06 decided the document's kind and sections. The agent drafted the remaining wording.",
+  "decision": "The revised 2026 MSCA-DN Part B is a fourth document, RESUBMISSION_2026 in tools/import_external_proposal.py. It is a submitted document of the 2025 original's kind and a document of its own, not a revision of the original. Every value about its PDF stays undeclared here and comes from the operator's private configuration input (V17), as for the original.",
+  "rules": [
+    {
+      "id": "R1",
+      "rule": "Identity: config_id resubmission_2026, intake_id msca-dn-2026-resubmission, document_id MSCA-DN-2026_part_b_resubmission. The title names HORIZON-MSCA-2026-DN-01 in the 2025 original's title style ('MSCA-DN 2025 Part B, as submitted').",
+      "declared_status": "Confirmed",
+      "basis": "Operator confirmation in session, 2026-11-10: the three ids as proposed in the ticket, and the title's call id and style. The title's exact wording is R2's, not the operator's."
+    },
+    {
+      "id": "R2",
+      "rule": "The title reads 'MSCA-DN 2026 Part B, resubmission to HORIZON-MSCA-2026-DN-01'. It says 'resubmission to' and not 'as submitted', because at V16 the text has not yet been submitted, and the 24 November deadline follows V16.",
+      "declared_status": "Inferred",
+      "basis": "Scope cut 2026-11-06, calendar: V16 around 19-20 November, deadline 24 November. The agent chose the qualifier; the operator may reword it."
+    },
+    {
+      "id": "R3",
+      "rule": "Same kind as the 2025 original: is_submitted_document true, no graph root in the repository, nothing inherited from any other document, refuses until the private input completes it, declared_status Assumed, declaration fields presence and extraction_fidelity.",
+      "declared_status": "Confirmed",
+      "basis": "Scope cut 2026-11-06, ticket 11 decisions. Tests: tests/test_msca_dn_import.py and tests/test_msca_dn_original_import_route.py run each submitted-document test on both documents."
+    },
+    {
+      "id": "R4",
+      "rule": "Sections: the three MSCA-DN Part B criterion sections, MSCA_DN_PART_B_SECTIONS.",
+      "declared_status": "Inferred",
+      "basis": "W02 measured the V5/V6 template equivalence in the scorecard and found the 2026 Part B keeps the three sections. Not re-measured against the 2026 PDF; the V08 dry import of that PDF does."
+    },
+    {
+      "id": "R5",
+      "rule": "The two submitted documents stay apart. An input naming one does not complete the other. A revision of one may not supersede a revision of the other. A revision id registered to one cannot be registered to the other.",
+      "declared_status": "Confirmed",
+      "basis": "Existing rules in DocumentConfig.__post_init__, complete_from_input and register_document, unchanged. Three tests in tests/test_msca_dn_original_import_route.py, run from each side."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "The V18 register renderer (tools/author_original_workspace.py, render_submitted_register) states for every submitted document that 'This file is the text the ESR evaluated' and that 'The ESR evaluated this text', and files call and submission ids under historical_submission. No ESR has evaluated the 2026 resubmission, so a register written for it at V16 would carry two false sentences. Ticket 11 forbids changes to V17/V18 code, so the renderer is unchanged. The one test asserting the sentence runs on the 2025 original only. Whether to fix the wording before the freeze, after V16, or accept it is the operator's call."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The PE-09 runbook's stage B section does not yet name --document resubmission_2026. It is out of scope here and belongs to the Converse runbook delta."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The stage B profile-applicability record (W02) is the operator's to author."
+    }
+  ],
+  "lane_change": "None. The new tests are parametrised cases in existing modules of the dry_import area and of tests/harness/test_execution_receipt.py. No skip is added.",
+  "private_content": "None. This record names ids, rules and synthetic fixture values only."
+}

@@ -50,6 +50,9 @@ WORKSPACE = REPO / DOCUMENT.workspace_rel
 #: map or a ledger contract that was only ever checked against the first copy.
 REVISIONS = DOCUMENT.revisions
 REVISION_IDS = [r.revision_id for r in REVISIONS]
+#: The two submitted documents: the 2025 original and the 2026 resubmission
+#: (ticket 11). Both are the same kind, so every test of that kind runs on both.
+SUBMITTED_DOCUMENTS = ("official_original", "resubmission_2026")
 
 #: U+FB01, the one ligature the revised copy carries.
 LIGATURE_FI = "ﬁ"
@@ -976,14 +979,16 @@ class TestDocumentConfiguration:
             needed = ie.needs_form_title(spec)
             assert needed == (spec.sub_section_id == "1.1"), spec.sub_section_id
 
-    def test_the_provenance_refusal_names_the_intake_record(self) -> None:
-        """The original's missing provenance is its intake record. A refusal
-        that named only the undeclared path field would not say so."""
+    @pytest.mark.parametrize("config_id", SUBMITTED_DOCUMENTS)
+    def test_the_provenance_refusal_names_the_intake_record(self, config_id) -> None:
+        """A submitted document's missing provenance is its intake record. A
+        refusal that named only the undeclared path field would not say so."""
+        submitted = ie.document_by_id(config_id)
         with pytest.raises(ie.ImportRefused) as exc:
-            ie.OFFICIAL_ORIGINAL.require_provenance(REPO)
+            submitted.require_provenance(REPO)
         message = str(exc.value)
         assert "no provenance of its own" in message
-        assert "msca-dn-2025-original.json" in message
+        assert f"{submitted.intake_id}.json" in message
         assert "workspace_rel is not declared" in message
 
     def test_a_source_index_is_refused_for_the_wrong_document(self) -> None:
@@ -1000,7 +1005,8 @@ class TestDocumentConfiguration:
             assert config.status_note
             assert config.identity()["declared_status"] == "Assumed"
         assert "Confirmed" in ie.SANITISED_DERIVATIVE.status_note
-        assert "no value is Confirmed" in ie.OFFICIAL_ORIGINAL.status_note
+        for config_id in SUBMITTED_DOCUMENTS:
+            assert "no value is Confirmed" in ie.document_by_id(config_id).status_note
 
     def test_the_registers_work_package_labels_come_from_the_layout(self) -> None:
         """The register's derived half counts the three labels its provenance
@@ -1034,17 +1040,21 @@ class TestDocumentConfiguration:
 
     # -- criterion 2: the original has its own identity and role -- #
 
-    def test_the_original_is_declared_with_its_own_identity_and_role(self) -> None:
-        original, copy = ie.OFFICIAL_ORIGINAL, ie.SANITISED_DERIVATIVE
+    @pytest.mark.parametrize("config_id", SUBMITTED_DOCUMENTS)
+    def test_the_original_is_declared_with_its_own_identity_and_role(self, config_id) -> None:
+        original, copy = ie.document_by_id(config_id), ie.SANITISED_DERIVATIVE
         assert original.is_submitted_document is True
         identity = original.identity()
         assert identity["is_submitted_document"] is True
-        assert identity["config_id"] == "official_original"
+        assert identity["config_id"] == config_id
         for field in ("config_id", "title", "role", "intake_id"):
             assert getattr(original, field) and getattr(original, field) != getattr(copy, field)
 
-    def test_the_original_inherits_no_page_map_no_page_count_and_no_description(self) -> None:
-        original, copy = ie.OFFICIAL_ORIGINAL, ie.SANITISED_DERIVATIVE
+    @pytest.mark.parametrize("config_id", SUBMITTED_DOCUMENTS)
+    def test_the_original_inherits_no_page_map_no_page_count_and_no_description(
+        self, config_id
+    ) -> None:
+        original, copy = ie.document_by_id(config_id), ie.SANITISED_DERIVATIVE
         assert original.sub_sections == ()
         assert original.expected_pages is None
         assert original.body_point_size is None
@@ -1067,17 +1077,31 @@ class TestDocumentConfiguration:
     def test_the_original_declares_the_sections_of_the_form_and_nothing_else(self) -> None:
         """The three criterion sections come from the application form, not from
         either document, so both declare them; no other shape is shared."""
-        assert ie.OFFICIAL_ORIGINAL.sections == ie.MSCA_DN_PART_B_SECTIONS
+        for config_id in SUBMITTED_DOCUMENTS:
+            assert ie.document_by_id(config_id).sections == ie.MSCA_DN_PART_B_SECTIONS
         assert ie.SANITISED_DERIVATIVE.sections == ie.MSCA_DN_PART_B_SECTIONS
         assert [s for s, _t in ie.MSCA_DN_PART_B_SECTIONS] == list(SPEC_SHAPE)
 
     # -- criterion 3: not a descendant of the copy -- #
 
-    def test_the_original_is_not_hung_off_the_copys_version_chain(self) -> None:
-        original = ie.OFFICIAL_ORIGINAL
+    @pytest.mark.parametrize("config_id", SUBMITTED_DOCUMENTS)
+    def test_the_original_is_not_hung_off_the_copys_version_chain(self, config_id) -> None:
+        original = ie.document_by_id(config_id)
         assert original.intake_id != ie.SANITISED_DERIVATIVE.intake_id
         assert all(r.supersedes is None for r in original.revisions)
         assert original.workspace_rel != ie.SANITISED_DERIVATIVE.workspace_rel
+
+    def test_the_resubmission_is_a_document_of_its_own_and_not_the_originals(self) -> None:
+        """Ticket 11: the 2026 resubmission is not a revision of the 2025
+        original, whose identity is the 2025 submission. Same kind, no shared
+        identifier, and nothing to hang a version chain on."""
+        original, resubmission = ie.OFFICIAL_ORIGINAL, ie.RESUBMISSION_2026
+        for field in ("config_id", "intake_id", "document_id", "title", "role"):
+            assert getattr(resubmission, field) != getattr(original, field), field
+        for field in ("declaration_fields", "declaration_record_type", "sections"):
+            assert getattr(resubmission, field) == getattr(original, field), field
+        assert "HORIZON-MSCA-2026-DN-01" in resubmission.title
+        assert "2025" not in resubmission.title
 
     def test_a_revision_may_not_supersede_another_documents_revision(self) -> None:
         borrowed = ie.Revision(
@@ -1147,9 +1171,13 @@ class TestDocumentConfiguration:
             )
             assert "runtime_environment" not in manifest
 
-    def test_the_originals_manifest_would_carry_the_declared_extraction_pin(self) -> None:
-        assert ie.OFFICIAL_ORIGINAL.manifest_records_runtime_environment is True
-        block = ie._runtime_environment_block(ie.OFFICIAL_ORIGINAL)["runtime_environment"]
+    @pytest.mark.parametrize("config_id", SUBMITTED_DOCUMENTS)
+    def test_the_originals_manifest_would_carry_the_declared_extraction_pin(
+        self, config_id
+    ) -> None:
+        submitted = ie.document_by_id(config_id)
+        assert submitted.manifest_records_runtime_environment is True
+        block = ie._runtime_environment_block(submitted)["runtime_environment"]
         assert block["pymupdf"] == extraction_environment.PINNED_PYMUPDF
         assert block["mupdf"] == extraction_environment.PINNED_MUPDF
         assert block["measured_python"] == list(extraction_environment.MEASURED_PYTHON)
@@ -1185,31 +1213,38 @@ class TestDocumentConfiguration:
         )
         assert "scorecard_rel" not in labelled.missing_fields()
 
-    def test_selecting_the_original_refuses_and_names_its_page_map(self, capsys) -> None:
-        assert ie.main(["--document", "official_original", "--check"]) == 1
+    @pytest.mark.parametrize("config_id", SUBMITTED_DOCUMENTS)
+    def test_selecting_the_original_refuses_and_names_its_page_map(
+        self, capsys, config_id
+    ) -> None:
+        assert ie.main(["--document", config_id, "--check"]) == 1
         message = capsys.readouterr().err
         assert "refused" in message
         for field in ("workspace_rel", "sub_sections", "expected_pages", "revisions"):
             assert field in message, field
 
-    def test_the_original_has_no_provenance_record_of_its_own_yet(self) -> None:
+    @pytest.mark.parametrize("config_id", SUBMITTED_DOCUMENTS)
+    def test_the_original_has_no_provenance_record_of_its_own_yet(self, config_id) -> None:
         """Its intake id is declared and no intake record stands behind it, so
         the import refuses on provenance as well as on the page map. The
         refusal names that record whether or not a graph root is declared."""
-        declared_root = replace(ie.OFFICIAL_ORIGINAL, workspace_rel=Path("workspaces/elsewhere"))
+        submitted = ie.document_by_id(config_id)
+        declared_root = replace(submitted, workspace_rel=Path("workspaces/elsewhere"))
         with pytest.raises(ie.ImportRefused) as exc:
             declared_root.require_provenance(REPO)
         message = str(exc.value)
-        assert "msca-dn-2025-original.json" in message
+        assert f"{submitted.intake_id}.json" in message
         assert "no provenance of its own" in message
         assert "does not exist" in message
 
-    def test_describe_prints_the_identity_and_writes_nothing(self, capsys) -> None:
+    @pytest.mark.parametrize("config_id", SUBMITTED_DOCUMENTS)
+    def test_describe_prints_the_identity_and_writes_nothing(self, capsys, config_id) -> None:
         before = {
             rel: (REPO / rel).read_bytes() for rel in ie.render_all(REPO, ie.SANITISED_DERIVATIVE)
         }
-        assert ie.main(["--document", "official_original", "--describe"]) == 0
+        assert ie.main(["--document", config_id, "--describe"]) == 0
         identity = json.loads(capsys.readouterr().out)
+        assert identity["config_id"] == config_id
         assert identity["is_submitted_document"] is True
         assert identity["importable"] is False
         assert identity["missing_required_fields"]

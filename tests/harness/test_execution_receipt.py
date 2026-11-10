@@ -1126,6 +1126,27 @@ class TestTheCommand:
         assert code == 0, capsys.readouterr().out
         assert "green" in capsys.readouterr().out
 
+    def test_a_receipt_for_the_2026_resubmission_binds_its_own_candidate(
+        self, tmp_path: Path, capsys: Any
+    ) -> None:
+        """Ticket 11: stage B's candidate is the 2026 resubmission, a document
+        of its own. Its receipt validates under its own document id, and an
+        expectation naming the 2025 original refuses it."""
+        resubmission = "MSCA-DN-2026_part_b_resubmission"
+        path, _ = _bound_to_this_trees_profile(tmp_path)
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc["preflight"]["document_id"] = resubmission
+        doc["preflight"]["report_sha256"] = ""
+        preflight = _preflight_doc(
+            profile_id=doc["preflight"]["profile_id"], document_id=resubmission
+        )
+        path = _world(tmp_path, receipt=doc, preflight=preflight)
+        argv = ["--receipt", str(path), "--repo-root", str(REPO_ROOT), "--expect-candidate"]
+        assert command.main([*argv, resubmission]) == 0, capsys.readouterr().out
+        assert "green" in capsys.readouterr().out
+        assert command.main([*argv, "MSCA-DN-2025_part_b_as_submitted"]) == 1
+        assert "CANDIDATE BINDING MISMATCH" in capsys.readouterr().out
+
     def _report(self, tmp_path: Path, transport: str) -> Path:
         path = tmp_path / "blind_report.json"
         body = {"record_type": BLIND_REPORT_RECORD_TYPE, "assessor_transport": transport}

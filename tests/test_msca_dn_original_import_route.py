@@ -24,6 +24,10 @@ V18 (the register of a submitted document)
      there, in the vocabulary it recognises.
   5. No private content reaches this repository.
 
+Ticket 11 adds the 2026 resubmission, a submitted document of the original's
+kind. Every test that reads a submitted document runs once per document (the
+``submitted`` fixture), and three tests hold the two documents apart.
+
 The verification is this module. It builds a four-page non-sensitive Part B
 shape with pymupdf in a temporary directory outside the repository, runs the
 V08 dry import over it, authors a configuration input beside it, authors the
@@ -38,7 +42,7 @@ import copy
 import hashlib
 import json
 import re
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable
 
@@ -63,13 +67,31 @@ TEMPLATE = REPO / "tools/original_configuration_template.json"
 #: nobody wrote a case for.
 _SOURCE = (REPO / "runner/original_configuration.py").read_text(encoding="utf-8")
 
-SUBMISSION_ID = "MSCA-DN-2025-FIXTURE-NOT-THE-REAL-NUMBER"
-CALL_ID = "HORIZON-MSCA-2025-DN-01"
 CONFIG_FILE = "original_configuration.json"
 DRY_DIR = "v08_dry_import"
 WORKSPACE = "workspaces/msca_dn_original"
 PRIVATE_DIR = "private/msca_dn_original"
-REVISION_ID = "as_submitted_v1"
+
+#: The fixture values each submitted document owns. The revision ids differ
+#: because a revision resolves to exactly one document within the process.
+_SUBMITTED: dict[str, dict[str, str]] = {
+    "official_original": {
+        "submission_id": "MSCA-DN-2025-FIXTURE-NOT-THE-REAL-NUMBER",
+        "call_id": "HORIZON-MSCA-2025-DN-01",
+        "esr_availability": "unknown",
+        "revision_id": "as_submitted_v1",
+        "source_id_prefix": "SRC-DN-ORIG",
+        "manifest_name": "MSCA-DN-2025_part_b_as_submitted.json",
+    },
+    "resubmission_2026": {
+        "submission_id": "MSCA-DN-2026-FIXTURE-NOT-THE-REAL-NUMBER",
+        "call_id": "HORIZON-MSCA-2026-DN-01",
+        "esr_availability": "not_applicable",
+        "revision_id": "resubmitted_v1",
+        "source_id_prefix": "SRC-DN-RESUB",
+        "manifest_name": "MSCA-DN-2026_part_b_resubmission.json",
+    },
+}
 
 #: The vocabulary the copy's register header uses about itself. None of it may
 #: appear in the submitted document's identity or transformation fields.
@@ -87,6 +109,30 @@ def _page(doc: Any) -> Any:
 
 def _line(page: Any, y: float, text: str, size: float = 12) -> None:
     page.insert_text((72, y), text, fontsize=size)
+
+
+@dataclass(frozen=True)
+class Submitted:
+    """One submitted document and the fixture values that are its own."""
+
+    config: ie.DocumentConfig
+    submission_id: str
+    call_id: str
+    esr_availability: str
+    revision_id: str
+    source_id_prefix: str
+    manifest_name: str
+
+    @property
+    def other(self) -> "Submitted":
+        """The other submitted document, as this module declares it."""
+        (other_id,) = set(_SUBMITTED) - {self.config.config_id}
+        return Submitted(config=ie.document_by_id(other_id), **_SUBMITTED[other_id])
+
+
+@pytest.fixture(scope="module", params=sorted(_SUBMITTED))
+def submitted(request: pytest.FixtureRequest) -> Submitted:
+    return Submitted(config=ie.document_by_id(request.param), **_SUBMITTED[request.param])
 
 
 @pytest.fixture(scope="module")
@@ -130,7 +176,9 @@ def sha256(pdf: Path) -> str:
 
 
 @pytest.fixture(scope="module")
-def root(pdf: Path, sha256: str, tmp_path_factory: pytest.TempPathFactory) -> Path:
+def root(
+    pdf: Path, sha256: str, submitted: Submitted, tmp_path_factory: pytest.TempPathFactory
+) -> Path:
     """The private root: the PDF, the dry import's records, nothing public."""
     base = tmp_path_factory.mktemp("v17_private")
     (base / PRIVATE_DIR).mkdir(parents=True)
@@ -141,8 +189,10 @@ def root(pdf: Path, sha256: str, tmp_path_factory: pytest.TempPathFactory) -> Pa
             "--pdf", str(target),
             "--expect-sha256", sha256,
             "--out", str(base / DRY_DIR),
-            "--submission-id", SUBMISSION_ID,
-            "--call-id", CALL_ID,
+            "--document", submitted.config.config_id,
+            "--submission-id", submitted.submission_id,
+            "--call-id", submitted.call_id,
+            "--esr-availability", submitted.esr_availability,
         ]
     ) == 0
     return base
@@ -159,12 +209,12 @@ def _inventory_sha256(root: Path) -> str:
     return hashlib.sha256((root / DRY_DIR / dio.INVENTORY_FILE).read_bytes()).hexdigest()
 
 
-def _document(root: Path, sha256: str) -> dict[str, Any]:
+def _document(root: Path, sha256: str, submitted: Submitted) -> dict[str, Any]:
     """A complete configuration input for the fixture, as a plain mapping."""
     return {
         "schema": oc.SCHEMA,
         "record_type": oc.RECORD_TYPE,
-        "config_id": "official_original",
+        "config_id": submitted.config.config_id,
         "declared_by": "the operator, reconciling against the PDF",
         "declared_on": "2026-10-13",
         "declared_status": "Assumed",
@@ -236,14 +286,14 @@ def _document(root: Path, sha256: str) -> dict[str, Any]:
         "pages_outside_the_map": [],
         "revisions": [
             {
-                "revision_id": REVISION_ID,
+                "revision_id": submitted.revision_id,
                 "pdf_rel": f"{PRIVATE_DIR}/part_b_as_submitted.pdf",
-                "source_id_prefix": "SRC-DN-ORIG",
-                "manifest_name": "MSCA-DN-2025_part_b_as_submitted.json",
+                "source_id_prefix": submitted.source_id_prefix,
+                "manifest_name": submitted.manifest_name,
                 "register_rel": f"{PRIVATE_DIR}/fidelity_register_as_submitted.json",
                 "candidate_role": (
-                    "Current assessment artifact: the Part B of the 2025 submission, as "
-                    "submitted. The submitted text itself."
+                    f"Current assessment artifact: {submitted.config.title}. The submitted "
+                    f"text itself."
                 ),
                 "candidate_version": "as submitted, 4 pages",
                 "summary": "The submitted Part B, imported inside the private network.",
@@ -256,8 +306,8 @@ def _document(root: Path, sha256: str) -> dict[str, Any]:
 
 
 @pytest.fixture
-def document(root: Path, sha256: str) -> dict[str, Any]:
-    return _document(root, sha256)
+def document(root: Path, sha256: str, submitted: Submitted) -> dict[str, Any]:
+    return _document(root, sha256, submitted)
 
 
 @pytest.fixture
@@ -273,10 +323,14 @@ def write(root: Path) -> Callable[[dict[str, Any], str], Path]:
 
 
 @pytest.fixture(scope="module")
-def configuration(root: Path, sha256: str) -> oc.OriginalConfiguration:
+def configuration(
+    root: Path, sha256: str, submitted: Submitted
+) -> oc.OriginalConfiguration:
     """The fixture's configuration, written once and read back."""
     path = root / CONFIG_FILE
-    path.write_text(json.dumps(_document(root, sha256), indent=2), encoding="utf-8")
+    path.write_text(
+        json.dumps(_document(root, sha256, submitted), indent=2), encoding="utf-8"
+    )
     return oc.load_configuration(path, root)
 
 
@@ -288,8 +342,10 @@ def report(
 
 
 @pytest.fixture(scope="module")
-def completed(configuration: oc.OriginalConfiguration) -> ie.DocumentConfig:
-    return ie.complete_from_input(ie.OFFICIAL_ORIGINAL, configuration)
+def completed(
+    configuration: oc.OriginalConfiguration, submitted: Submitted
+) -> ie.DocumentConfig:
+    return ie.complete_from_input(submitted.config, configuration)
 
 
 @pytest.fixture(scope="module")
@@ -348,9 +404,9 @@ _REQUIRED = list(oc.REQUIRED_FIELDS)
 
 class TestTheConfigurationInput:
     def test_a_complete_input_reads_back(
-        self, configuration: oc.OriginalConfiguration, root: Path
+        self, configuration: oc.OriginalConfiguration, root: Path, submitted: Submitted
     ) -> None:
-        assert configuration.config_id == "official_original"
+        assert configuration.config_id == submitted.config.config_id
         assert configuration.path_rel == CONFIG_FILE
         assert configuration.sha256 == hashlib.sha256(
             (root / CONFIG_FILE).read_bytes()
@@ -748,7 +804,7 @@ class TestTheMeasurementChecksTheDeclaration:
         assert "revision_supersedes_an_unknown_revision" in [n for n, _d in report.findings]
 
     def test_a_later_revisions_bytes_are_not_authenticated_here(
-        self, document: dict[str, Any], root: Path, write: Any
+        self, document: dict[str, Any], root: Path, write: Any, submitted: Submitted
     ) -> None:
         def add(doc: dict[str, Any], _root: Path) -> None:
             later = copy.deepcopy(doc["revisions"][0])
@@ -757,7 +813,7 @@ class TestTheMeasurementChecksTheDeclaration:
                 source_id_prefix="SRC-DN-ORIG-V2",
                 manifest_name="later.json",
                 register_rel=f"{PRIVATE_DIR}/fidelity_register_later.json",
-                supersedes=REVISION_ID,
+                supersedes=submitted.revision_id,
             )
             doc["revisions"].append(later)
 
@@ -795,12 +851,12 @@ class TestTheMeasurementChecksTheDeclaration:
         assert "work_package_layout_declared_as_none" in names
 
     def test_the_summary_carries_names_and_counts_and_no_declared_value(
-        self, report: oc.ConfigurationCheck, sha256: str
+        self, report: oc.ConfigurationCheck, sha256: str, submitted: Submitted
     ) -> None:
         text = "\n".join(report.lines())
         assert "findings: 0" in text
         assert sha256 not in text
-        assert SUBMISSION_ID not in text
+        assert submitted.submission_id not in text
 
 
 # --------------------------------------------------------------------------- #
@@ -826,12 +882,12 @@ class TestThePrivateRoot:
         assert oc.require_private_root(root) == root.resolve()
 
     def test_the_skeleton_is_the_copys_pattern(
-        self, authored: list[str], root: Path
+        self, authored: list[str], root: Path, submitted: Submitted
     ) -> None:
         assert sorted(authored) == sorted(
             [
                 f"{WORKSPACE}/README.md",
-                f"{WORKSPACE}/{INTAKE_REL}/msca-dn-2025-original.json",
+                f"{WORKSPACE}/{INTAKE_REL}/{submitted.config.intake_id}.json",
                 f"{WORKSPACE}/{Path(INTAKE_REL).parent.as_posix()}/documents/.gitkeep",
                 f"{WORKSPACE}/{Path(INTAKE_REL).parent.as_posix()}/snapshots/.gitkeep",
                 f"{WORKSPACE}/{Path(INTAKE_REL).parent.as_posix()}/packages/.gitkeep",
@@ -845,26 +901,26 @@ class TestThePrivateRoot:
         assert ows.check(root, configuration) == []
 
     def test_the_intake_is_the_dry_imports_own_record(
-        self, root: Path, authored: list[str]
+        self, root: Path, authored: list[str], submitted: Submitted
     ) -> None:
+        name = f"{submitted.config.intake_id}.json"
         recorded = json.loads(
-            (root / WORKSPACE / INTAKE_REL / "msca-dn-2025-original.json").read_text(
-                encoding="utf-8"
-            )
+            (root / WORKSPACE / INTAKE_REL / name).read_text(encoding="utf-8")
         )
         authored_by_dry_import = json.loads(
-            (root / DRY_DIR / "msca-dn-2025-original.json").read_text(encoding="utf-8-sig")
+            (root / DRY_DIR / name).read_text(encoding="utf-8-sig")
         )
         assert recorded == authored_by_dry_import
-        assert recorded["submission_id"] == SUBMISSION_ID
-        assert recorded["call_id"] == CALL_ID
+        assert recorded["submission_id"] == submitted.submission_id
+        assert recorded["call_id"] == submitted.call_id
+        assert recorded["esr_availability"] == submitted.esr_availability
 
     def test_the_readme_names_this_documents_own_ids(
         self, root: Path, authored: list[str], completed: ie.DocumentConfig
     ) -> None:
         text = (root / WORKSPACE / "README.md").read_text(encoding="utf-8")
         assert completed.source_id(completed.revisions[0], 1) in text
-        assert "msca-dn-2025-original" in text
+        assert completed.intake_id in text
         assert "the submitted text itself" in text
         for word in ("sanitised", "derivative", "84"):
             assert word not in text, word
@@ -903,8 +959,10 @@ class TestThePrivateRoot:
 
 
 class TestCompletingTheDocument:
-    def test_the_five_missing_fields_are_the_ones_the_input_declares(self) -> None:
-        assert set(ie.OFFICIAL_ORIGINAL.missing_fields()) == {
+    def test_the_five_missing_fields_are_the_ones_the_input_declares(
+        self, submitted: Submitted
+    ) -> None:
+        assert set(submitted.config.missing_fields()) == {
             "workspace_rel",
             "sub_sections",
             "expected_pages",
@@ -940,11 +998,56 @@ class TestCompletingTheDocument:
             assert word not in described, word
 
     def test_an_input_naming_another_document_is_refused(
-        self, configuration: oc.OriginalConfiguration
+        self, configuration: oc.OriginalConfiguration, submitted: Submitted
     ) -> None:
         with pytest.raises(ie.ImportRefused) as exc:
             ie.complete_from_input(ie.SANITISED_DERIVATIVE, configuration)
-        assert "official_original" in str(exc.value)
+        assert submitted.config.config_id in str(exc.value)
+
+    def test_an_input_for_one_submitted_document_does_not_complete_the_other(
+        self, configuration: oc.OriginalConfiguration, submitted: Submitted
+    ) -> None:
+        """Ticket 11: both are submitted documents of one kind, and that is
+        not a licence to complete one from the other's input."""
+        with pytest.raises(ie.ImportRefused) as exc:
+            ie.complete_from_input(submitted.other.config, configuration)
+        message = str(exc.value)
+        assert submitted.config.config_id in message
+        assert submitted.other.config.config_id in message
+        assert submitted.other.config.missing_fields()
+
+    def test_a_revision_may_not_supersede_the_other_documents_revision(
+        self, completed: ie.DocumentConfig, submitted: Submitted
+    ) -> None:
+        later = replace(
+            completed.revisions[0],
+            revision_id=f"{submitted.revision_id}_later",
+            source_id_prefix=f"{submitted.source_id_prefix}-LATER",
+            manifest_name="later.json",
+            pdf_rel=Path(f"{PRIVATE_DIR}/later.pdf"),
+            register_rel=Path(f"{PRIVATE_DIR}/fidelity_register_later.json"),
+            supersedes=submitted.other.revision_id,
+        )
+        with pytest.raises(ie.ImportRefused) as exc:
+            replace(completed, revisions=completed.revisions + (later,))
+        assert submitted.other.revision_id in str(exc.value)
+        assert "not a revision of this document" in str(exc.value)
+
+    def test_a_revision_cannot_belong_to_both_documents(
+        self, completed: ie.DocumentConfig, submitted: Submitted
+    ) -> None:
+        """The completed revision is registered to this document, so the other
+        submitted document cannot declare it as its own."""
+        borrower = replace(
+            submitted.other.config,
+            workspace_rel=Path("workspaces/elsewhere"),
+            revisions=completed.revisions,
+        )
+        with pytest.raises(ie.ImportRefused) as exc:
+            ie.register_document(borrower)
+        assert "already belongs to document" in str(exc.value)
+        assert submitted.config.config_id in str(exc.value)
+        assert ie.config_for(completed.revisions[0]).config_id == submitted.config.config_id
 
     def test_a_complete_document_may_not_be_redeclared_from_an_input(
         self, document: dict[str, Any], root: Path, write: Any
@@ -960,13 +1063,14 @@ class TestCompletingTheDocument:
         assert "already complete" in str(exc.value)
 
     def test_the_page_map_provenance_names_the_input_and_its_hash(
-        self, completed: ie.DocumentConfig, configuration: oc.OriginalConfiguration
+        self, completed: ie.DocumentConfig, configuration: oc.OriginalConfiguration,
+        submitted: Submitted,
     ) -> None:
         declared = completed.page_map_declared_from
         assert CONFIG_FILE in declared
         assert configuration.sha256 in declared
         assert "No page map is declared here yet" not in declared
-        assert "No page map is declared here yet" in ie.OFFICIAL_ORIGINAL.page_map_declared_from
+        assert "No page map is declared here yet" in submitted.config.page_map_declared_from
 
     def test_the_status_note_names_the_measurement_that_checked_it(
         self, completed: ie.DocumentConfig, configuration: oc.OriginalConfiguration
@@ -976,11 +1080,11 @@ class TestCompletingTheDocument:
         assert "runner/original_configuration.py" in note
         assert "unchecked" in note
 
-    def test_the_completed_revision_resolves_to_the_original(
-        self, completed: ie.DocumentConfig
+    def test_the_completed_revision_resolves_to_its_own_document(
+        self, completed: ie.DocumentConfig, submitted: Submitted
     ) -> None:
         resolved = ie.config_for(completed.revisions[0])
-        assert resolved.config_id == "official_original"
+        assert resolved.config_id == submitted.config.config_id
         assert resolved.expected_pages == completed.expected_pages
 
     def test_a_document_this_tool_does_not_declare_cannot_be_registered(
@@ -1092,6 +1196,11 @@ class TestTheHeaderDeclaresTheSubmittedDocumentsOwnFacts:
         statement = register["provenance"]["transformation"]["statement"]
         assert "not a declaration that the extraction preserved everything" in statement
 
+    # The 2025 original only. The renderer states this sentence for every
+    # submitted document, and no ESR has evaluated the 2026 resubmission: a
+    # known gap of ticket 11, recorded in its decision-log entry, and not
+    # asserted here as if it were true.
+    @pytest.mark.parametrize("submitted", ["official_original"], indirect=True)
     def test_the_relationship_to_the_esr_is_the_copys_inverted(
         self, register: dict[str, Any]
     ) -> None:
@@ -1153,10 +1262,11 @@ class TestTheReconciliationIsTheFidelityEvidence:
         assert block["not_proof"] == di.GRAPHICAL_PROOF_STATEMENT
 
     def test_an_open_reconciliation_refuses_the_register(
-        self, root: Path, configuration: oc.OriginalConfiguration
+        self, root: Path, configuration: oc.OriginalConfiguration,
+        submitted: Submitted,
     ) -> None:
         records = ows.read_dry_import(
-            root, configuration, "msca-dn-2025-original", "MSCA-DN-2025_part_b_as_submitted"
+            root, configuration, submitted.config.intake_id, submitted.config.document_id
         )
         open_record = copy.deepcopy(dict(records.acceptance))
         open_record["complete"] = False
@@ -1173,12 +1283,13 @@ class TestTheReconciliationIsTheFidelityEvidence:
         assert di.ACCEPTANCE_ITEMS[0].item in message
 
     def test_a_record_marked_complete_over_an_open_item_is_inadmissible(
-        self, root: Path, configuration: oc.OriginalConfiguration
+        self, root: Path, configuration: oc.OriginalConfiguration,
+        submitted: Submitted,
     ) -> None:
         """V08's own finding, enforced here: the record says complete and an
         item says unreconciled, so the claim and the evidence disagree."""
         records = ows.read_dry_import(
-            root, configuration, "msca-dn-2025-original", "MSCA-DN-2025_part_b_as_submitted"
+            root, configuration, submitted.config.intake_id, submitted.config.document_id
         )
         lying = copy.deepcopy(dict(records.acceptance))
         lying["items"][0]["verdict"] = "unreconciled"
@@ -1187,12 +1298,13 @@ class TestTheReconciliationIsTheFidelityEvidence:
         assert "complete_with_unreconciled_item" in str(exc.value)
 
     def test_an_inadmissible_reconciliation_refuses_the_register(
-        self, root: Path, configuration: oc.OriginalConfiguration
+        self, root: Path, configuration: oc.OriginalConfiguration,
+        submitted: Submitted,
     ) -> None:
         """A 'preserved' verdict resting on a measurement equally true of a
         document whose figures are gone. V08 reports it; this refuses on it."""
         records = ows.read_dry_import(
-            root, configuration, "msca-dn-2025-original", "MSCA-DN-2025_part_b_as_submitted"
+            root, configuration, submitted.config.intake_id, submitted.config.document_id
         )
         bad = copy.deepcopy(dict(records.acceptance))
         bad["items"][0]["verdict"] = "preserved"
@@ -1230,22 +1342,26 @@ class TestTheReconciliationIsTheFidelityEvidence:
         assert block["limitations_recorded"] >= 1
 
     def test_a_reconciliation_over_other_bytes_is_refused(
-        self, root: Path, document: dict[str, Any], write: Any
+        self, root: Path, document: dict[str, Any], write: Any,
+        submitted: Submitted,
     ) -> None:
         other = hashlib.sha256(b"not this document").hexdigest()
         mutated = _mutate(document, lambda d, r: d.update(authenticated_sha256=other), root)
         configuration = oc.load_configuration(write(mutated, "mismatch.json"), root)
         with pytest.raises(ows.AuthoringRefused) as exc:
             ows.read_dry_import(
-                root, configuration, "msca-dn-2025-original", "MSCA-DN-2025_part_b_as_submitted"
+                root, configuration, submitted.config.intake_id, submitted.config.document_id
             )
         assert "one document's reconciliation as another's" in str(exc.value)
 
     def test_an_intake_under_another_id_or_document_is_refused(
-        self, root: Path, configuration: oc.OriginalConfiguration
+        self, root: Path, configuration: oc.OriginalConfiguration,
+        submitted: Submitted,
     ) -> None:
         with pytest.raises(ows.AuthoringRefused) as exc:
-            ows.read_dry_import(root, configuration, "msca-dn-2025-original", "another-document")
+            ows.read_dry_import(
+                root, configuration, submitted.config.intake_id, "another-document"
+            )
         assert "names document" in str(exc.value)
         with pytest.raises(ows.AuthoringRefused) as exc:
             ows.read_dry_import(root, configuration, "another-intake", None)
@@ -1272,16 +1388,17 @@ class TestTheDeclaredHalfAsksTheSubmittedDocumentsQuestion:
         assert fd.INPUT_BLOCK_KEY not in register["declared"]
 
     def test_a_declaration_under_the_private_root_reaches_the_register(
-        self, root: Path, completed: ie.DocumentConfig, register: dict[str, Any]
+        self, root: Path, completed: ie.DocumentConfig, register: dict[str, Any],
+        submitted: Submitted,
     ) -> None:
         contract = completed.declaration_contract()
-        path = root / contract.dir_rel / f"{REVISION_ID}.json"
+        path = root / contract.dir_rel / f"{submitted.revision_id}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
             json.dumps(
                 {
                     "record_type": contract.record_type,
-                    "revision_id": REVISION_ID,
+                    "revision_id": submitted.revision_id,
                     "sub_sections": [
                         {
                             "sub_section_id": "1.1",
@@ -1306,16 +1423,17 @@ class TestTheDeclaredHalfAsksTheSubmittedDocumentsQuestion:
             path.unlink()
 
     def test_the_copys_record_type_is_refused_here(
-        self, root: Path, completed: ie.DocumentConfig
+        self, root: Path, completed: ie.DocumentConfig,
+        submitted: Submitted,
     ) -> None:
         contract = completed.declaration_contract()
-        path = root / contract.dir_rel / f"{REVISION_ID}.json"
+        path = root / contract.dir_rel / f"{submitted.revision_id}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
             json.dumps(
                 {
                     "record_type": fd.DECLARATIONS_RECORD_TYPE,
-                    "revision_id": REVISION_ID,
+                    "revision_id": submitted.revision_id,
                     "sub_sections": [],
                 }
             ),
@@ -1329,19 +1447,20 @@ class TestTheDeclaredHalfAsksTheSubmittedDocumentsQuestion:
             path.unlink()
 
     def test_a_transformation_declaration_is_not_a_reconciliation(
-        self, root: Path, completed: ie.DocumentConfig
+        self, root: Path, completed: ie.DocumentConfig,
+        submitted: Submitted,
     ) -> None:
         """The copy's two fields do not satisfy this document's contract: a
         row that declares a transformation of the submitted text and no
         extraction fidelity is refused, naming the field it owes."""
         contract = completed.declaration_contract()
-        path = root / contract.dir_rel / f"{REVISION_ID}.json"
+        path = root / contract.dir_rel / f"{submitted.revision_id}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
             json.dumps(
                 {
                     "record_type": contract.record_type,
-                    "revision_id": REVISION_ID,
+                    "revision_id": submitted.revision_id,
                     "sub_sections": [
                         {
                             "sub_section_id": "1.1",
@@ -1467,7 +1586,8 @@ class TestTheImportUnderThePrivateRoot:
         assert recorded["sha256"] in manifest["page_map"]["declared_from"]
 
     def test_the_page_sources_are_this_revisions_own(
-        self, root: Path, imported: list[str], completed: ie.DocumentConfig
+        self, root: Path, imported: list[str], completed: ie.DocumentConfig,
+        submitted: Submitted,
     ) -> None:
         index = json.loads(
             (root / WORKSPACE / "docs/tier3_project_instantiation/source_materials/sources.json")
@@ -1475,7 +1595,7 @@ class TestTheImportUnderThePrivateRoot:
         )
         ids = [source["source_id"] for source in index["sources"]]
         assert ids == [completed.source_id(completed.revisions[0], n) for n in range(1, 5)]
-        assert all(sid.startswith("SRC-DN-ORIG") for sid in ids)
+        assert all(sid.startswith(submitted.source_id_prefix) for sid in ids)
 
     def test_the_derived_half_is_the_shared_renderer(
         self, register: dict[str, Any], root: Path
@@ -1493,19 +1613,23 @@ class TestTheImportUnderThePrivateRoot:
 
 
 class TestNothingPrivateReachesThisRepository:
-    def test_no_register_or_graph_root_of_the_original_is_committed(self) -> None:
+    def test_no_register_or_graph_root_of_the_original_is_committed(
+        self, submitted: Submitted
+    ) -> None:
         for pattern in (
             "**/fidelity_register_as_submitted.json",
             "**/part_b_as_submitted.pdf",
+            f"**/{submitted.manifest_name}",
+            f"**/{submitted.config.intake_id}.json",
             "workspaces/msca_dn_original/**",
         ):
             assert list(REPO.glob(pattern)) == [], pattern
 
-    def test_the_original_still_declares_no_graph_root_here(self) -> None:
-        assert ie.OFFICIAL_ORIGINAL.workspace_rel is None
-        assert ie.OFFICIAL_ORIGINAL.declarations_dir_rel is None
-        assert ie.OFFICIAL_ORIGINAL.configuration_input_rel is None
-        assert ie.OFFICIAL_ORIGINAL.revisions == ()
+    def test_the_original_still_declares_no_graph_root_here(self, submitted: Submitted) -> None:
+        assert submitted.config.workspace_rel is None
+        assert submitted.config.declarations_dir_rel is None
+        assert submitted.config.configuration_input_rel is None
+        assert submitted.config.revisions == ()
 
     def test_the_template_carries_no_hash_and_no_private_path(self) -> None:
         text = TEMPLATE.read_text(encoding="utf-8")

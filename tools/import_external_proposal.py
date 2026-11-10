@@ -36,9 +36,11 @@ Which document, and what it may assume (V07)
 Every assumption about the document — its graph root, intake, title, role,
 submitted-document flag, page count, section and sub-section maps, criterion
 heading anchors, beneficiary marker, work-package table layout, body point
-size and source-id spelling — is a field of :class:`DocumentConfig`. Two are
-declared: ``SANITISED_DERIVATIVE``, the copy PE-03 imported, and
-``OFFICIAL_ORIGINAL``, the submitted text. Select one with ``--document``.
+size and source-id spelling — is a field of :class:`DocumentConfig`. Four are
+declared: ``SANITISED_DERIVATIVE``, the copy PE-03 imported;
+``OFFICIAL_ORIGINAL``, the 2025 submitted text; ``ANONYMISED_DERIVATIVE``
+(AN10); and ``RESUBMISSION_2026``, the 2026 resubmission (ticket 11). Select
+one with ``--document``.
 
 A configuration is selected, never merged. The original inherits no page map,
 no 84-page count and no derivative description, and it is not a revision of
@@ -1038,11 +1040,76 @@ ANONYMISED_DERIVATIVE = DocumentConfig(
     ),
 )
 
+#: The 2026 resubmission (ticket 11): the revised Part B for the 2026 MSCA
+#: Doctoral Networks call. It is a submitted document of the original's kind
+#: and a document of its own, not a revision of the 2025 original, whose
+#: identity is the 2025 submission. It inherits nothing, declares no graph
+#: root, and refuses until the operator's private configuration input (V17)
+#: completes it. Identity names confirmed by the operator on 2026-11-10.
+RESUBMISSION_2026 = DocumentConfig(
+    config_id="resubmission_2026",
+    is_submitted_document=True,
+    intake_id="msca-dn-2026-resubmission",
+    document_id="MSCA-DN-2026_part_b_resubmission",
+    title="MSCA-DN 2026 Part B, resubmission to HORIZON-MSCA-2026-DN-01",
+    role=(
+        "Current assessment artifact: the Part B of the 2026 MSCA Doctoral Networks "
+        "resubmission (HORIZON-MSCA-2026-DN-01). The resubmission text itself, and not a "
+        "revision of the 2025 original."
+    ),
+    workspace_rel=None,
+    sections=MSCA_DN_PART_B_SECTIONS,
+    short_name="the 2026 resubmission",
+    page_map_declared_from=(
+        "the V08 dry-import reconciliation against the PDF, page by page. No page map is "
+        "declared here yet, which is why selecting this document refuses."
+    ),
+    first_revision_key="is_the_first_version_of_the_resubmission",
+    claim_ledger_note=(
+        "These are the proposal's own assertions, extracted from the resubmission text. No "
+        "claim declares source_grounded: resolving a citation to its source is the "
+        "imported-source grounding route of ticket X01, which has not landed, so a citation this "
+        "document carries is not resolved here. The span locates the assertion in its page "
+        "source and is not evidence for it. Nobody in this repository approves a proposal's "
+        "assertions, so approval is not applicable. The integrity audit enumerates this ledger "
+        "and reports each claim Unresolved."
+    ),
+    import_ticket="PE-09 stage B (V16), under V17; run inside the private network",
+    declaration_fields=("presence", "extraction_fidelity"),
+    declaration_record_type="extraction_fidelity_declarations",
+    declared_status="Assumed",
+    status_note=(
+        "Every value here is an operator declaration about a document this repository does not "
+        "hold. Nothing has been derived from the resubmission, so no value is Confirmed and none "
+        "can be until V08's dry import measures it."
+    ),
+    page_statement=(
+        "Page {page} of the Part B of the 2026 resubmission to the MSCA Doctoral Networks call "
+        "(HORIZON-MSCA-2026-DN-01). The resubmission text itself, held in the private network "
+        "and not in this repository."
+    ),
+    reader_caveat_key="the_resubmission_text_itself",
+    reader_caveat=(
+        "This is the resubmission text. What its extraction loses is therefore unknown until "
+        "the V08 dry import has been reconciled against the PDF page by page, and nothing here "
+        "declares that reconciliation done."
+    ),
+    manifest_records_runtime_environment=True,
+    summary=(
+        "Not imported. Its page map, page count, body point size, work-package layout, graph "
+        "root and revisions are undeclared, and no value is taken from the 2025 original or "
+        "either derivative. It is a document of its own and not a revision of the original: its "
+        "intake id differs, and a revision of one document may not supersede a revision of "
+        "another."
+    ),
+)
+
 #: Every document this tool can be pointed at.
 DOCUMENTS: tuple[DocumentConfig, ...] = (
     SANITISED_DERIVATIVE,
     OFFICIAL_ORIGINAL,
     ANONYMISED_DERIVATIVE,
+    RESUBMISSION_2026,
 )
 #: The document selected when none is named: the one PE-03 imported.
 DEFAULT_DOCUMENT: DocumentConfig = SANITISED_DERIVATIVE
