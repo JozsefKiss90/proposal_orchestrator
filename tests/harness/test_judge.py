@@ -382,7 +382,7 @@ class TestAsk:
 
     def test_a_negative_budget_is_refused(self):
         with pytest.raises(JudgeConfigError, match="max_redraws"):
-            Judge(_cfg(), max_redraws=-1)
+            Judge(_cfg(), backend=_Backend([]), max_redraws=-1)
 
 
 # --------------------------------------------------------------------------- #
@@ -419,12 +419,13 @@ class TestEvaluateMajority:
 
 
 # --------------------------------------------------------------------------- #
-# Default backend independence
+# Backend independence (the judge factory's openai-compatible route)
 # --------------------------------------------------------------------------- #
 
 
-class TestDefaultBackendIndependence:
+class TestFactoryBackendIndependence:
     def test_claude_cli_backend_rejected(self, monkeypatch):
+        from harness.judge_factory import ROUTE_OPENAI_COMPATIBLE, build_judge
         from runner.transport.capabilities import CAPABILITIES_REGISTRY
         from runner.transport.config import ProviderConfig
 
@@ -438,11 +439,11 @@ class TestDefaultBackendIndependence:
         monkeypatch.setattr(
             "runner.transport.config.resolve_provider_config", lambda: claude_cfg
         )
-        judge = Judge(_cfg())  # no injected backend -> tries to build default
         with pytest.raises(JudgeIndependenceError, match="OpenAI-compatible"):
-            judge._send("s", "u")
+            build_judge(ROUTE_OPENAI_COMPATIBLE, _cfg())
 
     def test_pins_judge_model_on_build(self, monkeypatch):
+        from harness.judge_factory import ROUTE_OPENAI_COMPATIBLE, build_judge
         from runner.transport.capabilities import CAPABILITIES_REGISTRY
         from runner.transport.config import ProviderConfig
 
@@ -465,7 +466,7 @@ class TestDefaultBackendIndependence:
 
         monkeypatch.setattr("runner.transport.config.build_openai_backend", _fake_build)
 
-        judge = Judge(_cfg(model=NON_DRAFTER))
+        judge, _wrapper = build_judge(ROUTE_OPENAI_COMPATIBLE, _cfg(model=NON_DRAFTER))
         res = judge.evaluate("s", "u", metric="m", property_key="C1")
         assert res.verdict.passed is True
         # the pinned judge model overrides the env default; temp 0 passed through

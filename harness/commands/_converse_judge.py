@@ -9,10 +9,10 @@ The ``openai-compatible`` route cannot reach it, because Converse has no base
 URL, and the ``bedrock`` preset targets the ``bedrock-mantle`` proxy, which a
 host with no internet route cannot reach (handoff §9, ticket AN1a).
 
-:func:`build_converse_judge` builds through
-:func:`harness.judge.build_judge_backend`, the same seam ``Judge._get_backend``
-uses.  The model-level non-drafter guard (:class:`~harness.judge.JudgeConfig`)
-therefore still applies.  On Bedrock the drafter and the assessor share a
+The judge itself is built by :func:`harness.judge_factory.build_judge` on the
+``bedrock-converse`` route; this module holds the route's retry wrapper and
+error.  The model-level non-drafter guard (:class:`~harness.judge.JudgeConfig`)
+applies there as on every route.  On Bedrock the drafter and the assessor share a
 provider, so the guard compares the model each id names
 (:func:`~harness.judge.canonical_model_id`), not the id string.  A different
 Claude model on the shared provider is admissible; the drafter's own model is
@@ -30,35 +30,32 @@ and the freeze requires that record (ticket AN1b).
 The pin names the transport
 ---------------------------
 A report records ``model@version`` and nothing else about the assessor.  The
-builder refuses a version tag that does not contain :data:`TRANSPORT_TAG`
+factory refuses a version tag that does not contain :data:`TRANSPORT_TAG`
 (spec decision 10), and it refuses an environment that resolves to any backend
-other than ``bedrock_converse``.  Either would let a report name a transport it
-did not speak.
+other than ``bedrock_converse`` (the route's row of
+:data:`harness.judge_factory.INDEPENDENCE_POLICY`).  Either would let a report
+name a transport it did not speak.
 
 Retries, not pacing
 -------------------
 Bedrock quotas are account-level, not the per-minute free-tier ceiling the
 paced wrapper was tuned for.  The backend goes through the same
-:class:`~harness.commands.freeze_grounding_baselines.PacedRetryingBackend`
-the OpenAI-compatible route uses, with both pacing budgets switched off, so
-only its retry on retryable errors (throttling, server errors) remains.
+:class:`~harness.judge_factory.PacedRetryingBackend` the OpenAI-compatible
+route uses, with both pacing budgets switched off, so only its retry on
+retryable errors (throttling, server errors) remains.
 
 Advisory output only.  The harness is never a runtime gate.
 """
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
-from harness.commands.freeze_grounding_baselines import PacedRetryingBackend
-from harness.judge import Judge, JudgeConfig, JudgeError, build_judge_backend
-from harness.provenance import ProvenanceLog
+from harness.judge_factory import JudgeRouteError, PacedRetryingBackend
 
 __all__ = [
     "TRANSPORT_TAG",
     "ConverseJudgeError",
     "ConverseRetryingBackend",
-    "build_converse_judge",
 ]
 
 #: The transport name the command flag, the report and the version tag share.
@@ -70,7 +67,7 @@ TRANSPORT_TAG: str = "bedrock-converse"
 _BACKEND_NAME: str = "bedrock_converse"
 
 
-class ConverseJudgeError(JudgeError):
+class ConverseJudgeError(JudgeRouteError):
     """The Converse assessor was asked for something it cannot be.
 
     A :class:`~harness.judge.JudgeError` so the commands convert it to their
@@ -129,57 +126,3 @@ class ConverseRetryingBackend(PacedRetryingBackend):
             ),
         }
 
-
-def build_converse_judge(
-    cfg: JudgeConfig,
-    *,
-    prov_path: Path,
-    max_retries: int = 6,
-    log: Callable[[str], None] = print,
-) -> tuple[Judge, Any]:
-    """Build a :class:`Judge` over Bedrock Converse.
-
-    Returns the judge and the retry wrapper around the
-    :class:`~runner.transport.bedrock_converse.BedrockConverseBackend`, as
-    ``build_paced_judge`` does, so a caller can read the retry count.
-
-    Raises
-    ------
-    ConverseJudgeError
-        If the version tag does not name this transport, the environment
-        does not resolve to ``bedrock_converse``, or the transport refuses the
-        configuration or cannot build the backend.
-    """
-    from runner.transport.config import resolve_provider_config
-
-    if TRANSPORT_TAG not in str(cfg.version):
-        raise ConverseJudgeError(
-            f"HARNESS_JUDGE_VERSION is {cfg.version!r}, which does not name this "
-            f"transport. The report records model@version and nothing else about "
-            f"the assessor, so the tag must contain {TRANSPORT_TAG!r} (e.g. "
-            f"'{TRANSPORT_TAG}-eu-north-1@2026-10-27'); pass --assessor-version."
-        )
-    # The transport refuses a misconfiguration with a plain ValueError (no Region
-    # in production mode, a backend production mode does not allow, no model).
-    # Converted here so the command fails closed with one line, not a traceback.
-    try:
-        provider = resolve_provider_config()
-    except ValueError as exc:
-        raise ConverseJudgeError(f"the Converse configuration is refused: {exc}") from exc
-    if provider.backend_name != _BACKEND_NAME:
-        raise ConverseJudgeError(
-            f"--transport {TRANSPORT_TAG} needs the environment to resolve to "
-            f"{_BACKEND_NAME!r}, but it resolves to {provider.backend_name!r}. Set "
-            f"ORCHESTRATOR_TRANSPORT_BACKEND={_BACKEND_NAME} (or a Converse preset) "
-            f"so the report names the transport it spoke."
-        )
-    try:
-        inner = build_judge_backend(provider, cfg)
-    except (ValueError, ImportError) as exc:
-        raise ConverseJudgeError(f"the Converse backend cannot be built: {exc}") from exc
-    # No pacing: an infinite token budget and no request floor.
-    wrapper = ConverseRetryingBackend(
-        inner, tpm_budget=float("inf"), rpm_budget=0, max_retries=max_retries, log=log
-    )
-    judge = Judge(cfg, backend=wrapper, provenance_log=ProvenanceLog(prov_path))
-    return judge, wrapper

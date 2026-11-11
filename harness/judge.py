@@ -1,5 +1,5 @@
 """
-The independent judge — pinned, non-drafter, over the OpenAI-compatible transport (E1).
+The independent judge — pinned, non-drafter, over a route the factory builds (E1).
 
 The harness's one privileged capability: an LLM-as-judge for the *semantic gap* no
 deterministic predicate can reach.  Three guardrails shape it, and this module is
@@ -8,9 +8,10 @@ where they are enforced in code, not merely documented:
 * **Grader/generator independence.**  The judge must be a *different* model from
   the drafter/in-run reviewer, over a *different* transport.  An in-run reviewer
   that shares the drafter's blind spots cannot be the unbiased grader of its own
-  pipeline (strategy §1).  :class:`JudgeConfig` rejects any drafter model, and
-  the default backend rejects the ``claude_cli`` transport, so the judge always
-  speaks over the OpenAI-compatible path to a non-drafter model.
+  pipeline (strategy §1).  :class:`JudgeConfig` rejects any drafter model.
+  Which other kinds of independence hold depends on the route, and
+  :data:`harness.judge_factory.INDEPENDENCE_POLICY` states them; the factory
+  is the only place a judge is built with a real backend.
 * **Pin + determinism.**  Model and version are pinned; temperature is 0.  A
   repin re-opens E1.5's advisory-only state, so both are recorded on every
   verdict's provenance.
@@ -24,9 +25,10 @@ Every verdict is typed :data:`~harness.verdict.EVIDENCE_TYPE_INFERRED` and, when
 :class:`~harness.provenance.ProvenanceLog` is attached, logged before it is
 returned — so "provenance for every verdict" is structural, not a convention.
 
-The judge is injectable: pass a ``backend`` callable (the
-:class:`~runner.transport.tool_loop.ToolLoopBackend` shape) and no network or
-``httpx`` is touched — the whole substrate is unit-testable offline.
+The judge never builds a backend: it must be given one (the
+:class:`~runner.transport.tool_loop.ToolLoopBackend` shape).  Production backends
+come from :func:`harness.judge_factory.build_judge`; a test passes a scripted one
+and no network or ``httpx`` is touched.
 
 Constitutional authority:
     Subordinate to CLAUDE.md.  Out-of-band QA substrate.  The judge never
@@ -68,7 +70,6 @@ __all__ = [
     "JudgeResult",
     "MajorityJudgeResult",
     "Judge",
-    "build_judge_backend",
     "canonical_model_id",
     "drafter_models",
     "parse_verdict",
@@ -240,44 +241,6 @@ def resolve_judge_config() -> JudgeConfig:
 
 
 # --------------------------------------------------------------------------- #
-# Backend construction
-# --------------------------------------------------------------------------- #
-
-
-def build_judge_backend(provider: Any, config: JudgeConfig) -> Backend:
-    """Build the real judge backend for a resolved provider configuration.
-
-    The judge model is pinned authoritatively from *config*, whatever model
-    the environment names.  Temperature and the token limit come from *config*
-    too.  A ``bedrock_converse`` provider builds the native Converse backend,
-    which needs no base URL (AN1a); every other non-CLI provider builds the
-    OpenAI-compatible HTTP backend, as before.
-
-    Raises
-    ------
-    JudgeIndependenceError
-        If *provider* is the ``claude_cli`` drafter transport.
-    """
-    from runner.transport.config import build_converse_backend, build_openai_backend
-
-    if provider.backend_name == "claude_cli":
-        raise JudgeIndependenceError(
-            "The independent judge requires a non-drafter API transport "
-            "(OpenAI-compatible or Bedrock Converse), but the resolved backend "
-            "is 'claude_cli' (the drafter transport). "
-            "Set ORCHESTRATOR_TRANSPORT_PRESET / ORCHESTRATOR_TRANSPORT_BACKEND "
-            "to a non-Claude backend for grader–generator independence."
-        )
-    provider = dataclasses.replace(provider, model=config.model)
-    build = (
-        build_converse_backend
-        if provider.backend_name == "bedrock_converse"
-        else build_openai_backend
-    )
-    return build(provider, temperature=config.temperature, max_tokens=config.max_tokens)
-
-
-# --------------------------------------------------------------------------- #
 # Result bundles
 # --------------------------------------------------------------------------- #
 
@@ -429,26 +392,20 @@ def _verdict_from_payload(payload: dict, *, metric: str, property_key: str) -> V
 
 
 class Judge:
-    """A pinned, non-drafter judge over the OpenAI-compatible transport.
+    """A pinned, non-drafter judge over the backend it is given.
 
     Parameters
     ----------
     config:
         A validated :class:`JudgeConfig` (pinned model+version, temp 0).
     backend:
-        Optional injected backend callable (the
-        :class:`~runner.transport.tool_loop.ToolLoopBackend` shape).  When
-        supplied, no network or ``httpx`` is touched — the path used by tests
-        and by callers that wire their own transport.  When ``None``, a real
-        backend is built lazily from ``resolve_provider_config()`` on first use
-        (:func:`build_judge_backend`): native Converse for ``bedrock_converse``,
-        OpenAI-compatible otherwise, and a ``claude_cli`` transport is rejected
-        for independence.  Note: the *transport*-independence check
-        (non-``claude_cli``) applies only to the default-built backend — the
-        judge cannot introspect an arbitrary injected callable's transport, so
-        on the injected path transport independence is the caller's
-        responsibility.  The *model*-level non-drafter guard
-        (:class:`JudgeConfig`) always applies regardless of backend.
+        The backend callable (the
+        :class:`~runner.transport.tool_loop.ToolLoopBackend` shape).  Required:
+        there is no default build.  A production backend comes from
+        :func:`harness.judge_factory.build_judge`, which applies the route's
+        independence policy before it constructs the judge; a test passes a
+        scripted one.  The *model*-level non-drafter guard
+        (:class:`JudgeConfig`) applies whatever the backend.
     provenance_log:
         Optional :class:`~harness.provenance.ProvenanceLog`.  When present, every
         verdict's provenance is appended before the result is returned.
@@ -469,7 +426,7 @@ class Judge:
         self,
         config: JudgeConfig,
         *,
-        backend: Backend | None = None,
+        backend: Backend,
         provenance_log: ProvenanceLog | None = None,
         clock: Clock | None = None,
         response_cache: ResponseCache | None = None,
@@ -477,6 +434,11 @@ class Judge:
     ) -> None:
         if isinstance(max_redraws, bool) or not isinstance(max_redraws, int) or max_redraws < 0:
             raise JudgeConfigError(f"max_redraws must be a non-negative int; got {max_redraws!r}.")
+        if backend is None:
+            raise JudgeConfigError(
+                "Judge needs a backend; there is no default build. Build a "
+                "production judge with harness.judge_factory.build_judge."
+            )
         self.config = config
         self._backend = backend
         self._provenance_log = provenance_log
@@ -502,9 +464,9 @@ class Judge:
     def attach_response_cache(self, cache: ResponseCache) -> None:
         """Attach a checkpoint to a judge built elsewhere.
 
-        The live assessors are built by their own builders
-        (``build_paced_judge``, ``build_subscription_judge``), so a command
-        that wants a checkpoint attaches it after the fact.  A second cache is
+        The live assessors are built by the factory
+        (:func:`harness.judge_factory.build_judge`), so a command that wants a
+        checkpoint attaches it after the fact.  A second cache is
         refused: two caches would each hold half a run and neither would
         replay it.
         """
@@ -526,16 +488,6 @@ class Judge:
 
     # -- transport -------------------------------------------------------- #
 
-    def _get_backend(self) -> Backend:
-        """Return the backend, building a real one from env config on first use."""
-        if self._backend is not None:
-            return self._backend
-
-        from runner.transport.config import resolve_provider_config
-
-        self._backend = build_judge_backend(resolve_provider_config(), self.config)
-        return self._backend
-
     def _send(self, system_prompt: str, user_prompt: str) -> str:
         """Send one chat request and return the raw content string (private).
 
@@ -555,8 +507,7 @@ class Judge:
             replayed = cache.take(key)
             if replayed is not None:
                 return replayed
-        backend = self._get_backend()
-        result = backend(
+        result = self._backend(
             [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},

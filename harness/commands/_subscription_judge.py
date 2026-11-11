@@ -3,22 +3,24 @@ The subscription assessor: a judge backend over the local ``claude`` CLI.
 
 Why this module exists
 ----------------------
-``Judge._get_backend`` refuses the ``claude_cli`` transport, and
-``build_paced_judge`` refuses it again — grader–generator independence
-(strategy §1).  Both refusals govern the **default-built** backend.  ``Judge``
-documents the *injected* backend as the seam for "callers that wire their own
-transport", and states that on that path transport independence is the caller's
-responsibility.  This module is such a caller.  What follows discharges that
-responsibility by stating exactly which axes of independence survive and which
-do not.
+The ``openai-compatible`` and ``bedrock-converse`` routes refuse the
+``claude_cli`` transport — grader–generator independence (strategy §1).  The
+``claude-cli`` route is the one route that speaks it.  The judge is built by
+:func:`harness.judge_factory.build_judge`, whose
+:data:`~harness.judge_factory.INDEPENDENCE_POLICY` row for ``claude-cli``
+states which axes of independence hold; this module holds the route's backend
+and checks, and what follows is the account behind that row.  The route also
+requires the transport environment to resolve to ``claude_cli``, so a
+workstation whose ``.env.harness`` points at another transport is refused,
+naming both, rather than reporting a transport it did not choose.
 
 What independence survives
 --------------------------
 **Model — preserved.**  ``JudgeConfig`` refuses every model in
 ``drafter_models()``, which it reads live from ``SKILL_MODEL`` and
 ``AGENT_MODEL``.  The assessor therefore can never be the model that drafted
-the sections under assessment.  :func:`build_subscription_judge` builds through
-``JudgeConfig``, so that guard is not bypassed here.
+the sections under assessment.  The factory re-applies that guard on this route
+as on every other, so it is not bypassed here.
 
 **Context — preserved, and the blind lane rests on it.**  The assessor sees the
 rubric prompts over the frozen evidence pack, and nothing else.  Two controls
@@ -55,7 +57,7 @@ different-family assessor is.
 A report produced through this backend must say so.  The ``model@version`` pin
 is where it says it: set ``HARNESS_JUDGE_VERSION`` to a tag naming the
 transport, following the convention the Groq pin already uses
-(``llama-3.3-70b-versatile@groq-llama-3.3-70b@2026-08-03``).  The builder
+(``llama-3.3-70b-versatile@groq-llama-3.3-70b@2026-08-03``).  The factory
 refuses a version tag that does not contain :data:`TRANSPORT_TAG` (spec
 decision 10), so a report cannot carry this transport under another name.
 
@@ -69,8 +71,7 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
-from harness.judge import Judge, JudgeConfig, JudgeError
-from harness.provenance import ProvenanceLog
+from harness.judge_factory import JudgeRouteError
 from runner.claude_transport import (
     NO_TOOLS,
     ClaudeCLIUnavailableError,
@@ -85,7 +86,6 @@ __all__ = [
     "ClaudeCLIJudgeBackend",
     "SubscriptionJudgeError",
     "assessor_working_dir",
-    "build_subscription_judge",
     "is_claude_model_pin",
 ]
 
@@ -110,7 +110,7 @@ DEFAULT_MAX_RETRIES: int = 2
 DEFAULT_RETRY_DELAY: float = 5.0
 
 
-class SubscriptionJudgeError(JudgeError):
+class SubscriptionJudgeError(JudgeRouteError):
     """The subscription assessor was asked for something it cannot be.
 
     A :class:`~harness.judge.JudgeError` so the commands convert it to their
@@ -288,63 +288,3 @@ class ClaudeCLIJudgeBackend:
             "unreachable: the retry loop exited without returning or raising"
         )
 
-
-def build_subscription_judge(
-    cfg: JudgeConfig,
-    *,
-    prov_path: Path,
-    repo_root: Path | None = None,
-    working_dir: Path | None = None,
-    timeout_seconds: int = 300,
-    max_retries: int = DEFAULT_MAX_RETRIES,
-    log: Callable[[str], None] = print,
-) -> tuple[Judge, ClaudeCLIJudgeBackend]:
-    """Build a judge that speaks the Max subscription, with its pin recorded.
-
-    Mirrors :func:`~harness.commands.freeze_grounding_baselines.build_paced_judge`
-    in shape and return value, and differs in exactly one way: the backend is
-    the ``claude`` CLI rather than an OpenAI-compatible endpoint.  No pacing
-    wrapper — there is no TPM or RPM cap to pace against, and the calls are
-    sequential subprocesses.
-
-    *working_dir* defaults to a fresh directory from :func:`assessor_working_dir`.
-
-    Raises
-    ------
-    SubscriptionJudgeError
-        If the pinned model is not one the ``claude`` CLI can resolve; if the
-        version tag does not name this transport (:data:`TRANSPORT_TAG`); or if
-        the working directory is missing or lies inside the repository.  The
-        drafter-model guard is :class:`JudgeConfig`'s and has already run by the
-        time *cfg* exists.
-    """
-    if not is_claude_model_pin(cfg.model):
-        raise SubscriptionJudgeError(
-            f"HARNESS_JUDGE_MODEL is {cfg.model!r}, which the 'claude' CLI "
-            f"cannot resolve. The subscription assessor needs a Claude pin "
-            f"(e.g. 'claude-sonnet-5'); the Groq pin belongs to the "
-            f"OpenAI-compatible transport."
-        )
-    if TRANSPORT_TAG not in str(cfg.version):
-        raise SubscriptionJudgeError(
-            f"HARNESS_JUDGE_VERSION is {cfg.version!r}, which does not name this "
-            f"transport. The report records model@version and nothing else about "
-            f"the assessor, so the tag must contain {TRANSPORT_TAG!r} (e.g. "
-            f"'claude-cli-subscription@2026-10-05'); pass --assessor-version."
-        )
-    root = _resolve_repo_root(repo_root)
-    backend = ClaudeCLIJudgeBackend(
-        model=cfg.model,
-        max_tokens=cfg.max_tokens,
-        working_dir=working_dir if working_dir is not None else assessor_working_dir(root),
-        repo_root=root,
-        timeout_seconds=timeout_seconds,
-        max_retries=max_retries,
-        log=log,
-    )
-    log(
-        f"    assessor child: tools disabled (--tools \"\" --strict-mcp-config), "
-        f"working directory {backend.working_dir}"
-    )
-    judge = Judge(cfg, backend=backend, provenance_log=ProvenanceLog(prov_path))
-    return judge, backend

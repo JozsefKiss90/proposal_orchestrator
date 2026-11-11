@@ -3,7 +3,7 @@
 E1.5 faithfulness-calibration runner (turnkey, resumable) — "run the first calibration".
 
 Loads the human-labeled gold set, runs the pinned non-drafter judge over every
-pair through the freeze runner's paced/retry backend (so ~42 calls don't trip
+pair through the judge factory's paced/retry route (so ~42 calls don't trip
 Groq's 6k tokens/min limit), computes precision/recall, applies the graduation
 threshold, and writes a decision-log DRAFT.
 
@@ -30,7 +30,6 @@ Judge config comes from `.env.harness` (auto-loaded). Advisory; never a runtime 
 """
 from __future__ import annotations
 
-import dataclasses
 import datetime
 import json
 import os
@@ -40,12 +39,11 @@ from pathlib import Path
 from harness.calibration import calibrate, graduation_for
 from harness.commands._common import REPO_ROOT as _ROOT
 from harness.commands._common import load_harness_env
-from harness.commands.freeze_grounding_baselines import PacedRetryingBackend
 from harness.faithfulness import judge_pair_supported
 from harness.gold_set import GoldSet, gold_set_hash, load_gold_set
-from harness.judge import Judge, JudgeResponseError, resolve_judge_config
+from harness.judge import JudgeError, JudgeResponseError, resolve_judge_config
+from harness.judge_factory import ROUTE_OPENAI_COMPATIBLE, build_judge
 from harness.provenance import ProvenanceLog
-from runner.transport.config import build_openai_backend, resolve_provider_config
 
 GOLD = "harness/gold_sets/faithfulness_gold_excellence.jsonl"
 CKPT = "harness/gold_sets/faithfulness_calibration_checkpoint.json"
@@ -53,18 +51,6 @@ PROV = "harness/gold_sets/provenance_faithfulness_calibration.jsonl"
 
 #: The judge's decision is a clear "passed": true|false even when the JSON envelope glitches.
 _PASSED_RE = re.compile(r'"passed"\s*:\s*(true|false)', re.IGNORECASE)
-
-
-def _paced_judge(cfg, *, tpm, rpm, max_retries):
-    provider = resolve_provider_config()
-    if provider.backend_name == "claude_cli":
-        raise SystemExit(
-            "transport resolves to 'claude_cli' (the drafter transport). Point "
-            "ORCHESTRATOR_TRANSPORT_* in .env.harness at the non-drafter Groq judge."
-        )
-    provider = dataclasses.replace(provider, model=cfg.model)
-    inner = build_openai_backend(provider, temperature=cfg.temperature, max_tokens=cfg.max_tokens)
-    return Judge(cfg, backend=PacedRetryingBackend(inner, tpm_budget=tpm, rpm_budget=rpm, max_retries=max_retries))
 
 
 def _env_int(name, default):
@@ -151,7 +137,11 @@ def main() -> int:
     jr = _env_int("HARNESS_JUDGE_JSON_RETRIES", 3)
     print(f"pacing: <= {tpm} TPM / {rpm} RPM, transport-retry x{mr}; parse-retry x{jr}; checkpoint -> {CKPT}")
 
-    judge = _paced_judge(cfg, tpm=tpm, rpm=rpm, max_retries=mr)
+    # No provenance log on the judge: _run appends each kept record itself.
+    try:
+        judge, _wrapper = build_judge(ROUTE_OPENAI_COMPATIBLE, cfg, tpm=tpm, rpm=rpm, max_retries=mr)
+    except JudgeError as exc:
+        raise SystemExit(str(exc)) from exc
     prov = ProvenanceLog(_ROOT / PROV)
     try:
         pred_by_id, salvaged, excluded = _run(gs, judge, ckpt_path, prov, retries=jr)

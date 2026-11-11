@@ -96,7 +96,6 @@ from harness.expectation_grounding import (
 )
 from harness.expectations import ExpectationError, section_paths_for
 from harness.judge import Judge, JudgeError, resolve_judge_config
-from harness.provenance import ProvenanceLog
 from harness.profile import PreEvaluationProfile
 from harness.rubrics import ProfileBundle, RubricError, RubricSet, load_profile_bundle
 from harness.status_faithfulness import SEVERITY_NONE, STATUS_CONFIRMED
@@ -963,8 +962,11 @@ def grade_all(
 
 
 def _build_judge(provenance_path: Path) -> Judge:
-    """The CLI's judge: env-pinned config + a durable provenance trail."""
-    return Judge(resolve_judge_config(), provenance_log=ProvenanceLog(provenance_path))
+    """The CLI's judge: env-pinned config on the openai-compatible route + a durable provenance trail."""
+    from harness.judge_factory import ROUTE_OPENAI_COMPATIBLE, build_judge
+
+    judge, _wrapper = build_judge(ROUTE_OPENAI_COMPATIBLE, resolve_judge_config(), prov_path=provenance_path)
+    return judge
 
 
 # --------------------------------------------------------------------------- #

@@ -91,7 +91,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from harness.blind_assessment import (
     DEFAULT_PACKAGE_BUDGET,
@@ -287,43 +287,29 @@ def _refuse_an_omitted_converse_transport() -> None:
 def _live_judge(args: argparse.Namespace, repo_root: Path) -> Judge:
     """The live assessor: the ``.env.harness`` pin over the chosen transport.
 
-    Two transports, one pin.  ``openai-compatible`` is the default and the
+    The transport is the judge route (:mod:`harness.judge_factory`), which
+    checks that the environment agrees and applies the route's row of
+    ``INDEPENDENCE_POLICY``.  ``openai-compatible`` is the default and the
     independent path: a non-drafter model at a non-Claude endpoint.
     ``claude-cli`` speaks the Max subscription instead, which trades transport
     and vendor independence for needing no API key; the model-level guard and
     the assessor's blindness both survive that trade.  See
     ``harness/commands/_subscription_judge.py`` for what each axis costs.
     """
-    cfg = _judge_config(args)
-    if args.transport == TRANSPORT_BEDROCK_CONVERSE:
-        from harness.commands._converse_judge import build_converse_judge
+    from harness.judge_factory import build_judge
 
-        judge, _backend = build_converse_judge(
-            cfg,
-            prov_path=repo_root / args.provenance,
-            max_retries=args.max_retries,
-        )
-        return judge
-    if args.transport == TRANSPORT_CLAUDE_CLI:
-        from harness.commands._subscription_judge import build_subscription_judge
-
-        judge, _backend = build_subscription_judge(
-            cfg,
-            prov_path=repo_root / args.provenance,
-            repo_root=repo_root,
-            timeout_seconds=args.cli_timeout,
-            max_retries=args.max_retries,
-        )
-        return judge
-
-    from harness.commands.freeze_grounding_baselines import build_paced_judge
-
-    judge, _wrapper = build_paced_judge(
-        cfg,
-        tpm=args.tpm,
-        rpm=args.rpm,
-        max_retries=args.max_retries,
+    route = _transport(args)
+    options: dict[str, Any] = {}
+    if route == TRANSPORT_OPENAI:
+        options = {"tpm": args.tpm, "rpm": args.rpm}
+    elif route == TRANSPORT_CLAUDE_CLI:
+        options = {"repo_root": repo_root, "timeout_seconds": args.cli_timeout}
+    judge, _wrapper = build_judge(
+        route,
+        _judge_config(args),
         prov_path=repo_root / args.provenance,
+        max_retries=args.max_retries,
+        **options,
     )
     return judge
 
