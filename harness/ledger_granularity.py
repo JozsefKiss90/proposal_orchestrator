@@ -44,7 +44,6 @@ ASCII summary table.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import re
 import sys
 from pathlib import Path
@@ -55,6 +54,7 @@ from harness.claim_ledger import (
     dedup_ledger_claims,
     load_section_prose,
 )
+from harness.content_hash import file_hash
 from harness.regression import (
     DEFAULT_GOLDEN_DIR,
     DEFAULT_SECTIONS_DIR,
@@ -78,10 +78,6 @@ DEFAULT_OUT_REL = (
     "docs/tier4_orchestration_state/decision_log/"
     "lg1_ledger_granularity_measurement_2026-07-27.json"
 )
-
-
-def _sha256(text: str) -> str:
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def _count_sentences(text: str) -> int:
@@ -128,7 +124,7 @@ def measure_section(
     per_sub_identity = []
     all_identical = True
     for ss in prose:
-        cur_hash = _sha256(ss.content)
+        cur_hash = file_hash(ss.content.encode("utf-8"))
         gold_hash = golden_sub_hash.get(ss.sub_section_id)
         identical = cur_hash == gold_hash
         all_identical = all_identical and identical

@@ -1,6 +1,6 @@
 # 04 — One content-hash module: one canonical rule, two named formats
 
-Status: needs-triage
+Status: in-progress
 Type: task
 Blocked by: None — can start immediately
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate E. Not grilled; written on
@@ -51,17 +51,17 @@ After this ticket, callers ask for a **content hash** (a parsed value, canonical
 
 Characterisation first (written before anything moves, all must stay green):
 
-- [ ] On fixtures, the candidate hash, profile version, rubric fingerprint, rubric-set fingerprint, regression section fingerprint, gold-set hash, materiality-set hash, evidence-preflight pack-set hash and blind-baseline report hash are byte-identical before and after.
-- [ ] An existing frozen blind baseline and an existing E4 fingerprint fixture still load and verify.
+- [x] On fixtures, the candidate hash, profile version, rubric fingerprint, rubric-set fingerprint, regression section fingerprint, gold-set hash, materiality-set hash, evidence-preflight pack-set hash and blind-baseline report hash are byte-identical before and after.
+- [x] An existing frozen blind baseline and an existing E4 fingerprint fixture still load and verify.
 
 Failing tests first:
 
-- [ ] The numbered-path helper accepts a bare-hex digest and yields the same name as for the prefixed form of the same digest.
-- [ ] The short form of a prefixed and of a bare digest of the same bytes is identical.
+- [x] The numbered-path helper accepts a bare-hex digest and yields the same name as for the prefixed form of the same digest.
+- [x] The short form of a prefixed and of a bare digest of the same bytes is identical.
 
 Then:
 
-- [ ] No harness module outside the hash module calls `hashlib.sha256` or builds canonical JSON for hashing (a boundary test pins this; the response checkpoint's per-response hash may use the file-hash operation).
+- [x] No harness module outside the hash module calls `hashlib.sha256` or builds canonical JSON for hashing (a boundary test pins this; the response checkpoint's per-response hash may use the file-hash operation).
 - [ ] Display code uses the short form; no hard-coded slice lengths for hashes remain in the DN record modules.
 - [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
 - [ ] **PE-09 acceptance lane green** (admission rule 5: evidence-preflight and blind-assessment code change).
@@ -83,3 +83,4 @@ Size: ~150–250 changed non-test lines, mostly deletions and call-site swaps
 
 - Deferred at Step 3 (2026-11-06): on the path but byte-identical by design, so no value for V14/V16 before the deadline; touches freeze inputs two days before the bundle. Revisit after V16.
 - Wave 2a (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.
+- Session 2026-11-11 (base `92ce1e16`): targeted 59 modules, 1 failed (on the §5 red line) / 2,952 passed / 17 skipped, then 221 passed / 2 skipped after the last edits; display box open (operator_review `[:16]` Markdown widths kept for byte-equal replay).

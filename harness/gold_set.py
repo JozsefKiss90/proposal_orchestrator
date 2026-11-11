@@ -26,13 +26,13 @@ Constitutional authority:
 
 from __future__ import annotations
 
-import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
 from runner.atomic_write import atomic_write_text
+from harness.content_hash import digest
 
 __all__ = [
     "RECOMMENDED_MIN_PAIRS",
@@ -266,17 +266,16 @@ def gold_set_hash(gold_set: GoldSet) -> str:
     so a re-label or a claim edit changes the hash (a calibration recorded
     against an old hash is visibly stale), but a cosmetic note edit does not.
     """
-    h = hashlib.sha256()
-    for p in gold_set.pairs:
-        h.update(
-            json.dumps(
-                [p.pair_id, p.claim, p.source_ref, p.source_excerpt, p.supported],
-                ensure_ascii=False,
-                sort_keys=True,
-            ).encode("utf-8")
-        )
-        h.update(b"\x00")
-    return f"sha256:{h.hexdigest()}"
+    data = b"".join(
+        json.dumps(
+            [p.pair_id, p.claim, p.source_ref, p.source_excerpt, p.supported],
+            ensure_ascii=False,
+            sort_keys=True,
+        ).encode("utf-8")
+        + b"\x00"
+        for p in gold_set.pairs
+    )
+    return digest(data, prefixed=True)
 
 
 def _even_spaced_indices(n: int, k: int) -> list[int]:

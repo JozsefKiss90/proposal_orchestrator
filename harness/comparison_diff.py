@@ -62,6 +62,7 @@ from harness.esr_comparison import (
     pointer_rule_of,
     load_comparison,
 )
+from harness.content_hash import short_hash
 from harness.evidence_preflight import file_sha256
 
 DIFF_RECORD_TYPE = "esr_comparison_diff"
@@ -189,11 +190,11 @@ def _bind(before: LoadedComparison, after: LoadedComparison) -> dict[str, Any]:
         if a != b:
             raise ComparisonDiffError(
                 f"the two comparisons are over different {name}s "
-                f"({str(a)[:19]} vs {str(b)[:19]}); a successor shares its predecessor's evidence."
+                f"({short_hash(str(a), keep_prefix=True)} vs {short_hash(str(b), keep_prefix=True)}); a successor shares its predecessor's evidence."
             )
     if before.sha256 == after.sha256:
         raise ComparisonDiffError(
-            f"both paths name the same comparison ({before.sha256[:12]}); there is nothing to diff."
+            f"both paths name the same comparison ({short_hash(before.sha256)}); there is nothing to diff."
         )
     missing = sorted(set(before.rows) - set(after.rows))
     added = sorted(set(after.rows) - set(before.rows))
@@ -478,9 +479,9 @@ def write_diff(diff: Mapping[str, Any], out_dir: Path | str) -> tuple[Path, Path
     """Write the diff as JSON and as Markdown; never overwrite either."""
     out = Path(out_dir)
     sha = str(diff["successor"]["comparison_sha256"])
-    target = next_report_path(out, "sha256:" + sha, prefix=_DIFF_PREFIX)
+    target = next_report_path(out, sha, prefix=_DIFF_PREFIX)
     seq = target.stem.rsplit("_", 1)[1]
-    markdown = out / f"{_DIFF_PREFIX}_{sha[:12]}_{seq}{_MARKDOWN_SUFFIX}"
+    markdown = out / f"{_DIFF_PREFIX}_{short_hash(sha)}_{seq}{_MARKDOWN_SUFFIX}"
     if markdown.exists():
         raise ComparisonDiffError(f"{markdown} already exists; nothing overwritten.")
     out.mkdir(parents=True, exist_ok=True)
@@ -549,8 +550,8 @@ def render_diff(diff: Mapping[str, Any]) -> str:
     add("")
     b = diff["bindings"]
     add(
-        f"Both are over baseline report `{str(b['baseline_report_sha256'])[:12]}`, ESR record "
-        f"`{str(b['esr_record_sha256'])[:12]}` and candidate `{str(b['candidate_hash'])[:19]}`, "
+        f"Both are over baseline report `{short_hash(str(b['baseline_report_sha256']))}`, ESR record "
+        f"`{short_hash(str(b['esr_record_sha256']))}` and candidate `{short_hash(str(b['candidate_hash']), keep_prefix=True)}`, "
         f"and both cover all {b['observations']} observations. The criterion scores are "
         "identical in both: no assessor ran."
     )
@@ -628,10 +629,10 @@ def render_summary(diff: Mapping[str, Any]) -> str:
     """One screen for the terminal."""
     b = diff["bindings"]
     lines = [
-        f"COMPARISON DIFF  {str(diff['predecessor']['comparison_sha256'])[:12]} -> "
-        f"{str(diff['successor']['comparison_sha256'])[:12]}",
-        f"baseline:      {str(b['baseline_report_sha256'])[:12]}  "
-        f"candidate {str(b['candidate_hash'])[:19]}",
+        f"COMPARISON DIFF  {short_hash(str(diff['predecessor']['comparison_sha256']))} -> "
+        f"{short_hash(str(diff['successor']['comparison_sha256']))}",
+        f"baseline:      {short_hash(str(b['baseline_report_sha256']))}  "
+        f"candidate {short_hash(str(b['candidate_hash']), keep_prefix=True)}",
         f"observations:  {b['observations']}  changed {diff['rows_changed']}  "
         f"unchanged {len(diff['rows_unchanged'])}",
         f"counts moved:  {len(diff['counts']['changed'])}",

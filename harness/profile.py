@@ -26,11 +26,12 @@ Constitutional authority:
 
 from __future__ import annotations
 
-import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
+
+from harness.content_hash import content_hash
 
 __all__ = [
     "ProfileError",
@@ -41,7 +42,6 @@ __all__ = [
     "ComponentPin",
     "Scoring",
     "PreEvaluationProfile",
-    "canonical_hash",
     "parse_profile",
     "load_profile",
     "default_profile",
@@ -56,16 +56,6 @@ DEFAULT_PROFILE_PATH: Path = Path("harness/profiles/msca_pf_default.json")
 
 class ProfileError(Exception):
     """The profile document is missing, malformed, or inconsistent (fail-closed)."""
-
-
-def canonical_hash(data: Any) -> str:
-    """A ``sha256:`` hash of *data*'s canonical JSON (sorted keys, compact).
-
-    Formatting-invariant: two files holding the same JSON value hash alike
-    whatever their whitespace or key order.
-    """
-    canonical = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 # --------------------------------------------------------------------------- #
@@ -312,7 +302,7 @@ def parse_profile(data: Any, *, source_path: Path | None = None) -> PreEvaluatio
         registry_path=registry_path,
         scorecard=scorecard,
         rubric_set=rubric_set,
-        document_hash=canonical_hash(data),
+        document_hash=content_hash(data),
         source_path=source_path,
         criterion_appendix_mapping=mapping_path,
     )
@@ -450,7 +440,7 @@ def profile_version(
     changes — the profile-level counterpart of
     :func:`harness.rubrics.rubric_fingerprint`.
     """
-    return canonical_hash(
+    return content_hash(
         {
             "profile_id": profile.profile_id,
             "document_hash": profile.document_hash,

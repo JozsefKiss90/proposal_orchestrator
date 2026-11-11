@@ -44,12 +44,12 @@ Constitutional authority:
 from __future__ import annotations
 
 import dataclasses
-import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
+from harness.content_hash import content_hash
 from harness.appendix_mapping import (
     AppendixMappingError,
     CriterionAppendixMapping,
@@ -75,7 +75,6 @@ from harness.profile import (
     PreEvaluationProfile,
     ProfileError,
     Scoring,
-    canonical_hash,
     default_profile,
     load_profile,
     parse_scoring,
@@ -175,8 +174,7 @@ def rubric_fingerprint(rubric: Rubric) -> str:
     data = rubric.to_dict()
     del data["source_page"]
     del data["form_name"]
-    canonical = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return content_hash(data)
 
 
 @dataclass(frozen=True)
@@ -199,8 +197,12 @@ class RubricSet:
 
     @property
     def fingerprint(self) -> str:
-        """A stable ``sha256:`` hash over the set identity + every rubric fingerprint."""
-        canonical = json.dumps(
+        """A stable ``sha256:`` hash over the set identity + every rubric fingerprint.
+
+        Its stored format escapes non-ASCII, unlike every other content hash, so
+        it says so explicitly: fingerprints already recorded keep their bytes.
+        """
+        return content_hash(
             {
                 "rubric_set_id": self.rubric_set_id,
                 "version": self.version,
@@ -208,10 +210,8 @@ class RubricSet:
                 "scorecard_version": self.scorecard_version,
                 "rubrics": [rubric_fingerprint(r) for r in self.rubrics],
             },
-            sort_keys=True,
-            separators=(",", ":"),
+            ensure_ascii=True,
         )
-        return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 # --------------------------------------------------------------------------- #
@@ -478,7 +478,7 @@ def load_profile_bundle(
         scoring = parse_scoring(scorecard_data, profile.criterion_ids)
     except ProfileError as exc:
         raise RubricError(str(exc)) from exc
-    scorecard_hash = canonical_hash(scorecard_data)
+    scorecard_hash = content_hash(scorecard_data)
     mapping: CriterionAppendixMapping | None = None
     if profile.criterion_appendix_mapping is not None:
         mapping_pin = rubric_set.appendix_mapping_pin or {}

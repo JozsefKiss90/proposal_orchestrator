@@ -185,7 +185,19 @@ _Avoid_: readiness checklist
 Every item an approval left open, and what closes it.
 
 **Record binding**:
-Tying a successor record to the records it reads, by the hash of their bytes.
+Tying a successor record to the records it reads, by the file hash of their bytes.
+
+**Content hash**:
+The hash of a parsed value's canonical JSON, stored with the `sha256:` prefix. Formatting-invariant.
+The candidate hash, profile version and rubric fingerprint are content hashes.
+
+**File hash**:
+The hash of raw bytes, stored as bare hex (`report_sha256`, `comparison_sha256`).
+
+**Short form**:
+The first 12 hex characters of a content hash or a file hash, the same for either format; used for
+file names and display.
+_Avoid_: hash12, short hash (in prose)
 
 ### Assurance
 

@@ -62,6 +62,7 @@ from runner.working_assumptions import (
     WorkingAssumptions,
     load_working_assumptions,
 )
+from harness.content_hash import short_hash
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
@@ -583,7 +584,7 @@ def main(argv=None) -> int:
     atomic_write_json(plan, budget_path, prefix="rubric_run_budget_")
     t, a = plan["totals"], plan["assessment"]
     print(f"judge : {cfg.model}@{cfg.version}")
-    print(f"profile: {bundle.profile_id} [{bundle.version[:19]}]")
+    print(f"profile: {bundle.profile_id} [{short_hash(bundle.version, keep_prefix=True)}]")
     print(
         f"plan  : {t['cells']} cells, {t['unique_claims']} unique claims -> "
         f"~{t['calls_est']} calls / ~{t['tokens_est']:,} tokens "

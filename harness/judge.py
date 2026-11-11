@@ -37,7 +37,6 @@ Constitutional authority:
 from __future__ import annotations
 
 import dataclasses
-import hashlib
 import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -45,6 +44,7 @@ from typing import Any, Callable, Generic, Protocol, TypeVar
 
 from runner.json_extract import extract_first_json_object
 from runner.model_ids import canonical_model_id
+from harness.content_hash import file_hash
 from harness.provenance import ProvenanceLog, ProvenanceRecord, prompt_hash
 from harness.response_cache import ResponseCache
 from harness.verdict import (
@@ -642,7 +642,7 @@ class Judge:
                         sample_index=sample_index,
                         attempt=attempt,
                         reason=str(exc),
-                        response_sha256=hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+                        response_sha256=file_hash(raw.encode("utf-8")),
                         response_chars=len(raw),
                         replayed=replayed,
                     )

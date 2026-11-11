@@ -33,11 +33,12 @@ Constitutional authority:
 
 from __future__ import annotations
 
-import hashlib
 import textwrap
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Protocol, runtime_checkable
+
+from harness.content_hash import file_hash
 
 __all__ = [
     "SOURCE_ROLES",
@@ -99,9 +100,8 @@ class BindingCheck:
         return not (self.missing or self.edited_immutable or self.stale_tracked)
 
 
-def file_sha256(path: Path) -> str:
-    """The sha256 of *path*'s bytes, hex, no prefix."""
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+#: The file hash of a path's bytes, bare hex; kept under this name for its importers.
+file_sha256 = file_hash
 
 
 def check_bindings(sources: Iterable[Bound], repo_root: Path) -> BindingCheck:

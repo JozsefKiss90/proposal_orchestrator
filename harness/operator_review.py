@@ -95,6 +95,7 @@ from harness.esr_comparison import (
     resolve_register_pointer,
     verify_evidence,
 )
+from harness.content_hash import short_hash
 from harness.evidence_preflight import file_sha256
 
 REVIEW_NOTES_RECORD_TYPE = "esr_review_notes"
@@ -452,8 +453,8 @@ def _expect_sha(path: Path, declared: Any, *, role: str) -> str:
     actual = file_sha256(path)
     if isinstance(declared, str) and declared and actual != declared:
         raise OperatorReviewError(
-            f"{role} at {path} hashes to {actual[:12]}, the comparison recorded "
-            f"{declared[:12]}. The review is refused: the artifact moved under the report."
+            f"{role} at {path} hashes to {short_hash(actual)}, the comparison recorded "
+            f"{short_hash(declared)}. The review is refused: the artifact moved under the report."
         )
     return actual
 
@@ -523,8 +524,8 @@ def resolve_inputs(
     report_sha = str(frozen.record.get("report_sha256") or "")
     if report_sha != baseline_block.get("report_sha256"):
         raise OperatorReviewError(
-            f"the frozen baseline at {baseline_dir} is report {report_sha[:12]}, the "
-            f"comparison was built over {str(baseline_block.get('report_sha256'))[:12]}."
+            f"the frozen baseline at {baseline_dir} is report {short_hash(report_sha)}, the "
+            f"comparison was built over {short_hash(str(baseline_block.get('report_sha256')))}."
         )
     baseline_report = json.loads(frozen.copy_path.read_text(encoding="utf-8-sig"))
     inventory.append(
@@ -545,8 +546,8 @@ def resolve_inputs(
     actual_hash = candidate_hash(candidate)
     if actual_hash != cand_block.get("candidate_hash"):
         raise OperatorReviewError(
-            f"the candidate at {cand_dir} hashes to {actual_hash[:19]}, the comparison "
-            f"was built over {str(cand_block.get('candidate_hash'))[:19]}."
+            f"the candidate at {cand_dir} hashes to {short_hash(actual_hash, keep_prefix=True)}, the comparison "
+            f"was built over {short_hash(str(cand_block.get('candidate_hash')), keep_prefix=True)}."
         )
     inventory.append(
         InputRecord(
@@ -568,8 +569,8 @@ def resolve_inputs(
         hist_hash = candidate_hash(historical)
         if hist_hash != hist_block.get("candidate_hash"):
             raise OperatorReviewError(
-                f"the historical candidate at {hist_dir} hashes to {hist_hash[:19]}, the "
-                f"comparison was built over {str(hist_block.get('candidate_hash'))[:19]}."
+                f"the historical candidate at {hist_dir} hashes to {short_hash(hist_hash, keep_prefix=True)}, the "
+                f"comparison was built over {short_hash(str(hist_block.get('candidate_hash')), keep_prefix=True)}."
             )
         inventory.append(
             InputRecord(
@@ -613,7 +614,7 @@ def resolve_inputs(
                 role="integrity audit",
                 path=_portable(a_path, repo_root),
                 sha256=a_sha,
-                note=f"over candidate {str(entry.get('candidate_hash'))[:19]}",
+                note=f"over candidate {short_hash(str(entry.get('candidate_hash')), keep_prefix=True)}",
             )
         )
     try:
@@ -894,8 +895,8 @@ def build_review(
     """
     if notes.comparison_sha256 != inputs.comparison_sha256:
         raise OperatorReviewError(
-            f"the review notes are bound to comparison {notes.comparison_sha256[:12]}, "
-            f"this one is {inputs.comparison_sha256[:12]}."
+            f"the review notes are bound to comparison {short_hash(notes.comparison_sha256)}, "
+            f"this one is {short_hash(inputs.comparison_sha256)}."
         )
     rows = list(inputs.comparison.get("rows") or [])
     row_ids = [str(r.get("observation_id")) for r in rows]
@@ -966,8 +967,8 @@ def _approval_record(inputs: ResolvedInputs, notes: ReviewNotes) -> InputRecord 
     pinned = approval.get("sha256")
     if isinstance(pinned, str) and pinned.strip() and actual != pinned.strip():
         raise OperatorReviewError(
-            f"the operator approval record at {declared} hashes to {actual[:12]}, the notes "
-            f"recorded {pinned[:12]}. The report is refused: the record the decisions were "
+            f"the operator approval record at {declared} hashes to {short_hash(actual)}, the notes "
+            f"recorded {short_hash(pinned)}. The report is refused: the record the decisions were "
             "transcribed from is not the one on disk."
         )
     return InputRecord(
@@ -1535,10 +1536,10 @@ def render_decisions(review: Review, *, review_name: str | None = None) -> str:
 
 
 def next_markdown_path(out_dir: Path, digest: str, *, prefix: str) -> Path:
-    """The next free ``<prefix>_<hash12>_<NNNN>.md`` under *out_dir*.
+    """The next free ``<prefix>_<short>_<NNNN>.md`` under *out_dir*.
 
     The shared sequencer of every harness writer, with the Markdown suffix;
-    *digest* is ``sha256:<hex>`` as that sequencer expects.  Nothing is ever
+    *digest* is a content hash or a file hash.  Nothing is ever
     overwritten: an earlier review of the same comparison stays as the
     operator read it.
     """
@@ -1551,10 +1552,8 @@ def write_review(review: Review, out_dir: Path | str) -> tuple[Path, Path]:
     The two share a sequence number, as the comparison and its revisions do.
     """
     out = Path(out_dir)
-    short = review.inputs.comparison_sha256[:12]
-    target = next_markdown_path(
-        out, "sha256:" + review.inputs.comparison_sha256, prefix=_REVIEW_PREFIX
-    )
+    short = short_hash(review.inputs.comparison_sha256)
+    target = next_markdown_path(out, review.inputs.comparison_sha256, prefix=_REVIEW_PREFIX)
     seq = target.stem.rsplit("_", 1)[1]
     decisions = out / f"{_DECISIONS_PREFIX}_{short}_{seq}{_MARKDOWN_SUFFIX}"
     if decisions.exists():
@@ -1572,8 +1571,8 @@ def render_summary(review: Review) -> str:
     counts = review.counts
     crit = counts["criticisms"]
     lines = [
-        f"OPERATOR REVIEW  comparison {review.inputs.comparison_sha256[:12]}  "
-        f"notes {review.notes.sha256[:12]}",
+        f"OPERATOR REVIEW  comparison {short_hash(review.inputs.comparison_sha256)}  "
+        f"notes {short_hash(review.notes.sha256)}",
         f"state:         {review.notes.review_state}",
         f"observations:  {counts['observations']}  "
         f"criticisms {crit['total']}  strengths {counts['strengths']['total']} "

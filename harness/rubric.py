@@ -75,6 +75,7 @@ from runner.working_assumptions import (
     WorkingAssumptionsError,
     load_working_assumptions,
 )
+from harness.content_hash import short_hash
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
@@ -835,7 +836,7 @@ def render_report(report: Mapping[str, Any]) -> str:
         raise RubricReportError("report 'cells' must be an array.")
     summary = report.get("summary", {})
 
-    fingerprint = str(report.get("rubric_set_fingerprint") or "")[:19]
+    fingerprint = short_hash(str(report.get("rubric_set_fingerprint") or ""), keep_prefix=True)
     header = (
         f"EXPECTATION RUBRIC GRID - coverage x grounding "
         f"({len(cells)} cells; no blended score)\n"
@@ -844,7 +845,7 @@ def render_report(report: Mapping[str, Any]) -> str:
         f"[{fingerprint}]  "
         f"judge: {report.get('judge_model')}/{report.get('judge_version')}\n"
         f"profile: {report.get('profile_id', '') or '-'} "
-        f"[{str(report.get('profile_version') or '')[:19]}]\n"
+        f"[{short_hash(str(report.get('profile_version') or ''), keep_prefix=True)}]\n"
         f"advisory={report.get('advisory')} blocking={report.get('blocking')}\n"
     )
 

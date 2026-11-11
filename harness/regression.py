@@ -55,7 +55,6 @@ Constitutional authority:
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from dataclasses import dataclass
@@ -65,6 +64,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from runner.atomic_write import atomic_write_json
 from harness.claim_ledger import SubSectionProse, load_section_prose
+from harness.content_hash import content_hash, file_hash
 from harness.judge import Judge
 from harness.status_faithfulness import (
     FaithfulnessBaseline,
@@ -318,7 +318,7 @@ class SubSectionFingerprint:
         return cls(
             sub_section_id=sub.sub_section_id,
             title=sub.title,
-            content_sha256=hashlib.sha256(sub.content.encode("utf-8")).hexdigest(),
+            content_sha256=file_hash(sub.content.encode("utf-8")),
             char_count=len(sub.content),
         )
 
@@ -408,14 +408,6 @@ class SectionFingerprint:
         )
 
 
-def _canonical_artifact_sha256(data: Any) -> str:
-    """Hash the *parsed* artifact canonically, so formatting/BOM churn is inert."""
-    canonical = json.dumps(
-        data, sort_keys=True, ensure_ascii=False, separators=(",", ":")
-    )
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-
-
 def freeze_section_fingerprint(
     path: Path | str,
     *,
@@ -441,7 +433,9 @@ def freeze_section_fingerprint(
     return SectionFingerprint(
         section_id=section_id or p.stem,
         artifact_path=p.as_posix(),
-        artifact_sha256=_canonical_artifact_sha256(data),
+        # The parsed artifact's content hash, so formatting/BOM churn is inert.
+        # Stored unprefixed, as every fingerprint before it was.
+        artifact_sha256=content_hash(data, prefixed=False),
         frozen_at=frozen_at if frozen_at is not None else _default_clock(),
         claims=tuple(LedgerEntry.from_claim(c) for c in claims),
         sub_sections=tuple(SubSectionFingerprint.from_prose(s) for s in subs),

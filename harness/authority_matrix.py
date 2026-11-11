@@ -86,6 +86,7 @@ from harness.record_binding import (
     check_bindings,
     file_sha256,
 )
+from harness.content_hash import short_hash
 from harness.record_binding import Unreadable as _Unreadable
 from harness.record_binding import one_line as _one_line
 from harness.record_binding import wrap as _wrap
@@ -1539,7 +1540,7 @@ def render_matrix(matrix: Matrix, index: SourceIndex) -> str:
     add(f"Review state: **{_as_words(matrix.review_state)}**.")
     add(f"The matrix's own reading of its sources is declared **{matrix.declared_status}**.")
     add(f"Relationship to earlier versions: {matrix.supersedes}")
-    add(f"Source index: `{matrix.index_path}`, bound at `sha256:{matrix.index_sha256[:12]}`.")
+    add(f"Source index: `{matrix.index_path}`, bound at `sha256:{short_hash(matrix.index_sha256)}`.")
     add("")
     add(_wrap(matrix.purpose))
     add("")

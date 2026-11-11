@@ -47,15 +47,14 @@ Constitutional authority:
 
 from __future__ import annotations
 
-import hashlib
 import json
-import re
 from collections import deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
+from harness.content_hash import file_hash, next_numbered_path, short_hash
 from harness.jsonl_log import JsonlLog
 
 __all__ = [
@@ -77,11 +76,6 @@ CHECKPOINT_DISCARD_RECORD_TYPE: str = "harness.assessor_response_discarded"
 #: Bumped when the on-disk shape changes; a resume refuses another version.
 CHECKPOINT_FORMAT_VERSION: int = 1
 
-_CHECKPOINT_NAME_RE = re.compile(
-    r"^checkpoint_(?P<hash>[0-9a-f]{12})_(?P<seq>\d{4})\.jsonl$"
-)
-
-
 #: Binding fields a pre-ticket-15 checkpoint does not carry.
 _INFERENCE_FIELDS: tuple[str, ...] = ("temperature", "max_tokens")
 
@@ -95,21 +89,13 @@ def _utc_now() -> str:
 
 
 def next_checkpoint_path(reports_dir: Path | str, digest: str) -> Path:
-    """The next free ``checkpoint_<hash12>_<NNNN>.jsonl`` under *reports_dir*.
+    """The next free ``checkpoint_<short>_<NNNN>.jsonl`` under *reports_dir*.
 
-    Mirrors :func:`~harness.blind_assessment.next_report_path` so a run's
-    checkpoint sits beside its report under the same candidate-hash stem, and so
-    a checkpoint is never overwritten by the next run.
+    Named by the same helper as every report, so a run's checkpoint sits beside
+    its report under the same candidate-hash stem, and so a checkpoint is never
+    overwritten by the next run.
     """
-    directory = Path(reports_dir)
-    short = digest.split(":", 1)[1][:12] if ":" in digest else digest[:12]
-    taken = 0
-    if directory.is_dir():
-        for existing in directory.iterdir():
-            m = _CHECKPOINT_NAME_RE.match(existing.name)
-            if m and m.group("hash") == short:
-                taken = max(taken, int(m.group("seq")))
-    return directory / f"checkpoint_{short}_{taken + 1:04d}.jsonl"
+    return next_numbered_path(reports_dir, digest, prefix="checkpoint", suffix=".jsonl")
 
 
 @dataclass(frozen=True)
@@ -315,7 +301,7 @@ class ResponseCache:
                 "prompt_hash": prompt_hash,
                 "at": self._clock(),
                 "chars": len(response),
-                "sha256": hashlib.sha256(response.encode("utf-8")).hexdigest(),
+                "sha256": file_hash(response.encode("utf-8")),
                 "response": response,
             }
         )
@@ -340,7 +326,7 @@ class ResponseCache:
                 "record_type": CHECKPOINT_DISCARD_RECORD_TYPE,
                 "prompt_hash": key,
                 "at": self._clock(),
-                "sha256": hashlib.sha256(response.encode("utf-8")).hexdigest(),
+                "sha256": file_hash(response.encode("utf-8")),
                 "reason": reason,
             }
         )
@@ -415,14 +401,14 @@ class ResponseCache:
                 )
             digest = record.get("sha256")
             if isinstance(digest, str) and digest:
-                actual = hashlib.sha256(response.encode("utf-8")).hexdigest()
+                actual = file_hash(response.encode("utf-8"))
                 if actual != digest:
                     raise ResponseCacheError(
                         f"checkpoint {self._path} line {index + 1}: the recorded "
-                        f"response does not match its sha256 (recorded {digest[:12]}, "
-                        f"actual {actual[:12]}) — the file has been edited."
+                        f"response does not match its sha256 (recorded {short_hash(digest)}, "
+                        f"actual {short_hash(actual)}) — the file has been edited."
                     )
-            if (key, hashlib.sha256(response.encode("utf-8")).hexdigest()) in discarded:
+            if (key, file_hash(response.encode("utf-8"))) in discarded:
                 # Recorded, kept, and never served again: the parsers rejected
                 # it in the run that drew it, and replaying it would only
                 # reproduce that rejection.

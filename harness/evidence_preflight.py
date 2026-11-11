@@ -57,7 +57,6 @@ Constitutional authority:
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 from dataclasses import dataclass
@@ -100,7 +99,7 @@ from harness.evidence_pack import (
     EvidencePack,
     split_paragraphs,
 )
-from harness.profile import canonical_hash
+from harness.content_hash import content_hash, file_hash, short_hash
 from harness.rubrics import ProfileBundle, build_pack_for
 
 __all__ = [
@@ -159,9 +158,8 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def file_sha256(path: Path | str) -> str:
-    """The plain hex sha256 of a file's bytes."""
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+#: The file hash of a path's bytes, bare hex; kept under this name for its importers.
+file_sha256 = file_hash
 
 
 class PreflightMismatch(BlindAssessmentError):
@@ -255,7 +253,7 @@ class RealisedPack:
 
     @property
     def hash(self) -> str:
-        return canonical_hash(self.binding_record)
+        return content_hash(self.binding_record)
 
     def _excluded(self, reason: str) -> dict[str, int]:
         items = [e for e in (self.pack.excluded if self.pack else ()) if e.reason == reason]
@@ -319,7 +317,7 @@ class RealisedPackSet:
         the frozen blind report binds this hash alone (spec PE-06) and finding F9 was
         exactly a ceiling nobody recorded.
         """
-        return canonical_hash(
+        return content_hash(
             {
                 "params": self.params.to_dict(),
                 "packs": {f"{p.expectation_key}/{p.section_id}": p.hash for p in self.packs},
@@ -978,7 +976,7 @@ def check_preflight(
     for key in sorted(set(then_packs) | set(now_packs)):
         if then_packs.get(key) != now_packs.get(key):
             moved.append(
-                f"pack {key}: preflight {str(then_packs.get(key))[:19]}, now {str(now_packs.get(key))[:19]}"
+                f"pack {key}: preflight {short_hash(str(then_packs.get(key)), keep_prefix=True)}, now {short_hash(str(now_packs.get(key)), keep_prefix=True)}"
             )
     _cmp("pack_set_hash", data.get("pack_set_hash"), realised.hash)
     if moved:
@@ -1040,16 +1038,16 @@ def render_preflight(report: Mapping[str, Any]) -> str:
     params = report.get("params") or {}
     lines = [
         f"EVIDENCE PREFLIGHT [{'FLAGGED' if flags else 'OK'}] - {len(report.get('packs') or [])} pack(s)",
-        f"candidate: {str(report.get('candidate_hash') or '')[:19]}  {report.get('candidate_path', '')}",
-        f"profile:   {report.get('profile_id', '') or '-'} [{str(report.get('profile_version') or '')[:19]}]  "
+        f"candidate: {short_hash(str(report.get('candidate_hash') or ''), keep_prefix=True)}  {report.get('candidate_path', '')}",
+        f"profile:   {report.get('profile_id', '') or '-'} [{short_hash(str(report.get('profile_version') or ''), keep_prefix=True)}]  "
         f"rubrics {report.get('rubric_set_id', '-')} v{report.get('rubric_set_version', '-')}",
-        f"pack set:  {str(report.get('pack_set_hash') or '')[:19]}  "
+        f"pack set:  {short_hash(str(report.get('pack_set_hash') or ''), keep_prefix=True)}  "
         + "  ".join(f"{k}={v}" for k, v in params.items()),
     ]
     if report.get("package_id"):
         lines.append(
             f"evidence:  source={report.get('evidence_source')} view={report.get('evidence_view')} "
-            f"package={str(report.get('package_id') or '')[:19]} snapshot={str(report.get('snapshot_id') or '')[:19]}"
+            f"package={short_hash(str(report.get('package_id') or ''), keep_prefix=True)} snapshot={short_hash(str(report.get('snapshot_id') or ''), keep_prefix=True)}"
         )
     else:
         lines.append(f"evidence:  source={report.get('evidence_source')} (no dev-graph package)")
@@ -1058,7 +1056,7 @@ def render_preflight(report: Mapping[str, Any]) -> str:
     manifest = report.get("import_manifest")
     if isinstance(manifest, Mapping):
         versions = "  ".join(f"{k}={v}" for k, v in (manifest.get("versions") or {}).items())
-        lines.append(f"manifest:  sha256:{str(manifest.get('sha256'))[:12]}  {manifest.get('path')}  {versions}")
+        lines.append(f"manifest:  sha256:{short_hash(str(manifest.get('sha256')))}  {manifest.get('path')}  {versions}")
     anchors = report.get("anchors") or {}
     lines.append(
         f"\nANCHORS - {anchors.get('rubrics_with_every_anchor_present', 0)} of "
@@ -1102,7 +1100,7 @@ def render_preflight(report: Mapping[str, Any]) -> str:
         lines.append("\nCRITERION INPUTS - complete section plus declared appendix")
         crows: list[tuple[str, ...]] = [("criterion", "input", "tokens", "budget", "complete")]
         for c in crit:
-            crows.append((str(c.get("criterion_id")), str(c.get("input_hash") or "")[:19],
+            crows.append((str(c.get("criterion_id")), short_hash(str(c.get("input_hash") or ""), keep_prefix=True),
                           str(c.get("token_estimate")), str(c.get("token_budget")),
                           "yes" if c.get("complete") else "no"))
         lines.extend(_table(crows))

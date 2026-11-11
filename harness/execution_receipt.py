@@ -60,6 +60,7 @@ from typing import Any, Mapping
 from harness.blind_baseline import BASELINE_CHECKS
 from harness.evidence_preflight import PREFLIGHT_RECORD_TYPE
 from harness.grounding_scope import declared_scope_of
+from harness.content_hash import short_hash
 from harness.record_binding import REVIEW_STATES, STATUSES, file_sha256
 
 __all__ = [
@@ -925,7 +926,7 @@ def _check_preflight(
     if file_sha256(path) != binding.report_sha256:
         found["preflight_disagrees_with_the_receipt"].append(
             f"{binding.report_path} does not hash to the recorded "
-            f"{binding.report_sha256[:12]}; the receipt pins other bytes"
+            f"{short_hash(binding.report_sha256)}; the receipt pins other bytes"
         )
         return
     try:
@@ -1016,9 +1017,9 @@ def _check_bindings(
         )
     if receipt.preflight.profile_sha256 != intended.profile_sha256:
         found["profile_binding_mismatch"].append(
-            f"the receipt pins profile bytes {receipt.preflight.profile_sha256[:12]}; "
+            f"the receipt pins profile bytes {short_hash(receipt.preflight.profile_sha256)}; "
             f"{intended.profile_path} in this tree hashes to "
-            f"{intended.profile_sha256[:12]}"
+            f"{short_hash(intended.profile_sha256)}"
         )
 
 
