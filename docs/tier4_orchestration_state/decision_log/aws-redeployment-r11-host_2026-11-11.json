@@ -1,0 +1,89 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r11-host_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "harness_overhaul",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R11 of plans/aws_redeployment_tickets.md (endpoints and host: first PrivateLink call)",
+  "supersedes": "none. Point 6 of STEPS.md (CPU credits standard on a t3 host) was replaced by OD9-r1 (aws-redeployment-od9-host-size-r1_2026-11-11) before the host first ran.",
+  "authority": "Agent-drafted under CLAUDE.md §9.4. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no proposal gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "Points 1-10: the agent, in STEPS.md, accepted by the operator's merge ('Having reviewed the R11 steps, I would also like to merge them', 34a4e2e1). R11-D11 and R11-D12: the agent, recorded in RUNLOG.md, pending the operator's review.",
+  "decision": "R11 is built and run as STEPS.md points 1-10 state, as amended by STEPS_fix1.md (OD9-r1) and by the corrected step 14 criterion.",
+  "why": "The ticket needs one host stack that creates the six interface endpoints and the host, proves one Converse call over PrivateLink by the hardened runtime role, and deletes and recreates cleanly. The points below settle what no earlier record settled.",
+  "inputs": [
+    "docs/infrastructure_security/evidence_v2/R11/STEPS.md (points 1-10)",
+    "docs/infrastructure_security/evidence_v2/R11/STEPS_fix1.md",
+    "docs/infrastructure_security/evidence_v2/R11/RUNLOG.md",
+    "docs/infrastructure_security/evidence_v2/R11/VERIFICATION.md",
+    "deploy/aws/templates/90-host.yaml, deploy/aws/parameters/host.json, deploy/aws/parameters/secret.json, deploy/aws/collector_inputs.json"
+  ],
+  "findings": [
+    {
+      "id": "F-R11-1",
+      "declared_status": "Confirmed",
+      "finding": "An EC2 dry run does not evaluate Free Tier eligibility. The step 03g dry run accepted t3.medium; the real creation refused it.",
+      "basis": "R11_03_run-instances-dry-run.txt; R11_06_stack-events.json. Recorded in OD9-r1 as F-OD9r1-2."
+    },
+    {
+      "id": "F-R11-2",
+      "declared_status": "Confirmed",
+      "finding": "describe-instance-credit-specifications reports CpuCredits standard for the c7i-flex.large host, although the template omits CreditSpecification for that type.",
+      "basis": "R11_09_credit-specification.json (instance i-03308c50670917059)."
+    },
+    {
+      "id": "F-R11-3",
+      "declared_status": "Confirmed",
+      "finding": "Two of the six exports the host stack imports are also imported by base stacks: network-VpcId by the audit stack (flow log), iam-RuntimeRoleArn by the kms, audit and secret stacks (policies). STEPS.md step 14 wrongly expected all six to be unimported after the delete.",
+      "basis": "R11_14_imports-after.txt; deploy/aws/templates/40-audit.yaml, 30-kms.yaml, 50-secret.yaml (Fn::ImportValue)."
+    },
+    {
+      "id": "F-R11-4",
+      "declared_status": "Confirmed",
+      "finding": "The R5-D4 known gap is answered: the flow log delivers records with the flow-logs role's DescribeLogGroups scoped to the one group.",
+      "basis": "R11_21_flow-log-status.json (ACTIVE, SUCCESS), R11_21_flow-log-streams.json (14 streams of R11 interfaces after step 06), R11_21_flow-log-event-count.json."
+    },
+    {
+      "id": "F-R11-5",
+      "declared_status": "Confirmed",
+      "finding": "The R4-D3 / R5 known gap is answered for Run Command: the SSM Agent registered and ran commands with only the interface endpoints and the S3 gateway endpoint, no other route.",
+      "basis": "R11_10_instance-information.json, R11_10_run-command.json, R11_18_run-command.json; DC-06 (R4)."
+    },
+    {
+      "id": "F-R11-6",
+      "declared_status": "Unresolved",
+      "finding": "That the root volumes' key (key/3ac821af-7db1-4528-bfd7-400a9404a70c) is the key behind alias/aws/ebs, the account's EBS default in R11_03_ebs-default-key.json. No evidence file resolves the alias.",
+      "basis": "R11_09_root-volume.json, R11_18_root-volume.json, R11_03_ebs-default-key.json. Settled by the read-only check 23a."
+    }
+  ],
+  "decisions": [
+    {"id": "R11-D1", "question": "How the runtime role's calls are proven (point 1)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "Every host-side check runs through SSM Run Command as the instance profile's role; the secret read prints the version stage only; the Converse call follows the R12a collector's dc37_converse.sh pattern.", "reason": "STEPS.md point 1.", "consequence": "Steps 10-12 and 18."},
+    {"id": "R11-D2", "question": "Converse model (point 2)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "TransportModelId of secret.json, eu.anthropic.claude-opus-4-6-v1; one call; Sonnet 4.6 not called.", "reason": "STEPS.md point 2; OD7-orchestrator.", "consequence": "R11_20_converse-events.json modelId equals it."},
+    {"id": "R11-D3", "question": "Bedrock endpoint policy form (point 3)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "Principal '*' with ArnEquals aws:PrincipalArn = RuntimeRoleArn; two Allow statements on the OD7 profiles and the routed foundation models.", "reason": "STEPS.md point 3.", "consequence": "R11_08_bedrock-endpoint-policy.json equals it by script (DC-04)."},
+    {"id": "R11-D4", "question": "Policies of the five supporting endpoints (point 4)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "AWS default endpoint policy; no aws:PrincipalAccount restriction.", "reason": "STEPS.md point 4: the ticket asks for the Bedrock policy only; a restriction is untested against the SSM Agent.", "consequence": "A later ticket may add an F7-style guard and test it with Run Command."},
+    {"id": "R11-D5", "question": "Root volume key (point 5)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "Encrypted true without KmsKeyId: the account's default EBS key; size from the image.", "reason": "STEPS.md point 5; the kms stack's key is not exported to R11 and is scoped to Secrets Manager and S3 (R6-D3).", "consequence": "F-R11-6 until check 23a."},
+    {"id": "R11-D6", "question": "CPU credits and host behaviour (point 6)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "Replaced for CPU credits by OD9-r1 (credits set only on a t3 type). Detailed monitoring off; shutdown from inside the host stops it.", "reason": "STEPS.md point 6; OD9-r1.", "consequence": "F-R11-2 records what EC2 reports for the c7i-flex host."},
+    {"id": "R11-D7", "question": "VpcId import outside the outputs contract (point 7)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "The host stack imports network-VpcId; tests/test_aws_host_template.py names this one exception.", "reason": "STEPS.md point 7: an interface endpoint requires the VPC id.", "consequence": "Known gap: R11 is not yet listed as a consumer of proposal-orchestrator-network-VpcId in outputs_contract.json (operator's one-line change)."},
+    {"id": "R11-D8", "question": "Outputs of the second creation (point 8)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "Saved as R11_17_outputs-recreated.json; both stacks deleted in the session; R12a reads a later session's outputs with --host-outputs.", "reason": "STEPS.md point 8; OD5.", "consequence": "R11_outputs.json keeps the first creation's ids."},
+    {"id": "R11-D9", "question": "Re-check after recreation (point 9)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "Step 18 repeats the structural checks and one Run Command, not the Converse call.", "reason": "STEPS.md point 9.", "consequence": "One Bedrock call in R11."},
+    {"id": "R11-D10", "question": "Credit floor (point 10)", "answer_kind": "agent_decision_operator_merged", "declared_status": "Confirmed", "answer": "195.00 USD at session start.", "reason": "STEPS.md point 10.", "consequence": "F01 read 199.25 USD."},
+    {"id": "R11-D11", "question": "Step 14 imports criterion", "answer_kind": "agent_correction", "declared_status": "Inferred", "answer": "After the delete, no import list names proposal-orchestrator-host; network-VpcId and iam-RuntimeRoleArn stay imported by their base-stack consumers; the four host-only exports are unimported.", "reason": "F-R11-3. The original criterion contradicted the base templates; the corrected one tests what step 14 is for.", "consequence": "STEPS_fix1.md amendment row for step 14; RUNLOG.md marks it a sheet error. Pending the operator's review."},
+    {"id": "R11-D12", "question": "Deviations accepted as evidence", "answer_kind": "agent_proposal", "declared_status": "Inferred", "answer": "Round 2's step 06 (t3.medium, no recorded go, block run twice) is kept as evidence of the refusal only; the R11 criteria rest on round 1b and round 2b. Step 23 run 1 came before VERIFICATION.md; run 2 after it is the closing run.", "reason": "RUNLOG.md rounds 2 and 2b.", "consequence": "VERIFICATION.md cites R11_fix1_06_* for step 06. Pending the operator's review."}
+  ],
+  "known_gaps": [
+    {"decision": "R11-D5", "declared_status": "Unresolved", "gap": "F-R11-6, closed by check 23a."},
+    {"decision": "R11-D7", "declared_status": "Unresolved", "gap": "outputs_contract.json does not yet list R11 as a consumer of network-VpcId."},
+    {"decision": "R11-D10", "declared_status": "Assumed", "gap": "The session's cost: credits read 199.25 USD before and after; billing is delayed. R14 prices the hours of both creations (21:03:42 to the step 13 delete, 21:51:19 to the step 19 delete) and the seven minutes of round 2's endpoints."}
+  ],
+  "not_evidence_of": [
+    "The R9 launcher on the host (R8-D3: R11 does not need it); the drafter transport through the host (R12b, R15).",
+    "Any proposal content: the Converse call carried the fixed test string only, and no prompt or reply body is saved."
+  ],
+  "unblocks_when_recorded": ["R12b (needs R11)", "R14 (prices c7i-flex.large and the endpoints)"],
+  "stays_blocked": [],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, session token, IMDS token, prompt text or model output other than the fixed test string.",
+    "basis": "Identifiers, AWS status and error text only; step 23 secret scan CLEAN."
+  }
+}

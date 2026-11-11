@@ -1,0 +1,33 @@
+﻿{
+    "id": "i-07ef9808f79b39ef3",
+    "state": "running",
+    "type": "c7i-flex.large",
+    "publicIp": null,
+    "publicDns": "",
+    "groups": [
+        "sg-0c4e5657a1bd246ff"
+    ],
+    "profile": "arn:aws:iam::797661577394:instance-profile/proposal-orchestrator-runtime-profile",
+    "keyName": null,
+    "metadata": {
+        "State": "applied",
+        "HttpTokens": "required",
+        "HttpPutResponseHopLimit": 1,
+        "HttpEndpoint": "enabled",
+        "HttpProtocolIpv6": "disabled",
+        "InstanceMetadataTags": "disabled"
+    },
+    "rootDevice": "/dev/xvda",
+    "blockDevices": [
+        {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+                "AttachTime": "2026-11-11T21:52:31+00:00",
+                "DeleteOnTermination": true,
+                "Status": "attached",
+                "VolumeId": "vol-0edc6d2bebcd52d6e",
+                "EbsCardIndex": 0
+            }
+        }
+    ]
+}

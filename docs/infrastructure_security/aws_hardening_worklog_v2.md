@@ -496,3 +496,14 @@ Each entry records the same fields as v1:
 | Verification Result | Ticket criterion 2 PASS; criterion 1 N/A (deferred per OD12, not attempted). R16 open as deferred (OD12), not DONE (R16-D3). |
 | Next Action | Operator: confirm in session; agent then ticks only R16's second criterion and marks R16 "open as deferred (OD12)"; operator commits the rest (e.g. `R16 DC-38 deferred`). Frontier: R11 held by the operator (hourly cost); R12b after R11 (F-R12a-1–3); R14, R15, R13 follow. R16's first criterion only with a successor to OD12. |
 
+### 2026-11-11 — R11: endpoints and host, first PrivateLink call — verified
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-11-11T22:15:00Z |
+| Control ID | DC-01, DC-02, DC-03, DC-04, DC-05, DC-07, DC-09, DC-14, DC-26, DC-37 (→ VERIFIED_PASS); notes on DC-08, DC-19, DC-20, DC-21, DC-28 |
+| Action Taken | Operator ran `STEPS.md` round 1 (01–05) and step 06, which the Free plan refused for `t3.medium` (rolled back; go not recorded; block run twice). Operator chose `c7i-flex.large`; agent wrote OD9-r1, the template change (credits only on t3) and `STEPS_fix1.md`; operator merged (`d2cadc0d`), ran F01–F05, confirmed OD9-r1 and gave the go (21:00:40); ran steps 06–15, the second go (21:45:33), steps 17–23. Agent corrected the step 14 imports criterion (R11-D11), checked every file by script, wrote `VERIFICATION.md`, the register rows and `aws-redeployment-r11-host_2026-11-11` |
+| Evidence Requested | `R11_01_*`–`R11_05_*`, `R11_06_*`, `R11_fix1_01_*`–`R11_fix1_06_*`, `R11_outputs.json`, `R11_07_*`–`R11_22_*`, `R11_17_outputs-recreated.json`, `R11_23_*` |
+| Evidence Received | `evidence_v2/R11/`: two creations of the host stack on `c7i-flex.large`, each `CREATE_COMPLETE` and deleted in the session; one Converse call from the host through the Bedrock endpoint, attributed in CloudTrail to the runtime role; clean deletes; base stacks and exports unchanged |
+| Verification Result | Every criterion PASS except round 2's step 06 (superseded) and the root-volume key alias (F-R11-6, check 23a pending); ticket criteria 1–5 PASS. Findings F-R11-1–6 |
+| Next Action | Operator: step 23 run 2 with check 23a; review R11-D11 and R11-D12; confirm R11 in session; agent then ticks R11. Frontier: R12b (needs a new creation and go), R14 (prices `c7i-flex.large`) |
