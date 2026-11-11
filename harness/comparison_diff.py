@@ -16,7 +16,10 @@ this reads them, re-hashes them, and reports the difference:
   record and the same candidate, and must cover the same observation ids. A
   comparison against another baseline is not a successor of this one, and
   diffing the two would present two readings of different evidence as a
-  revision of one. Refused, nothing written.
+  revision of one. Refused, nothing written. Each comparison is loaded through
+  the record chain (:mod:`harness.record_chain`), so a baseline report, ESR
+  record or dispositions file that moved after it was written refuses the
+  pair; each revisions artifact must bind what its comparison binds.
 * **Rows.** Per observation: the disposition and its status, the declared
   preservation status, the lanes credited, the blind and audit citations, the
   register pointers, the quoted passages, whether the explanation moved,
@@ -38,7 +41,9 @@ Outputs
 -------
 ``review_diff_<sha12>_<NNNN>.json`` and ``review_diff_<sha12>_<NNNN>.md``,
 sharing a sequence number, under the output directory; ``<sha12>`` is the
-*successor* comparison's hash. Nothing is overwritten.
+*successor* comparison's hash. Nothing is overwritten. Loading a written diff
+re-hashes both comparisons, both revisions artifacts and both dispositions
+files it names.
 
 Constitutional standing: an advisory Tier 4 artifact, never run-blocking. It
 evaluates no gate, invokes no Claude and coins no ``schema_id``.
@@ -51,19 +56,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
-from runner.atomic_write import atomic_write_json, atomic_write_text
+from runner.atomic_write import atomic_write_text
 
-from harness.blind_assessment import BlindAssessmentError, next_report_path
+from harness.blind_assessment import BlindAssessmentError
 from harness.blind_baseline import _portable
 from harness.esr_comparison import (
+    COMPARISON_KIND,
     DISPOSITION_ADDRESSED,
     OBSERVATION_KIND_STRENGTH,
     POINTER_RESOLUTION_IDENTITY,
+    REVISIONS_RECORD_TYPE,
     pointer_rule_of,
-    load_comparison,
 )
 from harness.content_hash import short_hash
-from harness.evidence_preflight import file_sha256
+from harness.record_chain import Predecessor, RecordKind, load_record, write_record
 
 DIFF_RECORD_TYPE = "esr_comparison_diff"
 DIFF_SCHEMA_VERSION = "1.0"
@@ -110,6 +116,41 @@ class ComparisonDiffError(BlindAssessmentError):
     """Two comparisons that cannot be diffed; nothing is written."""
 
 
+#: The revisions artifact as the diff reads it, beside its comparison.
+_REVISIONS_KIND = RecordKind(
+    name="revisions artifact", record_type=REVISIONS_RECORD_TYPE, error=ComparisonDiffError
+)
+
+#: What a revisions artifact binds, and where its comparison binds the same.
+_REVISIONS_BINDINGS: tuple[tuple[str, str, tuple[str, str]], ...] = (
+    ("baseline report", "baseline_report_sha256", ("baseline", "report_sha256")),
+    ("ESR record", "esr_record_sha256", ("esr_record", "sha256")),
+    ("dispositions", "dispositions_sha256", ("dispositions", "sha256")),
+)
+
+
+def _side_predecessors(side: str) -> tuple[Predecessor, ...]:
+    return tuple(
+        Predecessor(f"the {side} {name}", path=f"{side}/{field}", sha256=f"{side}/{field}_sha256")
+        for name, field in (
+            ("comparison", "comparison"),
+            ("revisions artifact", "revisions"),
+            ("dispositions", "dispositions"),
+        )
+    )
+
+
+#: The comparison diff in the DN record chain: both comparisons, both
+#: revisions artifacts and both dispositions files are re-hashed on every load.
+DIFF_KIND = RecordKind(
+    name="diff",
+    record_type=DIFF_RECORD_TYPE,
+    error=ComparisonDiffError,
+    prefix=_DIFF_PREFIX,
+    predecessors=_side_predecessors("predecessor") + _side_predecessors("successor"),
+)
+
+
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -143,8 +184,13 @@ class LoadedComparison:
         }
 
 
-def load_pair_member(path: Path | str, *, what: str) -> LoadedComparison:
+def load_pair_member(
+    path: Path | str, *, what: str, repo_root: Path | str | None = None
+) -> LoadedComparison:
     """Load one comparison and the revisions artifact it names beside it.
+
+    The comparison is loaded through the record chain: every file it names by
+    hash is re-hashed, under *repo_root* when one is given.
 
     The comparison records its revisions artifact as an absolute path from the
     run that wrote it, so the *name* is what carries over and the directory is
@@ -152,7 +198,8 @@ def load_pair_member(path: Path | str, *, what: str) -> LoadedComparison:
     its priorities compared, and a partial diff would be the quieter failure.
     """
     p = Path(path)
-    data = load_comparison(p)
+    comparison = load_record(COMPARISON_KIND, p, repo_root=repo_root)
+    data = comparison.data
     recorded = data.get("revisions_artifact")
     if not isinstance(recorded, str) or not recorded.strip():
         raise ComparisonDiffError(f"the {what} comparison {p} names no revisions artifact.")
@@ -162,18 +209,26 @@ def load_pair_member(path: Path | str, *, what: str) -> LoadedComparison:
             f"the {what} comparison names revisions artifact {revisions_path.name}, "
             f"which is not beside it in {p.parent}."
         )
-    revisions = json.loads(revisions_path.read_text(encoding="utf-8-sig"))
-    if revisions.get("record_type") != "esr_revision_priorities":
-        raise ComparisonDiffError(
-            f"{revisions_path} is not an 'esr_revision_priorities' record."
-        )
+    revisions = load_record(_REVISIONS_KIND, revisions_path)
+    # The comparison records no hash of its revisions artifact, so what the
+    # artifact itself binds is checked instead; a written diff records the
+    # artifact's hash and re-hashes it on load (DIFF_KIND).
+    for name, own, (outer, inner) in _REVISIONS_BINDINGS:
+        bound = revisions.data.get(own)
+        expected = (data.get(outer) or {}).get(inner)
+        if bound != expected:
+            raise ComparisonDiffError(
+                f"the {what} comparison {p.name} binds {name} {short_hash(str(expected))}; the "
+                f"revisions artifact {revisions_path.name} beside it binds {short_hash(str(bound))}. "
+                "A revisions artifact binds what its comparison binds."
+            )
     return LoadedComparison(
         path=p,
-        sha256=file_sha256(p),
+        sha256=comparison.sha256,
         data=data,
         revisions_path=revisions_path,
-        revisions_sha256=file_sha256(revisions_path),
-        revisions=revisions,
+        revisions_sha256=revisions.sha256,
+        revisions=revisions.data,
     )
 
 
@@ -479,27 +534,27 @@ def write_diff(diff: Mapping[str, Any], out_dir: Path | str) -> tuple[Path, Path
     """Write the diff as JSON and as Markdown; never overwrite either."""
     out = Path(out_dir)
     sha = str(diff["successor"]["comparison_sha256"])
-    target = next_report_path(out, sha, prefix=_DIFF_PREFIX)
-    seq = target.stem.rsplit("_", 1)[1]
-    markdown = out / f"{_DIFF_PREFIX}_{short_hash(sha)}_{seq}{_MARKDOWN_SUFFIX}"
-    if markdown.exists():
-        raise ComparisonDiffError(f"{markdown} already exists; nothing overwritten.")
-    out.mkdir(parents=True, exist_ok=True)
-    data = dict(diff)
-    data["writes"] = [(out / target.name).as_posix(), (out / markdown.name).as_posix()]
-    atomic_write_text(render_diff(data), markdown, prefix="review_diff_")
-    atomic_write_json(data, target, prefix="review_diff_")
-    return target, markdown
+    markdown_path: list[Path] = []
+
+    def complete(target: Path) -> dict[str, Any]:
+        seq = target.stem.rsplit("_", 1)[1]
+        markdown = out / f"{_DIFF_PREFIX}_{short_hash(sha)}_{seq}{_MARKDOWN_SUFFIX}"
+        if markdown.exists():
+            raise ComparisonDiffError(f"{markdown} already exists; nothing overwritten.")
+        data = dict(diff)
+        data["writes"] = [(out / target.name).as_posix(), (out / markdown.name).as_posix()]
+        atomic_write_text(render_diff(data), markdown, prefix="review_diff_")
+        markdown_path.append(markdown)
+        return data
+
+    written = write_record(DIFF_KIND, diff, out, digest=sha, complete=complete)
+    return written.path, markdown_path[0]
 
 
-def load_diff(path: Path | str) -> dict[str, Any]:
-    p = Path(path)
-    data = json.loads(p.read_text(encoding="utf-8-sig"))
-    if data.get("record_type") != DIFF_RECORD_TYPE:
-        raise ComparisonDiffError(f"{p} is not an {DIFF_RECORD_TYPE!r} record.")
-    if data.get("advisory") is not True or data.get("blocking") is not False:
-        raise ComparisonDiffError(f"diff {p} must carry advisory=true and blocking=false.")
-    return data
+def load_diff(path: Path | str, *, repo_root: Path | str | None = None) -> dict[str, Any]:
+    """Load a written diff, re-hashing every comparison, revisions artifact and
+    dispositions file it names (see :func:`harness.record_chain.load_record`)."""
+    return load_record(DIFF_KIND, path, repo_root=repo_root).data
 
 
 # --------------------------------------------------------------------------- #
@@ -646,6 +701,7 @@ def render_summary(diff: Mapping[str, Any]) -> str:
 
 
 __all__ = [
+    "DIFF_KIND",
     "DIFF_RECORD_TYPE",
     "DIFF_SCHEMA_VERSION",
     "ROW_FIELDS",

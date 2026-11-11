@@ -902,8 +902,8 @@ def _diff(
 ) -> int:
     """The ``diff`` sub-command: load both written comparisons with the revisions
     artifact beside each, bind them to one body of evidence, and write the diff."""
-    before = load_pair_member(_under_root(args.before, repo_root), what="predecessor")
-    after = load_pair_member(_under_root(args.after, repo_root), what="successor")
+    before = load_pair_member(_under_root(args.before, repo_root), what="predecessor", repo_root=repo_root)
+    after = load_pair_member(_under_root(args.after, repo_root), what="successor", repo_root=repo_root)
     diff = diff_comparisons(before, after, repo_root=repo_root, clock=clock)
     out_dir = _under_root(args.out_dir, repo_root)
     report, markdown = write_diff(diff, out_dir)

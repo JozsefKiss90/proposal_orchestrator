@@ -59,10 +59,24 @@ def _write_comparison(inputs, name: str) -> Path:
     return next(out.glob("comparison_*.json"))
 
 
+def _fork_dispositions(inputs, name: str) -> Path:
+    """Give the next comparison its own dispositions file, as R05 did.
+
+    A comparison names its dispositions by hash, so editing the file in place
+    would move the earlier comparison's predecessor under it (ticket 05).
+    """
+    current = inputs["dispositions"]
+    forked = current.with_name(f"{current.stem}_{name}{current.suffix}")
+    forked.write_bytes(current.read_bytes())
+    inputs["dispositions"] = forked
+    return forked
+
+
 @pytest.fixture
 def pair(inputs):
     """The comparison as PE-08 wrote it, and a successor with R03's changes."""
     before = _write_comparison(inputs, "before")
+    _fork_dispositions(inputs, "after")
 
     def mutate(data):
         # OBS-1: the blind citation is withdrawn and a register basis named, so
@@ -90,9 +104,10 @@ def loaded(pair):
 
 
 class TestBinding:
-    def test_a_comparison_without_its_revisions_artifact_is_refused(self, pair, tmp_path):
+    def test_a_comparison_without_its_revisions_artifact_is_refused(self, inputs, pair):
         before, _ = pair
-        moved = tmp_path / before.name
+        # Moved within the world, so its predecessors still resolve (ticket 05).
+        moved = inputs["world"] / before.name
         moved.write_bytes(before.read_bytes())
         with pytest.raises(cd.ComparisonDiffError, match="not beside it"):
             cd.load_pair_member(moved, what="predecessor")
@@ -336,6 +351,7 @@ def approved_pair(inputs):
         row["review_status"] = "agent_recommended_pending_operator_review"
     _rewrite(inputs, to_1_1)
     before = _write_comparison(inputs, "before")
+    _fork_dispositions(inputs, "after")
 
     def to_1_2(data):
         data["schema_version"] = "1.2"
