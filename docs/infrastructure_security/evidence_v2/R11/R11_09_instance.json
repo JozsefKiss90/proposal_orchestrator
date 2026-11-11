@@ -1,0 +1,61 @@
+﻿{
+    "id": "i-03308c50670917059",
+    "state": "running",
+    "type": "c7i-flex.large",
+    "image": "ami-04005916a1c241ff5",
+    "arch": "x86_64",
+    "az": "eu-north-1a",
+    "subnet": "subnet-018cd285bbe5cbdaf",
+    "vpc": "vpc-0f33f9ced5a78b09f",
+    "privateIp": "10.60.0.11",
+    "publicIp": null,
+    "publicDns": "",
+    "groups": [
+        "sg-0c4e5657a1bd246ff"
+    ],
+    "profile": "arn:aws:iam::797661577394:instance-profile/proposal-orchestrator-runtime-profile",
+    "keyName": null,
+    "metadata": {
+        "State": "applied",
+        "HttpTokens": "required",
+        "HttpPutResponseHopLimit": 1,
+        "HttpEndpoint": "enabled",
+        "HttpProtocolIpv6": "disabled",
+        "InstanceMetadataTags": "disabled"
+    },
+    "rootDevice": "/dev/xvda",
+    "blockDevices": [
+        {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+                "AttachTime": "2026-11-11T21:04:44+00:00",
+                "DeleteOnTermination": true,
+                "Status": "attached",
+                "VolumeId": "vol-08e9986a6f901c566",
+                "EbsCardIndex": 0
+            }
+        }
+    ],
+    "tags": [
+        {
+            "Key": "project",
+            "Value": "proposal-orchestrator"
+        },
+        {
+            "Key": "Name",
+            "Value": "proposal-orchestrator-host"
+        },
+        {
+            "Key": "aws:cloudformation:logical-id",
+            "Value": "Host"
+        },
+        {
+            "Key": "aws:cloudformation:stack-name",
+            "Value": "proposal-orchestrator-host"
+        },
+        {
+            "Key": "aws:cloudformation:stack-id",
+            "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/9efe1ce0-de11-11f1-ad55-0affe3c28faf"
+        }
+    ]
+}
