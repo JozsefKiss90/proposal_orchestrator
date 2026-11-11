@@ -149,7 +149,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterator, Mapping, Sequence
 
-from runner.atomic_write import atomic_write_json
 from runner.external_proposal import ExtractionError, is_row, parse_row
 from harness.blind_assessment import (
     EVIDENCE_SOURCE_DEV_GRAPH,
@@ -158,10 +157,10 @@ from harness.blind_assessment import (
     BlindEvidence,
     Candidate,
     candidate_hash,
-    next_report_path,
 )
 from harness.blind_baseline import BlindBaselineError, FrozenBaseline, load_frozen_baseline
 from harness.candidate_provenance import UNSTATED_PROVENANCE, CandidateProvenance
+from harness.record_chain import RecordKind, load_record, write_record
 from harness.evidence_pack import split_paragraphs
 from harness.status_faithfulness import (
     SEVERITY_UNRESOLVED,
@@ -1934,37 +1933,42 @@ def run_audit(
     )
 
 
+def _audit_shape(path: Path, data: Mapping[str, Any]) -> None:
+    for key in ("candidate_hash", "profile_version", "checks", "grounding", "baseline"):
+        if key not in data:
+            raise IntegrityAuditError(f"audit {path} lacks {key!r}.")
+
+
+#: The integrity audit in the DN record chain. Its baseline block records the
+#: blind baseline's directory as an absolute path from the run that wrote it, so
+#: the chain does not re-hash the blind baseline on load: the audit read it through
+#: :func:`~harness.blind_baseline.load_frozen_baseline` when it ran, and the
+#: ESR comparison re-hashes the same baseline report itself.
+AUDIT_KIND = RecordKind(
+    name="audit",
+    record_type=AUDIT_RECORD_TYPE,
+    error=IntegrityAuditError,
+    prefix=_REPORT_PREFIX,
+    check_shape=_audit_shape,
+)
+
+
 def write_audit(report: IntegrityAuditReport, reports_dir: Path | str) -> Path:
     """Write *report* as ``integrity_<hash12>_<NNNN>.json``; never overwrite."""
-    out_dir = Path(reports_dir)
-    target = next_report_path(out_dir, report.candidate_hash, prefix=_REPORT_PREFIX)
-    out_dir.mkdir(parents=True, exist_ok=True)
     data = report.to_dict()
-    # The path as the operator gave it, so a committed report stays portable.
-    data["writes"] = [(Path(reports_dir) / target.name).as_posix()]
-    atomic_write_json(data, target, prefix="integrity_audit_")
-    return target
+
+    def complete(target: Path) -> dict[str, Any]:
+        # The path as the operator gave it, so a committed report stays portable.
+        return {**data, "writes": [(Path(reports_dir) / target.name).as_posix()]}
+
+    return write_record(
+        AUDIT_KIND, data, reports_dir, digest=report.candidate_hash, complete=complete
+    ).path
 
 
 def load_audit(path: Path | str) -> dict[str, Any]:
     """Load a persisted audit report, fail-closed on shape and flags."""
-    import json
-
-    p = Path(path)
-    if not p.is_file():
-        raise IntegrityAuditError(f"audit report not found: {p}")
-    try:
-        data = json.loads(p.read_text(encoding="utf-8-sig"))
-    except json.JSONDecodeError as exc:
-        raise IntegrityAuditError(f"audit {p} is not valid JSON: {exc}") from exc
-    if not isinstance(data, Mapping) or data.get("record_type") != AUDIT_RECORD_TYPE:
-        raise IntegrityAuditError(f"{p} is not an {AUDIT_RECORD_TYPE!r} record.")
-    if data.get("advisory") is not True or data.get("blocking") is not False:
-        raise IntegrityAuditError(f"audit {p} must carry advisory=true and blocking=false.")
-    for key in ("candidate_hash", "profile_version", "checks", "grounding", "baseline"):
-        if key not in data:
-            raise IntegrityAuditError(f"audit {p} lacks {key!r}.")
-    return dict(data)
+    return load_record(AUDIT_KIND, path).data
 
 
 # --------------------------------------------------------------------------- #

@@ -109,7 +109,8 @@ from harness.grounding_scope import (
     scope_for,
     scope_lines,
 )
-from harness.content_hash import content_hash, next_numbered_path, short_hash
+from harness.content_hash import content_hash, short_hash
+from harness.record_chain import RecordKind, load_record, write_record
 from harness.judge import Judge
 from harness.profile import PreEvaluationProfile
 from harness.rubrics import ProfileBundle, Rubric
@@ -157,7 +158,6 @@ __all__ = [
     "BlindAssessmentReport",
     "assess_candidate",
     "write_report",
-    "next_report_path",
     "load_report",
     "render_report",
 ]
@@ -1104,41 +1104,35 @@ def assess_candidate(
 # --------------------------------------------------------------------------- #
 
 
-def next_report_path(
-    reports_dir: Path, digest: str, *, prefix: str = "blind", suffix: str = ".json"
-) -> Path:
-    """The next free ``<prefix>_<short>_<NNNN><suffix>`` under *reports_dir* for *digest*.
-
-    Shared by every writer that must not overwrite itself or another: the blind
-    report, the evidence preflight, the integrity audit, the ESR comparison,
-    and — with ``suffix=".md"`` — the operator review's Markdown pair.
-    *digest* is a content hash or a file hash; both name the same file.
-    """
-    return next_numbered_path(reports_dir, digest, prefix=prefix, suffix=suffix)
+def _report_shape(path: Path, data: Mapping[str, Any]) -> None:
+    if data.get("task_label", BLIND_TASK_LABEL) != BLIND_TASK_LABEL:
+        raise BlindAssessmentError(
+            f"report {path} carries task_label {data.get('task_label')!r}; only a "
+            f"{BLIND_TASK_LABEL!r} report is a blind assessment."
+        )
 
 
-_next_report_path = next_report_path
+#: The blind report in the DN record chain. It names its preflight by path and
+#: pack-set content hash, not by file hash, so the chain re-hashes nothing; the
+#: report's own check, the candidate hash recomputed from the candidate
+#: directory, stays in :func:`load_report`.
+REPORT_KIND = RecordKind(
+    name="report",
+    record_type=BLIND_REPORT_RECORD_TYPE,
+    error=BlindAssessmentError,
+    prefix="blind",
+    check_shape=_report_shape,
+)
 
 
-def write_report(
-    report: BlindAssessmentReport, reports_dir: Path | str, *, path: Path | None = None
-) -> Path:
+def write_report(report: BlindAssessmentReport, reports_dir: Path | str) -> Path:
     """Write *report* as a new file under *reports_dir* and return its path.
 
-    The default name is ``blind_<hash12>_<NNNN>.json`` with the next free
-    sequence number for this candidate hash.  An existing path — default or
-    explicit — is never overwritten: historical reports are immutable.
+    The name is ``blind_<short>_<NNNN>.json`` with the next free sequence
+    number for this candidate hash.  An existing file is never overwritten:
+    historical reports are immutable.
     """
-    out_dir = Path(reports_dir)
-    target = Path(path) if path is not None else _next_report_path(out_dir, report.candidate_hash)
-    if target.exists():
-        raise BlindAssessmentError(
-            f"report {target} already exists — historical reports are immutable; "
-            "a rerun writes a new file."
-        )
-    out_dir.mkdir(parents=True, exist_ok=True)
-    atomic_write_json(report.to_dict(), target, prefix="blind_assessment_")
-    return target
+    return write_record(REPORT_KIND, report.to_dict(), reports_dir, digest=report.candidate_hash).path
 
 
 def load_report(
@@ -1157,24 +1151,7 @@ def load_report(
     under a different profile version.
     """
     p = Path(path)
-    if not p.is_file():
-        raise BlindAssessmentError(f"report file not found: {p}")
-    try:
-        data = json.loads(p.read_text(encoding="utf-8-sig"))
-    except json.JSONDecodeError as exc:
-        raise BlindAssessmentError(f"report {p} is not valid JSON: {exc}") from exc
-    if not isinstance(data, Mapping) or data.get("record_type") != BLIND_REPORT_RECORD_TYPE:
-        raise BlindAssessmentError(f"{p} is not a {BLIND_REPORT_RECORD_TYPE!r} record.")
-    if data.get("advisory") is not True or data.get("blocking") is not False:
-        raise BlindAssessmentError(
-            f"report {p} must carry advisory=true and blocking=false; got "
-            f"advisory={data.get('advisory')!r}, blocking={data.get('blocking')!r}."
-        )
-    if data.get("task_label", BLIND_TASK_LABEL) != BLIND_TASK_LABEL:
-        raise BlindAssessmentError(
-            f"report {p} carries task_label {data.get('task_label')!r}; only a "
-            f"{BLIND_TASK_LABEL!r} report is a blind assessment."
-        )
+    data = load_record(REPORT_KIND, p).data
     recorded = str(data.get("candidate_hash", ""))
     current = candidate_hash(load_candidate(candidate_dir, profile))
     if recorded != current:

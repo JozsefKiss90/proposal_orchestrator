@@ -16,6 +16,8 @@ references it carries, and the error class a refusal raises. Two operations:
   naming the record, the predecessor and both hashes.
 * :func:`write_record` writes a record of a kind to the next numbered path,
   atomically, and returns the path and its file hash.
+  :func:`write_rendering` does the same for a kind whose written form is a
+  Markdown rendering rather than JSON (the operator review).
 
 The chain is shared; the readers are not. Each record keeps its own vocabulary,
 field readers and shape rules in its own module (``harness/record_binding.py``
@@ -51,7 +53,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
-from runner.atomic_write import atomic_write_json
+from runner.atomic_write import atomic_write_json, atomic_write_text
 
 from harness.content_hash import file_hash, next_numbered_path, short_hash
 from harness.record_pointer import UNRESOLVED, resolve_field
@@ -63,6 +65,7 @@ __all__ = [
     "WrittenRecord",
     "load_record",
     "write_record",
+    "write_rendering",
 ]
 
 #: The repository this module belongs to: the last place a relative path is looked for.
@@ -248,4 +251,23 @@ def write_record(
     record = data if complete is None else complete(target)
     _check_type_and_flags(kind, target, record)
     atomic_write_json(dict(record), target, prefix=f"{kind.prefix}_")
+    return WrittenRecord(path=target, sha256=file_hash(target))
+
+
+def write_rendering(
+    kind: RecordKind,
+    out_dir: Path | str,
+    *,
+    digest: str,
+    render: Callable[[Path], str],
+) -> WrittenRecord:
+    """Write a Markdown rendering of a record of *kind* to the next numbered path.
+
+    The path is ``<prefix>_<short form of digest>_<NNNN>.md``; nothing is
+    overwritten. *render* receives that path before anything is written and
+    returns the text, so companions can share its sequence number. A rendering
+    carries no record type or flags, so none is checked.
+    """
+    target = next_numbered_path(out_dir, digest, prefix=kind.prefix, suffix=".md")
+    atomic_write_text(render(target), target, prefix=f"{kind.prefix}_")
     return WrittenRecord(path=target, sha256=file_hash(target))

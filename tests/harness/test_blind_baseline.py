@@ -662,7 +662,7 @@ class TestFreeze:
             frozen.copy_path.read_text(encoding="utf-8").replace("fake-assessor", "other"),
             encoding="utf-8",
         )
-        with pytest.raises(bb.BlindBaselineError, match="edited after"):
+        with pytest.raises(bb.BlindBaselineError, match="moved after the freeze was written"):
             bb.load_frozen_baseline(baseline)
 
     def test_a_check_that_did_not_apply_is_not_recorded_as_passed(self, world, bundle):
