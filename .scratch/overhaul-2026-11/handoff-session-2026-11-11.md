@@ -194,20 +194,22 @@ Ticked only on the evidence each protocol (§3) names. Newest line last.
       confirmed in session); AN tickets wontfix; R15 rescoped (operator approved); BASELINE §5 = 42 node
       ids, checked by node id against `suite-merged-2026-11-10c.txt`; ticket 17 written; suite outputs
       untracked and ignored. Guard tests run: 140 passed, 5 skipped.
-- [ ] **O1** — 01 ∥ 04 ∥ 17, merge 01 → 04 → 17, suite + lane. Merged by the operator: `df1b16cf` (01),
+- [x] **O1** — 01 ∥ 04 ∥ 17, merge 01 → 04 → 17, suite + lane. Merged by the operator: `df1b16cf` (01),
       `33d298f9` (04), `d5016542` (17). Suite at `2a8385d9`: 42 failed, 9,515 passed, 87 skipped. The 42
       failed node ids equal BASELINE §5 exactly (`suite-o1.txt`). Lane GREEN: 3,577 passed, 0 failed,
-      17 declared exclusions (`lane-o1.xml`). 01 and 17 are done. 04 stays open on its display box: the
-      spec review found `[:16]` and `[:19]` slices left. That needs an operator exception or a follow-up.
-      O1 is ticked when 04 closes.
-- [ ] **O2** — 03 ∥ 05, merge, suite + lane. 03 is unblocked; 05 waits on 04.
+      17 declared exclusions (`lane-o1.xml`). 01, 04 and 17 are done. 04 closed on an operator exception:
+      three `[:16]` slices in `operator_review.py` keep their width for byte-equal replay
+      (`overhaul-04-display-width-exception_2026-11-11`).
+- [ ] **O2** — 03 ∥ 05, merge, suite + lane. 03 committed as `5350e2c4` (operator confirmed its three
+      behaviour changes); the ESR successor `41836e77` merges in the same batch. 05 started off the O1 head.
 - [ ] **O3** — 02 ∥ 06, merge, suite + lane
 - [x] **H1** — runbook Converse delta. Merged by the operator as `2a8385d9`; covered by the O1 suite and
       lane above (the runbook guard is a lane module). The V14 compare line changes again when the ESR
       record is rebound off `msca-dn-2025-sanitised-v1` (operator, 2026-11-11: that intake is out of
       scope).
 - [ ] **A1** — R11 (operator's explicit go). Step sheet reviewed by the operator and merged as `34a4e2e1`;
-      its tests pass (25). Nothing has run on AWS. Waits for the operator's explicit go at step 05.
+      its tests pass (25). Nothing has run on AWS. The operator runs steps 01–05 and hands back the change
+      set; the agent then writes VERIFICATION.md.
 - [ ] **A2** — R12b
 - [ ] **A3** — R14
 - [ ] **O5** — re-freeze, tag, bundle, sha256 record

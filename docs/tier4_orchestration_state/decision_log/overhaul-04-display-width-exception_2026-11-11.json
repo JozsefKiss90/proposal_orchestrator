@@ -1,0 +1,35 @@
+{
+  "record_type": "decision_record",
+  "id": "overhaul-04-display-width-exception_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "harness_overhaul",
+  "base_commit": "ac90a3a4",
+  "milestone": "November 2026 overhaul, wave 2, batch O1",
+  "ticket": "04 of .scratch/overhaul-2026-11/issues/04-one-content-hash-module.md, acceptance box 'Display code uses the short form; no hard-coded slice lengths for hashes remain in the DN record modules.'",
+  "authority": "Operator, in session 2026-11-11. Recorded under CLAUDE.md §9.4. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "operator_confirmed",
+  "decided_by": "operator",
+  "decision": "Three 16-character hash slices in harness/operator_review.py stay as written. They are an accepted exception to ticket 04's display criterion. Ticket 04 closes.",
+  "rules": [
+    {
+      "id": "W1",
+      "rule": "harness/operator_review.py keeps the 16-character width at three sites: line 1127 (an unprefixed inventory digest), line 1131 (the review notes' sha256) and line 1137 (an extra input's sha256). They are not replaced by short_hash, whose short form is 12 characters.",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11. The committed operator reviews under docs/tier4_orchestration_state/msca_dn/reviews/ print these widths in their inventory tables, and tests reproduce every committed review byte for byte. A 12-character short form would break that replay."
+    },
+    {
+      "id": "W2",
+      "rule": "No other hard-coded hash slice remains in the DN record modules. The [:19] slices in harness/rubric.py and harness/commands/rubric_grading_run.py that the ticket's spec review reported were replaced by short_hash before ticket 04's final commit (bcf29bec).",
+      "declared_status": "Confirmed",
+      "basis": "Tree check at ac90a3a4, 2026-11-11: a grep of harness/ for slices of sha256, digest, hash and fingerprint values finds the three sites of W1 and the one site of W3. The spec review had read an earlier state of the branch."
+    },
+    {
+      "id": "W3",
+      "rule": "harness/materiality_calibration.py line 356 prints set_hash[:23] to the console. It is not a DN record module, so the criterion does not reach it. It is left as is.",
+      "declared_status": "Inferred",
+      "basis": "The criterion's second clause names the DN record modules. This line is a console print in a calibration command and is not persisted."
+    }
+  ],
+  "known_gaps": [],
+  "private_content": "None. This record names files, line numbers and widths only."
+}
