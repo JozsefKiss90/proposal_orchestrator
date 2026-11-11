@@ -1,0 +1,58 @@
+{
+  "record_type": "decision_record",
+  "id": "overhaul-05-revisions-hash-gap_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "ticket/05-record-chain-expand",
+  "base_commit": "fee00fec",
+  "milestone": "November 2026 overhaul, wave 2, batch O2",
+  "ticket": "05 of .scratch/overhaul-2026-11/issues/05-dn-record-chain-expand.md, acceptance box 'code-review run since the base commit, with no gaps on the spec axis.'",
+  "authority": "Operator, in session 2026-11-11. Recorded under CLAUDE.md §9.4. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "operator_confirmed",
+  "decided_by": "operator",
+  "decision": "Ticket 05 closes with one accepted limitation: a comparison record binds its revisions artifact by path only. Four behaviour changes made by the ticket are accepted.",
+  "rules": [
+    {
+      "id": "G1",
+      "rule": "A comparison record stores the path of its revisions artifact and no hash of it. A written diff stores that hash, so loading a written diff refuses an edited revisions artifact. A new diff run checks only the hashes the comparison binds, so it does not detect an edit to the revisions artifact. This limitation is accepted for the O5 bundle.",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11 (option 1). The three committed comparisons under docs/tier4_orchestration_state/msca_dn/comparisons/ carry revisions_artifact paths only. Ticket 05 forbids record-format changes."
+    },
+    {
+      "id": "G2",
+      "rule": "Adding a revisions hash to the comparison record is a later format ticket. It lands after V16, so the bundle frozen at O5 serves V14 and V16 unchanged.",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11. D2 of plan-order-reliability_2026-11-11: nothing lands in the bundle between V14 and V16."
+    },
+    {
+      "id": "C1",
+      "rule": "load_comparison without a repo root resolves a relative predecessor path first against the nearest folder above the record that contains it, then against the harness repository.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11."
+    },
+    {
+      "id": "C2",
+      "rule": "Loading a comparison re-hashes its dispositions, fidelity register and audits, as well as its baseline report and ESR record. Every committed comparison still loads.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11. Tests load and replay the committed comparisons."
+    },
+    {
+      "id": "C3",
+      "rule": "A revisions artifact without advisory=true and blocking=false is refused. All three committed revisions artifacts carry both flags.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11."
+    },
+    {
+      "id": "C4",
+      "rule": "Comparison writes use the temp-file prefix comparison_ instead of esr_comparison_. The written bytes are unchanged.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "G1's limitation stays open until the later format ticket of G2 lands."
+    }
+  ],
+  "private_content": "None. This record names files, fields and behaviours only."
+}
