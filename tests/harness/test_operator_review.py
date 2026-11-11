@@ -43,6 +43,8 @@ from tests.harness.test_esr_comparison import (  # noqa: F401 - fixtures
     DN_PROFILE,
     DN_REGISTER,
     _compare,
+    _declare_submitted,
+    _historical_copy,
     frozen_world,
     inputs,
 )
@@ -881,3 +883,37 @@ class TestRecordedDecisions:
         _edit(written["notes"], lambda d: d.__setitem__("review_state", "operator_reviewed"))
         with pytest.raises(orv.OperatorReviewError, match="review_state"):
             orv.load_review_notes(written["notes"])
+
+
+# --------------------------------------------------------------------------- #
+# Ticket 17: a review over a submitted-document comparison
+# --------------------------------------------------------------------------- #
+
+
+def _written_with_historical(inputs, *, submitted: bool) -> dict:
+    if submitted:
+        _declare_submitted(inputs)
+    historical = _historical_copy(inputs)
+    code, out = _compare(inputs, "--historical-candidate", str(historical))
+    assert code == 0
+    comparison = next(out.glob("comparison_*.json"))
+    notes = _write_json(
+        inputs["world"] / "docs" / "review" / "notes.json",
+        _notes(orv.file_sha256(comparison)),
+    )
+    return {**inputs, "comparison": comparison, "notes": notes, "reviews": out.parent / "reviews"}
+
+
+class TestSubmittedDocumentWording:
+    def test_neither_candidate_is_called_a_sanitised_copy(self, inputs):
+        text = _report_text(_written_with_historical(inputs, submitted=True))
+        assert "sanitised copy" not in text
+        assert "the submitted document, which every quote below must match" in text
+        assert "the historical candidate, where historical quotes resolve" in text
+        assert "**The same passages in the historical candidate:**" in text
+
+    def test_a_copys_review_keeps_its_wording(self, inputs):
+        text = _report_text(_written_with_historical(inputs, submitted=False))
+        assert "the materialised sanitised copy every quote below is checked against" in text
+        assert "the earlier sanitised copy; historical quotes resolve here" in text
+        assert "**The same passages in the earlier sanitised copy:**" in text

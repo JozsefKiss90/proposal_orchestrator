@@ -1,6 +1,6 @@
 # 17 — Wording for a submitted document that no ESR has evaluated yet
 
-Status: ready-for-agent
+Status: in-progress
 Type: task
 Blocked by: None — can start immediately (wave 2, batch O1, parallel with 01 and 04)
 Source: `discovery/slice3-esr-review-2026-11-10.md` F1; the first Unresolved gap in
@@ -39,32 +39,32 @@ After this ticket the wording is keyed on two facts the code already holds:
 
 Failing tests first:
 
-- [ ] A register rendered for the 2026 resubmission on synthetic config contains neither "the text the ESR
+- [x] A register rendered for the 2026 resubmission on synthetic config contains neither "the text the ESR
       evaluated" nor "The ESR evaluated this text", and says no ESR has evaluated it yet.
-- [ ] The 2026 register does not file its call and submission ids under a key named `historical_submission`.
+- [x] The 2026 register does not file its call and submission ids under a key named `historical_submission`.
       The 2025 original's register is unchanged byte for byte.
-- [ ] A comparison whose register declares `is_submitted_document: true` carries a score statement that
+- [x] A comparison whose register declares `is_submitted_document: true` carries a score statement that
       names assessor variance, the profile and the extraction, and does not call the candidate a sanitised
       derivative.
-- [ ] In that comparison each row's `historical_proposal_evidence.note` does not say the submitted document
+- [x] In that comparison each row's `historical_proposal_evidence.note` does not say the submitted document
       is unavailable.
-- [ ] An operator review over that comparison does not call either candidate a sanitised copy, in the
+- [x] An operator review over that comparison does not call either candidate a sanitised copy, in the
       inventory notes or in the row heading.
-- [ ] Every committed comparison and review under `docs/tier4_orchestration_state/msca_dn/comparisons/`
+- [x] Every committed comparison and review under `docs/tier4_orchestration_state/msca_dn/comparisons/`
       replays byte-equal.
 
 Then:
 
-- [ ] Targeted tests pass, including every module that imports a changed module (wave-1 lesson).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] Targeted tests pass, including every module that imports a changed module (wave-1 lesson).
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
 - [ ] Full suite at or above `plans/overhaul/BASELINE.md` §5 (operator, after merge).
 - [ ] Acceptance lane GREEN (operator, after merge). The touched modules are lane modules.
-- [ ] The identity record's first known gap is closed by a successor note or record (§9.4).
+- [x] The identity record's first known gap is closed by a successor note or record (§9.4).
 
 ## Session brief
 
 ```
-Ticket: .scratch/overhaul-2026-11/issues/17-submitted-not-yet-evaluated-wording.md   Base commit: 60fca14e (step 0 on harness_overhaul)
+Ticket: .scratch/overhaul-2026-11/issues/17-submitted-not-yet-evaluated-wording.md   Base commit: 92ce1e16 (handoff log on harness_overhaul)
 Read first: CLAUDE.md §9, §12, §16–17; CONTEXT-MAP.md (+ harness/CONTEXT.md); docs/agents/*.md;
             plans/overhaul/BASELINE.md §5; .scratch/overhaul-2026-11/discovery/slice3-esr-review-2026-11-10.md;
             docs/tier4_orchestration_state/decision_log/msca-dn-resubmission-2026-identity_2026-11-10.json
@@ -91,3 +91,5 @@ Record: a successor note to the identity record's first known gap (§9.4)
 - Slice 3 F2 and F3 (runbook notes, H1).
 
 ## Comments
+
+- 2026-11-11, base 92ce1e16: wording keyed on EVALUATED_BY_AN_ESR (register) and is_submitted_document (comparison, review). Targeted: 19 importing modules, 1272 passed, 0 failed. Committed comparisons, revisions and reviews replay byte-equal under tests. The 2025 register equals the base renderer's bytes. Successor record: msca-dn-not-yet-evaluated-wording_2026-11-11. Full suite and lane not run.

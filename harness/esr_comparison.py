@@ -247,6 +247,33 @@ _SCORE_STATEMENT = (
     "changed wording, removed evidence or assessor variance. The blind spread "
     "is within-assessor repeatability and cannot decompose that difference."
 )
+#: The score statement when the register declares the candidate the submitted
+#: document itself (ticket 17). Changed wording and removed evidence drop out.
+_SUBMITTED_SCORE_STATEMENT = (
+    "This comparison scores criteria apart from the qualitative rows. It "
+    "attributes no deduction to any individual criticism. The candidate is the "
+    "submitted document itself. A difference from the historical score is "
+    "therefore not interpretable as model error. It may come from assessor "
+    "variance, the profile or what the extraction lost. The blind spread is "
+    "within-assessor repeatability and cannot decompose that difference."
+)
+_COPY_EVIDENCE_NOTE = (
+    "The submitted document is not available in this environment; the "
+    "historical evidence is quoted from the earlier sanitised copy, which "
+    "stands for the submission only as far as the fidelity register says."
+)
+_COPY_EVIDENCE_NOTE_ALONE = (
+    "The submitted document is not available in this environment; no "
+    "historical copy was given, so the current copy stands for both."
+)
+_SUBMITTED_EVIDENCE_NOTE = (
+    "The candidate is the submitted document. The historical quotes come from "
+    "the historical candidate this comparison names."
+)
+_SUBMITTED_EVIDENCE_NOTE_ALONE = (
+    "The candidate is the submitted document. No historical candidate was given, "
+    "so the submitted document stands for both."
+)
 _NOT_ASSESSABLE_STATEMENT = (
     "A 'not assessable from this copy' row is counted separately. It is never a "
     "model failure, never a detection, and never dropped from the row count."
@@ -433,6 +460,18 @@ class Register:
     path: Path
     sha256: str
     data: Mapping[str, Any]
+
+
+def declares_submitted_document(register: Mapping[str, Any]) -> bool:
+    """Whether the register declares its candidate the submitted document.
+
+    Only a literal ``True`` counts. A register that declares ``False`` or
+    nothing keeps the sanitised copy's wording, so committed records replay
+    byte-equal (ticket 17).
+    """
+    provenance = register.get("provenance")
+    artifact = provenance.get("current_assessment_artifact") if isinstance(provenance, Mapping) else None
+    return isinstance(artifact, Mapping) and artifact.get("is_submitted_document") is True
 
 
 def load_register(path: Path | str) -> Register:
@@ -1263,6 +1302,12 @@ def run_comparison(
         else {}
     )
 
+    submitted = declares_submitted_document(register.data)
+    if historical_candidate is not None:
+        evidence_note = _SUBMITTED_EVIDENCE_NOTE if submitted else _COPY_EVIDENCE_NOTE
+    else:
+        evidence_note = _SUBMITTED_EVIDENCE_NOTE_ALONE if submitted else _COPY_EVIDENCE_NOTE_ALONE
+
     rows: list[dict[str, Any]] = []
     for obs in esr.observations:
         oid = str(obs["id"])
@@ -1370,14 +1415,7 @@ def run_comparison(
             "historical_location": obs["esr_location"],
             "proposal_location": obs.get("proposal_location"),
             "historical_proposal_evidence": {
-                "note": (
-                    "The submitted document is not available in this environment; the "
-                    "historical evidence is quoted from the earlier sanitised copy, which "
-                    "stands for the submission only as far as the fidelity register says."
-                    if historical_candidate is not None
-                    else "The submitted document is not available in this environment; no "
-                    "historical copy was given, so the current copy stands for both."
-                ),
+                "note": evidence_note,
                 "quotes": historical,
             },
             "current_proposal_evidence": current,
@@ -1434,7 +1472,7 @@ def run_comparison(
                 "operator decision the dispositions record names for that row."
             ),
         }
-    scores = _compare_scores(esr, baseline, frozen.record)
+    scores = _compare_scores(esr, baseline, frozen.record, submitted=submitted)
     revisions = _prioritise(rows, weights, esr_criteria=sorted(esr_criteria))
     open_without_revision = [
         r["observation_id"] for r in rows
@@ -1724,7 +1762,9 @@ def _summarise(rows: Sequence[Mapping[str, Any]], criteria: set[str]) -> dict[st
     }
 
 
-def _compare_scores(esr: EsrRecord, baseline: Mapping[str, Any], freeze: Mapping[str, Any]) -> dict[str, Any]:
+def _compare_scores(
+    esr: EsrRecord, baseline: Mapping[str, Any], freeze: Mapping[str, Any], *, submitted: bool = False
+) -> dict[str, Any]:
     scoring = baseline.get("criterion_scoring") or {}
     blind = {str(s.get("criterion_id")): s for s in scoring.get("scores") or []}
     criteria = []
@@ -1752,7 +1792,7 @@ def _compare_scores(esr: EsrRecord, baseline: Mapping[str, Any], freeze: Mapping
         },
         "spread_label": freeze.get("spread_label") or scoring.get("spread_label"),
         "no_deduction_attributed_to_individual_criticism": True,
-        "statement": _SCORE_STATEMENT,
+        "statement": _SUBMITTED_SCORE_STATEMENT if submitted else _SCORE_STATEMENT,
     }
 
 

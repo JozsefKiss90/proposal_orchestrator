@@ -1,0 +1,75 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-not-yet-evaluated-wording_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "ticket/17-not-yet-evaluated-wording",
+  "base_commit": "92ce1e16",
+  "milestone": "November 2026 overhaul, wave 2, batch O1",
+  "ticket": "17 of .scratch/overhaul-2026-11/issues/17-submitted-not-yet-evaluated-wording.md (slice 3 F1; the first known gap of msca-dn-resubmission-2026-identity_2026-11-10)",
+  "authority": "Agent-authored under CLAUDE.md while implementing ticket 17. Operator decision D5 of plan-order-reliability_2026-11-11 admitted the ticket and set its timing. Recorded under CLAUDE.md §9.4. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The operator decided the timing and the byte-equal rule on 2026-11-11 (D5). The agent chose the keys and drafted the new sentences.",
+  "successor_of": "msca-dn-resubmission-2026-identity_2026-11-10, known_gaps[0]. That record is not edited.",
+  "decision": "Three renderers now choose their wording from two facts. The V18 register renderer reads whether an ESR has evaluated the submitted document. The ESR comparison and the operator review read the register's is_submitted_document. A sanitised copy's records keep their wording unchanged, and so does the 2025 original's register.",
+  "rules": [
+    {
+      "id": "R1",
+      "rule": "tools/author_original_workspace.py holds EVALUATED_BY_AN_ESR, the config ids of submitted documents an ESR has evaluated. It lists official_original only. A submitted document not listed gets the not-yet-evaluated wording, so an unlisted document never claims an ESR.",
+      "declared_status": "Confirmed",
+      "basis": "Ticket 17 'What to build': true for the 2025 original, false for the 2026 resubmission. The 2026 intake declares esr_availability not_applicable and the 2025 fixture declares unknown, so the intake cannot carry the fact. The set lives in the renderer to keep the importer's document set untouched."
+    },
+    {
+      "id": "R2",
+      "rule": "A register for a document no ESR has evaluated states 'No ESR has evaluated it yet' and 'No ESR has evaluated this text yet'. It names no ESR record. It files the call and submission ids under 'submission', not 'historical_submission'.",
+      "declared_status": "Confirmed",
+      "basis": "tests/test_msca_dn_original_import_route.py: test_a_document_no_esr_has_evaluated_says_so and test_a_document_no_esr_has_evaluated_files_no_historical_submission, on the synthetic resubmission_2026 configuration."
+    },
+    {
+      "id": "R3",
+      "rule": "The 2025 original's register is unchanged byte for byte.",
+      "declared_status": "Confirmed",
+      "basis": "Session check on 2026-11-11: the base renderer (92ce1e16) and the new renderer rendered the synthetic official_original fixture to equal canonical bytes. The existing assertion of 'The ESR evaluated this text' still passes."
+    },
+    {
+      "id": "R4",
+      "rule": "A comparison whose register declares is_submitted_document true gets a score statement naming assessor variance, the profile and the extraction. Its rows' historical evidence notes say the candidate is the submitted document. A register declaring false or nothing keeps the copy's statement and notes.",
+      "declared_status": "Confirmed",
+      "basis": "tests/harness/test_esr_comparison.py, TestSubmittedDocumentWording. test_every_committed_comparison_replays_byte_equal replays the three committed comparisons and their revisions artifacts byte for byte. It normalises only the output directory the records spell absolute."
+    },
+    {
+      "id": "R5",
+      "rule": "An operator review over such a comparison calls the candidate 'the submitted document' and the historical candidate 'the historical candidate'. Both the inventory and the row heading use these names. A copy's review keeps its wording.",
+      "declared_status": "Confirmed",
+      "basis": "tests/harness/test_operator_review.py, TestSubmittedDocumentWording. The existing test reproducing every committed operator review byte for byte passes."
+    }
+  ],
+  "closes": [
+    {
+      "record": "msca-dn-resubmission-2026-identity_2026-11-10",
+      "known_gap": 0,
+      "closure": "The V18 register no longer states that an ESR evaluated the 2026 resubmission, and no longer files its ids under historical_submission (R1, R2). The 2025 original keeps both sentences (R3).",
+      "declared_status": "Confirmed",
+      "basis": "R2 and R3 above. Nobody has rendered the register for the real 2026 PDF yet. That happens at V16 inside the private network."
+    }
+  ],
+  "known_gaps": [
+    {
+      "declared_status": "Assumed",
+      "gap": "When an ESR of the 2026 resubmission arrives, someone must add resubmission_2026 to EVALUATED_BY_AN_ESR. Until then its register says no ESR has evaluated it."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "Three other fixed sentences in harness/operator_review.py still speak of sanitisation in a submitted-document review: the not-assessable legend, the praised-point paragraph and its follow-up bullet. The ticket scoped the inventory notes and the row heading only. Whether they need wording keyed on the register is the operator's call."
+    },
+    {
+      "declared_status": "Assumed",
+      "gap": "The comparison and the review key on is_submitted_document alone. Their new sentences hold when the ESR evaluated the candidate itself. run_comparison refuses an ESR record whose intake differs from the baseline's, so a resubmission cannot meet the 2025 ESR there. A baseline without an intake id is only flagged."
+    },
+    {
+      "declared_status": "Unresolved",
+      "gap": "The full suite and the acceptance lane have not been run on this branch. Only targeted tests ran. Both are the operator's after merge."
+    }
+  ],
+  "lane_change": "None. The new tests are cases in existing lane modules. No skip is added.",
+  "private_content": "None. This record names ids, rules and synthetic fixture values only."
+}

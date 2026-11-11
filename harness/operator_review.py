@@ -55,7 +55,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
@@ -86,6 +86,7 @@ from harness.esr_comparison import (
     POINTER_RESOLUTION_IDENTITY,
     pointer_rule_of,
     EsrComparisonError,
+    declares_submitted_document,
     load_audits,
     load_comparison,
     load_esr_record,
@@ -411,6 +412,26 @@ def load_review_notes(path: Path | str) -> ReviewNotes:
 # --------------------------------------------------------------------------- #
 
 
+#: How the inventory names the two candidates, keyed on whether the register
+#: declares the candidate the submitted document (ticket 17). A copy's review
+#: keeps its wording, so committed reviews replay byte-equal.
+_CANDIDATE_NOTES: Mapping[bool, Mapping[str, str]] = {
+    False: {
+        "candidate": "the materialised sanitised copy every quote below is checked against",
+        "historical candidate": "the earlier sanitised copy; historical quotes resolve here",
+    },
+    True: {
+        "candidate": "the submitted document, which every quote below must match",
+        "historical candidate": "the historical candidate, where historical quotes resolve",
+    },
+}
+#: The row heading over the historical quotes, keyed the same way.
+_HISTORICAL_HEADING: Mapping[bool, str] = {
+    False: "**The same passages in the earlier sanitised copy:** ",
+    True: "**The same passages in the historical candidate:** ",
+}
+
+
 @dataclass(frozen=True)
 class InputRecord:
     """One row of the report's input inventory."""
@@ -553,7 +574,7 @@ def resolve_inputs(
             role="candidate",
             path=_portable(cand_dir, repo_root),
             sha256=actual_hash,
-            note="the materialised sanitised copy every quote below is checked against",
+            note=_CANDIDATE_NOTES[False]["candidate"],
         )
     )
 
@@ -576,7 +597,7 @@ def resolve_inputs(
                 role="historical candidate",
                 path=_portable(hist_dir, repo_root),
                 sha256=hist_hash,
-                note="the earlier sanitised copy; historical quotes resolve here",
+                note=_CANDIDATE_NOTES[False]["historical candidate"],
             )
         )
 
@@ -587,6 +608,12 @@ def resolve_inputs(
         register = load_register(reg_path).data
     except EsrComparisonError as exc:
         raise OperatorReviewError(str(exc)) from exc
+    if declares_submitted_document(register):
+        # Ticket 17: the candidates were listed before the register was read.
+        notes_for = _CANDIDATE_NOTES[True]
+        inventory = [
+            replace(r, note=notes_for[r.role]) if r.role in notes_for else r for r in inventory
+        ]
     inventory.append(
         InputRecord(
             role="fidelity register",
@@ -1379,8 +1406,8 @@ def _render_row(review: Review, row: ReviewRow) -> list[str]:
     historical = (c.get("historical_proposal_evidence") or {}).get("quotes") or []
     if historical:
         add(
-            "**The same passages in the earlier sanitised copy:** "
-            f"{len(historical)} quote(s), verified."
+            _HISTORICAL_HEADING[declares_submitted_document(review.inputs.register)]
+            + f"{len(historical)} quote(s), verified."
         )
         add("")
 
