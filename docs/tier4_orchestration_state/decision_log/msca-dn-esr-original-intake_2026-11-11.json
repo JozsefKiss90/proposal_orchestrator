@@ -39,8 +39,9 @@
   "resolves": "The V14 compare refusal found 2026-11-11: run_comparison refuses the PE-08 ESR record against a baseline assessed under --intake msca-dn-2025-original, because the record names msca-dn-2025-sanitised-v1.",
   "known_gaps": [
     {
-      "declared_status": "Unresolved",
-      "gap": "The full suite and the acceptance lane have not been run on this branch. Only targeted tests ran. Both are the operator's after merge."
+      "declared_status": "Confirmed",
+      "gap": "The full suite and the acceptance lane have not been run on this branch. Only targeted tests ran. Both are the operator's after merge.",
+      "resolution": "Closed 2026-11-11 by the operator's O2 run at 70fcb6b5: the suite's 42 failed node ids equal plans/overhaul/BASELINE.md §5; the lane is GREEN (3,645 passed, 0 failed, 17 declared exclusions)."
     },
     {
       "declared_status": "Assumed",
