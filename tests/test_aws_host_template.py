@@ -4,7 +4,7 @@ Acceptance, from ``plans/aws_redeployment_tickets.md`` R11, the handoff
 (``plans/aws_redeployment_handoff_2026-10-21.md`` §4 F1, F2, F7; §6 R11; §7)
 and the decision records OD2 (one hardened runtime role), OD4 (one zone),
 OD5 (per-session stack), OD6-r3 (stack layout, imports, outputs contract),
-OD7-resources (model lists) and OD9 (AL2023 x86_64, t3.medium):
+OD7-resources (model lists) and OD9-r1 (AL2023 x86_64, c7i-flex.large):
 
 - exactly six interface endpoints (``bedrock-runtime``, ``sts``,
   ``secretsmanager``, ``ssm``, ``ssmmessages``, ``ec2messages``) and one
@@ -219,7 +219,9 @@ def test_host_image_size_and_profile(template: dict[str, Any], resources: dict[s
     assert params["LatestAmiId"]["Type"] == "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
     assert params["LatestAmiId"]["Default"] == "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
     assert props["InstanceType"] == {"Ref": "InstanceType"}
-    assert params["InstanceType"]["Default"] == "t3.medium"  # OD9
+    assert params["InstanceType"]["Default"] == "c7i-flex.large"  # OD9-r1
+    # t3.medium is not Free Tier eligible (R11 step 06); t3.micro stays for a smoke run.
+    assert params["InstanceType"]["AllowedValues"] == ["c7i-flex.large", "t3.micro"]
     assert props["IamInstanceProfile"] == INSTANCE_PROFILE  # DC-14, F1
 
 
@@ -266,7 +268,10 @@ def test_host_has_no_key_pair_no_user_data_and_no_extras(resources: dict[str, An
     for key in ("KeyName", "UserData", "LaunchTemplate", "SsmAssociations", "HibernationOptions",
                 "SourceDestCheck", "ElasticGpuSpecifications", "PlacementGroupName"):
         assert key not in props, key
-    assert props["CreditSpecification"] == {"CPUCredits": "standard"}
+    # CPU credits are a T-instance setting: standard on t3, absent on c7i-flex (OD9-r1).
+    assert props["CreditSpecification"] == {
+        "Fn::If": ["IsBurstable", {"CPUCredits": "standard"}, {"Ref": "AWS::NoValue"}]
+    }
     assert props["Monitoring"] is False
     assert props["DisableApiTermination"] is False
     tags = {t["Key"]: t["Value"] for t in props["Tags"]}
@@ -333,3 +338,12 @@ def test_parameter_file_sets_exactly_the_required_parameters(template: dict[str,
     assert required == {"ExpectedAccountId", "InferenceProfileArns", "FoundationModelArns"}
     assert required <= values
     assert values - required <= {"ExpectedRegion"}  # defaults are set only to state them
+
+
+def test_cpu_credits_are_set_only_for_a_burstable_type(template: dict[str, Any]) -> None:
+    # The condition reads the family before the first dot: "t3" for t3.micro, "c7i-flex" for c7i-flex.large.
+    assert template["Conditions"]["IsBurstable"] == {
+        "Fn::Equals": [{"Fn::Select": [0, {"Fn::Split": [".", {"Ref": "InstanceType"}]}]}, "t3"]
+    }
+    for allowed in template["Parameters"]["InstanceType"]["AllowedValues"]:
+        assert (allowed.split(".")[0] == "t3") == allowed.startswith("t3."), allowed

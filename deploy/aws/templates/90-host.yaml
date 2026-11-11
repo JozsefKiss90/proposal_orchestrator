@@ -42,11 +42,13 @@ Parameters:
     Description: Foundation model ARNs the Bedrock endpoint policy admits (OD7-resources, F2).
   InstanceType:
     Type: String
-    Default: t3.medium
+    Default: c7i-flex.large
     AllowedValues:
+      - c7i-flex.large
       - t3.micro
-      - t3.medium
-    Description: Host size (OD9). t3.micro only for a smoke run.
+    Description: >-
+      Host size (OD9-r1). c7i-flex.large is Free Tier eligible in the project Region;
+      t3.medium is not (R11 step 06). t3.micro only for a smoke run.
   LatestAmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
@@ -54,6 +56,10 @@ Parameters:
       AL2023 x86_64 image (OD9), resolved from the AWS public SSM parameter
       when the stack is created. Readability is shown in
       evidence_v2/R3/R3_07_al2023-ami-parameter.json.
+
+Conditions:
+  # CreditSpecification applies to burstable T instances only (OD9-r1).
+  IsBurstable: !Equals [!Select [0, !Split [".", !Ref InstanceType]], t3]
 
 Rules:
   DeployTarget:
@@ -243,8 +249,10 @@ Resources:
             VolumeType: gp3
             Encrypted: true
             DeleteOnTermination: true
-      CreditSpecification:
-        CPUCredits: standard
+      CreditSpecification: !If
+        - IsBurstable
+        - CPUCredits: standard
+        - !Ref AWS::NoValue
       Monitoring: false
       DisableApiTermination: false
       InstanceInitiatedShutdownBehavior: stop
