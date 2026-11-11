@@ -93,7 +93,7 @@ class TestRecordAndReplay:
         cache = ResponseCache(tmp_path / "ck.jsonl", BINDING, clock=lambda: FROZEN)
         judge = _judge(tmp_path, CountingBackend('{"passed": true, "rationale": "r"}'), cache)
 
-        judge.raw_invoke("system", "user")
+        judge._send("system", "user")
 
         records = [json.loads(l) for l in cache.path.read_text(encoding="utf-8").splitlines()]
         assert records[0]["record_type"] == CHECKPOINT_HEADER_RECORD_TYPE
@@ -107,12 +107,12 @@ class TestRecordAndReplay:
         path = tmp_path / "ck.jsonl"
         first = ResponseCache(path, BINDING, clock=lambda: FROZEN)
         backend = CountingBackend('{"passed": true, "rationale": "first run"}')
-        _judge(tmp_path, backend, first).raw_invoke("system", "user")
+        _judge(tmp_path, backend, first)._send("system", "user")
         assert backend.calls == 1
 
         resumed = ResponseCache(path, BINDING, resume=True, clock=lambda: FROZEN)
         second = CountingBackend('{"passed": false, "rationale": "must not be asked"}')
-        text = _judge(tmp_path, second, resumed).raw_invoke("system", "user")
+        text = _judge(tmp_path, second, resumed)._send("system", "user")
 
         assert text == '{"passed": true, "rationale": "first run"}'
         assert second.calls == 0
@@ -124,22 +124,22 @@ class TestRecordAndReplay:
         backend = CountingBackend("one", "two", "three")
         judge = _judge(tmp_path, backend, cache)
         for _ in range(3):
-            judge.raw_invoke("system", "user")
+            judge._send("system", "user")
 
         resumed = ResponseCache(path, BINDING, resume=True, clock=lambda: FROZEN)
         replay = _judge(tmp_path, CountingBackend("must not be asked"), resumed)
-        assert [replay.raw_invoke("system", "user") for _ in range(3)] == ["one", "two", "three"]
+        assert [replay._send("system", "user") for _ in range(3)] == ["one", "two", "three"]
 
     def test_the_run_goes_live_where_the_checkpoint_runs_out(self, tmp_path):
         path = tmp_path / "ck.jsonl"
         cache = ResponseCache(path, BINDING, clock=lambda: FROZEN)
-        _judge(tmp_path, CountingBackend("recorded"), cache).raw_invoke("system", "user")
+        _judge(tmp_path, CountingBackend("recorded"), cache)._send("system", "user")
 
         resumed = ResponseCache(path, BINDING, resume=True, clock=lambda: FROZEN)
         backend = CountingBackend("live")
         judge = _judge(tmp_path, backend, resumed)
-        assert judge.raw_invoke("system", "user") == "recorded"
-        assert judge.raw_invoke("system", "user") == "live"
+        assert judge._send("system", "user") == "recorded"
+        assert judge._send("system", "user") == "live"
         assert backend.calls == 1
         assert resumed.replayed == 1 and resumed.live == 1
         # The live call joins the same file, so a second resume covers both.
@@ -149,11 +149,11 @@ class TestRecordAndReplay:
     def test_a_different_prompt_is_not_served_from_another_prompts_record(self, tmp_path):
         path = tmp_path / "ck.jsonl"
         cache = ResponseCache(path, BINDING, clock=lambda: FROZEN)
-        _judge(tmp_path, CountingBackend("for prompt A"), cache).raw_invoke("system", "A")
+        _judge(tmp_path, CountingBackend("for prompt A"), cache)._send("system", "A")
 
         resumed = ResponseCache(path, BINDING, resume=True, clock=lambda: FROZEN)
         backend = CountingBackend("for prompt B")
-        assert _judge(tmp_path, backend, resumed).raw_invoke("system", "B") == "for prompt B"
+        assert _judge(tmp_path, backend, resumed)._send("system", "B") == "for prompt B"
         assert backend.calls == 1
 
     def test_a_response_is_checkpointed_before_anything_parses_it(self, tmp_path):
@@ -161,7 +161,7 @@ class TestRecordAndReplay:
         path = tmp_path / "ck.jsonl"
         cache = ResponseCache(path, BINDING, clock=lambda: FROZEN)
         broken = '{"score": 4.1, "rationale": "trailing comma", }'
-        _judge(tmp_path, CountingBackend(broken), cache).raw_invoke("system", "user")
+        _judge(tmp_path, CountingBackend(broken), cache)._send("system", "user")
 
         resumed = ResponseCache(path, BINDING, resume=True, clock=lambda: FROZEN)
         assert resumed.take(prompt_hash("system", "user")) == broken
@@ -281,7 +281,7 @@ class TestBoundedReask:
     def test_the_trailing_comma_that_cost_the_run_is_now_redrawn(self, tmp_path):
         scoring = _scoring()
         backend = CountingBackend(_score_json(4.1, trailing_comma=True), _score_json(4.1))
-        sample, discarded = cs._draw_sample(
+        sample, discarded, _record = cs._draw_sample(
             _judge(tmp_path, backend), "system", "user", scoring, 0
         )
         assert sample.score == 4.1
@@ -292,7 +292,7 @@ class TestBoundedReask:
 
     def test_nothing_from_a_discarded_draw_reaches_the_sample(self, tmp_path):
         backend = CountingBackend(_score_json(2.0, trailing_comma=True), _score_json(5.0))
-        sample, _ = cs._draw_sample(_judge(tmp_path, backend), "system", "user", _scoring(), 0)
+        sample, _, _record = cs._draw_sample(_judge(tmp_path, backend), "system", "user", _scoring(), 0)
         assert sample.score == 5.0
 
     def test_the_budget_is_bounded_and_the_run_then_fails_closed(self, tmp_path):
@@ -303,7 +303,7 @@ class TestBoundedReask:
 
     def test_a_clean_run_records_no_discarded_draw(self, tmp_path):
         backend = CountingBackend(_score_json(4.0))
-        _, discarded = cs._draw_sample(_judge(tmp_path, backend), "system", "user", _scoring(), 0)
+        _, discarded, _record = cs._draw_sample(_judge(tmp_path, backend), "system", "user", _scoring(), 0)
         assert discarded == [] and backend.calls == 1
 
     def test_the_prompt_asks_for_strict_json(self, bundle_and_input):
@@ -327,7 +327,7 @@ class TestDiscardedResponses:
         cache = ResponseCache(path, BINDING, clock=lambda: FROZEN)
         broken = _score_json(4.1, trailing_comma=True)
         judge = _judge(tmp_path, CountingBackend(broken), cache)
-        judge.raw_invoke("system", "user")
+        judge._send("system", "user")
         cache.discard_last("would not parse")
 
         resumed = ResponseCache(path, BINDING, resume=True, clock=lambda: FROZEN)
@@ -339,7 +339,7 @@ class TestDiscardedResponses:
         path = tmp_path / "ck.jsonl"
         cache = ResponseCache(path, BINDING, clock=lambda: FROZEN)
         broken = _score_json(4.1, trailing_comma=True)
-        _judge(tmp_path, CountingBackend(broken), cache).raw_invoke("system", "user")
+        _judge(tmp_path, CountingBackend(broken), cache)._send("system", "user")
         cache.discard_last("would not parse")
 
         records = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines()]
@@ -379,7 +379,7 @@ class TestDiscardedResponses:
 
         resumed = ResponseCache(path, BINDING, resume=True, clock=lambda: FROZEN)
         good = CountingBackend(_score_json(4.1))
-        sample, discarded = cs._draw_sample(
+        sample, discarded, _record = cs._draw_sample(
             _judge(tmp_path, good, resumed), "system", "user", _scoring(), 0
         )
         assert sample.score == 4.1
@@ -677,6 +677,32 @@ class TestSalvage:
         )
         assert resumed.replayable == 0
 
+    def test_json_that_is_not_a_valid_verdict_counts_as_malformed(self, tmp_path, capsys):
+        """Ticket 01, test 6: salvage judges with the verdict parser the run uses."""
+        import harness.commands.blind_assessment as cmd
+
+        repo, bundle, candidate_dir, candidate = self._world(tmp_path)
+        out, transcripts = tmp_path / "reports", tmp_path / "transcripts"
+        transcripts.mkdir()
+        checkpoint = tmp_path / "ck.jsonl"
+        _system, user = self._cell_prompts(bundle, candidate)[0]
+        # A JSON object, but neither 'passed' nor 'score': not a verdict.
+        _fake_transcript(transcripts / "0000.jsonl", user, '{"rationale": "no verdict"}')
+
+        _argv, salvage_argv = self._argv(
+            bundle, candidate_dir, repo, out, transcripts, checkpoint
+        )
+        assert cmd.main(salvage_argv, clock=lambda: FROZEN) == 1
+        assert "malformed:  1 recorded response(s)" in capsys.readouterr().out
+        resumed = ResponseCache(
+            checkpoint,
+            CacheBinding.from_dict(
+                json.loads(checkpoint.read_text(encoding="utf-8").splitlines()[0])["binding"]
+            ),
+            resume=True,
+        )
+        assert resumed.replayable == 0
+
     def test_the_salvaged_binding_equals_the_one_assess_computes(self, tmp_path):
         """A binding that disagreed by one field would refuse the resume."""
         import harness.commands.blind_assessment as cmd
@@ -792,12 +818,12 @@ class TestAResumeIsHonest:
 
     def test_an_identical_configuration_replays_as_before(self, tmp_path):
         path = tmp_path / "ck.jsonl"
-        _judge(tmp_path, CountingBackend("recorded"), ResponseCache(path, BINDING)).raw_invoke(
+        _judge(tmp_path, CountingBackend("recorded"), ResponseCache(path, BINDING))._send(
             "system", "user"
         )
         resumed = ResponseCache(path, BINDING, resume=True)
         backend = CountingBackend("must not be asked")
-        assert _judge(tmp_path, backend, resumed).raw_invoke("system", "user") == "recorded"
+        assert _judge(tmp_path, backend, resumed)._send("system", "user") == "recorded"
         assert backend.calls == 0 and resumed.replayed == 1
 
     def test_a_pre_change_checkpoint_opens_but_its_resume_is_refused(self, tmp_path):
@@ -847,12 +873,12 @@ class TestAResumeIsHonest:
         piece = cl.ProseChunk(sub_section_id="1.1", chunk_index=0, text="Some passage.")
         payload = '{"assertions": ["one assertion"]}'
         first = _judge(tmp_path / "a", CountingBackend(payload), ResponseCache(path, BINDING))
-        cl.decompose_chunk(first, piece, clock=lambda: FROZEN)
+        cl.decompose_chunk(first, piece)
         assert all("replayed" not in r for r in _provenance(tmp_path / "a" / "provenance.jsonl"))
 
         backend = CountingBackend(payload)
         second = _judge(tmp_path / "b", backend, ResponseCache(path, BINDING, resume=True))
-        cl.decompose_chunk(second, piece, clock=lambda: FROZEN)
+        cl.decompose_chunk(second, piece)
         (record,) = _provenance(tmp_path / "b" / "provenance.jsonl")
         assert record["replayed"] is True and backend.calls == 0
 

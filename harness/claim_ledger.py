@@ -61,7 +61,6 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -78,7 +77,7 @@ from harness.materiality import (
     classify_materiality,
     normalize_text,
 )
-from harness.provenance import ProvenanceLog, ProvenanceRecord, prompt_hash
+from harness.provenance import ProvenanceLog
 from harness.report import HarnessReport, build_report
 from harness.routing import RoutingDecision, assert_judgeable
 from harness.verdict import MajorityVerdict, Verdict, validate_sample_count
@@ -156,11 +155,12 @@ ESCAPE_ESCALATION_UNCONFIRMED: str = "escalation_unconfirmed"
 
 
 class ClaimLedgerError(Exception):
-    """A section artifact, judge response, or metric input is malformed."""
+    """A section artifact or metric input is malformed.
 
-
-def _default_clock() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    A malformed judge response raises
+    :class:`~harness.judge.JudgeResponseError` instead, the judge's one
+    "malformed, redraw" signal.
+    """
 
 
 # --------------------------------------------------------------------------- #
@@ -293,28 +293,43 @@ def parse_assertions_payload(raw: str) -> tuple[str, ...]:
     non-blank strings.  An empty array is **valid** (a pure-transition chunk
     asserts nothing); anything malformed — no object, a bare top-level array,
     a missing/non-array key, a non-string or blank member — raises
-    :class:`ClaimLedgerError` so the chunk fails loudly instead of yielding a
-    quietly wrong assertion set.
+    :class:`~harness.judge.JudgeResponseError`, the judge's one "malformed,
+    redraw" signal, so the draw is redrawn and, once the budget is spent, the
+    chunk fails loudly instead of yielding a quietly wrong assertion set.
     """
     payload = extract_first_json_object(raw)
     if payload is None:
-        raise ClaimLedgerError(
+        raise JudgeResponseError(
             f"decomposition response carried no parseable JSON object: {raw[:200]!r}"
         )
     assertions = payload.get("assertions")
     if not isinstance(assertions, list):
-        raise ClaimLedgerError(
+        raise JudgeResponseError(
             "decomposition response has no 'assertions' array "
             f"(got {type(assertions).__name__})."
         )
     out: list[str] = []
     for i, a in enumerate(assertions):
         if not isinstance(a, str) or not a.strip():
-            raise ClaimLedgerError(
+            raise JudgeResponseError(
                 f"decomposition assertion [{i}] must be a non-blank string; got {a!r}."
             )
         out.append(a.strip())
     return tuple(out)
+
+
+@dataclass(frozen=True)
+class _Decomposition:
+    """A parsed decomposition as it reports itself to the judge's record."""
+
+    texts: tuple[str, ...]
+    chunk_id: str
+    score: float | None = None
+    passed: bool | None = None
+
+    @property
+    def rationale(self) -> str:
+        return f"decomposed {len(self.texts)} assertion(s) from {self.chunk_id}"
 
 
 def decompose_chunk(
@@ -322,41 +337,29 @@ def decompose_chunk(
     chunk: ProseChunk,
     *,
     provenance_log: ProvenanceLog | None = None,
-    clock: Callable[[], str] | None = None,
 ) -> tuple[str, ...]:
     """Decompose one chunk into assertion texts via the independent judge.
 
-    Uses :meth:`~harness.judge.Judge.raw_invoke` — decomposition is generative,
-    not a boolean verdict, so it does not flow through ``evaluate()``.  Its
-    provenance is therefore hand-built here.  It lands in the explicit
-    *provenance_log* when one is passed (the
-    :func:`~harness.calibration.calibrate_with_judge` precedent), **falling
-    back to the judge's own attached log** — so a caller using the standard
-    attach-a-log-to-the-Judge pattern still gets decomposition provenance
-    rather than a silent gap; only a judge with no log anywhere logs nothing.
-    A malformed response raises :class:`ClaimLedgerError`; the pipeline surfaces
+    Decomposition is generative, not a boolean verdict, so it goes through
+    :meth:`~harness.judge.Judge.ask` with its own parser rather than
+    ``evaluate()``.  The judge redraws a malformed draw within its budget and
+    writes the provenance record: into the explicit *provenance_log* when one
+    is passed (the :func:`~harness.calibration.calibrate_with_judge`
+    precedent), else into the judge's own attached log; only a judge with no
+    log anywhere logs nothing.  Once the budget is spent a malformed response
+    raises :class:`~harness.judge.JudgeResponseError`; the pipeline surfaces
     it as a :class:`ChunkFailure`.
     """
     system_prompt, user_prompt = build_decomposition_prompt(chunk)
-    raw = judge.raw_invoke(system_prompt, user_prompt)
-    texts = parse_assertions_payload(raw)
-    log = provenance_log if provenance_log is not None else judge.provenance_log
-    if log is not None:
-        log.append(
-            ProvenanceRecord(
-                judge_model=judge.config.model,
-                judge_version=judge.config.version,
-                prompt_hash=prompt_hash(system_prompt, user_prompt),
-                score=None,
-                rationale=f"decomposed {len(texts)} assertion(s) from {chunk.chunk_id}",
-                metric=DECOMPOSITION_METRIC,
-                property_key=chunk.chunk_id,
-                passed=None,
-                timestamp=(clock or _default_clock)(),
-                replayed=judge.last_call_replayed,
-            )
-        )
-    return texts
+    answer = judge.ask(
+        system_prompt,
+        user_prompt,
+        lambda raw: _Decomposition(parse_assertions_payload(raw), chunk.chunk_id),
+        metric=DECOMPOSITION_METRIC,
+        property_key=chunk.chunk_id,
+        provenance_log=provenance_log,
+    )
+    return answer.value.texts
 
 
 #: Decomposer shape — injectable so tests (and future non-judge decomposers)
@@ -1006,7 +1009,6 @@ def evaluate_ledger_completeness(
     shortlist_k: int = DEFAULT_SHORTLIST_K,
     materiality_calibration: MaterialityCalibration | None = None,
     provenance_log: ProvenanceLog | None = None,
-    clock: Callable[[], str] | None = None,
     decomposer: Decomposer | None = None,
     materiality_classifier: MaterialityClassifier | None = None,
     sub_section_filter: Callable[[SubSectionProse], bool] | None = None,
@@ -1028,9 +1030,7 @@ def evaluate_ledger_completeness(
     records = dedup_ledger_claims(claims)
 
     def default_decomposer(chunk: ProseChunk) -> tuple[str, ...]:
-        return decompose_chunk(
-            judge, chunk, provenance_log=provenance_log, clock=clock
-        )
+        return decompose_chunk(judge, chunk, provenance_log=provenance_log)
 
     def default_classifier(text: str, property_key: str) -> Verdict | MajorityVerdict:
         return classify_materiality(judge, text, property_key=property_key, n=n)

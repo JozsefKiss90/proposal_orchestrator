@@ -185,8 +185,9 @@ class CacheBinding:
 class ResponseCache:
     """Raw assessor responses, written as they arrive and replayable in order.
 
-    Consulted and fed by :meth:`harness.judge.Judge.raw_invoke`, which is the
-    single seam every grader's assessor call passes through.  Responses are
+    Consulted and fed by the judge's private single-draw method, under
+    :meth:`harness.judge.Judge.ask`, the one call path every grader's
+    judge draw passes through.  Responses are
     keyed by :func:`~harness.provenance.prompt_hash` of the ``(system, user)``
     pair and served first-in-first-out within a key, so the N samples of one
     prompt replay in the order they were drawn.

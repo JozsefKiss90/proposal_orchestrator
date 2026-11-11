@@ -224,7 +224,8 @@ class TestNoSilentRepair:
         ],
     )
     def test_malformed_raises(self, content):
-        judge = Judge(_cfg(), backend=_Backend([content]))
+        # Malformed on every draw: the redraw budget is spent, then it raises.
+        judge = Judge(_cfg(), backend=_Backend([content] * 3))
         with pytest.raises(JudgeResponseError):
             judge.evaluate("s", "u", metric="m", property_key="C1")
 
@@ -232,6 +233,156 @@ class TestNoSilentRepair:
         judge = Judge(_cfg(), backend=_Backend([None]))
         with pytest.raises(JudgeResponseError, match="empty content"):
             judge.evaluate("s", "u", metric="m", property_key="C1")
+
+
+# --------------------------------------------------------------------------- #
+# ask(): the one call path and the redraw rule (ticket 01)
+# --------------------------------------------------------------------------- #
+
+PASS = '{"passed": true, "score": 0.9, "rationale": "ok"}'
+BAD = '{"rationale": "no verdict"}'
+
+
+class TestAsk:
+    def test_a_parser_raising_anything_else_propagates_with_no_redraw(self, tmp_path):
+        """Ticket 01, test 3: only JudgeResponseError means malformed."""
+        from harness.response_cache import CacheBinding, ResponseCache
+
+        backend = _Backend([PASS, PASS, PASS])
+        cache = ResponseCache(
+            tmp_path / "ck.jsonl",
+            CacheBinding(
+                candidate_hash="sha256:" + "a" * 64,
+                profile_version="sha256:" + "b" * 64,
+                assessor_pin=f"{NON_DRAFTER}@2026-07-20",
+                preflight_pack_set_hash="sha256:" + "c" * 64,
+                include_claims=False,
+                n=3,
+                criterion_samples=5,
+                temperature=0.0,
+                max_tokens=2048,
+            ),
+        )
+        log = ProvenanceLog(tmp_path / "p.jsonl")
+        judge = Judge(_cfg(), backend=backend, provenance_log=log, response_cache=cache)
+
+        def parser(raw: str):
+            raise KeyError("a defect in the parser, not a malformed draw")
+
+        with pytest.raises(KeyError, match="defect"):
+            judge.ask("s", "u", parser, metric="m", property_key="C1")
+        assert len(backend.calls) == 1
+        assert cache.discarded == 0
+        assert len(log) == 0
+
+    def test_a_majority_vote_with_one_redraw_still_has_n_verdicts(self, tmp_path):
+        """Ticket 01, test 4: the redraw replaces the malformed sample."""
+        backend = _Backend([PASS, BAD, PASS, PASS])
+        log = ProvenanceLog(tmp_path / "p.jsonl")
+        judge = Judge(_cfg(), backend=backend, provenance_log=log)
+        res = judge.evaluate_majority("s", "u", metric="m", property_key="C1", n=3)
+        assert len(res.verdicts) == 3
+        assert res.majority.n == 3
+        assert [p.sample_index for p in res.provenance] == [0, 1, 2]
+        assert len(log) == 3
+        assert len(backend.calls) == 4
+        (draw,) = res.discarded_draws
+        assert draw.sample_index == 1 and draw.attempt == 0
+        assert "neither 'passed' nor 'score'" in draw.reason
+        assert "replayed" not in draw.to_dict()
+
+    def test_a_replayed_malformed_draw_uses_budget_and_is_marked_replayed(self, tmp_path):
+        """Ticket 01, test 5."""
+        from harness.provenance import prompt_hash
+        from harness.response_cache import CacheBinding, ResponseCache
+
+        binding = CacheBinding(
+            candidate_hash="sha256:" + "a" * 64,
+            profile_version="sha256:" + "b" * 64,
+            assessor_pin=f"{NON_DRAFTER}@2026-07-20",
+            preflight_pack_set_hash="sha256:" + "c" * 64,
+            include_claims=False,
+            n=3,
+            criterion_samples=5,
+            temperature=0.0,
+            max_tokens=2048,
+        )
+        path = tmp_path / "ck.jsonl"
+        # A checkpoint holding three responses the parser now rejects (as when
+        # a parser grew stricter after the run that drew them).
+        first = ResponseCache(path, binding)
+        for _ in range(3):
+            first.record(prompt_hash("s", "u"), BAD)
+
+        backend = _Backend([PASS])
+        judge = Judge(_cfg(), backend=backend, response_cache=ResponseCache(path, binding, resume=True))
+        with pytest.raises(JudgeResponseError, match=r"3 draw\(s\)"):
+            judge.evaluate("s", "u", metric="m", property_key="C1")
+        assert backend.calls == []  # the budget was spent on replays alone
+
+        second = tmp_path / "ck2.jsonl"
+        cache = ResponseCache(second, binding)
+        cache.record(prompt_hash("s", "u"), BAD)
+        judge = Judge(_cfg(), backend=_Backend([PASS]), response_cache=ResponseCache(second, binding, resume=True))
+        res = judge.evaluate("s", "u", metric="m", property_key="C1")
+        assert res.verdict.passed is True
+        (draw,) = res.discarded_draws
+        assert draw.replayed is True
+        assert draw.to_dict()["replayed"] is True
+        assert res.provenance.replayed is False  # the draw that parsed was live
+
+    def test_budget_exhaustion_fails_closed_with_the_parsers_message_and_the_count(self):
+        backend = _Backend([BAD] * 5)
+        judge = Judge(_cfg(), backend=backend, max_redraws=1)
+        with pytest.raises(JudgeResponseError) as exc:
+            judge.evaluate("s", "u", metric="m", property_key="C1", sample_index=2)
+        message = str(exc.value)
+        assert "neither 'passed' nor 'score'" in message
+        assert "m/C1 sample 2: 2 draw(s)" in message
+        assert "nothing was repaired" in message
+        assert len(backend.calls) == 2
+
+    def test_the_value_reports_its_own_provenance(self, tmp_path):
+        from dataclasses import dataclass
+
+        @dataclass(frozen=True)
+        class Sample:
+            raw_score: float
+
+            @property
+            def score(self):
+                return self.raw_score / 5
+
+            passed = None
+            rationale = "a reason of its own"
+
+        log = ProvenanceLog(tmp_path / "p.jsonl")
+        judge = Judge(_cfg(), backend=_Backend(["4"]), provenance_log=log, clock=lambda: "T")
+        answer = judge.ask("s", "u", lambda raw: Sample(float(raw)), metric="m", property_key="k", sample_index=0)
+        assert answer.value.raw_score == 4.0
+        (record,) = log.records()
+        assert record["score"] == 0.8 and record["passed"] is None
+        assert record["rationale"] == "a reason of its own"
+        assert record["timestamp"] == "T" and record["sample_index"] == 0
+        assert answer.discarded_draws == ()
+
+    def test_no_harness_module_outside_the_judge_draws_raw(self):
+        """The prompt-and-parser call is the only way a draw goes out."""
+        import re
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[2] / "harness"
+        offenders = [
+            p.relative_to(root).as_posix()
+            for p in root.rglob("*.py")
+            if p.name != "judge.py"
+            and re.search(r"\.(_send|raw_invoke)\(", p.read_text(encoding="utf-8"))
+        ]
+        assert offenders == []
+
+    def test_a_negative_budget_is_refused(self):
+        with pytest.raises(JudgeConfigError, match="max_redraws"):
+            Judge(_cfg(), max_redraws=-1)
 
 
 # --------------------------------------------------------------------------- #
@@ -289,7 +440,7 @@ class TestDefaultBackendIndependence:
         )
         judge = Judge(_cfg())  # no injected backend -> tries to build default
         with pytest.raises(JudgeIndependenceError, match="OpenAI-compatible"):
-            judge.raw_invoke("s", "u")
+            judge._send("s", "u")
 
     def test_pins_judge_model_on_build(self, monkeypatch):
         from runner.transport.capabilities import CAPABILITIES_REGISTRY
