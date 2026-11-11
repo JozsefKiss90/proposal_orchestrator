@@ -64,7 +64,7 @@ Then:
 ## Session brief
 
 ```
-Ticket: .scratch/overhaul-2026-11/issues/17-submitted-not-yet-evaluated-wording.md   Base commit: <the step 0 commit on harness_overhaul>
+Ticket: .scratch/overhaul-2026-11/issues/17-submitted-not-yet-evaluated-wording.md   Base commit: 60fca14e (step 0 on harness_overhaul)
 Read first: CLAUDE.md §9, §12, §16–17; CONTEXT-MAP.md (+ harness/CONTEXT.md); docs/agents/*.md;
             plans/overhaul/BASELINE.md §5; .scratch/overhaul-2026-11/discovery/slice3-esr-review-2026-11-10.md;
             docs/tier4_orchestration_state/decision_log/msca-dn-resubmission-2026-identity_2026-11-10.json

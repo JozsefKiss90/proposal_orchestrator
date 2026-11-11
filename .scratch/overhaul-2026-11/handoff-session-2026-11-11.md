@@ -185,3 +185,27 @@ step 0 ─┬─ Overhaul O1 → O2 → O3 → O4 ─┐
 - `gh` is not installed; PRs go through the GitHub compare page.
 - `harness_overhaul` and `msca-dn-pre-eval` are ahead of `origin`; push branches and tags when you want the
   freeze recoverable off this machine.
+
+## 6. Progress log
+
+Ticked only on the evidence each protocol (§3) names. Newest line last.
+
+- [x] **Step 0** — `60fca14e`. Decision entry `plan-order-reliability_2026-11-11.json` (D1–D5, operator
+      confirmed in session); AN tickets wontfix; R15 rescoped (operator approved); BASELINE §5 = 42 node
+      ids, checked by node id against `suite-merged-2026-11-10c.txt`; ticket 17 written; suite outputs
+      untracked and ignored. Guard tests run: 140 passed, 5 skipped.
+- [ ] **O1** — 01 ∥ 04 ∥ 17, merge 01 → 04 → 17, suite + lane
+- [ ] **O2** — 03 ∥ 05, merge, suite + lane
+- [ ] **O3** — 02 ∥ 06, merge, suite + lane
+- [ ] **H1** — runbook Converse delta
+- [ ] **A1** — R11 (operator's explicit go)
+- [ ] **A2** — R12b
+- [ ] **A3** — R14
+- [ ] **O5** — re-freeze, tag, bundle, sha256 record
+- [ ] **A4** — R15 (rescoped)
+- [ ] **H2** — V14 (operator)
+- [ ] **H3** — V15 (operator signs)
+- [ ] **H4** — revisions + Stage B profile-applicability record (operator)
+- [ ] **H5** — V16 (operator)
+- [ ] **O6** — 07a ∥ 08 → 07b → 09; hygiene F1/F2; BASELINE §6
+- [ ] **A5** — R13
