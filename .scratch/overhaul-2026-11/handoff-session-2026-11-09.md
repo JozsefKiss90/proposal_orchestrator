@@ -11,7 +11,7 @@ clean. **This commit is the base commit for every wave-1 session.**
 | Plan step | State | Evidence |
 |-----------|-------|----------|
 | Step 0, baseline | **done**. Windows full suite: 9,237 passed / 43 failed / 87 skipped, 900 s; the 43 failures by node id are the red line | `plans/overhaul/BASELINE.md` §4, raw `plans/overhaul/baseline-windows.txt` |
-| Step 0, `.env.harness` | untracked and ignored (`83c210e9`, `09baceac`); **key rotation unconfirmed** | — |
+| Step 0, `.env.harness` | untracked and ignored (`83c210e9`, `09baceac`); **key revoked 2026-11-11, closed** (`docs/tier4_orchestration_state/decision_log/transport-key-revoked_2026-11-11.json`) | — |
 | Step 0, worktrees | **`git worktree prune` not run** (prunable entries remain); `..\ur_slices` still exists | §5 |
 | Step 1 (F1, F2) | not done; deferred to after the freeze | `discovery/scope-cut-2026-11-06.md` |
 | Step 2, discovery | **done**: harness + runtime reviews (01–09), ultrareview slice 1 (10 findings) and slice 2 (10 findings), F7 wayfinder map with **all six tickets resolved** | `discovery/ultrareview-*.md`, `../overhaul-2026-11-f7-wayfinder/map.md` + `W01/W02/W03-findings.md` |
@@ -97,7 +97,7 @@ Wave 2 (01–09, from ~25 Nov): see `discovery/scope-cut-2026-11-06.md`, "Implem
   only if it would make V14's ESR comparison wrong or crash. Run it **before the freeze**, because V14 uses
   that code after it.
 - **Operator housekeeping:**
-  - rotate the transport key;
+  - ~~rotate the transport key~~ (done 2026-11-11: revoked, closed, `docs/tier4_orchestration_state/decision_log/transport-key-revoked_2026-11-11.json`);
   - run `git worktree prune` **from Windows** (the Linux shell cannot see the `C:/` paths);
   - `git worktree remove ..\ur_slices`;
   - close draft PRs #1–#3 without merging and delete the `ur/*` branches locally and on `origin`.

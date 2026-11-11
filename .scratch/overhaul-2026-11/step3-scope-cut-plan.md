@@ -13,7 +13,7 @@ recorded disposition. This file names what is still missing and in what order.
 | Runtime architecture pass | done → tickets 07a, 07b, 08, 09 (`needs-triage`); E not taken (`discovery/decision-E-tapm-banner-2026-11-04.md`) |
 | Ultrareview | slice 1 done, 10 findings (`discovery/ultrareview-run-path-2026-11-04.md`); **slices 2 and 3 not run** |
 | Wayfinder F7 | map charted (`../overhaul-2026-11-f7-wayfinder/map.md`); **tickets W01–W06 open, none resolved** |
-| Step 0 | `.env.harness` untracked (`83c210e9`, `09baceac`). **Key rotation unconfirmed.** **`plans/overhaul/BASELINE.md` missing.** **3 prunable worktrees.** |
+| Step 0 | `.env.harness` untracked (`83c210e9`, `09baceac`). **Key revoked 2026-11-11 (closed, `docs/tier4_orchestration_state/decision_log/transport-key-revoked_2026-11-11.json`).** **`plans/overhaul/BASELINE.md` missing.** **3 prunable worktrees.** |
 | Step 1 (F1 checkboxes, F2 `AGENTS.md` drift) | **not started** |
 
 ## B. Before the grill (Wed 4 evening → Thu 5 morning)
@@ -35,7 +35,7 @@ In this order. The first three run in parallel.
 6. **Wayfinder W06** (how V16 reads V14's gap). It can wait until after the cut **unless** W05's answer
    implies harness support (a report field or a linking record). Then grill it before the cut.
 7. **Step 0, the operator's part:**
-   - confirm the key is rotated;
+   - ~~confirm the key is rotated~~ (closed 2026-11-11, `docs/tier4_orchestration_state/decision_log/transport-key-revoked_2026-11-11.json`);
    - run `py -3.10 -m pytest -q` on Windows and write `plans/overhaul/BASELINE.md` (pass, fail, skip,
      wall time);
    - `git worktree prune`.

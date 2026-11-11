@@ -1,0 +1,33 @@
+{
+  "record_type": "decision_record",
+  "id": "transport-key-revoked_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "harness_overhaul",
+  "milestone": "overhaul-2026-11 Step 0 (F3)",
+  "authority": "operator, in session",
+  "review_state": "closed",
+  "decided_by": "operator",
+  "decision": "The transport API key that .env.harness carried from commit fa5b1eb8 (2026-08-04) until it was untracked on 2026-11-04 (83c210e9 / d113901d) was revoked at its provider by the operator on 2026-11-11. No replacement key is issued: that provider is no longer used, and the private-host runs authenticate through the hardened IAM runtime role. The F3 rotation item is CLOSED and is not to be raised again.",
+  "rules": [
+    {
+      "id": "K1",
+      "rule": "The revoked key is inert; its string remaining in public git history is accepted. History is not rewritten (it would invalidate every published branch and the msca-dn-freeze-2026-11-11 tag for no protection).",
+      "declared_status": "Confirmed",
+      "basis": "Operator revoked the key at the provider, 2026-11-11."
+    },
+    {
+      "id": "K2",
+      "rule": "A history scan for provider-key patterns (2026-11-11) found this one key and no other credential. CloudTrail evidence files from June-July 2026 carry old-account access-key IDs (AKIA/ASIA) only, with no secret access key; IDs are not secrets.",
+      "declared_status": "Confirmed",
+      "basis": "git log --all -p pattern scan, values never printed."
+    },
+    {
+      "id": "K3",
+      "rule": "Recurrence guard: tests/test_no_tracked_secrets.py fails the full suite when .env.harness (or any .env file) is tracked or when a tracked file contains a provider API-key pattern.",
+      "declared_status": "Confirmed",
+      "basis": "Added on harness_overhaul after the freeze; it changes no bundled behaviour."
+    }
+  ],
+  "known_gaps": [],
+  "private_content": "none: no key value, prefix beyond the provider family, or credential appears in this record"
+}

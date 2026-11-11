@@ -435,7 +435,7 @@ The two pin flags are not optional. `.env.harness` is loaded with `override=True
 holds the Groq pin, so an exported variable loses to the file and the CLI would be asked for
 `llama-3.3-70b-versatile`. The file itself was not edited: it keeps its key and its pin, and the
 E5f lane that shares it is untouched. The alternative also stays open — rotate the Groq key and
-drop the four flags to run the same assessment over the independent transport.
+drop the four flags to run the same assessment over the independent transport. *(No longer open: Groq was dropped and the key revoked on 2026-11-11; see `docs/tier4_orchestration_state/decision_log/transport-key-revoked_2026-11-11.json`.)*
 
 **A third finding, and the largest, found by rehearsing that lane end to end.** F9: one
 provider's free-tier rate limit was deciding how much of the Part B the assessor may read.

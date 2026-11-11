@@ -82,7 +82,7 @@ Commit them together on `harness_overhaul` (e.g. "Runtime tickets 07–09, F7 wa
   `ur/base-run-path` and `ur/review-run-path` exist locally and on `origin`. Close PR #1 without merging and
   delete the `ur/*` branches once all slices are done.
 - **`.env.harness`:** untracked and ignored; the operator moved it to `..\env.harness.keep`. It is still in
-  git history (since `fa5b1eb`). **Rotation of the key is unconfirmed.**
+  git history (since `fa5b1eb`). **Rotation of the key is unconfirmed.** *(Closed 2026-11-11: key revoked, `docs/tier4_orchestration_state/decision_log/transport-key-revoked_2026-11-11.json`.)*
 - My device shell shows CRLF-only "modified" noise on some files. Windows git is clean. Check with
   `git diff --ignore-cr-at-eol --stat`.
 
@@ -91,7 +91,7 @@ Commit them together on `harness_overhaul` (e.g. "Runtime tickets 07–09, F7 wa
 1. Run ultrareview slices 2 and 3 (commands in the plan, §F) and triage them like slice 1.
 2. Resolve wayfinder W03 (most important), W01 and W02: AFK research, one session each, in parallel.
 3. Grill W04, then W05 (and W06 only if W05 implies harness support).
-4. Operator Step 0: rotate the key, write `BASELINE.md` (Windows `py -3.10 -m pytest -q`), `git worktree prune`.
+4. Operator Step 0: ~~rotate the key~~ (closed 2026-11-11), write `BASELINE.md` (Windows `py -3.10 -m pytest -q`), `git worktree prune`.
 5. Thu 5: the scope-cut grill over the merged list. The recommended keeps are UR-A, UR-B, UR-C, 01 (+ the
    finding-5 box), 03 if Converse, plus 1–3 wayfinder must-lands. Defer 02, 04–06 and 07a–09.
 6. `to-tickets` for the keeps (`issues/10-…`), set `ready-for-agent`, comment on the deferrals, write

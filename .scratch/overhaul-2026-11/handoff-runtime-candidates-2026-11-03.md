@@ -34,7 +34,7 @@ Claude project memory, if your session can read it: `caller-context-bindings.md`
 - **Tickets:** harness 01–06 are written and all `Status: needs-triage`. **Step 3, the scope cut, has not happened**, so no ticket is `ready-for-agent` yet. The plan targets 5–8 tickets in total, and the harness alone already has six. The operator's suggested harness priority is 01 → 03 → 02, with 04–06 deferred first.
 - **Step 0 prerequisites are still open, and they block implementation:**
   - `plans/overhaul/BASELINE.md` does not exist (the folder doesn't either). The baseline must be the operator's **Windows workstation** run, `py -3.10 -m pytest -q`: pass, fail and skip counts plus wall time. The device VM lacks `dotenv` and `boto3`, so its numbers are not a baseline.
-  - `.env.harness` is still tracked in git and holds a live transport key. The operator still has to rotate it and untrack it. **Never print, copy or commit its contents.**
+  - `.env.harness` is still tracked in git and holds a live transport key. The operator still has to rotate it and untrack it. *(Closed: untracked 2026-11-04, key revoked 2026-11-11, `docs/tier4_orchestration_state/decision_log/transport-key-revoked_2026-11-11.json`.)* **Never print, copy or commit its contents.**
   - `git worktree prune`: three prunable worktree registrations remain.
 
 ## 4. The runtime candidates: what to ticket, and how
