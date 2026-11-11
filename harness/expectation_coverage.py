@@ -65,7 +65,7 @@ from harness.evidence_pack import (
     EvidencePack,
     clean_pass,
 )
-from harness.judge import Judge
+from harness.judge import DiscardedDraw, Judge
 from harness.provenance import ProvenanceRecord
 from harness.routing import RoutingDecision, assert_judgeable
 from harness.rubrics import (
@@ -137,6 +137,10 @@ class CoverageGrade:
     judge_passed: bool | None
     score: float | None
     rationale: str
+    #: Draws discarded as malformed and drawn again (empty on a clean panel).
+    #: Carried by the blind cell, not by :meth:`to_dict`, so a coverage record
+    #: keeps its shape.
+    discarded_draws: tuple[DiscardedDraw, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """A JSON-serializable view (report / baseline input)."""
@@ -227,6 +231,7 @@ def grade_coverage(
         judge_passed=majority.passed,
         score=majority.score,
         rationale=majority.rationale,
+        discarded_draws=result.discarded_draws,
     )
 
 

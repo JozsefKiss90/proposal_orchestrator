@@ -111,12 +111,12 @@ def converse_env(monkeypatch) -> None:
 class TestTheJudgeBuildsConverse:
     def test_a_resolved_converse_config_builds_the_converse_backend(self, converse_env, client):
         judge = Judge(JudgeConfig(model=PIN, version=VERSION, max_tokens=3072))
-        assert judge.raw_invoke("system text", "user text") == '{"passed": true, "score": 0.9, "rationale": "scripted pass"}'
+        assert judge._send("system text", "user text") == '{"passed": true, "score": 0.9, "rationale": "scripted pass"}'
         assert isinstance(judge._backend, bc.BedrockConverseBackend)
 
     def test_the_request_carries_the_pin_temperature_and_token_limit(self, converse_env, client):
         judge = Judge(JudgeConfig(model=PIN, version=VERSION, max_tokens=3072))
-        judge.raw_invoke("system text", "user text")
+        judge._send("system text", "user text")
         (request,) = client.requests
         assert request["modelId"] == PIN
         assert request["inferenceConfig"] == {"maxTokens": 3072, "temperature": 0.0}
@@ -124,12 +124,12 @@ class TestTheJudgeBuildsConverse:
         assert request["messages"] == [{"role": "user", "content": [{"text": "user text"}]}]
 
     def test_the_request_carries_no_tools(self, converse_env, client):
-        Judge(JudgeConfig(model=PIN, version=VERSION)).raw_invoke("s", "u")
+        Judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
         (request,) = client.requests
         assert "toolConfig" not in request
 
     def test_the_client_targets_the_resolved_region(self, converse_env, client):
-        Judge(JudgeConfig(model=PIN, version=VERSION)).raw_invoke("s", "u")
+        Judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
         assert client.client_kwargs["region_name"] == "eu-west-1"
 
     def test_the_converse_route_needs_no_base_url(self, converse_env, client):
@@ -137,7 +137,7 @@ class TestTheJudgeBuildsConverse:
         from runner.transport.config import resolve_provider_config
 
         assert resolve_provider_config().base_url is None
-        Judge(JudgeConfig(model=PIN, version=VERSION)).raw_invoke("s", "u")
+        Judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
         assert len(client.requests) == 1
 
 
@@ -151,7 +151,7 @@ class TestTheBuilder:
         judge, wrapper = cj.build_converse_judge(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
-        judge.raw_invoke("s", "u")
+        judge._send("s", "u")
         assert judge.config.model == PIN
         assert judge.provenance_log is not None
         assert client.requests[0]["modelId"] == PIN
@@ -188,7 +188,7 @@ class TestTheBuilder:
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl",
             max_retries=2, log=lambda _m: None,
         )
-        assert judge.raw_invoke("s", "u")
+        assert judge._send("s", "u")
         assert len(fake.requests) == 2
         assert wrapper.retries == 1
 
@@ -243,7 +243,7 @@ class TestTheCommand:
              "--transport", cmd.TRANSPORT_BEDROCK_CONVERSE]
         )
         judge = cmd._live_judge(args, tmp_path)
-        judge.raw_invoke("s", "u")
+        judge._send("s", "u")
         assert client.requests[0]["modelId"] == PIN
 
     def test_a_full_synthetic_blind_pass_runs_over_converse(self, converse_env, client, world):
@@ -474,7 +474,7 @@ class TestTheInvocationRecordIsMeasured:
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
         wrapper._inner._tools = [{"type": "function", "function": {"name": "read_file", "parameters": {}}}]
-        judge.raw_invoke("s", "u")
+        judge._send("s", "u")
         assert "toolConfig" in client.requests[0]
         assert wrapper.invocation_record()["tool_config_sent"] is True
 
@@ -714,7 +714,7 @@ class TestJudgeIndependenceOnASharedProvider:
         judge, _wrapper = cj.build_converse_judge(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
-        assert judge.raw_invoke("s", "u")
+        assert judge._send("s", "u")
         assert client.requests[0]["modelId"] == PIN
 
     @pytest.mark.parametrize(
@@ -776,6 +776,6 @@ class TestTheHostsEnvironment:
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl",
             log=lambda _m: None,
         )
-        assert judge.raw_invoke("s", "u")
+        assert judge._send("s", "u")
         assert client.requests[0]["modelId"] == PIN
         assert client.client_kwargs["region_name"] == host_env["AWS_REGION"]

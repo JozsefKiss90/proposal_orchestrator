@@ -1135,8 +1135,9 @@ def _salvage(
     produced it.  Those calls are redrawn.
     """
     from harness.evidence_pack import EvidencePackError
+    from harness.expectation_coverage import EXPECTATION_COVERAGE_METRIC, coverage_property_key
+    from harness.judge import JudgeResponseError, parse_verdict
     from harness.rubrics import build_pack_for, build_rubric_prompts
-    from runner.json_extract import extract_first_json_object
 
     transcripts = Path(args.transcripts)
     if not transcripts.is_absolute():
@@ -1151,6 +1152,7 @@ def _salvage(
     # issues them.  The index is keyed by the user prompt, which is the only
     # half the transcript records.
     index: dict[str, tuple[str, str]] = {}
+    property_keys: dict[str, str] = {}
     collisions: set[str] = set()
     for rubric in bundle.rubric_set.rubrics:
         for section_id in bundle.profile.section_ids_for(rubric.criterion_id):
@@ -1174,6 +1176,7 @@ def _salvage(
             if user in index and index[user] != (system, user):
                 collisions.add(user)
             index[user] = (system, user)
+            property_keys[user] = coverage_property_key(rubric.expectation_key, section_id)
     if collisions:
         raise BlindAssessmentError(
             f"{len(collisions)} rebuilt cell prompt(s) share a user prompt under two "
@@ -1210,10 +1213,17 @@ def _salvage(
             unmatched.append((f, user.splitlines()[0] if user else "<no user prompt>"))
             continue
         cache.record(prompt_hash(*hit), response)
-        if extract_first_json_object(response) is None:
-            # Recorded for the record, never replayed: the run that drew it
-            # could not use it either.
-            cache.discard_last("recorded response carries no parseable JSON object")
+        try:
+            # The verdict parser the run uses: a transcript the run could not
+            # use is no more usable here.
+            parse_verdict(
+                response,
+                metric=EXPECTATION_COVERAGE_METRIC,
+                property_key=property_keys[hit[1]],
+            )
+        except JudgeResponseError as exc:
+            # Recorded for the record, never replayed.
+            cache.discard_last(str(exc))
             malformed += 1
         else:
             recovered += 1

@@ -1,6 +1,6 @@
 # 01 — Deepen the judge call: one `ask`, parser in, verdict out
 
-Status: needs-triage
+Status: in-progress
 Type: task
 Blocked by: None — can start immediately
 Source: `discovery/grill-A-judge-call.md` (operator-confirmed 2026-11-03) · `discovery/architecture-review-harness-2026-11-03.html`, candidate A
@@ -48,23 +48,23 @@ transcripts with the same verdict parser the run uses.
 
 Failing tests first, in this order:
 
-- [ ] A cell gets a malformed draw, then a valid one: it succeeds with exactly one discarded draw recorded on the cell.
-- [ ] Claim-ledger decomposition gets a malformed draw: it is discarded from the checkpoint and redrawn, and its provenance record is written by the judge.
-- [ ] A parser raising anything other than `JudgeResponseError` propagates with no redraw and no discard.
-- [ ] A majority vote with one redraw still yields exactly n verdicts.
-- [ ] A replayed malformed draw uses redraw budget and is marked `replayed`.
-- [ ] Salvage counts a transcript holding JSON that is not a valid verdict as malformed.
-- [ ] A blind report written before this change, without `discarded_draws`, still loads, verifies and freezes.
+- [x] A cell gets a malformed draw, then a valid one: it succeeds with exactly one discarded draw recorded on the cell.
+- [x] Claim-ledger decomposition gets a malformed draw: it is discarded from the checkpoint and redrawn, and its provenance record is written by the judge.
+- [x] A parser raising anything other than `JudgeResponseError` propagates with no redraw and no discard.
+- [x] A majority vote with one redraw still yields exactly n verdicts.
+- [x] A replayed malformed draw uses redraw budget and is marked `replayed`.
+- [x] Salvage counts a transcript holding JSON that is not a valid verdict as malformed.
+- [x] A blind report written before this change, without `discarded_draws`, still loads, verifies and freezes.
 
 Then:
 
-- [ ] Budget exhaustion fails closed with the parser's last message and the draw count; nothing is repaired.
-- [ ] No harness module outside the judge calls the raw single-draw method.
-- [ ] Criterion scoring's own redraw loop and its hand-built provenance are gone; behaviour is pinned by its existing tests.
-- [ ] `harness/HARNESS.md` describes the one call path and the redraw rule.
+- [x] Budget exhaustion fails closed with the parser's last message and the draw count; nothing is repaired.
+- [x] No harness module outside the judge calls the raw single-draw method.
+- [x] Criterion scoring's own redraw loop and its hand-built provenance are gone; behaviour is pinned by its existing tests.
+- [x] `harness/HARNESS.md` describes the one call path and the redraw rule.
 - [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
 - [ ] **PE-09 acceptance lane green** (admission rule 5: blind-assessment code changes).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
 
@@ -91,3 +91,4 @@ Record: no decision-log entry needed (harness is out-of-band; no orchestration i
 
 - Deferred at Step 3 (2026-11-06) until after V16. It is the only candidate that changes assessment output, and W05 locks V14 and V16 to one bundle from the 10 Nov freeze commit; today's behaviour already fails closed and resumes cheaply. Finding 5 (replays recorded as live draws) moved to ticket 15. Revisit after V16, together with 02 and 03.
 - Wave 2a (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.
+- Session 2026-11-11 (base `92ce1e16`, branch `ticket/01-judge-call`): targeted 55 modules, 2,679 passed, 1 failed (§5 baseline id `test_demo_candidate_blind_baseline.py::...::test_the_leakage_scan_file_count_is_re_derivable`), 3 skipped; after review fixes 453/453 on the 10 core modules. Full suite and lane are the operator's.

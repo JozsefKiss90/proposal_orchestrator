@@ -339,7 +339,7 @@ class TestIndependence:
         )
         judge = Judge(JudgeConfig(model="fake-judge", version="pin-1"))
         with pytest.raises(JudgeIndependenceError, match="OpenAI-compatible"):
-            judge.raw_invoke("s", "u")
+            judge._send("s", "u")
 
     def test_coverage_module_never_imports_the_drafter_stack(self):
         # Static source check (same mechanism as test_boundary.py): the grader
