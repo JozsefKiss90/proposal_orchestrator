@@ -1,6 +1,6 @@
 # 05 — DN record chain (expand): one way to load a record against its predecessors
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 04
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate D. Not grilled; written on
@@ -65,8 +65,8 @@ Then:
 - [x] An untouched fixture chain (preflight → report → baseline → audit → comparison → review → diff) loads end to end.
 - [x] Records written before this ticket load when their predecessors are unchanged.
 - [x] The ESR comparison and comparison diff no longer carry their own type/flag/re-hash code for the links moved here.
-- [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
-- [ ] **PE-09 acceptance lane green** (admission rule 5).
+- [x] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
+- [x] **PE-09 acceptance lane green** (admission rule 5).
 - [x] `code-review` run since the base commit, with no gaps on the spec axis. Operator exception: the revisions-hash gap is accepted (decision `overhaul-05-revisions-hash-gap_2026-11-11`).
 
 ## Session brief
@@ -88,3 +88,4 @@ Size: ~250–350 changed non-test lines
 - Wave 2b (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.
 - 2026-11-11, base 6820395e: targeted 24 modules, 1 failed (on the BASELINE §5 red line: `test_demo_candidate_blind_baseline.py::...::test_the_leakage_scan_file_count_is_re_derivable`) / 1,272 passed. Code-review ran (spec + standards); fixed: comparison now also re-hashes the fidelity register and each audit, the diff command passes --repo-root through, unused `beside` rule removed, record_binding docstring notes the chain. Spec gap left open: a comparison records no hash of its revisions artifact, so a content edit to it is refused when a written diff is loaded (the diff holds its hash) but not when a new diff is run (only its bound hashes are checked); closing it needs a record-format change, which this ticket forbids. Code-review box open for the operator. Full suite and lane not run.
 - 2026-11-11, operator decision: option 1. The revisions-hash gap is accepted for the O5 bundle; a revisions hash in the comparison record is a later format ticket after V16. The four behaviour changes (path lookup without a repo root, re-hashing dispositions/fidelity register/audits, required advisory/blocking flags on revisions, temp-file prefix `comparison_`) are accepted. Record: `overhaul-05-revisions-hash-gap_2026-11-11`. Suite and lane boxes wait for the operator's O2 run.
+- 2026-11-11, closed: merged by the operator as `70fcb6b5` (with `8579d877`). Suite at `70fcb6b5`: 42 failed, 9,606 passed, 87 skipped; the 42 failed node ids equal BASELINE §5 exactly (none new, none gone; `suite-o2.txt`). Lane GREEN: 3,662 tests, 3,645 passed, 0 failed, 0 errors, 17 declared exclusions (`lane-o2.xml`). The revisions-hash gap stays open under `overhaul-05-revisions-hash-gap_2026-11-11` G1 until its format ticket lands after V16.

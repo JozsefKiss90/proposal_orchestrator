@@ -1,6 +1,6 @@
 # 03 — One place that builds a judge and states its independence
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 01
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate B. Not grilled; the
@@ -76,8 +76,8 @@ Then:
 
 - [x] Faithfulness calibration's private builder and the paced builder in grounding freeze are gone; every command calls the factory.
 - [x] `harness/HARNESS.md`'s guardrail table points at the factory's policy table, and the subscription module's "what independence survives" account stays accurate.
-- [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
-- [ ] **PE-09 acceptance lane green** (admission rule 5: blind-assessment command and assessor construction change).
+- [x] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
+- [x] **PE-09 acceptance lane green** (admission rule 5: blind-assessment command and assessor construction change).
 - [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
@@ -107,3 +107,4 @@ Record: no decision-log entry needed
 - Wave 2b (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.
 - 2026-11-11, session (base `ac90a3a4`, branch `ticket/03-judge-factory`): targeted 64 modules, 3,145 passed, 1 failed (§5 baseline id `test_demo_candidate_blind_baseline.py::...::test_the_leakage_scan_file_count_is_re_derivable`), 13 skipped. Code review: spec axis found no missing or wrong requirement (judgement calls: the `claude-cli` route now requires a `claude_cli` environment; the two former lazy-default callers are refused on a Converse environment and gain retries; pacing characterisation covers blind assessment and the grounding freeze, rubric grading and faithfulness calibration only through the shared factory); standards axis found no hard violation (layering note: the factory lazily imports the two route backends from `harness/commands/`). `test_judge_factory.py` joined the isolation lane area. Full suite and lane not run.
 - 2026-11-11: the operator confirmed the three behaviour changes in session: (1) `--transport claude-cli` requires a `claude_cli` environment; (2) the rubric grid helper and materiality calibration use the `openai-compatible` route and now retry; (3) an unknown route and pacing budgets on an unpaced route are refused.
+- 2026-11-11, closed: merged by the operator as `7f5c5cc3` (with `44a1a191`). Suite at `70fcb6b5`: 42 failed, 9,606 passed, 87 skipped; the 42 failed node ids equal BASELINE §5 exactly (none new, none gone; `suite-o2.txt`). Lane GREEN: 3,662 tests, 3,645 passed, 0 failed, 0 errors, 17 declared exclusions (`lane-o2.xml`).

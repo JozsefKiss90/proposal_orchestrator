@@ -200,16 +200,22 @@ Ticked only on the evidence each protocol (§3) names. Newest line last.
       17 declared exclusions (`lane-o1.xml`). 01, 04 and 17 are done. 04 closed on an operator exception:
       three `[:16]` slices in `operator_review.py` keep their width for byte-equal replay
       (`overhaul-04-display-width-exception_2026-11-11`).
-- [ ] **O2** — 03 ∥ 05, merge, suite + lane. 03 committed as `5350e2c4` (operator confirmed its three
-      behaviour changes); the ESR successor `41836e77` merges in the same batch. 05 started off the O1 head.
+- [x] **O2** — 03 ∥ 05, merge, suite + lane. Merged by the operator: `7f5c5cc3` (03), `c80732fc` (ESR
+      successor bound to `msca-dn-2025-original`), `70fcb6b5` (05). Suite at `70fcb6b5`: 42 failed, 9,606
+      passed, 87 skipped; the 42 failed node ids equal BASELINE §5 exactly (`suite-o2.txt`). Lane GREEN:
+      3,645 passed, 0 failed, 17 declared exclusions (`lane-o2.xml`). 03 and 05 are done. 05 closed on an
+      accepted gap: a comparison binds its revisions artifact by path only; a revisions hash is a format
+      ticket after V16 (`overhaul-05-revisions-hash-gap_2026-11-11`).
 - [ ] **O3** — 02 ∥ 06, merge, suite + lane
 - [x] **H1** — runbook Converse delta. Merged by the operator as `2a8385d9`; covered by the O1 suite and
       lane above (the runbook guard is a lane module). The V14 compare line changes again when the ESR
       record is rebound off `msca-dn-2025-sanitised-v1` (operator, 2026-11-11: that intake is out of
       scope).
 - [ ] **A1** — R11 (operator's explicit go). Step sheet reviewed by the operator and merged as `34a4e2e1`;
-      its tests pass (25). Nothing has run on AWS. The operator runs steps 01–05 and hands back the change
-      set; the agent then writes VERIFICATION.md.
+      its tests pass (25). Round 1 (steps 01–05, read-only plus an unexecuted change set) run by the
+      operator on 2026-11-11; every evidence file passes its criterion (`R11/RUNLOG.md`). The change set
+      `r11-create-01` lists exactly the seven additions. Step 06 waits for the operator's explicit go;
+      VERIFICATION.md follows step 23.
 - [ ] **A2** — R12b
 - [ ] **A3** — R14
 - [ ] **O5** — re-freeze, tag, bundle, sha256 record
