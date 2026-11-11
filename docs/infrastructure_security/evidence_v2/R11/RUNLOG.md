@@ -61,3 +61,4 @@ time and the operator's words.
 
 | Step | UTC (approx.) | Who | Result | Deviation / error |
 |---|---|---|---|---|
+| go | 2026-11-11 21:00:40 | operator | "OD9-r1 confirmed; go for R11 step 06", in session on `R11_fix1_05_change-set.json`. Recorded before execution. Step 13 deletes the stack in this same session (OD5) | none |

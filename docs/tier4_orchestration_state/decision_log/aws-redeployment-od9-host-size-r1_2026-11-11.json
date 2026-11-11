@@ -8,7 +8,7 @@
   "ticket": "R11 of plans/aws_redeployment_tickets.md (revises OD9 of R0)",
   "supersedes": "aws-redeployment-operator-decisions_2026-10-21, decision OD9 only, the host size; and that record's OD9 known gap, which R11 step 06 answers. The image (AL2023 x86_64) and every other decision there stand.",
   "authority": "Agent-drafted under CLAUDE.md §9.4, recording a choice the operator made in session on 2026-11-11 after R11 step 06 failed. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no gate and amends no constitutional rule.",
-  "review_state": "agent_drafted_pending_operator_review",
+  "review_state": "operator_confirmed",
   "decided_by": "the operator, in session on 2026-11-11 ('I choose c7i-flex.large'), after the Free plan refused t3.medium",
   "decision": "The host is AL2023 x86_64 on c7i-flex.large, stopped when idle. t3.micro remains for a smoke run only. t3.medium is withdrawn: the Free plan refuses it. CPU credits are set only on a burstable T type.",
   "why": "OD9 chose t3.medium and left open whether the Free plan permits it. R11 step 06 measured that it does not. OD10 (no upgrade before the ELTE approval) stands, so the host must be a Free Tier eligible type.",
@@ -77,5 +77,6 @@
     "claim": "No secret value, credential, prompt text or proposal content.",
     "basis": "Identifiers, instance types and AWS error text only."
   },
-  "evidence_round": "STEPS_fix1.md F01-F05 all PASS (RUNLOG.md round 1b); change set r11-fix1-create-01 CREATE_COMPLETE, AVAILABLE, InstanceType c7i-flex.large, awaiting the operator's go."
+  "evidence_round": "STEPS_fix1.md F01-F05 all PASS (RUNLOG.md round 1b); change set r11-fix1-create-01 CREATE_COMPLETE, AVAILABLE, InstanceType c7i-flex.large, awaiting the operator's go.",
+  "confirmed": "2026-11-11 21:00 UTC, operator in session: 'OD9-r1 confirmed; go for R11 step 06'."
 }
