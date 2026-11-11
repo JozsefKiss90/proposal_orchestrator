@@ -132,6 +132,8 @@ Constraints that apply to every ticket:
 
 ## AN8b — Closed-book model attack (second half of A5) (DONE 2026-10-15, rules pending operator confirmation; cannot run until the research-group threshold is set)
 
+**Status 2026-11-11: the research-group threshold question is wontfix** (`docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json` D1). The code stays as built; it is not run.
+
 **What to build:** A separate Bedrock call tries to re-identify the derivative. It uses a different prompt and the O2 attack model, so the rewriter does not grade itself. It runs closed book, with no tools and no retrieval. It names the coordinating institution, any partner, any supervisor, the country set, the acronym and the research group, each with a confidence and the passage that gave it away. Guesses are scored privately against the dictionary under the O3 threshold. A correct guess sends that passage back to A3.
 
 **Blocked by:** AN6, AN7, AN8a.
@@ -173,17 +175,21 @@ Constraints that apply to every ticket:
 
 ## AN12 — Offline bundle and private-host smoke run (CODE DONE 2026-10-16, rules confirmed, host steps pending operator)
 
+**Status 2026-11-11: criterion 2 is wontfix** (`docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json` D1). Criteria 1 and 3 and the code stay in scope; they move to R15 (rescoped) in `plans/aws_redeployment_tickets.md`.
+
 **What to build:** The pipeline and the Converse assessor reach the private host through the offline deployment bundle (Decision 8). On the host, the full pipeline runs on the synthetic fixture against live Bedrock, and a blind pass runs over the Converse backend. The operator performs the host steps.
 
 **Blocked by:** AN1b, AN1c, AN11.
 
 - [ ] The updated bundle installs on the private host without an internet route.
-- [ ] The pipeline runs A0 to A7 on the synthetic fixture against live Bedrock within its token budgets.
+- [ ] ~~The pipeline runs A0 to A7 on the synthetic fixture against live Bedrock within its token budgets.~~ wontfix, D1.
 - [ ] A synthetic blind pass over Converse freezes on the host with a validated receipt.
 
 Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operator decision D1), `tools/anonymisation_host_smoke.py`, `harness/commands/converse_smoke.py`. Procedure: `plans/msca_dn_an12_host_runbook.md`. Decision record: `msca-dn-an12-offline-bundle_2026-10-16`. The three criteria stay open until the operator runs the host steps. Operator decisions D2 to D4 (2026-10-16): the audit amendment `plans/msca_dn_an12_audit_amendment_draft.md` is approved and applied (2026-10-16); an A7 refusal over A3 edits satisfies criterion 2; `verify` measures the private endpoint and leaves a DNS-failed probe unmeasured.
 
 ## AN12a — Apply the A3 rewrite plan (A3b)
+
+**Status: wontfix (2026-11-11).** Anonymisation is out of scope: the original is assessed privately on the AWS host, so no derivative is needed. Recorded in `docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json` D1.
 
 **What to build:** A stage applies the validated span edits of an A3 rewrite plan to the A2 output through the stage edit harness (`apply_stage_edits`), as A4 does. It writes a new derivative and an edit log in the private store. A5, A6 and A7 then read the applied derivative. Queued entity proposals stay out: they go to the dictionary, and A2 reruns. Without this stage, any A3 edit makes A7 refuse (AN11 R3), so the DN original cannot reach acceptance.
 
@@ -195,6 +201,8 @@ Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operat
 
 ## AN13 — Operator run on the DN original and acceptance
 
+**Status: wontfix (2026-11-11).** Anonymisation is out of scope: the original is assessed privately on the AWS host, so no derivative is needed. Recorded in `docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json` D1.
+
 **What to build:** The operator authors the entity dictionary privately and runs the pipeline on the DN original inside the private network. They read the derivative, review the A5 and A6 reports and sign the acceptance. The derivative is exported as D3 through the written procedure.
 
 **Blocked by:** AN12, AN12a.
@@ -203,6 +211,8 @@ Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operat
 - [ ] The derivative is exported through the written procedure and lands outside the network as D3.
 
 ## AN14 — Dress rehearsal outside the network, stopping at the freeze
+
+**Status: wontfix (2026-11-11).** Anonymisation is out of scope: the original is assessed privately on the AWS host, so no derivative is needed. Recorded in `docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json` D1.
 
 **What to build:** The V14 route runs end to end on the derivative outside the private network: V07/V08/V17/V18 import, preflight, checkpointed assessment, resume, freeze and audit. The rehearsal stops at the freeze. The code revision is locked before any ESR comparison of the derivative, protecting V14's "frozen before ESR" and the no-tuning-toward-85.80 rule.
 
@@ -213,6 +223,8 @@ Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operat
 
 ## AN15 — Score fidelity (A8), inside the V14 session
 
+**Status: wontfix (2026-11-11).** Anonymisation is out of scope: the original is assessed privately on the AWS host, so no derivative is needed. Recorded in `docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json` D1.
+
 **What to build:** In the V14 private session, after the original's blind run is frozen, one blind pass runs over the derivative with the same profile, model and sample plan. It is frozen. The per-criterion and total deltas are recorded as a successor record with the within-assessor spread beside them. The delta is a single measurement, never a correction factor. No ESR material is involved.
 
 **Blocked by:** AN14, V14.
@@ -222,6 +234,8 @@ Code: `runner/offline_bundle.py` (bundle with a CPython 3.11 interpreter, operat
 - [ ] The record states that the delta is not a predictor.
 
 ## AN-P — Optional FIELDWISE pilot
+
+**Status: wontfix (2026-11-11).** Anonymisation is out of scope: the original is assessed privately on the AWS host, so no derivative is needed. Recorded in `docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json` D1.
 
 **What to build:** The pipeline runs locally on the FIELDWISE MSCA-PF proposal to test the method before the DN. FIELDWISE's original and evaluation are both at hand, so the pilot can measure re-identification rate, layout preservation and score delta.
 

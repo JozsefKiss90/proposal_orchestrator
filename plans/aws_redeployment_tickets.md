@@ -355,17 +355,24 @@ re-assessed.
 - [ ] The DC-15 in-host tests are collected.
 - [ ] DC-40 is re-assessed. It stays N/A unless the account joined an Organization.
 
-## R15 AN12 host run
+## R15 Host install and Converse smoke run
 
-**What to build:** The operator runs AN12 on the new host per its runbook, with the new deploy
-bucket, the OD1 region and the OD7 models substituted. The offline bundle verifies with the
-no-internet probe. The synthetic-fixture pipeline and the Converse blind pass then run. The agent
-writes a successor decision record to the 2026-10-16 AN12 offline-bundle record.
+**Rescoped 2026-11-11** (`docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json`
+D3). Prior text: "The operator runs AN12 on the new host per its runbook … The synthetic-fixture pipeline
+and the Converse blind pass then run." The anonymisation pipeline (AN12 criterion 2) is out of scope (D1).
 
-**Blocked by:** R9, R9e, R11, R12b.
+**What to build:** The operator installs the offline bundle from the O5 re-freeze on the new host, per
+`plans/msca_dn_an12_host_runbook.md` Part 2, with the new deploy bucket, the OD1 region and the OD7
+models substituted. The bundle verifies with the no-internet probe. The synthetic Converse blind pass then
+runs and freezes with a validated receipt. Its version tag names `bedrock-converse` and the Region. The
+agent writes a successor decision record to the 2026-10-16 AN12 offline-bundle record.
 
+**Blocked by:** R9, R9e, R11, R12b, and the O5 re-freeze bundle.
+
+- [ ] The bundle's sha256 on the host equals the one recorded at O5.
 - [ ] `runner.offline_bundle verify --probe-no-internet` passes on the host.
-- [ ] Each AN12 criterion the runbook defines is met, with evidence.
+- [ ] The production configuration is verified on the host (AN12 criterion 1).
+- [ ] The synthetic Converse blind pass freezes on the host with a validated receipt (AN12 criterion 3).
 - [ ] The successor decision record is committed.
 
 ## R13 Documentation amendments

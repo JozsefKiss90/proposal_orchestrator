@@ -1,0 +1,70 @@
+{
+  "record_type": "decision_record",
+  "id": "plan-order-reliability_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "harness_overhaul",
+  "base_commit": "2babf10a",
+  "confirmed": "operator approved D1-D5 and the amended R15 text in session, 2026-11-11, before commit",
+  "milestone": "overhaul-2026-11 step 0; AWS redeployment; MSCA-DN historical validation",
+  "authority": "operator, in session 2026-11-11. Recorded under CLAUDE.md §9.4. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "operator_confirmed",
+  "decided_by": "operator",
+  "source": ".scratch/overhaul-2026-11/handoff-session-2026-11-11.md §2 items 1-5",
+  "supersedes": "The calendar in .scratch/overhaul-2026-11/handoff-session-2026-11-09.md §3-§4 and the calendar answer W05 Q3 (.scratch/overhaul-2026-11-f7-wayfinder/issues/05-v14-timing-and-code-revision-lock.md). W05 Q0 and the locked-revision rule of W05 Q1 stand.",
+  "decision": "The three plans run in reliability order, not deadline order. Every change on the V14/V16 run path lands first, the host is fully evidenced, the code is frozen once, and then the runs follow on one bundle.",
+  "rules": [
+    {
+      "id": "D1",
+      "title": "Anonymisation is out of scope",
+      "prior_rule": "The anonymisation pipeline (AN tickets) was to produce a D3 derivative of the 2025 original that could leave the private network. AN12 had three criteria, including criterion 2, the A0-A7 pipeline on the synthetic fixture.",
+      "new_rule": "No derivative is produced. The original is assessed privately on the AWS host. Out of scope: AN12 criterion 2, AN12a, AN13, AN14, AN15, AN-P and the AN8b research-group threshold question. Kept because the runs use them: AN1a (Converse backend), AN1b (Converse receipt), AN1c (judge independence on shared Bedrock), and AN12's code, runner/offline_bundle.py and harness/commands/converse_smoke.py, which is the only route for code onto a host without internet.",
+      "reason": "A private assessment on the host needs no derivative, so the pipeline adds work and risk without serving a run.",
+      "impacted_tickets": ["AN12 (criterion 2)", "AN12a", "AN13", "AN14", "AN15", "AN-P", "AN8b (threshold question)"],
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11."
+    },
+    {
+      "id": "D2",
+      "title": "Reliability order replaces the deadline order",
+      "prior_rule": "W05 Q1-Q3: freeze on 10 Nov (at the latest 12 Nov), then R11, AN12 criteria 1 and 3, V14 on 13-15 Nov and V16 around 19-20 Nov. Tickets not merged by the freeze waited until after V16.",
+      "new_rule": "The wave-2 harness chain (01, 02, 03, 04, 05, 06) and a new wording ticket 17 land before the runs. R12b and R14 precede R15. The code is re-frozen once (step O5). One bundle from that freeze serves V14 and V16, and nothing lands in that bundle between them. The W05 Q1 locked-revision rule stays.",
+      "reason": "Runs on a fully evidenced host and a finished harness are worth more than an early run date.",
+      "impacted_tickets": ["overhaul 01-06", "overhaul 17", "R12b", "R14", "R15", "V14", "V16"],
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11."
+    },
+    {
+      "id": "D3",
+      "title": "R15 is rescoped",
+      "prior_rule": "R15 ran AN12 on the new host per its runbook: offline install, the synthetic-fixture anonymisation pipeline and the Converse blind pass.",
+      "new_rule": "R15 is 'host install and Converse smoke run': offline install, runner.offline_bundle verify --probe-no-internet, and the synthetic Converse blind pass frozen with a validated receipt. Its R12b blocker stays.",
+      "reason": "Follows from D1: AN12 criterion 2 is out of scope.",
+      "impacted_tickets": ["R15", "AN12"],
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11. The amended R15 text in plans/aws_redeployment_tickets.md is approved by the operator in session before commit."
+    },
+    {
+      "id": "D4",
+      "title": "V15 stays V16's blocker",
+      "prior_rule": "A planned ledger edit would relax V16's blocker from V15 to V14 (wayfinder map; handoff 2026-11-09 item 91).",
+      "new_rule": "The ledger edit is dropped. V16 stays blocked by V15, as plans/msca_dn_historical_validation_tickets.md states.",
+      "reason": "Reliability order removes the time pressure that motivated the relaxation.",
+      "impacted_tickets": ["V15", "V16"],
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11."
+    },
+    {
+      "id": "D5",
+      "title": "Wording for a not-yet-evaluated document is fixed before the runs",
+      "prior_rule": "Slice 3 F1 proposed a caveat in V14's and V16's operator review notes and a fix after V16. The register-sentence gap in msca-dn-resubmission-2026-identity_2026-11-10 left the timing to the operator.",
+      "new_rule": "Ticket 17 fixes ticket 11's register sentences and slice 3's F1 before the runs. Wording is keyed on the register's is_submitted_document and on whether an ESR evaluated the text.",
+      "reason": "A register or review written at V14 or V16 must not carry a false sentence.",
+      "impacted_tickets": ["overhaul 17", "V14", "V16"],
+      "resolves": "The first Unresolved known_gap of msca-dn-resubmission-2026-identity_2026-11-10 (the V18 register sentences), by decision of timing. The gap closes when ticket 17 is done.",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11."
+    }
+  ],
+  "known_gaps": [],
+  "private_content": "none"
+}

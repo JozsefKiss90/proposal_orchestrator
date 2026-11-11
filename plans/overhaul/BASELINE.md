@@ -224,3 +224,20 @@ Raw output: `plans/overhaul/baseline-windows.txt` (UTF-16, from `Tee-Object`).
 - `tests/test_transport_openai_compatible.py::TestErrorHandling::test_timeout_raises_timeout_error`
 - `tests/test_transport_openai_compatible.py::TestResponseParsing::test_call_sends_post_and_returns_parsed`
 - `tests/test_transport_openai_compatible.py::TestResponseParsing::test_tool_calls_round_trip`
+
+## 5. Post-wave-1 red line (binding from 2026-11-11)
+
+Wave-2 tickets (01–06, 17) and the O5 re-freeze judge themselves against this section, not §4. "At or
+above §5" means no failure outside the 42 node ids below, and no passing test turned red.
+
+| Field | Value |
+|-------|-------|
+| Red line | §4's 43 node ids minus one, so **42 node ids** |
+| Removed | `tests/test_msca_dn_declaration_drafts.py::TestDeterminismAndTheCommittedArtifacts::test_the_committed_artifacts_are_reproducible`. It passes since the `b7c2b9f9` re-render. |
+| Suite evidence | `.scratch/overhaul-2026-11/suite-merged-2026-11-10c.txt` (UTF-16, untracked), at `96f40333`: 44 failed, 9,466 passed, 87 skipped. |
+| The two extra failures | `tests/harness/test_integrity_audit.py::TestCommand::test_document_route_binds_snapshot_and_leaves_it_unchanged` and `::test_the_report_carries_the_reason_the_candidates_records_derive`. Ticket 16 broke them. `1ab64dc2` fixed them in test code only. |
+| Lane evidence | PE-09 acceptance lane GREEN at `dbf6582f`: 3,532 passed, 17 declared exclusions, exit 0. |
+| Checked by | Node-id comparison of the 10c failures with §4's list, 2026-11-11. |
+
+The 42 node ids are §4's list without the removed line. They are not repeated here, so the two lists
+cannot drift apart.
