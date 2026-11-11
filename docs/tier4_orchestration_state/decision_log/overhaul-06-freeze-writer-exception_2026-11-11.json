@@ -1,0 +1,65 @@
+{
+  "record_type": "decision_record",
+  "id": "overhaul-06-freeze-writer-exception_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "ticket/06-record-chain-contract",
+  "base_commit": "37afba76",
+  "milestone": "November 2026 overhaul, wave 2, batch O3",
+  "ticket": "06 of .scratch/overhaul-2026-11/issues/06-dn-record-chain-contract.md, acceptance boxes 'Preflight, blind report, baseline, audit and operator review load and write through the chain module; their private copies are deleted.' and 'code-review run since the base commit, with no gaps on the spec axis.'",
+  "authority": "Operator, in session 2026-11-11. Recorded under CLAUDE.md §9.4. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "operator_confirmed",
+  "decided_by": "operator",
+  "decision": "Ticket 06 closes with one accepted exception: the blind-baseline freeze keeps writing its two fixed-name files itself. The explicit-path branch of write_report is removed. Six behaviour changes made by the ticket are accepted.",
+  "rules": [
+    {
+      "id": "F1",
+      "rule": "harness/blind_baseline.py freeze_baseline writes blind_baseline_<short>.json and blind_baseline_<short>.freeze.json itself, not through record_chain.write_record. It loads through the chain (FREEZE_KIND).",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision in session, 2026-11-11 (option 1). write_record writes numbered names only; giving the freeze numbered names would change the record format, which ticket 06 forbids. The committed freeze under docs/tier4_orchestration_state/msca_dn/baselines/ uses the fixed names."
+    },
+    {
+      "id": "F2",
+      "rule": "harness/blind_assessment.py write_report takes no explicit path. Every blind report is written through the chain at the next numbered name.",
+      "declared_status": "Confirmed",
+      "basis": "Operator instruction in session, 2026-11-11. The branch had no caller outside one test; the test now asserts the parameter is gone."
+    },
+    {
+      "id": "C1",
+      "rule": "record_chain gains write_rendering, which writes a Markdown rendering at the next numbered .md path. load_record and write_record are unchanged.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11. The operator review's Markdown file has no JSON record for write_record."
+    },
+    {
+      "id": "C2",
+      "rule": "The audit, preflight and review-notes kinds declare no predecessor. A loaded audit does not re-hash its blind baseline.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11. The committed audits under docs/tier4_orchestration_state/msca_dn/audit/ record baseline_dir as an absolute path in the main checkout, so a re-hash would refuse them in any other checkout, including the host bundle. The comparison re-hashes the same frozen report. The preflight binds by content hash; build_review still compares the notes' comparison hash."
+    },
+    {
+      "id": "C3",
+      "rule": "The operator review loads its comparison through load_record(COMPARISON_KIND) and takes the comparison's file hash from the chain; _expect_sha is removed.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11."
+    },
+    {
+      "id": "C4",
+      "rule": "Refusal wording for the migrated links comes from the chain: an edited frozen copy reads 'moved after the freeze was written' with short hashes; 'report file not found' becomes 'report not found'; review-notes flags are checked before required keys. Error classes are unchanged.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11."
+    },
+    {
+      "id": "C5",
+      "rule": "Temp-file prefixes change to blind_, preflight_, integrity_ and operator_review_. Written bytes are unchanged.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11; the same kind of change as overhaul-05-revisions-hash-gap_2026-11-11 C4."
+    },
+    {
+      "id": "C6",
+      "rule": "blind_assessment.next_report_path and operator_review.next_markdown_path are removed. Numbered paths come from content_hash.next_numbered_path through the chain.",
+      "declared_status": "Confirmed",
+      "basis": "Operator acceptance in session, 2026-11-11. Neither had a caller outside tests."
+    }
+  ],
+  "known_gaps": [],
+  "private_content": "None. This record names files, functions and behaviours only."
+}

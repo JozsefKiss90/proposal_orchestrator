@@ -390,12 +390,12 @@ class TestImmutability:
         assert first.read_bytes() == first_bytes
         assert sorted(p.name for p in out.iterdir()) == sorted([first.name, second.name])
 
-    def test_writer_never_overwrites_an_existing_path(self, tmp_path, bundle):
-        report = _assess(tmp_path, bundle, _candidate(tmp_path, bundle))
-        out = tmp_path / "reports"
-        path = ba.write_report(report, out)
-        with pytest.raises(ba.BlindAssessmentError, match="exists"):
-            ba.write_report(report, out, path=path)
+    def test_writer_takes_no_explicit_path(self):
+        # Every report is written through the record chain at the next numbered
+        # name; a caller cannot name a path of its own (ticket 06).
+        import inspect
+
+        assert "path" not in inspect.signature(ba.write_report).parameters
 
     def test_report_cannot_be_constructed_blocking(self, tmp_path, bundle):
         report = _assess(tmp_path, bundle, _candidate(tmp_path, bundle))

@@ -37,13 +37,13 @@ Failing tests first:
 
 Then:
 
-- [ ] Preflight, blind report, baseline, audit and operator review load and write through the chain module; their private copies are deleted.
+- [x] Preflight, blind report, baseline, audit and operator review load and write through the chain module; their private copies are deleted. Operator exception: the blind-baseline freeze writes its two fixed-name files itself (decision `overhaul-06-freeze-writer-exception_2026-11-11` F1).
 - [x] The boundary test above is in place.
 - [x] The full fixture chain loads end to end, and records written before 05 still load when unchanged.
 - [x] Blind-baseline freeze conditions, freeze schema version and the PE-09 runbook test are unchanged and green.
 - [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
 - [ ] **PE-09 acceptance lane green** (admission rule 5).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] `code-review` run since the base commit, with no gaps on the spec axis. The one gap is the accepted exception above.
 
 ## Session brief
 
@@ -63,3 +63,4 @@ Size: ~250–350 changed non-test lines, net negative
 - Deferred at Step 3 (2026-11-06): as 05. Blocked by 05.
 - Wave 2c (2026-11-06): also after 01, because both edit the blind-report module (collision edge, not a functional dependency).
 - 2026-11-11, base 69995f1e: targeted 27 modules (1,595 tests), 1 failed / 1,594 passed; the failure is on the BASELINE §5 red line (`tests/test_demo_candidate_blind_baseline.py::TestTheReportsNumbersAreTheArtifactsOwn::test_the_leakage_scan_file_count_is_re_derivable`). Code-review ran (spec + standards); fixed: the review is written before its decisions list again, glossary wording in the audit kind, the boundary test also bans `hashlib`. Judgement calls: `record_chain.write_rendering` added (additive; the operator review's Markdown pair has no JSON record for `write_record`); the audit, preflight and review-notes kinds declare no predecessor (committed audits name their blind baseline by an absolute path from another tree; the preflight binds by content hash; the notes' comparison hash is still compared in `build_review`); the operator review loads the comparison with `load_record(COMPARISON_KIND)` to take its file hash from the chain. Behaviour changes: refusal wording now comes from the chain (an edited frozen copy says 'moved after the freeze was written', short hashes; `test_blind_baseline` match updated); review-notes flags are checked before their required keys; `next_report_path` and `next_markdown_path` removed (no caller outside tests). Spec gap left open: the blind baseline freeze still writes its two fixed-name files itself (numbered names would change the record format), and `write_report(path=...)` still writes an explicit path itself; so the 'load and write through the chain' and code-review boxes stay open. Full suite and lane not run.
+- 2026-11-11, operator decision: option 1. The freeze keeps its fixed-name writer (F1). `write_report(path=...)` is removed on this branch; its test now asserts the parameter is gone (F2). The six behaviour changes (`write_rendering`, kinds without predecessors, the review's comparison load, chain wording, temp-file prefixes, removed numbering helpers) are accepted (C1-C6). Record: `overhaul-06-freeze-writer-exception_2026-11-11`. Suite and lane boxes wait for the operator's O3 run.

@@ -1125,25 +1125,14 @@ REPORT_KIND = RecordKind(
 )
 
 
-def write_report(
-    report: BlindAssessmentReport, reports_dir: Path | str, *, path: Path | None = None
-) -> Path:
+def write_report(report: BlindAssessmentReport, reports_dir: Path | str) -> Path:
     """Write *report* as a new file under *reports_dir* and return its path.
 
-    The default name is ``blind_<hash12>_<NNNN>.json`` with the next free
-    sequence number for this candidate hash.  An existing path — default or
-    explicit — is never overwritten: historical reports are immutable.
+    The name is ``blind_<short>_<NNNN>.json`` with the next free sequence
+    number for this candidate hash.  An existing file is never overwritten:
+    historical reports are immutable.
     """
-    if path is None:
-        return write_record(REPORT_KIND, report.to_dict(), reports_dir, digest=report.candidate_hash).path
-    target = Path(path)
-    if target.exists():
-        raise BlindAssessmentError(
-            f"report {target} already exists — historical reports are immutable; "
-            "a rerun writes a new file."
-        )
-    atomic_write_json(report.to_dict(), target, prefix="blind_assessment_")
-    return target
+    return write_record(REPORT_KIND, report.to_dict(), reports_dir, digest=report.candidate_hash).path
 
 
 def load_report(
