@@ -1,6 +1,6 @@
 # 17 — Wording for a submitted document that no ESR has evaluated yet
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: None — can start immediately (wave 2, batch O1, parallel with 01 and 04)
 Source: `discovery/slice3-esr-review-2026-11-10.md` F1; the first Unresolved gap in
@@ -57,8 +57,8 @@ Then:
 
 - [x] Targeted tests pass, including every module that imports a changed module (wave-1 lesson).
 - [x] `code-review` run since the base commit, with no gaps on the spec axis.
-- [ ] Full suite at or above `plans/overhaul/BASELINE.md` §5 (operator, after merge).
-- [ ] Acceptance lane GREEN (operator, after merge). The touched modules are lane modules.
+- [x] Full suite at or above `plans/overhaul/BASELINE.md` §5 (operator, after merge).
+- [x] Acceptance lane GREEN (operator, after merge). The touched modules are lane modules.
 - [x] The identity record's first known gap is closed by a successor note or record (§9.4).
 
 ## Session brief
@@ -93,3 +93,4 @@ Record: a successor note to the identity record's first known gap (§9.4)
 ## Comments
 
 - 2026-11-11, base 92ce1e16: wording keyed on EVALUATED_BY_AN_ESR (register) and is_submitted_document (comparison, review). Targeted: 19 importing modules, 1272 passed, 0 failed. Committed comparisons, revisions and reviews replay byte-equal under tests. The 2025 register equals the base renderer's bytes. Successor record: msca-dn-not-yet-evaluated-wording_2026-11-11. Full suite and lane not run.
+- 2026-11-11, closed: merged by the operator as `d5016542`. Suite at 2a8385d9: 42 failed, 9,515 passed, 87 skipped; the 42 failed node ids equal BASELINE §5 exactly (none new, none gone; `suite-o1.txt`). Lane: GREEN, 3,594 tests, 3,577 passed, 0 failed, 0 errors, 17 declared exclusions (`lane-o1.xml`). The identity record's first gap closes with this ticket (D5).

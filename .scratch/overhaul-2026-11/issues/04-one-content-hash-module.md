@@ -63,8 +63,8 @@ Then:
 
 - [x] No harness module outside the hash module calls `hashlib.sha256` or builds canonical JSON for hashing (a boundary test pins this; the response checkpoint's per-response hash may use the file-hash operation).
 - [ ] Display code uses the short form; no hard-coded slice lengths for hashes remain in the DN record modules.
-- [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
-- [ ] **PE-09 acceptance lane green** (admission rule 5: evidence-preflight and blind-assessment code change).
+- [x] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
+- [x] **PE-09 acceptance lane green** (admission rule 5: evidence-preflight and blind-assessment code change).
 - [ ] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
@@ -84,3 +84,4 @@ Size: ~150–250 changed non-test lines, mostly deletions and call-site swaps
 - Deferred at Step 3 (2026-11-06): on the path but byte-identical by design, so no value for V14/V16 before the deadline; touches freeze inputs two days before the bundle. Revisit after V16.
 - Wave 2a (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.
 - Session 2026-11-11 (base `92ce1e16`): targeted 59 modules, 1 failed (on the §5 red line) / 2,952 passed / 17 skipped, then 221 passed / 2 skipped after the last edits; display box open (operator_review `[:16]` Markdown widths kept for byte-equal replay).
+- 2026-11-11, merged by the operator as `33d298f9` (over `39c3c542`, which merged 01 in). Suite at 2a8385d9: 42 failed, 9,515 passed, 87 skipped; the 42 failed node ids equal BASELINE §5 exactly (none new, none gone; `suite-o1.txt`). Lane: GREEN, 3,594 tests, 3,577 passed, 0 failed, 0 errors, 17 declared exclusions (`lane-o1.xml`). Code-review ran (spec + standards). The spec axis has one gap: the display box is partial (`operator_review.py` `[:16]` at the inventory widths; `rubric.py` and `commands/rubric_grading_run.py` `[:19]`). The display and code-review boxes stay open, and so does the status, until the operator records an exception or a follow-up closes the gap. Ticket 05 waits on this.
