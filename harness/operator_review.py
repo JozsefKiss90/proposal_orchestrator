@@ -67,7 +67,6 @@ from harness.blind_assessment import (
     PreEvaluationProfile,
     candidate_hash,
     load_candidate,
-    next_report_path,
 )
 from harness.blind_baseline import FrozenBaseline, _portable, load_frozen_baseline
 from harness.esr_comparison import (
@@ -83,12 +82,12 @@ from harness.esr_comparison import (
     OBSERVATION_KIND_MINOR,
     OBSERVATION_KIND_SHORTCOMING,
     OBSERVATION_KIND_STRENGTH,
+    COMPARISON_KIND,
     POINTER_RESOLUTION_IDENTITY,
     pointer_rule_of,
     EsrComparisonError,
     declares_submitted_document,
     load_audits,
-    load_comparison,
     load_esr_record,
     load_register,
     resolve_audit_reference,
@@ -98,6 +97,7 @@ from harness.esr_comparison import (
 )
 from harness.content_hash import short_hash
 from harness.evidence_preflight import file_sha256
+from harness.record_chain import RecordKind, load_record, write_rendering
 
 REVIEW_NOTES_RECORD_TYPE = "esr_review_notes"
 REVIEW_SCHEMA_VERSION = "1.0"
@@ -287,6 +287,18 @@ def _one_of(row: Mapping[str, Any], key: str, allowed: Sequence[str], *, label: 
     return str(value)
 
 
+#: The operator review in the DN record chain: the review notes it loads, and
+#: the Markdown pair (review and decisions) it renders from them. The notes are
+#: bound to their comparison by hash, which :func:`build_review` compares with
+#: the comparison the review was given.
+REVIEW_KIND = RecordKind(
+    name="review notes",
+    record_type=REVIEW_NOTES_RECORD_TYPE,
+    error=OperatorReviewError,
+    prefix=_REVIEW_PREFIX,
+)
+
+
 def load_review_notes(path: Path | str) -> ReviewNotes:
     """Load the review notes, fail-closed on shape and vocabulary.
 
@@ -298,16 +310,8 @@ def load_review_notes(path: Path | str) -> ReviewNotes:
     to take.
     """
     p = Path(path)
-    try:
-        raw = p.read_text(encoding="utf-8-sig")
-    except OSError as exc:
-        raise OperatorReviewError(f"review notes {p} cannot be read: {exc}") from exc
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        raise OperatorReviewError(f"review notes {p} are not valid JSON: {exc}") from exc
-    if not isinstance(data, Mapping) or data.get("record_type") != REVIEW_NOTES_RECORD_TYPE:
-        raise OperatorReviewError(f"{p} is not an {REVIEW_NOTES_RECORD_TYPE!r} record.")
+    loaded = load_record(REVIEW_KIND, p)
+    data = loaded.data
     for key in (
         "schema_version",
         "comparison",
@@ -322,11 +326,6 @@ def load_review_notes(path: Path | str) -> ReviewNotes:
         raise OperatorReviewError(
             f"review notes {p} are schema version {data['schema_version']!r}; this module "
             f"reads {REVIEW_SCHEMA_VERSION!r}."
-        )
-    if data.get("advisory") is not True or data.get("blocking") is not False:
-        raise OperatorReviewError(
-            f"review notes {p} must carry advisory=true and blocking=false: the review is "
-            "advisory to a human and gates nothing (harness/HARNESS.md)."
         )
     if data["review_state"] not in REVIEW_STATES:
         raise OperatorReviewError(
@@ -405,7 +404,7 @@ def load_review_notes(path: Path | str) -> ReviewNotes:
                 "put to the operator."
             )
         by_id[oid] = row
-    return ReviewNotes(path=p, sha256=file_sha256(p), data=data, rows=by_id)
+    return ReviewNotes(path=p, sha256=loaded.sha256, data=data, rows=by_id)
 
 
 # --------------------------------------------------------------------------- #
@@ -468,16 +467,14 @@ def _under(repo_root: Path, raw: str) -> Path:
     return p if p.is_absolute() else repo_root / p
 
 
-def _expect_sha(path: Path, declared: Any, *, role: str) -> str:
-    if not path.is_file():
-        raise OperatorReviewError(f"the comparison names {role} at {path}, which is not a file.")
-    actual = file_sha256(path)
-    if isinstance(declared, str) and declared and actual != declared:
-        raise OperatorReviewError(
-            f"{role} at {path} hashes to {short_hash(actual)}, the comparison recorded "
-            f"{short_hash(declared)}. The review is refused: the artifact moved under the report."
-        )
-    return actual
+def _bound(repo_root: Path, block: Any, *, role: str) -> tuple[Path, str]:
+    """A predecessor the comparison names: its path, and the hash the record
+    chain re-checked against its bytes when the comparison was loaded."""
+    entry = block if isinstance(block, Mapping) else {}
+    raw, sha = str(entry.get("path") or ""), str(entry.get("sha256") or "")
+    if not raw or not sha:
+        raise OperatorReviewError(f"the comparison names no {role} with a path and a hash.")
+    return _under(repo_root, raw), sha
 
 
 def resolve_inputs(
@@ -488,6 +485,10 @@ def resolve_inputs(
 ) -> ResolvedInputs:
     """Load the comparison and every artifact it names, re-hashing each one.
 
+    The files the comparison names by hash are re-hashed by the record chain
+    (:data:`harness.esr_comparison.COMPARISON_KIND`) when it is loaded; the
+    candidates, bound by content hash, are re-derived here.
+
     The review takes its inputs from the comparison rather than from the
     command line on purpose: a report that could be rendered against a
     different ESR record or a different candidate than the comparison used
@@ -495,10 +496,10 @@ def resolve_inputs(
     """
     cmp_path = Path(comparison_path)
     try:
-        data = load_comparison(cmp_path, repo_root=repo_root)
+        loaded = load_record(COMPARISON_KIND, cmp_path, repo_root=repo_root)
     except EsrComparisonError as exc:
         raise OperatorReviewError(str(exc)) from exc
-    cmp_sha = file_sha256(cmp_path)
+    data, cmp_sha = loaded.data, loaded.sha256
     inventory: list[InputRecord] = [
         InputRecord(
             role="comparison report",
@@ -508,9 +509,7 @@ def resolve_inputs(
         )
     ]
 
-    esr_block = data.get("esr_record") or {}
-    esr_path = _under(repo_root, str(esr_block.get("path") or ""))
-    esr_sha = _expect_sha(esr_path, esr_block.get("sha256"), role="the ESR record")
+    esr_path, esr_sha = _bound(repo_root, data.get("esr_record"), role="the ESR record")
     try:
         esr = load_esr_record(esr_path)
     except EsrComparisonError as exc:
@@ -524,9 +523,7 @@ def resolve_inputs(
         )
     )
 
-    disp_block = data.get("dispositions") or {}
-    disp_path = _under(repo_root, str(disp_block.get("path") or ""))
-    disp_sha = _expect_sha(disp_path, disp_block.get("sha256"), role="the dispositions")
+    disp_path, disp_sha = _bound(repo_root, data.get("dispositions"), role="the dispositions")
     inventory.append(
         InputRecord(
             role="dispositions",
@@ -602,9 +599,9 @@ def resolve_inputs(
             )
         )
 
-    reg_block = data.get("fidelity_register") or {}
-    reg_path = _under(repo_root, str(reg_block.get("path") or ""))
-    reg_sha = _expect_sha(reg_path, reg_block.get("sha256"), role="the fidelity register")
+    reg_path, reg_sha = _bound(
+        repo_root, data.get("fidelity_register"), role="the fidelity register"
+    )
     try:
         register = load_register(reg_path).data
     except EsrComparisonError as exc:
@@ -631,9 +628,8 @@ def resolve_inputs(
     declared_audit_paths: list[str] = []
     audit_paths: list[str] = []
     for entry in data.get("audits") or []:
-        declared = str(entry.get("path") or "")
-        a_path = _under(repo_root, declared)
-        a_sha = _expect_sha(a_path, entry.get("sha256"), role="an integrity audit")
+        a_path, a_sha = _bound(repo_root, entry, role="an integrity audit")
+        declared = str(entry["path"])
         declared_audit_paths.append(declared)
         audit_paths.append(str(a_path))
         inventory.append(
@@ -1562,35 +1558,34 @@ def render_decisions(review: Review, *, review_name: str | None = None) -> str:
 # --------------------------------------------------------------------------- #
 
 
-def next_markdown_path(out_dir: Path, digest: str, *, prefix: str) -> Path:
-    """The next free ``<prefix>_<short>_<NNNN>.md`` under *out_dir*.
-
-    The shared sequencer of every harness writer, with the Markdown suffix;
-    *digest* is a content hash or a file hash.  Nothing is ever
-    overwritten: an earlier review of the same comparison stays as the
-    operator read it.
-    """
-    return next_report_path(out_dir, digest, prefix=prefix, suffix=_MARKDOWN_SUFFIX)
-
-
 def write_review(review: Review, out_dir: Path | str) -> tuple[Path, Path]:
     """Write the review and the decisions list; never overwrite either.
 
-    The two share a sequence number, as the comparison and its revisions do.
+    The review takes the next numbered path through the record chain; the
+    decisions list shares its sequence number, as the comparison and its
+    revisions do. An earlier review of the same comparison stays as the
+    operator read it.
     """
     out = Path(out_dir)
     short = short_hash(review.inputs.comparison_sha256)
-    target = next_markdown_path(out, review.inputs.comparison_sha256, prefix=_REVIEW_PREFIX)
-    seq = target.stem.rsplit("_", 1)[1]
-    decisions = out / f"{_DECISIONS_PREFIX}_{short}_{seq}{_MARKDOWN_SUFFIX}"
-    if decisions.exists():
-        raise OperatorReviewError(f"{decisions} already exists; nothing overwritten.")
-    out.mkdir(parents=True, exist_ok=True)
-    atomic_write_text(render_review(review), target, prefix="operator_review_")
-    atomic_write_text(
-        render_decisions(review, review_name=target.name), decisions, prefix="operator_decisions_"
+    review_text = render_review(review)
+    pending: list[tuple[Path, str]] = []
+
+    def render(target: Path) -> str:
+        seq = target.stem.rsplit("_", 1)[1]
+        decisions = out / f"{_DECISIONS_PREFIX}_{short}_{seq}{_MARKDOWN_SUFFIX}"
+        if decisions.exists():
+            raise OperatorReviewError(f"{decisions} already exists; nothing overwritten.")
+        pending.append((decisions, render_decisions(review, review_name=target.name)))
+        return review_text
+
+    written = write_rendering(
+        REVIEW_KIND, out, digest=review.inputs.comparison_sha256, render=render
     )
-    return target, decisions
+    # The review first, then its decisions list, as before the record chain.
+    ((decisions, decisions_text),) = pending
+    atomic_write_text(decisions_text, decisions, prefix="operator_decisions_")
+    return written.path, decisions
 
 
 def render_summary(review: Review) -> str:
@@ -1644,7 +1639,6 @@ __all__ = [
     "check_references",
     "cross_check_counts",
     "load_review_notes",
-    "next_markdown_path",
     "recount",
     "render_decisions",
     "render_review",

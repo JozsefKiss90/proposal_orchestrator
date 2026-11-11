@@ -64,7 +64,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from runner.atomic_write import atomic_write_json
 from runner.dev_graph import HISTORICAL_FEEDBACK_TAGS, build_snapshot
 from runner.external_proposal import ExtractionError, is_row, parse_row
 from runner.leakage_scan import scan_tree
@@ -80,7 +79,6 @@ from harness.blind_assessment import (
     assert_no_leakage,
     candidate_hash,
     load_candidate,
-    next_report_path,
 )
 from harness.criterion_scoring import CriterionInput, build_criterion_input
 from harness.grounding_scope import (
@@ -100,6 +98,7 @@ from harness.evidence_pack import (
     split_paragraphs,
 )
 from harness.content_hash import content_hash, file_hash, short_hash
+from harness.record_chain import RecordKind, load_record, write_record
 from harness.rubrics import ProfileBundle, build_pack_for
 
 __all__ = [
@@ -888,32 +887,32 @@ def run_preflight(
 # --------------------------------------------------------------------------- #
 
 
+def _preflight_shape(path: Path, data: Mapping[str, Any]) -> None:
+    for key in ("candidate_hash", "profile_version", "rubric_set_fingerprint", "pack_set_hash", "params", "packs"):
+        if key not in data:
+            raise BlindAssessmentError(f"preflight {path} lacks {key!r}.")
+
+
+#: The evidence preflight in the DN record chain. It names no predecessor by
+#: file hash: what it binds (candidate, profile, packs) is re-derived by
+#: :func:`check_preflight` before an assessment, not re-hashed on load.
+PREFLIGHT_KIND = RecordKind(
+    name="preflight",
+    record_type=PREFLIGHT_RECORD_TYPE,
+    error=BlindAssessmentError,
+    prefix=_REPORT_PREFIX,
+    check_shape=_preflight_shape,
+)
+
+
 def write_preflight(report: PreflightReport, reports_dir: Path | str) -> Path:
     """Write *report* as ``preflight_<hash12>_<NNNN>.json``; never overwrite."""
-    out_dir = Path(reports_dir)
-    target = next_report_path(out_dir, report.candidate_hash, prefix=_REPORT_PREFIX)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    atomic_write_json(report.to_dict(), target, prefix="evidence_preflight_")
-    return target
+    return write_record(PREFLIGHT_KIND, report.to_dict(), reports_dir, digest=report.candidate_hash).path
 
 
 def load_preflight(path: Path | str) -> dict[str, Any]:
     """Load a persisted preflight report, fail-closed on shape and flags."""
-    p = Path(path)
-    if not p.is_file():
-        raise BlindAssessmentError(f"preflight report not found: {p}")
-    try:
-        data = json.loads(p.read_text(encoding="utf-8-sig"))
-    except json.JSONDecodeError as exc:
-        raise BlindAssessmentError(f"preflight {p} is not valid JSON: {exc}") from exc
-    if not isinstance(data, Mapping) or data.get("record_type") != PREFLIGHT_RECORD_TYPE:
-        raise BlindAssessmentError(f"{p} is not an {PREFLIGHT_RECORD_TYPE!r} record.")
-    if data.get("advisory") is not True or data.get("blocking") is not False:
-        raise BlindAssessmentError(f"preflight {p} must carry advisory=true and blocking=false.")
-    for key in ("candidate_hash", "profile_version", "rubric_set_fingerprint", "pack_set_hash", "params", "packs"):
-        if key not in data:
-            raise BlindAssessmentError(f"preflight {p} lacks {key!r}.")
-    return dict(data)
+    return load_record(PREFLIGHT_KIND, path).data
 
 
 def check_preflight(

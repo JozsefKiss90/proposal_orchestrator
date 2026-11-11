@@ -58,7 +58,6 @@ The freeze is advisory and never a runtime gate (``harness/HARNESS.md``).
 """
 from __future__ import annotations
 
-import json
 import math
 import re
 import shutil
@@ -92,6 +91,7 @@ from harness.criterion_scoring import (
 )
 from harness.content_hash import SHORT_LEN, file_hash, short_hash
 from harness.evidence_preflight import load_preflight
+from harness.record_chain import Predecessor, RecordKind, load_record
 from harness.grounding_scope import (
     SCOPE_SOURCE_GROUNDED,
     UNIT_CELL,
@@ -1117,11 +1117,33 @@ def _portable(path: Path, repo_root: Path | str | None) -> str:
     return path.as_posix()
 
 
+def _freeze_shape(path: Path, data: Mapping[str, Any]) -> None:
+    copy_name = str(data.get("report_copy") or "")
+    if not re.fullmatch(r"blind_baseline_[0-9a-f]{%d}\.json" % SHORT_LEN, copy_name):
+        raise BlindBaselineError(f"{path} names an unexpected report copy {copy_name!r}.")
+
+
+#: The blind baseline in the DN record chain: the frozen report copy beside the
+#: freeze is re-hashed on every load. The original report the freeze names by
+#: ``report_path`` is not: it may live in another tree, and the copy is what a
+#: later stage reads. The freeze conditions stay in :func:`run_baseline_checks`.
+FREEZE_KIND = RecordKind(
+    name="freeze",
+    record_type=BASELINE_FREEZE_RECORD_TYPE,
+    error=BlindBaselineError,
+    predecessors=(
+        Predecessor("the frozen report copy", path="report_copy", sha256="report_sha256"),
+    ),
+    check_shape=_freeze_shape,
+)
+
+
 def load_frozen_baseline(baseline_dir: Path | str) -> FrozenBaseline:
     """Load the one freeze under *baseline_dir* and check the copy's hash.
 
     Later stages read the baseline through this so a copy edited after the
-    freeze is refused rather than read.
+    freeze is refused rather than read. The copy is looked for in
+    *baseline_dir* only.
     """
     target = Path(baseline_dir)
     freezes = sorted(target.glob(_FREEZE_GLOB)) if target.is_dir() else []
@@ -1132,27 +1154,9 @@ def load_frozen_baseline(baseline_dir: Path | str) -> FrozenBaseline:
             f"{target} holds {len(freezes)} freeze records; a baseline directory holds one."
         )
     freeze_path = freezes[0]
-    try:
-        record = json.loads(freeze_path.read_text(encoding="utf-8-sig"))
-    except json.JSONDecodeError as exc:
-        raise BlindBaselineError(f"{freeze_path} is not valid JSON: {exc}") from exc
-    if not isinstance(record, Mapping) or record.get("record_type") != BASELINE_FREEZE_RECORD_TYPE:
-        raise BlindBaselineError(f"{freeze_path} is not a {BASELINE_FREEZE_RECORD_TYPE!r} record.")
-    if record.get("advisory") is not True or record.get("blocking") is not False:
-        raise BlindBaselineError(f"{freeze_path} must carry advisory=true and blocking=false.")
-    copy_name = str(record.get("report_copy") or "")
-    if not re.fullmatch(r"blind_baseline_[0-9a-f]{%d}\.json" % SHORT_LEN, copy_name):
-        raise BlindBaselineError(f"{freeze_path} names an unexpected report copy {copy_name!r}.")
-    copy_path = target / copy_name
-    if not copy_path.is_file():
-        raise BlindBaselineError(f"the frozen report copy {copy_path} is missing.")
-    actual = file_hash(copy_path)
-    if actual != record.get("report_sha256"):
-        raise BlindBaselineError(
-            f"the frozen report copy {copy_path} hashes to {actual}, the freeze says "
-            f"{record.get('report_sha256')}; the baseline was edited after it was frozen."
-        )
-    return FrozenBaseline(record=dict(record), freeze_path=freeze_path, copy_path=copy_path)
+    record = load_record(FREEZE_KIND, freeze_path, repo_root=target).data
+    copy_path = target / str(record["report_copy"])
+    return FrozenBaseline(record=record, freeze_path=freeze_path, copy_path=copy_path)
 
 
 # --------------------------------------------------------------------------- #

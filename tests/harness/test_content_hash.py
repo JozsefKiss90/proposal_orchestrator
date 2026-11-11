@@ -24,6 +24,7 @@ import pytest
 import harness.blind_assessment as ba
 import harness.regression as reg
 from harness.blind_baseline import load_frozen_baseline
+from harness.content_hash import next_numbered_path
 from harness.gold_set import GoldPair, GoldSet, gold_set_hash
 from harness.materiality import MaterialityExample, materiality_set_hash
 from harness.provenance import prompt_hash
@@ -198,13 +199,13 @@ HEX = "f60ae6e0a2a1ddcdb4a82b1e690941048a286ef72cc016ec8b325c728096bb01"
 
 class TestNumberingAcceptsBothFormats:
     def test_a_bare_hex_digest_is_named_as_its_prefixed_form_is(self, tmp_path):
-        bare = ba.next_report_path(tmp_path, HEX, prefix="comparison")
-        prefixed = ba.next_report_path(tmp_path, "sha256:" + HEX, prefix="comparison")
+        bare = next_numbered_path(tmp_path, HEX, prefix="comparison", suffix=".json")
+        prefixed = next_numbered_path(tmp_path, "sha256:" + HEX, prefix="comparison", suffix=".json")
         assert bare == prefixed == tmp_path / "comparison_f60ae6e0a2a1_0001.json"
 
     def test_the_sequence_counts_files_named_from_either_format(self, tmp_path):
-        ba.next_report_path(tmp_path, HEX, prefix="comparison").write_text("{}", encoding="utf-8")
-        assert ba.next_report_path(tmp_path, "sha256:" + HEX, prefix="comparison").name == (
+        next_numbered_path(tmp_path, HEX, prefix="comparison", suffix=".json").write_text("{}", encoding="utf-8")
+        assert next_numbered_path(tmp_path, "sha256:" + HEX, prefix="comparison", suffix=".json").name == (
             "comparison_f60ae6e0a2a1_0002.json"
         )
 
