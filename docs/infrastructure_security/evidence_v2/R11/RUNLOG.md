@@ -62,3 +62,4 @@ time and the operator's words.
 | Step | UTC (approx.) | Who | Result | Deviation / error |
 |---|---|---|---|---|
 | go | 2026-11-11 21:00:40 | operator | "OD9-r1 confirmed; go for R11 step 06", in session on `R11_fix1_05_change-set.json`. Recorded before execution. Step 13 deletes the stack in this same session (OD5) | none |
+| 06 | 2026-11-11 21:03:42–21:04:56 | operator | `r11-fix1-create-01` executed once: `execute exit=0`; stack `CREATE_COMPLETE`, capabilities null, tag `project=proposal-orchestrator`. `Host` started 21:04:42 and completed 21:04:56; 24 events, none failed. Hourly charges run from 21:03:42 until step 13 | none. Files `R11_fix1_06_*`; run 1's `R11_06_*` kept |
