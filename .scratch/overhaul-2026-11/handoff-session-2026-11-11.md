@@ -206,7 +206,12 @@ Ticked only on the evidence each protocol (§3) names. Newest line last.
       3,645 passed, 0 failed, 17 declared exclusions (`lane-o2.xml`). 03 and 05 are done. 05 closed on an
       accepted gap: a comparison binds its revisions artifact by path only; a revisions hash is a format
       ticket after V16 (`overhaul-05-revisions-hash-gap_2026-11-11`).
-- [ ] **O3** — 02 ∥ 06, merge, suite + lane
+- [x] **O3** — 02 ∥ 06, merge, suite + lane. Merged by the operator: `67224ced` (02), `7697524c` (06). Suite at
+      `7697524c`: 43 failed; 42 equal BASELINE §5, the 43rd (`test_evidence_v2_tree_is_itself_clean`) came
+      from the agent's R11 run log naming the secret patterns, fixed and re-run green. Lane GREEN: 3,746
+      tests, 0 failed, 17 declared exclusions (`lane-o3.xml`). 02 and 06 are done. 06 closed on an accepted
+      exception: the blind-baseline freeze keeps its fixed-name writer
+      (`overhaul-06-freeze-writer-exception_2026-11-11`).
 - [x] **H1** — runbook Converse delta. Merged by the operator as `2a8385d9`; covered by the O1 suite and
       lane above (the runbook guard is a lane module). The V14 compare line changes again when the ESR
       record is rebound off `msca-dn-2025-sanitised-v1` (operator, 2026-11-11: that intake is out of

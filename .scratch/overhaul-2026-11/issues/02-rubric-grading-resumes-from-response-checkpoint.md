@@ -1,6 +1,6 @@
 # 02 — Rubric grading resumes from the response checkpoint, bound to content
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 01, 03
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate C. Grill skipped by the
@@ -59,7 +59,7 @@ Then:
 - [x] The rubric report and frozen rubric baseline carry the candidate hash and replayed / live draw counts; a baseline frozen before this change still loads.
 - [x] `--plan-only` budget accounting is unchanged.
 - [x] The module docstring and `harness/HARNESS.md` describe the new resume rule.
-- [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
+- [x] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
 - [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
@@ -83,3 +83,5 @@ Admission rule 5: does not apply (no blind_*/evidence_*/execution_receipt/anonym
 - Wave 2c (2026-11-06): also after 03, because both edit rubric grading (collision edge, not a functional dependency).
 - 2026-11-11, base 69995f1e (branch `ticket/02-rubric-resume-checkpoint`): targeted 40 modules (every test module importing `harness.response_cache`, `harness.rubric`, `harness.regression` or `harness.commands`): 1,902 passed, 1 failed, 6 skipped; the failure is the BASELINE §5 id `tests/test_demo_candidate_blind_baseline.py::TestTheReportsNumbersAreTheArtifactsOwn::test_the_leakage_scan_file_count_is_re_derivable`. PE-09 acceptance lane run from the worktree (the binding's header form now filters empty rubric fields): GREEN, 3,662 passed, 0 failed, 17 declared exclusions. Review (standards + spec axes): glossary wording fixed (draw, short form), shared `next_checkpoint_path` reused, plan note left unchanged; no open spec gap. Judgement calls for the operator: the checkpoint is kept after a completed run (blind assessment's rule; the pickle was deleted); the judge pin is bound in the existing `assessor_pin` field; the profile version is always bound because the command always loads a profile bundle (the default one when `--profile` is absent); the report renders a `candidate: ... draws: N live, M replayed` header line only when it carries a candidate hash; the two retired pickle lines left `.gitignore`. Full suite not run.
 - 2026-11-11, operator: confirmed (1) the checkpoint is kept after a completed run; (2) the judge pin is bound in `assessor_pin`; (4) the rubric report's new header line, only with a candidate hash; (5) the separate `.harness/rubric_checkpoints/` folder; (6) the two pickle lines removed from `.gitignore`. Still open with the operator: (3) the profile version is always bound, and (7) `plans/harness_plan/tickets_eval_harness.md` line 200 still describes `--fresh` and the pickle.
+- 2026-11-11, operator: (3) accepted: the command always binds the loaded profile's version (the default profile when `--profile` is absent); only a direct `run_grading` call without one binds it empty. (7) accepted: `plans/harness_plan/tickets_eval_harness.md` keeps its ticked line as history, with a superseded note under it.
+- 2026-11-11, closed: merged by the operator as `67224ced`. Suite at `7697524c`: 43 failed, 9,689 passed, 87 skipped (`suite-o3.txt`). 42 failed node ids equal BASELINE §5; the 43rd, `tests/test_evidence_protocol_scaffold.py::test_evidence_v2_tree_is_itself_clean`, was caused by the agent's R11 `RUNLOG.md` (committed `69995f1e`), which named the four secret patterns literally; the line is reworded and the module passes (22 passed). Lane GREEN: 3,746 tests, 0 failed, 0 errors, 17 declared exclusions (`lane-o3.xml`).
