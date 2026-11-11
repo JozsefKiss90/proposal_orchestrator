@@ -28,11 +28,12 @@ Constitutional authority:
 
 from __future__ import annotations
 
-import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
+
+from harness.content_hash import file_hash
 
 __all__ = [
     "AppendixMappingError",
@@ -119,7 +120,7 @@ def load_criterion_appendix_mapping(
     if not p.is_file():
         raise AppendixMappingError(f"criterion appendix mapping not found: {p}")
     raw = p.read_bytes()
-    digest = hashlib.sha256(raw).hexdigest()
+    digest = file_hash(raw)
     if not expected_sha256:
         raise AppendixMappingError(
             f"the rubric set carries no sha256 pin for the criterion appendix mapping "

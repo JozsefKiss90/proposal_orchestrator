@@ -47,7 +47,6 @@ Constitutional authority:
 from __future__ import annotations
 
 import dataclasses
-import hashlib
 import statistics
 from dataclasses import dataclass
 from typing import Any, Mapping, Protocol, Sequence
@@ -56,7 +55,8 @@ from runner.json_extract import extract_first_json_object
 from harness.appendix_mapping import AppendixRow
 from harness.evidence_pack import UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET, estimate_tokens
 from harness.judge import Judge, JudgeResponseError
-from harness.profile import Scoring, canonical_hash
+from harness.content_hash import content_hash, file_hash
+from harness.profile import Scoring
 from harness.provenance import ProvenanceRecord, prompt_hash
 from harness.routing import RoutingDecision, assert_judgeable
 from harness.rubrics import RUBRIC_INDEPENDENCE_PREAMBLE, ProfileBundle
@@ -325,8 +325,8 @@ def build_criterion_input(
         section_ids=tuple(spec.section_ids),
         present_section_ids=present,
         text=text,
-        section_hash=canonical_hash(section_record),
-        input_hash=canonical_hash({"sections": section_record, "appendix": appendix_record}),
+        section_hash=content_hash(section_record),
+        input_hash=content_hash({"sections": section_record, "appendix": appendix_record}),
         appendix=tuple(resolved),
         mapping_version=mapping.version if mapping is not None else None,
         token_estimate=tokens,
@@ -617,7 +617,7 @@ def _draw_sample(
                     sample_index=index,
                     attempt=attempt,
                     reason=str(exc),
-                    response_sha256=hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+                    response_sha256=file_hash(raw.encode("utf-8")),
                     response_chars=len(raw),
                 )
             )

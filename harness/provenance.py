@@ -31,10 +31,10 @@ Constitutional authority:
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass
 from typing import Any
 
+from harness.content_hash import digest
 from harness.jsonl_log import JsonlLog
 from harness.verdict import EVIDENCE_TYPE_INFERRED, Verdict
 
@@ -61,11 +61,9 @@ def prompt_hash(system_prompt: str, user_prompt: str) -> str:
     produced from byte-identical prompts and are directly comparable; a changed
     hash is a changed question.
     """
-    h = hashlib.sha256()
-    h.update(system_prompt.encode("utf-8"))
-    h.update(b"\x00")
-    h.update(user_prompt.encode("utf-8"))
-    return f"sha256:{h.hexdigest()}"
+    return digest(
+        system_prompt.encode("utf-8") + b"\x00" + user_prompt.encode("utf-8"), prefixed=True
+    )
 
 
 @dataclass(frozen=True)

@@ -174,6 +174,7 @@ from harness.criterion_scoring import DEFAULT_CRITERION_SAMPLES, CriterionScorin
 from harness.expectation_coverage import CoverageError
 from harness.expectations import ExpectationError
 from harness.judge import Judge, JudgeConfig, JudgeError
+from harness.content_hash import short_hash
 from harness.profile import ProfileError
 from harness.routing import DeterministicCoverageError
 from harness.rubrics import ProfileBundle, RubricError, load_profile_bundle
@@ -1222,8 +1223,8 @@ def _salvage(
     print(
         f"SALVAGE - {recovered} cell response(s) recovered from {len(files)} transcript(s)\n"
         f"checkpoint: {path}\n"
-        f"binding:    candidate {digest[:19]}  profile {bundle.version[:19]}\n"
-        f"            assessor {pin}  preflight {preflight_hash[:19]}\n"
+        f"binding:    candidate {short_hash(digest, keep_prefix=True)}  profile {short_hash(bundle.version, keep_prefix=True)}\n"
+        f"            assessor {pin}  preflight {short_hash(preflight_hash, keep_prefix=True)}\n"
         f"            n={args.n} criterion_samples={binding.criterion_samples} "
         f"include_claims={params.include_claims}\n"
         f"cells:      {recovered} of {expected} expected "

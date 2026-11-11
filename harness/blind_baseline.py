@@ -58,7 +58,6 @@ The freeze is advisory and never a runtime gate (``harness/HARNESS.md``).
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import re
@@ -91,7 +90,8 @@ from harness.criterion_scoring import (
     weighted_points_for,
     weighted_total,
 )
-from harness.evidence_preflight import file_sha256, load_preflight
+from harness.content_hash import SHORT_LEN, file_hash, short_hash
+from harness.evidence_preflight import load_preflight
 from harness.grounding_scope import (
     SCOPE_SOURCE_GROUNDED,
     UNIT_CELL,
@@ -184,11 +184,10 @@ TRANSPORT_ISOLATION_EVIDENCE: Mapping[str, Mapping[str, Any]] = MappingProxyType
 _ARITHMETIC_TOLERANCE: float = 1e-9
 
 #: File names under the baseline directory: the byte copy of the report and
-#: the freeze record, both named by the report's content hash.
+#: the freeze record, both named by the short form of the report's file hash.
 _COPY_NAME: str = "blind_baseline_{short}.json"
 _FREEZE_NAME: str = "blind_baseline_{short}.freeze.json"
 _FREEZE_GLOB: str = "*.freeze.json"
-_SHORT_LEN: int = 12
 
 _FREEZE_NOTE: str = (
     "Frozen blind baseline. Advisory to a human, never run-blocking. Later "
@@ -201,10 +200,6 @@ _FREEZE_NOTE: str = (
 
 class BlindBaselineError(BlindAssessmentError):
     """The report cannot be frozen, or the frozen record is not what it claims."""
-
-
-def _sha256_bytes(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
 
 
 # --------------------------------------------------------------------------- #
@@ -1087,8 +1082,8 @@ def freeze_baseline(
             "baseline is never replaced. Freeze a second baseline into another directory."
         )
 
-    digest = _sha256_bytes(path.read_bytes())
-    short = digest[:_SHORT_LEN]
+    digest = file_hash(path)
+    short = short_hash(digest)
     copy_path = target / _COPY_NAME.format(short=short)
     freeze_path = target / _FREEZE_NAME.format(short=short)
     if copy_path.exists() or freeze_path.exists():
@@ -1102,7 +1097,7 @@ def freeze_baseline(
         report_path=_portable(path, repo_root),
         report_sha256=digest,
         copy_name=copy_path.name,
-        preflight_sha256=file_sha256(preflight_path),
+        preflight_sha256=file_hash(preflight_path),
         frozen_at=(clock or _utc_now)(),
         checks=checks,
     )
@@ -1146,12 +1141,12 @@ def load_frozen_baseline(baseline_dir: Path | str) -> FrozenBaseline:
     if record.get("advisory") is not True or record.get("blocking") is not False:
         raise BlindBaselineError(f"{freeze_path} must carry advisory=true and blocking=false.")
     copy_name = str(record.get("report_copy") or "")
-    if not re.fullmatch(r"blind_baseline_[0-9a-f]{%d}\.json" % _SHORT_LEN, copy_name):
+    if not re.fullmatch(r"blind_baseline_[0-9a-f]{%d}\.json" % SHORT_LEN, copy_name):
         raise BlindBaselineError(f"{freeze_path} names an unexpected report copy {copy_name!r}.")
     copy_path = target / copy_name
     if not copy_path.is_file():
         raise BlindBaselineError(f"the frozen report copy {copy_path} is missing.")
-    actual = file_sha256(copy_path)
+    actual = file_hash(copy_path)
     if actual != record.get("report_sha256"):
         raise BlindBaselineError(
             f"the frozen report copy {copy_path} hashes to {actual}, the freeze says "
@@ -1190,11 +1185,11 @@ def render_freeze(record: Mapping[str, Any]) -> str:
         f"FROZEN BLIND BASELINE  {record.get('report_copy')}",
         f"report sha256: {record.get('report_sha256')}",
         f"frozen at:     {record.get('frozen_at')}",
-        f"candidate:     {str(b.get('candidate_hash') or '')[:19]}",
-        f"profile:       {b.get('profile_id')} [{str(b.get('profile_version') or '')[:19]}]",
+        f"candidate:     {short_hash(str(b.get('candidate_hash') or ''), keep_prefix=True)}",
+        f"profile:       {b.get('profile_id')} [{short_hash(str(b.get('profile_version') or ''), keep_prefix=True)}]",
         f"assessor:      {b.get('assessor_pin')}  transport={b.get('assessor_transport')}",
-        f"snapshot:      {str(b.get('snapshot_id') or '')[:19]}  package={str(b.get('package_id') or '')[:19]}",
-        f"preflight:     pack set {str(b.get('preflight_pack_set_hash') or '')[:19]}  {b.get('preflight_report')}",
+        f"snapshot:      {short_hash(str(b.get('snapshot_id') or ''), keep_prefix=True)}  package={short_hash(str(b.get('package_id') or ''), keep_prefix=True)}",
+        f"preflight:     pack set {short_hash(str(b.get('preflight_pack_set_hash') or ''), keep_prefix=True)}  {b.get('preflight_report')}",
         f"cells:         {len(record.get('cells') or [])}  "
         f"criterion scores: {len(record.get('criterion_scores') or [])}",
     ]

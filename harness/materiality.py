@@ -47,7 +47,6 @@ Constitutional authority:
 
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 from dataclasses import dataclass
@@ -57,6 +56,7 @@ from typing import Any, Callable, Iterable, Sequence
 
 from runner.atomic_write import atomic_write_text
 from harness.calibration import ConfusionMatrix, confusion_from_labels
+from harness.content_hash import digest
 from harness.faithfulness import INDEPENDENCE_PREAMBLE, build_claim_user_prompt
 from harness.gold_set import TO_BE_LABELED
 from harness.judge import Judge, JudgeConfig, MajorityJudgeResult
@@ -375,13 +375,11 @@ def materiality_set_hash(examples: Iterable[MaterialityExample]) -> str:
     edit changes the hash (a calibration recorded against an old hash is
     visibly stale); a note edit does not.
     """
-    h = hashlib.sha256()
-    for e in examples:
-        h.update(
-            json.dumps([e.example_id, e.text, e.material], ensure_ascii=False).encode("utf-8")
-        )
-        h.update(b"\x00")
-    return f"sha256:{h.hexdigest()}"
+    data = b"".join(
+        json.dumps([e.example_id, e.text, e.material], ensure_ascii=False).encode("utf-8") + b"\x00"
+        for e in examples
+    )
+    return digest(data, prefixed=True)
 
 
 # --------------------------------------------------------------------------- #

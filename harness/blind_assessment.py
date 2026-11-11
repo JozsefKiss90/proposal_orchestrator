@@ -11,7 +11,7 @@ rejected, so a verdict can never be re-attached to a different draft.
 What this module enforces, in code:
 
 * **Candidate binding.**  The candidate hash is the harness's formatting-
-  invariant artifact hash (:func:`~harness.profile.canonical_hash`) over the
+  invariant content hash (:func:`~harness.content_hash.content_hash`) over the
   parsed section artifacts, keyed by section id — whitespace, key order and a
   BOM are inert; a changed sentence is not.  :func:`load_report` recomputes the
   hash from disk and raises :class:`CandidateHashMismatch` naming both hashes.
@@ -64,7 +64,6 @@ from __future__ import annotations
 
 import dataclasses
 import json
-import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -110,8 +109,9 @@ from harness.grounding_scope import (
     scope_for,
     scope_lines,
 )
+from harness.content_hash import content_hash, next_numbered_path, short_hash
 from harness.judge import Judge
-from harness.profile import PreEvaluationProfile, canonical_hash
+from harness.profile import PreEvaluationProfile
 from harness.rubrics import ProfileBundle, Rubric
 from harness.verdict import MIN_MAJORITY_SAMPLES
 
@@ -177,18 +177,6 @@ DEFAULT_REPORTS_DIR: Path = Path("harness/blind_reports")
 
 #: Default provenance trail for the command (harness-owned, repo-relative).
 DEFAULT_PROVENANCE_PATH: Path = Path("harness/provenance/blind_assessment.jsonl")
-
-#: Report file name: ``<prefix>_<12 hex of the candidate hash>_<NNNN><suffix>``;
-#: the blind report uses prefix ``blind``, the evidence preflight ``preflight``.
-#: The suffix is ``.json`` for every bound record and ``.md`` for the operator
-#: review's Markdown pair.
-def _report_name_re(prefix: str, suffix: str = ".json") -> re.Pattern[str]:
-    return re.compile(
-        rf"^{re.escape(prefix)}_(?P<hash>[0-9a-f]{{12}})_(?P<seq>\d{{4}}){re.escape(suffix)}$"
-    )
-
-
-_REPORT_NAME_RE = _report_name_re("blind")
 
 #: The only dev-graph view the blind lane builds evidence under.
 BLIND_VIEW: str = "blind_pre_evaluation"
@@ -584,7 +572,7 @@ def load_candidate(candidate_dir: Path | str, profile: PreEvaluationProfile) -> 
 
 def candidate_hash(candidate: Candidate) -> str:
     """The formatting-invariant content hash of the candidate's present sections."""
-    return canonical_hash({sid: candidate.contents[sid] for sid in sorted(candidate.contents)})
+    return content_hash({sid: candidate.contents[sid] for sid in sorted(candidate.contents)})
 
 
 def assessor_pin(judge: Judge) -> str:
@@ -1107,21 +1095,14 @@ def assess_candidate(
 def next_report_path(
     reports_dir: Path, digest: str, *, prefix: str = "blind", suffix: str = ".json"
 ) -> Path:
-    """The next free ``<prefix>_<hash12>_<NNNN><suffix>`` under *reports_dir* for *digest*.
+    """The next free ``<prefix>_<short>_<NNNN><suffix>`` under *reports_dir* for *digest*.
 
     Shared by every writer that must not overwrite itself or another: the blind
     report, the evidence preflight, the integrity audit, the ESR comparison,
     and — with ``suffix=".md"`` — the operator review's Markdown pair.
+    *digest* is a content hash or a file hash; both name the same file.
     """
-    short = digest.split(":", 1)[1][:12]
-    pattern = _report_name_re(prefix, suffix)
-    taken = 0
-    if reports_dir.is_dir():
-        for existing in reports_dir.iterdir():
-            m = pattern.match(existing.name)
-            if m and m.group("hash") == short:
-                taken = max(taken, int(m.group("seq")))
-    return reports_dir / f"{prefix}_{short}_{taken + 1:04d}{suffix}"
+    return next_numbered_path(reports_dir, digest, prefix=prefix, suffix=suffix)
 
 
 _next_report_path = next_report_path
@@ -1259,10 +1240,10 @@ def render_report(report: Mapping[str, Any]) -> str:
     scope = str(report.get("scope", "")).upper()
     header = (
         f"BLIND ASSESSMENT [{scope}] - {len(cells)} cell(s)\n"
-        f"candidate: {str(report.get('candidate_hash') or '')[:19]}  "
+        f"candidate: {short_hash(str(report.get('candidate_hash') or ''), keep_prefix=True)}  "
         f"{report.get('candidate_path', '')}\n"
         f"profile:   {report.get('profile_id', '') or '-'} "
-        f"[{str(report.get('profile_version') or '')[:19]}]  "
+        f"[{short_hash(str(report.get('profile_version') or ''), keep_prefix=True)}]  "
         f"assessor: {report.get('assessor_pin', '-')}\n"
         f"advisory={report.get('advisory')} blocking={report.get('blocking')}\n"
     )
@@ -1272,8 +1253,8 @@ def render_report(report: Mapping[str, Any]) -> str:
     if report.get("package_id"):
         lines.append(
             f"evidence:  source={report.get('evidence_source', '-')} view={report.get('evidence_view', '-')} "
-            f"package={str(report.get('package_id') or '')[:19]} "
-            f"snapshot={str(report.get('snapshot_id') or '')[:19]} "
+            f"package={short_hash(str(report.get('package_id') or ''), keep_prefix=True)} "
+            f"snapshot={short_hash(str(report.get('snapshot_id') or ''), keep_prefix=True)} "
             f"esr={report.get('esr_availability', 'unknown')}"
             + (f" intake={report['intake_id']}" if report.get("intake_id") else "")
             + "\n"
@@ -1285,7 +1266,7 @@ def render_report(report: Mapping[str, Any]) -> str:
         )
     if report.get("preflight_pack_set_hash"):
         lines.append(
-            f"preflight: pack set {str(report.get('preflight_pack_set_hash') or '')[:19]}  "
+            f"preflight: pack set {short_hash(str(report.get('preflight_pack_set_hash') or ''), keep_prefix=True)}  "
             f"{report.get('preflight_report', '')}\n"
         )
     if report.get("checkpoint_path"):
@@ -1341,7 +1322,7 @@ def render_report(report: Mapping[str, Any]) -> str:
                     f"{score:.2f}" if isinstance(score, (int, float)) else "-",
                     f"{spread:.2f}" if isinstance(spread, (int, float)) else "-",
                     threshold_text,
-                    str(s.get("input_hash") or "")[:19],
+                    short_hash(str(s.get("input_hash") or ""), keep_prefix=True),
                     "yes" if (s.get("input") or {}).get("complete") else "no",
                 )
             )

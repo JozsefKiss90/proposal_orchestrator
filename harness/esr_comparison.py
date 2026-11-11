@@ -82,6 +82,7 @@ from harness.blind_assessment import (
     next_report_path,
 )
 from harness.blind_baseline import FrozenBaseline, _portable
+from harness.content_hash import short_hash
 from harness.evidence_preflight import file_sha256
 from harness.integrity_audit import IntegrityAuditError, fold_ligatures, load_audit
 
@@ -1197,19 +1198,19 @@ def run_comparison(
     # candidate to the baseline, every audit to a candidate in play.
     if dispositions.baseline_report_sha256 != report_sha:
         raise EsrComparisonError(
-            f"the dispositions are bound to baseline report {dispositions.baseline_report_sha256[:12]}, "
-            f"the frozen baseline is {report_sha[:12]}."
+            f"the dispositions are bound to baseline report {short_hash(dispositions.baseline_report_sha256)}, "
+            f"the frozen baseline is {short_hash(report_sha)}."
         )
     if dispositions.data.get("esr_record_sha256") != esr.sha256:
         raise EsrComparisonError(
             "the dispositions are bound to another ESR record "
-            f"({str(dispositions.data.get('esr_record_sha256'))[:12]} vs {esr.sha256[:12]})."
+            f"({short_hash(str(dispositions.data.get('esr_record_sha256')))} vs {short_hash(esr.sha256)})."
         )
     current_hash = candidate_hash(candidate)
     if current_hash != bindings.get("candidate_hash"):
         raise EsrComparisonError(
-            f"the candidate at {candidate_path} hashes to {current_hash[:19]}, the frozen "
-            f"baseline is bound to {str(bindings.get('candidate_hash'))[:19]}."
+            f"the candidate at {candidate_path} hashes to {short_hash(current_hash, keep_prefix=True)}, the frozen "
+            f"baseline is bound to {short_hash(str(bindings.get('candidate_hash')), keep_prefix=True)}."
         )
     flags: list[str] = []
     if not bindings.get("intake_id"):
@@ -1228,7 +1229,7 @@ def run_comparison(
     for audit in audits.values():
         if audit.data.get("candidate_hash") not in in_play:
             raise EsrComparisonError(
-                f"audit {audit.key} is over candidate {str(audit.data.get('candidate_hash'))[:19]}, "
+                f"audit {audit.key} is over candidate {short_hash(str(audit.data.get('candidate_hash')), keep_prefix=True)}, "
                 "which is neither the current nor the historical candidate."
             )
 
@@ -1814,10 +1815,9 @@ def write_comparison(report: ComparisonReport, out_dir: Path | str) -> tuple[Pat
     """Write ``comparison_<sha12>_<NNNN>.json`` and ``revisions_<sha12>_<NNNN>.json``;
     never overwrite. The two share a sequence number."""
     out = Path(out_dir)
-    digest = "sha256:" + report.baseline_report_sha256
-    target = next_report_path(out, digest, prefix=_COMPARISON_PREFIX)
+    target = next_report_path(out, report.baseline_report_sha256, prefix=_COMPARISON_PREFIX)
     seq = target.name.rsplit("_", 1)[1]
-    revisions = out / f"{_REVISIONS_PREFIX}_{report.baseline_report_sha256[:12]}_{seq}"
+    revisions = out / f"{_REVISIONS_PREFIX}_{short_hash(report.baseline_report_sha256)}_{seq}"
     if revisions.exists():
         raise EsrComparisonError(f"{revisions} already exists; nothing overwritten.")
     out.mkdir(parents=True, exist_ok=True)
@@ -1847,8 +1847,8 @@ def render_comparison(data: Mapping[str, Any]) -> str:
     b = data.get("baseline") or {}
     s = data.get("summary") or {}
     lines = [
-        f"ESR COMPARISON  baseline {str(b.get('report_sha256') or '')[:12]}  "
-        f"candidate {str(b.get('candidate_hash') or '')[:19]}",
+        f"ESR COMPARISON  baseline {short_hash(str(b.get('report_sha256') or ''))}  "
+        f"candidate {short_hash(str(b.get('candidate_hash') or ''), keep_prefix=True)}",
         f"assessor:      {b.get('assessor_pin')}  transport={b.get('assessor_transport')}",
         f"ESR record:    {(data.get('esr_record') or {}).get('path')}",
         f"dispositions:  {(data.get('dispositions') or {}).get('path')}",
