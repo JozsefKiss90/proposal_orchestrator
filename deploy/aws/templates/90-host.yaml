@@ -1,14 +1,14 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  proposal-orchestrator endpoints-and-host stack (filled by ticket R11): the
-  part with an hourly cost. Interface endpoints for bedrock-runtime, sts,
+  proposal-orchestrator endpoints-and-host stack (ticket R11): the part with
+  an hourly cost. Interface endpoints for bedrock-runtime, sts,
   secretsmanager, ssm, ssmmessages and ec2messages with private DNS in the
-  one zone (OD4), a Bedrock endpoint policy naming the runtime role and the
-  OD7 resources, and the host (OD9) with no public IP, IMDSv2 required with
-  hop limit 1, an encrypted gp3 root volume deleted on termination and the
-  runtime instance profile. Created and deleted per working session (OD5),
-  each time with the operator's explicit go. Imports from the base stacks
-  and exports nothing. Skeleton written in R3. See deploy/aws/README.md.
+  one private subnet (OD4), a Bedrock endpoint policy naming the runtime role
+  and the OD7 resources, and the host (OD9) with no public IP, IMDSv2
+  required with hop limit 1, an encrypted gp3 root volume deleted on
+  termination and the runtime instance profile. Created and deleted per
+  working session (OD5), each time with the operator's explicit go. Imports
+  from the base stacks and exports nothing. See deploy/aws/README.md.
 
 Metadata:
   ProposalOrchestrator:
@@ -64,15 +64,216 @@ Rules:
         AssertDescription: The stack is not being created in ExpectedRegion.
 
 Resources:
-  # R3 skeleton only. R11 replaces this no-cost placeholder with the
-  # endpoints and the host and adds the outputs named in
-  # deploy/aws/outputs_contract.json (without exports).
-  SkeletonPlaceholder:
-    Type: AWS::CloudFormation::WaitConditionHandle
-    Metadata:
-      SkeletonParameters:
-        ProjectName: !Ref ProjectName
-        InferenceProfileArns: !Ref InferenceProfileArns
-        FoundationModelArns: !Ref FoundationModelArns
-        InstanceType: !Ref InstanceType
-        LatestAmiId: !Ref LatestAmiId
+  # DC-01, DC-02, DC-04 (R11). The one interface endpoint whose policy is not
+  # the AWS default: it admits only InvokeModel and
+  # InvokeModelWithResponseStream (Converse and ConverseStream), only by the
+  # runtime role (OD2 a, imported from the iam stack), only on the OD7
+  # inference profiles and the foundation models they route to (F2, the same
+  # lists as R5's invoke policy). Every other request through this endpoint
+  # is refused. Private DNS on, so bedrock-runtime.<Region>.amazonaws.com
+  # resolves to the endpoint's private address in the one subnet (OD4).
+  BedrockRuntimeEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.bedrock-runtime"
+      VpcId: !ImportValue proposal-orchestrator-network-VpcId
+      SubnetIds:
+        - !ImportValue proposal-orchestrator-network-PrivateSubnetId
+      SecurityGroupIds:
+        - !ImportValue proposal-orchestrator-network-EndpointSecurityGroupId
+      PrivateDnsEnabled: true
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: RuntimeRoleInvokesOd7Profiles
+            Effect: Allow
+            Principal: "*"
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: !Ref InferenceProfileArns
+            Condition:
+              ArnEquals:
+                aws:PrincipalArn: !ImportValue proposal-orchestrator-iam-RuntimeRoleArn
+          - Sid: RuntimeRoleInvokesRoutedModels
+            Effect: Allow
+            Principal: "*"
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: !Ref FoundationModelArns
+            Condition:
+              ArnEquals:
+                aws:PrincipalArn: !ImportValue proposal-orchestrator-iam-RuntimeRoleArn
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-bedrock-runtime-endpoint"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # DC-05 (interface half): the five supporting endpoints, same subnet, same
+  # endpoint security group (DC-03 attached), private DNS on, default endpoint
+  # policy (the R5 role policy and the R8 secret policy limit what the
+  # runtime role does through them).
+  StsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.sts"
+      VpcId: !ImportValue proposal-orchestrator-network-VpcId
+      SubnetIds:
+        - !ImportValue proposal-orchestrator-network-PrivateSubnetId
+      SecurityGroupIds:
+        - !ImportValue proposal-orchestrator-network-EndpointSecurityGroupId
+      PrivateDnsEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-sts-endpoint"
+        - Key: project
+          Value: !Ref ProjectName
+
+  SecretsManagerEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.secretsmanager"
+      VpcId: !ImportValue proposal-orchestrator-network-VpcId
+      SubnetIds:
+        - !ImportValue proposal-orchestrator-network-PrivateSubnetId
+      SecurityGroupIds:
+        - !ImportValue proposal-orchestrator-network-EndpointSecurityGroupId
+      PrivateDnsEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-secretsmanager-endpoint"
+        - Key: project
+          Value: !Ref ProjectName
+
+  SsmEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ssm"
+      VpcId: !ImportValue proposal-orchestrator-network-VpcId
+      SubnetIds:
+        - !ImportValue proposal-orchestrator-network-PrivateSubnetId
+      SecurityGroupIds:
+        - !ImportValue proposal-orchestrator-network-EndpointSecurityGroupId
+      PrivateDnsEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-ssm-endpoint"
+        - Key: project
+          Value: !Ref ProjectName
+
+  SsmMessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ssmmessages"
+      VpcId: !ImportValue proposal-orchestrator-network-VpcId
+      SubnetIds:
+        - !ImportValue proposal-orchestrator-network-PrivateSubnetId
+      SecurityGroupIds:
+        - !ImportValue proposal-orchestrator-network-EndpointSecurityGroupId
+      PrivateDnsEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-ssmmessages-endpoint"
+        - Key: project
+          Value: !Ref ProjectName
+
+  Ec2MessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ec2messages"
+      VpcId: !ImportValue proposal-orchestrator-network-VpcId
+      SubnetIds:
+        - !ImportValue proposal-orchestrator-network-PrivateSubnetId
+      SecurityGroupIds:
+        - !ImportValue proposal-orchestrator-network-EndpointSecurityGroupId
+      PrivateDnsEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-ec2messages-endpoint"
+        - Key: project
+          Value: !Ref ProjectName
+
+  # OD9 host; DC-14 (instance profile, no long-term keys), DC-07 attached.
+  # Created after the six endpoints, so that the SSM Agent and the AWS CLI
+  # resolve the private names from the first boot. No public IP, no key pair,
+  # no user data. IMDSv2 required with hop limit 1 (also the account default,
+  # R1-D3; set here on the host as well). The root volume is gp3, encrypted
+  # and deleted with the instance; with no KmsKeyId EC2 uses the account's
+  # default EBS key (R1-D3), because the kms stack's key is not exported to
+  # R11 (outputs_contract.json) and its policy (R6-D3) is scoped to Secrets
+  # Manager and S3. The device name is the AL2023 root device. CPU credits
+  # standard: a t3 host never accrues surplus-credit charges.
+  Host:
+    Type: AWS::EC2::Instance
+    DependsOn:
+      - BedrockRuntimeEndpoint
+      - StsEndpoint
+      - SecretsManagerEndpoint
+      - SsmEndpoint
+      - SsmMessagesEndpoint
+      - Ec2MessagesEndpoint
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !ImportValue proposal-orchestrator-iam-InstanceProfileName
+      NetworkInterfaces:
+        - DeviceIndex: "0"
+          SubnetId: !ImportValue proposal-orchestrator-network-PrivateSubnetId
+          GroupSet:
+            - !ImportValue proposal-orchestrator-network-HostSecurityGroupId
+          AssociatePublicIpAddress: false
+          DeleteOnTermination: true
+      MetadataOptions:
+        HttpEndpoint: enabled
+        HttpTokens: required
+        HttpPutResponseHopLimit: 1
+        HttpProtocolIpv6: disabled
+        InstanceMetadataTags: disabled
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp3
+            Encrypted: true
+            DeleteOnTermination: true
+      CreditSpecification:
+        CPUCredits: standard
+      Monitoring: false
+      DisableApiTermination: false
+      InstanceInitiatedShutdownBehavior: stop
+      PropagateTagsToVolumeOnCreation: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-host"
+        - Key: project
+          Value: !Ref ProjectName
+
+Outputs:
+  BedrockRuntimeEndpointId:
+    Description: The bedrock-runtime interface endpoint (DC-01, DC-02, DC-04).
+    Value: !Ref BedrockRuntimeEndpoint
+  StsEndpointId:
+    Description: The sts interface endpoint (DC-05).
+    Value: !Ref StsEndpoint
+  SecretsManagerEndpointId:
+    Description: The secretsmanager interface endpoint (DC-05).
+    Value: !Ref SecretsManagerEndpoint
+  SsmEndpointId:
+    Description: The ssm interface endpoint (DC-05).
+    Value: !Ref SsmEndpoint
+  SsmMessagesEndpointId:
+    Description: The ssmmessages interface endpoint (DC-05).
+    Value: !Ref SsmMessagesEndpoint
+  Ec2MessagesEndpointId:
+    Description: The ec2messages interface endpoint (DC-05).
+    Value: !Ref Ec2MessagesEndpoint
+  InstanceId:
+    Description: The host (OD9, DC-14).
+    Value: !Ref Host
