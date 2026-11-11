@@ -25,19 +25,32 @@ retryable errors — plus what E5f adds on top:
   call.  If the plan does not fit one Groq free-tier day, the recorded plan is
   an explicit multi-day resume — never a silently reduced N or a shrunken
   pack.  ``--plan-only`` stops after this step.
-* **Per-cell checkpoint, resumable.**  Every completed (expectation, section)
-  cell and the cross-expectation verdict cache are persisted after each cell
-  (and on failure), so a daily-cap 429, a crash, or a Ctrl-C loses at most the
-  cell in flight; re-running resumes without re-spending judge budget.  The
-  checkpoint is run-local scratch (pickle; the durable records are the report,
-  the baseline, and the provenance JSONL) and is keyed to the judge pin,
-  rubric fingerprint, pack budget, and N — a mismatch refuses to resume
-  rather than silently mixing runs (pass ``--fresh`` to discard).
+* **Resume from the response checkpoint, bound to content (ticket 02).**
+  Every raw judge draw is written to a JSONL response checkpoint
+  (:mod:`harness.response_cache`) the moment it arrives, so a daily-cap 429, a
+  crash or a Ctrl-C loses nothing already drawn.  A resume replays those draws
+  through the same code: every cell is graded again, and the cells and the
+  claim verdict cache are rebuilt in memory from the replayed responses; the
+  run goes live from the first draw the checkpoint does not hold.  The
+  checkpoint is bound to the candidate hash over the section artifacts in the
+  grid (the formatting-invariant hash blind assessment uses), the judge pin,
+  the rubric-set fingerprint, the profile version, the pack token budget, the
+  span budget fraction, n and the judge's inference configuration.  A changed,
+  added or removed section moves the candidate hash, so the resume is refused
+  with every moved field named: a resume grades exactly the content the
+  interrupted run graded, or it does not run.
+* **Explicit checkpoint files.**  A new run writes a new numbered checkpoint
+  (``.harness/rubric_checkpoints/checkpoint_<short>_<NNNN>.jsonl``, or the file
+  ``--checkpoint`` names).  A resume names its file with ``--resume``.  An
+  existing file is never opened without ``--resume``.  The checkpoint is kept
+  after a completed run; the report and the baseline record the candidate hash
+  and how many draws were replayed versus drawn live.
 
 Usage (judge config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
 
     py -3.10 -m harness.commands.rubric_grading_run --plan-only   # record the math
-    py -3.10 -m harness.commands.rubric_grading_run               # grade (resumable)
+    py -3.10 -m harness.commands.rubric_grading_run               # grade (new checkpoint)
+    py -3.10 -m harness.commands.rubric_grading_run --resume <checkpoint.jsonl>
 
 Advisory artifact; never a runtime gate (``harness/HARNESS.md``).
 """
@@ -47,11 +60,10 @@ import argparse
 import json
 import math
 import os
-import pickle
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any, Callable
 
 # Offline imports only at module scope: the budget plan and the grading loop
 # are unit-tested with a fake judge, and importing this module must not load
@@ -62,7 +74,7 @@ from runner.working_assumptions import (
     WorkingAssumptions,
     load_working_assumptions,
 )
-from harness.content_hash import short_hash
+from harness.content_hash import content_hash, short_hash
 from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
@@ -90,15 +102,22 @@ from harness.rubric import (
     render_report,
 )
 from harness.profile import PreEvaluationProfile
+from harness.response_cache import (
+    CacheBinding,
+    ResponseCache,
+    ResponseCacheError,
+    next_checkpoint_path,
+)
 from harness.rubrics import RubricSet, build_pack_for, load_profile_bundle
 from harness.verdict import MIN_MAJORITY_SAMPLES
 
 #: Where the pre-run budget accounting is written (harness-owned).
 DEFAULT_BUDGET_PATH = Path("harness/rubric_reports/rubric_run_budget.json")
 
-#: Run-local checkpoint (pickle scratch, retired on completion — the durable
-#: records are the report, the baseline, and the provenance JSONL).
-DEFAULT_CHECKPOINT_PATH = Path("harness/rubric_reports/rubric_run_checkpoint.pkl")
+#: Where a new run writes its response checkpoint when none is named, under
+#: the repository root (gitignored runtime state, beside blind assessment's
+#: ``.harness/checkpoints``).
+DEFAULT_CHECKPOINT_DIR: str = ".harness/rubric_checkpoints"
 
 #: Groq free-tier caps for llama-3.3-70b-versatile (the .env.harness judge).
 GROQ_TPM, GROQ_RPM, GROQ_TPD, GROQ_RPD = 6000, 30, 100_000, 1000
@@ -301,74 +320,88 @@ def compute_budget_plan(
 
 
 # --------------------------------------------------------------------------- #
-# Checkpoint — per-cell, resumable, keyed to the run parameters
+# Checkpoint binding — the content graded and the parameters it was graded under
 # --------------------------------------------------------------------------- #
 
 
-def run_meta(
+def _grid_section_paths(
+    rubric_set: RubricSet,
+    *,
+    repo_root: Path,
+    sections_dir: Path | str | None,
+    profile: PreEvaluationProfile | None,
+) -> tuple[Path, ...]:
+    """Every section artifact the grid grades, once each, in grid order."""
+    section_kwargs: dict[str, Any] = {"repo_root": repo_root, "profile": profile}
+    if sections_dir is not None:
+        section_kwargs["sections_dir"] = sections_dir
+    seen: dict[Path, None] = {}
+    for rubric in rubric_set.rubrics:
+        for path in section_paths_for(rubric.criterion_id, **section_kwargs):
+            seen.setdefault(path, None)
+    return tuple(seen)
+
+
+def grid_candidate_hash(
+    rubric_set: RubricSet,
+    *,
+    repo_root: Path,
+    sections_dir: Path | str | None = None,
+    profile: PreEvaluationProfile | None = None,
+) -> str:
+    """The candidate hash over the section artifacts in the grid.
+
+    The same formatting-invariant content hash blind assessment takes
+    (:func:`harness.blind_assessment.candidate_hash`): the parsed artifacts
+    keyed by section id.  Rewriting a section's content, or adding or removing
+    a section from the grid, moves it.
+    """
+    contents: dict[str, Any] = {}
+    for path in _grid_section_paths(
+        rubric_set, repo_root=repo_root, sections_dir=sections_dir, profile=profile
+    ):
+        contents[path.stem] = json.loads(path.read_text(encoding="utf-8-sig"))
+    return content_hash({sid: contents[sid] for sid in sorted(contents)})
+
+
+def rubric_binding(
     judge: Judge,
     rubric_set: RubricSet,
     *,
+    candidate_hash: str,
+    profile_version: str,
     token_budget: int,
     span_budget_fraction: float,
     n: int,
-    sections_dir: str | None,
-) -> dict[str, Any]:
-    """The parameters a checkpoint is keyed to — a mismatch refuses to resume."""
-    return {
-        "judge_pin": f"{judge.config.model}@{judge.config.version}",
-        "rubric_set_fingerprint": rubric_set.fingerprint,
-        "token_budget": token_budget,
-        "span_budget_fraction": span_budget_fraction,
-        "n": n,
-        "sections_dir": sections_dir,
-    }
+) -> CacheBinding:
+    """The binding a rubric grading run's checkpoint carries.
 
-
-def save_checkpoint(path: Path, meta: Mapping[str, Any], cells: dict, cache: dict) -> None:
-    """Persist the run state atomically (pickle scratch; same-code resume)."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    with open(tmp, "wb") as fh:
-        pickle.dump({"meta": dict(meta), "cells": cells, "verdict_cache": cache}, fh)
-    os.replace(tmp, path)
-
-
-def load_checkpoint(
-    path: Path, meta: Mapping[str, Any], *, log: Callable[[str], None] = print
-) -> tuple[dict, dict]:
-    """Load the resumable state, fail-closed on any mismatch.
-
-    An unreadable checkpoint or one written under different run parameters
-    raises ``SystemExit`` telling the operator to pass ``--fresh`` — silently
-    restarting would re-spend judge budget, silently mixing runs would
-    aggregate grades across pins.
+    The rubric fields of :class:`~harness.response_cache.CacheBinding` plus the
+    shared ones a rubric run decides: the candidate hash, the judge pin (in the
+    ``assessor_pin`` field), the profile version (empty when no profile is
+    given), n and the judge's inference configuration.  The blind-only fields
+    keep their defaults.
     """
-    if not path.is_file():
-        return {}, {}
-    try:
-        with open(path, "rb") as fh:
-            state = pickle.load(fh)
-    except Exception as exc:
-        raise SystemExit(
-            f"checkpoint {path} is unreadable ({type(exc).__name__}: {exc}) — "
-            "likely written by different code. Re-run with --fresh to discard "
-            "it (the already-spent verdicts survive only in provenance)."
-        ) from exc
-    if state.get("meta") != dict(meta):
-        raise SystemExit(
-            f"checkpoint {path} was written under different run parameters:\n"
-            f"  checkpoint: {state.get('meta')}\n  current   : {dict(meta)}\n"
-            "Refusing to mix runs. Re-run with the original parameters, or "
-            "--fresh to discard the checkpoint."
-        )
-    cells, cache = state.get("cells", {}), state.get("verdict_cache", {})
-    log(f"  resume: {len(cells)} cell(s) + {len(cache)} cached verdict(s) from {path.name}")
-    return cells, cache
+    return CacheBinding(
+        candidate_hash=candidate_hash,
+        profile_version=profile_version,
+        assessor_pin=f"{judge.config.model}@{judge.config.version}",
+        n=n,
+        temperature=judge.config.temperature,
+        max_tokens=judge.config.max_tokens,
+        rubric_set_fingerprint=rubric_set.fingerprint,
+        pack_token_budget=token_budget,
+        span_budget_fraction=span_budget_fraction,
+    )
+
+
+def default_checkpoint_path(repo_root: Path, candidate_hash: str) -> Path:
+    """The next free numbered checkpoint under :data:`DEFAULT_CHECKPOINT_DIR`."""
+    return next_checkpoint_path(Path(repo_root) / DEFAULT_CHECKPOINT_DIR, candidate_hash)
 
 
 # --------------------------------------------------------------------------- #
-# The grading loop — cell by cell, persisted after every cell
+# The grading loop — cell by cell, every draw checkpointed as it arrives
 # --------------------------------------------------------------------------- #
 
 
@@ -384,89 +417,101 @@ def run_grading(
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
     n: int = MIN_MAJORITY_SAMPLES,
     checkpoint_path: Path,
+    resume: bool = False,
     tokens_spent: Callable[[], int] | None = None,
     tpd_stop: int = 0,
     log: Callable[[str], None] = print,
     profile: PreEvaluationProfile | None = None,
+    profile_version: str = "",
 ) -> tuple[ExpectationCell, ...]:
-    """Grade every (expectation, section) cell, checkpointing after each.
+    """Grade every (expectation, section) cell under a response checkpoint.
 
     The semantic body of :func:`harness.rubric.grade_all` with E5f's run
-    control around it: completed cells are skipped on resume, the shared
-    verdict cache is persisted with them (so a resumed run re-spends nothing),
-    and a configured *tpd_stop* raises :class:`BudgetStop` cleanly *between*
-    cells once the measured spend reaches it.  On any failure the state
-    gathered so far — including cache entries from a partially graded cell —
-    is persisted before the error propagates.
+    control around it.  The checkpoint at *checkpoint_path* is opened before
+    the first draw and attached to *judge*: a new one (``resume=False``; the
+    file must not exist) records every draw as it arrives; a resumed one
+    (``resume=True``) must carry this run's binding (see
+    :func:`rubric_binding`; the candidate hash is
+    :func:`grid_candidate_hash`) or
+    :class:`~harness.response_cache.ResponseCacheError` names every field that
+    moved.  On resume every cell is graded again through the same code; the
+    draws the checkpoint holds are replayed, which rebuilds the cells and the
+    claim verdict cache in memory, and the run goes live from the first draw
+    it does not hold.
+
+    A configured *tpd_stop* raises :class:`BudgetStop` cleanly *between* cells
+    once the measured spend reaches it.  Replayed draws spend nothing, so a
+    resume after a stop continues from the first draw it has not yet made.
     """
     wa = (
         working_assumptions
         if working_assumptions is not None
         else load_working_assumptions(repo_root)
     )
-    meta = run_meta(
+    binding = rubric_binding(
         judge,
         rubric_set,
+        candidate_hash=grid_candidate_hash(
+            rubric_set, repo_root=repo_root, sections_dir=sections_dir, profile=profile
+        ),
+        profile_version=profile_version,
         token_budget=token_budget,
         span_budget_fraction=span_budget_fraction,
         n=n,
-        sections_dir=str(sections_dir) if sections_dir is not None else None,
     )
-    cells, cache = load_checkpoint(checkpoint_path, meta, log=log)
+    checkpoint_path = Path(checkpoint_path)
+    if not resume:
+        checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint = ResponseCache(checkpoint_path, binding, resume=resume)
+    judge.attach_response_cache(checkpoint)
+    if resume:
+        log(
+            f"  resume: replaying {checkpoint.replayable} recorded draw(s) from "
+            f"{checkpoint_path.name} before going live"
+        )
 
+    verdict_cache: dict = {}
     section_kwargs: dict[str, Any] = {"repo_root": repo_root, "profile": profile}
     if sections_dir is not None:
         section_kwargs["sections_dir"] = sections_dir
 
-    ordered_keys: list[str] = []
-    try:
-        for rubric in rubric_set.rubrics:
-            for section_path in section_paths_for(rubric.criterion_id, **section_kwargs):
-                key = _cell_key(rubric.expectation_key, section_path.stem)
-                ordered_keys.append(key)
-                if key in cells:
-                    log(f"  skip  {key}: already graded (checkpoint)")
-                    continue
-                if tpd_stop and tokens_spent is not None and tokens_spent() >= tpd_stop:
-                    raise BudgetStop(
-                        f"measured spend {tokens_spent()} tokens reached the "
-                        f"daily stop ({tpd_stop}) — pausing cleanly before {key}."
-                    )
-                t0 = time.monotonic()
-                coverage = grade_expectation(
-                    judge,
-                    rubric,
-                    section_path,
-                    token_budget=token_budget,
-                    span_budget_fraction=span_budget_fraction,
-                    n=n,
+    cells: list[ExpectationCell] = []
+    for rubric in rubric_set.rubrics:
+        for section_path in section_paths_for(rubric.criterion_id, **section_kwargs):
+            key = _cell_key(rubric.expectation_key, section_path.stem)
+            if tpd_stop and tokens_spent is not None and tokens_spent() >= tpd_stop:
+                raise BudgetStop(
+                    f"measured spend {tokens_spent()} tokens reached the "
+                    f"daily stop ({tpd_stop}) — pausing cleanly before {key}."
                 )
-                grounding = derive_expectation_grounding(
-                    rubric,
-                    section_path,
-                    token_budget=token_budget,
-                    span_budget_fraction=span_budget_fraction,
-                    judge=judge,
-                    repo_root=repo_root,
-                    working_assumptions=wa,
-                    n=n,
-                    verdict_cache=cache,
-                )
-                cells[key] = combine_axes(coverage, grounding, spine)
-                save_checkpoint(checkpoint_path, meta, cells, cache)
-                log(
-                    f"  cell  {key}: cell={cells[key].cell} "
-                    f"({(time.monotonic() - t0) / 60:.1f} min; checkpointed)"
-                )
-    except BaseException:
-        # BaseException, not Exception: a Ctrl-C (KeyboardInterrupt) must also
-        # persist whatever the in-flight cell contributed to the shared
-        # verdict cache — a resume re-runs the cell but re-spends only the
-        # unjudged part.
-        save_checkpoint(checkpoint_path, meta, cells, cache)
-        raise
-
-    return tuple(cells[k] for k in ordered_keys)
+            t0 = time.monotonic()
+            live_before = checkpoint.live
+            coverage = grade_expectation(
+                judge,
+                rubric,
+                section_path,
+                token_budget=token_budget,
+                span_budget_fraction=span_budget_fraction,
+                n=n,
+            )
+            grounding = derive_expectation_grounding(
+                rubric,
+                section_path,
+                token_budget=token_budget,
+                span_budget_fraction=span_budget_fraction,
+                judge=judge,
+                repo_root=repo_root,
+                working_assumptions=wa,
+                n=n,
+                verdict_cache=verdict_cache,
+            )
+            cells.append(combine_axes(coverage, grounding, spine))
+            log(
+                f"  cell  {key}: cell={cells[-1].cell} "
+                f"({checkpoint.live - live_before} live draw(s); "
+                f"{(time.monotonic() - t0) / 60:.1f} min)"
+            )
+    return tuple(cells)
 
 
 # --------------------------------------------------------------------------- #
@@ -486,15 +531,13 @@ def _spent_line(wrapper) -> str:
     )
 
 
-def main(argv=None) -> int:
-    """Exit codes: ``0`` clean grid; ``1`` grid frozen with contradiction(s)
-    (advisory); ``2`` stopped on an error (checkpointed — re-run to resume);
-    ``3`` paused cleanly on the daily budget stop (re-run after the reset)."""
+def build_parser() -> argparse.ArgumentParser:
+    """The command line (offline; building it loads nothing)."""
     ap = argparse.ArgumentParser(
         description=(
             "E5f: first real E5 rubric-grid grading run — budget math recorded "
-            "before the run, per-cell checkpoint, frozen report + E4 "
-            "rubric-lane baseline. Advisory; never a runtime gate."
+            "before the run, every judge draw checkpointed as it arrives, frozen "
+            "report + E4 rubric-lane baseline. Advisory; never a runtime gate."
         )
     )
     ap.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
@@ -522,14 +565,45 @@ def main(argv=None) -> int:
                     help="pre-evaluation profile JSON (default: the harness default profile)")
     ap.add_argument("--plan-only", action="store_true",
                     help="record the budget math and stop before any judge call")
-    ap.add_argument("--fresh", action="store_true",
-                    help="discard an existing checkpoint instead of resuming")
     ap.add_argument("--out", default=str(DEFAULT_REPORT_PATH))
     ap.add_argument("--baseline-out", default=str(DEFAULT_RUBRIC_BASELINE_PATH))
     ap.add_argument("--budget-out", default=str(DEFAULT_BUDGET_PATH))
-    ap.add_argument("--checkpoint", default=str(DEFAULT_CHECKPOINT_PATH))
     ap.add_argument("--provenance", default=str(DEFAULT_PROVENANCE_PATH))
-    args = ap.parse_args(argv)
+    ckpt = ap.add_mutually_exclusive_group()
+    ckpt.add_argument(
+        "--checkpoint", default=None,
+        help=(
+            "where a new run checkpoints every raw judge draw as it arrives "
+            f"(default: {DEFAULT_CHECKPOINT_DIR}/checkpoint_<short>_<NNNN>.jsonl "
+            "under --repo-root, numbered after the candidate hash). An existing "
+            "file is never opened without --resume"
+        ),
+    )
+    ckpt.add_argument(
+        "--resume", default=None,
+        help=(
+            "resume an earlier run from its checkpoint: every draw the file holds "
+            "is replayed through the same code and the run goes live from the "
+            "first draw it does not hold, appending to the same file. The "
+            "binding - candidate hash over the graded sections, judge pin, rubric "
+            "fingerprint, profile version, pack budget, span fraction, n - must "
+            "equal this run's, or the resume is refused naming what moved"
+        ),
+    )
+    return ap
+
+
+def _resolve(repo_root: Path, path: str) -> Path:
+    candidate = Path(path)
+    return candidate if candidate.is_absolute() else repo_root / candidate
+
+
+def main(argv=None) -> int:
+    """Exit codes: ``0`` clean grid; ``1`` grid frozen with contradiction(s)
+    (advisory); ``2`` stopped on an error or a refused checkpoint (every draw
+    so far is checkpointed — ``--resume`` it); ``3`` paused cleanly on the
+    daily budget stop (``--resume`` after the reset)."""
+    args = build_parser().parse_args(argv)
 
     # The live-judge bootstrap: load .env.harness (override=True) before any
     # transport/judge resolution; the judge comes from the factory's paced,
@@ -599,10 +673,21 @@ def main(argv=None) -> int:
     if args.plan_only:
         return 0
 
-    checkpoint_path = repo_root / args.checkpoint
-    if args.fresh and checkpoint_path.is_file():
-        checkpoint_path.unlink()
-        print(f"discarded checkpoint {checkpoint_path.name} (--fresh)")
+    resume = args.resume is not None
+    if resume:
+        checkpoint_path = _resolve(repo_root, args.resume)
+    elif args.checkpoint is not None:
+        checkpoint_path = _resolve(repo_root, args.checkpoint)
+    else:
+        checkpoint_path = default_checkpoint_path(
+            repo_root,
+            grid_candidate_hash(
+                rubric_set,
+                repo_root=repo_root,
+                sections_dir=args.sections,
+                profile=bundle.profile,
+            ),
+        )
 
     try:
         judge, wrapper = build_judge(
@@ -634,29 +719,36 @@ def main(argv=None) -> int:
             span_budget_fraction=args.span_fraction,
             n=args.n,
             checkpoint_path=checkpoint_path,
+            resume=resume,
             tokens_spent=lambda: wrapper.total_tokens,
             tpd_stop=args.tpd_stop,
             profile=bundle.profile,
+            profile_version=bundle.version,
         )
+    except ResponseCacheError as exc:
+        print(f"\nREFUSED: {exc}")
+        return 2
     except BudgetStop as exc:
         print(f"\nPAUSED: {exc}")
         print(f"  {_spent_line(wrapper)}")
         print(
-            "  Progress is checkpointed. Re-run the same command after the "
-            "daily reset to resume — completed cells and cached verdicts are "
-            "never re-spent."
+            "  Every draw so far is checkpointed. After the daily reset, re-run "
+            f"the same command with --resume {checkpoint_path}; the recorded "
+            "draws are replayed, never re-spent."
         )
         return 3
     except Exception as exc:
         print(f"\nSTOPPED: {type(exc).__name__}: {exc}")
         print(f"  {_spent_line(wrapper)}")
         print(
-            "  Progress is checkpointed (completed cells + the verdict cache). "
-            "If this is the Groq daily cap, wait for the reset and re-run the "
-            "same command; it resumes without re-spending."
+            "  Every draw so far is checkpointed. If this is the Groq daily cap, "
+            "wait for the reset and re-run the same command with --resume "
+            f"{checkpoint_path}; the recorded draws are replayed, never re-spent."
         )
         return 2
 
+    checkpoint = judge.response_cache
+    stats = checkpoint.stats()
     report = build_rubric_report(
         cells,
         rubric_set=rubric_set,
@@ -664,6 +756,9 @@ def main(argv=None) -> int:
         judge_model=cfg.model,
         judge_version=cfg.version,
         spine_source=spine.source_path,
+        candidate_hash=checkpoint.binding.candidate_hash,
+        replayed_calls=stats["replayed_calls"],
+        live_calls=stats["live_calls"],
     )
     data = report.to_dict()
     print()
@@ -676,8 +771,10 @@ def main(argv=None) -> int:
         "retries": wrapper.retries,
         "measured_tokens": wrapper.total_tokens,
         "note": (
-            "measured over this invocation only; a resumed run's earlier "
-            "spend is visible in the provenance JSONL"
+            "measured over this invocation only; draws replayed from a resumed "
+            "checkpoint spend nothing and are counted in the report's "
+            "replayed_calls, and their earlier spend is visible in the "
+            "provenance JSONL"
         ),
     }
     baseline = freeze_rubric_baseline(
@@ -686,10 +783,9 @@ def main(argv=None) -> int:
     baseline_path = repo_root / args.baseline_out
     atomic_write_json(baseline, baseline_path, prefix="rubric_baseline_")
 
-    if checkpoint_path.is_file():
-        checkpoint_path.unlink()
     print(f"\nfrozen report   -> {out_path}")
     print(f"frozen baseline -> {baseline_path} (budget accounting embedded)")
+    print(f"checkpoint kept -> {checkpoint_path}")
     print(_spent_line(wrapper))
     return 1 if report.contradictions else 0
 

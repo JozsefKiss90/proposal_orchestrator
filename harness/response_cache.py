@@ -34,7 +34,8 @@ Refusals, all fail-closed
   ``resume=True`` is refused, and resuming a missing one is refused.
 * A checkpoint carries the binding it was drawn under — candidate hash, profile
   version, assessor pin, preflight pack-set hash, the sample counts and the
-  inference configuration (temperature and token limit).
+  inference configuration (temperature and token limit); a rubric grading run
+  adds its rubric-set fingerprint, pack token budget and span budget fraction.
   Resuming into a different binding is refused, naming every field that moved.
   Replaying one candidate's responses into another candidate's report would be
   fabrication, and the binding check is what makes that impossible.
@@ -79,6 +80,16 @@ CHECKPOINT_FORMAT_VERSION: int = 1
 #: Binding fields a pre-ticket-15 checkpoint does not carry.
 _INFERENCE_FIELDS: tuple[str, ...] = ("temperature", "max_tokens")
 
+#: Binding fields only a rubric grading run sets (ticket 02).  Additive: each
+#: has an empty default, is written into a header only when set, and reads as
+#: empty from a header that lacks it — so a blind-assessment header, old or new,
+#: keeps its exact shape and still resumes.
+_RUBRIC_FIELDS: tuple[str, ...] = (
+    "rubric_set_fingerprint",
+    "pack_token_budget",
+    "span_budget_fraction",
+)
+
 
 class ResponseCacheError(Exception):
     """A checkpoint could not be opened, read or resumed as asked."""
@@ -113,6 +124,13 @@ class CacheBinding:
 
     ``None`` for either means a checkpoint written before they were recorded;
     :class:`ResponseCache` refuses to resume one.
+
+    A rubric grading run (:mod:`harness.commands.rubric_grading_run`) binds
+    three more: the rubric-set fingerprint, the evidence-pack token budget and
+    the span budget fraction, which decide what each coverage and grounding
+    prompt is shown.  Its candidate hash is taken over the section artifacts in
+    the grid.  The three are empty for a blind assessment and are left out of
+    its header.
     """
 
     candidate_hash: str = ""
@@ -124,8 +142,20 @@ class CacheBinding:
     criterion_samples: int | None = None
     temperature: float | None = None
     max_tokens: int | None = None
+    rubric_set_fingerprint: str = ""
+    pack_token_budget: int | None = None
+    span_budget_fraction: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
+        """The header form: every field, less the rubric fields left empty."""
+        full = self._all_fields()
+        return {
+            key: value
+            for key, value in full.items()
+            if key not in _RUBRIC_FIELDS or value not in ("", None)
+        }
+
+    def _all_fields(self) -> dict[str, Any]:
         return {
             "candidate_hash": self.candidate_hash,
             "profile_version": self.profile_version,
@@ -136,6 +166,9 @@ class CacheBinding:
             "criterion_samples": self.criterion_samples,
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
+            "rubric_set_fingerprint": self.rubric_set_fingerprint,
+            "pack_token_budget": self.pack_token_budget,
+            "span_budget_fraction": self.span_budget_fraction,
         }
 
     @classmethod
@@ -156,11 +189,26 @@ class CacheBinding:
                 None if data.get("temperature") is None else float(data["temperature"])
             ),
             max_tokens=None if data.get("max_tokens") is None else int(data["max_tokens"]),
+            rubric_set_fingerprint=str(data.get("rubric_set_fingerprint") or ""),
+            pack_token_budget=(
+                None
+                if data.get("pack_token_budget") is None
+                else int(data["pack_token_budget"])
+            ),
+            span_budget_fraction=(
+                None
+                if data.get("span_budget_fraction") is None
+                else float(data["span_budget_fraction"])
+            ),
         )
 
     def differences(self, other: "CacheBinding") -> list[str]:
-        """Field-by-field account of how *other* differs from this binding."""
-        mine, theirs = self.to_dict(), other.to_dict()
+        """Field-by-field account of how *other* differs from this binding.
+
+        Every field is compared, the empty rubric fields included, so a blind
+        checkpoint can never be resumed into a rubric run or the reverse.
+        """
+        mine, theirs = self._all_fields(), other._all_fields()
         return [
             f"{key}: checkpoint {mine[key]!r} != this run {theirs[key]!r}"
             for key in mine

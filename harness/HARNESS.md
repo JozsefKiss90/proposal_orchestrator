@@ -1574,6 +1574,30 @@ stay in the file as the faithful record of what the assessor said; a resume
 skips them and redraws that call.
 Without this, the response that killed a run would kill every resume of it.
 
+**Rubric grading resumes the same way (ticket 02).** `commands/rubric_grading_run.py`
+no longer keeps a pickle of completed cells and the claim verdict cache; the
+response checkpoint is the one resume module in the harness. A new run writes a
+new numbered checkpoint under `.harness/rubric_checkpoints/` (or the file
+`--checkpoint` names); `--resume <file>` replays it; opening an existing file
+without `--resume` is refused, and `--fresh` is gone. On resume every cell is
+graded again through the same code: the recorded draws are replayed, so the
+cells and the verdict cache are rebuilt in memory, and the run goes live from
+the first draw the file does not hold. The daily budget stop still pauses
+between cells, and the next `--resume` spends nothing on the draws the stopped
+run already made. The binding adds three rubric fields to the one above, each
+with an empty default: `rubric_set_fingerprint`, `pack_token_budget` and
+`span_budget_fraction`. A rubric run also binds the candidate hash, taken over
+the section artifacts in the grid with the same formatting-invariant hash blind
+assessment uses, plus the judge pin (in `assessor_pin`), the profile version,
+n and the inference configuration. A changed, added or removed section moves
+the candidate hash, so the resume is refused with every moved field named. The
+rubric fields are written into a header only when set, so a blind-assessment
+header keeps its exact shape, and one written before ticket 02 (DN runs
+included) still opens and resumes with no binding differences. The rubric
+report and the frozen rubric baseline carry `candidate_hash`, `replayed_calls`
+and `live_calls`; a report or baseline written before them still loads, and the
+report renders the counts only when it has them.
+
 **One call path, one redraw rule (ticket 01).** `Judge.ask(system, user,
 parser, *, metric, property_key)` is the only way a draw goes out; `evaluate`
 (`ask` + `parse_verdict`) and `evaluate_majority` (n × `evaluate` + majority

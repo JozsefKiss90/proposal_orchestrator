@@ -1027,6 +1027,11 @@ def freeze_rubric_baseline(
     the judge and rubric set it was graded under.  *budget_record* is the E5f
     budget accounting — recorded with the freeze so the baseline documents
     what the run cost and what it planned.
+
+    The candidate hash and the replayed / live draw counts are lifted from the
+    report (ticket 02), so the baseline says what content it froze and how much
+    of it came from a resumed checkpoint.  They are additive: a report without
+    them freezes them empty, and a baseline frozen before them still loads.
     """
     _require_report(report, "rubric report")
     return {
@@ -1041,6 +1046,9 @@ def freeze_rubric_baseline(
         "rubric_set_fingerprint": str(report.get("rubric_set_fingerprint", "")),
         "profile_id": str(report.get("profile_id", "")),
         "profile_version": str(report.get("profile_version", "")),
+        "candidate_hash": str(report.get("candidate_hash") or ""),
+        "replayed_calls": report.get("replayed_calls"),
+        "live_calls": report.get("live_calls"),
         "budget_record": dict(budget_record) if budget_record is not None else None,
         "report": dict(report),
     }
