@@ -5,7 +5,7 @@
 | Verified by / on | agent (Claude) / 2026-11-11 (round 1 before 19:30 UTC; round 1b ~20:55; steps 06–15 ~21:10–21:30; steps 17–22 ~22:10) |
 | Step sheets | `STEPS.md` (steps 01–23) as amended by `STEPS_fix1.md` (F01–F05, and the amendment table for steps 06, 09, 14, 18), run as in `RUNLOG.md` |
 | Decisions | `aws-redeployment-r11-host_2026-11-11` (R11-D1–D12, F-R11-1–6); OD9-r1 `aws-redeployment-od9-host-size-r1_2026-11-11` (operator confirmed 21:00 UTC) |
-| Secret scan | Operator: step 23 run 1 → `CLEAN`, `exit=0`. Run 2 follows this report (sheet order). Agent re-run over `evidence_v2/R11` after this report → see the last line of `RUNLOG.md` |
+| Secret scan | Operator: step 23 run 1 and run 2 (after this report, last) → `CLEAN`, `exit=0`. Agent re-run over `evidence_v2/R11` after each edit → `CLEAN` |
 | Old-ID guard | Operator: F04 and step 23 run 1 → `CLEAN` (20 ids) |
 | Stacks | `proposal-orchestrator-host`, three lives. Round 2 (`r11-create-01`, `t3.medium`): 20:12:14–20:19:02, `ROLLBACK_COMPLETE`, deleted in F02. Round 2b first creation (`r11-fix1-create-01`): `CREATE_COMPLETE` 21:04:56, deleted in step 13. Recreation (`r11-create-02`): `CREATE_COMPLETE` 21:52:44, deleted in step 19. Each go recorded before execution in rounds 1b and 2b (21:00:40, 21:45:33); round 2's go was not |
 | Cost | Hourly: six interface endpoints and one `c7i-flex.large` host per creation, plus round 2's endpoints for about seven minutes. Credits 199.25 USD before and after (billing delayed). R14 prices it |
@@ -32,7 +32,7 @@ answers were matched to the endpoint interfaces through each endpoint's ENI id.
 | 08 | Bedrock endpoint policy = template (DC-04) | `R11_08_bedrock-endpoint-policy.json` | PASS | Two statements by `Sid`; `Allow`, `Principal` `*`, the two invoke actions, the 14 ARNs of `host.json`, `ArnEquals aws:PrincipalArn` = `RuntimeRoleArn`; nothing else |
 | 08 | Seven interfaces, no public IP; groups (DC-07 attached) | `R11_08_network-interfaces.json` | PASS | Six `vpc_endpoint` with the endpoint SG; one `interface` on the host with the host SG |
 | 09 | Host: `c7i-flex.large` (amended), no public IP, IMDSv2 hop 1, profile, no key (DC-14) | `R11_09_instance.json` | PASS | x86_64, eu-north-1a, step 03's image, `10.60.0.11`, one block device, tags `Name` and `project` |
-| 09 | Root volume gp3, encrypted with the default EBS key, `deleteOnTermination` | `R11_09_root-volume.json` | PASS, one item Unresolved | gp3, encrypted, `deleteOnTermination` true, tag `project`. Key `key/3ac821af-…`; that it is `alias/aws/ebs` is not in the evidence (F-R11-6): check 23a |
+| 09 | Root volume gp3, encrypted with the default EBS key, `deleteOnTermination` | `R11_09_root-volume.json` | PASS | gp3, encrypted, `deleteOnTermination` true, tag `project`. Key `key/3ac821af-…` = `alias/aws/ebs`, AWS-managed, `Enabled` (`R11_23a_ebs-default-key-resolved.json`, F-R11-6) |
 | 09 | Profile associated (DC-14, DC-09) | `R11_09_profile-association.json` | PASS | `associated`, `InstanceProfileArn` |
 | 09 | Credit specification | `R11_09_credit-specification.json` | Recorded (no criterion, amended) | `CpuCredits` `standard` (F-R11-2) |
 | 10 | SSM `Online`; Run Command `Success` | `R11_10_*` | PASS | Amazon Linux 2023, agent 3.3.5700.0, IP = step 09's; output `R11_RUN_COMMAND_OK`, `x86_64`, no stderr |
@@ -47,7 +47,7 @@ answers were matched to the endpoint interfaces through each endpoint's ENI id.
 | 20 | CloudTrail `Converse` event, metadata only (DC-26, DC-37, F1) | `R11_20_*` | PASS | 21:08:58Z, `eu-north-1`, `AssumedRole`, runtime-role caller with the host's session, issuer = `RuntimeRoleArn`, `vpcEndpointId` = step 07's Bedrock endpoint, model = `TransportModelId`, no error; only the listed fields |
 | 21 | Flow-log delivery (DC-08 note) | `R11_21_*` | PASS | ACTIVE / SUCCESS; 14 streams of R11 interfaces after 21:03:42; 50 events (the query limit). R5-D4 gap answered (F-R11-4) |
 | 22 | Invocation logging unset (DC-28); no Bedrock log group (DC-29); credits | `R11_22_*` | PASS | `exit=0`, no configuration; `logGroups` `[]`; 199.25 USD |
-| 23 | 260 passed; guards CLEAN; scan last | `R11_23_*` | PASS (run 1), run 2 pending | Run 1 before this report (order deviation). Run 2 with check 23a follows |
+| 23 | 260 passed; guards CLEAN; scan last | `R11_23_*`, `R11_23a_*` | PASS | Run 2 after this report: Python 3.10.6, 260 passed; old-ID guard and secret scan CLEAN, `exit=0`, scan last. Run 1 (before the report) had the same results |
 
 ## Ticket checklist
 
@@ -61,10 +61,10 @@ answers were matched to the endpoint interfaces through each endpoint's ENI id.
 
 ## Done conditions (handoff §7a)
 
-- [x] Every criterion above is PASS, except step 06 round 2 (superseded, R11-D12) and the volume-key item (F-R11-6, check 23a).
+- [x] Every criterion above is PASS, except step 06 round 2 (superseded, R11-D12).
 - [x] Register v2 updated (2026-11-11).
 - [x] Worklog v2 entry 2026-11-11T22:15:00Z.
-- [ ] Step 23 run 2, with check 23a, after this report.
+- [x] Step 23 run 2, with check 23a, after this report (2026-11-11): 260 passed, both CLEAN; F-R11-6 closed.
 - [ ] Operator reviews `aws-redeployment-r11-host_2026-11-11` (R11-D11, R11-D12) and confirms R11 in session; the agent then ticks R11.
 
 ## Notes for later tickets
