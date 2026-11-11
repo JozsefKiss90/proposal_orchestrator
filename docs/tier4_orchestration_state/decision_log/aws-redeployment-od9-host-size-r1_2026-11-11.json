@@ -33,9 +33,15 @@
     },
     {
       "id": "F-OD9r1-4",
-      "declared_status": "Unresolved",
-      "finding": "That c7i-flex.large is Free Tier eligible in eu-north-1, offered in eu-north-1a (the one private subnet's zone), x86_64, and its vCPU and memory size.",
-      "basis": "Measured by docs/infrastructure_security/evidence_v2/R11/STEPS_fix1.md step F03 (read-only). This record does not assert it from prior knowledge."
+      "declared_status": "Confirmed",
+      "finding": "c7i-flex.large is Free Tier eligible in eu-north-1 and offered in eu-north-1a (the one private subnet's zone): x86_64, 2 vCPU, 4096 MiB, not burstable. The eligible list holds six types: c7i-flex.large, m7i-flex.large (x86_64, 2 vCPU, 8192 MiB), t3.small (x86_64, 2 vCPU, 2048 MiB), t3.micro (x86_64, 2 vCPU, 1024 MiB), t4g.small and t4g.micro (arm64). It holds no t3.medium. A dry run of the host launch on c7i-flex.large returned DryRunOperation.",
+      "basis": "docs/infrastructure_security/evidence_v2/R11/R11_fix1_03_free-tier-types.json, R11_fix1_03_offerings.json, R11_fix1_03_dry-run.txt (STEPS_fix1.md step F03, 2026-11-11). Was Unresolved in the draft; measured before any change set."
+    },
+    {
+      "id": "F-OD9r1-5",
+      "declared_status": "Confirmed",
+      "finding": "An EC2 dry run of the same c7i-flex.large launch with CpuCredits=standard also returned DryRunOperation. The dry run does not refuse the credit option on a non-burstable type. What a real launch does with it stays unmeasured; the template omits the option for this type (F-OD9r1-3), so the host never sends it.",
+      "basis": "docs/infrastructure_security/evidence_v2/R11/R11_fix1_03_dry-run-credits.txt (STEPS_fix1.md step F03d, informational); F-OD9r1-2 limits what a dry run shows."
     }
   ],
   "decisions": [
@@ -52,8 +58,8 @@
   "known_gaps": [
     {
       "decision": "OD9-r1",
-      "declared_status": "Unresolved",
-      "gap": "F-OD9r1-4: eligibility, zone offering and size of c7i-flex.large are measured in STEPS_fix1.md step F03. If c7i-flex.large is not eligible or not offered in eu-north-1a, the operator chooses again before any change set."
+      "declared_status": "Confirmed",
+      "gap": "Closed by STEPS_fix1.md step F03 (F-OD9r1-4): c7i-flex.large is eligible and offered in eu-north-1a. No second choice was needed."
     },
     {
       "decision": "OD9-r1",
@@ -70,5 +76,6 @@
     "declared_status": "Confirmed",
     "claim": "No secret value, credential, prompt text or proposal content.",
     "basis": "Identifiers, instance types and AWS error text only."
-  }
+  },
+  "evidence_round": "STEPS_fix1.md F01-F05 all PASS (RUNLOG.md round 1b); change set r11-fix1-create-01 CREATE_COMPLETE, AVAILABLE, InstanceType c7i-flex.large, awaiting the operator's go."
 }

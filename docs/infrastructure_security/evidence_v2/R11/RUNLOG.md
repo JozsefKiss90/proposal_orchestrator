@@ -37,3 +37,27 @@ in session on `R11_05_change-set.json`, recorded below with its UTC time and the
 | 06 (run 1) | 2026-11-11 20:12:14–20:19:02 | operator | `execute-change-set` started creation at 20:12:14. The six endpoints reached `CREATE_COMPLETE` between 20:13:13 and 20:13:23. `Host` started at 20:13:23 and failed at 20:13:25: "The specified instance type is not eligible for Free Tier". Rollback deleted all seven resources by 20:19:01; the stack is `ROLLBACK_COMPLETE` (20:19:02). The host never ran; the six endpoints existed for about seven minutes | **STOP rule of step 06.** First failed event: `Host` `CREATE_FAILED`. `R11_06_stack-status.json` and `R11_06_stack-events.json` are this run's |
 | 06 (run 2) | 2026-11-11, after 20:19 | operator | The step 06 block ran a second time. `execute-change-set` answered `ChangeSetNotFound` (`exit=254`): run 1 had consumed `r11-create-01` | `R11_06_execute-exit.txt` holds run 2's output; run 1's execute output was overwritten and is not kept |
 | check | 2026-11-11 | agent | The refusal answers OD9's known gap: the Free plan does not admit `t3.medium`. Step 03g's dry run returned `DryRunOperation` for `t3.medium`, so a dry run does not evaluate Free Tier eligibility | Operator chose `c7i-flex.large` in session. Fix sheet: `STEPS_fix1.md` |
+
+## Round 1b — `STEPS_fix1.md` steps F01–F05
+
+| Step | UTC (approx.) | Who | Result | Deviation / error |
+|---|---|---|---|---|
+| merge | 2026-11-11, before 20:51 | operator | `aws/r11-fix1-instance-type` merged `--no-ff` as `d2cadc0d` | none |
+| F01 | 2026-11-11, before 20:51 | operator | Plan FREE / ACTIVE, credits 199.25 USD (floor 195.00), expiry 2027-04-19; one budget, spend 0.478 of 10.0; three notifications OK; account 797661577394, assumed-role/AccountFullAccessRole | none |
+| F02 | 2026-11-11, before 20:51 | operator | Stack before: `ROLLBACK_COMPLETE`; `delete exit=0`; stack after: `ValidationError`, does not exist, `exit=254`; VPC holds only the S3 gateway endpoint `vpce-0770a3016be1317ef` (`available`), no network interface, no instance | none. PowerShell wrapped the expected error in a `NativeCommandError` record |
+| F03a | 2026-11-11, before 20:51 | operator | Six Free Tier eligible types: `c7i-flex.large` (x86_64, 2 vCPU, 4096 MiB, not burstable); `m7i-flex.large` (x86_64, 2 vCPU, 8192 MiB, not burstable); `t4g.small` (arm64, 2 vCPU, 2048 MiB, burstable); `t4g.micro` (arm64, 2 vCPU, 1024 MiB, burstable); `t3.small` (x86_64, 2 vCPU, 2048 MiB, burstable); `t3.micro` (x86_64, 2 vCPU, 1024 MiB, burstable). No `t3.medium` | none |
+| F03b | 2026-11-11, before 20:51 | operator | `c7i-flex.large` and `t3.micro` both offered in `eu-north-1a` (`PrivateSubnetAz`) | none |
+| F03c | 2026-11-11, before 20:51 | operator | Image `ami-04005916a1c241ff5` (equals `R11_03_image.json`); dry run of `c7i-flex.large` without a credit option: `DryRunOperation`, `exit=254` | none |
+| F03d | 2026-11-11, before 20:51 | operator | Dry run with `CpuCredits=standard`: also `DryRunOperation`, `exit=254`. EC2's dry run does not refuse the credit option on this non-burstable type | Informational, no criterion |
+| F04 | 2026-11-11, before 20:51 | operator | cfn-lint 1.57.2 `exit=0`, no finding; template guard CLEAN (6); old-ID guard CLEAN (20 ids); Python 3.10.6, 260 passed | none |
+| F05 | 2026-11-11 20:51:08 | operator | Change set `r11-fix1-create-01` (`56f5efbe-2e22-4905-8f54-ec1f7e70ec03`), stack id `9efe1ce0-de11-11f1-ad55-0affe3c28faf`: `CREATE_COMPLETE`, `AVAILABLE`, no capabilities, tag `project=proposal-orchestrator`; exactly seven `Add` changes, the same six `AWS::EC2::VPCEndpoint` and `Host` as step 05 | none |
+| check | 2026-11-11 | agent | All 20 files PASS against `STEPS_fix1.md` (`utf-8-sig`, by script): `FoundationModelArns`, `InferenceProfileArns`, `ExpectedAccountId` and `ExpectedRegion` equal `host.json`; `ProjectName`, `InstanceType` (`c7i-flex.large`) and `LatestAmiId` take the template defaults; the resolved image equals F03c's. Secret scan of the `R11_fix1_*` files CLEAN. OD9-r1 updated with the F03 measurements | — |
+
+**STOP — end of round 1b.** Step 06 (as amended in `STEPS_fix1.md`) starts hourly charges. It runs only
+after the operator's explicit go in session on `R11_fix1_05_change-set.json`, recorded below with its UTC
+time and the operator's words.
+
+## Round 2b — steps 06–23 (amended by `STEPS_fix1.md`)
+
+| Step | UTC (approx.) | Who | Result | Deviation / error |
+|---|---|---|---|---|

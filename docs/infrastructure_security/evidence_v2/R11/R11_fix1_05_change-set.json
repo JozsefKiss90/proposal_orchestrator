@@ -1,0 +1,130 @@
+﻿{
+    "Changes": [
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "BedrockRuntimeEndpoint",
+                "ResourceType": "AWS::EC2::VPCEndpoint",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "Ec2MessagesEndpoint",
+                "ResourceType": "AWS::EC2::VPCEndpoint",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "Host",
+                "ResourceType": "AWS::EC2::Instance",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "SecretsManagerEndpoint",
+                "ResourceType": "AWS::EC2::VPCEndpoint",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "SsmEndpoint",
+                "ResourceType": "AWS::EC2::VPCEndpoint",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "SsmMessagesEndpoint",
+                "ResourceType": "AWS::EC2::VPCEndpoint",
+                "Scope": [],
+                "Details": []
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Add",
+                "LogicalResourceId": "StsEndpoint",
+                "ResourceType": "AWS::EC2::VPCEndpoint",
+                "Scope": [],
+                "Details": []
+            }
+        }
+    ],
+    "ChangeSetName": "r11-fix1-create-01",
+    "ChangeSetId": "arn:aws:cloudformation:eu-north-1:797661577394:changeSet/r11-fix1-create-01/56f5efbe-2e22-4905-8f54-ec1f7e70ec03",
+    "StackId": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/9efe1ce0-de11-11f1-ad55-0affe3c28faf",
+    "StackName": "proposal-orchestrator-host",
+    "Description": null,
+    "Parameters": [
+        {
+            "ParameterKey": "FoundationModelArns",
+            "ParameterValue": "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-6,arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-sonnet-4-6"
+        },
+        {
+            "ParameterKey": "ProjectName",
+            "ParameterValue": "proposal-orchestrator"
+        },
+        {
+            "ParameterKey": "LatestAmiId",
+            "ParameterValue": "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64",
+            "ResolvedValue": "ami-04005916a1c241ff5"
+        },
+        {
+            "ParameterKey": "ExpectedAccountId",
+            "ParameterValue": "797661577394"
+        },
+        {
+            "ParameterKey": "InferenceProfileArns",
+            "ParameterValue": "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1,arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6"
+        },
+        {
+            "ParameterKey": "InstanceType",
+            "ParameterValue": "c7i-flex.large"
+        },
+        {
+            "ParameterKey": "ExpectedRegion",
+            "ParameterValue": "eu-north-1"
+        }
+    ],
+    "CreationTime": "2026-11-11T20:51:08.940000+00:00",
+    "ExecutionStatus": "AVAILABLE",
+    "Status": "CREATE_COMPLETE",
+    "StatusReason": null,
+    "NotificationARNs": [],
+    "RollbackConfiguration": {},
+    "Capabilities": [],
+    "Tags": [
+        {
+            "Key": "project",
+            "Value": "proposal-orchestrator"
+        }
+    ],
+    "ParentChangeSetId": null,
+    "IncludeNestedStacks": false,
+    "RootChangeSetId": null,
+    "OnStackFailure": null,
+    "ImportExistingResources": null,
+    "StackDriftStatus": null,
+    "DeploymentMode": null
+}
