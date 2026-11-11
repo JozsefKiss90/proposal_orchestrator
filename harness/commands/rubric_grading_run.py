@@ -532,11 +532,11 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     # The live-judge bootstrap: load .env.harness (override=True) before any
-    # transport/judge resolution, and take the paced/retrying backend wrapper
-    # from the freeze runner.
+    # transport/judge resolution; the judge comes from the factory's paced,
+    # retrying openai-compatible route.
     from harness.commands._common import load_harness_env
-    from harness.commands.freeze_grounding_baselines import build_paced_judge
-    from harness.judge import resolve_judge_config
+    from harness.judge import JudgeError, resolve_judge_config
+    from harness.judge_factory import ROUTE_OPENAI_COMPATIBLE, build_judge
 
     load_harness_env()
     repo_root = Path(args.repo_root).resolve()
@@ -604,13 +604,17 @@ def main(argv=None) -> int:
         checkpoint_path.unlink()
         print(f"discarded checkpoint {checkpoint_path.name} (--fresh)")
 
-    judge, wrapper = build_paced_judge(
-        cfg,
-        tpm=args.tpm,
-        rpm=args.rpm,
-        max_retries=args.max_retries,
-        prov_path=repo_root / args.provenance,
-    )
+    try:
+        judge, wrapper = build_judge(
+            ROUTE_OPENAI_COMPATIBLE,
+            cfg,
+            tpm=args.tpm,
+            rpm=args.rpm,
+            max_retries=args.max_retries,
+            prov_path=repo_root / args.provenance,
+        )
+    except JudgeError as exc:
+        raise SystemExit(str(exc)) from exc
     print(
         f"pacing: <= {args.tpm} TPM / {args.rpm} RPM, retry x{args.max_retries}; "
         f"daily stop at {args.tpd_stop:,} measured tokens"

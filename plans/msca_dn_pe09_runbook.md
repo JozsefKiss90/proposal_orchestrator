@@ -484,6 +484,12 @@ passes on, and the freeze requires that record. The test that would fail if it b
 `tests/harness/test_converse_judge.py::TestTheInvocationRecordIsMeasured`. With no process and no
 filesystem access, that is the transport's whole isolation claim.
 
+Each `--transport` value is a judge route (`harness/judge_factory.py`), and the transport environment
+must resolve to it: `bedrock_converse` for `bedrock-converse`, `claude_cli` for `claude-cli`, an
+OpenAI-compatible backend for `openai-compatible`. A mismatch is refused, naming both, before the
+first call. The test that would fail if it broke is
+`tests/harness/test_judge_factory.py::TestTheEnvironmentMustAgree`.
+
 `--transport claude-cli` renders the assessor's tool list as `--tools "" --strict-mcp-config`
 (`runner/claude_transport.py`). On that route two controls keep the assessor blind, and each has a
 test that would fail if it broke:

@@ -34,6 +34,7 @@ import harness.judge as hj
 import runner.transport.bedrock_converse as bc
 from harness.commands import _converse_judge as cj
 from harness.judge import Judge, JudgeConfig
+from harness.judge_factory import ROUTE_BEDROCK_CONVERSE, build_judge
 from harness.rubrics import load_profile_bundle
 from runner.dev_graph import import_document
 from tests.harness._preflight import preflighted
@@ -47,6 +48,17 @@ from tests.harness.test_blind_leakage import (
 )
 
 PIN = "eu.anthropic.claude-sonnet-4-6"
+
+
+def build_converse(cfg: JudgeConfig, **kwargs: Any):
+    """The judge factory on the Converse route (formerly ``build_converse_judge``)."""
+    kwargs.setdefault("log", lambda _m: None)
+    return build_judge(ROUTE_BEDROCK_CONVERSE, cfg, **kwargs)
+
+
+def converse_judge(cfg: JudgeConfig) -> Judge:
+    judge, _wrapper = build_converse(cfg)
+    return judge
 VERSION = f"{cj.TRANSPORT_TAG}-eu-west-1@2026-10-14"
 
 
@@ -110,12 +122,12 @@ def converse_env(monkeypatch) -> None:
 
 class TestTheJudgeBuildsConverse:
     def test_a_resolved_converse_config_builds_the_converse_backend(self, converse_env, client):
-        judge = Judge(JudgeConfig(model=PIN, version=VERSION, max_tokens=3072))
+        judge = converse_judge(JudgeConfig(model=PIN, version=VERSION, max_tokens=3072))
         assert judge._send("system text", "user text") == '{"passed": true, "score": 0.9, "rationale": "scripted pass"}'
-        assert isinstance(judge._backend, bc.BedrockConverseBackend)
+        assert isinstance(judge._backend._inner, bc.BedrockConverseBackend)
 
     def test_the_request_carries_the_pin_temperature_and_token_limit(self, converse_env, client):
-        judge = Judge(JudgeConfig(model=PIN, version=VERSION, max_tokens=3072))
+        judge = converse_judge(JudgeConfig(model=PIN, version=VERSION, max_tokens=3072))
         judge._send("system text", "user text")
         (request,) = client.requests
         assert request["modelId"] == PIN
@@ -124,12 +136,12 @@ class TestTheJudgeBuildsConverse:
         assert request["messages"] == [{"role": "user", "content": [{"text": "user text"}]}]
 
     def test_the_request_carries_no_tools(self, converse_env, client):
-        Judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
+        converse_judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
         (request,) = client.requests
         assert "toolConfig" not in request
 
     def test_the_client_targets_the_resolved_region(self, converse_env, client):
-        Judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
+        converse_judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
         assert client.client_kwargs["region_name"] == "eu-west-1"
 
     def test_the_converse_route_needs_no_base_url(self, converse_env, client):
@@ -137,7 +149,7 @@ class TestTheJudgeBuildsConverse:
         from runner.transport.config import resolve_provider_config
 
         assert resolve_provider_config().base_url is None
-        Judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
+        converse_judge(JudgeConfig(model=PIN, version=VERSION))._send("s", "u")
         assert len(client.requests) == 1
 
 
@@ -148,7 +160,7 @@ class TestTheJudgeBuildsConverse:
 
 class TestTheBuilder:
     def test_the_builder_wires_the_pin_and_a_provenance_log(self, converse_env, client, tmp_path):
-        judge, wrapper = cj.build_converse_judge(
+        judge, wrapper = build_converse(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
         judge._send("s", "u")
@@ -160,14 +172,14 @@ class TestTheBuilder:
     def test_a_version_tag_that_does_not_name_the_transport_is_refused(self, converse_env, client, tmp_path):
         cfg = JudgeConfig(model=PIN, version="claude-cli-subscription@2026-10-05")
         with pytest.raises(cj.ConverseJudgeError, match=cj.TRANSPORT_TAG):
-            cj.build_converse_judge(cfg, prov_path=tmp_path / "prov.jsonl")
+            build_converse(cfg, prov_path=tmp_path / "prov.jsonl")
 
     def test_an_environment_resolving_another_backend_is_refused(self, converse_env, client, monkeypatch, tmp_path):
         """The flag says Converse, the environment says otherwise: the report
         would name a transport it did not speak."""
         monkeypatch.setenv("ORCHESTRATOR_TRANSPORT_BACKEND", "ollama")
         with pytest.raises(cj.ConverseJudgeError, match="ollama"):
-            cj.build_converse_judge(JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl")
+            build_converse(JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl")
 
     def test_a_retryable_failure_is_retried(self, converse_env, monkeypatch, tmp_path):
         from botocore.exceptions import ClientError
@@ -181,10 +193,10 @@ class TestTheBuilder:
 
         fake = _Throttled()
         monkeypatch.setattr(bc.boto3, "client", lambda *_a, **_k: fake)
-        import harness.commands.freeze_grounding_baselines as fgb
+        import harness.judge_factory as jf
 
-        monkeypatch.setattr(fgb.time, "sleep", lambda _s: None)
-        judge, wrapper = cj.build_converse_judge(
+        monkeypatch.setattr(jf.time, "sleep", lambda _s: None)
+        judge, wrapper = build_converse(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl",
             max_retries=2, log=lambda _m: None,
         )
@@ -323,9 +335,9 @@ class TestABadConfigurationIsRefusedBeforeTheFirstCall:
         def _refuse(*_a, **_k):
             raise ValueError("model is required for bedrock_converse backend")
 
-        monkeypatch.setattr(cj, "build_judge_backend", _refuse)
+        monkeypatch.setattr("runner.transport.config.build_converse_backend", _refuse)
         with pytest.raises(cj.ConverseJudgeError, match="model is required"):
-            cj.build_converse_judge(JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "p.jsonl")
+            build_converse(JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "p.jsonl")
 
     def test_an_omitted_transport_on_a_converse_environment_names_the_flag(
         self, converse_env, client, world, monkeypatch, capsys
@@ -470,7 +482,7 @@ class TestTheInvocationRecordIsMeasured:
         """The record is read off the requests the backend built, not
         declared: a Converse backend given a tool list sends a toolConfig,
         and the record says so."""
-        judge, wrapper = cj.build_converse_judge(
+        judge, wrapper = build_converse(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
         wrapper._inner._tools = [{"type": "function", "function": {"name": "read_file", "parameters": {}}}]
@@ -479,7 +491,7 @@ class TestTheInvocationRecordIsMeasured:
         assert wrapper.invocation_record()["tool_config_sent"] is True
 
     def test_no_request_means_no_inference_config(self, converse_env, client, tmp_path):
-        _judge, wrapper = cj.build_converse_judge(
+        _judge, wrapper = build_converse(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
         record = wrapper.invocation_record()
@@ -490,7 +502,7 @@ class TestTheInvocationRecordIsMeasured:
     def test_with_no_request_the_builder_is_still_measured(self, converse_env, client, tmp_path):
         """A run served wholly from a checkpoint sends nothing. The record is
         then measured from a probe the same builder makes, never from silence."""
-        _judge, wrapper = cj.build_converse_judge(
+        _judge, wrapper = build_converse(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
         wrapper._inner._tools = [{"type": "function", "function": {"name": "read_file", "parameters": {}}}]
@@ -711,7 +723,7 @@ class TestJudgeIndependenceOnASharedProvider:
         assert JudgeConfig(model=model, version=VERSION).model == model
 
     def test_a_different_claude_model_runs_over_converse(self, converse_env, client, tmp_path):
-        judge, _wrapper = cj.build_converse_judge(
+        judge, _wrapper = build_converse(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
         assert judge._send("s", "u")
@@ -772,7 +784,7 @@ class TestTheHostsEnvironment:
         assert client.requests == []
 
     def test_the_od7_assessor_runs_over_converse_in_the_secrets_region(self, host_env, client, tmp_path):
-        judge, _wrapper = cj.build_converse_judge(
+        judge, _wrapper = build_converse(
             JudgeConfig(model=PIN, version=VERSION), prov_path=tmp_path / "prov.jsonl",
             log=lambda _m: None,
         )

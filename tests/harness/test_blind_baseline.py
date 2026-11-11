@@ -157,12 +157,16 @@ class TestTheReportNamesItsTransport:
             cmd.TRANSPORT_BEDROCK_CONVERSE,
         }
 
-    def test_the_isolation_the_freeze_requires_is_what_the_backend_declares(self, tmp_path):
+    def test_the_isolation_the_freeze_requires_is_what_the_backend_declares(self, tmp_path, monkeypatch):
         """The required declarations must be ones the subscription backend
         actually makes, or no real baseline could satisfy the check."""
-        from harness.commands import _subscription_judge as sj
+        from harness.judge_factory import ROUTE_CLAUDE_CLI, build_judge
 
-        _judge, backend = sj.build_subscription_judge(
+        for name in ("ORCHESTRATOR_TRANSPORT_PRESET", "ORCHESTRATOR_PRODUCTION_MODE"):
+            monkeypatch.delenv(name, raising=False)
+        monkeypatch.setenv("ORCHESTRATOR_TRANSPORT_BACKEND", "claude_cli")
+        _judge, backend = build_judge(
+            ROUTE_CLAUDE_CLI,
             JudgeConfig(model="claude-sonnet-5", version=VERSION),
             prov_path=tmp_path / "prov.jsonl",
             repo_root=find_repo_root(),

@@ -323,7 +323,7 @@ class TestIndependence:
 
     def test_judge_default_transport_rejects_the_drafter_transport(self, monkeypatch):
         # Transport axis: the in-run skill speaks claude_cli; the judge's
-        # default backend refuses to.
+        # openai-compatible route refuses to.
         from runner.transport.capabilities import CAPABILITIES_REGISTRY
         from runner.transport.config import ProviderConfig
 
@@ -337,9 +337,10 @@ class TestIndependence:
         monkeypatch.setattr(
             "runner.transport.config.resolve_provider_config", lambda: claude_cfg
         )
-        judge = Judge(JudgeConfig(model="fake-judge", version="pin-1"))
+        from harness.judge_factory import ROUTE_OPENAI_COMPATIBLE, build_judge
+
         with pytest.raises(JudgeIndependenceError, match="OpenAI-compatible"):
-            judge._send("s", "u")
+            build_judge(ROUTE_OPENAI_COMPATIBLE, JudgeConfig(model="fake-judge", version="pin-1"))
 
     def test_coverage_module_never_imports_the_drafter_stack(self):
         # Static source check (same mechanism as test_boundary.py): the grader

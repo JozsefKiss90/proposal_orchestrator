@@ -1,6 +1,6 @@
 # 03 — One place that builds a judge and states its independence
 
-Status: needs-triage
+Status: in-progress
 Type: task
 Blocked by: 01
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate B. Not grilled; the
@@ -8,9 +8,7 @@ operator asked for the ticket directly on 2026-11-03, and every recommendation b
 decision.
 Findings: F5 · DN critical path (assessor construction) · one confirmed misroute defect
 
-> `needs-triage` until the Step 3 scope cut admits it; then `ready-for-agent`.
-> Blocked by 01 because both change the judge module and the blind-assessment command. It touches only
-> the judge-building lines of rubric grading, so it does not need to wait for 02.
+> Admitted by operator decision D2 (`docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json`); 01 has landed.
 
 ## What to build
 
@@ -61,26 +59,26 @@ that route's independence policy, and returns the judge with its retry wrapper.
 
 Failing tests first:
 
-- [ ] The environment resolves to `bedrock_converse` and the `openai-compatible` route is asked for: it is refused, naming both. (Today an OpenAI-compatible backend is built.)
-- [ ] The same mismatch check holds for every route pair.
-- [ ] A drafter model is refused on every route.
-- [ ] A judge constructed without a backend raises; there is no lazy default build.
-- [ ] A boundary test: no harness module other than the factory constructs a judge with a production backend.
+- [x] The environment resolves to `bedrock_converse` and the `openai-compatible` route is asked for: it is refused, naming both. (Today an OpenAI-compatible backend is built.)
+- [x] The same mismatch check holds for every route pair.
+- [x] A drafter model is refused on every route.
+- [x] A judge constructed without a backend raises; there is no lazy default build.
+- [x] A boundary test: no harness module other than the factory constructs a judge with a production backend.
 
 Characterisation, pinned before anything moves:
 
-- [ ] The `claude-cli` route still refuses a non-Claude pin, a version without the transport tag, and a working directory inside the repository, and still passes the empty tool list.
-- [ ] The `bedrock-converse` route still requires its version tag and applies retry without pacing.
-- [ ] The `openai-compatible` route applies the same pacing and retry parameters as before.
-- [ ] Blind reports record the same `assessor_transport` strings as before.
+- [x] The `claude-cli` route still refuses a non-Claude pin, a version without the transport tag, and a working directory inside the repository, and still passes the empty tool list.
+- [x] The `bedrock-converse` route still requires its version tag and applies retry without pacing.
+- [x] The `openai-compatible` route applies the same pacing and retry parameters as before.
+- [x] Blind reports record the same `assessor_transport` strings as before.
 
 Then:
 
-- [ ] Faithfulness calibration's private builder and the paced builder in grounding freeze are gone; every command calls the factory.
-- [ ] `harness/HARNESS.md`'s guardrail table points at the factory's policy table, and the subscription module's "what independence survives" account stays accurate.
+- [x] Faithfulness calibration's private builder and the paced builder in grounding freeze are gone; every command calls the factory.
+- [x] `harness/HARNESS.md`'s guardrail table points at the factory's policy table, and the subscription module's "what independence survives" account stays accurate.
 - [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
 - [ ] **PE-09 acceptance lane green** (admission rule 5: blind-assessment command and assessor construction change).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
 
@@ -107,3 +105,4 @@ Record: no decision-log entry needed
 
 - Deferred at Step 3 (2026-11-06): its misroute does not reach the blind assessment on either transport (W03 §3); ticket 12 gives the DN path an up-front refusal for an omitted --transport. Revisit after 01.
 - Wave 2b (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.
+- 2026-11-11, session (base `ac90a3a4`, branch `ticket/03-judge-factory`): targeted 64 modules, 3,145 passed, 1 failed (§5 baseline id `test_demo_candidate_blind_baseline.py::...::test_the_leakage_scan_file_count_is_re_derivable`), 13 skipped. Code review: spec axis found no missing or wrong requirement (judgement calls: the `claude-cli` route now requires a `claude_cli` environment; the two former lazy-default callers are refused on a Converse environment and gain retries; pacing characterisation covers blind assessment and the grounding freeze, rubric grading and faithfulness calibration only through the shared factory); standards axis found no hard violation (layering note: the factory lazily imports the two route backends from `harness/commands/`). `test_judge_factory.py` joined the isolation lane area. Full suite and lane not run.

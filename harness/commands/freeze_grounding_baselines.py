@@ -15,8 +15,9 @@ judge — Groq free tier for ``llama-3.3-70b-versatile`` is 30 RPM / 6,000 TPM /
 1,000 RPD — a naive ~400-call burst trips the per-minute token cap.  The
 transport marks a 429 ``retryable`` (``runner/transport/errors.py``) but nothing
 acts on it, and E2's per-claim loop is out of reach of any outer pacing.  So
-this runner injects a single choke-point backend wrapper (the one place every
-judge call passes through) that:
+this runner asks the judge factory (:mod:`harness.judge_factory`) for the
+``openai-compatible`` route, whose backend wrapper (the one place every judge
+call passes through):
 
   * paces every judge call under a TPM/RPM budget, using the backend's REAL
     ``last_usage`` token counts (not an estimate), and
@@ -59,178 +60,25 @@ All flags have env fallbacks: --n, --tpm, --rpm, --max-retries, --only,
 from __future__ import annotations
 
 import argparse
-import dataclasses
 import os
-import re
 import sys
 import time
-from collections import deque
 from pathlib import Path
 
 from harness.commands._common import load_harness_env
-from harness.judge import Judge, resolve_judge_config
-from harness.provenance import ProvenanceLog
+from harness.judge import JudgeError, resolve_judge_config
+from harness.judge_factory import ROUTE_OPENAI_COMPATIBLE, build_judge
 from harness.regression import (
     DEFAULT_GOLDEN_DIR,
     DEFAULT_SECTIONS_DIR,
     freeze_section_grounding,
 )
 from harness.status_faithfulness import load_baseline, write_baseline
-from runner.transport.config import build_openai_backend, resolve_provider_config
-from runner.transport.errors import OpenAICompatTransportError
 from runner.working_assumptions import load_working_assumptions
 
 #: Suffix for the judge-lane baseline — distinct from the deterministic
 #: ``*.golden.json`` so ``harness.regression``'s ``load_golden_set`` never reads it.
 GROUNDING_SUFFIX = ".grounding.json"
-
-#: Cold-start token estimate before any real usage is observed. Faithfulness
-#: calls carry a source excerpt, so they are not tiny — bias high to be safe.
-_COLD_ESTIMATE_TOKENS = 3000
-
-#: Parse a provider "please try again in 8.5s" hint out of a 429 body, if present.
-_RETRY_AFTER_RE = re.compile(r"try again in\s*([0-9.]+)\s*s", re.IGNORECASE)
-
-
-class PacedRetryingBackend:
-    """Injected backend wrapper: token-accurate pacing + retry on retryable errors.
-
-    Conforms to the ``ToolLoopBackend`` shape (``messages -> {"content", ...}``)
-    and delegates to *inner* (a real ``OpenAICompatBackend``).  It is the single
-    point every judge call passes through, which is the only place per-call
-    pacing is reachable — E2's per-claim loop is internal to
-    ``evaluate_status_aware_faithfulness`` and cannot be paced from outside.
-    """
-
-    def __init__(
-        self,
-        inner,
-        *,
-        tpm_budget,
-        rpm_budget,
-        max_retries,
-        base_delay=8.0,
-        max_delay=90.0,
-        log=print,
-    ) -> None:
-        self._inner = inner
-        self._tpm = float(tpm_budget)
-        self._min_interval = 60.0 / float(rpm_budget) if rpm_budget else 0.0
-        self._max_retries = int(max_retries)
-        self._base = float(base_delay)
-        self._max = float(max_delay)
-        self._log = log
-        self._window: deque = deque()   # (monotonic_ts, total_tokens) within the last 60s
-        self._recent: deque = deque(maxlen=8)
-        self._last_ts = 0.0
-        # counters for the run summary
-        self.calls = 0
-        self.retries = 0
-        self.total_tokens = 0
-
-    # -- token-aware pacing --------------------------------------------- #
-    def _evict(self, now: float) -> None:
-        while self._window and now - self._window[0][0] >= 60.0:
-            self._window.popleft()
-
-    def _tokens_in_window(self) -> int:
-        return sum(t for _, t in self._window)
-
-    def _estimate_next(self) -> int:
-        return max(self._recent) if self._recent else _COLD_ESTIMATE_TOKENS
-
-    def _pace(self) -> None:
-        # (1) RPM floor — cheap request spacing.
-        if self._min_interval:
-            gap = self._min_interval - (time.monotonic() - self._last_ts)
-            if gap > 0:
-                time.sleep(gap)
-        # (2) TPM sliding window — wait until the projected next call fits the budget.
-        while self._window:
-            now = time.monotonic()
-            self._evict(now)
-            if not self._window:
-                break
-            if self._tokens_in_window() + self._estimate_next() <= self._tpm:
-                break
-            sleep_for = 60.0 - (now - self._window[0][0]) + 0.1
-            self._log(
-                f"    pacing: {self._tokens_in_window()} tok in the 60s window; "
-                f"waiting {sleep_for:.1f}s for TPM headroom"
-            )
-            time.sleep(max(sleep_for, 0.1))
-
-    # -- backend protocol ----------------------------------------------- #
-    def __call__(self, messages):
-        delay = self._base
-        for attempt in range(self._max_retries + 1):
-            self._pace()
-            try:
-                result = self._inner(messages)
-            except OpenAICompatTransportError as exc:
-                # Use the transport's OWN retryability flag (verified: 429/5xx/
-                # timeout => retryable=True; 400/401/403/404 => False).
-                if not getattr(exc, "retryable", False) or attempt >= self._max_retries:
-                    raise
-                self.retries += 1
-                wait = self._retry_after(exc, delay)
-                self._log(
-                    f"    {getattr(exc.category, 'value', 'error')} "
-                    f"(attempt {attempt + 1}/{self._max_retries}) — waiting {wait:.0f}s then retrying"
-                )
-                time.sleep(wait)
-                delay = min(delay * 2, self._max)
-                continue
-            # success — record REAL usage so pacing tracks actual tokens.
-            self._last_ts = time.monotonic()
-            usage = getattr(self._inner, "last_usage", None)
-            tok = (
-                int(usage["total_tokens"])
-                if usage and usage.get("total_tokens")
-                else self._estimate_next()
-            )
-            self._window.append((self._last_ts, tok))
-            self._recent.append(tok)
-            self.calls += 1
-            self.total_tokens += tok
-            return result
-        raise RuntimeError("unreachable: retry loop exited without returning or raising")
-
-    def _retry_after(self, exc, fallback: float) -> float:
-        body = getattr(exc, "response_body", "") or ""
-        m = _RETRY_AFTER_RE.search(body)
-        if m:
-            try:
-                return min(max(float(m.group(1)) + 0.5, 1.0), self._max)
-            except ValueError:
-                pass
-        return fallback
-
-
-def build_paced_judge(cfg, *, tpm, rpm, max_retries, prov_path, log=print):
-    """Build a :class:`Judge` whose backend is the pacing+retry wrapper.
-
-    Mirrors ``Judge._get_backend`` (resolve provider, reject the ``claude_cli``
-    drafter transport, pin the judge model), then wraps the real backend before
-    handing it to the judge — so the model-level non-drafter guard
-    (``JudgeConfig``) AND the transport-independence check both still hold.
-    """
-    provider = resolve_provider_config()
-    if provider.backend_name == "claude_cli":
-        raise SystemExit(
-            "transport resolves to 'claude_cli' (the drafter transport). Point "
-            "ORCHESTRATOR_TRANSPORT_* at the non-drafter OpenAI-compatible judge "
-            "(e.g. the Groq preset) for grader-generator independence."
-        )
-    provider = dataclasses.replace(provider, model=cfg.model)
-    inner = build_openai_backend(
-        provider, temperature=cfg.temperature, max_tokens=cfg.max_tokens
-    )
-    wrapper = PacedRetryingBackend(
-        inner, tpm_budget=tpm, rpm_budget=rpm, max_retries=max_retries, log=log
-    )
-    judge = Judge(cfg, backend=wrapper, provenance_log=ProvenanceLog(prov_path))
-    return judge, wrapper
 
 
 def _env_int(name: str, default: int) -> int:
@@ -272,13 +120,17 @@ def main(argv=None) -> int:
 
     cfg = resolve_judge_config()   # fail-closed if HARNESS_JUDGE_MODEL / _VERSION unset
     wa = load_working_assumptions(repo_root)
-    judge, wrapper = build_paced_judge(
-        cfg,
-        tpm=args.tpm,
-        rpm=args.rpm,
-        max_retries=args.max_retries,
-        prov_path=out_dir / "provenance_grounding_freeze.jsonl",
-    )
+    try:
+        judge, wrapper = build_judge(
+            ROUTE_OPENAI_COMPATIBLE,
+            cfg,
+            tpm=args.tpm,
+            rpm=args.rpm,
+            max_retries=args.max_retries,
+            prov_path=out_dir / "provenance_grounding_freeze.jsonl",
+        )
+    except JudgeError as exc:
+        raise SystemExit(str(exc)) from exc
 
     sections = sorted(sections_dir.glob("*.json"))
     if args.only:

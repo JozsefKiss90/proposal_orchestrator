@@ -3,7 +3,8 @@ Offline tests for the harness module commands (``harness.commands``).
 
 The rubric grading runner has its own suite (``test_rubric_run.py``).  This file
 covers the two runners that previously lived untested under ``scripts/``: the
-paced/retrying backend wrapper from the E4 freeze runner, and the E1.5
+paced/retrying backend wrapper the E4 freeze runner uses (now in
+``harness.judge_factory``), and the E1.5
 calibration checkpoint loader.  No transport, no ``.env.harness``, no sleeping —
 ``time.sleep`` and ``time.monotonic`` are stubbed.
 """
@@ -17,7 +18,7 @@ import pytest
 
 from harness.commands import _common
 from harness.commands import faithfulness_calibration as fc
-from harness.commands import freeze_grounding_baselines as fgb
+from harness import judge_factory as jf
 from runner.transport.errors import ErrorCategory, OpenAICompatTransportError
 
 COMMANDS = (
@@ -44,8 +45,8 @@ class _Clock:
 @pytest.fixture
 def clock(monkeypatch):
     c = _Clock()
-    monkeypatch.setattr(fgb.time, "monotonic", c.monotonic)
-    monkeypatch.setattr(fgb.time, "sleep", c.sleep)
+    monkeypatch.setattr(jf.time, "monotonic", c.monotonic)
+    monkeypatch.setattr(jf.time, "sleep", c.sleep)
     return c
 
 
@@ -65,8 +66,8 @@ class _Inner:
         return out
 
 
-def paced(inner, *, tpm=6000, rpm=0, max_retries=2, **kw) -> fgb.PacedRetryingBackend:
-    return fgb.PacedRetryingBackend(
+def paced(inner, *, tpm=6000, rpm=0, max_retries=2, **kw) -> jf.PacedRetryingBackend:
+    return jf.PacedRetryingBackend(
         inner, tpm_budget=tpm, rpm_budget=rpm, max_retries=max_retries, log=lambda *_: None, **kw
     )
 

@@ -22,6 +22,7 @@ import pytest
 import harness.grounding_scope as gs
 from harness.commands import _subscription_judge as sj
 from harness.judge import JudgeConfig, JudgeIndependenceError
+from harness.judge_factory import ROUTE_CLAUDE_CLI, build_judge
 from runner.claude_transport import (
     NO_TOOLS,
     ClaudeCLIResolution,
@@ -36,6 +37,19 @@ CONTENT_FOCUSED = gs.SCOPE_CONTENT_FOCUSED
 PIN = "claude-sonnet-5"
 VERSION = "claude-cli-subscription@2026-10-02"
 REPO = find_repo_root()
+
+
+@pytest.fixture(autouse=True)
+def claude_cli_environment(monkeypatch):
+    """The transport environment the ``claude-cli`` route requires."""
+    for name in ("ORCHESTRATOR_TRANSPORT_PRESET", "ORCHESTRATOR_PRODUCTION_MODE"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("ORCHESTRATOR_TRANSPORT_BACKEND", "claude_cli")
+
+
+def build_subscription(cfg: JudgeConfig, **kwargs):
+    """The judge factory on the ``claude-cli`` route (formerly ``build_subscription_judge``)."""
+    return build_judge(ROUTE_CLAUDE_CLI, cfg, **kwargs)
 
 
 @pytest.fixture
@@ -303,11 +317,11 @@ class TestWhatIndependenceSurvives:
         it would fail once per cell with an unknown-model error."""
         cfg = JudgeConfig(model="llama-3.3-70b-versatile", version=VERSION)
         with pytest.raises(sj.SubscriptionJudgeError, match="cannot resolve"):
-            sj.build_subscription_judge(cfg, prov_path=tmp_path / "prov.jsonl")
+            build_subscription(cfg, prov_path=tmp_path / "prov.jsonl")
 
     def test_the_builder_wires_the_pin_and_a_provenance_log(self, tmp_path):
         cfg = JudgeConfig(model=PIN, version=VERSION)
-        judge, backend = sj.build_subscription_judge(
+        judge, backend = build_subscription(
             cfg, prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
         assert judge.config.model == PIN
@@ -321,7 +335,7 @@ class TestWhatIndependenceSurvives:
         from harness.blind_assessment import assessor_pin
 
         cfg = JudgeConfig(model=PIN, version=VERSION)
-        judge, _ = sj.build_subscription_judge(
+        judge, _ = build_subscription(
             cfg, prov_path=tmp_path / "prov.jsonl", log=lambda _m: None
         )
         assert assessor_pin(judge) == f"{PIN}@{VERSION}"
@@ -332,11 +346,11 @@ class TestWhatIndependenceSurvives:
         ``groq-llama@...`` over the subscription would misdescribe its assessor."""
         cfg = JudgeConfig(model=PIN, version="groq-llama-3.3-70b@2026-08-03")
         with pytest.raises(sj.SubscriptionJudgeError, match=sj.TRANSPORT_TAG):
-            sj.build_subscription_judge(cfg, prov_path=tmp_path / "prov.jsonl")
+            build_subscription(cfg, prov_path=tmp_path / "prov.jsonl")
 
     def test_the_builder_creates_a_working_directory_outside_the_repository(self, tmp_path):
         cfg = JudgeConfig(model=PIN, version=VERSION)
-        _judge, backend = sj.build_subscription_judge(
+        _judge, backend = build_subscription(
             cfg, prov_path=tmp_path / "prov.jsonl", repo_root=REPO, log=lambda _m: None
         )
         assert backend.working_dir.is_dir()
@@ -346,14 +360,14 @@ class TestWhatIndependenceSurvives:
     def test_the_builder_refuses_a_working_directory_inside_the_repository(self, tmp_path):
         cfg = JudgeConfig(model=PIN, version=VERSION)
         with pytest.raises(sj.SubscriptionJudgeError, match="inside the repository"):
-            sj.build_subscription_judge(
+            build_subscription(
                 cfg, prov_path=tmp_path / "prov.jsonl", repo_root=REPO,
                 working_dir=REPO / "harness", log=lambda _m: None,
             )
 
     def test_the_invocation_record_says_what_the_child_could_reach(self, tmp_path):
         cfg = JudgeConfig(model=PIN, version=VERSION)
-        _judge, backend = sj.build_subscription_judge(
+        _judge, backend = build_subscription(
             cfg, prov_path=tmp_path / "prov.jsonl", repo_root=REPO, log=lambda _m: None
         )
         record = backend.invocation_record()

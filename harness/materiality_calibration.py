@@ -251,12 +251,12 @@ def decide(precision, recall_escapes, reviewed: bool) -> tuple[str, str]:
 # The run (touches the harness: judge, classifier, native confusion matrix)
 # ─────────────────────────────────────────────────────────────────────────────
 def _build_judge():
-    """Return (config, judge): the pinned, non-drafter judge over the OAI transport (E1)."""
-    from harness.judge import resolve_judge_config, Judge
-    from harness.provenance import ProvenanceLog
+    """Return (config, judge): the pinned, non-drafter judge on the openai-compatible route (E1)."""
+    from harness.judge import resolve_judge_config
+    from harness.judge_factory import ROUTE_OPENAI_COMPATIBLE, build_judge
     cfg = resolve_judge_config()
     prov_path = _out_dir() / "provenance_materiality_calibration.jsonl"
-    judge = Judge(cfg, provenance_log=ProvenanceLog(prov_path))
+    judge, _wrapper = build_judge(ROUTE_OPENAI_COMPATIBLE, cfg, prov_path=prov_path)
     return cfg, judge
 
 

@@ -73,7 +73,7 @@ unbiased grader of its own pipeline).
 | Never a runtime gate / advisory-to-human | `report.py` — `HarnessReport(advisory=True, blocking=False)` cannot be constructed otherwise; no method returns a scheduler-consumable gate result |
 | `harness` never becomes a runtime dependency | one-way import: `harness → runner` only; `tests/harness/test_boundary.py` asserts `runner`, `tools/` and `scripts/` never import `harness`. The judge runners (E1.5 calibration, E4 grounding freeze, E5f rubric grading) therefore live in `harness/commands/` and run as `py -3.10 -m harness.commands.<name>` |
 | Deterministic-first routing | `routing.py` — a property named by a deterministic `PREDICATE_REGISTRY` function is refused for judging (`assert_judgeable` raises `DeterministicCoverageError`) |
-| Grader–generator independence | `judge.py` — `JudgeConfig` rejects any drafter/in-run model, in any Bedrock id form; the default backend rejects the `claude_cli` transport, forcing the OpenAI-compatible path |
+| Grader–generator independence | `judge_factory.INDEPENDENCE_POLICY` — one row per route (`openai-compatible`, `bedrock-converse`, `claude-cli`) stating which kinds of independence hold and what the route requires. `judge_factory.build_judge` is the only place a judge gets a production backend: it re-applies the `JudgeConfig` drafter-model guard (any Bedrock id form) on every route, refuses an environment that resolves to another route, naming both, and applies the route's row. `Judge` has no default backend |
 | Pin + determinism | `judge.py` — model + version pinned, temperature forced to 0; both recorded on every provenance record |
 | No silent repair | `judge.py` — a malformed/empty judge response raises `JudgeResponseError`; the judge never guesses a verdict |
 | Provenance for every verdict | `judge.py` builds a `ProvenanceRecord` for every `Verdict` and appends it to the attached `ProvenanceLog` before returning |
@@ -367,15 +367,24 @@ refuses the former and permits the latter.
 
 - **Model + version pinned**, temperature 0 (`JudgeConfig`). A repin re-opens
   E1.5's advisory-only state, so both are logged on every verdict.
-- **Non-drafter** model, over the **OpenAI-compatible transport** — never the
-  `claude_cli` drafter transport. Independence is checked at both the config
-  layer (model) and the backend layer (transport).
+- **Non-drafter** model on every route. A command names a route and
+  `judge_factory.build_judge` builds it; the route's row of
+  `judge_factory.INDEPENDENCE_POLICY` states which kinds of independence hold:
+
+  | Route | Environment must resolve to | Wrapper | Also requires | Transport / vendor independence |
+  |---|---|---|---|---|
+  | `openai-compatible` | an OpenAI-compatible backend (`openai_compatible`, `bedrock`, `together_ai`, `ollama`) | paced and retrying | — | transport holds; vendor not checked |
+  | `bedrock-converse` | `bedrock_converse` | retrying, not paced | version tag naming the route | neither holds (shared provider; AN1c) |
+  | `claude-cli` | `claude_cli` | the CLI backend's own retry | Claude pin, version tag naming the route, no tools (`--tools "" --strict-mcp-config`), fresh working directory outside the repository | neither holds (`commands/_subscription_judge.py`) |
+
+  A mismatch between the route and the environment is refused, naming both; no
+  route is inferred. Blind assessment takes the route from `--transport`; the
+  other commands use `openai-compatible`.
 - Configured from `HARNESS_JUDGE_MODEL` / `HARNESS_JUDGE_VERSION` (see
-  `resolve_judge_config`), pointed at a non-Claude backend via the standard
-  `ORCHESTRATOR_TRANSPORT_*` variables (e.g. a `together_ai` or
-  `openai_compatible` preset). The judge is **injectable** — pass a backend
-  callable and no network/`httpx` is touched, which is how the substrate is
-  unit-tested offline.
+  `resolve_judge_config`), with the transport from the standard
+  `ORCHESTRATOR_TRANSPORT_*` variables. `Judge` never builds a backend: it is
+  given one, so a test passes a scripted backend and no network/`httpx` is
+  touched.
 
 ## N≥3 majority scaffold
 
