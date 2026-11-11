@@ -1273,3 +1273,36 @@ class TestSubmittedDocumentWording:
         assert "sanitised derivative of the assessed document" in data["score_comparison"]["statement"]
         note = data["rows"][0]["historical_proposal_evidence"]["note"]
         assert note.startswith("The submitted document is not available in this environment; the ")
+
+
+DN_ORIGINAL_ESR = REPO / "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-original-esr.json"
+SUCCESSOR_FIELDS = {
+    "artifact_purpose", "ticket", "intake_id", "supersedes", "supersedes_sha256", "supersession_note",
+}
+
+
+class TestTheOriginalIntakeSuccessor:
+    """The V14 compare binds the ESR to the submitted original's intake (operator, 2026-11-11).
+
+    The PE-08 record stays as written, because the committed comparisons bind its bytes.
+    """
+
+    def test_the_successor_loads_and_names_the_originals_intake(self):
+        esr = ec.load_esr_record(DN_ORIGINAL_ESR)
+        assert esr.data["intake_id"] == "msca-dn-2025-original"
+
+    def test_the_successor_binds_the_predecessors_bytes(self):
+        data = json.loads(DN_ORIGINAL_ESR.read_bytes())
+        assert data["supersedes"] == DN_ESR.relative_to(REPO).as_posix()
+        assert data["supersedes_sha256"] == ec.load_esr_record(DN_ESR).sha256
+
+    def test_the_predecessor_is_unchanged(self):
+        esr = ec.load_esr_record(DN_ESR)
+        assert esr.data["intake_id"] == "msca-dn-2025-sanitised-v1"
+        assert esr.sha256 == "2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb"
+
+    def test_only_the_declared_fields_differ(self):
+        old = json.loads(DN_ESR.read_bytes())
+        new = json.loads(DN_ORIGINAL_ESR.read_bytes())
+        assert {k for k in old.keys() | new.keys() if old.get(k) != new.get(k)} == SUCCESSOR_FIELDS
+        assert ec.load_esr_record(DN_ORIGINAL_ESR).criterion_scores == ec.load_esr_record(DN_ESR).criterion_scores

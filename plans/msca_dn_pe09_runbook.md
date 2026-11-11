@@ -563,8 +563,14 @@ The audit names the import manifest explicitly, for the same reason the prefligh
 the report states that the grounding cause is Unresolved and borrows no other document's reason.
 
 ```
-py -3.10 -m harness.commands.blind_assessment compare --baseline-dir <private baseline dir> --esr docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-esr.json --dispositions <private dispositions, schema 1.2> --candidate <materialised candidate dir> --register <private register> --audit <private audit report> --profile harness/profiles/msca_dn_2025_historical.json --out-dir <private comparisons dir>
+py -3.10 -m harness.commands.blind_assessment compare --baseline-dir <private baseline dir> --esr docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-original-esr.json --dispositions <private dispositions, schema 1.2> --candidate <materialised candidate dir> --register <private register> --audit <private audit report> --profile harness/profiles/msca_dn_2025_historical.json --out-dir <private comparisons dir>
 ```
+
+The ESR record is the successor bound to intake `msca-dn-2025-original`. `compare` refuses an ESR
+record whose intake differs from the baseline's, so the PE-08 record, bound to the out-of-scope
+`msca-dn-2025-sanitised-v1`, cannot serve here. The private dispositions bind the successor's sha256 in
+`esr_record_sha256`. The approved template below binds the predecessor's, so copy its rows, not that
+field.
 
 The dispositions are written privately, one row per ESR observation, under schema `1.2`. Register
 pointers resolve by identity, and every miss declares its failure mode. A Confirmed preservation

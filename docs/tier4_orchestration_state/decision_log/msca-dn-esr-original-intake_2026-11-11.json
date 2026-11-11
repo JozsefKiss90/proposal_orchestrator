@@ -1,0 +1,50 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-esr-original-intake_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "docs/esr-original-successor",
+  "base_commit": "ac90a3a4",
+  "milestone": "MSCA-DN historical validation, before the O5 re-freeze (V14 compare path)",
+  "authority": "Operator, in session 2026-11-11. Recorded under CLAUDE.md §9.4. Closes no gate, adds no runtime gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The operator decided that msca-dn-2025-sanitised-v1 is out of scope and is not needed further down the pipeline. The agent chose the successor-record route and drafted this record.",
+  "decision": "The V14 compare uses a successor ESR record bound to intake msca-dn-2025-original. The PE-08 ESR record stays as written.",
+  "rules": [
+    {
+      "id": "E1",
+      "rule": "Intake msca-dn-2025-sanitised-v1 is out of scope. No V14, V15 or V16 step uses it.",
+      "declared_status": "Confirmed",
+      "basis": "Operator statement in session, 2026-11-11. It follows D1 of plan-order-reliability_2026-11-11: no derivative is produced and the original is assessed privately."
+    },
+    {
+      "id": "E2",
+      "rule": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-original-esr.json is the ESR record for the V14 compare. It differs from the PE-08 record only in artifact_purpose, ticket and intake_id, and in three added fields: supersedes, supersedes_sha256 and supersession_note. The source, authorship, declared status, evaluation result, clusters and observations are the predecessor's, value for value.",
+      "declared_status": "Confirmed",
+      "basis": "tests/harness/test_esr_comparison.py, TestTheOriginalIntakeSuccessor. The successor was derived by replacing three header lines of the predecessor's bytes and inserting three, so every other line is byte-identical."
+    },
+    {
+      "id": "E3",
+      "rule": "The PE-08 record msca-dn-2025-esr.json is not edited. Its intake stays msca-dn-2025-sanitised-v1 and its sha256 stays 2c880e6cbe5a40c8411671214dfa759f894a882271638b92e27673ff28e89bbb.",
+      "declared_status": "Confirmed",
+      "basis": "The committed PE-08 comparisons, dispositions and reviews bind those bytes and replay byte-equal. The authority matrix and the deferral register cite it too. TestTheOriginalIntakeSuccessor pins the hash."
+    },
+    {
+      "id": "E4",
+      "rule": "The runbook's compare line names the successor. The private V14 dispositions bind the successor's sha256 in esr_record_sha256. The approved public dispositions remain the template for rows only, because they bind the predecessor's sha256.",
+      "declared_status": "Confirmed",
+      "basis": "plans/msca_dn_pe09_runbook.md, the compare step. harness/esr_comparison.py refuses dispositions whose esr_record_sha256 differs from the ESR record's, and an ESR record whose intake_id differs from the baseline's."
+    }
+  ],
+  "resolves": "The V14 compare refusal found 2026-11-11: run_comparison refuses the PE-08 ESR record against a baseline assessed under --intake msca-dn-2025-original, because the record names msca-dn-2025-sanitised-v1.",
+  "known_gaps": [
+    {
+      "declared_status": "Unresolved",
+      "gap": "The full suite and the acceptance lane have not been run on this branch. Only targeted tests ran. Both are the operator's after merge."
+    },
+    {
+      "declared_status": "Assumed",
+      "gap": "The sanitised intake record and the committed artifacts that name it stay in the tree as history. Nothing downstream reads them for V14 to V16. Removing them would break the byte-equal replays, so they are left in place."
+    }
+  ],
+  "private_content": "None. The ESR text is already public in the predecessor; this record names ids, paths and hashes only."
+}
