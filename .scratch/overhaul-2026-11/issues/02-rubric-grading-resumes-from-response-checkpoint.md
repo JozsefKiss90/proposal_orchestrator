@@ -1,6 +1,6 @@
 # 02 — Rubric grading resumes from the response checkpoint, bound to content
 
-Status: needs-triage
+Status: in-progress
 Type: task
 Blocked by: 01, 03
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate C. Grill skipped by the
@@ -47,25 +47,25 @@ binding includes a content hash of the graded sections. The pickle checkpoint is
 
 Failing tests first:
 
-- [ ] A section's content is replaced after a partial run, then resumed: the resume is refused, naming the candidate hash as checkpoint vs current.
-- [ ] A section is added or removed between runs: the resume is refused in the same way.
-- [ ] An interrupted run, resumed: every already-drawn response is replayed (zero live draws for them) and the finished grid equals an uninterrupted run's.
-- [ ] A daily budget stop, then a resume: the run continues from the first undrawn call.
-- [ ] A blind-assessment checkpoint header written before this change still opens, resumes, and reports no binding differences.
-- [ ] No pickle is written anywhere by rubric grading.
+- [x] A section's content is replaced after a partial run, then resumed: the resume is refused, naming the candidate hash as checkpoint vs current.
+- [x] A section is added or removed between runs: the resume is refused in the same way.
+- [x] An interrupted run, resumed: every already-drawn response is replayed (zero live draws for them) and the finished grid equals an uninterrupted run's.
+- [x] A daily budget stop, then a resume: the run continues from the first undrawn call.
+- [x] A blind-assessment checkpoint header written before this change still opens, resumes, and reports no binding differences.
+- [x] No pickle is written anywhere by rubric grading.
 
 Then:
 
-- [ ] The rubric report and frozen rubric baseline carry the candidate hash and replayed / live draw counts; a baseline frozen before this change still loads.
-- [ ] `--plan-only` budget accounting is unchanged.
-- [ ] The module docstring and `harness/HARNESS.md` describe the new resume rule.
+- [x] The rubric report and frozen rubric baseline carry the candidate hash and replayed / live draw counts; a baseline frozen before this change still loads.
+- [x] `--plan-only` budget accounting is unchanged.
+- [x] The module docstring and `harness/HARNESS.md` describe the new resume rule.
 - [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] `code-review` run since the base commit, with no gaps on the spec axis.
 
 ## Session brief
 
 ```
-Ticket: .scratch/overhaul-2026-11/issues/02-rubric-grading-resumes-from-response-checkpoint.md   Base commit: <sha at start>
+Ticket: .scratch/overhaul-2026-11/issues/02-rubric-grading-resumes-from-response-checkpoint.md   Base commit: 69995f1e
 Read first: CLAUDE.md §16–17, CONTEXT-MAP.md (+ harness/CONTEXT.md), docs/agents/*.md,
             plans/overhaul/BASELINE.md, issue 01 (landed)
 Seam: the response checkpoint binding (additive fields) — rubric grading's resume moves onto it
@@ -81,3 +81,5 @@ Admission rule 5: does not apply (no blind_*/evidence_*/execution_receipt/anonym
 
 - Deferred at Step 3 (2026-11-06): rubric lane, off the V14/V16 path (W03 §4). Still blocked by 01.
 - Wave 2c (2026-11-06): also after 03, because both edit rubric grading (collision edge, not a functional dependency).
+- 2026-11-11, base 69995f1e (branch `ticket/02-rubric-resume-checkpoint`): targeted 40 modules (every test module importing `harness.response_cache`, `harness.rubric`, `harness.regression` or `harness.commands`): 1,902 passed, 1 failed, 6 skipped; the failure is the BASELINE §5 id `tests/test_demo_candidate_blind_baseline.py::TestTheReportsNumbersAreTheArtifactsOwn::test_the_leakage_scan_file_count_is_re_derivable`. PE-09 acceptance lane run from the worktree (the binding's header form now filters empty rubric fields): GREEN, 3,662 passed, 0 failed, 17 declared exclusions. Review (standards + spec axes): glossary wording fixed (draw, short form), shared `next_checkpoint_path` reused, plan note left unchanged; no open spec gap. Judgement calls for the operator: the checkpoint is kept after a completed run (blind assessment's rule; the pickle was deleted); the judge pin is bound in the existing `assessor_pin` field; the profile version is always bound because the command always loads a profile bundle (the default one when `--profile` is absent); the report renders a `candidate: ... draws: N live, M replayed` header line only when it carries a candidate hash; the two retired pickle lines left `.gitignore`. Full suite not run.
+- 2026-11-11, operator: confirmed (1) the checkpoint is kept after a completed run; (2) the judge pin is bound in `assessor_pin`; (4) the rubric report's new header line, only with a candidate hash; (5) the separate `.harness/rubric_checkpoints/` folder; (6) the two pickle lines removed from `.gitignore`. Still open with the operator: (3) the profile version is always bound, and (7) `plans/harness_plan/tickets_eval_harness.md` line 200 still describes `--fresh` and the pickle.

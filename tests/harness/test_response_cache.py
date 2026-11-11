@@ -32,6 +32,7 @@ import pytest
 
 import harness.criterion_scoring as cs
 import harness.grounding_scope as gs
+from harness.content_hash import file_hash
 from harness.judge import Judge, JudgeConfig, JudgeError, JudgeResponseError
 from harness.provenance import ProvenanceLog, prompt_hash
 from harness.response_cache import (
@@ -959,3 +960,88 @@ class TestAResumeIsHonest:
         )
         assert code == 2 and backend.calls == 0
         assert "max_tokens: checkpoint 2048 != this run 4096" in capsys.readouterr().err
+
+
+# --------------------------------------------------------------------------- #
+# Ticket 02: the rubric fields are additive; blind checkpoints are unchanged
+# --------------------------------------------------------------------------- #
+
+#: A blind-assessment binding exactly as headers were written before ticket 02
+#: (the shape of every DN run's checkpoint): nine fields, no rubric fields.
+PRE_TICKET_02_BINDING = {
+    "candidate_hash": BINDING.candidate_hash,
+    "profile_version": BINDING.profile_version,
+    "assessor_pin": BINDING.assessor_pin,
+    "preflight_pack_set_hash": BINDING.preflight_pack_set_hash,
+    "include_claims": BINDING.include_claims,
+    "n": BINDING.n,
+    "criterion_samples": BINDING.criterion_samples,
+    "temperature": BINDING.temperature,
+    "max_tokens": BINDING.max_tokens,
+}
+
+
+class TestRubricFieldsAreAdditive:
+    def test_a_blind_header_written_before_this_change_opens_resumes_and_moves_nothing(
+        self, tmp_path
+    ):
+        response = '{"passed": true, "rationale": "recorded before ticket 02"}'
+        path = tmp_path / "ck.jsonl"
+        path.write_text(
+            json.dumps(
+                {
+                    "record_type": CHECKPOINT_HEADER_RECORD_TYPE,
+                    "format_version": CHECKPOINT_FORMAT_VERSION,
+                    "opened_at": FROZEN,
+                    "binding": PRE_TICKET_02_BINDING,
+                }
+            )
+            + "\n"
+            + json.dumps(
+                {
+                    "record_type": "harness.assessor_response",
+                    "prompt_hash": prompt_hash("system", "user"),
+                    "at": FROZEN,
+                    "chars": len(response),
+                    "sha256": file_hash(response.encode("utf-8")),
+                    "response": response,
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        assert CacheBinding.from_dict(PRE_TICKET_02_BINDING).differences(BINDING) == []
+        resumed = ResponseCache(path, BINDING, resume=True, clock=lambda: FROZEN)
+        backend = CountingBackend("must not be asked")
+        assert _judge(tmp_path, backend, resumed)._send("system", "user") == response
+        assert backend.calls == 0 and resumed.replayed == 1
+
+    def test_a_blind_header_written_after_this_change_has_the_same_shape(self):
+        assert BINDING.to_dict() == PRE_TICKET_02_BINDING
+
+    def test_a_rubric_binding_records_its_fields_and_refuses_a_blind_resume(self, tmp_path):
+        rubric = CacheBinding(
+            candidate_hash=BINDING.candidate_hash,
+            assessor_pin=BINDING.assessor_pin,
+            n=3,
+            temperature=0.0,
+            max_tokens=2048,
+            rubric_set_fingerprint="sha256:" + "d" * 64,
+            pack_token_budget=4000,
+            span_budget_fraction=0.6,
+        )
+        recorded = rubric.to_dict()
+        assert recorded["rubric_set_fingerprint"] == "sha256:" + "d" * 64
+        assert recorded["pack_token_budget"] == 4000
+        assert recorded["span_budget_fraction"] == 0.6
+        assert CacheBinding.from_dict(recorded) == rubric
+
+        path = tmp_path / "ck.jsonl"
+        ResponseCache(path, rubric, clock=lambda: FROZEN)
+        blind = CacheBinding(**{**PRE_TICKET_02_BINDING, "n": 3})
+        with pytest.raises(ResponseCacheError) as refusal:
+            ResponseCache(path, blind, resume=True)
+        message = str(refusal.value)
+        for field in ("rubric_set_fingerprint", "pack_token_budget", "span_budget_fraction"):
+            assert f"{field}: checkpoint" in message

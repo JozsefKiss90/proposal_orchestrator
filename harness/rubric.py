@@ -680,6 +680,12 @@ class RubricReport:
     travel separately into :meth:`to_dict` and the renderer, because a blend
     would average away exactly the contradiction cell this report exists to
     surface.
+
+    ``candidate_hash``, ``replayed_calls`` and ``live_calls`` say what was
+    graded and how its draws were obtained (ticket 02): the content hash of the
+    section artifacts in the grid, and how many judge draws were replayed from a
+    resumed response checkpoint rather than drawn live.  A report built without
+    a checkpoint leaves them empty (``""`` / ``None``).
     """
 
     cells: tuple[ExpectationCell, ...]
@@ -694,6 +700,9 @@ class RubricReport:
     judge_version: str | None = None
     spine_source: str = ""
     notes: str = ""
+    candidate_hash: str = ""
+    replayed_calls: int | None = None
+    live_calls: int | None = None
     advisory: bool = True
     blocking: bool = False
 
@@ -748,6 +757,9 @@ class RubricReport:
             "judge_version": self.judge_version,
             "spine_source": self.spine_source,
             "notes": self.notes,
+            "candidate_hash": self.candidate_hash,
+            "replayed_calls": self.replayed_calls,
+            "live_calls": self.live_calls,
             "summary": self.summary,
             "cells": [c.to_dict() for c in self.cells],
         }
@@ -770,8 +782,16 @@ def build_rubric_report(
     judge_version: str | None = None,
     spine_source: str = "",
     notes: str = _ADVISORY_NOTE,
+    candidate_hash: str = "",
+    replayed_calls: int | None = None,
+    live_calls: int | None = None,
 ) -> RubricReport:
-    """Assemble the :class:`RubricReport`, pinned to its rubric set, profile and judge."""
+    """Assemble the :class:`RubricReport`, pinned to its rubric set, profile and judge.
+
+    *candidate_hash* and the draw counts come from the run's response
+    checkpoint (:mod:`harness.commands.rubric_grading_run`); they stay empty
+    when the grid was graded without one.
+    """
     return RubricReport(
         cells=tuple(cells),
         rubric_set_id=rubric_set.rubric_set_id if rubric_set else "",
@@ -785,6 +805,9 @@ def build_rubric_report(
         judge_version=judge_version,
         spine_source=spine_source,
         notes=notes,
+        candidate_hash=candidate_hash,
+        replayed_calls=replayed_calls,
+        live_calls=live_calls,
     )
 
 
@@ -847,6 +870,16 @@ def render_report(report: Mapping[str, Any]) -> str:
         f"[{short_hash(str(report.get('profile_version') or ''), keep_prefix=True)}]\n"
         f"advisory={report.get('advisory')} blocking={report.get('blocking')}\n"
     )
+    if report.get("candidate_hash"):
+        # Only a report graded under a response checkpoint carries these; an
+        # older report renders exactly as before.
+        header += (
+            f"candidate: [{short_hash(str(report['candidate_hash']), keep_prefix=True)}]  "
+            f"draws: {report.get('live_calls')} live, "
+            f"{report.get('replayed_calls')} replayed"
+            + (" [NOT a fresh draw]" if report.get("replayed_calls") else "")
+            + "\n"
+        )
 
     rows: list[tuple[str, str, str, str, str]] = [
         ("expectation", "section", "coverage", "grounding", "cell")

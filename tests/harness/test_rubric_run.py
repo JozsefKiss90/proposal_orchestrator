@@ -6,13 +6,15 @@ Everything runs offline with the injectable fake backend: the budget plan is
 deterministic arithmetic, the grading loop is exercised end-to-end (coverage +
 grounding + combine) against a synthetic mini-repo, and resume is proven by
 counting backend calls — a resumed run must re-spend nothing that the
-checkpoint already holds.
+checkpoint already holds.  Resume runs on the response checkpoint
+(``harness.response_cache``), bound to the content of the graded sections
+(ticket 02): a resume replays every recorded draw through the same code and
+rebuilds the cells and the claim verdict cache in memory.
 """
 
 from __future__ import annotations
 
 import json
-import pickle
 from pathlib import Path
 
 import pytest
@@ -22,6 +24,7 @@ import harness.rubric as hr
 import harness.commands.rubric_grading_run as run
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
+from harness.response_cache import ResponseCacheError
 from harness.rubrics import Rubric, RubricSet
 from runner.working_assumptions import WorkingAssumptions
 
@@ -107,16 +110,22 @@ def mini_repo(tmp_path: Path) -> Path:
 
 
 class CountingBackend:
-    """A fake backend that can be armed to fail after a number of calls."""
+    """A fake backend that can be armed to fail after a number of calls.
+
+    It keeps every prompt it was sent, so a test can name the first call a
+    resumed run spent live.
+    """
 
     def __init__(self, fail_after: int | None = None):
         self.calls = 0
         self.fail_after = fail_after
+        self.prompts: list[tuple[str, str]] = []
 
     def __call__(self, messages):
         self.calls += 1
         if self.fail_after is not None and self.calls > self.fail_after:
             raise RuntimeError("simulated transport failure (daily cap)")
+        self.prompts.append((messages[0]["content"], messages[1]["content"]))
         return {"content": PASS_JSON}
 
 
@@ -145,10 +154,34 @@ def grade(judge, tmp_path, root, *, checkpoint=None, rubrics=TWO_RUBRICS, **kw):
         EMPTY_SPINE,
         repo_root=root,
         working_assumptions=EMPTY_WA,
-        checkpoint_path=checkpoint or (tmp_path / "ckpt.pkl"),
+        checkpoint_path=checkpoint or (tmp_path / "ckpt.jsonl"),
         log=lambda _: None,
         **kw,
     )
+
+
+def without_replay_marks(value):
+    """*value* with every provenance ``replayed`` mark removed.
+
+    A replayed draw is the same response as the live one, parsed by the same
+    code; the only thing a resumed grid may differ in is that it says so.
+    """
+    if isinstance(value, dict):
+        return {k: without_replay_marks(v) for k, v in value.items() if k != "replayed"}
+    if isinstance(value, list):
+        return [without_replay_marks(v) for v in value]
+    return value
+
+
+def grid(cells) -> list:
+    return without_replay_marks([c.to_dict() for c in cells])
+
+
+def replace_section_content(root: Path, name: str, text: str) -> None:
+    path = root / "docs/tier5_deliverables/proposal_sections" / f"{name}.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["sub_sections"][0]["content"] = text
+    path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
 # --------------------------------------------------------------------------- #
@@ -200,40 +233,228 @@ class TestBudgetPlan:
 
 
 # --------------------------------------------------------------------------- #
-# Checkpoint
+# Resume — the response checkpoint, bound to the graded content (ticket 02)
 # --------------------------------------------------------------------------- #
 
 
-class TestCheckpoint:
-    META = {"judge_pin": "fake-judge@pin-1", "n": 3}
+class TestResumeIsBoundToContent:
+    def test_replaced_section_content_refuses_the_resume_naming_the_candidate_hash(
+        self, tmp_path
+    ):
+        root = mini_repo(tmp_path)
+        ckpt = tmp_path / "ckpt.jsonl"
+        with pytest.raises(RuntimeError, match="simulated"):
+            grade(make_judge(tmp_path, CountingBackend(fail_after=4)), tmp_path, root,
+                  checkpoint=ckpt)
+        before = run.grid_candidate_hash(rubric_set(*TWO_RUBRICS), repo_root=root)
 
-    def test_round_trip(self, tmp_path):
-        p = tmp_path / "ckpt.pkl"
-        run.save_checkpoint(p, self.META, {"k": "cell"}, {("a", "b", "c"): "finding"})
-        cells, cache = run.load_checkpoint(p, self.META, log=lambda _: None)
-        assert cells == {"k": "cell"}
-        assert cache == {("a", "b", "c"): "finding"}
+        replace_section_content(root, "excellence_section", "Rewritten after the run.")
+        after = run.grid_candidate_hash(rubric_set(*TWO_RUBRICS), repo_root=root)
+        assert before != after
 
-    def test_absent_checkpoint_is_a_fresh_start(self, tmp_path):
-        cells, cache = run.load_checkpoint(tmp_path / "none.pkl", self.META)
-        assert cells == {} and cache == {}
+        resumed = CountingBackend()
+        with pytest.raises(ResponseCacheError) as refusal:
+            grade(make_judge(tmp_path, resumed), tmp_path, root, checkpoint=ckpt,
+                  resume=True)
+        message = str(refusal.value)
+        assert f"candidate_hash: checkpoint {before!r} != this run {after!r}" in message
+        assert resumed.calls == 0
 
-    def test_meta_mismatch_refuses_to_resume(self, tmp_path):
-        p = tmp_path / "ckpt.pkl"
-        run.save_checkpoint(p, self.META, {}, {})
-        with pytest.raises(SystemExit, match="different run parameters"):
-            run.load_checkpoint(p, {**self.META, "n": 1}, log=lambda _: None)
+    @pytest.mark.parametrize(
+        "resumed_rubrics",
+        [
+            pytest.param(
+                TWO_RUBRICS + (make_rubric("impl-plan", "implementation"),), id="added"
+            ),
+            pytest.param(TWO_RUBRICS[:1], id="removed"),
+        ],
+    )
+    def test_an_added_or_removed_section_refuses_the_resume_the_same_way(
+        self, tmp_path, resumed_rubrics
+    ):
+        root = mini_repo(tmp_path)
+        ckpt = tmp_path / "ckpt.jsonl"
+        grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt)
+        before = run.grid_candidate_hash(rubric_set(*TWO_RUBRICS), repo_root=root)
+        after = run.grid_candidate_hash(rubric_set(*resumed_rubrics), repo_root=root)
+        assert before != after
 
-    def test_corrupt_checkpoint_fails_closed(self, tmp_path):
-        p = tmp_path / "ckpt.pkl"
-        p.write_bytes(b"not a pickle")
-        with pytest.raises(SystemExit, match="--fresh"):
-            run.load_checkpoint(p, self.META, log=lambda _: None)
+        resumed = CountingBackend()
+        with pytest.raises(ResponseCacheError) as refusal:
+            grade(make_judge(tmp_path, resumed), tmp_path, root, checkpoint=ckpt,
+                  rubrics=resumed_rubrics, resume=True)
+        assert f"candidate_hash: checkpoint {before!r} != this run {after!r}" in str(
+            refusal.value
+        )
+        assert resumed.calls == 0
+
+    def test_the_candidate_hash_is_the_one_blind_assessment_uses(self, tmp_path):
+        from harness.blind_assessment import Candidate, candidate_hash
+
+        root = mini_repo(tmp_path)
+        sections = root / "docs/tier5_deliverables/proposal_sections"
+        contents = {
+            name: json.loads((sections / f"{name}.json").read_text(encoding="utf-8"))
+            for name in ("excellence_section", "impact_section")
+        }
+        candidate = Candidate(root=sections, sections={}, contents=contents, missing=())
+        assert run.grid_candidate_hash(
+            rubric_set(*TWO_RUBRICS), repo_root=root
+        ) == candidate_hash(candidate)
+
+    @pytest.mark.parametrize(
+        "moved, field",
+        [
+            ({"token_budget": 500}, "pack_token_budget"),
+            ({"span_budget_fraction": 0.5}, "span_budget_fraction"),
+            ({"n": 5}, "n"),
+            ({"profile_version": "sha256:" + "f" * 64}, "profile_version"),
+        ],
+        ids=["token_budget", "span_budget_fraction", "n", "profile_version"],
+    )
+    def test_a_moved_run_parameter_refuses_the_resume(self, tmp_path, moved, field):
+        root = mini_repo(tmp_path)
+        ckpt = tmp_path / "ckpt.jsonl"
+        grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt)
+        with pytest.raises(ResponseCacheError, match=f"(?m)^  - {field}: checkpoint"):
+            grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt,
+                  resume=True, **moved)
+
+    def test_a_moved_rubric_set_refuses_the_resume(self, tmp_path):
+        root = mini_repo(tmp_path)
+        ckpt = tmp_path / "ckpt.jsonl"
+        grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt)
+        reworded = (
+            TWO_RUBRICS[0],
+            Rubric(**{**TWO_RUBRICS[1].__dict__, "rubric": "Reworded rubric."}),
+        )
+        with pytest.raises(ResponseCacheError, match="rubric_set_fingerprint"):
+            grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt,
+                  rubrics=reworded, resume=True)
+
+    def test_a_moved_judge_pin_refuses_the_resume(self, tmp_path):
+        root = mini_repo(tmp_path)
+        ckpt = tmp_path / "ckpt.jsonl"
+        grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt)
+        other = Judge(
+            JudgeConfig(model="fake-judge", version="pin-2"),
+            backend=CountingBackend(),
+            provenance_log=ProvenanceLog(tmp_path / "provenance.jsonl"),
+        )
+        with pytest.raises(ResponseCacheError, match="assessor_pin"):
+            grade(other, tmp_path, root, checkpoint=ckpt, resume=True)
 
 
-# --------------------------------------------------------------------------- #
-# The grading loop — end-to-end offline, resume proven by call counting
-# --------------------------------------------------------------------------- #
+class TestResumeReplays:
+    def test_an_interrupted_run_replays_every_drawn_response_and_matches_an_uninterrupted_one(
+        self, tmp_path
+    ):
+        root = mini_repo(tmp_path)
+        uninterrupted = grade(
+            make_judge(tmp_path, CountingBackend()), tmp_path, root,
+            checkpoint=tmp_path / "whole.jsonl",
+        )
+
+        # Interrupted one call into the second cell's coverage samples.
+        drawn = FIRST_CELL_CALLS + 1
+        ckpt = tmp_path / "ckpt.jsonl"
+        with pytest.raises(RuntimeError, match="simulated"):
+            grade(make_judge(tmp_path, CountingBackend(fail_after=drawn)), tmp_path, root,
+                  checkpoint=ckpt)
+
+        resumed_backend = CountingBackend()
+        judge = make_judge(tmp_path, resumed_backend)
+        cells = grade(judge, tmp_path, root, checkpoint=ckpt, resume=True)
+
+        stats = judge.response_cache.stats()
+        assert stats["replayed_calls"] == drawn
+        assert stats["live_calls"] == FIRST_CELL_CALLS + SECOND_CELL_CALLS - drawn
+        assert resumed_backend.calls == stats["live_calls"]
+        assert stats["unreplayed_calls"] == 0
+        assert grid(cells) == grid(uninterrupted)
+        # The verdict cache was rebuilt by the replay: the second cell's
+        # grounding still came entirely from it.
+        assert all(r.verdict_source == "cache" for r in cells[1].grounding.rows)
+
+    def test_a_budget_stop_then_a_resume_continues_from_the_first_undrawn_call(
+        self, tmp_path
+    ):
+        root = mini_repo(tmp_path)
+        reference = CountingBackend()
+        grade(make_judge(tmp_path, reference), tmp_path, root,
+              checkpoint=tmp_path / "whole.jsonl")
+
+        ckpt = tmp_path / "ckpt.jsonl"
+        stopped = CountingBackend()
+        with pytest.raises(run.BudgetStop, match="daily stop"):
+            grade(make_judge(tmp_path, stopped), tmp_path, root, checkpoint=ckpt,
+                  tokens_spent=lambda: stopped.calls * 100,
+                  tpd_stop=FIRST_CELL_CALLS * 100)
+        assert stopped.calls == FIRST_CELL_CALLS  # paused between cells
+
+        resumed = CountingBackend()
+        judge = make_judge(tmp_path, resumed)
+        cells = grade(judge, tmp_path, root, checkpoint=ckpt, resume=True,
+                      tokens_spent=lambda: resumed.calls * 100,
+                      tpd_stop=FIRST_CELL_CALLS * 100)
+        assert len(cells) == 2
+        assert resumed.calls == SECOND_CELL_CALLS
+        assert resumed.prompts[0] == reference.prompts[FIRST_CELL_CALLS]
+        assert judge.response_cache.stats()["replayed_calls"] == FIRST_CELL_CALLS
+
+    def test_no_pickle_is_written_anywhere(self, tmp_path):
+        root = mini_repo(tmp_path)
+        ckpt = tmp_path / "ckpts" / "ckpt.jsonl"
+        with pytest.raises(RuntimeError, match="simulated"):
+            grade(make_judge(tmp_path, CountingBackend(fail_after=4)), tmp_path, root,
+                  checkpoint=ckpt)
+        grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt,
+              resume=True)
+        written = [p for p in tmp_path.rglob("*") if p.is_file()]
+        assert not [p for p in written if p.suffix in (".pkl", ".pickle", ".tmp")]
+        assert ckpt.is_file()
+        source = Path(run.__file__).read_text(encoding="utf-8")
+        assert "pickle" not in source
+        assert not hasattr(run, "save_checkpoint") and not hasattr(run, "load_checkpoint")
+
+
+class TestCheckpointFile:
+    def test_a_new_run_refuses_an_existing_file_without_resume(self, tmp_path):
+        root = mini_repo(tmp_path)
+        ckpt = tmp_path / "ckpt.jsonl"
+        grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt)
+        backend = CountingBackend()
+        with pytest.raises(ResponseCacheError, match="already exists"):
+            grade(make_judge(tmp_path, backend), tmp_path, root, checkpoint=ckpt)
+        assert backend.calls == 0
+
+    def test_resuming_a_missing_file_is_refused(self, tmp_path):
+        root = mini_repo(tmp_path)
+        with pytest.raises(ResponseCacheError, match="nothing to resume"):
+            grade(make_judge(tmp_path, CountingBackend()), tmp_path, root,
+                  checkpoint=tmp_path / "none.jsonl", resume=True)
+
+    def test_a_new_run_takes_the_next_numbered_checkpoint(self, tmp_path):
+        digest = "sha256:" + "a" * 64
+        first = run.default_checkpoint_path(tmp_path, digest)
+        assert first == (
+            tmp_path / run.DEFAULT_CHECKPOINT_DIR / "checkpoint_aaaaaaaaaaaa_0001.jsonl"
+        )
+        first.parent.mkdir(parents=True)
+        first.write_text("", encoding="utf-8")
+        assert run.default_checkpoint_path(tmp_path, digest).name == (
+            "checkpoint_aaaaaaaaaaaa_0002.jsonl"
+        )
+
+    def test_the_cli_has_no_fresh_flag_and_resume_names_a_file(self):
+        parser = run.build_parser()
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--fresh"])
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--checkpoint", "a.jsonl", "--resume", "b.jsonl"])
+        assert parser.parse_args(["--resume", "b.jsonl"]).resume == "b.jsonl"
+        assert parser.parse_args([]).checkpoint is None
+        assert not hasattr(run, "DEFAULT_CHECKPOINT_PATH")
 
 
 class TestRunGrading:
@@ -258,64 +479,75 @@ class TestRunGrading:
         assert report.summary["cells"] == 2
         hr.render_report(report.to_dict())  # renders without raising
 
-    def test_failure_checkpoints_and_resume_respends_nothing(self, tmp_path):
-        root = mini_repo(tmp_path)
-        ckpt = tmp_path / "ckpt.pkl"
-
-        # Fail during the second cell's coverage grading.
-        failing = CountingBackend(fail_after=FIRST_CELL_CALLS)
-        with pytest.raises(RuntimeError, match="simulated"):
-            grade(make_judge(tmp_path, failing), tmp_path, root, checkpoint=ckpt)
-        assert ckpt.is_file()
-        state = pickle.loads(ckpt.read_bytes())
-        assert list(state["cells"]) == ["exc-obj::excellence_section"]
-        assert len(state["verdict_cache"]) == 2  # cell 1's judged claims survive
-
-        # Resume with a healthy judge: cell 1 skipped, cell 2's grounding
-        # served from the persisted cache — only its coverage is judged.
-        resumed = CountingBackend()
-        cells = grade(make_judge(tmp_path, resumed), tmp_path, root, checkpoint=ckpt)
-        assert resumed.calls == SECOND_CELL_CALLS
-        assert len(cells) == 2
-        assert all(
-            r.verdict_source == "cache" for r in cells[1].grounding.rows
-        )
-
     def test_budget_stop_pauses_cleanly_between_cells(self, tmp_path):
         root = mini_repo(tmp_path)
-        ckpt = tmp_path / "ckpt.pkl"
+        ckpt = tmp_path / "ckpt.jsonl"
         backend = CountingBackend()
-        spent = {"tokens": 0}
-
-        def tokens_spent():
-            return spent["tokens"]
-
         with pytest.raises(run.BudgetStop, match="daily stop"):
-            spent["tokens"] = 99_999
             grade(
                 make_judge(tmp_path, backend),
                 tmp_path,
                 root,
                 checkpoint=ckpt,
-                tokens_spent=tokens_spent,
+                tokens_spent=lambda: 99_999,
                 tpd_stop=1000,
             )
         assert backend.calls == 0  # stopped before the first judge call
         assert ckpt.is_file()
 
-    def test_checkpoint_from_other_parameters_refuses(self, tmp_path):
-        root = mini_repo(tmp_path)
-        ckpt = tmp_path / "ckpt.pkl"
-        grade(make_judge(tmp_path, CountingBackend()), tmp_path, root, checkpoint=ckpt)
-        with pytest.raises(SystemExit, match="different run parameters"):
-            grade(
-                make_judge(tmp_path, CountingBackend()),
-                tmp_path,
-                root,
-                checkpoint=ckpt,
-                token_budget=500,
-            )
 
+# --------------------------------------------------------------------------- #
+# The report and the baseline carry the candidate hash and the draw counts
+# --------------------------------------------------------------------------- #
+
+
+class TestReportCarriesTheResume:
+    def test_report_and_baseline_carry_the_candidate_hash_and_draw_counts(self, tmp_path):
+        root = mini_repo(tmp_path)
+        ckpt = tmp_path / "ckpt.jsonl"
+        with pytest.raises(RuntimeError, match="simulated"):
+            grade(make_judge(tmp_path, CountingBackend(fail_after=4)), tmp_path, root,
+                  checkpoint=ckpt)
+        judge = make_judge(tmp_path, CountingBackend())
+        cells = grade(judge, tmp_path, root, checkpoint=ckpt, resume=True)
+        stats = judge.response_cache.stats()
+        digest = judge.response_cache.binding.candidate_hash
+        assert digest == run.grid_candidate_hash(rubric_set(*TWO_RUBRICS), repo_root=root)
+
+        report = hr.build_rubric_report(
+            cells,
+            judge_model="fake-judge",
+            judge_version="pin-1",
+            candidate_hash=digest,
+            replayed_calls=stats["replayed_calls"],
+            live_calls=stats["live_calls"],
+        ).to_dict()
+        assert report["candidate_hash"] == digest
+        assert report["replayed_calls"] == 4
+        assert report["live_calls"] == FIRST_CELL_CALLS + SECOND_CELL_CALLS - 4
+        rendered = hr.render_report(report)
+        assert "4 replayed" in rendered
+
+        baseline = reg.freeze_rubric_baseline(report, frozen_at="t")
+        assert baseline["candidate_hash"] == digest
+        assert baseline["replayed_calls"] == 4
+        assert baseline["live_calls"] == FIRST_CELL_CALLS + SECOND_CELL_CALLS - 4
+
+    def test_a_report_without_a_checkpoint_carries_empty_resume_fields(self):
+        report = hr.build_rubric_report((), judge_model="j", judge_version="v").to_dict()
+        assert report["candidate_hash"] == ""
+        assert report["replayed_calls"] is None and report["live_calls"] is None
+
+    def test_a_baseline_frozen_before_this_change_still_loads_and_compares(self, tmp_path):
+        old = reg.freeze_rubric_baseline(report_dict(), frozen_at="t")
+        for key in ("candidate_hash", "replayed_calls", "live_calls"):
+            old.pop(key, None)
+            old["report"].pop(key, None)
+        path = tmp_path / "old.rubric.json"
+        path.write_text(json.dumps(old), encoding="utf-8")
+        loaded = reg.load_rubric_baseline(path)
+        assert reg.compare_rubric_baseline(loaded, report_dict()).regressed is False
+        assert "replayed" not in hr.render_report(loaded["report"])
 
 # --------------------------------------------------------------------------- #
 # Rubric-lane baseline (harness.regression) — freeze / load / compare
