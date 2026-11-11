@@ -24,3 +24,16 @@
 | 03 | 2026-11-11, ~23:10 | operator | cfn-lint 1.57.2 exit 0; template guard and old-ID guard CLEAN; Python 3.10.6, `324 passed, 1 skipped`; collector plan `exit=0`, 82 commands with `--profile po-r1`, the 13 host checks "host stack outputs absent", no `get-secret-value` | `.venv-lint` was active (the prompt shows it); `py -3.10` ran the system interpreter regardless, as the first pytest line shows |
 | 04 | 2026-11-11 23:10:51 | operator | Change set `r12b-create-01`: `CREATE_COMPLETE` / `AVAILABLE`, no capabilities, tag `project`; parameter values equal `R11_fix1_05_change-set.json` (`c7i-flex.large`; the image is the same as R11's); exactly seven `Add` | none |
 | check | 2026-11-12 | agent | Every round 1 criterion PASS by script (`utf-8-sig`); plan ids all from the R4–R8 outputs files. The change set lists the seven expected additions, so the go of point 3 holds for step 06 without a further go | — |
+
+## Round 2 — steps 05–11 (first creation)
+
+| Step | UTC (approx.) | Who | Result | Deviation / error |
+|---|---|---|---|---|
+| 05 | 2026-11-11, before 23:36 | operator | Not reported. At step 09 the URL file did not exist | See step 09 |
+| 06 | 2026-11-11 23:36:41 | operator | `execute exit=0`; `CREATE_COMPLETE` (stack status 23:38); 24 events, all seven resources and the stack `CREATE_COMPLETE`, none failed; tag `project`. **Hourly charges start** | none |
+| 07 | 2026-11-11 ~23:40 | operator | `R12b_outputs.json`: seven keys, no export, seven distinct ids, none equal to R11's; `InstanceId` `i-05230b6ee9543190d` | none |
+| 08 | 2026-11-11 ~23:40 | operator | `Online`, Amazon Linux 2023, agent 3.3.5700.0, `EC2Instance` | none |
+| 09 | 2026-11-11 23:40:48 | operator | **`REFUSED: the F7 URL file cannot be read`, `exit=2`.** The collector stops before any AWS call; no `R12b_09_collector` folder; nothing collected | The URL file did not exist when the collector read it (`OSError`). Handled per point 6: no re-run, straight to step 10 |
+| 10 | 2026-11-11 23:41:23 – ~23:45 | operator | `delete exit=0`; stack does not exist (`exit=254`); no interface, instance or project volume; base stacks equal step 02. **Hourly charges end** (~9 minutes) | none |
+| 11 | 2026-11-11 ~23:47 | operator | Ran without a collector folder: `started_utc` empty, so `lookup-events` failed on `--start-time` (`ParamValidation`) and `R12b_11_converse-events.json` holds one all-null record | Invalid run, two minutes after the delete. The files stay as evidence of the deviation and support no criterion. Not reported: whether the URL file and the outside bucket were removed |
+| check | 2026-11-12 | agent | Steps 06, 07, 08 and 10 PASS by script. Steps 09 and 11 FAIL (no collection). `STEPS_fix1.md` written: the URL file is written and read by the collector's `--plan` before the stack exists; new change set `r12b-create-02`; fix-run files `R12b_fix1_*`. A second creation needs a new go (point 3 covered one) | — |
