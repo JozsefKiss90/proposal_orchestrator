@@ -1,6 +1,6 @@
 # PE-09 private-network runbook (ticket R06, corrected by V12)
 
-Date: 2026-10-08. Corrected 2026-10-13 under ticket V12.
+Date: 2026-10-08. Corrected 2026-10-13 under ticket V12. Amended 2026-11-11 under H1, the Converse delta.
 Branch: `msca-dn-pre-eval`
 Status: **preparation only. PE-09 is not executed in this repository.** Every step below runs
 inside the approved private environment, by its operator, under its rules.
@@ -21,6 +21,24 @@ exists.
 V06 is why: it made `--grounding-scope` required, and every documented command line was wrong
 until it was corrected.
 
+### The host's route (H1)
+
+The private host has one model route: native Bedrock Converse over PrivateLink. Every assessor line
+for V14 (stage A) and V16 (stage B) therefore passes `--transport bedrock-converse`.
+
+- The Region is eu-north-1. The decision is
+  `docs/tier4_orchestration_state/decision_log/aws-redeployment-od1-region-r1_2026-10-21.json`.
+- The assessor is `eu.anthropic.claude-sonnet-4-6`, an eu. inference profile. The decision is
+  `docs/tier4_orchestration_state/decision_log/aws-redeployment-od7-model-set_2026-10-21.json`.
+- The version tag is `bedrock-converse-eu-north-1@<date>`. The date is the one the operator declares
+  for the run.
+- The host's environment must resolve to `bedrock_converse`. The command refuses any other backend
+  under this flag.
+
+Never omit `--transport`. An omitted transport over an environment that resolves to Converse is
+refused before the first assessor call. The refusal exits 2 and names `--transport bedrock-converse`
+(ticket 12). No route is inferred.
+
 ## 0. What this runbook separates
 
 | Stage | Candidate | Profile | What it establishes |
@@ -40,9 +58,10 @@ Before any command runs, the private environment must hold:
 - A private clone of this repository at the revision the decision log names
   (`docs/tier4_orchestration_state/decision_log/msca-dn-operator-approval_2026-10-08.json`).
 - The environment's own rules on what may leave it (§10). This runbook invents none.
-- The operator's own evidence about the assessor: which `claude` CLI, which version, which
-  configuration, and which processing route the environment permits. A readiness receipt records it,
-  and §1.1 validates that receipt before the run.
+- The operator's own evidence about the assessor: which transport, which Region, which model pin,
+  which configuration, and which processing route the environment permits. On the host the
+  transport is `bedrock-converse`. A readiness receipt records it, and §1.1 validates that receipt
+  before the run.
 - The deferrals and validation cases in §2, each read before the stage it belongs to.
 
 Nothing from the private environment is written back into this public workspace except what §10
@@ -50,27 +69,50 @@ permits.
 
 ### 1.1 The readiness receipt
 
-The receipt is the operator's pre-run evidence. `harness/execution_receipt_template.json` is the
-form to fill in, in the private environment. It covers eight things:
+The receipt is the operator's pre-run evidence. On the host, fill in
+`harness/execution_receipt_template_bedrock_converse.json` in the private environment. It covers
+seven things:
 
 - the permitted processing and export route;
-- the `claude` CLI version, as the CLI printed it;
 - the model pin;
 - every configured setting, with whether the transport sends it;
-- the rendered argv;
+- the rendered request: model, temperature, token limit and no tool configuration;
 - the isolation verification;
 - the checkpoint path;
 - the preflight the run is bound to.
+
+`harness/execution_receipt_template.json` is the form for a `claude-cli` run. That receipt records
+the CLI version and the rendered argv in place of the rendered request. A receipt carrying a section
+its transport does not use is refused.
 
 ```
 py -3.10 -m harness.commands.execution_receipt --receipt <private receipt path> --expect-candidate <original document id> --expect-profile harness/profiles/msca_dn_2025_historical.json
 ```
 
 It exits 0 when the receipt is complete and bound to the intended Stage A pair. It exits 1 on a
-finding, and 2 when it refuses to read the receipt at all. What it refuses:
+finding, and 2 when it refuses to read the receipt at all.
+
+After the run, validate the same receipt against the run's report. The receipt must name the
+transport the report's run spoke:
+
+```
+py -3.10 -m harness.commands.execution_receipt --receipt <private receipt path> --expect-candidate <original document id> --expect-profile harness/profiles/msca_dn_2025_historical.json --report <blind report>
+```
+
+#### Where receipts live
+
+Keep every receipt outside every checkout of this repository. That covers the private clone, the
+freeze bundle and any worktree.
+
+The validator measures the receipt against the checkout it runs from, wherever it runs (ticket 13).
+It refuses a receipt inside that checkout. It does not see other checkouts. A receipt inside a
+second checkout passes this guard, and still holds private paths. The guard is the floor, and this
+rule is the operator's.
+
+What the validator refuses:
 
 - A receipt stored inside this repository. The receipt holds private paths and the operator's own
-  verification acts, so it stays in the private environment. The committed template is refused on
+  verification acts, so it stays in the private environment. The committed templates are refused on
   this rule, which is the rule working.
 - An unfilled placeholder, a missing section, a missing field and an empty one. An absent answer is
   never read as a negative answer. The template leaves `review_state` and `declared_status`
@@ -81,13 +123,16 @@ What it reports as a finding, at exit 1:
 - A receipt bound to another candidate or another profile than the pair named on the command line.
   The profile is pinned by the bytes in this tree.
 - A setting recorded as transmitted that the transport does not send, and the reverse.
-  `harness/execution_receipt.py` holds that table, derived from `runner/claude_transport.py`: the
-  pinned temperature and the judge's token limit reach no provider on this transport.
-- A claimed operating-system sandbox. There is none (§5).
+  `harness/execution_receipt.py` holds that table per transport. On `bedrock-converse` the model,
+  the temperature and the token limit are all sent. On `claude-cli` the temperature and the token
+  limit reach no provider.
+- On `bedrock-converse`, a recorded tool configuration or a recorded child process. Converse is an
+  API call and sends neither.
+- On `claude-cli`, a claimed operating-system sandbox. There is none (§5).
 - A freeze condition or a freeze record cited as the isolation evidence. The freeze reads what a
-  report declares about its invocation; verifying the invocation is this receipt's own act, and the
+  report declares about its invocation. Verifying the invocation is this receipt's own act, and the
   two are separate records.
-- A rendered argv without the empty tool list or without `--strict-mcp-config`.
+- On `claude-cli`, a rendered argv without the empty tool list or without `--strict-mcp-config`.
 - A checkpoint path that already exists, or one outside the private clone.
 - A preflight whose bytes, candidate, profile, pack set, import manifest or grounding scope are not
   the ones the receipt records. The validator reads that report rather than trusting the copy.
@@ -309,7 +354,8 @@ The importer records what it measures. Each line is a check the operator reads b
 
 Then, against the original and only there, the operator records the per-sub-section
 `fidelity_to_submitted_original` declarations the R04 drafts left Unresolved. V01 requires those
-declarations before any miss can claim Confirmed preservation.
+declarations before any miss can claim Confirmed preservation. §6 says where each one goes and what
+it must carry.
 
 The original's own register asks a different question, and its renderer is a different one (V18).
 The copy's header declares a sanitisation, a transformation and a reflow, which are the copy's
@@ -331,8 +377,11 @@ Name the import manifest explicitly. The resolver's predecessor-manifest default
 (R05 item 9).
 
 ```
-py -3.10 -m harness.commands.blind_assessment preflight --document <original document id> --graph-root <private graph root> --profile harness/profiles/msca_dn_2025_historical.json --transport claude-cli --no-claims --grounding-scope content_focused --import-manifest <private manifest path> --out-dir <private reports dir>
+py -3.10 -m harness.commands.blind_assessment preflight --document <original document id> --graph-root <private graph root> --profile harness/profiles/msca_dn_2025_historical.json --transport bedrock-converse --no-claims --grounding-scope content_focused --import-manifest <private manifest path> --out-dir <private reports dir>
 ```
+
+Give the preflight the transport the assessment will use. The transport decides the pack ceiling,
+so a preflight under another transport does not match the assessment's pack set.
 
 This lane declares `--grounding-scope content_focused`. `--no-claims` withholds the claim ledger, so
 grounding is unassessable, and all three records say so. A `source_grounded` declaration is refused
@@ -344,11 +393,13 @@ pin and the declared grounding scope.
 ### The assessment
 
 ```
-py -3.10 -m harness.commands.blind_assessment assess --document <original document id> --graph-root <private graph root> --profile harness/profiles/msca_dn_2025_historical.json --transport claude-cli --no-claims --grounding-scope content_focused --import-manifest <private manifest path> --preflight <preflight report> --intake msca-dn-2025-original --assessor-model <pin> --assessor-version <tag naming claude-cli> --out-dir <private reports dir>
+py -3.10 -m harness.commands.blind_assessment assess --document <original document id> --graph-root <private graph root> --profile harness/profiles/msca_dn_2025_historical.json --transport bedrock-converse --no-claims --grounding-scope content_focused --import-manifest <private manifest path> --preflight <preflight report> --intake msca-dn-2025-original --assessor-model <the OD7 assessor pin> --assessor-version bedrock-converse-eu-north-1@<date> --out-dir <private reports dir>
 ```
 
 The run re-derives the pack set under these flags and refuses before any assessor call if it does
 not match the preflight's hash.
+
+Write this line down exactly as run. A resume is this line plus `--resume`, and nothing else.
 
 Checkpointing is on by default. Every raw response is written as it arrives to
 `.harness/checkpoints/checkpoint_<hash12>_<NNNN>.jsonl` under `--repo-root`, never under
@@ -358,8 +409,29 @@ Checkpointing is on by default. Every raw response is written as it arrives to
 - `--no-checkpoint` writes none. A failed run is then redrawn in full, at the cost of the quota.
 - `--resume <path>` replays every call the file covers and goes live from the first it does not.
   The report declares `replayed_calls` beside `live_calls`, so a partly replayed report says so.
-  The checkpoint's binding — candidate, profile, assessor pin, preflight pack set, sample counts —
-  must equal the resuming run's.
+
+### Resuming
+
+A resume is the original command line plus `--resume <checkpoint path>`. Nothing else changes: no
+flag added, none removed, no value altered.
+
+```
+py -3.10 -m harness.commands.blind_assessment assess --document <original document id> --graph-root <private graph root> --profile harness/profiles/msca_dn_2025_historical.json --transport bedrock-converse --no-claims --grounding-scope content_focused --import-manifest <private manifest path> --preflight <preflight report> --intake msca-dn-2025-original --assessor-model <the OD7 assessor pin> --assessor-version bedrock-converse-eu-north-1@<date> --out-dir <private reports dir> --resume <the checkpoint path the run printed>
+```
+
+The checkpoint binds the run it came from. The binding covers the candidate, the profile, the
+assessor pin, the preflight pack set and the sample counts. It also covers the inference
+configuration: the temperature and the token limit (ticket 15). A resume that differs on any of
+them is refused, naming the field and both values.
+
+- The temperature and the token limit have no flag on `assess`. The token limit comes from the
+  environment's `HARNESS_JUDGE_MAX_TOKENS`. Leave the environment as the original run had it.
+- A checkpoint written before ticket 15 recorded no inference configuration. It still opens, and a
+  resume of it is refused with a message saying so.
+- `--resume` cannot sit beside `--checkpoint` or `--no-checkpoint`. The parser accepts one of the
+  three. The documented line carries none, so adding `--resume` is the whole change.
+- A replayed response writes no unmarked provenance record. The provenance log tells replayed
+  draws from live ones.
 
 A malformed response stays in the checkpoint verbatim, with its hash and the parser's own message,
 marked discarded. Nothing repairs it, and it is never replayed. A malformed criterion draw is asked
@@ -369,10 +441,14 @@ Recovery is not permission to replace an inconvenient valid sample. A parseable 
 whatever it says. Only the parsers discard a response, and a sample the operator dislikes is
 evidence rather than an accident.
 
-If a run spent its quota before a checkpoint existed, rebuild one from the CLI's own session
-transcripts and then resume. Every flag below must be the one the lost run used, because the sample
-counts bind the checkpoint as much as the candidate does. Add `--skip-criterion-scores` if that run
-set it:
+`salvage` applies to `claude-cli` runs only. It rebuilds a checkpoint from the `claude` CLI's own
+session transcripts. A Converse run starts no CLI and writes no transcripts, so on the host the
+default checkpoint is the only recovery. Do not pass `--no-checkpoint` there (§11).
+
+If a `claude-cli` run spent its quota before a checkpoint existed, rebuild one from the CLI's own
+session transcripts and then resume. Every flag below must be the one the lost run used, because the
+sample counts bind the checkpoint as much as the candidate does. Add `--skip-criterion-scores` if
+that run set it:
 
 ```
 py -3.10 -m harness.commands.blind_assessment salvage --document <original document id> --graph-root <private graph root> --profile harness/profiles/msca_dn_2025_historical.json --transport claude-cli --no-claims --grounding-scope content_focused --preflight <preflight report> --transcripts <private transcripts directory> --checkpoint <new checkpoint path> --n <the lost run's --n> --criterion-n <the lost run's --criterion-n> --assessor-model <pin> --assessor-version <tag naming claude-cli> --out-dir <private reports dir>
@@ -386,20 +462,31 @@ recovered. A salvaged run is a replay of what the assessor said, not a fresh dra
 - `--assessor-model` and `--assessor-version` are **declared identifiers**. The report records
   `model@version` and nothing else about the assessor. Neither string is an attestation from the
   provider that this model answered.
-- The pinned temperature is 0. `JudgeConfig` declares it and refuses any other value, but the
-  `claude` CLI takes no temperature argument, so the value is not transmitted. Robustness comes from
-  majority voting over N samples instead.
-- `--assessor-version` must contain `claude-cli`, or the builder refuses. That rule stops a report
-  carrying this transport under another name. It does not verify the transport.
+- The pinned temperature is 0. `JudgeConfig` declares it and refuses any other value. On
+  `bedrock-converse` the temperature and the token limit are sent in the request's
+  `inferenceConfig`. The run records the configuration every request carried, and the receipt
+  records it too. On `claude-cli` the CLI takes no temperature argument, so the value is not
+  transmitted. Robustness comes from majority voting over N samples on both routes.
+- `--assessor-version` must name the transport, or the builder refuses. On the host it contains
+  `bedrock-converse`. On the subscription route it contains `claude-cli`. The freeze's
+  `pin_names_transport` condition checks the same rule. That rule stops a report carrying one
+  transport under another name. It does not verify the transport.
 - `JudgeConfig` refuses every drafter model, so the assessor can never be the model that drafted the
-  text. Transport, vendor and model family are not independent on this path, and the pin is where
-  the report says so.
+  text. On Bedrock the drafter and the assessor share a provider. The guard therefore compares the
+  model each id names, not the id string. Vendor and model family are not independent on this path,
+  and the pin is where the report says so.
 
 ### Isolation, and what it does not authorise
 
+`--transport bedrock-converse` sends each request with no tool configuration, and no child process
+runs (`harness/commands/_converse_judge.py`). The retry wrapper records this from every request it
+passes on, and the freeze requires that record. The test that would fail if it broke is
+`tests/harness/test_converse_judge.py::TestTheInvocationRecordIsMeasured`. With no process and no
+filesystem access, that is the transport's whole isolation claim.
+
 `--transport claude-cli` renders the assessor's tool list as `--tools "" --strict-mcp-config`
-(`runner/claude_transport.py`). Three controls keep the assessor blind, and each has a test that
-would fail if it broke:
+(`runner/claude_transport.py`). On that route two controls keep the assessor blind, and each has a
+test that would fail if it broke:
 
 - The explicit empty tool list, never `None`. `tools=None` omits the flag and leaves the CLI's
   built-in tools live. `--tools ""` alone still exposes the operator's MCP servers, measured
@@ -407,6 +494,9 @@ would fail if it broke:
   `tests/harness/test_subscription_judge.py::TestBlindnessAtTheArgvLevel`.
 - A fresh working directory outside every repository clone. The subscription judge refuses one
   inside.
+
+On both routes one more control holds:
+
 - The ESR sits outside the graph root, outside the package and outside every file the assessor can
   open. The intake's permitted purpose is `blind_pre_evaluation`. Leakage is tested in
   `tests/harness/test_blind_leakage.py`, and
@@ -420,8 +510,9 @@ runs the conditions listed below and no marker check.
 
 What these controls are not:
 
-- **Not an operating-system sandbox.** The child process runs from a directory, with the operator's
-  own privileges, filesystem rights and network access.
+- **Not an operating-system sandbox.** On `claude-cli` the child process runs from a directory, with
+  the operator's own privileges, filesystem rights and network access. On `bedrock-converse` the
+  harness process itself holds those rights.
 - **Not authorisation** to send private proposal content to a provider. An empty tool list stops the
   assessor reading this repository. It says nothing about what the private environment permits to
   leave it. §10 governs that, and §1 requires it settled first.
@@ -439,8 +530,9 @@ One freeze per directory. A second is refused, because a frozen baseline is neve
 The freeze loads the profile bundle and compares the report with what a complete report holds (V04).
 It refuses a report whose cells are not the profile's grid, whose criterion scores are not the
 profile's criteria, and whose total its own scores do not produce. A condition the report's transport
-cannot answer is recorded not applicable rather than passed: `invocation_evidence` applies to
-`claude-cli` and not to an API transport.
+cannot answer is recorded not applicable rather than passed. `invocation_evidence` applies to
+`claude-cli` and to `bedrock-converse`, and not to `openai-compatible`. On the host it requires the
+Converse record: no tool configuration sent, no child process.
 
 ### The conditions the freeze checks
 
@@ -480,6 +572,42 @@ claim rests on the register's `fidelity_to_submitted_original` declaration for t
 sub-section (V01). The approved public file
 `docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json` is the
 template, and its deferred rows are the questions §2.1 answers.
+
+#### Where `fidelity_to_submitted_original` goes for a Confirmed miss
+
+The block goes into the original's declaration input, not into the register. The input is the
+operator's private file for the original's revision. The register's declared half is rendered from
+it, and the renderer carries every extra field through unchanged.
+
+Put it in the `sub_sections` row whose `sub_section_id` is the quoted sub-section. That row already
+holds `presence` and `extraction_fidelity`. Add a `fidelity_to_submitted_original` object with:
+
+- `claim_scope`: `fidelity_against_the_submitted_original`;
+- `declared_status`: `Confirmed`;
+- `basis`: a non-empty statement;
+- `evidence`: a list holding an item whose `observation_ids` names the observation, with a `source`
+  and a `statement`.
+
+The disposition row then names that entry among its `evidence_basis` pointers, as
+`declared/sub_sections/<sub-section id>/fidelity_to_submitted_original`. Re-render the register
+after editing the input.
+
+The original's register note says this question "does not arise here". Its contract asks only for
+`presence` and `extraction_fidelity`. `compare` still needs the block for every Confirmed miss
+(slice 3 review, F2).
+
+A missing block is a named refusal at `compare`. It costs no assessor call, so fix the input and
+run `compare` again. An `Inferred` status passes without the block, but it understates the claim.
+
+#### Audit references are matched by path spelling
+
+`compare` keys each `--audit` report by its path. A path under `--repo-root` is keyed relative to
+it. Any other path is keyed as given, with forward slashes. Each disposition's
+`audit_findings[].report` must use exactly that key.
+
+Write every audit path once and copy it. Use the same spelling in the `--audit` argument and in
+every disposition that cites the report. Prefer forward slashes in both. A mismatch is refused, and
+the refusal lists the keys it loaded (slice 3 review, F3).
 
 ```
 py -3.10 -m harness.commands.blind_assessment review --comparison <private comparison> --notes <private review notes> --profile harness/profiles/msca_dn_2025_historical.json --out-dir <private reviews dir>
@@ -544,7 +672,77 @@ as an input.
 
 Stage B reuses the commands of §4 and §5, and the `audit` command of §6, with the stage-B document
 id, manifest, profile and output directories. It reuses the profile of the call being submitted to,
-after that profile's applicability is settled (§3).
+after that profile's applicability is settled (§3). The lines below are those commands with the
+stage-B values in place.
+
+### The importer's document id
+
+The importer and the dry import know the resubmission as `--document resubmission_2026` (ticket 11).
+It is a submitted document of its own, not a revision of the 2025 original. Its intake id is
+`msca-dn-2026-resubmission`, and a revision of one document may not supersede a revision of the
+other. Like the original, it refuses an import until a private configuration input completes it.
+
+```
+py -3.10 -m tools.import_external_proposal --document resubmission_2026 --describe
+```
+
+### Measure, configure and import
+
+The dry import defaults to the original, so stage B names its document. The submission id, the call
+id and the ESR availability are operator declarations, never inferred. No 2026 ESR exists. The line
+below leaves `--esr-availability` at its default, `unknown`. Add it with the operator's own answer.
+
+```
+py -3.10 -m tools.dry_import_original --document resubmission_2026 --pdf <private>/part_b_resubmission.pdf --expect-sha256 <hash from the authoritative source> --out <private>/v08_dry_import_2026 --submission-id <the resubmission's proposal number> --call-id <the 2026 call id>
+```
+
+```
+py -3.10 -m tools.dry_import_original --check-acceptance <private>/v08_dry_import_2026/extraction_fidelity_acceptance.json
+```
+
+Copy `tools/original_configuration_template.json` to a new private root for stage B. Set its
+`config_id` to `resubmission_2026`, and answer every other value from the stage-B dry import. A
+configuration input naming the 2025 original does not complete the resubmission.
+
+```
+py -3.10 -m tools.author_original_workspace --root <private stage-B root> --config-input <configuration input relative to that root>
+```
+
+```
+py -3.10 -m tools.import_external_proposal --document resubmission_2026 --config-input <configuration input> --repo-root <private stage-B root>
+```
+
+Ticket 17 owns one wording gap. Before it lands, the submitted-document register renderer states
+that the ESR evaluated the text. That sentence is false for 2026. Check that the bundle's revision
+carries ticket 17 before reading the stage-B register.
+
+### Receipt, preflight, assessment, freeze and audit
+
+The receipt is a new one, bound to the stage-B pair and kept outside every checkout (§1.1). The
+assessor lines run on `--transport bedrock-converse` with the host's version tag. A resume follows
+§5: the original line plus `--resume`, nothing else.
+
+```
+py -3.10 -m harness.commands.execution_receipt --receipt <private stage-B receipt path> --expect-candidate <stage-B document id> --expect-profile <stage-B profile>
+```
+
+```
+py -3.10 -m harness.commands.blind_assessment preflight --document <stage-B document id> --graph-root <private stage-B graph root> --profile <stage-B profile> --transport bedrock-converse --no-claims --grounding-scope content_focused --import-manifest <private stage-B manifest path> --out-dir <private stage-B reports dir>
+```
+
+```
+py -3.10 -m harness.commands.blind_assessment assess --document <stage-B document id> --graph-root <private stage-B graph root> --profile <stage-B profile> --transport bedrock-converse --no-claims --grounding-scope content_focused --import-manifest <private stage-B manifest path> --preflight <stage-B preflight report> --intake msca-dn-2026-resubmission --assessor-model <the OD7 assessor pin> --assessor-version bedrock-converse-eu-north-1@<date> --out-dir <private stage-B reports dir>
+```
+
+```
+py -3.10 -m harness.commands.blind_assessment freeze --report <stage-B blind report> --candidate <stage-B materialised candidate dir> --profile <stage-B profile> --baseline-dir <private stage-B baseline dir>
+```
+
+```
+py -3.10 -m harness.commands.blind_assessment audit --document <stage-B document id> --graph-root <private stage-B graph root> --profile <stage-B profile> --candidate-provenance <private stage-B manifest path> --baseline-dir <private stage-B baseline dir> --out-dir <private stage-B audit dir>
+```
+
+### What stage B excludes
 
 The rest of §6 is excluded. `compare`, `review` and `diff` do not apply, because the resubmission has
 no evaluation summary report of its own. The 2025 ESR is not a stage-B input, and an observation
@@ -582,6 +780,8 @@ declaration about the original leaves only if those rules say it may.
 | Claim loader, ledger statuses and E2 integration for imported documents (§9) | the grounding axis in both stages |
 | A labelled row-by-observation reading of two comparisons over different baselines (§6) | the stage-A reading against the public comparison |
 | The D14 successor provenance update and the D13 adoption, if decided (§2.2) | nothing in the harness; the register bindings |
+| No `salvage` route for a Converse run, which writes no transcripts (§5) | recovery of a host run made with `--no-checkpoint` |
+| No `assess` flag for the temperature or the token limit. The token limit is read from `HARNESS_JUDGE_MAX_TOKENS` (§5). | a resume fixed by its command line alone. The environment must match too. |
 
 Four rows have closed. V10 authored the historical profile from V09's matrix (§3), V13 built the readiness receipt and its validator (§1.1), V17 built the original's configuration route (§4 step 1b) and V18 its register renderer (§4 step 1c). The original's own values stay the operator's: the route is here and the declarations are theirs.
 
