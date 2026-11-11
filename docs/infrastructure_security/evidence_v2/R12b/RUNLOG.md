@@ -37,3 +37,12 @@
 | 10 | 2026-11-11 23:41:23 – ~23:45 | operator | `delete exit=0`; stack does not exist (`exit=254`); no interface, instance or project volume; base stacks equal step 02. **Hourly charges end** (~9 minutes) | none |
 | 11 | 2026-11-11 ~23:47 | operator | Ran without a collector folder: `started_utc` empty, so `lookup-events` failed on `--start-time` (`ParamValidation`) and `R12b_11_converse-events.json` holds one all-null record | Invalid run, two minutes after the delete. The files stay as evidence of the deviation and support no criterion. Not reported: whether the URL file and the outside bucket were removed |
 | check | 2026-11-12 | agent | Steps 06, 07, 08 and 10 PASS by script. Steps 09 and 11 FAIL (no collection). `STEPS_fix1.md` written: the URL file is written and read by the collector's `--plan` before the stack exists; new change set `r12b-create-02`; fix-run files `R12b_fix1_*`. A second creation needs a new go (point 3 covered one) | — |
+
+## Fix 1 — round 1b (steps F01, F04, F05; nothing billable)
+
+| Step | UTC (approx.) | Who | Result | Deviation / error |
+|---|---|---|---|---|
+| F01 | — | operator | Not reported | Run before F06 |
+| F04 | 2026-11-11 23:52:11 | operator | Change set `r12b-create-02`: equal to `R12b_04_change-set.json` in status, capabilities, tag, the seven `Add` and every parameter value (same image) — PASS by script. It waits unexecuted (no cost) | none |
+| F05 (plan first) | 2026-11-11 ~23:53 | operator | `exists=False`; the collector's plan refused with `the F7 URL file cannot be read`, `exit=2` (`R12b_fix1_05_collector-plan.txt`) | Order reversed: the read check ran before `STEPS.md` step 05. The check worked as intended: it stopped the run before any stack existed |
+| F05 (step 05) | 2026-11-11 ~23:54 | operator | Run with the placeholders `<outside-profile>` and `<outside-bucket-name>` unreplaced: `The config profile (<outside-profile>) could not be found`; `Out-File` left an **empty** `po-f7-url.txt` (0 bytes) | No URL was created; nothing reached AWS in either account. Blocked on the second account's CLI profile (asked in session) |
