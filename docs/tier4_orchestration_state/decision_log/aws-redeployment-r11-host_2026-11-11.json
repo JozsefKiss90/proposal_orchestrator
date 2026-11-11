@@ -7,8 +7,9 @@
   "ticket": "R11 of plans/aws_redeployment_tickets.md (endpoints and host: first PrivateLink call)",
   "supersedes": "none. Point 6 of STEPS.md (CPU credits standard on a t3 host) was replaced by OD9-r1 (aws-redeployment-od9-host-size-r1_2026-11-11) before the host first ran.",
   "authority": "Agent-drafted under CLAUDE.md §9.4. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no proposal gate and amends no constitutional rule.",
-  "review_state": "agent_drafted_pending_operator_review",
-  "decided_by": "Points 1-10: the agent, in STEPS.md, accepted by the operator's merge ('Having reviewed the R11 steps, I would also like to merge them', 34a4e2e1). R11-D11 and R11-D12: the agent, recorded in RUNLOG.md, pending the operator's review.",
+  "review_state": "operator_confirmed",
+  "confirmed": "2026-11-11 22:58 UTC, operator in session: 'R11 confirmed, the two decisions review, check the R11 ticket, 12b is a go'.",
+  "decided_by": "Points 1-10: the agent, in STEPS.md, accepted by the operator's merge ('Having reviewed the R11 steps, I would also like to merge them', 34a4e2e1). R11-D11 and R11-D12: the agent, recorded in RUNLOG.md, reviewed by the operator 2026-11-11.",
   "decision": "R11 is built and run as STEPS.md points 1-10 state, as amended by STEPS_fix1.md (OD9-r1) and by the corrected step 14 criterion.",
   "why": "The ticket needs one host stack that creates the six interface endpoints and the host, proves one Converse call over PrivateLink by the hardened runtime role, and deletes and recreates cleanly. The points below settle what no earlier record settled.",
   "inputs": [
@@ -150,20 +151,20 @@
     {
       "id": "R11-D11",
       "question": "Step 14 imports criterion",
-      "answer_kind": "agent_correction",
-      "declared_status": "Inferred",
+      "answer_kind": "agent_correction_operator_reviewed",
+      "declared_status": "Confirmed",
       "answer": "After the delete, no import list names proposal-orchestrator-host; network-VpcId and iam-RuntimeRoleArn stay imported by their base-stack consumers; the four host-only exports are unimported.",
       "reason": "F-R11-3. The original criterion contradicted the base templates; the corrected one tests what step 14 is for.",
-      "consequence": "STEPS_fix1.md amendment row for step 14; RUNLOG.md marks it a sheet error. Pending the operator's review."
+      "consequence": "STEPS_fix1.md amendment row for step 14; RUNLOG.md marks it a sheet error. Reviewed by the operator 2026-11-11."
     },
     {
       "id": "R11-D12",
       "question": "Deviations accepted as evidence",
-      "answer_kind": "agent_proposal",
-      "declared_status": "Inferred",
+      "answer_kind": "agent_proposal_operator_reviewed",
+      "declared_status": "Confirmed",
       "answer": "Round 2's step 06 (t3.medium, no recorded go, block run twice) is kept as evidence of the refusal only; the R11 criteria rest on round 1b and round 2b. Step 23 run 1 came before VERIFICATION.md; run 2 after it is the closing run.",
       "reason": "RUNLOG.md rounds 2 and 2b.",
-      "consequence": "VERIFICATION.md cites R11_fix1_06_* for step 06. Pending the operator's review."
+      "consequence": "VERIFICATION.md cites R11_fix1_06_* for step 06. Reviewed by the operator 2026-11-11."
     }
   ],
   "known_gaps": [

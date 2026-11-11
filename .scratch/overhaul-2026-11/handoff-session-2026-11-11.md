@@ -216,11 +216,13 @@ Ticked only on the evidence each protocol (§3) names. Newest line last.
       lane above (the runbook guard is a lane module). The V14 compare line changes again when the ESR
       record is rebound off `msca-dn-2025-sanitised-v1` (operator, 2026-11-11: that intake is out of
       scope).
-- [ ] **A1** — R11 (operator's explicit go). Step sheet reviewed by the operator and merged as `34a4e2e1`;
+- [x] **A1** — R11 (operator's explicit go). Step sheet reviewed by the operator and merged as `34a4e2e1`;
       its tests pass (25). Round 1 (steps 01–05, read-only plus an unexecuted change set) run by the
       operator on 2026-11-11; every evidence file passes its criterion (`R11/RUNLOG.md`). The change set
       `r11-create-01` lists exactly the seven additions. Step 06 waits for the operator's explicit go;
       VERIFICATION.md follows step 23.
+      DONE 2026-11-11 22:58 UTC: steps 06–23 PASS (host on `c7i-flex.large`, OD9-r1), operator confirmed R11 and
+      reviewed R11-D11/D12 (`aws-redeployment-r11-host_2026-11-11`); last commit before close `17f4631d`.
 - [ ] **A2** — R12b
 - [ ] **A3** — R14
 - [ ] **O5** — re-freeze, tag, bundle, sha256 record

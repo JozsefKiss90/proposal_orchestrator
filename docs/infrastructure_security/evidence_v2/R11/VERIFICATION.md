@@ -65,7 +65,7 @@ answers were matched to the endpoint interfaces through each endpoint's ENI id.
 - [x] Register v2 updated (2026-11-11).
 - [x] Worklog v2 entry 2026-11-11T22:15:00Z.
 - [x] Step 23 run 2, with check 23a, after this report (2026-11-11): 260 passed, both CLEAN; F-R11-6 closed.
-- [ ] Operator reviews `aws-redeployment-r11-host_2026-11-11` (R11-D11, R11-D12) and confirms R11 in session; the agent then ticks R11.
+- [x] Operator reviewed `aws-redeployment-r11-host_2026-11-11` (R11-D11, R11-D12) and confirmed R11 in session (2026-11-11 22:58 UTC); R11 ticked in `plans/aws_redeployment_tickets.md`.
 
 ## Notes for later tickets
 

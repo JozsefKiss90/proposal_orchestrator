@@ -316,12 +316,12 @@ recreated once.
 
 **Blocked by:** R4, R5, R6, R7, R8.
 
-- [ ] All endpoints show `available`. The host has no public IP.
-- [ ] A Run Command invocation returns `Success`.
-- [ ] The Converse call succeeds. CloudTrail shows the runtime role as caller, with the boundary
+- [x] All endpoints show `available`. The host has no public IP.
+- [x] A Run Command invocation returns `Success`.
+- [x] The Converse call succeeds. CloudTrail shows the runtime role as caller, with the boundary
       attached (closes F1).
-- [ ] DC-01, DC-02, DC-04, DC-05, DC-14, DC-26 and DC-37 are evidenced.
-- [ ] The stack deletes cleanly, leaves the base stack intact, and recreates from the templates.
+- [x] DC-01, DC-02, DC-04, DC-05, DC-14, DC-26 and DC-37 are evidenced.
+- [x] The stack deletes cleanly, leaves the base stack intact, and recreates from the templates.
 
 ## R14 Operations and cost
 
