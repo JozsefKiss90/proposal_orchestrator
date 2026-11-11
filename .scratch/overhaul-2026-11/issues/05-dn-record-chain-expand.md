@@ -1,13 +1,13 @@
 # 05 — DN record chain (expand): one way to load a record against its predecessors
 
-Status: needs-triage
+Status: in-progress
 Type: task
 Blocked by: 04
 Source: `discovery/architecture-review-harness-2026-11-03.html`, candidate D. Not grilled; written on
 operator request 2026-11-03, with recommendations taken as decisions.
 Findings: F6 deepening · DN record chain (Stage A/B evidence trail)
 
-> `needs-triage` until the Step 3 scope cut admits it; then `ready-for-agent`.
+> Admitted by operator decision D2 (`docs/tier4_orchestration_state/decision_log/plan-order-reliability_2026-11-11.json`).
 > Candidate D is split expand → contract because it exceeds one session (admission rule 3).
 > This ticket adds the module and moves the **two weakest links** onto it; 06 moves the rest and deletes the copies.
 
@@ -55,19 +55,19 @@ the record, the predecessor, and both hashes. The ESR comparison and the compari
 
 Failing tests first:
 
-- [ ] Comparison diff over two comparisons whose shared baseline report was edited after they were written: refused, naming the baseline report and both hashes.
-- [ ] Comparison diff where one member's revisions artifact was edited: refused in the same way.
-- [ ] Loading an ESR comparison whose ESR record was edited: refused, naming it.
-- [ ] Loading a record whose `record_type` or advisory/blocking flags are wrong: refused with the record kind's own error class.
+- [x] Comparison diff over two comparisons whose shared baseline report was edited after they were written: refused, naming the baseline report and both hashes.
+- [x] Comparison diff where one member's revisions artifact was edited: refused in the same way.
+- [x] Loading an ESR comparison whose ESR record was edited: refused, naming it.
+- [x] Loading a record whose `record_type` or advisory/blocking flags are wrong: refused with the record kind's own error class.
 
 Then:
 
-- [ ] An untouched fixture chain (preflight → report → baseline → audit → comparison → review → diff) loads end to end.
-- [ ] Records written before this ticket load when their predecessors are unchanged.
-- [ ] The ESR comparison and comparison diff no longer carry their own type/flag/re-hash code for the links moved here.
+- [x] An untouched fixture chain (preflight → report → baseline → audit → comparison → review → diff) loads end to end.
+- [x] Records written before this ticket load when their predecessors are unchanged.
+- [x] The ESR comparison and comparison diff no longer carry their own type/flag/re-hash code for the links moved here.
 - [ ] Targeted tests and the full suite are at or above `plans/overhaul/BASELINE.md`.
 - [ ] **PE-09 acceptance lane green** (admission rule 5).
-- [ ] `code-review` run since the base commit, with no gaps on the spec axis.
+- [x] `code-review` run since the base commit, with no gaps on the spec axis. Operator exception: the revisions-hash gap is accepted (decision `overhaul-05-revisions-hash-gap_2026-11-11`).
 
 ## Session brief
 
@@ -86,3 +86,5 @@ Size: ~250–350 changed non-test lines
 
 - Deferred at Step 3 (2026-11-06): record-chain refactor, refusals only, no value for V14/V16 before the deadline. Blocked by 04.
 - Wave 2b (2026-11-06): order in `discovery/scope-cut-2026-11-06.md`; brief reads "at or above BASELINE.md §5" once wave 1 has merged.
+- 2026-11-11, base 6820395e: targeted 24 modules, 1 failed (on the BASELINE §5 red line: `test_demo_candidate_blind_baseline.py::...::test_the_leakage_scan_file_count_is_re_derivable`) / 1,272 passed. Code-review ran (spec + standards); fixed: comparison now also re-hashes the fidelity register and each audit, the diff command passes --repo-root through, unused `beside` rule removed, record_binding docstring notes the chain. Spec gap left open: a comparison records no hash of its revisions artifact, so a content edit to it is refused when a written diff is loaded (the diff holds its hash) but not when a new diff is run (only its bound hashes are checked); closing it needs a record-format change, which this ticket forbids. Code-review box open for the operator. Full suite and lane not run.
+- 2026-11-11, operator decision: option 1. The revisions-hash gap is accepted for the O5 bundle; a revisions hash in the comparison record is a later format ticket after V16. The four behaviour changes (path lookup without a repo root, re-hashing dispositions/fidelity register/audits, required advisory/blocking flags on revisions, temp-file prefix `comparison_`) are accepted. Record: `overhaul-05-revisions-hash-gap_2026-11-11`. Suite and lane boxes wait for the operator's O2 run.

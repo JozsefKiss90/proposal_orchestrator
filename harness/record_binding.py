@@ -26,6 +26,11 @@ that type; sharing the readers would mean either threading an exception class
 through every call site or collapsing two documented contracts into one. The
 dozen lines they duplicate cost less than either.
 
+The DN record chain reopens this only for loading a record against its
+predecessors (``harness/record_chain.py``): there the record kind declares its
+error class once, so no call site threads it, and the type and advisory/blocking
+check is shared. Each record's own field readers stay in its own module.
+
 Constitutional authority:
     Subordinate to CLAUDE.md. Out-of-band QA; reads the bound records read-only
     and writes nothing. Never a runtime gate. See ``harness/HARNESS.md``.

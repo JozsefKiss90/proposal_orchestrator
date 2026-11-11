@@ -495,7 +495,7 @@ def resolve_inputs(
     """
     cmp_path = Path(comparison_path)
     try:
-        data = load_comparison(cmp_path)
+        data = load_comparison(cmp_path, repo_root=repo_root)
     except EsrComparisonError as exc:
         raise OperatorReviewError(str(exc)) from exc
     cmp_sha = file_sha256(cmp_path)

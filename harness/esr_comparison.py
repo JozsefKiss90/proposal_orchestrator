@@ -79,12 +79,12 @@ from harness.blind_assessment import (
     BlindAssessmentError,
     Candidate,
     candidate_hash,
-    next_report_path,
 )
 from harness.blind_baseline import FrozenBaseline, _portable
 from harness.content_hash import short_hash
 from harness.evidence_preflight import file_sha256
 from harness.integrity_audit import IntegrityAuditError, fold_ligatures, load_audit
+from harness.record_chain import Predecessor, RecordKind, load_record, write_record
 
 ESR_RECORD_TYPE = "esr_record"
 DISPOSITIONS_RECORD_TYPE = "esr_dispositions"
@@ -1851,35 +1851,68 @@ def _prioritise(rows: Sequence[Mapping[str, Any]], weights: Mapping[str, float],
 # --------------------------------------------------------------------------- #
 
 
+def _comparison_shape(path: Path, data: Mapping[str, Any]) -> None:
+    for key in ("baseline", "rows", "summary", "score_comparison"):
+        if key not in data:
+            raise EsrComparisonError(f"comparison {path} lacks {key!r}.")
+
+
+#: The ESR comparison in the DN record chain: every file it names by hash (the
+#: baseline report, the ESR record, the dispositions, the fidelity register and
+#: each integrity audit) is re-hashed on every load. The candidate is bound by
+#: its content hash over a directory, which the operator review re-derives.
+COMPARISON_KIND = RecordKind(
+    name="comparison",
+    record_type=COMPARISON_RECORD_TYPE,
+    error=EsrComparisonError,
+    prefix=_COMPARISON_PREFIX,
+    predecessors=(
+        Predecessor(
+            "the baseline report",
+            path=("baseline/baseline_dir", "baseline/report_copy"),
+            sha256="baseline/report_sha256",
+        ),
+        Predecessor("the ESR record", path="esr_record/path", sha256="esr_record/sha256"),
+        Predecessor("the dispositions", path="dispositions/path", sha256="dispositions/sha256"),
+        Predecessor(
+            "the fidelity register", path="fidelity_register/path", sha256="fidelity_register/sha256"
+        ),
+        Predecessor("an integrity audit", path="path", sha256="sha256", each="audits"),
+    ),
+    check_shape=_comparison_shape,
+)
+
+
 def write_comparison(report: ComparisonReport, out_dir: Path | str) -> tuple[Path, Path]:
     """Write ``comparison_<sha12>_<NNNN>.json`` and ``revisions_<sha12>_<NNNN>.json``;
     never overwrite. The two share a sequence number."""
     out = Path(out_dir)
-    target = next_report_path(out, report.baseline_report_sha256, prefix=_COMPARISON_PREFIX)
-    seq = target.name.rsplit("_", 1)[1]
-    revisions = out / f"{_REVISIONS_PREFIX}_{short_hash(report.baseline_report_sha256)}_{seq}"
-    if revisions.exists():
-        raise EsrComparisonError(f"{revisions} already exists; nothing overwritten.")
-    out.mkdir(parents=True, exist_ok=True)
-    data = dict(report.data)
-    data["revisions_artifact"] = (Path(out_dir) / revisions.name).as_posix()
-    data["writes"] = [(Path(out_dir) / target.name).as_posix(), data["revisions_artifact"]]
-    atomic_write_json(report.revisions, revisions, prefix="esr_revisions_")
-    atomic_write_json(data, target, prefix="esr_comparison_")
-    return target, revisions
+    revisions_path: list[Path] = []
+
+    def complete(target: Path) -> dict[str, Any]:
+        seq = target.name.rsplit("_", 1)[1]
+        revisions = out / f"{_REVISIONS_PREFIX}_{short_hash(report.baseline_report_sha256)}_{seq}"
+        if revisions.exists():
+            raise EsrComparisonError(f"{revisions} already exists; nothing overwritten.")
+        data = dict(report.data)
+        data["revisions_artifact"] = (Path(out_dir) / revisions.name).as_posix()
+        data["writes"] = [(Path(out_dir) / target.name).as_posix(), data["revisions_artifact"]]
+        atomic_write_json(report.revisions, revisions, prefix="esr_revisions_")
+        revisions_path.append(revisions)
+        return data
+
+    written = write_record(COMPARISON_KIND, report.data, out, digest=report.baseline_report_sha256,
+                           complete=complete)
+    return written.path, revisions_path[0]
 
 
-def load_comparison(path: Path | str) -> dict[str, Any]:
-    p = Path(path)
-    data = _read_json(p, "comparison report")
-    if data.get("record_type") != COMPARISON_RECORD_TYPE:
-        raise EsrComparisonError(f"{p} is not an {COMPARISON_RECORD_TYPE!r} record.")
-    if data.get("advisory") is not True or data.get("blocking") is not False:
-        raise EsrComparisonError(f"comparison {p} must carry advisory=true and blocking=false.")
-    for key in ("baseline", "rows", "summary", "score_comparison"):
-        if key not in data:
-            raise EsrComparisonError(f"comparison {p} lacks {key!r}.")
-    return data
+def load_comparison(path: Path | str, *, repo_root: Path | str | None = None) -> dict[str, Any]:
+    """Load a written comparison, re-hashing the predecessors it names.
+
+    *repo_root* is the root its relative paths were written under; without it
+    they are looked for as :func:`harness.record_chain.load_record` says.
+    """
+    return load_record(COMPARISON_KIND, path, repo_root=repo_root).data
 
 
 def render_comparison(data: Mapping[str, Any]) -> str:
@@ -1933,6 +1966,7 @@ def render_comparison(data: Mapping[str, Any]) -> str:
 
 
 __all__ = [
+    "COMPARISON_KIND",
     "COMPARISON_RECORD_TYPE",
     "DECLARED_STATUSES",
     "DISPOSITIONS",
