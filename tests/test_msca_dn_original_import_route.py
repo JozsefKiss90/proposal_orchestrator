@@ -111,6 +111,14 @@ def _line(page: Any, y: float, text: str, size: float = 12) -> None:
     page.insert_text((72, y), text, fontsize=size)
 
 
+def _submission_block(register: dict[str, Any]) -> dict[str, Any]:
+    """The block filing the call and submission ids. The document's ESR status
+    selects its key (ticket 17), and a register carries exactly one of the two."""
+    provenance = register["provenance"]
+    (key,) = {"historical_submission", "submission"} & set(provenance)
+    return provenance[key]
+
+
 @dataclass(frozen=True)
 class Submitted:
     """One submitted document and the fixture values that are its own."""
@@ -1180,7 +1188,7 @@ class TestTheHeaderDeclaresTheSubmittedDocumentsOwnFacts:
         identity = json.dumps(
             [
                 register["provenance"]["current_assessment_artifact"]["kind"],
-                register["provenance"]["historical_submission"]["instrument"],
+                _submission_block(register)["instrument"],
                 transformation["identifiers"],
                 transformation["citations"],
                 transformation["prose"],
@@ -1196,10 +1204,8 @@ class TestTheHeaderDeclaresTheSubmittedDocumentsOwnFacts:
         statement = register["provenance"]["transformation"]["statement"]
         assert "not a declaration that the extraction preserved everything" in statement
 
-    # The 2025 original only. The renderer states this sentence for every
-    # submitted document, and no ESR has evaluated the 2026 resubmission: a
-    # known gap of ticket 11, recorded in its decision-log entry, and not
-    # asserted here as if it were true.
+    # The 2025 original only: an ESR evaluated it, and no ESR has evaluated
+    # the 2026 resubmission (ticket 17 tests that document's wording below).
     @pytest.mark.parametrize("submitted", ["official_original"], indirect=True)
     def test_the_relationship_to_the_esr_is_the_copys_inverted(
         self, register: dict[str, Any]
@@ -1207,11 +1213,36 @@ class TestTheHeaderDeclaresTheSubmittedDocumentsOwnFacts:
         statement = register["provenance"]["relationship_to_esr"]["statement"]
         assert "The ESR evaluated this text" in statement
         assert register["provenance"]["relationship_to_esr"]["esr_sha256"] is None
+        artifact = register["provenance"]["current_assessment_artifact"]
+        assert artifact["statement"].startswith("This file is the text the ESR evaluated.")
+        assert "historical_submission" in register["provenance"]
+
+    # Ticket 17: the 2026 resubmission has no ESR at V16, so neither sentence
+    # the original's register carries is true of it.
+    @pytest.mark.parametrize("submitted", ["resubmission_2026"], indirect=True)
+    def test_a_document_no_esr_has_evaluated_says_so(
+        self, register: dict[str, Any]
+    ) -> None:
+        provenance = register["provenance"]
+        text = json.dumps(provenance)
+        assert "the text the ESR evaluated" not in text
+        assert "The ESR evaluated this text" not in text
+        assert "No ESR has evaluated this text yet" in provenance["relationship_to_esr"]["statement"]
+        assert "No ESR has evaluated" in provenance["current_assessment_artifact"]["statement"]
+
+    @pytest.mark.parametrize("submitted", ["resubmission_2026"], indirect=True)
+    def test_a_document_no_esr_has_evaluated_files_no_historical_submission(
+        self, register: dict[str, Any], submitted: Submitted
+    ) -> None:
+        provenance = register["provenance"]
+        assert "historical_submission" not in provenance
+        assert provenance["submission"]["call_id"]["value"] == submitted.call_id
+        assert provenance["submission"]["submission_id"]["value"] == submitted.submission_id
 
     def test_the_network_type_is_checked_on_the_page_it_is_declared_on(
         self, register: dict[str, Any]
     ) -> None:
-        dn_type = register["provenance"]["historical_submission"]["dn_type"]
+        dn_type = _submission_block(register)["dn_type"]
         assert dn_type["value"] == "standard Doctoral Network"
         assert dn_type["declared_status"] == "Confirmed"
         assert "p. 4" in dn_type["basis"]

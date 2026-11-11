@@ -113,6 +113,34 @@ _SCHEMA_REF = (
     f"root that has a schema: {INTAKE_SCHEMA_ID}."
 )
 
+#: The submitted documents an ESR has evaluated (ticket 17). The 2025 original
+#: has one. The 2026 resubmission has none at V16, so its register may not say
+#: that an ESR evaluated it. A submitted document not listed here gets the
+#: not-yet-evaluated wording: an unlisted document never claims an ESR.
+EVALUATED_BY_AN_ESR: frozenset[str] = frozenset({"official_original"})
+
+_EVALUATED_STATEMENT = (
+    "This file is the text the ESR evaluated. A result over it is a result over "
+    "the submission, as far as the extraction of it carries the submission: what "
+    "the extraction loses is the reconciliation above, and no statement here "
+    "settles it."
+)
+_NOT_YET_EVALUATED_STATEMENT = (
+    "This file is the submitted text. No ESR has evaluated it yet. A result over it "
+    "is a result over the submission, as far as its extraction carries the submission. "
+    "The reconciliation above records what the extraction loses."
+)
+_EVALUATED_RELATIONSHIP = (
+    "The ESR evaluated this text. A difference between a result over this "
+    "document and the ESR's own is therefore not explained by changed wording or "
+    "removed evidence, as it is for the copy. Assessor variance, the profile and "
+    "what the extraction lost remain."
+)
+_NOT_YET_EVALUATED_RELATIONSHIP = (
+    "No ESR has evaluated this text yet. This register therefore names no ESR record. "
+    "A later ESR of this text would be a record of its own."
+)
+
 PROCEDURE_REL = "plans/msca_dn_v08_original_dry_import_procedure.md"
 SPEC_REL = "plans/msca_dn_pre_evaluation_spec.md"
 RUNBOOK_REL = "plans/msca_dn_pe09_runbook.md"
@@ -436,6 +464,7 @@ def render_submitted_register(repo_root: Path, revision: Any) -> dict[str, Any]:
         )
     rows = _input_rows(repo_root, revision, records)
     intake = records.intake
+    evaluated = config.config_id in EVALUATED_BY_AN_ESR
     return {
         "record_type": REGISTER_RECORD_TYPE,
         "schema_ref": _SCHEMA_REF,
@@ -468,7 +497,7 @@ def render_submitted_register(repo_root: Path, revision: Any) -> dict[str, Any]:
                 "checked_against": f"{records.dir_rel}/{INVENTORY_FILE}",
                 "checked_by": "runner/original_configuration.py",
             },
-            "historical_submission": {
+            ("historical_submission" if evaluated else "submission"): {
                 "instrument": "MSCA Doctoral Networks",
                 "dn_type": _network_type(repo_root, revision, configuration),
                 "call_id": {
@@ -510,10 +539,7 @@ def render_submitted_register(repo_root: Path, revision: Any) -> dict[str, Any]:
                     ),
                 },
                 "statement": (
-                    "This file is the text the ESR evaluated. A result over it is a result over "
-                    "the submission, as far as the extraction of it carries the submission: what "
-                    "the extraction loses is the reconciliation above, and no statement here "
-                    "settles it."
+                    _EVALUATED_STATEMENT if evaluated else _NOT_YET_EVALUATED_STATEMENT
                 ),
             },
             "transformation": {
@@ -549,21 +575,24 @@ def render_submitted_register(repo_root: Path, revision: Any) -> dict[str, Any]:
                     ),
                 },
             },
-            "relationship_to_esr": {
-                "statement": (
-                    "The ESR evaluated this text. A difference between a result over this "
-                    "document and the ESR's own is therefore not explained by changed wording or "
-                    "removed evidence, as it is for the copy. Assessor variance, the profile and "
-                    "what the extraction lost remain."
-                ),
-                "esr_record": "docs/tier4_orchestration_state/msca_dn/esr/ (this repository)",
-                "esr_sha256": None,
-                "esr_sha256_basis": (
-                    "not resolved under the private root. The ESR is a public artifact of the "
-                    "repository, bound by hash in the committed register and in the V09 "
-                    "authority index; a hash this root cannot produce is not restated here."
-                ),
-            },
+            "relationship_to_esr": (
+                {
+                    "statement": _EVALUATED_RELATIONSHIP,
+                    "esr_record": "docs/tier4_orchestration_state/msca_dn/esr/ (this repository)",
+                    "esr_sha256": None,
+                    "esr_sha256_basis": (
+                        "not resolved under the private root. The ESR is a public artifact of the "
+                        "repository, bound by hash in the committed register and in the V09 "
+                        "authority index; a hash this root cannot produce is not restated here."
+                    ),
+                }
+                if evaluated
+                else {
+                    "statement": _NOT_YET_EVALUATED_RELATIONSHIP,
+                    "esr_record": None,
+                    "esr_sha256": None,
+                }
+            ),
             "storage": {
                 "stored_in_the_public_repository": False,
                 "basis": (

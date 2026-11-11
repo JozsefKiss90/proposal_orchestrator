@@ -700,6 +700,32 @@ class TestCommittedMscaDn:
         assert by_id == {"excellence": 4.2, "impact": 4.5, "implementation": 4.2}
         assert sc["no_deduction_attributed_to_individual_criticism"] is True
 
+    @pytest.mark.parametrize("seq", ["0001", "0002", "0003"])
+    def test_every_committed_comparison_replays_byte_equal(self, tmp_path, seq):
+        """Ticket 17: the copy's wording stays, so each committed comparison and
+        revisions artifact replays from the inputs it names. Only the output
+        directory, which the record spells absolute, is normalised."""
+        committed_dir = REPO / "docs/tier4_orchestration_state/msca_dn/comparisons"
+        committed = committed_dir / f"comparison_f60ae6e0a2a1_{seq}.json"
+        d = json.loads(committed.read_text(encoding="utf-8"))
+        out = tmp_path / "comparisons"
+        argv = [
+            "compare", "--baseline-dir", d["baseline"]["baseline_dir"], "--esr", d["esr_record"]["path"],
+            "--dispositions", d["dispositions"]["path"], "--candidate", d["candidate"]["path"],
+            "--historical-candidate", d["historical_candidate"]["path"],
+            "--register", d["fidelity_register"]["path"], "--repo-root", str(REPO),
+            "--profile", str(DN_PROFILE), "--out-dir", str(out),
+        ]
+        for audit in d["audits"]:
+            argv += ["--audit", audit["path"]]
+        assert cmd.main(argv, clock=lambda: d["compared_at"]) == 0
+        recorded_dir = Path(d["writes"][0]).parent.as_posix().encode()
+        for kind in ("comparison", "revisions"):
+            replayed = (out / f"{kind}_f60ae6e0a2a1_0001.json").read_bytes()
+            replayed = replayed.replace(out.as_posix().encode(), recorded_dir)
+            replayed = replayed.replace(b"f60ae6e0a2a1_0001", f"f60ae6e0a2a1_{seq}".encode())
+            assert replayed == (committed_dir / f"{kind}_f60ae6e0a2a1_{seq}.json").read_bytes(), kind
+
     def test_the_comparison_states_how_much_was_assessable(self, tmp_path):
         _code, data, rev, _frozen = self._run(tmp_path)
         s = data["summary"]
@@ -1186,3 +1212,64 @@ class TestConfirmedPreservationNeedsTheOriginalFidelityClaim:
                 continue
             rows = json.loads(path.read_text(encoding="utf-8-sig"))["rows"]
             assert not [r for r in rows if r.get("evidence_preserved_status") == "Confirmed"], name
+
+
+# --------------------------------------------------------------------------- #
+# Ticket 17: a submitted-document candidate is not called a sanitised copy
+# --------------------------------------------------------------------------- #
+
+
+def _declare_submitted(inputs, submitted=True) -> None:
+    _rewrite_register(
+        inputs,
+        lambda d: d["provenance"].update(
+            current_assessment_artifact={"is_submitted_document": submitted}
+        ),
+    )
+
+
+def _historical_copy(inputs) -> Path:
+    historical = inputs["world"] / "historical_candidate"
+    historical.mkdir()
+    for p in inputs["candidate"].iterdir():
+        data = json.loads(p.read_text(encoding="utf-8"))
+        if data["section_id"] == "S2":
+            data["sub_sections"][0]["content"] = "Task three is led by Participant B."
+        _write_json(historical / p.name, data)
+    return historical
+
+
+class TestSubmittedDocumentWording:
+    def test_the_score_statement_names_what_remains_and_no_derivative(self, inputs):
+        _declare_submitted(inputs)
+        code, out = _compare(inputs)
+        assert code == 0
+        statement = ec.load_comparison(next(out.glob("comparison_*.json")))["score_comparison"]["statement"]
+        assert "derivative" not in statement and "saniti" not in statement
+        for words in ("assessor variance", "the profile", "the extraction"):
+            assert words in statement, words
+
+    @pytest.mark.parametrize("with_historical", [False, True], ids=["alone", "with_historical"])
+    def test_no_row_says_the_submitted_document_is_unavailable(self, inputs, with_historical):
+        _declare_submitted(inputs)
+        extra = ("--historical-candidate", str(_historical_copy(inputs))) if with_historical else ()
+        code, out = _compare(inputs, *extra)
+        assert code == 0
+        rows = ec.load_comparison(next(out.glob("comparison_*.json")))["rows"]
+        for row in rows:
+            note = row["historical_proposal_evidence"]["note"]
+            assert "not available" not in note and "saniti" not in note, note
+            assert "the submitted document" in note
+
+    @pytest.mark.parametrize("submitted", [False, None], ids=["declared_false", "undeclared"])
+    def test_a_register_that_does_not_declare_the_submission_keeps_the_copys_wording(
+        self, inputs, submitted
+    ):
+        if submitted is not None:
+            _declare_submitted(inputs, submitted)
+        code, out = _compare(inputs, "--historical-candidate", str(_historical_copy(inputs)))
+        assert code == 0
+        data = ec.load_comparison(next(out.glob("comparison_*.json")))
+        assert "sanitised derivative of the assessed document" in data["score_comparison"]["statement"]
+        note = data["rows"][0]["historical_proposal_evidence"]["note"]
+        assert note.startswith("The submitted document is not available in this environment; the ")
