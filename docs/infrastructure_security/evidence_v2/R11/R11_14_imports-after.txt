@@ -1,0 +1,60 @@
+﻿== proposal-orchestrator-network-VpcId
+{
+    "Imports": [
+        "proposal-orchestrator-audit"
+    ]
+}
+exit=0
+== proposal-orchestrator-network-PrivateSubnetId
+aws : 
+At line:12 char:210
++ ... trator-$x"; aws cloudformation list-imports --profile po-r1 --region  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+aws: [ERROR]: An error occurred (ValidationError) when calling the ListImports operation: Export 'proposal-orchestrator-network-PrivateSubnetId' is not imported by 
+any stack.
+exit=254
+== proposal-orchestrator-network-EndpointSecurityGroupId
+aws : 
+At line:12 char:210
++ ... trator-$x"; aws cloudformation list-imports --profile po-r1 --region  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+aws: [ERROR]: An error occurred (ValidationError) when calling the ListImports operation: Export 'proposal-orchestrator-network-EndpointSecurityGroupId' is not impo
+rted by any stack.
+exit=254
+== proposal-orchestrator-network-HostSecurityGroupId
+aws : 
+At line:12 char:210
++ ... trator-$x"; aws cloudformation list-imports --profile po-r1 --region  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+aws: [ERROR]: An error occurred (ValidationError) when calling the ListImports operation: Export 'proposal-orchestrator-network-HostSecurityGroupId' is not imported
+ by any stack.
+exit=254
+== proposal-orchestrator-iam-RuntimeRoleArn
+{
+    "Imports": [
+        "proposal-orchestrator-kms",
+        "proposal-orchestrator-audit",
+        "proposal-orchestrator-secret"
+    ]
+}
+exit=0
+== proposal-orchestrator-iam-InstanceProfileName
+aws : 
+At line:12 char:210
++ ... trator-$x"; aws cloudformation list-imports --profile po-r1 --region  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+aws: [ERROR]: An error occurred (ValidationError) when calling the ListImports operation: Export 'proposal-orchestrator-iam-InstanceProfileName' is not imported by 
+any stack.
+exit=254

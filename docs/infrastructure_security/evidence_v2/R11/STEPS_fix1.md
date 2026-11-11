@@ -166,7 +166,8 @@ Get-Content "$E\R11_fix1_05_change-set.json"
 | Header, hourly cost | The instance is `c7i-flex.large` (per instance-hour). It has no CPU credits, so no surplus-credit charge applies |
 | 06 | Use `--change-set-name r11-fix1-create-01`. Write `R11_fix1_06_execute-exit.txt`, `R11_fix1_06_stack-status.json` and `R11_fix1_06_stack-events.json`, so run 1's files stay as evidence. Run the block **once** |
 | 09 | `R11_09_instance.json`: `type` `c7i-flex.large`. `R11_09_credit-specification.json`: no criterion; recorded for OD9-r1 (a c7i-flex instance has no CPU credit option). Every other criterion stands |
-| 13, 14 | Unchanged |
+| 13 | Unchanged |
+| 14 | `R11_14_imports-after.txt` (corrected 2026-11-11 after the run; the sheet's criterion was the agent's error): no import list names `proposal-orchestrator-host`. `network-VpcId` stays imported by `proposal-orchestrator-audit` (the flow log, `40-audit.yaml`) and `iam-RuntimeRoleArn` by `-kms`, `-audit` and `-secret` (key, bucket and secret policies), each `exit=0`. The other four exports: `ValidationError`, not imported by any stack, `exit=254`. Every other criterion stands |
 | 15, 17 | Unchanged (`r11-create-02`). The recreation reads the merged template, so it builds `c7i-flex.large` |
 | 18 | `R11_18_instance.json`: `type` `c7i-flex.large` |
 | All others | Unchanged |
