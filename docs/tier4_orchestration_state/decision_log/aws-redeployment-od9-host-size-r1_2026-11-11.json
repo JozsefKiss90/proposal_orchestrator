@@ -1,0 +1,74 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-od9-host-size-r1_2026-11-11",
+  "date": "2026-11-11",
+  "branch": "aws/r11-fix1-instance-type",
+  "base_commit": "ac99ffc2",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R11 of plans/aws_redeployment_tickets.md (revises OD9 of R0)",
+  "supersedes": "aws-redeployment-operator-decisions_2026-10-21, decision OD9 only, the host size; and that record's OD9 known gap, which R11 step 06 answers. The image (AL2023 x86_64) and every other decision there stand.",
+  "authority": "Agent-drafted under CLAUDE.md §9.4, recording a choice the operator made in session on 2026-11-11 after R11 step 06 failed. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no gate and amends no constitutional rule.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "the operator, in session on 2026-11-11 ('I choose c7i-flex.large'), after the Free plan refused t3.medium",
+  "decision": "The host is AL2023 x86_64 on c7i-flex.large, stopped when idle. t3.micro remains for a smoke run only. t3.medium is withdrawn: the Free plan refuses it. CPU credits are set only on a burstable T type.",
+  "why": "OD9 chose t3.medium and left open whether the Free plan permits it. R11 step 06 measured that it does not. OD10 (no upgrade before the ELTE approval) stands, so the host must be a Free Tier eligible type.",
+  "findings": [
+    {
+      "id": "F-OD9r1-1",
+      "declared_status": "Confirmed",
+      "finding": "On the Free plan in eu-north-1, CloudFormation's creation of the R11 host as t3.medium failed: 'The specified instance type is not eligible for Free Tier.' The six interface endpoints were created first and were rolled back with it.",
+      "basis": "docs/infrastructure_security/evidence_v2/R11/R11_06_stack-events.json (Host CREATE_FAILED, 2026-11-11 20:13:25 UTC); R11_06_stack-status.json (ROLLBACK_COMPLETE)."
+    },
+    {
+      "id": "F-OD9r1-2",
+      "declared_status": "Confirmed",
+      "finding": "An EC2 dry run does not evaluate Free Tier eligibility. The R11 step 03g dry run of the same t3.medium launch returned DryRunOperation. R1's dry run (F-OD1r1-3) therefore did not settle OD9's gap.",
+      "basis": "docs/infrastructure_security/evidence_v2/R11/R11_03_run-instances-dry-run.txt against R11_06_stack-events.json."
+    },
+    {
+      "id": "F-OD9r1-3",
+      "declared_status": "Confirmed",
+      "finding": "CreditSpecification is documented as the CPU credit option of a burstable T instance only. The documentation does not state what EC2 does when it is set on another type.",
+      "basis": "AWS CloudFormation template reference, AWS::EC2::Instance, property CreditSpecification, and AWS::EC2::Instance CreditSpecification ('Specifies the credit option for CPU usage of a T instance'), read 2026-11-11."
+    },
+    {
+      "id": "F-OD9r1-4",
+      "declared_status": "Unresolved",
+      "finding": "That c7i-flex.large is Free Tier eligible in eu-north-1, offered in eu-north-1a (the one private subnet's zone), x86_64, and its vCPU and memory size.",
+      "basis": "Measured by docs/infrastructure_security/evidence_v2/R11/STEPS_fix1.md step F03 (read-only). This record does not assert it from prior knowledge."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "OD9-r1",
+      "question": "Host image and size, given that the Free plan refuses t3.medium",
+      "answer_kind": "operator_answer",
+      "declared_status": "Confirmed",
+      "answer": "AL2023 x86_64, c7i-flex.large, stopped when idle. t3.micro for a smoke run only.",
+      "reason": "The Free plan refuses t3.medium (F-OD9r1-1), and OD10 keeps the account on the Free plan. The operator chose c7i-flex.large over the smoke-only t3.micro.",
+      "consequence": "deploy/aws/templates/90-host.yaml: InstanceType defaults to c7i-flex.large and allows c7i-flex.large and t3.micro; a condition IsBurstable sets CreditSpecification (CPUCredits standard) only for a t3 type, otherwise the property is omitted (F-OD9r1-3). tests/test_aws_host_template.py pins all three. The AN12 bundle's platform (manylinux x86_64, bundled CPython 3.11) is unchanged. R11 continues with STEPS_fix1.md, which amends the criteria of STEPS.md steps 06, 09 and 18 that name t3.medium or CPU credits. R14 prices c7i-flex.large."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "OD9-r1",
+      "declared_status": "Unresolved",
+      "gap": "F-OD9r1-4: eligibility, zone offering and size of c7i-flex.large are measured in STEPS_fix1.md step F03. If c7i-flex.large is not eligible or not offered in eu-north-1a, the operator chooses again before any change set."
+    },
+    {
+      "decision": "OD9-r1",
+      "declared_status": "Unresolved",
+      "gap": "What describe-instance-credit-specifications returns for a c7i-flex instance (R11 step 09). STEPS_fix1.md records the answer without a pass criterion on it."
+    },
+    {
+      "decision": "OD9-r1",
+      "declared_status": "Assumed",
+      "gap": "Free Tier eligible is not the same as free of charge: on the Free plan the host's hours draw on the account's credits. R14 prices the hours; the session-start credit floor stays as STEPS.md sets it."
+    }
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, prompt text or proposal content.",
+    "basis": "Identifiers, instance types and AWS error text only."
+  }
+}
