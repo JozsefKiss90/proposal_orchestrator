@@ -54,13 +54,13 @@ from typing import Any, Mapping, Protocol, Sequence
 from runner.json_extract import extract_first_json_object
 from harness.appendix_mapping import AppendixRow
 from harness.evidence_pack import UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET, estimate_tokens
-from harness.judge import Judge, JudgeResponseError
-from harness.content_hash import content_hash, file_hash
+from harness.content_hash import content_hash
+from harness.judge import DEFAULT_MAX_REDRAWS, DiscardedDraw, Judge, JudgeResponseError
 from harness.profile import Scoring
 from harness.provenance import ProvenanceRecord, prompt_hash
 from harness.routing import RoutingDecision, assert_judgeable
 from harness.rubrics import RUBRIC_INDEPENDENCE_PREAMBLE, ProfileBundle
-from harness.verdict import MIN_MAJORITY_SAMPLES, Verdict
+from harness.verdict import MIN_MAJORITY_SAMPLES
 
 __all__ = [
     "CRITERION_SCORING_METRIC",
@@ -528,10 +528,9 @@ class CriterionScore:
 
 
 #: Extra draws allowed for a single sample whose response will not parse.
-#: Three draws in all.  A malformed response is never repaired; it is drawn
-#: again over the identical prompt, and every discarded draw is recorded on
-#: the score (:class:`DiscardedDraw`).
-MAX_SAMPLE_REDRAWS: int = 2
+#: The judge owns the redraw (:meth:`~harness.judge.Judge.ask`); this is its
+#: default budget, kept under the name the criterion tests pin.
+MAX_SAMPLE_REDRAWS: int = DEFAULT_MAX_REDRAWS
 
 
 def criterion_property_key(criterion_id: str) -> str:
@@ -552,78 +551,51 @@ def _str_list(payload: Mapping[str, Any], key: str, *, required: bool) -> tuple[
 
 
 @dataclass(frozen=True)
-class DiscardedDraw:
-    """One assessor draw that would not parse, and was drawn again.
+class _ParsedSample:
+    """A parsed criterion sample as it reports itself to the judge's record.
 
-    Kept so that a re-ask never hides: the score a report carries names every
-    draw that was thrown away, why it was thrown, and the sha256 and length of
-    the text that was thrown.
+    The record carries the score normalised to ``[0, 1]`` so the trail stays
+    comparable with every other harness verdict.
     """
 
-    sample_index: int
-    attempt: int
-    reason: str
-    response_sha256: str
-    response_chars: int
+    sample: CriterionSample
+    scale_max: float
+    passed: bool | None = None
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "sample_index": self.sample_index,
-            "attempt": self.attempt,
-            "reason": self.reason,
-            "response_sha256": self.response_sha256,
-            "response_chars": self.response_chars,
-        }
+    @property
+    def score(self) -> float:
+        return self.sample.score / self.scale_max
+
+    @property
+    def rationale(self) -> str:
+        return self.sample.rationale
 
 
 def _draw_sample(
-    judge: Judge, system: str, user: str, scoring: Scoring, index: int
-) -> tuple[CriterionSample, list[DiscardedDraw]]:
-    """Draw one parseable sample, re-asking a malformed draw up to the budget.
+    judge: Judge,
+    system: str,
+    user: str,
+    scoring: Scoring,
+    index: int,
+    *,
+    property_key: str = CRITERION_SCORING_METRIC,
+) -> tuple[CriterionSample, list[DiscardedDraw], ProvenanceRecord]:
+    """Draw one parseable sample through the judge's one call path.
 
-    Re-asking is not repairing.  The no-repair rule this module works under
-    forbids mending what the assessor said; it does not forbid asking again.
-    Nothing from a discarded draw reaches the score: the text is not patched,
-    not merged and not partially read.  It is recorded — index, attempt, the
-    parser's own message, hash and length — and a fresh draw is taken over the
-    identical prompt.
-
-    The budget (:data:`MAX_SAMPLE_REDRAWS`) is small on purpose.  One stray
-    character in an otherwise sound answer is worth a second ask: a trailing
-    comma before the closing brace cost a 45-call run at call 44 on
-    2026-10-06.  An assessor that cannot produce the schema three times running
-    is not having an accident, and the run then fails closed carrying the
-    parser's message.
+    The judge redraws a malformed draw over the identical prompt within its
+    budget, records every discarded draw, fails closed when the budget is
+    spent, and writes the sample's provenance itself.  Nothing from a
+    discarded draw reaches the score.
     """
-    discarded: list[DiscardedDraw] = []
-    for attempt in range(MAX_SAMPLE_REDRAWS + 1):
-        raw = judge.raw_invoke(system, user)
-        try:
-            return _parse_sample(raw, scoring, index), discarded
-        except JudgeResponseError as exc:
-            # Below the parser, the checkpoint cannot tell a usable response
-            # from an unusable one.  Say so, or a resumed run would replay
-            # this draw and fail on it again.
-            cache = getattr(judge, "response_cache", None)
-            if cache is not None:
-                cache.discard_last(str(exc))
-            if attempt >= MAX_SAMPLE_REDRAWS:
-                raise JudgeResponseError(
-                    f"{exc} (sample {index}: {attempt + 1} draw(s) over an identical "
-                    f"prompt, every one malformed; nothing was repaired)"
-                ) from exc
-            discarded.append(
-                DiscardedDraw(
-                    sample_index=index,
-                    attempt=attempt,
-                    reason=str(exc),
-                    response_sha256=file_hash(raw.encode("utf-8")),
-                    response_chars=len(raw),
-                )
-            )
-    raise CriterionScoringError(  # pragma: no cover - the loop returns or raises
-        "unreachable: the redraw loop exited without a sample"
+    answer = judge.ask(
+        system,
+        user,
+        lambda raw: _ParsedSample(_parse_sample(raw, scoring, index), scoring.scale_max),
+        metric=CRITERION_SCORING_METRIC,
+        property_key=property_key,
+        sample_index=index,
     )
+    return answer.value.sample, list(answer.discarded_draws), answer.provenance
 
 
 def median_score(values: Sequence[float]) -> float:
@@ -709,9 +681,10 @@ def grade_criterion(
     never yield a score.  An incomplete input returns :data:`NOT_SCORED`
     without a judge call.  Each sample is
     parsed strictly (score on the scale and at its resolution, a shortcomings
-    list, a rationale); a malformed one fails the run through
-    :class:`~harness.judge.JudgeResponseError`.  Every sample's provenance is
-    appended to the judge's log with the score normalised to ``[0, 1]`` so
+    list, a rationale); a malformed one is redrawn by the judge within its
+    budget and then fails the run through
+    :class:`~harness.judge.JudgeResponseError`.  The judge appends every
+    sample's provenance to its log with the score normalised to ``[0, 1]`` so
     the trail stays comparable with every other harness verdict.
     """
     if judge.provenance_log is None:
@@ -774,26 +747,10 @@ def grade_criterion(
     records: list[ProvenanceRecord] = []
     discarded: list[DiscardedDraw] = []
     for i in range(n):
-        sample, thrown = _draw_sample(judge, system, user, scoring, i)
+        sample, thrown, record = _draw_sample(
+            judge, system, user, scoring, i, property_key=common["property_key"]
+        )
         discarded.extend(thrown)
-        verdict = Verdict(
-            metric=CRITERION_SCORING_METRIC,
-            property_key=common["property_key"],
-            score=sample.score / scoring.scale_max,
-            rationale=sample.rationale,
-            sample_index=i,
-        )
-        record = ProvenanceRecord.from_verdict(
-            verdict,
-            judge_model=judge.config.model,
-            judge_version=judge.config.version,
-            prompt_hash=digest,
-            timestamp=judge.clock(),
-            # The last call was the draw that parsed; a replayed one already
-            # has its live record from the run that drew it.
-            replayed=judge.last_call_replayed,
-        )
-        judge.provenance_log.append(record)
         samples.append(sample)
         records.append(record)
     values = [s.score for s in samples]

@@ -621,6 +621,7 @@ class BlindCell:
             "clean_pass": self.coverage.passed,
             "score": self.coverage.score,
             "coverage": self.coverage.to_dict(),
+            "discarded_draws": [d.to_dict() for d in self.coverage.discarded_draws],
         }
 
 
@@ -718,6 +719,10 @@ class BlindAssessmentReport:
     checkpoint_path: str = ""
     replayed_calls: int = 0
     live_calls: int = 0
+    #: Draws discarded as malformed and drawn again over the run: every
+    #: cell's plus every criterion score's.  Each one is named on the cell or
+    #: score that drew it.  A report written before this field reads as none.
+    discarded_draws: int = 0
     notes: str = _ADVISORY_NOTE
     advisory: bool = True
     blocking: bool = False
@@ -862,6 +867,7 @@ class BlindAssessmentReport:
             "checkpoint_path": self.checkpoint_path,
             "replayed_calls": self.replayed_calls,
             "live_calls": self.live_calls,
+            "discarded_draws": self.discarded_draws,
             "notes": self.notes,
             "summary": self.summary,
             "cells": [c.to_dict() for c in self.cells],
@@ -1084,6 +1090,12 @@ def assess_candidate(
         checkpoint_path=str(cache_stats.get("checkpoint_path", "")),
         replayed_calls=int(cache_stats.get("replayed_calls", 0)),
         live_calls=int(cache_stats.get("live_calls", 0)),
+        discarded_draws=sum(len(c.coverage.discarded_draws) for c in cells)
+        + (
+            sum(len(s.discarded_draws) for s in criterion_scoring.scores)
+            if criterion_scoring is not None
+            else 0
+        ),
     )
 
 
@@ -1276,6 +1288,12 @@ def render_report(report: Mapping[str, Any]) -> str:
             f"{replayed} replayed from the checkpoint"
             + ("  [NOT a fresh draw]" if replayed else "")
             + f"\n           {report.get('checkpoint_path', '')}\n"
+        )
+    discarded = int(report.get("discarded_draws") or 0)
+    if discarded:
+        lines.append(
+            f"redrawn:   {discarded} malformed draw(s) discarded and drawn again; "
+            "each is named on its cell or criterion score\n"
         )
     missing = report.get("partial_coverage") or []
     if missing:

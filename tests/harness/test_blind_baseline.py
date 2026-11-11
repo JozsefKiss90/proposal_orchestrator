@@ -579,6 +579,30 @@ class TestFreeze:
         assert TRANSPORT in printed
         assert f"{len(bb.BASELINE_CHECKS)} of {len(bb.BASELINE_CHECKS)} passed" in printed
 
+    def test_a_report_written_before_discarded_draws_still_loads_verifies_and_freezes(
+        self, world, bundle
+    ):
+        """Ticket 01, test 7: the field is additive; missing reads as none recorded."""
+        _code, report = _assess(world, bundle, RecordingBackend())
+        data = json.loads(report.read_text(encoding="utf-8"))
+        assert data["discarded_draws"] == 0
+        assert all(c["discarded_draws"] == [] for c in data["cells"])
+        del data["discarded_draws"]
+        for cell in data["cells"]:
+            del cell["discarded_draws"]
+        report.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        loaded = ba.load_report(report, _candidate_dir(world), bundle.profile)
+        assert "discarded_draws" not in loaded
+        assert cmd.main(
+            ["verify", "--report", str(report), "--candidate", str(_candidate_dir(world)),
+             "--profile", str(bundle.profile.source_path), "--repo-root", str(world)],
+            clock=lambda: FROZEN,
+        ) == 0
+        baseline = world / "baseline"
+        assert _freeze(world, bundle, report, baseline) == 0
+        assert bb.load_frozen_baseline(baseline).record["checks_passed"] == list(bb.BASELINE_CHECKS)
+
     def test_cells_and_criterion_scores_are_present_with_spreads(self, world, bundle):
         _code, report = _assess(world, bundle, RecordingBackend())
         baseline = world / "baseline"

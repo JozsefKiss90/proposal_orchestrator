@@ -1536,8 +1536,8 @@ ending `..."rationale": "...", }` — one trailing comma — and the fail-closed
 parse discarded 43 paid-for calls with it. Two changes, neither of which
 loosens a parser.
 
-**Every raw response is checkpointed as it arrives.** `Judge.raw_invoke` is the
-single seam every assessor call passes through, so the cache lives there. The
+**Every raw response is checkpointed as it arrives.** Every draw goes out
+through `Judge.ask` and its private `_send`, so the cache lives there. The
 file is JSONL under `.harness/checkpoints/` (never `--out-dir`: a failed run
 still writes no report), one header record carrying the run's binding and one
 record per response. `--resume <file>` replays those bytes through the same
@@ -1560,20 +1560,41 @@ mismatch) is refused, not read.
 
 **A response the parsers rejected is kept and never replayed.** The cache sits
 below the parsers and cannot tell a usable response from an unusable one, so
-`Judge.evaluate` and `criterion_scoring._draw_sample` tell it: a discard marker
-is appended beside the record. The bytes stay in the file as the faithful
-record of what the assessor said; a resume skips them and redraws that call.
+`Judge.ask` tells it: a discard marker is appended beside the record. The bytes
+stay in the file as the faithful record of what the assessor said; a resume
+skips them and redraws that call.
 Without this, the response that killed a run would kill every resume of it.
 
-**A malformed criterion sample is drawn again**, up to
-`MAX_SAMPLE_REDRAWS` (two extra draws, three in all), over the identical
-prompt. Re-asking is not repairing: nothing from a discarded draw is patched,
-merged or partly read, and every one is recorded on the score as a
-`DiscardedDraw` — index, attempt, the parser's own message, sha256 and length.
-An assessor that cannot produce the schema three times running is not having an
-accident, and the run fails closed carrying the parser's message. The criterion
-system prompt now also asks for strict JSON in as many words, which moved the
-criterion `prompt_hash`.
+**One call path, one redraw rule (ticket 01).** `Judge.ask(system, user,
+parser, *, metric, property_key)` is the only way a draw goes out; `evaluate`
+(`ask` + `parse_verdict`) and `evaluate_majority` (n × `evaluate` + majority
+vote) are presets on top of it, and the single-draw `_send` is private. Inside
+`ask`, in order: the checkpoint serves the call or it is drawn live and
+recorded; the parser reads it strictly; on `JudgeResponseError` — and only
+that, any other exception passes straight through — the draw is discarded from
+the checkpoint, recorded as a `DiscardedDraw` (sample index, attempt, the
+parser's own message, sha256 and length, and `replayed: true` when the thrown
+draw came from a resumed checkpoint) and drawn again over the identical prompt,
+up to the judge's `max_redraws` (default `DEFAULT_MAX_REDRAWS`, two extra
+draws, three in all; criterion scoring's `MAX_SAMPLE_REDRAWS` is the same
+number). A replayed draw that fails uses budget like a live one. Once the
+budget is spent the ask fails closed with the parser's last message and the
+draw count; nothing is repaired. Then the judge writes the provenance record
+itself, from what the parsed value reports about itself (`Judged`: `score`,
+`passed`, `rationale`), and returns the value, its record and its discarded
+draws. In a majority vote of n a redraw replaces the malformed sample, so there
+are still n votes.
+
+This holds for every caller: the blind-assessment cells and every
+`evaluate`/`evaluate_majority` metric, the criterion samples, and claim-ledger
+decomposition (whose parser raises `JudgeResponseError`). The DN blind report
+names every discarded draw: each cell carries `discarded_draws` (the criterion
+scores already did), and the report carries the run's total as
+`discarded_draws` next to `replayed_calls` / `live_calls`, rendered as a
+`redrawn:` line when non-zero. The field is additive: a report written before
+it loads, verifies and freezes as before (missing reads as none recorded); no
+freeze check reads it. The criterion system prompt also asks for strict JSON in
+as many words, which moved the criterion `prompt_hash`.
 
 **Salvage (`salvage`).** One-off recovery for a run that spent its quota before
 the checkpoint existed. The `claude` CLI writes one session transcript per
@@ -1588,8 +1609,10 @@ and that single deterministic transformation is undone before comparing.
 The binding is computed by the same `_cache_binding` the assess run uses, so a
 salvaged checkpoint either resumes or is refused, never half-matches. A
 transcript matching nothing is named and left out, which costs the resumed run
-one live call and can never cost it a wrong answer. A recorded response that
-will not parse is written and immediately marked discarded, so it is redrawn.
+one live call and can never cost it a wrong answer. Each recorded response is
+judged with the run's own verdict parser (`parse_verdict`), not "any JSON
+object": one that would not parse as a verdict is written and immediately marked
+discarded, so it is redrawn.
 
 Only the cells are recovered. A criterion prompt carries the drawing run's
 aspect findings, so it cannot be rebuilt from the candidate alone, and the

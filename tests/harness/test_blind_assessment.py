@@ -308,6 +308,34 @@ class TestAssessor:
         with pytest.raises(JudgeResponseError):
             ba.assess_candidate(judge, bundle, candidate, clock=lambda: FROZEN)
 
+    def test_a_malformed_cell_draw_is_redrawn_and_recorded_on_the_cell(self, tmp_path, bundle):
+        """Ticket 01, test 1: one malformed draw, then a valid one, succeeds with
+        exactly one discarded draw recorded on the cell that drew it."""
+
+        class MalformedOnce(ScriptedBackend):
+            def __call__(self, messages):
+                if self.calls == 0:
+                    self.calls += 1
+                    return {"content": "not json at all"}
+                return super().__call__(messages)
+
+        candidate = _candidate(tmp_path, bundle)
+        backend = MalformedOnce(PASS_JSON)
+        report = _assess(tmp_path, bundle, candidate, backend)
+        data = report.to_dict()
+        first, *rest = data["cells"]
+        assert len(first["discarded_draws"]) == 1
+        (draw,) = first["discarded_draws"]
+        assert draw["sample_index"] == 0 and draw["attempt"] == 0
+        assert "parseable JSON" in draw["reason"]
+        assert draw["response_chars"] == len("not json at all")
+        assert all(c["discarded_draws"] == [] for c in rest)
+        assert data["discarded_draws"] == 1
+        assert "redrawn:   1 malformed draw(s)" in ba.render_report(data)
+        # Still n votes on the cell: the redraw replaced the malformed sample.
+        assert report.cells[0].coverage.verdict.n == 3
+        assert backend.calls == 3 * len(report.cells) + 1
+
     def test_panel_below_the_majority_minimum_is_refused(self, tmp_path, bundle):
         judge = _judge(tmp_path, ScriptedBackend())
         with pytest.raises(ba.BlindAssessmentError, match="majority"):
@@ -316,7 +344,10 @@ class TestAssessor:
     def test_malformed_response_via_the_command_exits_2_and_writes_nothing(self, tmp_path, bundle):
         candidate = _candidate(tmp_path, bundle)
         out = tmp_path / "reports"
-        judge = _judge(tmp_path, ScriptedBackend(PASS_JSON, '{"rationale": "no verdict"}'))
+        # One sound draw, then three malformed ones: the second sample spends its
+        # redraw budget and the run fails closed.
+        bad = '{"rationale": "no verdict"}'
+        judge = _judge(tmp_path, ScriptedBackend(PASS_JSON, bad, bad, bad))
         code = cmd.main(
             preflighted(["assess", "--candidate", str(candidate), "--out-dir", str(out),
              "--repo-root", str(bundle.profile.source_path.parents[1]),

@@ -157,31 +157,34 @@ class TestParseAssertionsPayload:
         assert cl.parse_assertions_payload(raw) == ("a",)
 
     def test_no_object_raises(self):
-        with pytest.raises(cl.ClaimLedgerError, match="no parseable JSON object"):
+        with pytest.raises(JudgeResponseError, match="no parseable JSON object"):
             cl.parse_assertions_payload("not json")
 
     def test_bare_top_level_array_raises(self):
-        with pytest.raises(cl.ClaimLedgerError, match="no parseable JSON object"):
+        with pytest.raises(JudgeResponseError, match="no parseable JSON object"):
             cl.parse_assertions_payload('["a", "b"]')
 
     def test_missing_key_raises(self):
-        with pytest.raises(cl.ClaimLedgerError, match="assertions"):
+        with pytest.raises(JudgeResponseError, match="assertions"):
             cl.parse_assertions_payload('{"other": []}')
 
     def test_non_string_member_raises(self):
-        with pytest.raises(cl.ClaimLedgerError, match=r"\[1\]"):
+        with pytest.raises(JudgeResponseError, match=r"\[1\]"):
             cl.parse_assertions_payload('{"assertions": ["ok", 42]}')
 
     def test_blank_member_raises_not_dropped(self):
-        with pytest.raises(cl.ClaimLedgerError, match=r"\[0\]"):
+        with pytest.raises(JudgeResponseError, match=r"\[0\]"):
             cl.parse_assertions_payload('{"assertions": ["  "]}')
 
 
 class TestDecomposeChunk:
     def test_returns_texts_and_logs_provenance(self, tmp_path):
-        judge, backend = make_judge(always({"assertions": ["the host is ELTE"]}))
+        backend = RuleBackend(always({"assertions": ["the host is ELTE"]}))
+        judge = Judge(
+            JudgeConfig(model="acme-judge-1", version="v1"), backend=backend, clock=lambda: "T"
+        )
         log = ProvenanceLog(tmp_path / "prov.jsonl")
-        texts = cl.decompose_chunk(judge, chunk(), provenance_log=log, clock=lambda: "T")
+        texts = cl.decompose_chunk(judge, chunk(), provenance_log=log)
         assert texts == ("the host is ELTE",)
         assert len(backend.calls) == 1
         system, user = backend.calls[0]
@@ -226,8 +229,52 @@ class TestDecomposeChunk:
 
     def test_malformed_raises(self):
         judge, _ = make_judge(always("not json"))
-        with pytest.raises(cl.ClaimLedgerError):
+        with pytest.raises(JudgeResponseError):
             cl.decompose_chunk(judge, chunk())
+
+    def test_a_malformed_draw_is_discarded_redrawn_and_logged_by_the_judge(self, tmp_path):
+        """Ticket 01, test 2."""
+        from harness.provenance import prompt_hash
+        from harness.response_cache import CacheBinding, ResponseCache
+
+        binding = CacheBinding(
+            candidate_hash="sha256:" + "a" * 64,
+            profile_version="sha256:" + "b" * 64,
+            assessor_pin="acme-judge-1@v1",
+            preflight_pack_set_hash="sha256:" + "c" * 64,
+            include_claims=False,
+            n=3,
+            criterion_samples=5,
+            temperature=0.0,
+            max_tokens=2048,
+        )
+        path = tmp_path / "ck.jsonl"
+        cache = ResponseCache(path, binding)
+        replies = iter(["not json", json.dumps({"assertions": ["the host is ELTE"]})])
+        backend = RuleBackend(lambda system, user: next(replies))
+        log = ProvenanceLog(tmp_path / "prov.jsonl")
+        judge = Judge(
+            JudgeConfig(model="acme-judge-1", version="v1"),
+            backend=backend,
+            provenance_log=log,
+            clock=lambda: "judge-clock",
+            response_cache=cache,
+        )
+        assert cl.decompose_chunk(judge, chunk()) == ("the host is ELTE",)
+        assert len(backend.calls) == 2
+        assert cache.discarded == 1
+        resumed = ResponseCache(path, binding, resume=True)
+        system, user = cl.build_decomposition_prompt(chunk())
+        assert resumed.replayable == 1
+        assert resumed.take(prompt_hash(system, user)) == json.dumps(
+            {"assertions": ["the host is ELTE"]}
+        )
+        (record,) = log.records()
+        # Written by the judge: its clock, its record shape.
+        assert record["timestamp"] == "judge-clock"
+        assert record["metric"] == cl.DECOMPOSITION_METRIC
+        assert record["property_key"] == "1.1:c00"
+        assert record["rationale"] == "decomposed 1 assertion(s) from 1.1:c00"
 
 
 class TestDedupAssertions:
