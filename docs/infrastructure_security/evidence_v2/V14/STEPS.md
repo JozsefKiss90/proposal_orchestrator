@@ -200,6 +200,7 @@ Set `$O` to your output folder `O`. The bucket encrypts with the project key by 
 $E = "docs\infrastructure_security\evidence_v2\V14"; $V2 = "docs\infrastructure_security\evidence_v2"; $O = "<O>"
 function O($f, $k) { ((Get-Content $f -Raw | ConvertFrom-Json) | Where-Object OutputKey -eq $k).OutputValue }
 $DB = O "$V2\R7\R7_outputs.json" DeployBucketName; $N = "input-20261112-40eb1f.tar.gz"
+if ($O -match '[<>]' -or -not (Test-Path -LiteralPath "$O\$N")) { throw "H02 refused: set `$O to the W06 output folder holding $N" }
 & { (Get-FileHash "$O\$N" -Algorithm SHA256).Hash.ToLower(); (Get-Item "$O\$N").Length; aws s3 cp "$O\$N" "s3://$DB/bundles/$N" --profile po-r1 --region eu-north-1 --only-show-errors; "cp_exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\V14_H02_upload.txt"
 aws s3api head-object --profile po-r1 --region eu-north-1 --bucket $DB --key "bundles/$N" --query "{length:ContentLength,sse:ServerSideEncryption,kmsKey:SSEKMSKeyId,bucketKey:BucketKeyEnabled,version:VersionId}" --output json 2>&1 | Out-File -Encoding utf8 "$E\V14_H02_head.json"
 Get-Content "$E\V14_H02_upload.txt", "$E\V14_H02_head.json"
@@ -308,6 +309,7 @@ ends `RESULT=started`. A started host keeps `/root/v14`. After a start, use `V14
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\V14"; $O = "<O>"
+if ($O -match '[<>]') { throw "H08a refused: set `$O to your output folder" }
 py -3.10 "$E\workstation\v14_pack_one.py" --freeze C:\Code\proposal_demo\freeze_bundle --esr --out-dir $O --vars-out "$E\host\v14_esr.vars.json"
 ```
 
