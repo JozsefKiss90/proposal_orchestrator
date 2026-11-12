@@ -349,11 +349,13 @@ re-assessed.
 
 **Blocked by:** R12a, R9, R11.
 
-- [ ] Register v2 shows every control as VERIFIED_PASS, NOT_APPLICABLE with a reason, or DEFERRED
+Confirmed by the operator 2026-11-12 with criterion 2 (F7) open: `evidence_v2/R12b/VERIFICATION.md`, decision record `aws-redeployment-r12b-reevidence_2026-11-12`.
+
+- [x] Register v2 shows every control as VERIFIED_PASS, NOT_APPLICABLE with a reason, or DEFERRED
       with a reason, and gives a v2 evidence path for each.
-- [ ] The presigned PUT to an outside bucket fails from the host (closes F7).
-- [ ] The DC-15 in-host tests are collected.
-- [ ] DC-40 is re-assessed. It stays N/A unless the account joined an Organization.
+- [ ] The presigned PUT to an outside bucket fails from the host (closes F7). **Open:** 2026-11-12 run inconclusive (`404 NoSuchBucket`, F-R12b-1); retest in the next host session (R12b-D9).
+- [x] The DC-15 in-host tests are collected.
+- [x] DC-40 is re-assessed. It stays N/A unless the account joined an Organization.
 
 ## R15 Host install and Converse smoke run
 

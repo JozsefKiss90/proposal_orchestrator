@@ -7,8 +7,9 @@
   "ticket": "R12b of plans/aws_redeployment_tickets.md (full re-evidence and register v2)",
   "supersedes": "none. Amends point 2 of R12b STEPS.md (F7 bucket) by the operator's answer of 2026-11-12.",
   "authority": "Agent-drafted under CLAUDE.md §9.4. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no proposal gate and amends no constitutional rule.",
-  "review_state": "agent_drafted_pending_operator_review",
-  "decided_by": "R12b-D1–D3, D9: the operator in session. D4, D5, D7, D8 (approach): STEPS.md points 4, 5, 7, 8, confirmed by the operator ('points 4, 7, 8 confirmed'). D6: the agent, with the operator's go. D8 (status), D10–D12: the agent, pending the operator's review.",
+  "review_state": "operator_confirmed",
+  "confirmed": "2026-11-12 01:14 UTC, operator in session: 'R12b confirmed, tick criteria 1, 3 and 4 and leave F7 unticked'. Taken as the review of R12b-D8, D10–D12. Step 12 (tests, guards, scan) had not run at that moment.",
+  "decided_by": "R12b-D1–D3, D9: the operator in session. D4, D5, D7, D8 (approach): STEPS.md points 4, 5, 7, 8, confirmed by the operator ('points 4, 7, 8 confirmed'). D6: the agent, with the operator's go. D8 (status), D10–D12: the agent, reviewed with the operator's confirmation of R12b (2026-11-12).",
   "decision": "R12b re-evidences every register v2 control with the R12a collector on one host session (fix 1), defers DC-33–35 to R15, marks DC-40 not applicable, and carries F7 forward to the next host session.",
   "why": "The ticket asks for register v2 complete with a v2 path per row, F7, the DC-15 in-host tests and DC-40 re-assessed. The first real collector run also exposed three collector defects, recorded here so that the evidence they affect is read correctly.",
   "inputs": [
@@ -63,30 +64,147 @@
     }
   ],
   "decisions": [
-    {"id": "R12b-D1", "question": "DC-33–DC-35 without a bundle on the host", "answer_kind": "operator_decision", "declared_status": "Confirmed", "answer": "Deferred to R15: the launcher check runs on the O5 bundle.", "reason": "The launcher imports boto3; the AL2023 host has none and no internet route; the O5 bundle does not exist yet.", "consequence": "Register rows DC-33–35 DEFERRED; collector run without --host-bundle-dir."},
-    {"id": "R12b-D2", "question": "F7 outside bucket", "answer_kind": "operator_decision", "declared_status": "Confirmed", "answer": "No second account: the URL is presigned with po-r1 for a random bucket name this account does not own.", "reason": "Operator 2026-11-12 ('use this one'). Replaces STEPS.md point 2.", "consequence": "The test cannot show the outside-signer half (aws:PrincipalAccount). With a non-existent bucket it proved inconclusive (F-R12b-1)."},
-    {"id": "R12b-D3", "question": "Scope of the go given before the sheet existed", "answer_kind": "operator_decision", "declared_status": "Confirmed", "answer": "The go of 2026-11-11 22:58 UTC held for one creation once the sheet was reviewed.", "reason": "STEPS.md point 3.", "consequence": "Used by round 2; the second creation took a new go (R12b-D6)."},
-    {"id": "R12b-D4", "question": "Recreation", "answer_kind": "agent_decision_operator_confirmed", "declared_status": "Confirmed", "answer": "No recreation test: R11 proved it twice.", "reason": "STEPS.md point 4.", "consequence": "Two creations happened only because round 2 collected nothing."},
-    {"id": "R12b-D5", "question": "DC-26 timing", "answer_kind": "agent_decision", "declared_status": "Confirmed", "answer": "A metadata-only lookup no earlier than 15 minutes after the collector, after the delete.", "reason": "STEPS.md point 5; F-R12a-2.", "consequence": "R12b_fix1_11_converse-events.json holds the event; the collector's own lookup held none."},
-    {"id": "R12b-D6", "question": "Round 2 and fix 1", "answer_kind": "agent_decision_operator_go", "declared_status": "Confirmed", "answer": "Round 2 is superseded (collector refused before any AWS call). Fix 1 writes and checks the URL before the stack exists, uses change set r12b-create-02, and gates F06 on F01 and F05 inside one paste, with the delete in every case.", "reason": "RUNLOG.md round 2; operator's go 2026-11-12 00:25 UTC.", "consequence": "VERIFICATION.md rests on the fix-1 files."},
-    {"id": "R12b-D7", "question": "DC-40", "answer_kind": "agent_decision_operator_confirmed", "declared_status": "Confirmed", "answer": "NOT_APPLICABLE: the management account is outside the project and SCP listing is denied; Region enforcement rests on DC-16 and DC-17.", "reason": "STEPS.md point 7; DC-40_organization.json, DC-40_scp-list.txt.", "consequence": "Register row DC-40."},
-    {"id": "R12b-D8", "question": "DC-39", "answer_kind": "agent_proposal", "declared_status": "Inferred", "answer": "VERIFIED_PASS by document review: Service Terms §1.14.1 incorporates the AWS DPA when the account processes Customer Data; §1.14.3 incorporates the 2021 SCCs.", "reason": "STEPS.md point 8 (approach confirmed); the DPA PDF text was not readable.", "consequence": "Register row DC-39. Pending the operator's review."},
-    {"id": "R12b-D9", "question": "F7 after the inconclusive run", "answer_kind": "operator_decision", "declared_status": "Confirmed", "answer": "Retest in the next host session, against a bucket that exists, expecting the endpoint's 403.", "reason": "Operator 2026-11-12: 'retest F7 in the next session'. Avoids a creation for one check.", "consequence": "Ticket criterion 2 stays unticked; F7 stays open."},
-    {"id": "R12b-D10", "question": "DC-15 with the script defect", "answer_kind": "agent_proposal", "declared_status": "Inferred", "answer": "VERIFIED_PASS: no IAM user, no account access key, every host file and process scan clean; the unexpected result comes only from F-R12b-2, and DC-14 shows the CLI uses the role's instance session.", "reason": "F-R12b-2.", "consequence": "Register row DC-15. Pending the operator's review."},
-    {"id": "R12b-D11", "question": "The three DC-11 files lost to alternate data streams", "answer_kind": "agent_proposal", "declared_status": "Inferred", "answer": "The recovered copies in R12b_fix1_09_ads-recovered/ (bound by RECOVERY.sha256, read from the streams on the workstation the collector wrote them on) are accepted as the collector's output for those three cases.", "reason": "F-R12b-3; the collector folder is not edited.", "consequence": "DC-11 note cites them. Pending the operator's review."},
-    {"id": "R12b-D12", "question": "The seven simulations decided by the SCP", "answer_kind": "agent_proposal", "declared_status": "Inferred", "answer": "They do not evidence R5's policies; R5 step 12 stays the evidence for those cases, and R11/R12b live calls show the allowed paths work.", "reason": "F-R12b-4.", "consequence": "DC-11 and DC-12 notes. Pending the operator's review."}
+    {
+      "id": "R12b-D1",
+      "question": "DC-33–DC-35 without a bundle on the host",
+      "answer_kind": "operator_decision",
+      "declared_status": "Confirmed",
+      "answer": "Deferred to R15: the launcher check runs on the O5 bundle.",
+      "reason": "The launcher imports boto3; the AL2023 host has none and no internet route; the O5 bundle does not exist yet.",
+      "consequence": "Register rows DC-33–35 DEFERRED; collector run without --host-bundle-dir."
+    },
+    {
+      "id": "R12b-D2",
+      "question": "F7 outside bucket",
+      "answer_kind": "operator_decision",
+      "declared_status": "Confirmed",
+      "answer": "No second account: the URL is presigned with po-r1 for a random bucket name this account does not own.",
+      "reason": "Operator 2026-11-12 ('use this one'). Replaces STEPS.md point 2.",
+      "consequence": "The test cannot show the outside-signer half (aws:PrincipalAccount). With a non-existent bucket it proved inconclusive (F-R12b-1)."
+    },
+    {
+      "id": "R12b-D3",
+      "question": "Scope of the go given before the sheet existed",
+      "answer_kind": "operator_decision",
+      "declared_status": "Confirmed",
+      "answer": "The go of 2026-11-11 22:58 UTC held for one creation once the sheet was reviewed.",
+      "reason": "STEPS.md point 3.",
+      "consequence": "Used by round 2; the second creation took a new go (R12b-D6)."
+    },
+    {
+      "id": "R12b-D4",
+      "question": "Recreation",
+      "answer_kind": "agent_decision_operator_confirmed",
+      "declared_status": "Confirmed",
+      "answer": "No recreation test: R11 proved it twice.",
+      "reason": "STEPS.md point 4.",
+      "consequence": "Two creations happened only because round 2 collected nothing."
+    },
+    {
+      "id": "R12b-D5",
+      "question": "DC-26 timing",
+      "answer_kind": "agent_decision",
+      "declared_status": "Confirmed",
+      "answer": "A metadata-only lookup no earlier than 15 minutes after the collector, after the delete.",
+      "reason": "STEPS.md point 5; F-R12a-2.",
+      "consequence": "R12b_fix1_11_converse-events.json holds the event; the collector's own lookup held none."
+    },
+    {
+      "id": "R12b-D6",
+      "question": "Round 2 and fix 1",
+      "answer_kind": "agent_decision_operator_go",
+      "declared_status": "Confirmed",
+      "answer": "Round 2 is superseded (collector refused before any AWS call). Fix 1 writes and checks the URL before the stack exists, uses change set r12b-create-02, and gates F06 on F01 and F05 inside one paste, with the delete in every case.",
+      "reason": "RUNLOG.md round 2; operator's go 2026-11-12 00:25 UTC.",
+      "consequence": "VERIFICATION.md rests on the fix-1 files."
+    },
+    {
+      "id": "R12b-D7",
+      "question": "DC-40",
+      "answer_kind": "agent_decision_operator_confirmed",
+      "declared_status": "Confirmed",
+      "answer": "NOT_APPLICABLE: the management account is outside the project and SCP listing is denied; Region enforcement rests on DC-16 and DC-17.",
+      "reason": "STEPS.md point 7; DC-40_organization.json, DC-40_scp-list.txt.",
+      "consequence": "Register row DC-40."
+    },
+    {
+      "id": "R12b-D8",
+      "question": "DC-39",
+      "answer_kind": "agent_proposal_operator_confirmed",
+      "declared_status": "Confirmed",
+      "answer": "VERIFIED_PASS by document review: Service Terms §1.14.1 incorporates the AWS DPA when the account processes Customer Data; §1.14.3 incorporates the 2021 SCCs.",
+      "reason": "STEPS.md point 8 (approach confirmed); the DPA PDF text was not readable.",
+      "consequence": "Register row DC-39. Confirmed with R12b, 2026-11-12."
+    },
+    {
+      "id": "R12b-D9",
+      "question": "F7 after the inconclusive run",
+      "answer_kind": "operator_decision",
+      "declared_status": "Confirmed",
+      "answer": "Retest in the next host session, against a bucket that exists, expecting the endpoint's 403.",
+      "reason": "Operator 2026-11-12: 'retest F7 in the next session'. Avoids a creation for one check.",
+      "consequence": "Ticket criterion 2 stays unticked; F7 stays open."
+    },
+    {
+      "id": "R12b-D10",
+      "question": "DC-15 with the script defect",
+      "answer_kind": "agent_proposal_operator_confirmed",
+      "declared_status": "Confirmed",
+      "answer": "VERIFIED_PASS: no IAM user, no account access key, every host file and process scan clean; the unexpected result comes only from F-R12b-2, and DC-14 shows the CLI uses the role's instance session.",
+      "reason": "F-R12b-2.",
+      "consequence": "Register row DC-15. Confirmed with R12b, 2026-11-12."
+    },
+    {
+      "id": "R12b-D11",
+      "question": "The three DC-11 files lost to alternate data streams",
+      "answer_kind": "agent_proposal_operator_confirmed",
+      "declared_status": "Confirmed",
+      "answer": "The recovered copies in R12b_fix1_09_ads-recovered/ (bound by RECOVERY.sha256, read from the streams on the workstation the collector wrote them on) are accepted as the collector's output for those three cases.",
+      "reason": "F-R12b-3; the collector folder is not edited.",
+      "consequence": "DC-11 note cites them. Confirmed with R12b, 2026-11-12."
+    },
+    {
+      "id": "R12b-D12",
+      "question": "The seven simulations decided by the SCP",
+      "answer_kind": "agent_proposal_operator_confirmed",
+      "declared_status": "Confirmed",
+      "answer": "They do not evidence R5's policies; R5 step 12 stays the evidence for those cases, and R11/R12b live calls show the allowed paths work.",
+      "reason": "F-R12b-4.",
+      "consequence": "DC-11 and DC-12 notes. Confirmed with R12b, 2026-11-12."
+    }
   ],
   "known_gaps": [
-    {"decision": "R12b-D9", "declared_status": "Unresolved", "gap": "F7 not closed."},
-    {"decision": "R12b-D1", "declared_status": "Unresolved", "gap": "DC-33–35 not collected until R15."},
-    {"decision": "F-R12b-2, F-R12b-3, F-R12b-4", "declared_status": "Unresolved", "gap": "Collector defects to fix (with tests) before its next run."},
-    {"decision": "R12b-D6", "declared_status": "Assumed", "gap": "Cost of two creations (about 9 and 10 minutes); credits 199.25 USD, billing delayed; R14 prices it."}
+    {
+      "decision": "R12b-D9",
+      "declared_status": "Unresolved",
+      "gap": "F7 not closed."
+    },
+    {
+      "decision": "R12b-D1",
+      "declared_status": "Unresolved",
+      "gap": "DC-33–35 not collected until R15."
+    },
+    {
+      "decision": "F-R12b-2, F-R12b-3, F-R12b-4",
+      "declared_status": "Unresolved",
+      "gap": "Collector defects to fix (with tests) before its next run."
+    },
+    {
+      "decision": "R12b-D6",
+      "declared_status": "Assumed",
+      "gap": "Cost of two creations (about 9 and 10 minutes); credits 199.25 USD, billing delayed; R14 prices it."
+    }
   ],
   "not_evidence_of": [
     "DC-33–35 (deferred); any proposal content (the Converse call carried the fixed test string only)."
   ],
-  "unblocks_when_recorded": ["R14 (prices both R12b creations)", "A5 R13 (documentation amendments after R12b)"],
-  "stays_blocked": ["F7 closure until the next host session"],
+  "unblocks_when_recorded": [
+    "R14 (prices both R12b creations)",
+    "A5 R13 (documentation amendments after R12b)"
+  ],
+  "stays_blocked": [
+    "F7 closure until the next host session"
+  ],
   "privacy": {
     "declared_status": "Confirmed",
     "claim": "No secret value, credential, session token, presigned URL, prompt text or model output other than the fixed test string in the evidence.",

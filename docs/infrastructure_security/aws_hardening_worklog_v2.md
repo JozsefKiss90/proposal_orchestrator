@@ -518,4 +518,4 @@ Each entry records the same fields as v1:
 | Evidence Requested | `R12b_01_*`–`R12b_04_*`, `R12b_fix1_01_*`–`R12b_fix1_11_*`, `R12b_outputs.json`, `R12b_09_collector/` |
 | Evidence Received | `evidence_v2/R12b/`: one collector run against the live account and host (`exit=0`, 93 collected), the host stack created and deleted twice, one Converse call attributed to the runtime role through the Bedrock endpoint |
 | Verification Result | Ticket criteria 1, 3 and 4 PASS; criterion 2 (F7) open: `404 NoSuchBucket`, inconclusive (F-R12b-1). Collector defects F-R12b-2, -3, -4 |
-| Next Action | Operator: step 12; review R12b-D8, D10–D12; confirm R12b. Agent then ticks criteria 1, 3, 4. F7 retest in the next host session (R12b-D9). Collector fixes before its next run. Frontier: R14 |
+| Next Action | R12b confirmed by the operator (2026-11-12 01:14 UTC); criteria 1, 3, 4 ticked, F7 open. Operator: step 12 (`R12b_12_*`) still to run. F7 retest in the next host session (R12b-D9). Collector fixes before its next run. Frontier: R14 |

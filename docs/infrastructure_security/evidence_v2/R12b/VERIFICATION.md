@@ -64,8 +64,8 @@ proposed: VERIFIED_PASS, Inferred.
 - [x] Every criterion above is PASS, except round 2 (superseded) and F7 (open, carried forward).
 - [x] Register v2 updated (2026-11-12), Summary table included.
 - [x] Decision record `aws-redeployment-r12b-reevidence_2026-11-12` drafted.
-- [ ] Step 12 after this report.
-- [ ] Operator reviews the record (R12b-D7–D12) and confirms R12b; the agent ticks criteria 1, 3 and 4, and leaves criterion 2 (F7) open.
+- [ ] Step 12 after this report (not yet run when R12b was confirmed).
+- [x] Operator confirmed R12b (2026-11-12 01:14 UTC), taken as the review of R12b-D8, D10–D12; criteria 1, 3 and 4 ticked, criterion 2 (F7) left open.
 
 ## Notes for later tickets
 

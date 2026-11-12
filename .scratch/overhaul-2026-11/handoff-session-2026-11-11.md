@@ -223,7 +223,7 @@ Ticked only on the evidence each protocol (§3) names. Newest line last.
       VERIFICATION.md follows step 23.
       DONE 2026-11-11 22:58 UTC: steps 06–23 PASS (host on `c7i-flex.large`, OD9-r1), operator confirmed R11 and
       reviewed R11-D11/D12 (`aws-redeployment-r11-host_2026-11-11`); last commit before close `17f4631d`.
-- [ ] **A2** — R12b
+- [x] **A2** — R12b. Confirmed 2026-11-12 01:14 UTC with F7 open (retest in the next host session, R12b-D9); register v2 35 VERIFIED_PASS / 4 DEFERRED / 2 N/A (`aws-redeployment-r12b-reevidence_2026-11-12`). Collector defects F-R12b-2–4 to fix before its next run. Step 12 pending.
 - [ ] **A3** — R14
 - [ ] **O5** — re-freeze, tag, bundle, sha256 record
 - [ ] **A4** — R15 (rescoped)
