@@ -1,0 +1,174 @@
+{
+    "Reservations": [
+        {
+            "ReservationId": "r-0cc2385c575b9c4d8",
+            "OwnerId": "797661577394",
+            "RequesterId": "547167575488",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2026-11-12T00:35:48+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-0d3e962566325bc50",
+                                "EbsCardIndex": 0
+                            }
+                        }
+                    ],
+                    "ClientToken": "59c879cb-b199-1abf-4c35-107454de8f3c",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::797661577394:instance-profile/proposal-orchestrator-runtime-profile",
+                        "Id": "AIPA3TOCVYCZECEP4R3JE"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2026-11-12T00:35:48+00:00",
+                                "AttachmentId": "eni-attach-00f3ff395df566997",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-0c4e5657a1bd246ff",
+                                    "GroupName": "proposal-orchestrator-network-HostSecurityGroup-LsxaMqo80str"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "06:ff:fb:96:29:bf",
+                            "NetworkInterfaceId": "eni-0984a3ccadb5c2b23",
+                            "OwnerId": "797661577394",
+                            "PrivateDnsName": "ip-10-60-0-37.eu-north-1.compute.internal",
+                            "PrivateIpAddress": "10.60.0.37",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-10-60-0-37.eu-north-1.compute.internal",
+                                    "PrivateIpAddress": "10.60.0.37"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-018cd285bbe5cbdaf",
+                            "VpcId": "vpc-0f33f9ced5a78b09f",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-0c4e5657a1bd246ff",
+                            "GroupName": "proposal-orchestrator-network-HostSecurityGroup-LsxaMqo80str"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "project",
+                            "Value": "proposal-orchestrator"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "proposal-orchestrator-host"
+                        },
+                        {
+                            "Key": "aws:cloudformation:stack-id",
+                            "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/e9e1ad30-de2a-11f1-9e51-0effe6d3959d"
+                        },
+                        {
+                            "Key": "aws:cloudformation:logical-id",
+                            "Value": "Host"
+                        },
+                        {
+                            "Key": "aws:cloudformation:stack-name",
+                            "Value": "proposal-orchestrator-host"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "BootMode": "uefi-preferred",
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2026-11-12T00:35:48+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "uefi",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false,
+                        "HiddenByDefault": false
+                    },
+                    "InstanceId": "i-0cc2765679c1f96df",
+                    "ImageId": "ami-04005916a1c241ff5",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-10-60-0-37.eu-north-1.compute.internal",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "c7i-flex.large",
+                    "LaunchTime": "2026-11-12T00:35:48+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "eun1-az1",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "eu-north-1a"
+                    },
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-018cd285bbe5cbdaf",
+                    "VpcId": "vpc-0f33f9ced5a78b09f",
+                    "PrivateIpAddress": "10.60.0.37"
+                }
+            ]
+        }
+    ]
+}

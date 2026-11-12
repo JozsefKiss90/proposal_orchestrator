@@ -1,0 +1,412 @@
+{
+    "VpcEndpoints": [
+        {
+            "VpcEndpointId": "vpce-00a806eba654ee48b",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "ServiceName": "com.amazonaws.eu-north-1.sts",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-018cd285bbe5cbdaf"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-03cd8ea2cf5dae72c",
+                    "GroupName": "proposal-orchestrator-network-EndpointSecurityGroup-oUg8d8raT4Nq"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-0d0edcfa9e2a41dba"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-00a806eba654ee48b-f5z6tp59.sts.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "vpce-00a806eba654ee48b-f5z6tp59-eu-north-1a.sts.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "sts.eu-north-1.amazonaws.com",
+                    "HostedZoneId": "Z034130931FSMYG3M1L01"
+                },
+                {
+                    "DnsName": "sts.eu-north-1.api.aws",
+                    "HostedZoneId": "Z06625382MBC6T86WMAPT"
+                }
+            ],
+            "CreationTimestamp": "2026-11-12T00:34:50.739000+00:00",
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-host"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "StsEndpoint"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/e9e1ad30-de2a-11f1-9e51-0effe6d3959d"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-sts-endpoint"
+                }
+            ],
+            "OwnerId": "797661577394",
+            "ServiceRegion": "eu-north-1"
+        },
+        {
+            "VpcEndpointId": "vpce-0abd4d4a49db57422",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "ServiceName": "com.amazonaws.eu-north-1.ssmmessages",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-018cd285bbe5cbdaf"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-03cd8ea2cf5dae72c",
+                    "GroupName": "proposal-orchestrator-network-EndpointSecurityGroup-oUg8d8raT4Nq"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-0b130397e1fa32e95"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-0abd4d4a49db57422-y88331n7.ssmmessages.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "vpce-0abd4d4a49db57422-y88331n7-eu-north-1a.ssmmessages.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "ssmmessages.eu-north-1.amazonaws.com",
+                    "HostedZoneId": "Z00766621KXBS6CF9PD03"
+                },
+                {
+                    "DnsName": "ssmmessages.eu-north-1.api.aws",
+                    "HostedZoneId": "Z0076656OUQOCDUFWTYF"
+                }
+            ],
+            "CreationTimestamp": "2026-11-12T00:34:50.743000+00:00",
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-host"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "SsmMessagesEndpoint"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/e9e1ad30-de2a-11f1-9e51-0effe6d3959d"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-ssmmessages-endpoint"
+                }
+            ],
+            "OwnerId": "797661577394",
+            "ServiceRegion": "eu-north-1"
+        },
+        {
+            "VpcEndpointId": "vpce-0bbe060b87b4861f4",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "ServiceName": "com.amazonaws.eu-north-1.secretsmanager",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-018cd285bbe5cbdaf"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-03cd8ea2cf5dae72c",
+                    "GroupName": "proposal-orchestrator-network-EndpointSecurityGroup-oUg8d8raT4Nq"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-0e941046c91edf21e"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-0bbe060b87b4861f4-7n07zi6t.secretsmanager.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "vpce-0bbe060b87b4861f4-7n07zi6t-eu-north-1a.secretsmanager.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "secretsmanager.eu-north-1.amazonaws.com",
+                    "HostedZoneId": "Z0662577T1SFC0B3DCFD"
+                }
+            ],
+            "CreationTimestamp": "2026-11-12T00:34:50.774000+00:00",
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-host"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "SecretsManagerEndpoint"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/e9e1ad30-de2a-11f1-9e51-0effe6d3959d"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-secretsmanager-endpoint"
+                }
+            ],
+            "OwnerId": "797661577394",
+            "ServiceRegion": "eu-north-1"
+        },
+        {
+            "VpcEndpointId": "vpce-00d5aee90677d1c09",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "ServiceName": "com.amazonaws.eu-north-1.ec2messages",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-018cd285bbe5cbdaf"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-03cd8ea2cf5dae72c",
+                    "GroupName": "proposal-orchestrator-network-EndpointSecurityGroup-oUg8d8raT4Nq"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-09818cf9d2da02984"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-00d5aee90677d1c09-xmz05fbz.ec2messages.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "vpce-00d5aee90677d1c09-xmz05fbz-eu-north-1a.ec2messages.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "ec2messages.eu-north-1.amazonaws.com",
+                    "HostedZoneId": "Z0053375E46DFSZB5TFQ"
+                }
+            ],
+            "CreationTimestamp": "2026-11-12T00:34:50.793000+00:00",
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-host"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "Ec2MessagesEndpoint"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/e9e1ad30-de2a-11f1-9e51-0effe6d3959d"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-ec2messages-endpoint"
+                }
+            ],
+            "OwnerId": "797661577394",
+            "ServiceRegion": "eu-north-1"
+        },
+        {
+            "VpcEndpointId": "vpce-0eadc3f23a4452d8e",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "ServiceName": "com.amazonaws.eu-north-1.ssm",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-018cd285bbe5cbdaf"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-03cd8ea2cf5dae72c",
+                    "GroupName": "proposal-orchestrator-network-EndpointSecurityGroup-oUg8d8raT4Nq"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-03146273a65567545"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-0eadc3f23a4452d8e-kwzw51g9.ssm.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "vpce-0eadc3f23a4452d8e-kwzw51g9-eu-north-1a.ssm.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "ssm.eu-north-1.amazonaws.com",
+                    "HostedZoneId": "Z06563663CRXZMV7R09FA"
+                },
+                {
+                    "DnsName": "ssm.eu-north-1.api.aws",
+                    "HostedZoneId": "Z04498912CG5GHTZAJOHE"
+                }
+            ],
+            "CreationTimestamp": "2026-11-12T00:34:50.821000+00:00",
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-host"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "SsmEndpoint"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/e9e1ad30-de2a-11f1-9e51-0effe6d3959d"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-ssm-endpoint"
+                }
+            ],
+            "OwnerId": "797661577394",
+            "ServiceRegion": "eu-north-1"
+        },
+        {
+            "VpcEndpointId": "vpce-0ee1e2c1ce8c59b3e",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-0f33f9ced5a78b09f",
+            "ServiceName": "com.amazonaws.eu-north-1.bedrock-runtime",
+            "State": "available",
+            "PolicyDocument": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Condition\":{\"ArnEquals\":{\"aws:PrincipalArn\":\"arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role\"}},\"Action\":[\"bedrock:InvokeModel\",\"bedrock:InvokeModelWithResponseStream\"],\"Resource\":[\"arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1\",\"arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6\"],\"Effect\":\"Allow\",\"Principal\":\"*\",\"Sid\":\"RuntimeRoleInvokesOd7Profiles\"},{\"Condition\":{\"ArnEquals\":{\"aws:PrincipalArn\":\"arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role\"}},\"Action\":[\"bedrock:InvokeModel\",\"bedrock:InvokeModelWithResponseStream\"],\"Resource\":[\"arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-opus-4-6-v1\",\"arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1\",\"arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-opus-4-6-v1\",\"arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-opus-4-6-v1\",\"arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-opus-4-6-v1\",\"arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-opus-4-6-v1\",\"arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-sonnet-4-6\",\"arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-sonnet-4-6\",\"arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-sonnet-4-6\",\"arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-sonnet-4-6\",\"arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-6\",\"arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-sonnet-4-6\"],\"Effect\":\"Allow\",\"Principal\":\"*\",\"Sid\":\"RuntimeRoleInvokesRoutedModels\"}]}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-018cd285bbe5cbdaf"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-03cd8ea2cf5dae72c",
+                    "GroupName": "proposal-orchestrator-network-EndpointSecurityGroup-oUg8d8raT4Nq"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-09d692eae15a824ed"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-0ee1e2c1ce8c59b3e-78v5yyt5.bedrock-runtime.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "vpce-0ee1e2c1ce8c59b3e-78v5yyt5-eu-north-1a.bedrock-runtime.eu-north-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z3OWWK6JFDEDGC"
+                },
+                {
+                    "DnsName": "bedrock-runtime.eu-north-1.amazonaws.com",
+                    "HostedZoneId": "Z047037135XPDLQ2XLXXW"
+                }
+            ],
+            "CreationTimestamp": "2026-11-12T00:34:50.838000+00:00",
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "proposal-orchestrator-host"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "BedrockRuntimeEndpoint"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-north-1:797661577394:stack/proposal-orchestrator-host/e9e1ad30-de2a-11f1-9e51-0effe6d3959d"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-bedrock-runtime-endpoint"
+                }
+            ],
+            "OwnerId": "797661577394",
+            "ServiceRegion": "eu-north-1"
+        }
+    ]
+}

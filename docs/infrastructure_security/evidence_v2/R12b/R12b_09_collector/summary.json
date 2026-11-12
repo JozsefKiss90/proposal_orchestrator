@@ -1,0 +1,1935 @@
+{
+  "schema": "proposal-orchestrator-collector-summary/1",
+  "ticket": "R12b",
+  "step": "09",
+  "account": "797661577394",
+  "region": "eu-north-1",
+  "started_utc": "2026-11-12T00:37:25Z",
+  "finished_utc": "2026-11-12T00:42:16Z",
+  "collector_sha256": "cc01222c9c34acd5e63e1b85458129276a64b3d384d291820379014e7033b247",
+  "inputs_sha256": {
+    "contract": {
+      "path": "deploy/aws/outputs_contract.json",
+      "sha256": "c606fa0ab64a421ddc0d3988cb87835256a555f166e5f950c82328192b46c373"
+    },
+    "inputs": {
+      "path": "deploy/aws/collector_inputs.json",
+      "sha256": "a939abd8844f41422d5d92d6835e34dafec313ed33ed9a71b3c5ac1eb8874a7e"
+    },
+    "outputs:audit": {
+      "path": "docs/infrastructure_security/evidence_v2/R7/R7_outputs.json",
+      "sha256": "d61ac09776b445bc02cbf58c22fc087660036f9260b8d7bc0b20acdcc9387be4"
+    },
+    "outputs:host": {
+      "path": "docs/infrastructure_security/evidence_v2/R12b/R12b_outputs.json",
+      "sha256": "7130cd34961a4b6e5d81651aaeb03d05c75e23b79b7c746ab24d35c973ad9b8b"
+    },
+    "outputs:iam": {
+      "path": "docs/infrastructure_security/evidence_v2/R5/R5_outputs.json",
+      "sha256": "eb2def25fdd5b8a9194c9b90f5d08cf4cc557d263b6ee1a4d976770ca917041a"
+    },
+    "outputs:kms": {
+      "path": "docs/infrastructure_security/evidence_v2/R6/R6_outputs.json",
+      "sha256": "bc52a8ed4fc8bf3983001c62ece59e5387031c277110f967646c34e521a9e960"
+    },
+    "outputs:network": {
+      "path": "docs/infrastructure_security/evidence_v2/R4/R4_outputs.json",
+      "sha256": "1f9f7013f15a2237b843ea9b035f8b48fbac7688f09cbd5d4c52229cc34c9abf"
+    },
+    "outputs:secret": {
+      "path": "docs/infrastructure_security/evidence_v2/R8/R8_outputs.json",
+      "sha256": "5757406d08610916c25cb6041388e19702cd090fd5f5426ac7280d8b1a54bb7e"
+    },
+    "parameters:audit": {
+      "path": "deploy/aws/parameters/audit.json",
+      "sha256": "0e176eb862e80c7eae3f183c62f20c723a924b73d4031c053a3404ac9af7cdac"
+    },
+    "parameters:host": {
+      "path": "deploy/aws/parameters/host.json",
+      "sha256": "3847dadab3d8bdc4507bf6a10f76383577c39e9e01542dc46e526610a4e58f7b"
+    },
+    "parameters:iam": {
+      "path": "deploy/aws/parameters/iam.json",
+      "sha256": "59d92714dda2194702465d0397db84f3d1ba3d8fc677dadf826d8be196cdf4f9"
+    },
+    "parameters:kms": {
+      "path": "deploy/aws/parameters/kms.json",
+      "sha256": "0e176eb862e80c7eae3f183c62f20c723a924b73d4031c053a3404ac9af7cdac"
+    },
+    "parameters:network": {
+      "path": "deploy/aws/parameters/network.json",
+      "sha256": "747f6a2bdad8d151698ef1826e042c3146cbbc5068382c1c49d94d713ef0ffbf"
+    },
+    "parameters:secret": {
+      "path": "deploy/aws/parameters/secret.json",
+      "sha256": "0858fbc25693f28da66f5ebb880d3cb3e66ebfea1c389f64cd886682eb2d3e6a"
+    },
+    "secret_template": {
+      "path": "deploy/aws/templates/50-secret.yaml",
+      "sha256": "ccde5bf63f0018d15db7f2e3046bf7c0753094ba7aacff057053d5d1d01a9d9b"
+    }
+  },
+  "host_stack": "present",
+  "checks": [
+    {
+      "check": "route-table",
+      "file": "DC-06_route-table.json",
+      "controls": [
+        "DC-06"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-route-tables --route-table-ids rtb-043f4e86aa0b174e2 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "internet-gateways",
+      "file": "DC-06_internet-gateways.json",
+      "controls": [
+        "DC-06",
+        "DC-32"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-internet-gateways --filters Name=attachment.vpc-id,Values=vpc-0f33f9ced5a78b09f --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "nat-gateways",
+      "file": "DC-06_nat-gateways.json",
+      "controls": [
+        "DC-06",
+        "DC-32"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=vpc-0f33f9ced5a78b09f --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "vpc",
+      "file": "PL-8_vpc.json",
+      "controls": [
+        "PL-8"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-vpcs --vpc-ids vpc-0f33f9ced5a78b09f --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "vpc-dns-support",
+      "file": "PL-8_vpc-dns-support.json",
+      "controls": [
+        "PL-8"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-vpc-attribute --vpc-id vpc-0f33f9ced5a78b09f --attribute enableDnsSupport --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "vpc-dns-hostnames",
+      "file": "PL-8_vpc-dns-hostnames.json",
+      "controls": [
+        "PL-8"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-vpc-attribute --vpc-id vpc-0f33f9ced5a78b09f --attribute enableDnsHostnames --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "security-groups",
+      "file": "DC-03_security-groups.json",
+      "controls": [
+        "DC-03",
+        "DC-07"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-security-groups --group-ids sg-0c4e5657a1bd246ff sg-03cd8ea2cf5dae72c --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "security-group-rules",
+      "file": "DC-03_security-group-rules.json",
+      "controls": [
+        "DC-03",
+        "DC-07"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-security-group-rules --filters Name=group-id,Values=sg-0c4e5657a1bd246ff,sg-03cd8ea2cf5dae72c --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "s3-gateway-endpoint",
+      "file": "DC-05_s3-gateway-endpoint.json",
+      "controls": [
+        "DC-05"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-vpc-endpoints --vpc-endpoint-ids vpce-0770a3016be1317ef --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "subnet",
+      "file": "DC-08_subnet.json",
+      "controls": [
+        "DC-08"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-subnets --subnet-ids subnet-018cd285bbe5cbdaf --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "vpc-subnets",
+      "file": "DC-08_vpc-subnets.json",
+      "controls": [
+        "DC-08"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-subnets --filters Name=vpc-id,Values=vpc-0f33f9ced5a78b09f --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "interface-endpoints",
+      "file": "DC-01_interface-endpoints.json",
+      "controls": [
+        "DC-01",
+        "DC-02",
+        "DC-03",
+        "DC-04",
+        "DC-05"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-vpc-endpoints --vpc-endpoint-ids vpce-0ee1e2c1ce8c59b3e vpce-00a806eba654ee48b vpce-0bbe060b87b4861f4 vpce-0eadc3f23a4452d8e vpce-0abd4d4a49db57422 vpce-00d5aee90677d1c09 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "host-instance",
+      "file": "DC-07_host-instance.json",
+      "controls": [
+        "DC-07",
+        "DC-14"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-instances --instance-ids i-0cc2765679c1f96df --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "instance-profile-association",
+      "file": "DC-14_instance-profile-association.json",
+      "controls": [
+        "DC-14"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-iam-instance-profile-associations --filters Name=instance-id,Values=i-0cc2765679c1f96df --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "ssm-instance",
+      "file": "DC-14_ssm-instance.json",
+      "controls": [
+        "DC-14"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ssm describe-instance-information --filters Key=InstanceIds,Values=i-0cc2765679c1f96df --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "runtime-role",
+      "file": "DC-09_runtime-role.json",
+      "controls": [
+        "DC-09",
+        "DC-12",
+        "DC-13"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam get-role --role-name proposal-orchestrator-runtime-role --profile po-r1 --output json"
+    },
+    {
+      "check": "runtime-role-attached",
+      "file": "DC-09_runtime-role-attached.json",
+      "controls": [
+        "DC-09",
+        "DC-11"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam list-attached-role-policies --role-name proposal-orchestrator-runtime-role --profile po-r1 --output json"
+    },
+    {
+      "check": "runtime-role-inline",
+      "file": "DC-09_runtime-role-inline.json",
+      "controls": [
+        "DC-09"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam list-role-policies --role-name proposal-orchestrator-runtime-role --profile po-r1 --output json"
+    },
+    {
+      "check": "instance-profile",
+      "file": "DC-09_instance-profile.json",
+      "controls": [
+        "DC-09",
+        "DC-14"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam get-instance-profile --instance-profile-name proposal-orchestrator-runtime-profile --profile po-r1 --output json"
+    },
+    {
+      "check": "local-policies",
+      "file": "DC-10_local-policies.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam get-account-authorization-details --filter LocalManagedPolicy --profile po-r1 --output json"
+    },
+    {
+      "check": "boundary-policy",
+      "file": "DC-12_boundary-policy.json",
+      "controls": [
+        "DC-12"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam get-policy --policy-arn arn:aws:iam::797661577394:policy/proposal-orchestrator-boundary --profile po-r1 --output json"
+    },
+    {
+      "check": "explicit-deny-policy",
+      "file": "DC-11_explicit-deny-policy.json",
+      "controls": [
+        "DC-11"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam get-policy --policy-arn arn:aws:iam::797661577394:policy/proposal-orchestrator-explicit-deny --profile po-r1 --output json"
+    },
+    {
+      "check": "flow-logs-role",
+      "file": "DC-08_flow-logs-role.json",
+      "controls": [
+        "DC-08"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam get-role --role-name proposal-orchestrator-flow-logs-role --profile po-r1 --output json"
+    },
+    {
+      "check": "account-summary",
+      "file": "DC-15_account-summary.json",
+      "controls": [
+        "DC-15"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam get-account-summary --profile po-r1 --output json"
+    },
+    {
+      "check": "users",
+      "file": "DC-15_users.json",
+      "controls": [
+        "DC-15"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam list-users --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-profiles.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1 arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-north-1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-opus-4-6-v1.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-opus-4-6-v1 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-north-1,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-opus-4-6-v1.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-west-3,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-opus-4-6-v1.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-opus-4-6-v1 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-south-1,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-opus-4-6-v1.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-opus-4-6-v1 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-south-2,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-opus-4-6-v1.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-opus-4-6-v1 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-west-1,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-opus-4-6-v1.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-opus-4-6-v1 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-central-1,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-sonnet-4-6.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-sonnet-4-6 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-north-1,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-sonnet-4-6.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-sonnet-4-6 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-west-3,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-sonnet-4-6.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-sonnet-4-6 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-south-1,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-sonnet-4-6.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-sonnet-4-6 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-south-2,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-sonnet-4-6.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-6 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-west-1,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-sonnet-4-6.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-sonnet-4-6 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-central-1,ContextKeyType=string ContextKeyName=bedrock:InferenceProfileArn,ContextKeyValues=arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-12_sim-allow-s3-get-bundle.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names s3:GetObject --resource-arns arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/orchestrator.tar.gz --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-12_sim-allow-s3-list-bundles.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names s3:ListBucket --resource-arns arn:aws:s3:::proposal-orchestrator-deploy-797661577394 --context-entries ContextKeyName=s3:prefix,ContextKeyValues=bundles/,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-12_sim-allow-secret.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names secretsmanager:GetSecretValue --resource-arns arn:aws:secretsmanager:eu-north-1:797661577394:secret:proposal-orchestrator/env-config-KTsWow --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-12_sim-allow-sts-ssm.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names sts:GetCallerIdentity ssm:UpdateInstanceInformation ssmmessages:OpenControlChannel ec2messages:GetMessages --resource-arns * --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-admin-logging.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:PutModelInvocationLoggingConfiguration bedrock:CreateProvisionedModelThroughput --resource-arns * --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-north-1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-global-profile-global.anthropic.claude-sonnet-4-5-20250929-v1:0.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-north-1:797661577394:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-north-1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-non-claude-model-amazon.nova-pro-v1:0.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-north-1::foundation-model/amazon.nova-pro-v1:0 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-north-1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-other-profile-eu.anthropic.claude-haiku-4-5-20251001-v1:0.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-north-1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-16_sim-deny-unapproved-region.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=us-east-1,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-fm-without-profile.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names bedrock:InvokeModel bedrock:InvokeModelWithResponseStream --resource-arns arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1 --context-entries ContextKeyName=aws:RequestedRegion,ContextKeyValues=eu-west-3,ContextKeyType=string --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-s3-put-bundle.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names s3:PutObject s3:DeleteObject --resource-arns arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/orchestrator.tar.gz --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-s3-other-bucket.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names s3:GetObject s3:PutObject --resource-arns arn:aws:s3:::proposal-orchestrator-cloudtrail-797661577394/x --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-ec2.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names ec2:DescribeInstances ec2:RunInstances --resource-arns * --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-11_sim-deny-iam.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names iam:ListRoles iam:PassRole --resource-arns * --profile po-r1 --output json"
+    },
+    {
+      "check": "simulations",
+      "file": "DC-19_sim-deny-kms-identity-grant.json",
+      "controls": [
+        "DC-10",
+        "DC-11",
+        "DC-12",
+        "DC-16",
+        "DC-17",
+        "DC-19"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::797661577394:role/proposal-orchestrator-runtime-role --action-names kms:Decrypt --resource-arns arn:aws:kms:eu-north-1:797661577394:key/4ccc45a1-f205-4775-aa0b-195290bf1561 --profile po-r1 --output json"
+    },
+    {
+      "check": "organization",
+      "file": "DC-40_organization.json",
+      "controls": [
+        "DC-40"
+      ],
+      "scope": "global",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws organizations describe-organization --query Organization.{Id:Id,Arn:Arn,FeatureSet:FeatureSet,MasterAccountId:MasterAccountId,AvailablePolicyTypes:AvailablePolicyTypes} --profile po-r1 --output json"
+    },
+    {
+      "check": "scp-list",
+      "file": "DC-40_scp-list.txt",
+      "controls": [
+        "DC-40"
+      ],
+      "scope": "global",
+      "status": "expected_error",
+      "reason": "AccessDeniedException",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws organizations list-policies --filter SERVICE_CONTROL_POLICY --profile po-r1 --output json"
+    },
+    {
+      "check": "describe-key",
+      "file": "DC-18_describe-key.json",
+      "controls": [
+        "DC-18"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws kms describe-key --key-id arn:aws:kms:eu-north-1:797661577394:key/4ccc45a1-f205-4775-aa0b-195290bf1561 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "rotation-status",
+      "file": "DC-18_rotation-status.json",
+      "controls": [
+        "DC-18"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws kms get-key-rotation-status --key-id arn:aws:kms:eu-north-1:797661577394:key/4ccc45a1-f205-4775-aa0b-195290bf1561 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "describe-by-alias",
+      "file": "DC-18_describe-by-alias.json",
+      "controls": [
+        "DC-18"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws kms describe-key --key-id alias/proposal-orchestrator --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "aliases-of-key",
+      "file": "DC-18_aliases-of-key.json",
+      "controls": [
+        "DC-18"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws kms list-aliases --key-id 4ccc45a1-f205-4775-aa0b-195290bf1561 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "key-policy",
+      "file": "DC-19_key-policy.json",
+      "controls": [
+        "DC-19"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws kms get-key-policy --key-id arn:aws:kms:eu-north-1:797661577394:key/4ccc45a1-f205-4775-aa0b-195290bf1561 --policy-name default --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "key-grants",
+      "file": "DC-19_key-grants.json",
+      "controls": [
+        "DC-19"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws kms list-grants --key-id arn:aws:kms:eu-north-1:797661577394:key/4ccc45a1-f205-4775-aa0b-195290bf1561 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "describe-secret",
+      "file": "DC-20_describe-secret.json",
+      "controls": [
+        "DC-20",
+        "DC-33",
+        "DC-34",
+        "DC-35"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws secretsmanager describe-secret --secret-id arn:aws:secretsmanager:eu-north-1:797661577394:secret:proposal-orchestrator/env-config-KTsWow --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "version-ids",
+      "file": "DC-20_version-ids.json",
+      "controls": [
+        "DC-20"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws secretsmanager list-secret-version-ids --secret-id arn:aws:secretsmanager:eu-north-1:797661577394:secret:proposal-orchestrator/env-config-KTsWow --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "resource-policy",
+      "file": "DC-21_resource-policy.json",
+      "controls": [
+        "DC-21"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws secretsmanager get-resource-policy --secret-id arn:aws:secretsmanager:eu-north-1:797661577394:secret:proposal-orchestrator/env-config-KTsWow --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail",
+      "file": "DC-23_trail.json",
+      "controls": [
+        "DC-23",
+        "DC-24"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws cloudtrail describe-trails --trail-name-list arn:aws:cloudtrail:eu-north-1:797661577394:trail/proposal-orchestrator-bedrock-trail --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail-status",
+      "file": "DC-23_trail-status.json",
+      "controls": [
+        "DC-23"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws cloudtrail get-trail-status --name arn:aws:cloudtrail:eu-north-1:797661577394:trail/proposal-orchestrator-bedrock-trail --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail-event-selectors",
+      "file": "DC-26_trail-event-selectors.json",
+      "controls": [
+        "DC-26"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws cloudtrail get-event-selectors --trail-name arn:aws:cloudtrail:eu-north-1:797661577394:trail/proposal-orchestrator-bedrock-trail --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail-bucket-encryption",
+      "file": "DC-25_trail-bucket-encryption.json",
+      "controls": [
+        "DC-25"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-encryption --bucket proposal-orchestrator-cloudtrail-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail-bucket-public-access-block",
+      "file": "DC-25_trail-bucket-public-access-block.json",
+      "controls": [
+        "DC-25"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-public-access-block --bucket proposal-orchestrator-cloudtrail-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail-bucket-versioning",
+      "file": "DC-25_trail-bucket-versioning.json",
+      "controls": [
+        "DC-25"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-versioning --bucket proposal-orchestrator-cloudtrail-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail-bucket-ownership",
+      "file": "DC-25_trail-bucket-ownership.json",
+      "controls": [
+        "DC-25"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-ownership-controls --bucket proposal-orchestrator-cloudtrail-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail-bucket-policy",
+      "file": "DC-25_trail-bucket-policy.json",
+      "controls": [
+        "DC-25"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-policy --bucket proposal-orchestrator-cloudtrail-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "trail-bucket-lifecycle",
+      "file": "DC-27_trail-bucket-lifecycle.json",
+      "controls": [
+        "DC-27"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-lifecycle-configuration --bucket proposal-orchestrator-cloudtrail-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "deploy-bucket-encryption",
+      "file": "DC-05_deploy-bucket-encryption.json",
+      "controls": [
+        "DC-05"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-encryption --bucket proposal-orchestrator-deploy-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "deploy-bucket-public-access-block",
+      "file": "DC-05_deploy-bucket-public-access-block.json",
+      "controls": [
+        "DC-05"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-public-access-block --bucket proposal-orchestrator-deploy-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "deploy-bucket-versioning",
+      "file": "DC-05_deploy-bucket-versioning.json",
+      "controls": [
+        "DC-05"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-versioning --bucket proposal-orchestrator-deploy-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "deploy-bucket-ownership",
+      "file": "DC-05_deploy-bucket-ownership.json",
+      "controls": [
+        "DC-05"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-ownership-controls --bucket proposal-orchestrator-deploy-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "deploy-bucket-policy",
+      "file": "DC-05_deploy-bucket-policy.json",
+      "controls": [
+        "DC-05"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws s3api get-bucket-policy --bucket proposal-orchestrator-deploy-797661577394 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "invocation-logging",
+      "file": "DC-28_invocation-logging.json",
+      "controls": [
+        "DC-28"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws bedrock get-model-invocation-logging-configuration --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "log-groups-bedrock",
+      "file": "DC-29_log-groups-bedrock.json",
+      "controls": [
+        "DC-29"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws logs describe-log-groups --log-group-name-prefix /aws/bedrock --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "log-groups",
+      "file": "DC-30_log-groups.json",
+      "controls": [
+        "DC-30"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws logs describe-log-groups --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "flow-log",
+      "file": "DC-08_flow-log.json",
+      "controls": [
+        "DC-08"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws ec2 describe-flow-logs --flow-log-ids fl-018e0a5b5610c35c7 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "flow-log-streams",
+      "file": "DC-08_flow-log-streams.json",
+      "controls": [
+        "DC-08"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws logs describe-log-streams --log-group-name /proposal-orchestrator/vpc-flow-logs --order-by LastEventTime --descending --max-items 10 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "inference-profiles",
+      "file": "DC-36_inference-profile-eu.anthropic.claude-opus-4-6-v1.json",
+      "controls": [
+        "DC-36"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws bedrock get-inference-profile --inference-profile-identifier arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "inference-profiles",
+      "file": "DC-36_inference-profile-eu.anthropic.claude-sonnet-4-6.json",
+      "controls": [
+        "DC-36"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws bedrock get-inference-profile --inference-profile-identifier arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6 --profile po-r1 --region eu-north-1 --output json"
+    },
+    {
+      "check": "private-dns",
+      "file": "DC-02_host-private-dns.json",
+      "controls": [
+        "DC-02"
+      ],
+      "scope": "host",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "9c52a94e87d502ed5cc02672b99642ac30d77f6f804eee0924206d6121ee2ec6",
+      "host_result": "expected",
+      "command": ""
+    },
+    {
+      "check": "caller-identity",
+      "file": "DC-14_host-caller-identity.json",
+      "controls": [
+        "DC-14",
+        "DC-09"
+      ],
+      "scope": "host",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "a95d4da421880142c88176fa28904c7505f3a11d6a9e7e6d573145ec06fd6a53",
+      "host_result": "expected",
+      "command": ""
+    },
+    {
+      "check": "no-long-term-keys",
+      "file": "DC-15_host-no-long-term-keys.json",
+      "controls": [
+        "DC-15"
+      ],
+      "scope": "host",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "0ec084a5abf0ed28543e0e0f959b102758e6f72be6bb800187af4bfeb4bc98ae",
+      "host_result": "unexpected",
+      "command": ""
+    },
+    {
+      "check": "negative-region",
+      "file": "DC-17_host-negative-region.json",
+      "controls": [
+        "DC-17"
+      ],
+      "scope": "host",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "5d424f6a5b8129c997a95b6028fc5024aa4b9c87027226cdd7775a32f9a246af",
+      "host_result": "expected",
+      "command": ""
+    },
+    {
+      "check": "no-claude-cli",
+      "file": "DC-31_host-no-claude-cli.json",
+      "controls": [
+        "DC-31"
+      ],
+      "scope": "host",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "cc45276bbe5d930a27a4b55d1fded759fe6faea1138b0b07da56fb36dcb98f43",
+      "host_result": "expected",
+      "command": ""
+    },
+    {
+      "check": "egress-blocked",
+      "file": "DC-32_host-egress-blocked.json",
+      "controls": [
+        "DC-32"
+      ],
+      "scope": "host",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "df79d2df9167725193749af2b74329390f5dde9cc2cff7ff13187f40b3856986",
+      "host_result": "expected",
+      "command": ""
+    },
+    {
+      "check": "converse",
+      "file": "DC-37_host-converse.json",
+      "controls": [
+        "DC-37",
+        "DC-36"
+      ],
+      "scope": "host",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "94a443be8d5e6819bffbd78110f63e22a917bbb6ae8c92a0057238ba1018d86c",
+      "host_result": "expected",
+      "command": ""
+    },
+    {
+      "check": "launcher-config",
+      "file": "",
+      "controls": [
+        "DC-33",
+        "DC-34",
+        "DC-35",
+        "DC-21"
+      ],
+      "scope": "host",
+      "status": "not_collected",
+      "reason": "no host bundle directory given (--host-bundle-dir)",
+      "script_sha256": "",
+      "host_result": "",
+      "command": ""
+    },
+    {
+      "check": "f7-presigned-put",
+      "file": "DC-05_host-f7-presigned-put.json",
+      "controls": [
+        "DC-05",
+        "DC-07"
+      ],
+      "scope": "host",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "850654d1b880c1b2238d6902c726914e76d2dae9359dfa7ff1e99d97daa82ff9",
+      "host_result": "expected",
+      "command": ""
+    },
+    {
+      "check": "converse-events",
+      "file": "DC-26_converse-events.json",
+      "controls": [
+        "DC-26"
+      ],
+      "scope": "region",
+      "status": "collected",
+      "reason": "",
+      "script_sha256": "",
+      "host_result": "",
+      "command": "aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=Converse --start-time 2026-11-12T00:37:25Z --max-results 20 --profile po-r1 --region eu-north-1 --output json"
+    }
+  ],
+  "controls": {
+    "DC-01": {
+      "status": "collected",
+      "files": [
+        "DC-01_interface-endpoints.json"
+      ]
+    },
+    "DC-02": {
+      "status": "collected",
+      "files": [
+        "DC-01_interface-endpoints.json",
+        "DC-02_host-private-dns.json"
+      ]
+    },
+    "DC-03": {
+      "status": "collected",
+      "files": [
+        "DC-01_interface-endpoints.json",
+        "DC-03_security-group-rules.json",
+        "DC-03_security-groups.json"
+      ]
+    },
+    "DC-04": {
+      "status": "collected",
+      "files": [
+        "DC-01_interface-endpoints.json"
+      ]
+    },
+    "DC-05": {
+      "status": "collected",
+      "files": [
+        "DC-01_interface-endpoints.json",
+        "DC-05_deploy-bucket-encryption.json",
+        "DC-05_deploy-bucket-ownership.json",
+        "DC-05_deploy-bucket-policy.json",
+        "DC-05_deploy-bucket-public-access-block.json",
+        "DC-05_deploy-bucket-versioning.json",
+        "DC-05_host-f7-presigned-put.json",
+        "DC-05_s3-gateway-endpoint.json"
+      ]
+    },
+    "DC-06": {
+      "status": "collected",
+      "files": [
+        "DC-06_internet-gateways.json",
+        "DC-06_nat-gateways.json",
+        "DC-06_route-table.json"
+      ]
+    },
+    "DC-07": {
+      "status": "collected",
+      "files": [
+        "DC-03_security-group-rules.json",
+        "DC-03_security-groups.json",
+        "DC-05_host-f7-presigned-put.json",
+        "DC-07_host-instance.json"
+      ]
+    },
+    "DC-08": {
+      "status": "collected",
+      "files": [
+        "DC-08_flow-log-streams.json",
+        "DC-08_flow-log.json",
+        "DC-08_flow-logs-role.json",
+        "DC-08_subnet.json",
+        "DC-08_vpc-subnets.json"
+      ]
+    },
+    "DC-09": {
+      "status": "collected",
+      "files": [
+        "DC-09_instance-profile.json",
+        "DC-09_runtime-role-attached.json",
+        "DC-09_runtime-role-inline.json",
+        "DC-09_runtime-role.json",
+        "DC-14_host-caller-identity.json"
+      ]
+    },
+    "DC-10": {
+      "status": "collected",
+      "files": [
+        "DC-10_local-policies.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-profiles.json",
+        "DC-11_sim-deny-admin-logging.json",
+        "DC-11_sim-deny-ec2.json",
+        "DC-11_sim-deny-fm-without-profile.json",
+        "DC-11_sim-deny-global-profile-global.anthropic.claude-sonnet-4-5-20250929-v1:0.json",
+        "DC-11_sim-deny-iam.json",
+        "DC-11_sim-deny-non-claude-model-amazon.nova-pro-v1:0.json",
+        "DC-11_sim-deny-other-profile-eu.anthropic.claude-haiku-4-5-20251001-v1:0.json",
+        "DC-11_sim-deny-s3-other-bucket.json",
+        "DC-11_sim-deny-s3-put-bundle.json",
+        "DC-12_sim-allow-s3-get-bundle.json",
+        "DC-12_sim-allow-s3-list-bundles.json",
+        "DC-12_sim-allow-secret.json",
+        "DC-12_sim-allow-sts-ssm.json",
+        "DC-16_sim-deny-unapproved-region.json",
+        "DC-19_sim-deny-kms-identity-grant.json"
+      ]
+    },
+    "DC-11": {
+      "status": "collected",
+      "files": [
+        "DC-09_runtime-role-attached.json",
+        "DC-10_local-policies.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-profiles.json",
+        "DC-11_explicit-deny-policy.json",
+        "DC-11_sim-deny-admin-logging.json",
+        "DC-11_sim-deny-ec2.json",
+        "DC-11_sim-deny-fm-without-profile.json",
+        "DC-11_sim-deny-global-profile-global.anthropic.claude-sonnet-4-5-20250929-v1:0.json",
+        "DC-11_sim-deny-iam.json",
+        "DC-11_sim-deny-non-claude-model-amazon.nova-pro-v1:0.json",
+        "DC-11_sim-deny-other-profile-eu.anthropic.claude-haiku-4-5-20251001-v1:0.json",
+        "DC-11_sim-deny-s3-other-bucket.json",
+        "DC-11_sim-deny-s3-put-bundle.json",
+        "DC-12_sim-allow-s3-get-bundle.json",
+        "DC-12_sim-allow-s3-list-bundles.json",
+        "DC-12_sim-allow-secret.json",
+        "DC-12_sim-allow-sts-ssm.json",
+        "DC-16_sim-deny-unapproved-region.json",
+        "DC-19_sim-deny-kms-identity-grant.json"
+      ]
+    },
+    "DC-12": {
+      "status": "collected",
+      "files": [
+        "DC-09_runtime-role.json",
+        "DC-10_local-policies.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-profiles.json",
+        "DC-11_sim-deny-admin-logging.json",
+        "DC-11_sim-deny-ec2.json",
+        "DC-11_sim-deny-fm-without-profile.json",
+        "DC-11_sim-deny-global-profile-global.anthropic.claude-sonnet-4-5-20250929-v1:0.json",
+        "DC-11_sim-deny-iam.json",
+        "DC-11_sim-deny-non-claude-model-amazon.nova-pro-v1:0.json",
+        "DC-11_sim-deny-other-profile-eu.anthropic.claude-haiku-4-5-20251001-v1:0.json",
+        "DC-11_sim-deny-s3-other-bucket.json",
+        "DC-11_sim-deny-s3-put-bundle.json",
+        "DC-12_boundary-policy.json",
+        "DC-12_sim-allow-s3-get-bundle.json",
+        "DC-12_sim-allow-s3-list-bundles.json",
+        "DC-12_sim-allow-secret.json",
+        "DC-12_sim-allow-sts-ssm.json",
+        "DC-16_sim-deny-unapproved-region.json",
+        "DC-19_sim-deny-kms-identity-grant.json"
+      ]
+    },
+    "DC-13": {
+      "status": "collected",
+      "files": [
+        "DC-09_runtime-role.json"
+      ]
+    },
+    "DC-14": {
+      "status": "collected",
+      "files": [
+        "DC-07_host-instance.json",
+        "DC-09_instance-profile.json",
+        "DC-14_host-caller-identity.json",
+        "DC-14_instance-profile-association.json",
+        "DC-14_ssm-instance.json"
+      ]
+    },
+    "DC-15": {
+      "status": "collected",
+      "files": [
+        "DC-15_account-summary.json",
+        "DC-15_host-no-long-term-keys.json",
+        "DC-15_users.json"
+      ]
+    },
+    "DC-16": {
+      "status": "collected",
+      "files": [
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-profiles.json",
+        "DC-11_sim-deny-admin-logging.json",
+        "DC-11_sim-deny-ec2.json",
+        "DC-11_sim-deny-fm-without-profile.json",
+        "DC-11_sim-deny-global-profile-global.anthropic.claude-sonnet-4-5-20250929-v1:0.json",
+        "DC-11_sim-deny-iam.json",
+        "DC-11_sim-deny-non-claude-model-amazon.nova-pro-v1:0.json",
+        "DC-11_sim-deny-other-profile-eu.anthropic.claude-haiku-4-5-20251001-v1:0.json",
+        "DC-11_sim-deny-s3-other-bucket.json",
+        "DC-11_sim-deny-s3-put-bundle.json",
+        "DC-12_sim-allow-s3-get-bundle.json",
+        "DC-12_sim-allow-s3-list-bundles.json",
+        "DC-12_sim-allow-secret.json",
+        "DC-12_sim-allow-sts-ssm.json",
+        "DC-16_sim-deny-unapproved-region.json",
+        "DC-19_sim-deny-kms-identity-grant.json"
+      ]
+    },
+    "DC-17": {
+      "status": "collected",
+      "files": [
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-profiles.json",
+        "DC-11_sim-deny-admin-logging.json",
+        "DC-11_sim-deny-ec2.json",
+        "DC-11_sim-deny-fm-without-profile.json",
+        "DC-11_sim-deny-global-profile-global.anthropic.claude-sonnet-4-5-20250929-v1:0.json",
+        "DC-11_sim-deny-iam.json",
+        "DC-11_sim-deny-non-claude-model-amazon.nova-pro-v1:0.json",
+        "DC-11_sim-deny-other-profile-eu.anthropic.claude-haiku-4-5-20251001-v1:0.json",
+        "DC-11_sim-deny-s3-other-bucket.json",
+        "DC-11_sim-deny-s3-put-bundle.json",
+        "DC-12_sim-allow-s3-get-bundle.json",
+        "DC-12_sim-allow-s3-list-bundles.json",
+        "DC-12_sim-allow-secret.json",
+        "DC-12_sim-allow-sts-ssm.json",
+        "DC-16_sim-deny-unapproved-region.json",
+        "DC-17_host-negative-region.json",
+        "DC-19_sim-deny-kms-identity-grant.json"
+      ]
+    },
+    "DC-18": {
+      "status": "collected",
+      "files": [
+        "DC-18_aliases-of-key.json",
+        "DC-18_describe-by-alias.json",
+        "DC-18_describe-key.json",
+        "DC-18_rotation-status.json"
+      ]
+    },
+    "DC-19": {
+      "status": "collected",
+      "files": [
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-central-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-north-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-south-2-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-1-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-opus-4-6-v1.json",
+        "DC-10_sim-allow-fm-eu-west-3-anthropic.claude-sonnet-4-6.json",
+        "DC-10_sim-allow-profiles.json",
+        "DC-11_sim-deny-admin-logging.json",
+        "DC-11_sim-deny-ec2.json",
+        "DC-11_sim-deny-fm-without-profile.json",
+        "DC-11_sim-deny-global-profile-global.anthropic.claude-sonnet-4-5-20250929-v1:0.json",
+        "DC-11_sim-deny-iam.json",
+        "DC-11_sim-deny-non-claude-model-amazon.nova-pro-v1:0.json",
+        "DC-11_sim-deny-other-profile-eu.anthropic.claude-haiku-4-5-20251001-v1:0.json",
+        "DC-11_sim-deny-s3-other-bucket.json",
+        "DC-11_sim-deny-s3-put-bundle.json",
+        "DC-12_sim-allow-s3-get-bundle.json",
+        "DC-12_sim-allow-s3-list-bundles.json",
+        "DC-12_sim-allow-secret.json",
+        "DC-12_sim-allow-sts-ssm.json",
+        "DC-16_sim-deny-unapproved-region.json",
+        "DC-19_key-grants.json",
+        "DC-19_key-policy.json",
+        "DC-19_sim-deny-kms-identity-grant.json"
+      ]
+    },
+    "DC-20": {
+      "status": "collected",
+      "files": [
+        "DC-20_describe-secret.json",
+        "DC-20_version-ids.json"
+      ]
+    },
+    "DC-21": {
+      "status": "partial",
+      "files": [
+        "DC-21_resource-policy.json"
+      ]
+    },
+    "DC-22": {
+      "status": "non_command",
+      "reason": "NOT_APPLICABLE since R8 (R8-D14): no API-key secret exists"
+    },
+    "DC-23": {
+      "status": "collected",
+      "files": [
+        "DC-23_trail-status.json",
+        "DC-23_trail.json"
+      ]
+    },
+    "DC-24": {
+      "status": "collected",
+      "files": [
+        "DC-23_trail.json"
+      ]
+    },
+    "DC-25": {
+      "status": "collected",
+      "files": [
+        "DC-25_trail-bucket-encryption.json",
+        "DC-25_trail-bucket-ownership.json",
+        "DC-25_trail-bucket-policy.json",
+        "DC-25_trail-bucket-public-access-block.json",
+        "DC-25_trail-bucket-versioning.json"
+      ]
+    },
+    "DC-26": {
+      "status": "collected",
+      "files": [
+        "DC-26_converse-events.json",
+        "DC-26_trail-event-selectors.json"
+      ]
+    },
+    "DC-27": {
+      "status": "collected",
+      "files": [
+        "DC-27_trail-bucket-lifecycle.json"
+      ]
+    },
+    "DC-28": {
+      "status": "collected",
+      "files": [
+        "DC-28_invocation-logging.json"
+      ]
+    },
+    "DC-29": {
+      "status": "collected",
+      "files": [
+        "DC-29_log-groups-bedrock.json"
+      ]
+    },
+    "DC-30": {
+      "status": "collected",
+      "files": [
+        "DC-30_log-groups.json"
+      ]
+    },
+    "DC-31": {
+      "status": "collected",
+      "files": [
+        "DC-31_host-no-claude-cli.json"
+      ]
+    },
+    "DC-32": {
+      "status": "collected",
+      "files": [
+        "DC-06_internet-gateways.json",
+        "DC-06_nat-gateways.json",
+        "DC-32_host-egress-blocked.json"
+      ]
+    },
+    "DC-33": {
+      "status": "partial",
+      "files": [
+        "DC-20_describe-secret.json"
+      ]
+    },
+    "DC-34": {
+      "status": "partial",
+      "files": [
+        "DC-20_describe-secret.json"
+      ]
+    },
+    "DC-35": {
+      "status": "partial",
+      "files": [
+        "DC-20_describe-secret.json"
+      ]
+    },
+    "DC-36": {
+      "status": "collected",
+      "files": [
+        "DC-36_inference-profile-eu.anthropic.claude-opus-4-6-v1.json",
+        "DC-36_inference-profile-eu.anthropic.claude-sonnet-4-6.json",
+        "DC-37_host-converse.json"
+      ]
+    },
+    "DC-37": {
+      "status": "collected",
+      "files": [
+        "DC-37_host-converse.json"
+      ]
+    },
+    "DC-38": {
+      "status": "non_command",
+      "reason": "a full DAG run under production configuration: R16, deferred per OD12"
+    },
+    "DC-39": {
+      "status": "non_command",
+      "reason": "document review: the AWS data processing terms of the account (console, AWS Artifact)"
+    },
+    "DC-40": {
+      "status": "collected",
+      "files": [
+        "DC-40_organization.json",
+        "DC-40_scp-list.txt"
+      ]
+    },
+    "PL-8": {
+      "status": "collected",
+      "files": [
+        "PL-8_vpc-dns-hostnames.json",
+        "PL-8_vpc-dns-support.json",
+        "PL-8_vpc.json"
+      ]
+    }
+  }
+}

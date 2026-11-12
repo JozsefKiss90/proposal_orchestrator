@@ -1,0 +1,484 @@
+{
+    "UserDetailList": [],
+    "GroupDetailList": [],
+    "RoleDetailList": [],
+    "Policies": [
+        {
+            "PolicyName": "proposal-orchestrator-flow-logs-write",
+            "PolicyId": "ANPA3TOCVYCZA6Y7ZDFKF",
+            "Arn": "arn:aws:iam::797661577394:policy/proposal-orchestrator-flow-logs-write",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 1,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "CreateDate": "2026-10-25T21:14:31+00:00",
+            "UpdateDate": "2026-10-25T21:14:31+00:00",
+            "PolicyVersionList": [
+                {
+                    "Document": {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Action": [
+                                    "logs:CreateLogStream",
+                                    "logs:PutLogEvents",
+                                    "logs:DescribeLogGroups",
+                                    "logs:DescribeLogStreams"
+                                ],
+                                "Resource": "arn:aws:logs:eu-north-1:797661577394:log-group:/proposal-orchestrator/vpc-flow-logs:*",
+                                "Effect": "Allow",
+                                "Sid": "FlowLogGroupWrite"
+                            }
+                        ]
+                    },
+                    "VersionId": "v1",
+                    "IsDefaultVersion": true,
+                    "CreateDate": "2026-10-25T21:14:31+00:00"
+                }
+            ]
+        },
+        {
+            "PolicyName": "proposal-orchestrator-explicit-deny",
+            "PolicyId": "ANPA3TOCVYCZAYPCBIIAJ",
+            "Arn": "arn:aws:iam::797661577394:policy/proposal-orchestrator-explicit-deny",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 1,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "CreateDate": "2026-10-25T21:14:32+00:00",
+            "UpdateDate": "2026-10-25T21:14:32+00:00",
+            "PolicyVersionList": [
+                {
+                    "Document": {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Action": [
+                                    "bedrock:CreateModelCustomizationJob",
+                                    "bedrock:CreateProvisionedModelThroughput",
+                                    "bedrock:DeleteModelInvocationLoggingConfiguration",
+                                    "bedrock:PutModelInvocationLoggingConfiguration",
+                                    "bedrock:CreateGuardrail",
+                                    "bedrock:DeleteGuardrail",
+                                    "bedrock:TagResource",
+                                    "bedrock:UntagResource"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Deny",
+                                "Sid": "DenyBedrockAdministration"
+                            },
+                            {
+                                "Action": [
+                                    "iam:*",
+                                    "ec2:*",
+                                    "lambda:*",
+                                    "sqs:*",
+                                    "sns:*",
+                                    "dynamodb:*"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Deny",
+                                "Sid": "DenyOtherServices"
+                            },
+                            {
+                                "Action": [
+                                    "bedrock:InvokeModel",
+                                    "bedrock:InvokeModelWithResponseStream"
+                                ],
+                                "Effect": "Deny",
+                                "Sid": "DenyNonClaudeAndNonEuProfiles",
+                                "NotResource": [
+                                    "arn:aws:bedrock:*:797661577394:inference-profile/eu.anthropic.claude-*",
+                                    "arn:aws:bedrock:*::foundation-model/anthropic.claude-*"
+                                ]
+                            },
+                            {
+                                "Action": "s3:*",
+                                "Effect": "Deny",
+                                "Sid": "DenyS3OutsideDeployBundles",
+                                "NotResource": [
+                                    "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+                                    "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/*"
+                                ]
+                            },
+                            {
+                                "Condition": {
+                                    "StringNotEquals": {
+                                        "aws:RequestedRegion": [
+                                            "eu-north-1",
+                                            "eu-west-3",
+                                            "eu-south-1",
+                                            "eu-south-2",
+                                            "eu-west-1",
+                                            "eu-central-1"
+                                        ]
+                                    }
+                                },
+                                "Action": [
+                                    "bedrock:InvokeModel",
+                                    "bedrock:InvokeModelWithResponseStream"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Deny",
+                                "Sid": "DenyInvokeOutsideApprovedRegions"
+                            }
+                        ]
+                    },
+                    "VersionId": "v1",
+                    "IsDefaultVersion": true,
+                    "CreateDate": "2026-10-25T21:14:32+00:00"
+                }
+            ]
+        },
+        {
+            "PolicyName": "proposal-orchestrator-deploy-bucket-read",
+            "PolicyId": "ANPA3TOCVYCZEM34Y67ZK",
+            "Arn": "arn:aws:iam::797661577394:policy/proposal-orchestrator-deploy-bucket-read",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 1,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "CreateDate": "2026-10-25T21:14:32+00:00",
+            "UpdateDate": "2026-10-25T21:14:32+00:00",
+            "PolicyVersionList": [
+                {
+                    "Document": {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Condition": {
+                                    "StringLike": {
+                                        "s3:prefix": "bundles/*"
+                                    }
+                                },
+                                "Action": "s3:ListBucket",
+                                "Resource": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+                                "Effect": "Allow",
+                                "Sid": "ListBundlesPrefix"
+                            },
+                            {
+                                "Action": "s3:GetBucketLocation",
+                                "Resource": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+                                "Effect": "Allow",
+                                "Sid": "BucketLocation"
+                            },
+                            {
+                                "Action": "s3:GetObject",
+                                "Resource": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/*",
+                                "Effect": "Allow",
+                                "Sid": "GetBundles"
+                            }
+                        ]
+                    },
+                    "VersionId": "v1",
+                    "IsDefaultVersion": true,
+                    "CreateDate": "2026-10-25T21:14:32+00:00"
+                }
+            ]
+        },
+        {
+            "PolicyName": "proposal-orchestrator-supporting-services",
+            "PolicyId": "ANPA3TOCVYCZF5RKJAD3B",
+            "Arn": "arn:aws:iam::797661577394:policy/proposal-orchestrator-supporting-services",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 1,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "CreateDate": "2026-10-25T21:14:32+00:00",
+            "UpdateDate": "2026-10-25T21:14:32+00:00",
+            "PolicyVersionList": [
+                {
+                    "Document": {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Action": [
+                                    "ssm:DescribeAssociation",
+                                    "ssm:GetDeployablePatchSnapshotForInstance",
+                                    "ssm:GetDocument",
+                                    "ssm:DescribeDocument",
+                                    "ssm:GetManifest",
+                                    "ssm:GetParameter",
+                                    "ssm:GetParameters",
+                                    "ssm:ListAssociations",
+                                    "ssm:ListInstanceAssociations",
+                                    "ssm:PutInventory",
+                                    "ssm:PutComplianceItems",
+                                    "ssm:PutConfigurePackageResult",
+                                    "ssm:UpdateAssociationStatus",
+                                    "ssm:UpdateInstanceAssociationStatus",
+                                    "ssm:UpdateInstanceInformation"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                                "Sid": "SsmAgentCore"
+                            },
+                            {
+                                "Action": [
+                                    "ssmmessages:CreateControlChannel",
+                                    "ssmmessages:CreateDataChannel",
+                                    "ssmmessages:OpenControlChannel",
+                                    "ssmmessages:OpenDataChannel"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                                "Sid": "SsmAgentMessages"
+                            },
+                            {
+                                "Action": [
+                                    "ec2messages:AcknowledgeMessage",
+                                    "ec2messages:DeleteMessage",
+                                    "ec2messages:FailMessage",
+                                    "ec2messages:GetEndpoint",
+                                    "ec2messages:GetMessages",
+                                    "ec2messages:SendReply"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                                "Sid": "SsmAgentEc2Messages"
+                            },
+                            {
+                                "Action": "sts:GetCallerIdentity",
+                                "Resource": "*",
+                                "Effect": "Allow",
+                                "Sid": "CallerIdentity"
+                            },
+                            {
+                                "Action": "secretsmanager:GetSecretValue",
+                                "Resource": "arn:aws:secretsmanager:eu-north-1:797661577394:secret:proposal-orchestrator/env-config-*",
+                                "Effect": "Allow",
+                                "Sid": "RuntimeSecretRead"
+                            }
+                        ]
+                    },
+                    "VersionId": "v1",
+                    "IsDefaultVersion": true,
+                    "CreateDate": "2026-10-25T21:14:32+00:00"
+                }
+            ]
+        },
+        {
+            "PolicyName": "proposal-orchestrator-bedrock-invoke",
+            "PolicyId": "ANPA3TOCVYCZHHIB6US5G",
+            "Arn": "arn:aws:iam::797661577394:policy/proposal-orchestrator-bedrock-invoke",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 1,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "CreateDate": "2026-10-25T21:14:32+00:00",
+            "UpdateDate": "2026-10-25T21:14:32+00:00",
+            "PolicyVersionList": [
+                {
+                    "Document": {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:RequestedRegion": "eu-north-1"
+                                    }
+                                },
+                                "Action": [
+                                    "bedrock:InvokeModel",
+                                    "bedrock:InvokeModelWithResponseStream"
+                                ],
+                                "Resource": [
+                                    "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6"
+                                ],
+                                "Effect": "Allow",
+                                "Sid": "InvokeOd7Profiles"
+                            },
+                            {
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:RequestedRegion": [
+                                            "eu-north-1",
+                                            "eu-west-3",
+                                            "eu-south-1",
+                                            "eu-south-2",
+                                            "eu-west-1",
+                                            "eu-central-1"
+                                        ],
+                                        "bedrock:InferenceProfileArn": [
+                                            "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1",
+                                            "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6"
+                                        ]
+                                    }
+                                },
+                                "Action": [
+                                    "bedrock:InvokeModel",
+                                    "bedrock:InvokeModelWithResponseStream"
+                                ],
+                                "Resource": [
+                                    "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-sonnet-4-6"
+                                ],
+                                "Effect": "Allow",
+                                "Sid": "InvokeRoutedModelsThroughOd7Profiles"
+                            }
+                        ]
+                    },
+                    "VersionId": "v1",
+                    "IsDefaultVersion": true,
+                    "CreateDate": "2026-10-25T21:14:32+00:00"
+                }
+            ]
+        },
+        {
+            "PolicyName": "proposal-orchestrator-boundary",
+            "PolicyId": "ANPA3TOCVYCZLKEBFTGFN",
+            "Arn": "arn:aws:iam::797661577394:policy/proposal-orchestrator-boundary",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 0,
+            "PermissionsBoundaryUsageCount": 1,
+            "IsAttachable": true,
+            "CreateDate": "2026-10-25T21:14:31+00:00",
+            "UpdateDate": "2026-10-25T21:14:31+00:00",
+            "PolicyVersionList": [
+                {
+                    "Document": {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Action": [
+                                    "bedrock:InvokeModel",
+                                    "bedrock:InvokeModelWithResponseStream"
+                                ],
+                                "Resource": [
+                                    "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-north-1:797661577394:inference-profile/eu.anthropic.claude-sonnet-4-6"
+                                ],
+                                "Effect": "Allow",
+                                "Sid": "BedrockInvokeProfiles"
+                            },
+                            {
+                                "Action": [
+                                    "bedrock:InvokeModel",
+                                    "bedrock:InvokeModelWithResponseStream"
+                                ],
+                                "Resource": [
+                                    "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-opus-4-6-v1",
+                                    "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-west-3::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-south-1::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-south-2::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-6",
+                                    "arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-sonnet-4-6"
+                                ],
+                                "Effect": "Allow",
+                                "Sid": "BedrockInvokeRoutedModels"
+                            },
+                            {
+                                "Action": "secretsmanager:GetSecretValue",
+                                "Resource": "arn:aws:secretsmanager:eu-north-1:797661577394:secret:proposal-orchestrator/env-config-*",
+                                "Effect": "Allow",
+                                "Sid": "RuntimeSecretRead"
+                            },
+                            {
+                                "Action": [
+                                    "kms:Decrypt",
+                                    "kms:DescribeKey"
+                                ],
+                                "Resource": "arn:aws:kms:eu-north-1:797661577394:key/*",
+                                "Effect": "Allow",
+                                "Sid": "KmsDecryptThroughKeyPolicy"
+                            },
+                            {
+                                "Action": "sts:GetCallerIdentity",
+                                "Resource": "*",
+                                "Effect": "Allow",
+                                "Sid": "CallerIdentity"
+                            },
+                            {
+                                "Action": [
+                                    "ssm:DescribeAssociation",
+                                    "ssm:GetDeployablePatchSnapshotForInstance",
+                                    "ssm:GetDocument",
+                                    "ssm:DescribeDocument",
+                                    "ssm:GetManifest",
+                                    "ssm:GetParameter",
+                                    "ssm:GetParameters",
+                                    "ssm:ListAssociations",
+                                    "ssm:ListInstanceAssociations",
+                                    "ssm:PutInventory",
+                                    "ssm:PutComplianceItems",
+                                    "ssm:PutConfigurePackageResult",
+                                    "ssm:UpdateAssociationStatus",
+                                    "ssm:UpdateInstanceAssociationStatus",
+                                    "ssm:UpdateInstanceInformation"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                                "Sid": "SsmAgentCore"
+                            },
+                            {
+                                "Action": [
+                                    "ssmmessages:CreateControlChannel",
+                                    "ssmmessages:CreateDataChannel",
+                                    "ssmmessages:OpenControlChannel",
+                                    "ssmmessages:OpenDataChannel"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                                "Sid": "SsmAgentMessages"
+                            },
+                            {
+                                "Action": [
+                                    "ec2messages:AcknowledgeMessage",
+                                    "ec2messages:DeleteMessage",
+                                    "ec2messages:FailMessage",
+                                    "ec2messages:GetEndpoint",
+                                    "ec2messages:GetMessages",
+                                    "ec2messages:SendReply"
+                                ],
+                                "Resource": "*",
+                                "Effect": "Allow",
+                                "Sid": "SsmAgentEc2Messages"
+                            },
+                            {
+                                "Action": [
+                                    "s3:ListBucket",
+                                    "s3:GetBucketLocation"
+                                ],
+                                "Resource": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394",
+                                "Effect": "Allow",
+                                "Sid": "DeployBucketBundlesRead"
+                            },
+                            {
+                                "Action": "s3:GetObject",
+                                "Resource": "arn:aws:s3:::proposal-orchestrator-deploy-797661577394/bundles/*",
+                                "Effect": "Allow",
+                                "Sid": "DeployBucketBundlesObjects"
+                            }
+                        ]
+                    },
+                    "VersionId": "v1",
+                    "IsDefaultVersion": true,
+                    "CreateDate": "2026-10-25T21:14:31+00:00"
+                }
+            ]
+        }
+    ]
+}
