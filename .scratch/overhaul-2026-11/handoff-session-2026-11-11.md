@@ -224,7 +224,7 @@ Ticked only on the evidence each protocol (§3) names. Newest line last.
       DONE 2026-11-11 22:58 UTC: steps 06–23 PASS (host on `c7i-flex.large`, OD9-r1), operator confirmed R11 and
       reviewed R11-D11/D12 (`aws-redeployment-r11-host_2026-11-11`); last commit before close `17f4631d`.
 - [x] **A2** — R12b. Confirmed 2026-11-12 01:14 UTC with F7 open (retest in the next host session, R12b-D9); register v2 35 VERIFIED_PASS / 4 DEFERRED / 2 N/A (`aws-redeployment-r12b-reevidence_2026-11-12`). Collector defects F-R12b-2–4 to fix before its next run. Step 12 done (346 passed, 1 skipped; guards CLEAN).
-- [ ] **A3** — R14
+- [x] **A3** — R14. Confirmed 2026-11-12 with R14-D1 (offer-file prices) and R14-D5 (CloudShell steps 10–11 recovered) accepted; F7 closed (R12b criterion 2 ticked). Step 16: 224 passed, guards CLEAN. Both host creations deleted, nothing billable left (`aws-redeployment-r14-operations_2026-11-12`, `b25c7854`). F-R14-1/2 fixed; R15 runs the CloudShell teardown end to end and the input discard at a real terminal.
 - [ ] **O5** — re-freeze, tag, bundle, sha256 record
 - [ ] **A4** — R15 (rescoped)
 - [ ] **H2** — V14 (operator)
