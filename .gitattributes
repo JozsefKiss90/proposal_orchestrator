@@ -40,3 +40,7 @@ plans/pe08_review_and_pe09_handoff_tickets.md -text
 # then fails on the first line with "$'\r': command not found". Store and check
 # them out with LF on every platform (AWS redeployment, ticket R1).
 *.sh text eol=lf
+
+# The R12a evidence collector writes MANIFEST.sha256 over the raw bytes of each run folder
+# (tools/collect_evidence_v2.py); first real run R12b, 2026-11-12.
+docs/infrastructure_security/evidence_v2/*/*_collector/** -text
