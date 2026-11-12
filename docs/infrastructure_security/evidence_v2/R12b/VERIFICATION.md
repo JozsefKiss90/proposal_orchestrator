@@ -8,7 +8,7 @@
 | Collector run | `R12b_09_collector/`: started 00:37:25Z, finished 00:42:16Z; `exit=0`; 93 collected, 1 expected error (DC-40 SCP list), 1 not collected (the launcher check, point 1); 102 files with `MANIFEST.sha256` re-hashed by the agent; the collector's own secret scan and old-ID guard CLEAN |
 | Stacks | `proposal-orchestrator-host`, twice. Round 2 (`r12b-create-01`): 2026-11-11 23:36:41 – ~23:45, collector refused before any AWS call (F7 URL file missing). Fix 1 (`r12b-create-02`): 2026-11-12 00:34:46 – ~00:45, the run this report rests on. Both deleted in the session |
 | Cost | Hourly: two creations of six interface endpoints and one `c7i-flex.large` host, about 9 and 10 minutes. Credits 199.25 USD at F01 (billing delayed). R14 prices it |
-| Secret scan | Agent over `evidence_v2/R12b` after each edit: CLEAN. Operator: step 12, after this report |
+| Secret scan | Agent over `evidence_v2/R12b` after each edit: CLEAN. Operator step 12 (2026-11-12): CLEAN, `exit=0` |
 
 Every check below was re-run by the agent on the saved files (`utf-8-sig`), by script. Host ids come
 from `R12b_outputs.json` (the fix-1 creation); base ids from `R4_outputs.json`–`R8_outputs.json`.
@@ -64,7 +64,7 @@ proposed: VERIFIED_PASS, Inferred.
 - [x] Every criterion above is PASS, except round 2 (superseded) and F7 (open, carried forward).
 - [x] Register v2 updated (2026-11-12), Summary table included.
 - [x] Decision record `aws-redeployment-r12b-reevidence_2026-11-12` drafted.
-- [ ] Step 12 after this report (not yet run when R12b was confirmed).
+- [x] Step 12 after this report (run 2026-11-12, after the confirmation): Python 3.10.6, `346 passed, 1 skipped` (the symlink case), as stated; old-ID guard CLEAN (20 ids), `exit=0`; secret scan CLEAN over `evidence_v2/R12b`, `exit=0`, run last.
 - [x] Operator confirmed R12b (2026-11-12 01:14 UTC), taken as the review of R12b-D8, D10–D12; criteria 1, 3 and 4 ticked, criterion 2 (F7) left open.
 
 ## Notes for later tickets
