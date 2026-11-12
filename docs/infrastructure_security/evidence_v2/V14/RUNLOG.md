@@ -6,7 +6,7 @@
 | Runbook | `plans/msca_dn_pe09_runbook.md` §4–§6 |
 | Bundle | O5: tag `msca-dn-freeze-2026-11-12`, revision `17e32d54`, under `bundles/msca-dn-freeze-2026-11-12/` |
 | Kept by | agent (Claude), from the operator's decisions in session. The agent sees no proposal text and runs no model call |
-| Step sheet | `STEPS.md`: part W (workstation) written; part H (host) outlined, its scripts follow the measured cost |
+| Step sheet | `STEPS.md`: part W (workstation) done 2026-11-12; part H (host) written, scripts in `host/`, rehearsed (`REHEARSAL.md` R23–R31) |
 | Rehearsal | `REHEARSAL.md`, scripts in `rehearsal/` |
 
 ## Settling
@@ -18,9 +18,8 @@
 | 2026-11-12 | operator | V14-OP6 to V14-OP8 below, in session. Then the operator does the real import and the workstation preflight |
 | 2026-11-12 | operator | V14-F5 answered, OP7 date given, V14-A1 accepted, V14-F3 to be noted for V16, in session. The operator runs W01–W08 next |
 | 2026-11-12 | agent | Route (ii) rehearsed (`REHEARSAL.md` R14–R22): the re-rendered register loads against the frozen baseline. V14-F6 found |
-| 2026-11-12 | operator | W07 run 1, default budgets: refused, exit 2, `package incomplete under budget 200000` (V14-F7) |
-| 2026-11-12 | operator | W07 run 2, `--package-budget 400000`: the excellence criterion's input, 34,168, exceeds the 32,768 criterion budget and would go unscored, failing the freeze (V14-F7) |
-| 2026-11-12 | operator | W07 run 3, `--package-budget 400000 --criterion-budget 40000`: two flags remain, tables 250 against the manifest's 275 and 111 word-scan hits, both explained (V14-F8). Pack set and cost lines to follow |
+| 2026-11-12 | operator | W01–W08 done (below, "The input and the workstation run"). W07: one refusal at the default package budget, three flagged runs at the default criterion budget, then the final run with both budgets (V14-F7): exit 1, pack set `sha256:fe975e4b8489`, two flags (V14-F8) |
+| 2026-11-13 | agent | Measured cost in place (below). Part H written: `STEPS.md` H01–H12, `host/`, `workstation/v14_pack_one.py`; rehearsed on the synthetic root with a scripted Converse client (`REHEARSAL.md` R23–R31). Deviation V14-D2 recorded. Go asked, with points P1–P4. No go given |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -53,6 +52,29 @@
   snapshot carries that date as a tag. While V16 is unconfirmed the tag reads 2027-03-31; when V16 is confirmed the
   agent computes the earlier date and the operator re-tags it.
 
+### The input and the workstation run (operator, 2026-11-12)
+
+- **The input.** A page extract (Part B only) of the portal's proposal PDF, declared `Inferred`. Extract sha256
+  `c2caaeaa6782e11e7af4b740aff1bead1568d498fafc6ab46430d6097b92e9db`. The portal file's sha256, the page range and the
+  extraction tool are still to be reported. Part A stays off the host.
+- **W03.** `--describe` and `--environment` exit 0, the environment on the pin. Dry import: one refusal (a
+  placeholder left in), two runs with wrong identifiers, the output folder deleted, then one clean run, exit 0. The
+  acceptance record complete; `--check-acceptance` exit 0.
+- **W04.** Exit 0, findings 0, unchecked 0. Pages declared 57, measured 57, mapped 53.
+- **W05.** Refused once (the acceptance record not yet marked complete), then exit 0, findings 0, unchecked 0, three
+  files written.
+- **W06.** `freeze_revision=17e32d54…` `clean=yes`; 13 worktrees checked, root and output outside; 10 supplement
+  files, sha256 ok; no ESR record under the root. Archive `input-20261112-40eb1f.tar.gz`, 194,572 bytes, sha256
+  `406b15dcb1f790da957faf6720b338c908511fc4716b8b4f79f1ace126605174`; 19 members: workspace 8, register 1,
+  supplement 10.
+- **W07.** As V14-F7 and V14-F8.
+- **W08.** 10 packs complete, none unbuilt; 3 criteria, none incomplete. Pack tokens 63,965 in all, 12,807 the
+  largest. Criterion inputs 34,168, 11,895 and 26,340 tokens. 45 calls (`n` 3, `criterion_n` 5). The freeze
+  worktree's `status` printed nothing.
+- **Map decisions (operator).** Pages 1–4 lie outside the map: front matter and table of contents. Sections 9 and 10
+  are mapped as sub-sections. Sub-section 3.2 ends on page 33. The work-package labels are taken from the sanitised
+  copy's declaration, without a label-by-label check against the original (Assumed).
+
 ### Agent decision
 
 - **V14-A1. The archive holds less than the whole private root.** The rehearsal ran the host chain on a root
@@ -67,6 +89,14 @@
   lives across sittings with the instance stopped (V14-OP3). Stopped, the interface endpoints and the
   volume still bill: 0.063916 USD per hour, about 1.53 USD per day (`R14_05_cost-check/report.json`).
   The stack is deleted when V14 is confirmed, by the step 14 teardown of R15.
+- **V14-D2. The host lines are run by driver scripts, with an explicit checkpoint.** Runbook §5 writes the
+  commands as `python -m harness.commands.blind_assessment …` lines, and its documented assess line names no
+  checkpoint. On the host, `host/v14_h05a_prepare.sh` writes the exact argument list to `/root/v14/prepared.json`,
+  and `host/v14_h06_assess.sh` passes it to the same `main()`, in-process, as `harness.commands.converse_smoke`
+  did at R15. The list carries `--checkpoint /root/v14/R/.harness/checkpoints/v14_stage_a.jsonl`, because the
+  receipt must name the checkpoint path before the run (runbook §1.1). A resume therefore swaps `--checkpoint` for
+  `--resume` on that path and changes nothing else, where the runbook adds `--resume` to a line without either. The
+  parser accepts only one of the two. Rehearsed: REHEARSAL.md R27.
 
 ## Findings
 
@@ -129,8 +159,7 @@
   the preflight's parameters and pack set, not its flags, and the freeze does not read them (Inferred from the code;
   not run with a flagged preflight).
   - **Tables: 250 rows rendered and parsed, against 275 in the import manifest.** The operator explains the gap of
-    25 by rows on pages 1–4, which lie outside the declared page map (operator's count: `<rows on pages 1–4>`, to
-    be reported). The map is the original's configuration, so these rows are outside the assessed sections by
+    25 by the 25 rows on pages 1–4, which lie outside the declared page map (operator, 2026-11-12). The map is the original's configuration, so these rows are outside the assessed sections by
     declaration, not lost by the extraction.
   - **Word scan: 111 hits.** The scan is the instance-one leak scan (`harness/evidence_preflight.py`), built to
     keep instance-one names out of a sanitised tree. Here it runs over the private, unsanitised root of the real
@@ -153,22 +182,25 @@ Measured and found clear:
 
 ## Cost statement (agent, before any go)
 
-**Calls.** 45 Converse calls: 10 expectations × 3 samples (`--n` default) plus 3 criteria × 5 samples
-(`--criterion-n` default). The sanitised 2026-profile baseline made the same split: 45 live calls.
-Throttled calls are retried, up to 6 times. Malformed answers add calls.
+**Measured** by the operator's W07 preflight with both budgets, through `workstation/v14_cost.py` (W08), on
+2026-11-12. It replaces the 2026-11-12 estimate. Bedrock prices: Sonnet 4.6 Regional, 3.3 USD per 1M input tokens and
+16.5 USD per 1M output tokens.
+
+**Calls.** 45 Converse calls: 10 expectations × 3 samples plus 3 criteria × 5 samples. Throttled calls are retried, up
+to 6 times (V14-OP5). R15 met two throttles (F-R15-1). A retried call is billed again only if it returned.
 
 | Item | Planned | Upper bound | Basis |
 |---|---|---|---|
-| Bedrock input | about 675,000 tokens, 2.23 USD | 45 × 36,768 tokens, plus 20% for retries: 6.55 USD | Pack and criterion budgets on Converse are uncapped defaults of 32,768 tokens each. Instructions and rubric taken as about 4,000 tokens per call (Assumed). Planned assumes about 15,000 tokens per call (Assumed). 3.3 USD per 1M tokens |
-| Bedrock output | about 45,000 tokens, 0.74 USD | 45 × 2,048 tokens, plus 20%: 1.82 USD | `max_tokens` 2048 as in R15's receipt. 16.5 USD per 1M tokens |
+| Bedrock input | 592,378 tokens, 1.95 USD | 947,804 tokens, 3.13 USD | Measured packs (63,965 tokens) and criterion inputs (34,168, 11,895, 26,340) over their samples, plus the rehearsal's measured overhead per call. Upper adds 20% for retries and malformed answers |
+| Bedrock output | 45,000 tokens, 0.74 USD | 110,592 tokens, 1.82 USD | `maxTokens` 2048: 45 × 2,048, plus 20% |
+| **Bedrock, measured** | **2.70 USD** | **4.95 USD** | `v14_cost.py` |
 | Host running | 2 sittings × 2 h: 0.62 USD | 3 sittings × 3 h: 1.39 USD | 0.154686 USD per running hour |
 | Host stopped (V14-D1) | 3 days: 4.60 USD | 7 days: 10.74 USD | 0.063916 USD per stopped hour |
-| **V14** | **about 8.2 USD** | **about 20.5 USD** | Budget 10 USD per month; credits 199.19 USD at R15 step 01 |
+| Snapshot (V14-OP7) | at most 0.40 USD per month | about 1.9 USD to 2027-03-31 | 8 GB at most, at 0.05 USD per GB-month (Assumed: not read for eu-north-1). An incremental snapshot of the used blocks is smaller |
+| **V14** | **about 8.3 USD** | **about 19 USD** | Budget 10 USD per month; credits 199.19 USD at R15 step 01 |
 
-**Overhead measured.** The rehearsal measured the prompt overhead per call: at most 2,847 characters for a cell
-call and 4,564 for a criterion call, about 712 and 1,141 tokens (REHEARSAL.md). That replaces the 4,000 tokens
-assumed above. `workstation/v14_cost.py` applies it to the operator's preflight (STEPS.md W08).
+The planned Bedrock figure is now measured, not assumed. The hours and days remain the operator's pace. At the upper
+bound the 85% and 100% budget alerts fire. The credits cover it.
 
-The input planned figure is a guess until the original is measured. The preflight makes no model call
-and reports pack sizes, so a workstation preflight over the private root replaces the guess before the
-go. At the upper bound the 85% and 100% budget alerts fire. The credits cover it.
+**The go asked for** (STEPS.md, the STOP after H02): hourly charges from H03 until H11d, the 45-call pass at H06, and
+points P1–P4. The go is recorded here before H03.

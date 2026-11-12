@@ -103,3 +103,27 @@ the register alone, so the candidate hash and snapshot id the freeze bound do no
 successor dispositions to the same baseline, and a successor audit reports itself bound. What does not carry
 across the swap is `diff` from the route (iii) comparison, because it re-hashes the register that comparison
 recorded (V14-F6).
+
+## Part H scripts on a simulated host
+
+Run by the agent, 2026-11-13, after the operator's W01–W08. The host scripts of `host/` ran under Git Bash with their
+rehearsal overrides: `V14_APP` a copy of the bundle-only tree (plus a `bundle_manifest.json` naming `17e32d54`),
+`V14_PY` Python 3.10 with `boto3.client` replaced by the scripted Converse client, `V14_LAUNCH=none` (no runtime
+secret; the scripted client sets `AWS_REGION` and the transport environment), and `V14_LOCAL_ARCHIVE` in place of
+the bucket. The input was R11's synthetic archive. No AWS call, no model call. The synthetic root has its own pack
+set, so `V14_EXPECT_PACK_SET` was relaxed for R24 only.
+
+| # | Run | Result |
+|---|---|---|
+| R23 | `v14_inbound.sh`, kind `input` | `RESULT=expected`: 19 members, workspace 8, register 1, supplement 10, one manifest, no ESR record; `in_app_equal=8`, `in_app_differ=0`. A second run refused: the root exists |
+| R24 | `v14_h05a_prepare.sh` | Preflight exit 0 (the fixture raises no flag), package `complete` under 400000, 10 packs; the draft with the thirteen placeholders; the rendered request `eu.anthropic.claude-sonnet-4-6`, temperature 0, `maxTokens` 2048, no tool configuration, `eu-north-1` |
+| R25 | `v14_h05b_receipt.sh` | `placeholders_left=none`; the validator exit 0, `receipt check: green` |
+| R26 | `v14_h06_assess.sh` | Receipt green before; assess exit 0, 45 live calls, `requests=45`, no tool configuration, no child process; freeze exit 0, 22 of 22 conditions, two baseline files; receipt green after, against the report |
+| R27 | The pass cut by a scripted outage after 20 calls, then `PO_RESUME=yes` | The cut run left the checkpoint and no report. The resume: 20 replayed, 25 live, freeze 22 of 22, receipt green (V14-D2) |
+| R28 | The same cut after 30 calls, with the exception now caught | `assess_exit=exception:RuntimeError`, `report_count=0`, `checkpoint_lines=31`: the evidence says where it stopped |
+| R29 | `workstation/v14_pack_one.py --esr`, then `v14_inbound.sh` kind `esr`, then `v14_h08_audit.sh` first | The member sha256 `5c9b9c8e…` checked on both sides; the ESR placed at its repository path. Audit exit 1 (advisory), one report, `baseline_bound=bound` |
+| R30 | `v14_pack_one.py --register` over route (ii)'s re-rendered register, then kind `register`, the successor audit, `v14_status.sh` | Register `938cca93…` → `e0ccd3b3…`, as R16; the old copy kept. Successor audit bound. Status listed paths, sizes and hashes only |
+| R31 | `v14_h09_return.sh`, `v14_h11_credcheck.sh` | The return printed numbers, booleans, hashes and identifiers only. Two fixes came out of it: `assessed_at` was withheld for its `+`, now allowed; the criterion spread label is a fixed sentence, now not printed. The credential check found nothing on the simulated root, and caught a planted key-shaped string |
+
+Not rehearsed here: every AWS call (the sender, the bucket's version deletes, the lifecycle, the snapshot, CloudTrail),
+the launcher (R15 ran it on the host), and Linux file modes (the scripts check `root_mode=700` only on Linux).
