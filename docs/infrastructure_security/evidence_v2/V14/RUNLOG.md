@@ -20,6 +20,7 @@
 | 2026-11-12 | agent | Route (ii) rehearsed (`REHEARSAL.md` R14–R22): the re-rendered register loads against the frozen baseline. V14-F6 found |
 | 2026-11-12 | operator | W01–W08 done (below, "The input and the workstation run"). W07: one refusal at the default package budget, three flagged runs at the default criterion budget, then the final run with both budgets (V14-F7): exit 1, pack set `sha256:fe975e4b8489`, two flags (V14-F8) |
 | 2026-11-13 | agent | Measured cost in place (below). Part H written: `STEPS.md` H01–H12, `host/`, `workstation/v14_pack_one.py`; rehearsed on the synthetic root with a scripted Converse client (`REHEARSAL.md` R23–R31). Deviation V14-D2 recorded. Go asked, with points P1–P4. No go given |
+| 2026-11-13 | operator | **Go given, in session**, for hourly charges from H03 until H11d and the 45-call pass at H06. P1, P3 and P4 as written; V14-D2 accepted. P2 with the operator's authority wording (below, "The go"); processing and export as drafted. Input facts reported (portal file, pages, tool); limitation V14-L1 recorded. The operator runs H01 first, then H02 with H03 at the start of sitting 1 |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -55,8 +56,18 @@
 ### The input and the workstation run (operator, 2026-11-12)
 
 - **The input.** A page extract (Part B only) of the portal's proposal PDF, declared `Inferred`. Extract sha256
-  `c2caaeaa6782e11e7af4b740aff1bead1568d498fafc6ab46430d6097b92e9db`. The portal file's sha256, the page range and the
-  extraction tool are still to be reported. Part A stays off the host.
+  `c2caaeaa6782e11e7af4b740aff1bead1568d498fafc6ab46430d6097b92e9db`. Source: the portal file, sha256
+  `195c653d835b8b3b689c2367eaa27af7ecf6ed90bc65ef88933c239d8cc94108`, pages 105–161, extracted with MS Edge by
+  printing those pages to PDF (operator, 2026-11-13). Part A stays off the host.
+- **Limitation V14-L1.** Printing to PDF re-renders the pages; it is not a lossless page copy. The extract's bytes,
+  fonts and text layer can differ from the portal file's pages 105–161. So the extract's hash binds the run to the
+  extract, not to the portal file. That the extract is the submitted Part B is the operator's declaration, not a
+  measurement.
+- **The configuration's status note** (as the operator reports it): "Page count, body point size, page map and
+  markers reconciled against the PDF by the operator on 2026-11-12, using the dry import's worksheet. The PDF is a
+  page extract (Part B only) of the portal's proposal PDF: portal file sha256
+  195c653d835b8b3b689c2367eaa27af7ecf6ed90bc65ef88933c239d8cc94108, pages 105-161 of that file, extracted with MS
+  Edge. That the extract is the submitted Part B is the operator's declaration, not a measurement."
 - **W03.** `--describe` and `--environment` exit 0, the environment on the pin. Dry import: one refusal (a
   placeholder left in), two runs with wrong identifiers, the output folder deleted, then one clean run, exit 0. The
   acceptance record complete; `--check-acceptance` exit 0.
@@ -204,3 +215,18 @@ bound the 85% and 100% budget alerts fire. The credits cover it.
 
 **The go asked for** (STEPS.md, the STOP after H02): hourly charges from H03 until H11d, the 45-call pass at H06, and
 points P1–P4. The go is recorded here before H03.
+
+### The go (operator, 2026-11-13, in session)
+
+Given for hourly charges from H03 until the H11d teardown, and for the 45-call pass at H06.
+
+- **P1.** As written: `eu.anthropic.claude-sonnet-4-6`, version tag `bedrock-converse-eu-north-1@<run date, UTC>`.
+- **P2.** `processing_route.authority`, in the operator's words: "The operator authorises processing of the Part B
+  text of the 2025 submission by eu.anthropic.claude-sonnet-4-6 over Bedrock Converse (EU geographic profile,
+  private endpoint, invocation logging off) for the V14 blind assessment. This is the operator’s own decision of
+  2026-11-13, recorded with V14-OP1 to OP9. No consent of any other party is recorded." `processing` and `export`
+  as drafted. The wording is in `host/v14_h05b_receipt.sh`.
+- **P3.** As written: Run Command timeout 7,200 s; resume from the checkpoint.
+- **P4.** As written. Sitting 1: H02, H03 to H06, then H07 stop. Sitting 2: H08 to H09, then H07. Sitting 3 only
+  for route (ii).
+- **V14-D2** accepted.

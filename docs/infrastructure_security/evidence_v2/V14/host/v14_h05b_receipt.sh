@@ -63,10 +63,12 @@ doc.update(
                "and approved in session",
 )
 doc["processing_route"].update(
-    authority="ADR-001 for the new account (OD1-r1 eu-north-1, OD7 model set); AN0 O6 "
-              "(msca-dn-anonymisation-operator-decisions_2026-10-14), which approves the Converse "
-              "transport for the harness blind assessor; and the operator's V14 decisions "
-              "V14-OP1 to V14-OP9 (evidence_v2/V14/RUNLOG.md), which send the original to it",
+    # The operator's wording, given with the go on 2026-11-13 (evidence_v2/V14/RUNLOG.md). Verbatim.
+    authority="The operator authorises processing of the Part B text of the 2025 submission by "
+              "eu.anthropic.claude-sonnet-4-6 over Bedrock Converse (EU geographic profile, private "
+              "endpoint, invocation logging off) for the V14 blind assessment. This is the operator’s "
+              "own decision of 2026-11-13, recorded with V14-OP1 to OP9. No consent of any other party "
+              "is recorded.",
     processing="the MSCA-DN 2025 original's Part B (a page extract of the portal PDF, declared "
                "Inferred), as packed in input-20261112-40eb1f.tar.gz: evidence packs and criterion "
                "inputs under the historical profile; no Part A",

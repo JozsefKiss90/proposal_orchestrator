@@ -124,6 +124,7 @@ set, so `V14_EXPECT_PACK_SET` was relaxed for R24 only.
 | R29 | `workstation/v14_pack_one.py --esr`, then `v14_inbound.sh` kind `esr`, then `v14_h08_audit.sh` first | The member sha256 `5c9b9c8e…` checked on both sides; the ESR placed at its repository path. Audit exit 1 (advisory), one report, `baseline_bound=bound` |
 | R30 | `v14_pack_one.py --register` over route (ii)'s re-rendered register, then kind `register`, the successor audit, `v14_status.sh` | Register `938cca93…` → `e0ccd3b3…`, as R16; the old copy kept. Successor audit bound. Status listed paths, sizes and hashes only |
 | R31 | `v14_h09_return.sh`, `v14_h11_credcheck.sh` | The return printed numbers, booleans, hashes and identifiers only. Two fixes came out of it: `assessed_at` was withheld for its `+`, now allowed; the criterion spread label is a fixed sentence, now not printed. The credential check found nothing on the simulated root, and caught a planted key-shaped string |
+| R32 | `v14_h05b_receipt.sh` with the operator's P2 authority wording (2026-11-13) | `placeholders_left=none`; the validator exit 0, `receipt check: green` |
 
 Not rehearsed here: every AWS call (the sender, the bucket's version deletes, the lifecycle, the snapshot, CloudTrail),
 the launcher (R15 ran it on the host), and Linux file modes (the scripts check `root_mode=700` only on Linux).

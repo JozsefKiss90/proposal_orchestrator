@@ -149,9 +149,9 @@ The agent proposes these. The go accepts them, or you change them first.
 - **P2. The receipt's attestations** (`host/v14_h05b_receipt.sh`, between the `FILL` markers). `review_state`
   `operator_reviewed`, `declared_status` `Confirmed`, the dates the run date, `verified_by` "the operator". Three
   values need your reading in particular:
-  - `processing_route.authority` names ADR-001, AN0 O6 and V14-OP1 to OP9. **AN0 O6 approves the Converse
-    transport for the harness blind assessor. It does not name the original's text.** The authority to send the
-    original's Part B to Bedrock is your own decision. If the V14 decisions are not that authority, give the wording.
+  - `processing_route.authority`: the operator's own wording, given with the go on 2026-11-13 and recorded in
+    `RUNLOG.md`. AN0 O6 approves the Converse transport only; it does not name the original's text, so the
+    authority is the operator's decision.
   - `processing_route.processing`: the Part B page extract, declared Inferred, as packed in
     `input-20261112-40eb1f.tar.gz`; no Part A.
   - `processing_route.export`: metadata, numeric scores and spreads only (V14-OP2).
