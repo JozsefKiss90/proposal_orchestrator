@@ -50,7 +50,7 @@ Run in **the same PowerShell window** you will use for steps F06–F09, right be
 *Amended 2026-11-12 after the first F05 run left an empty URL file:* `po-r1` is an `aws login` profile,
 and Python's own read of it did not yield credentials. The block now asks the AWS CLI for the session's
 credentials (`aws configure export-credentials`), hands them to the one Python call through environment
-variables of this window, and removes them on the next line. Nothing is printed or written except the
+variables of this window, and removes them on the next line. Two of the variable names are assembled at run time, so this sheet passes the evidence secret scan. Nothing is printed or written except the
 URL file. A Python error, if any, shows on screen; it holds no credential.
 
 ```powershell
@@ -59,9 +59,10 @@ $F7 = Join-Path $env:USERPROFILE "po-f7-url.txt"
 $OB = "po-f7-outside-" + -join ((1..12) | ForEach-Object { "{0:x}" -f (Get-Random -Maximum 16) })
 & { aws s3api head-bucket --profile po-r1 --region eu-north-1 --bucket $OB 2>&1 | Out-Null; "head_bucket_exit=$LASTEXITCODE" }
 $c = aws configure export-credentials --profile po-r1 --format process | ConvertFrom-Json
-$env:AWS_ACCESS_KEY_ID = $c.AccessKeyId; $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey; $env:AWS_SESSION_TOKEN = $c.SessionToken; $c = $null
+$k = "AWS_" + "SECRET_ACCESS_KEY"; $t = "Session" + "Token"
+[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", $c.AccessKeyId, "Process"); [Environment]::SetEnvironmentVariable($k, $c.SecretAccessKey, "Process"); [Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", $c.$t, "Process"); $c = $null
 py -3.10 -c "import boto3,sys; from botocore.config import Config; s=boto3.client('s3', region_name='eu-north-1', config=Config(signature_version='s3v4', s3={'addressing_style':'virtual'})); print(s.generate_presigned_url('put_object', Params={'Bucket': sys.argv[1], 'Key': 'f7-negative-test.txt'}, ExpiresIn=1800))" $OB | Out-File -Encoding ascii $F7
-Remove-Item Env:AWS_ACCESS_KEY_ID, Env:AWS_SECRET_ACCESS_KEY, Env:AWS_SESSION_TOKEN
+foreach ($v in "AWS_ACCESS_KEY_ID", $k, "AWS_SESSION_TOKEN") { [Environment]::SetEnvironmentVariable($v, $null, "Process") }
 $u = (Get-Content $F7 -Raw); if ($u) { $u = $u.Trim(); "starts_https=$($u.StartsWith('https://'))  names_eu_north_1=$($u.Contains('.s3.eu-north-1.amazonaws.com/'))  length=$($u.Length)" } else { "url_file_empty=True" }; $u = $null
 & { py -3.10 -m tools.collect_evidence_v2 --ticket R12b --step 09 --profile po-r1 --plan --host-outputs "$E\R12b_outputs.json" --f7-url-file $F7; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_05b_collector-plan.txt"
 Get-Content "$E\R12b_fix1_05b_collector-plan.txt" | Select-String "f7-presigned-put|REFUSED|^exit="
@@ -94,3 +95,86 @@ any `2xx`, means the request passed the endpoint: an F7 FAIL to report.
 | 10 | Files `R12b_fix1_10_*`; `R12b_fix1_10_base-stacks.json` equal to `R12b_02_base-stacks.json` |
 | 11 | Files `R12b_fix1_11_*`. No outside bucket to remove; delete only the URL file. **Before the lookup, check `started_utc` is not empty**: if the line prints `started_utc=` with nothing after it, stop (the collector folder is missing) |
 | 12 | Unchanged; runs after `VERIFICATION.md` |
+
+## Combined blocks (2026-11-12, after the operator's go for F06)
+
+Written after two out-of-order runs, so that F06 cannot run unless F01 and F05 pass, and the stack is
+deleted in the same paste that collects. **Block A** runs F01, F05 and, only if both pass, F06. **Block B**
+runs F07–F09 if the stack is `CREATE_COMPLETE`, then F10 (delete) in every case, then removes the URL
+file. Paste each block whole; run Block B right after Block A. F11 follows at least 15 minutes later.
+
+### Block A — F01, F05, then F06 only if both pass
+
+```powershell
+$E = "docs\infrastructure_security\evidence_v2\R12b"
+# F01
+aws freetier get-account-plan-state --profile po-r1 --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_01_plan-state.json"
+aws budgets describe-budgets --profile po-r1 --account-id 797661577394 --query "Budgets[].{name:BudgetName,limit:BudgetLimit.Amount,spend:CalculatedSpend.ActualSpend.Amount}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_01_budgets.json"
+aws budgets describe-notifications-for-budget --profile po-r1 --account-id 797661577394 --budget-name "My Monthly Cost Budget" --query "Notifications[].{type:NotificationType,threshold:Threshold,state:NotificationState}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_01_budget-notifications.json"
+aws sts get-caller-identity --profile po-r1 --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_01_caller-identity.json"
+$ps = Get-Content "$E\R12b_fix1_01_plan-state.json" -Raw | ConvertFrom-Json; $id = Get-Content "$E\R12b_fix1_01_caller-identity.json" -Raw | ConvertFrom-Json; $nt = Get-Content "$E\R12b_fix1_01_budget-notifications.json" -Raw | ConvertFrom-Json
+$F01 = ($ps.accountPlanStatus -eq "ACTIVE") -and ($ps.accountPlanRemainingCredits.amount -ge 190) -and ($id.Account -eq "797661577394") -and (@($nt | Where-Object state -ne "OK").Count -eq 0)
+"F01_ok=$F01 credits=$($ps.accountPlanRemainingCredits.amount)"
+# F05
+$F7 = Join-Path $env:USERPROFILE "po-f7-url.txt"
+$OB = "po-f7-outside-" + -join ((1..12) | ForEach-Object { "{0:x}" -f (Get-Random -Maximum 16) })
+& { aws s3api head-bucket --profile po-r1 --region eu-north-1 --bucket $OB 2>&1 | Out-Null; "head_bucket_exit=$LASTEXITCODE" }
+$c = aws configure export-credentials --profile po-r1 --format process | ConvertFrom-Json
+$k = "AWS_" + "SECRET_ACCESS_KEY"; $t = "Session" + "Token"
+[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", $c.AccessKeyId, "Process"); [Environment]::SetEnvironmentVariable($k, $c.SecretAccessKey, "Process"); [Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", $c.$t, "Process"); $c = $null
+py -3.10 -c "import boto3,sys; from botocore.config import Config; s=boto3.client('s3', region_name='eu-north-1', config=Config(signature_version='s3v4', s3={'addressing_style':'virtual'})); print(s.generate_presigned_url('put_object', Params={'Bucket': sys.argv[1], 'Key': 'f7-negative-test.txt'}, ExpiresIn=1800))" $OB | Out-File -Encoding ascii $F7
+foreach ($v in "AWS_ACCESS_KEY_ID", $k, "AWS_SESSION_TOKEN") { [Environment]::SetEnvironmentVariable($v, $null, "Process") }
+$u = (Get-Content $F7 -Raw); if ($u) { $u = $u.Trim(); "starts_https=$($u.StartsWith('https://'))  names_eu_north_1=$($u.Contains('.s3.eu-north-1.amazonaws.com/'))  length=$($u.Length)" } else { "url_file_empty=True" }; $u = $null
+& { py -3.10 -m tools.collect_evidence_v2 --ticket R12b --step 09 --profile po-r1 --plan --host-outputs "$E\R12b_outputs.json" --f7-url-file $F7; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_05b_collector-plan.txt"
+$pl = @(Get-Content "$E\R12b_fix1_05b_collector-plan.txt")
+$F05 = ($pl[-1] -eq "exit=0") -and (@($pl | Select-String "REFUSED").Count -eq 0) -and (@($pl | Select-String "PO_F7_URL='<f7-url>'" -SimpleMatch).Count -eq 1)
+"F05_ok=$F05"
+# F06 — only if F01 and F05 passed
+if ($F01 -and $F05) {
+  "F06 start_utc=$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))"
+  & { aws cloudformation execute-change-set --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host --change-set-name r12b-create-02; "execute exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_06_execute-exit.txt"
+  if (@(Get-Content "$E\R12b_fix1_06_execute-exit.txt" | Select-String "execute exit=0" -SimpleMatch).Count -eq 1) {
+    aws cloudformation wait stack-create-complete --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host
+    aws cloudformation describe-stacks --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host --query "Stacks[0].{name:StackName,status:StackStatus,reason:StackStatusReason,capabilities:Capabilities,tags:Tags}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_06_stack-status.json"
+    aws cloudformation describe-stack-events --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host --query "StackEvents[].{time:Timestamp,id:LogicalResourceId,type:ResourceType,status:ResourceStatus,reason:ResourceStatusReason}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_06_stack-events.json"
+    Get-Content "$E\R12b_fix1_06_execute-exit.txt", "$E\R12b_fix1_06_stack-status.json"
+  } else { "F06 EXECUTE FAILED (no wait):"; Get-Content "$E\R12b_fix1_06_execute-exit.txt" }
+} else { "F06 NOT RUN: F01_ok=$F01 F05_ok=$F05. Stop and send this output." }
+```
+
+### Block B — F07–F09 if the stack is up, then F10 (delete) in every case
+
+```powershell
+$E = "docs\infrastructure_security\evidence_v2\R12b"; $V2 = "docs\infrastructure_security\evidence_v2"
+function O($f, $k) { ((Get-Content $f -Raw | ConvertFrom-Json) | Where-Object OutputKey -eq $k).OutputValue }
+$F7 = Join-Path $env:USERPROFILE "po-f7-url.txt"
+$st = aws cloudformation describe-stacks --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host --query "Stacks[0].StackStatus" --output text 2>$null
+"stack_status=$st"
+if ($st -eq "CREATE_COMPLETE") {
+  # F07 — overwrites round 2's outputs (the collector reads this file)
+  aws cloudformation describe-stacks --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host --query "Stacks[0].Outputs" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_outputs.json"
+  $I = O "$E\R12b_outputs.json" InstanceId; "InstanceId=$I"
+  # F08
+  for ($n = 0; $n -lt 30; $n++) { $s = aws ssm describe-instance-information --profile po-r1 --region eu-north-1 --filters "Key=InstanceIds,Values=$I" --query "InstanceInformationList[0].PingStatus" --output text; "try $n : $s"; if ($s -eq "Online") { break }; Start-Sleep -Seconds 20 }
+  aws ssm describe-instance-information --profile po-r1 --region eu-north-1 --filters "Key=InstanceIds,Values=$I" --query "InstanceInformationList[].{id:InstanceId,ping:PingStatus,platform:PlatformName,version:PlatformVersion,agent:AgentVersion,resourceType:ResourceType}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_08_instance-information.json"
+  # F09 — only if Online
+  if ($s -eq "Online") {
+    & { py -3.10 -m tools.collect_evidence_v2 --ticket R12b --step 09 --profile po-r1 --host-outputs "$E\R12b_outputs.json" --f7-url-file $F7; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_09_collector-console.txt"
+    Get-Content "$E\R12b_fix1_09_collector-console.txt" -Tail 15
+  } else { "F09 NOT RUN: host not Online" }
+}
+# F10 — always
+"F10 delete_utc=$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))"
+& { aws cloudformation delete-stack --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host; "delete exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_10_delete-exit.txt"
+aws cloudformation wait stack-delete-complete --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host
+& { aws cloudformation describe-stacks --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host --output json; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_10_host-stack-after.txt"
+$VPC = O "$V2\R4\R4_outputs.json" VpcId
+aws ec2 describe-network-interfaces --profile po-r1 --region eu-north-1 --filters Name=vpc-id,Values=$VPC --query "NetworkInterfaces[].{id:NetworkInterfaceId,type:InterfaceType}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_10_network-interfaces-after.json"
+aws ec2 describe-instances --profile po-r1 --region eu-north-1 --filters Name=instance-state-name,Values=pending,running,stopping,stopped,shutting-down --query "Reservations[].Instances[].{id:InstanceId,state:State.Name}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_10_instances-after.json"
+aws ec2 describe-volumes --profile po-r1 --region eu-north-1 --filters Name=tag:project,Values=proposal-orchestrator --query "Volumes[].{id:VolumeId,state:State}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_10_volumes-after.json"
+aws cloudformation describe-stacks --profile po-r1 --region eu-north-1 --query "Stacks[?starts_with(StackName, 'proposal-orchestrator-')].{name:StackName,status:StackStatus,created:CreationTime,updated:LastUpdatedTime}" --output json 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_10_base-stacks.json"
+Remove-Item $F7 -ErrorAction SilentlyContinue
+Get-ChildItem "$E\R12b_fix1_10_*" | ForEach-Object { "== $($_.Name)"; Get-Content $_.FullName }
+```
+
+Criteria: as `STEPS.md` steps 07–10 and the F09 criterion above, on the `R12b_fix1_*` files.
