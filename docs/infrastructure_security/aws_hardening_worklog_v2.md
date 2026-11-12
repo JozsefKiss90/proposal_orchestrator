@@ -543,3 +543,15 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R15/`: host created 17:00:54, delete issued 17:19:59 UTC, nothing left; bundle sha256 equal to O5 on the host; verify 11 of 11; launcher digest equal to R8; receipt green before and after the pass; 26 `Converse` events through the Bedrock interface endpoint as the runtime role |
 | Verification Result | Steps 01–15 PASS or with recorded deviation (R15-D1–D4). Ticket criteria 1–4 PASS; criterion 5 (decision record) drafted. AN12 criteria 1 and 3 Confirmed on the host; criterion 2 out of scope. Finding F-R15-1 (two throttled calls, retried) |
 | Next Action | Operator: answer R15-D4 (typed-ahead tests), rerun step 15 (R15-D2), run step 16, confirm R15. Then A4 is ticked; frontier H2 V14 (check F-R15-1 first) |
+
+### 2026-11-12 — R15: host install and Converse smoke run — confirmed
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-11-12T18:30:00Z |
+| Control ID | None changes status beyond the verified entry |
+| Action Taken | Operator reran step 15 (same 26 events; R15-D2 closed), answered R15-D4 (one early Enter; the input discard held), ran step 16 and confirmed R15 |
+| Evidence Requested | `R15_15_converse-events.json` (rerun), `R15_16_*` |
+| Evidence Received | `289 passed, 1 skipped`; old-ID guard and secret scan CLEAN, `exit=0` |
+| Verification Result | R15 DONE: five ticket criteria ticked. R14 gaps R14-D5 and F-R14-2 closed. F-R15-1 open |
+| Next Action | Operator clears `~/r15` and `~/r15.tar.gz` in CloudShell. Frontier H2 V14; check F-R15-1 (quota, pacing) first |

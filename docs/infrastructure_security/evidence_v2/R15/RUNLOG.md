@@ -35,6 +35,9 @@
 | 13 | 17:13:16–17:14:54 | operator | PASS. `assess_exit=0`, `receipt green`; one report; checkpoint 25 lines; two baseline files (`.json` 70,304 bytes, `.freeze.json` 6,401 bytes); receipt unchanged; `check_exit=0`, `receipt green`. 1.5 minutes of the 60 allowed | — |
 | 14 | 17:19:52–17:24:07 | operator | PASS. `confirmed=delete` on the first prompt; **delete issued 17:19:59** (charges end); `RESULT=deleted`; stack `does not exist`; only the S3 gateway endpoint; no ENI, instance or volume; `base_stacks_complete=5`, names equal step 02. The CloudShell teardown ran to its last line (closes R14-D5) | Typed-ahead test not reported (R15-D4) |
 | 15 | 17:27:34 | operator | PASS with deviations. 26 `Converse` events, all with the stated Region, caller, issuer, endpoint and model; 24 without error, 2 `ThrottlingException` (17:14:06, 17:14:25) | R15-D2, R15-D3 |
+| 15 rerun | 2026-11-12, after 17:30 | operator | PASS with R15-D3. Overwrote the file: again 26 events, the same fields (checked by script); 24 without error, 2 `ThrottlingException`. No late event | Closes R15-D2 |
+| 16 | 2026-11-12 | operator | PASS. `Python 3.10.6`; `289 passed, 1 skipped`, as stated; no `failed` or `error`; old-ID guard `CLEAN`, `exit=0`; secret scan `CLEAN`, `exit=0` | — |
+| Confirm | 2026-11-12 | operator | "R15 confirmed". On R15-D4: "I pressed enter only once" | — |
 
 Secret scan over `R15/` after steps 01–04 (agent): `CLEAN`. After steps 06–15 (agent): `CLEAN`.
 
@@ -52,7 +55,7 @@ at most 0.06 USD at the running rate.
 - **R15-D2. Step 15 ran early.** The lookup ran at 17:27:34, 12 minutes 40 seconds after
   `assess_done_utc` (17:14:54). The step asks for at least 15 minutes. The lookup still found 24
   successful calls. That equals the checkpoint's 24 responses (25 lines, one of them the header). The
-  agent asks the operator to rerun step 15 once, overwriting the file. The rerun calls nothing billable.
+  operator reran step 15 once, overwriting the file: the same 26 events. Closed.
 - **R15-D3. Two `Converse` calls were throttled.** At 17:14:06 and 17:14:25 Bedrock answered
   `ThrottlingException`. The step 15 criterion asks for `errorCode` null on every event, so these two
   events miss it. The transport marks throttling retryable. The retry wrapper of
@@ -60,8 +63,10 @@ at most 0.06 USD at the running rate.
   events has the stated Region, caller, issuer, endpoint and model, so DC-26 holds. Finding F-R15-1.
 - **R15-D4. The typed-ahead tests were not reported.** The operator's console shows `create` and
   `delete` typed at their prompts and accepted first time. It does not show whether Enter was pressed
-  twice while each script worked. The agent asks the operator whether it was. Until then, the R14
-  known gap on the input discard (F-R14-2) stays open.
+  twice while each script worked. The operator answered: "I pressed enter only once". At R14 one
+  early Enter was enough to make the prompt read an empty answer (`confirmed=no`). Here both prompts
+  took their word first time, so the discard held for one early Enter at a real terminal. Inferred;
+  closes the R14 known gap on F-R14-2.
 
 ## Expected cost of round 2 (stated by the agent before the go)
 

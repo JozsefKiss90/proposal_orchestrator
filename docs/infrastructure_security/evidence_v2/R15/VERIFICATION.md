@@ -8,7 +8,7 @@
 | Stack | `proposal-orchestrator-host`, once. Executed 17:00:54, delete issued 17:19:59, `RESULT=deleted` 17:24:07 UTC |
 | Cost | About 0.39 billable host hours, at most 0.06 USD at the running rate. Bedrock: 24 successful calls of Sonnet 4.6 at `max_tokens` 2048, inside the stated 2.05 USD upper bound. Stated before the go: about 0.60 USD planned |
 | Secret scan | Agent over `R15/` after steps 01–04 and after steps 06–15: CLEAN |
-| Confirmed | Pending: the operator, after step 16 |
+| Confirmed | By the operator, 2026-11-12, in session: "I pressed enter only once, I ran step 15-16, R15 confirmed, tick R15 and A4 in the handoff" |
 
 Every check below was re-run by the agent on the saved files (`utf-8-sig`), by script.
 
@@ -21,7 +21,7 @@ Every check below was re-run by the agent on the saved files (`utf-8-sig`), by s
 | 03 | Freeze, guard, tests, plan | `R15_03_*` | PASS (R15-D1) | Tag and branch `17e32d54`; tarball and manifest as O5; guard CLEAN; `258 passed, 1 skipped`; plan `exit=0`, 29 `aws` lines |
 | 04 | Bundle upload | `R15_04_*` | PASS (R15-D1) | 92,413,570 bytes and `.sha256`; SSE-KMS with the R6 key, bucket key on |
 | 05 | CloudShell readiness | `R15_05_*` | PASS | Caller and Region correct; three SHA-256 as stated; `RESULT=ready` |
-| 06 | PowerShell start, create path | `R15_06_*` | PASS (R15-D4) | Seven `Add`, `c7i-flex.large`; `confirmed=create`; `CREATE_COMPLETE`; seven outputs; `Online` |
+| 06 | PowerShell start, create path | `R15_06_*` | PASS (R15-D4, answered) | Seven `Add`, `c7i-flex.large`; `confirmed=create`; `CREATE_COMPLETE`; seven outputs; `Online` |
 | 07 | Fetch from the deploy bucket | `R15_07_fetch.json` | PASS | `Success`; both `cp` exit 0; size and sha256 equal O5; `sha256sum_check=OK` |
 | 08 | Install | `R15_08_install.json` | PASS | `install_exit=0`; 17 sums OK; `Python 3.11.16`; 299 files match the manifest |
 | 09 | Offline verify with the probe | `R15_09_verify.json` | PASS | `verify_exit=0`; 11 of 11 checks pass; probe `pypi.org:443` unreachable, no fallback needed |
@@ -29,9 +29,9 @@ Every check below was re-run by the agent on the saved files (`utf-8-sig`), by s
 | 11 | Prepare the receipt draft | `R15_11_prepare.json` | PASS | Assessor Sonnet 4.6 `eu.` profile, not the drafter's Opus (AN1c); temperature 0.0; `max_tokens` 2048; `eu-north-1`; exactly the 13 placeholders |
 | 12 | Fill and check the receipt | `R15_12_receipt.json` | PASS | No placeholder left; mode 600; `receipt green` |
 | 13 | Converse blind pass and freeze | `R15_13_assess.json`, `R15_13_window.txt` | PASS | `assess_exit=0`; one report; checkpoint 25 lines; two baseline files with size and sha256; receipt hash unchanged; `receipt green` |
-| 14 | CloudShell teardown | `R15_14_*` | PASS (R15-D4) | `confirmed=delete`; `RESULT=deleted`; stack absent; only the S3 gateway; no ENI, instance or volume; five base stacks equal step 02 |
-| 15 | CloudTrail Converse events (DC-26) | `R15_15_converse-events.json` | PASS with R15-D2, R15-D3 | 26 events. All 26: `eu-north-1`, `AssumedRole`, the runtime role on this host's instance, issuer `RuntimeRoleArn` of R5, the Bedrock endpoint of step 06, Sonnet 4.6. 24 without error, 2 `ThrottlingException`. Run 12 minutes 40 seconds after the pass, not 15 |
-| 16 | Tests, guard, scan last | `R15_16_*` | Pending | Expected: `289 passed, 1 skipped`; old-ID guard CLEAN, `exit=0`; secret scan CLEAN, `exit=0` |
+| 14 | CloudShell teardown | `R15_14_*` | PASS (R15-D4, answered) | `confirmed=delete`; `RESULT=deleted`; stack absent; only the S3 gateway; no ENI, instance or volume; five base stacks equal step 02 |
+| 15 | CloudTrail Converse events (DC-26) | `R15_15_converse-events.json` | PASS with R15-D2, R15-D3 | 26 events. All 26: `eu-north-1`, `AssumedRole`, the runtime role on this host's instance, issuer `RuntimeRoleArn` of R5, the Bedrock endpoint of step 06, Sonnet 4.6. 24 without error, 2 `ThrottlingException`. First run 12 minutes 40 seconds after the pass; the rerun found the same 26 events (R15-D2 closed) |
+| 16 | Tests, guard, scan last | `R15_16_*` | PASS | `Python 3.10.6`; `289 passed, 1 skipped`, as stated; old-ID guard CLEAN, `exit=0`; secret scan CLEAN, `exit=0` |
 
 ## Ticket checklist
 
@@ -41,7 +41,7 @@ Every check below was re-run by the agent on the saved files (`utf-8-sig`), by s
 | `runner.offline_bundle verify --probe-no-internet` passes on the host | PASS | Step 09: `record_passed=true`, `no_internet_route` passed on `pypi.org:443` |
 | The production configuration is verified on the host (AN12 criterion 1) | PASS | Step 09: production mode `true`, diagnostic level `metadata`, preset `BEDROCK_CONVERSE_EU` to `bedrock_converse`, Region `eu-north-1`. Step 10: the secret's key names and digest through the launcher |
 | The synthetic Converse blind pass freezes on the host with a validated receipt (AN12 criterion 3) | PASS, with R15-D3 | Steps 12 and 13: receipt green before and after the pass; baseline frozen. Step 15: every call through the private endpoint as the runtime role |
-| The successor decision record is committed | Drafted | `msca-dn-an12-host-run-r15_2026-11-12`; committed with this report |
+| The successor decision record is committed | PASS | `msca-dn-an12-host-run-r15_2026-11-12`, committed `1e576981`, confirmed with R15 |
 
 ## Gaps of the AN12 record that R15 closes
 
@@ -65,9 +65,9 @@ Every check below was re-run by the agent on the saved files (`utf-8-sig`), by s
 - [x] The host stack does not exist (`R15_14_host-stack-after.txt`).
 - [x] Register v2 rows DC-33–35 updated; DC-26 re-evidenced.
 - [x] Decision record `msca-dn-an12-host-run-r15_2026-11-12` drafted.
-- [ ] Operator answers R15-D4 (typed-ahead tests) and reruns step 15 (R15-D2).
-- [ ] Step 16: PASS.
-- [ ] Operator confirms R15.
+- [x] Operator answers R15-D4 (typed-ahead tests) and reruns step 15 (R15-D2).
+- [x] Step 16: PASS.
+- [x] Operator confirms R15.
 
 ## Notes for later tickets
 

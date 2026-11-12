@@ -373,11 +373,13 @@ agent writes a successor decision record to the 2026-10-16 AN12 offline-bundle r
 
 **Blocked by:** R9, R9e, R11, R12b, and the O5 re-freeze bundle.
 
-- [ ] The bundle's sha256 on the host equals the one recorded at O5.
-- [ ] `runner.offline_bundle verify --probe-no-internet` passes on the host.
-- [ ] The production configuration is verified on the host (AN12 criterion 1).
-- [ ] The synthetic Converse blind pass freezes on the host with a validated receipt (AN12 criterion 3).
-- [ ] The successor decision record is committed.
+- [x] The bundle's sha256 on the host equals the one recorded at O5.
+- [x] `runner.offline_bundle verify --probe-no-internet` passes on the host.
+- [x] The production configuration is verified on the host (AN12 criterion 1).
+- [x] The synthetic Converse blind pass freezes on the host with a validated receipt (AN12 criterion 3).
+- [x] The successor decision record is committed.
+
+Confirmed 2026-11-12 (`docs/infrastructure_security/evidence_v2/R15/VERIFICATION.md`; `msca-dn-an12-host-run-r15_2026-11-12`).
 
 ## R13 Documentation amendments
 

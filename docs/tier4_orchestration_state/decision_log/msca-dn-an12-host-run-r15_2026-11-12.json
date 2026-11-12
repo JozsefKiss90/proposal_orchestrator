@@ -7,9 +7,9 @@
   "ticket": "R15 of plans/aws_redeployment_tickets.md (host install and Converse smoke run, rescoped 2026-11-11)",
   "supersedes": "msca-dn-an12-offline-bundle_2026-10-16, as successor for AN12 criteria 1 and 3 and three of its known gaps. Its decisions D1-D4 and rules R1-R8 stand unchanged.",
   "authority": "Agent-drafted under CLAUDE.md §9.4. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no proposal gate and amends no constitutional rule.",
-  "review_state": "agent_drafted",
-  "confirmed": null,
-  "decided_by": "Points 1-8: the operator in session ('points 1-8 accepted'). Points 9-12: the agent, open to change on review. The round 2 go: the operator in session ('go for round 2'), recorded before step 06. R15-D1-D4: the agent, recorded in RUNLOG.md, for the operator to accept with R15.",
+  "review_state": "confirmed",
+  "confirmed": "2026-11-12, by the operator in session: 'I pressed enter only once, I ran step 15-16, R15 confirmed'. Step 16 passed (289 passed, 1 skipped; old-ID guard and secret scan CLEAN).",
+  "decided_by": "Points 1-8: the operator in session ('points 1-8 accepted'). Points 9-12: the agent, open to change on review. The round 2 go: the operator in session ('go for round 2'), recorded before step 06. R15-D1-D4: the agent, recorded in RUNLOG.md, accepted by the operator with R15 ('R15 confirmed').",
   "decision": "The O5 bundle (tag msca-dn-freeze-2026-11-12, revision 17e32d54) installs and verifies on the private host, the production configuration reads through the launcher, and the synthetic Converse blind pass freezes there with a green receipt. AN12 criteria 1 and 3 are measured on the host.",
   "why": "AN12 left criteria 1 and 3 to the operator's host run. R15 is that run on the redeployed network, with every host command sent by Run Command and returning metadata only.",
   "inputs": [
@@ -50,6 +50,16 @@
       "gap": "msca-dn-an12-offline-bundle_2026-10-16: private resolution shows where the name points, not that every call takes that path.",
       "now": "For this pass, every one of the 26 Converse events carries the Bedrock interface endpoint (R15_15_converse-events.json). The probe still tests one internet endpoint, so the gap stays open for other passes.",
       "declared_status": "Inferred"
+    },
+    {
+      "gap": "aws-redeployment-r14-operations_2026-11-12: the CloudShell teardown has not run to RESULT=deleted with its own after-checks (R14-D5).",
+      "now": "R15 step 14: confirmed=delete, RESULT=deleted, all after-checks in the script's own files.",
+      "declared_status": "Confirmed"
+    },
+    {
+      "gap": "aws-redeployment-r14-operations_2026-11-12: the input discard (F-R14-2) not tested at a real terminal.",
+      "now": "R15 steps 06 and 14: one early Enter, both prompts took their word first time (R15-D4).",
+      "declared_status": "Inferred"
     }
   ],
   "findings": [
@@ -75,7 +85,7 @@
       "question": "Step 15 ran 12 minutes 40 seconds after the pass, not 15",
       "answer_kind": "agent_decision",
       "declared_status": "Inferred",
-      "answer": "The lookup found 24 successful calls, equal to the checkpoint's 24 responses. The operator reruns step 15 once, overwriting the file; it calls nothing billable.",
+      "answer": "The lookup found 24 successful calls, equal to the checkpoint's 24 responses. The operator reran step 15 once, overwriting the file: the same 26 events. Closed.",
       "reason": "RUNLOG.md note R15-D2."
     },
     {
@@ -89,18 +99,13 @@
     {
       "id": "R15-D4",
       "question": "The typed-ahead tests at steps 06 and 14",
-      "answer_kind": "operator_pending",
-      "declared_status": "Unresolved",
-      "answer": "Both prompts accepted their word first time. Whether Enter was pressed early is not reported; the operator answers on review.",
+      "answer_kind": "operator_answer",
+      "declared_status": "Inferred",
+      "answer": "The operator pressed Enter once while the scripts worked ('I pressed enter only once'). Both prompts took their word first time. At R14 one early Enter made the prompt read an empty answer, so the input discard (F-R14-2) held at a real terminal.",
       "reason": "RUNLOG.md note R15-D4."
     }
   ],
   "known_gaps": [
-    {
-      "decision": "R15-D4",
-      "declared_status": "Unresolved",
-      "gap": "The input discard of F-R14-2 is shown at a real terminal only if the operator confirms Enter was pressed early at step 06 or 14."
-    },
     {
       "decision": "msca-dn-an12-offline-bundle_2026-10-16",
       "declared_status": "Unresolved",
