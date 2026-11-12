@@ -14,6 +14,7 @@
 | 2026-11-12 | operator | "points 1–8 accepted". Points 9–12 stand as the agent decided them, open to change on review |
 | 2026-11-12 | agent | Round 0 done (after steps 01–05, R15-D1). `deploy/aws/scripts/host-run.ps1`; `host/r15_07_fetch.sh`, `r15_08_install.sh`, `r15_09_verify.sh`, `r15_11_prepare.sh`, `r15_12_receipt.sh`, `r15_13_assess.sh`; `host/dc33_35.vars.json`; `tests/test_aws_host_run_script.py` (31 passed); `tests/fixtures/fake_aws_lifecycle.py` now records `file://` contents. Step 03 list plus the new file: `289 passed, 1 skipped`. Step 05 hashes unchanged. Secret scan and old-ID guard `CLEAN` |
 | 2026-11-12 | agent | Expected cost of round 2, stated before the go (below). No go given yet |
+| 2026-11-12 | operator | **Go for round 2**, in session: "go for round 2". Given after the expected cost (about 0.60 USD, upper bound about 2.05 USD) was stated. Covers one creation of the host stack, steps 06–15 |
 
 ## Runs
 
