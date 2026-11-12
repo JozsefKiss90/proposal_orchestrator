@@ -507,3 +507,15 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R11/`: two creations of the host stack on `c7i-flex.large`, each `CREATE_COMPLETE` and deleted in the session; one Converse call from the host through the Bedrock endpoint, attributed in CloudTrail to the runtime role; clean deletes; base stacks and exports unchanged |
 | Verification Result | Every criterion PASS except round 2's step 06 (superseded) and the root-volume key alias (F-R11-6, check 23a pending); ticket criteria 1–5 PASS. Findings F-R11-1–6 |
 | Next Action | R11 DONE: operator confirmed R11 and reviewed R11-D11 and R11-D12 (2026-11-11 22:58 UTC); five criteria ticked. Go given for R12b; agent writes `evidence_v2/R12b/STEPS.md` first. Frontier: R12b (needs a new creation and go), R14 (prices `c7i-flex.large`) |
+
+### 2026-11-12 — R12b: full re-evidence and register v2 — verified (F7 open)
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-11-12T01:15:00Z |
+| Control ID | All 41. DC-15, DC-16, DC-17, DC-31, DC-32, DC-36, DC-39 (→ VERIFIED_PASS); DC-33–DC-35 (→ DEFERRED, R15); DC-40 (→ NOT_APPLICABLE); the 28 earlier VERIFIED_PASS rows re-evidenced |
+| Action Taken | Agent wrote `STEPS.md` (points 1–9; operator answers 1–3, confirmed 4, 7, 8). Round 1 PASS. Round 2: creation and delete PASS, collector refused (F7 URL file missing). Agent wrote `STEPS_fix1.md` (URL signed with CLI-exported `po-r1` credentials for a bucket this account does not own, read by the collector's plan before the stack exists; combined blocks gating F06 and always deleting). Operator gave the go, ran Blocks A and B and the F11 lookup. Agent checked every file by script, recovered three files from NTFS streams, wrote `VERIFICATION.md`, the register rows and `aws-redeployment-r12b-reevidence_2026-11-12` |
+| Evidence Requested | `R12b_01_*`–`R12b_04_*`, `R12b_fix1_01_*`–`R12b_fix1_11_*`, `R12b_outputs.json`, `R12b_09_collector/` |
+| Evidence Received | `evidence_v2/R12b/`: one collector run against the live account and host (`exit=0`, 93 collected), the host stack created and deleted twice, one Converse call attributed to the runtime role through the Bedrock endpoint |
+| Verification Result | Ticket criteria 1, 3 and 4 PASS; criterion 2 (F7) open: `404 NoSuchBucket`, inconclusive (F-R12b-1). Collector defects F-R12b-2, -3, -4 |
+| Next Action | Operator: step 12; review R12b-D8, D10–D12; confirm R12b. Agent then ticks criteria 1, 3, 4. F7 retest in the next host session (R12b-D9). Collector fixes before its next run. Frontier: R14 |
