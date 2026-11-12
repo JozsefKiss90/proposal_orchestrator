@@ -1,0 +1,91 @@
+{
+  "record_type": "v14_supplement",
+  "ticket": "V14 (lane H2); used again unchanged by V16",
+  "decided_by": "V14-OP6: the operator chose option (a), the listed public files from the freeze tag, sha256 recorded, the same archive for V16",
+  "source": {
+    "tag": "msca-dn-freeze-2026-11-12",
+    "revision": "17e32d54f2bd60c1d69d9a1b6caa8688c34f036e",
+    "how": "git show <tag>:<path>, written into the private root at the same path"
+  },
+  "placement": "Inside the private root, at each file's repository path. Every runbook command on the host runs with --repo-root <private root>, so each file below resolves there (REHEARSAL.md, finding V14-F2).",
+  "measured_by": "docs/infrastructure_security/evidence_v2/V14/REHEARSAL.md",
+  "files": [
+    {
+      "path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+      "sha256": "808b514b88c1c2e894538453acfe1ead641c42ec57f5eb629ce8480dbd3d146e",
+      "bytes": 6527,
+      "in_bundle": false,
+      "needed_by": "preflight, assess, freeze, audit, compare, review, diff (registry_path of both MSCA-DN profiles)"
+    },
+    {
+      "path": "harness/evaluator_scorecard_msca_dn.json",
+      "sha256": "f0e16bf2c85657cef2969c5db94fe48d2ef097acd4617f2369fda3c9c0cb41b0",
+      "bytes": 27915,
+      "in_bundle": true,
+      "needed_by": "every §5 and §6 command under --repo-root <private root>"
+    },
+    {
+      "path": "harness/rubrics_msca_dn.json",
+      "sha256": "2af878036f96796a3e26f05a248a7534d851230ab0ad1b5a1b5926bdf56f8468",
+      "bytes": 23595,
+      "in_bundle": true,
+      "needed_by": "every §5 and §6 command under --repo-root <private root>"
+    },
+    {
+      "path": "harness/criterion_appendix_mapping_msca_dn.json",
+      "sha256": "36530cb0090fdf9ae36792b0e2361f282cde5015a4f8a188e1dd05b54cf59a08",
+      "bytes": 7220,
+      "in_bundle": true,
+      "needed_by": "every §5 and §6 command under --repo-root <private root>"
+    },
+    {
+      "path": "harness/profiles/msca_dn_2025_historical.json",
+      "sha256": "e71142c74722596c47c8c86206db12199b4db7ed6d9a893ce8a44c3f47374507",
+      "bytes": 11567,
+      "in_bundle": true,
+      "needed_by": "V14's profile; carried so a command that resolves a recorded profile path under --repo-root finds it"
+    },
+    {
+      "path": "harness/profiles/msca_dn_2026_default.json",
+      "sha256": "308a955dada102e92212f87c43cdf28576b49f1cb2a6894acb64c2ac87a3fee2",
+      "bytes": 2452,
+      "in_bundle": true,
+      "needed_by": "named by the historical profile; the stage-B profile candidate for V16"
+    },
+    {
+      "path": "harness/profiles/msca_pf_default.json",
+      "sha256": "843abfb7b0e03b2f51b5d4ec45c43af0cada1d866de1eed9141992da3d94f593",
+      "bytes": 1417,
+      "in_bundle": true,
+      "needed_by": "diff: it loads the repository default profile under --repo-root, whatever profile the comparisons used (V14-F4)"
+    },
+    {
+      "path": "harness/evaluator_scorecard_msca_pf.json",
+      "sha256": "7f3d920447d2906095daaf7508652dacd6ffed544f745648ca31d2d023f5b32a",
+      "bytes": 5666,
+      "in_bundle": true,
+      "needed_by": "diff, through msca_pf_default (V14-F4)"
+    },
+    {
+      "path": "harness/rubrics_msca_pf.json",
+      "sha256": "b1b4c5c87b2f0243e04fc68978d43cc519e6a9fae9318ba2bb9a1c6b11d1e8aa",
+      "bytes": 16669,
+      "in_bundle": true,
+      "needed_by": "diff, through msca_pf_default (V14-F4)"
+    },
+    {
+      "path": "docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json",
+      "sha256": "90484fcbd26ded9b85364eb86f6069c140a8954a8b2e8a2e655d4a03482ea9ef",
+      "bytes": 95515,
+      "in_bundle": false,
+      "needed_by": "no command; the template runbook §6 tells the operator to copy rows from when writing the private dispositions on the host"
+    }
+  ],
+  "not_in_this_archive": [
+    {
+      "path": "docs/tier4_orchestration_state/msca_dn/esr/msca-dn-2025-original-esr.json",
+      "sha256": "5c9b9c8e9f89f501e30256aaa90b55921ce2c3673b2218fa2c0bcd6b7d54b0a9",
+      "why": "V14-OP1: the ESR record travels in its own archive, uploaded only after the freeze, and is placed at this path under the private root"
+    }
+  ]
+}

@@ -6,7 +6,8 @@
 | Runbook | `plans/msca_dn_pe09_runbook.md` §4–§6 |
 | Bundle | O5: tag `msca-dn-freeze-2026-11-12`, revision `17e32d54`, under `bundles/msca-dn-freeze-2026-11-12/` |
 | Kept by | agent (Claude), from the operator's decisions in session. The agent sees no proposal text and runs no model call |
-| Step sheet | Not written. Waits for V14-F2 to be settled |
+| Step sheet | `STEPS.md`: part W (workstation) written; part H (host) outlined, its scripts follow the measured cost |
+| Rehearsal | `REHEARSAL.md`, scripts in `rehearsal/` |
 
 ## Settling
 
@@ -14,6 +15,8 @@
 |---|---|---|
 | 2026-11-12 | operator | V14-OP1 to V14-OP4 below, in session |
 | 2026-11-12 | agent | V14-F1 and V14-F2 measured. Cost statement written (below). No go given |
+| 2026-11-12 | operator | V14-OP6 to V14-OP8 below, in session. Then the operator does the real import and the workstation preflight |
+| 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
 
@@ -28,6 +31,22 @@
   never in Run Command output. The step sheet must show that session logging is off.
 - **V14-OP5. Pacing.** The Converse route stays as it is (`paced=False`, 6 retries). The agent states the
   call count and cost before the go.
+- **V14-OP6. Rehearsal and the supplement.** Rehearse on the workstation, and extend it to the §6 commands in the
+  bundle-only tree over the committed sanitised artifacts. Then option (a): ship the listed public files from the
+  freeze tag as a supplement, sha256 recorded, and use the same files for V16.
+- **V14-OP7. Private outputs after teardown.** An encrypted EBS snapshot, at final teardown only. Before it, check
+  the volume for credential material. Show that the snapshot is private and encrypted. Record the deletion date the
+  operator gives. No IAM change.
+- **V14-OP8. Session logging.** The step that reads the account's session preferences is accepted. Sessions use
+  the default document only.
+
+### Agent decision
+
+- **V14-A1. The archive holds less than the whole private root.** The rehearsal ran the host chain on a root
+  without the PDF, the dry-import records and the configuration input: same exits, same pack set (REHEARSAL.md R9,
+  R10, R12). So `v14_pack.py` ships the workspace, the register and the supplement, and refuses a PDF or a
+  dry-import record. The original's PDF never reaches the host. Open to change: the operator can ask for the whole
+  root.
 
 ### Deviation
 
@@ -50,8 +69,26 @@
   `harness.expectations.load_expectation_substrate` resolves it under `--repo-root`. On a tree that holds
   only the bundle's 299 files (extracted from the tag), loading fails with `expectation registry not
   found`. On the full `freeze_bundle` worktree it loads 10 expectations. R15 did not see this because
-  `converse_smoke` writes its own synthetic profile and registry. Whether §5 reads any other file
-  outside the bundle is not yet known. A rehearsal finds out (see the agent's proposal in session).
+  `converse_smoke` writes its own synthetic profile and registry. **Settled** by V14-OP6 and the rehearsal:
+  every command runs with `--repo-root <private root>`, and the ten files of `supplement.json` sit under it at
+  their repository paths. One is outside the bundle (the registry), eight are bundle files the commands resolve
+  under `--repo-root`, and one is the dispositions template. In the bundle-only tree, §5 and the §6 audit passed
+  over the historical profile, and §6 audit, compare, review and diff passed over the sanitised artifacts.
+- **V14-F3. Runbook step 1c refuses as written at the tag.** `py -m tools.import_external_proposal` runs the importer
+  as `__main__`. The register renderer imports `tools.import_external_proposal` again, a second module whose
+  registry lacks the revision declared at run time, so the import refuses: `revision 'as_submitted_v1' belongs to
+  no declared document`. It writes `sources.json` first. The test suite calls the importer in-process and never
+  sees this. For V14, `STEPS.md` W05 calls the same code in-process, so nothing is built from `harness_overhaul`
+  (O5). The fix belongs to `harness_overhaul` after V16.
+- **V14-F4. `diff` loads the repository default profile.** It reads `harness/profiles/msca_pf_default.json`, its
+  scorecard and its rubrics under `--repo-root`, whatever profile the two comparisons used. Covered by the
+  supplement. Whether `diff`'s output depends on that profile is not checked (Unresolved).
+- **V14-F5. The register's declarations can only be re-rendered on the workstation.** A Confirmed preservation
+  claim in `compare` needs a `fidelity_to_submitted_original` block in the register's declared half (runbook §6).
+  Re-rendering the register runs `tools/` code and re-extracts the PDF, and the host has neither. To decide before
+  the go: (i) declare on the workstation before packing, since the ESR's observation ids are public;
+  (ii) re-render on the workstation after reading the comparison, and ship the register in a second inbound
+  archive; or (iii) leave such misses `Inferred`, which `compare` accepts without the block.
 
 Measured and found clear:
 
@@ -79,6 +116,10 @@ Throttled calls are retried, up to 6 times. Malformed answers add calls.
 | Host running | 2 sittings × 2 h: 0.62 USD | 3 sittings × 3 h: 1.39 USD | 0.154686 USD per running hour |
 | Host stopped (V14-D1) | 3 days: 4.60 USD | 7 days: 10.74 USD | 0.063916 USD per stopped hour |
 | **V14** | **about 8.2 USD** | **about 20.5 USD** | Budget 10 USD per month; credits 199.19 USD at R15 step 01 |
+
+**Overhead measured.** The rehearsal measured the prompt overhead per call: at most 2,847 characters for a cell
+call and 4,564 for a criterion call, about 712 and 1,141 tokens (REHEARSAL.md). That replaces the 4,000 tokens
+assumed above. `workstation/v14_cost.py` applies it to the operator's preflight (STEPS.md W08).
 
 The input planned figure is a guess until the original is measured. The preflight makes no model call
 and reports pack sizes, so a workstation preflight over the private root replaces the guess before the
