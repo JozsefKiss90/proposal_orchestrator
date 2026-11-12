@@ -45,6 +45,8 @@ done_() { log "end_utc=$(utc)"; log "RESULT=$1"; exit "$2"; }
 # run <var> <aws args...>: output into <var>, exit code into RC.
 run() { local __v="$1"; shift; local __o; __o="$(aws "$@" --region "$REGION" 2>&1)"; RC=$?; printf -v "$__v" '%s' "$__o"; }
 ask() {
+  # Discard what was typed or pasted while the script ran, so only an answer to this prompt counts.
+  if [ -t 0 ]; then while read -r -t 0.1 _ahead; do :; done; fi
   echo; echo "Type $1 and press Enter to $2. Anything else stops."
   local typed=""; read -r typed || true
   typed="$(echo "$typed" | tr -d '[:space:]')"
@@ -179,7 +181,11 @@ execute exit=$RC"
     if [ "$RC" -ne 0 ]; then done_ start-failed 1; fi
     run OUT ec2 wait instance-running --instance-ids "$INSTANCE"
   else
-    log "refused: stack is $STATUS. A stack in REVIEW_IN_PROGRESS holds no resource: run teardown to remove it"
+    case "$STATUS" in
+      REVIEW_IN_PROGRESS) log "refused: stack is $STATUS. A stack in review holds no resource: run teardown to remove it" ;;
+      *_IN_PROGRESS) log "refused: stack is $STATUS. Wait until it ends, then run again" ;;
+      *) log "refused: stack is $STATUS. Run teardown, then start again" ;;
+    esac
     done_ refused-state 2
   fi
   instance_id

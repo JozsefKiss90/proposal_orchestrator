@@ -353,7 +353,7 @@ Confirmed by the operator 2026-11-12 with criterion 2 (F7) open: `evidence_v2/R1
 
 - [x] Register v2 shows every control as VERIFIED_PASS, NOT_APPLICABLE with a reason, or DEFERRED
       with a reason, and gives a v2 evidence path for each.
-- [ ] The presigned PUT to an outside bucket fails from the host (closes F7). **Open:** 2026-11-12 run inconclusive (`404 NoSuchBucket`, F-R12b-1); retest in the next host session (R12b-D9).
+- [x] The presigned PUT to an outside bucket fails from the host (closes F7). 2026-11-12 run inconclusive (`404 NoSuchBucket`, F-R12b-1); retested in R14 step 08 (`R12b_fix2_08_*`, `403 AccessDenied`), closed by the operator 2026-11-12.
 - [x] The DC-15 in-host tests are collected.
 - [x] DC-40 is re-assessed. It stays N/A unless the account joined an Organization.
 

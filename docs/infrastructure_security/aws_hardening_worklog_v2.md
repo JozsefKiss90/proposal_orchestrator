@@ -519,3 +519,15 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R12b/`: one collector run against the live account and host (`exit=0`, 93 collected), the host stack created and deleted twice, one Converse call attributed to the runtime role through the Bedrock endpoint |
 | Verification Result | Ticket criteria 1, 3 and 4 PASS; criterion 2 (F7) open: `404 NoSuchBucket`, inconclusive (F-R12b-1). Collector defects F-R12b-2, -3, -4 |
 | Next Action | R12b confirmed by the operator (2026-11-12 01:14 UTC); criteria 1, 3, 4 ticked, F7 open. Step 12 run 2026-11-12: 346 passed, 1 skipped; old-ID guard and secret scan CLEAN. F7 retest in the next host session (R12b-D9). Collector fixes before its next run. Frontier: R14 |
+
+### 2026-11-12 — R14: operations and cost — verified (F7 closed)
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-11-12T13:30:00Z |
+| Control ID | None changes status. DC-05 and DC-07: the F7 negative test is now evidenced (R12b criterion 2) |
+| Action Taken | Agent wrote `STEPS.md` (points 1–13) and round 0: `host-lifecycle.ps1` and `.sh`, `tools/aws_cost_check.py`, `budget.json`, the OD10 checklist, tests. Operator confirmed the points and ran rounds 1–3 under a recorded go (about 0.26 USD stated). The Price List API was refused; the agent priced from the public offer files (R14-D1). In round 3 step 08 was skipped in creation A and run in creation B (R14-D3); steps 10–11 lost their CloudShell files and step 11 was recovered (R14-D5). Agent fixed F-R14-1 and F-R14-2 after round 3, wrote `VERIFICATION.md`, the R12b F7 addendum and `aws-redeployment-r14-operations_2026-11-12` |
+| Evidence Requested | `R14_01_*`–`R14_16_*`, `R14_11r_*`, `R14_05_cost-check/`, `R12b/R12b_fix2_08_*` |
+| Evidence Received | `evidence_v2/R14/`: two host creations (12:12–12:18 and 12:35–12:55 UTC), both deleted, nothing left; the cost check with 13 cited prices; the F7 PUT refused with `403 AccessDenied` naming the VPC endpoint policy |
+| Verification Result | Steps 01–15 PASS or with recorded deviation; ticket criteria 1 and 2 PASS with deviations for the operator to confirm, criterion 3 PASS. Operator accepted F7 as closed. Findings F-R14-1–4 |
+| Next Action | Operator runs step 16 (expected `224 passed`), then confirms R14. Agent ticks the R14 criteria. R12b criterion 2 ticked. Frontier: O5 re-freeze, then R15 |

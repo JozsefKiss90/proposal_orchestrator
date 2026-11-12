@@ -1,0 +1,132 @@
+{
+  "record_type": "decision_record",
+  "id": "aws-redeployment-r14-operations_2026-11-12",
+  "date": "2026-11-12",
+  "branch": "harness_overhaul",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R14 of plans/aws_redeployment_tickets.md (operations and cost)",
+  "supersedes": "none. Closes the known gap R12b-D9 of aws-redeployment-r12b-reevidence_2026-11-12 (F7).",
+  "authority": "Agent-drafted under CLAUDE.md §9.4. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no proposal gate and amends no constitutional rule.",
+  "review_state": "pending_operator_review",
+  "confirmed": null,
+  "decided_by": "R14-D4: the operator in session ('accept F7 as closed, round 3 done'). R14-D1, D2, D3, D5, D6: the agent, reported in session and recorded in RUNLOG.md, for the operator's review with R14.",
+  "decision": "R14 delivers the PowerShell and CloudShell host-lifecycle scripts, the weekly cost check priced from the public AWS price list offer files, and the operator-only OD10 checklist. Both script forms ran against two host creations; F7 is closed.",
+  "why": "The ticket asks for scripts run once end to end, a cost check run once with every price cited, and the OD10 checklist. R12b-D9 placed the F7 retest in the next host session, which this ticket created.",
+  "inputs": [
+    "docs/infrastructure_security/evidence_v2/R14/STEPS.md, RUNLOG.md, VERIFICATION.md",
+    "docs/infrastructure_security/evidence_v2/R12b/VERIFICATION.md (addendum)"
+  ],
+  "findings": [
+    {
+      "id": "F-R14-1",
+      "declared_status": "Confirmed",
+      "finding": "The start script's refusal for any state other than absent or CREATE_COMPLETE named REVIEW_IN_PROGRESS and advised teardown, also for DELETE_IN_PROGRESS.",
+      "basis": "RUNLOG.md row 11; the console of step 12 at 12:19-12:21 UTC.",
+      "next": "Fixed after round 3 in both forms, with a test per state."
+    },
+    {
+      "id": "F-R14-2",
+      "declared_status": "Confirmed",
+      "finding": "An Enter typed or pasted while a script ran was buffered and read as the answer to the next prompt, giving confirmed=no.",
+      "basis": "RUNLOG.md rows 11 (first run), 12 (tries 1 and 2).",
+      "next": "Fixed after round 3: both forms discard pending input before the prompt, only at a terminal. Not yet run at a real terminal (R15)."
+    },
+    {
+      "id": "F-R14-3",
+      "declared_status": "Confirmed",
+      "finding": "The F7 block's object count printed None for the empty bucket instead of 0.",
+      "basis": "R12b/R12b_fix2_08_bucket-removed.txt.",
+      "next": "Count with --no-paginate or length(Contents || []) if the block is reused."
+    },
+    {
+      "id": "F-R14-4",
+      "declared_status": "Confirmed",
+      "finding": "Windows PowerShell 5.1 prefixes native stderr captured to a file with a System.Management.Automation.RemoteException line.",
+      "basis": "R14_15_host-stack-after.txt.",
+      "next": "Cosmetic; no action."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R14-D1",
+      "question": "Unit prices when the Price List API refuses the role",
+      "answer_kind": "agent_decision",
+      "declared_status": "Inferred",
+      "answer": "Read the public AWS price list offer files for eu-north-1 (anonymous HTTPS, no account access). Each price records the offer file read (source_url), the public page (page_url, not read) and the date.",
+      "reason": "STEPS.md point 4 provides a fallback when the API is refused. The offer files are the price list the API serves.",
+      "consequence": "deploy/aws/pricing/eu-north-1.json; R14_04_agent-offer-extract.json (13 SKUs). Ticket criterion 2 rests on it; operator to confirm."
+    },
+    {
+      "id": "R14-D2",
+      "question": "Hours per month for monthly prices",
+      "answer_kind": "agent_decision",
+      "declared_status": "Assumed",
+      "answer": "730, recorded as Assumed in the price file.",
+      "reason": "AWS convention, not read from a page.",
+      "consequence": "Affects only the gp3 volume share of the hourly figures (0.000916 USD/h)."
+    },
+    {
+      "id": "R14-D3",
+      "question": "Where to run the F7 retest after it was skipped in creation A",
+      "answer_kind": "agent_decision",
+      "declared_status": "Confirmed",
+      "answer": "In creation B, after step 12, with the script reading R14_12_outputs.json.",
+      "reason": "Same host template and endpoint policy; no extra creation needed.",
+      "consequence": "R12b_fix2_08_* evidence from creation B."
+    },
+    {
+      "id": "R14-D4",
+      "question": "Is F7 closed with the object count None",
+      "answer_kind": "operator_decision",
+      "declared_status": "Confirmed",
+      "answer": "Yes: 'accept F7 as closed'.",
+      "reason": "S3 answered the only PUT with 403 AccessDenied naming the VPC endpoint policy; a refused PUT writes no object.",
+      "consequence": "R12b criterion 2 ticked; register v2 DC-05 note updated."
+    },
+    {
+      "id": "R14-D5",
+      "question": "Evidence for steps 10 and 11 after the CloudShell files were lost",
+      "answer_kind": "agent_decision",
+      "declared_status": "Inferred",
+      "answer": "Step 10 from the pasted console and CloudTrail StartInstances; step 11 after-checks re-run by a recovery block (prefix R14_11r) once the deletion completed.",
+      "reason": "The delete was issued by the script; only its after-checks and both steps' files were lost.",
+      "consequence": "Ticket criterion 1 for the CloudShell form rests partly on recovered evidence; operator to confirm."
+    },
+    {
+      "id": "R14-D6",
+      "question": "Script changes after round 3",
+      "answer_kind": "agent_decision",
+      "declared_status": "Confirmed",
+      "answer": "F-R14-1 and F-R14-2 fixed after round 3, not during it.",
+      "reason": "A mid-round change would have invalidated the step 06 hashes for the remaining CloudShell steps.",
+      "consequence": "The next CloudShell session records new hashes. Step 16 list: 224 passed."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "R14-D5",
+      "declared_status": "Unresolved",
+      "gap": "The CloudShell teardown has not run to RESULT=deleted with its own after-checks. R15's teardown can show it."
+    },
+    {
+      "decision": "F-R14-2",
+      "declared_status": "Unresolved",
+      "gap": "The input discard is tested by its presence and its terminal guard, not at a real terminal."
+    }
+  ],
+  "not_evidence_of": [
+    "Any proposal content: no step called a model.",
+    "The approved HUF amount: still pending (point 6)."
+  ],
+  "unblocks_when_recorded": [
+    "R15 (host install and Converse smoke run) on the lifecycle scripts"
+  ],
+  "stays_blocked": [
+    "The OD10 upgrade until the ELTE financial office approves"
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, session token, presigned URL, prompt text or model output in the evidence.",
+    "basis": "The F7 script deletes its parameter file and checks for https:// by script; agent secret scan over evidence_v2 CLEAN."
+  }
+}

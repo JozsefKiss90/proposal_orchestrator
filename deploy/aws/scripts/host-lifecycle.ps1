@@ -108,6 +108,8 @@ function Save([string]$Name, [string]$Text) { $Text | Out-File -Encoding utf8 (J
 function Done([string]$Result, [int]$Code) { Log "end_utc=$(Utc)"; Log "RESULT=$Result"; exit $Code }
 function Count-Json([string]$Text) { $o = $Text | ConvertFrom-Json; return @($o | Where-Object { $null -ne $_ }).Count }
 function Ask([string]$Word, [string]$What) {
+  # Discard what was typed while the script ran, so only an answer to this prompt counts.
+  if (-not [Console]::IsInputRedirected) { while ([Console]::KeyAvailable) { $null = [Console]::ReadKey($true) } }
   Write-Host ""
   Write-Host "Type $Word and press Enter to $What. Anything else stops."
   $typed = [Console]::In.ReadLine()
@@ -206,7 +208,9 @@ if ($Action -eq "start") {
     $null = Run "wait_running"
   }
   else {
-    Log "refused: stack is $status. A stack in REVIEW_IN_PROGRESS holds no resource: run teardown to remove it"
+    if ($status -eq "REVIEW_IN_PROGRESS") { Log "refused: stack is $status. A stack in review holds no resource: run teardown to remove it" }
+    elseif ($status -like "*_IN_PROGRESS") { Log "refused: stack is $status. Wait until it ends, then run again" }
+    else { Log "refused: stack is $status. Run teardown, then start again" }
     Done "refused-state" 2
   }
   $V["{I}"] = Run "instance_id"

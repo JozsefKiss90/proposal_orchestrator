@@ -297,12 +297,32 @@ def test_start_refuses_another_account_before_any_other_call(form: str, tmp_path
 
 
 @pytest.mark.parametrize("form", FORMS)
-def test_start_refuses_a_stack_in_review(form: str, tmp_path: Path) -> None:
-    sc = scenario_create(**{f"cloudformation describe-stacks|{Q_STATUS}": [ok("REVIEW_IN_PROGRESS")]})
+@pytest.mark.parametrize("status, advice", [
+    ("REVIEW_IN_PROGRESS", "A stack in review holds no resource: run teardown to remove it"),
+    ("DELETE_IN_PROGRESS", "Wait until it ends, then run again"),
+    ("ROLLBACK_COMPLETE", "Run teardown, then start again"),
+])
+def test_start_refuses_a_stack_in_another_state_with_advice_for_that_state(
+        form: str, status: str, advice: str, tmp_path: Path) -> None:
+    # F-R14-1: the advice for DELETE_IN_PROGRESS named REVIEW_IN_PROGRESS and said to run teardown.
+    sc = scenario_create(**{f"cloudformation describe-stacks|{Q_STATUS}": [ok(status)]})
     run = run_form(form, tmp_path, "start", sc, typed="create\n")
     assert run.rc == 2
     assert run.log()[-1] == "RESULT=refused-state"
+    assert f"refused: stack is {status}. {advice}" in run.log()
     assert "cloudformation create-change-set" not in run.ops()
+
+
+@pytest.mark.parametrize("path, guard", [
+    (PS1, "if (-not [Console]::IsInputRedirected) { while ([Console]::KeyAvailable)"),
+    (SH, "if [ -t 0 ]; then while read -r -t 0.1 _ahead; do :; done; fi"),
+])
+def test_prompt_discards_input_typed_before_it_only_at_a_terminal(path: Path, guard: str) -> None:
+    # F-R14-2: an Enter pressed while the script ran was read as the answer. The discard runs before the
+    # prompt, and only at a terminal: the tests above pipe the answer in, and it must still be read.
+    text = path.read_text(encoding="utf-8")
+    assert text.count(guard) == 1
+    assert text.index(guard) < text.index("Type $")
 
 
 @pytest.mark.parametrize("form", FORMS)

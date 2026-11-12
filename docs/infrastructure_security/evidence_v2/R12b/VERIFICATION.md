@@ -55,7 +55,7 @@ proposed: VERIFIED_PASS, Inferred.
 | Ticket criterion (`plans/aws_redeployment_tickets.md`, R12b) | Status | Evidence |
 |---|---|---|
 | Register v2 shows every control as VERIFIED_PASS, NOT_APPLICABLE with a reason, or DEFERRED with a reason, and gives a v2 evidence path for each | PASS | Register v2 of 2026-11-12: 35 VERIFIED_PASS, 4 DEFERRED (DC-33–35 to R15, DC-38 per OD12), 2 NOT_APPLICABLE (DC-22, DC-40); every row names a v2 path; Summary table refreshed (F-R12a-1) |
-| The presigned PUT to an outside bucket fails from the host (closes F7) | **Open** | `DC-05_host-f7-presigned-put.json`: `404 NoSuchBucket`, inconclusive. Retest in the next host session (R12b-D9) |
+| The presigned PUT to an outside bucket fails from the host (closes F7) | PASS (addendum below) | 2026-11-12 run: `DC-05_host-f7-presigned-put.json`, `404 NoSuchBucket`, inconclusive. Retest in R14 step 08: `R12b_fix2_08_*`, `403 AccessDenied` naming the endpoint policy. Closed by the operator |
 | The DC-15 in-host tests are collected | PASS | `DC-15_host-no-long-term-keys.json` collected; content clean, script defect in its last test (F-R12b-2) |
 | DC-40 is re-assessed. It stays N/A unless the account joined an Organization | PASS | `DC-40_organization.json`, `DC-40_scp-list.txt`: the account is in an organization with a management account outside the project; NOT_APPLICABLE with that reason (point 7, operator-confirmed) |
 
@@ -66,6 +66,20 @@ proposed: VERIFIED_PASS, Inferred.
 - [x] Decision record `aws-redeployment-r12b-reevidence_2026-11-12` drafted.
 - [x] Step 12 after this report (run 2026-11-12, after the confirmation): Python 3.10.6, `346 passed, 1 skipped` (the symlink case), as stated; old-ID guard CLEAN (20 ids), `exit=0`; secret scan CLEAN over `evidence_v2/R12b`, `exit=0`, run last.
 - [x] Operator confirmed R12b (2026-11-12 01:14 UTC), taken as the review of R12b-D8, D10–D12; criteria 1, 3 and 4 ticked, criterion 2 (F7) left open.
+
+## Addendum, 2026-11-12: F7 retest (R14 step 08)
+
+Run in the R14 creation B session (`evidence_v2/R14/RUNLOG.md`, row 08; R14-D3), by the operator, from
+the workstation. The bucket was created in this account in `eu-north-1` with a random name, so it
+existed when the host sent the PUT (R12b-D9).
+
+| Evidence | Criterion | Status | Reason |
+|---|---|---|---|
+| `R12b_fix2_08_bucket.txt` | The bucket exists | PASS | `create_bucket_exit=0`, `head_bucket_exit=0` |
+| `R12b_fix2_08_f7-presigned-put.json` | `403`, `AccessDenied`, names the VPC endpoint policy; no URL in the file | PASS | Run Command `Success`; `http_status=403`, `error_code=AccessDenied`, `message_names_vpc_endpoint_policy=yes`, `RESULT=expected`; no `https://` (checked by script) |
+| `R12b_fix2_08_bucket-removed.txt` | First line `0`; `rb_exit=0` | Deviation, operator-accepted | First line `None`; `rb_exit=0`. Inferred: no object arrived, because S3 answered the only PUT with `403`. The empty bucket's listing returned no `KeyCount` (F-R14-3) |
+
+The operator accepted F7 as closed on 2026-11-12 ("accept F7 as closed"). Criterion 2 is ticked.
 
 ## Notes for later tickets
 
