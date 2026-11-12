@@ -1,0 +1,185 @@
+{
+  "region": "eu-north-1",
+  "note": "Read by the agent from the public AWS Price List offer files (anonymous download), because the Price List API refused the po-r1 role with AccessDeniedException in step 04 (R14_04_price-list-console.txt). STEPS.md point 4 fallback. source_url is the file read; page_url is the public pricing page for the same price, not read.",
+  "hours_per_month": {
+    "value": 730,
+    "source": "Assumed: the AWS convention of 730 hours per month, as used by the AWS Pricing Calculator; not read from a page in R14"
+  },
+  "root_volume_gb": {
+    "value": 8,
+    "source": "evidence_v2/R11/R11_09_root-volume.json (size 8)"
+  },
+  "interface_endpoints": {
+    "value": 6,
+    "source": "deploy/aws/templates/90-host.yaml (six VpcEndpointType Interface)"
+  },
+  "prices": {
+    "host_hour": {
+      "usd": 0.09077,
+      "unit": "Hrs",
+      "sku": "3CSQPDBUPCZWNZ6M",
+      "usagetype": "EUN1-BoxUsage:c7i-flex.large",
+      "description": "$0.09077 per On Demand Linux c7i-flex.large Instance Hour",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-10",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/20261110173852/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/ec2/pricing/on-demand/",
+      "date_read": "2026-11-12"
+    },
+    "gp3_gb_month": {
+      "usd": 0.0836,
+      "unit": "GB-Mo",
+      "sku": "H33YTQG3Y9XKNSF3",
+      "usagetype": "EUN1-EBS:VolumeUsage.gp3",
+      "description": "$0.0836 per GB-month of General Purpose (gp3) provisioned storage - EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-10",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/20261110173852/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/ebs/pricing/",
+      "date_read": "2026-11-12"
+    },
+    "endpoint_hour": {
+      "usd": 0.0105,
+      "unit": "Hrs",
+      "sku": "RQDW4F29PDT7RYTA",
+      "usagetype": "EUN1-VpcEndpoint-Hours",
+      "description": "$0.01 per VPC Endpoint Hour",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-05",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonVPC/20261105181945/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/privatelink/pricing/",
+      "date_read": "2026-11-12"
+    },
+    "endpoint_gb": {
+      "usd": 0.01,
+      "unit": "GB",
+      "sku": "PUGDDHYKX88JEKYR",
+      "usagetype": "EUN1-VpcEndpoint-Bytes",
+      "description": "$0.01 per GB for upto 1 PB monthly data processed by VPC Endpoints",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-05",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonVPC/20261105181945/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/privatelink/pricing/",
+      "date_read": "2026-11-12",
+      "tier_note": "first of 3 tiers, up to 1048576 GB per month"
+    },
+    "kms_key_month": {
+      "usd": 1.0,
+      "unit": "Keys",
+      "sku": "FJZGZWXK3EGTGQXE",
+      "usagetype": "eu-north-1-KMS-Keys",
+      "description": "$1 per customer managed KMS key version in EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-08",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/awskms/20261108172342/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/kms/pricing/",
+      "date_read": "2026-11-12"
+    },
+    "kms_request": {
+      "usd": 3e-06,
+      "unit": "Requests",
+      "sku": "2S77H5MZU5BVWEXS",
+      "usagetype": "eu-north-1-KMS-Requests",
+      "description": "$0.03 per 10000 KMS requests in EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-08",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/awskms/20261108172342/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/kms/pricing/",
+      "date_read": "2026-11-12"
+    },
+    "secret_month": {
+      "usd": 0.4,
+      "unit": "Secrets",
+      "sku": "CMSG8A9ZU2DMCFPE",
+      "usagetype": "EUN1-AWSSecretsManager-Secrets",
+      "description": "$0.40 per Secret",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-11",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSSecretsManager/20261111195606/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/secrets-manager/pricing/",
+      "date_read": "2026-11-12"
+    },
+    "logs_ingest_gb": {
+      "usd": 0.54,
+      "unit": "GB",
+      "sku": "2WXCZPMH3FF7XAAZ",
+      "usagetype": "EUN1-DataProcessing-Bytes",
+      "description": "$0.54 per GB custom log data ingested in Standard log class - EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-04",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonCloudWatch/20261104213532/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/cloudwatch/pricing/",
+      "date_read": "2026-11-12"
+    },
+    "logs_storage_gb_month": {
+      "usd": 0.028,
+      "unit": "GB-Mo",
+      "sku": "FC3W9RUMP83VDX52",
+      "usagetype": "EUN1-TimedStorage-ByteHrs",
+      "description": "$0.028 per GB-mo of log storage - EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-04",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonCloudWatch/20261104213532/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/cloudwatch/pricing/",
+      "date_read": "2026-11-12"
+    }
+  },
+  "bedrock": {
+    "eu.anthropic.claude-opus-4-6-v1": {
+      "input": {
+        "usd": 5.5,
+        "unit": "1M tokens",
+        "sku": "7NKGWNR398YVU3CF",
+        "usagetype": "EUN1-MP:EUN1_InputTokenCount-Units",
+        "description": "AWS Marketplace software usage|eu-north-1|Million Input Tokens Regional",
+        "effective_date": "2026-09-01",
+        "publication_date": "2026-11-09",
+        "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrockFoundationModels/20261109224312/eu-north-1/index.json",
+        "page_url": "https://aws.amazon.com/bedrock/pricing/",
+        "date_read": "2026-11-12",
+        "per_tokens": 1000000
+      },
+      "output": {
+        "usd": 27.5,
+        "unit": "1M tokens",
+        "sku": "DZUK32YQGNM9S5QK",
+        "usagetype": "EUN1-MP:EUN1_OutputTokenCount-Units",
+        "description": "AWS Marketplace software usage|eu-north-1|Million Response Tokens Regional",
+        "effective_date": "2026-09-01",
+        "publication_date": "2026-11-09",
+        "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrockFoundationModels/20261109224312/eu-north-1/index.json",
+        "page_url": "https://aws.amazon.com/bedrock/pricing/",
+        "date_read": "2026-11-12",
+        "per_tokens": 1000000
+      }
+    },
+    "eu.anthropic.claude-sonnet-4-6": {
+      "input": {
+        "usd": 3.3,
+        "unit": "1M tokens",
+        "sku": "8PYZ3HZ8YF4WUEJM",
+        "usagetype": "EUN1-MP:EUN1_InputTokenCount-Units",
+        "description": "AWS Marketplace software usage|eu-north-1|Million Input Tokens Regional CRIS",
+        "effective_date": "2026-09-01",
+        "publication_date": "2026-11-09",
+        "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrockFoundationModels/20261109224312/eu-north-1/index.json",
+        "page_url": "https://aws.amazon.com/bedrock/pricing/",
+        "date_read": "2026-11-12",
+        "per_tokens": 1000000
+      },
+      "output": {
+        "usd": 16.5,
+        "unit": "1M tokens",
+        "sku": "MG9KYTFRERE8WVUC",
+        "usagetype": "EUN1-MP:EUN1_OutputTokenCount-Units",
+        "description": "AWS Marketplace software usage|eu-north-1|Million Response Tokens Regional CRIS",
+        "effective_date": "2026-09-01",
+        "publication_date": "2026-11-09",
+        "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrockFoundationModels/20261109224312/eu-north-1/index.json",
+        "page_url": "https://aws.amazon.com/bedrock/pricing/",
+        "date_read": "2026-11-12",
+        "per_tokens": 1000000
+      }
+    }
+  }
+}

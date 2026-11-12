@@ -1,0 +1,30 @@
+﻿identity              aws sts get-caller-identity --output json --region eu-north-1 --profile po-r1
+stack_status          aws cloudformation describe-stacks --stack-name proposal-orchestrator-host --query Stacks[0].StackStatus --output text --region eu-north-1 --profile po-r1
+instance_id           aws cloudformation describe-stacks --stack-name proposal-orchestrator-host --query Stacks[0].Outputs[?OutputKey=='InstanceId'].OutputValue | [0] --output text --region eu-north-1 --profile po-r1
+instance_state        aws ec2 describe-instances --instance-ids {I} --query Reservations[0].Instances[0].State.Name --output text --region eu-north-1 --profile po-r1
+create_change_set     aws cloudformation create-change-set --stack-name proposal-orchestrator-host --change-set-name {CS} --change-set-type CREATE --template-body file://C:\Code\proposal_demo\proposal_orchestrator\deploy\aws\templates\90-host.yaml --parameters file://C:\Code\proposal_demo\proposal_orchestrator\deploy\aws\parameters\host.json --tags Key=project,Value=proposal-orchestrator --output json --region eu-north-1 --profile po-r1
+wait_change_set       aws cloudformation wait change-set-create-complete --stack-name proposal-orchestrator-host --change-set-name {CS} --region eu-north-1 --profile po-r1
+describe_change_set   aws cloudformation describe-change-set --stack-name proposal-orchestrator-host --change-set-name {CS} --output json --region eu-north-1 --profile po-r1
+execute_change_set    aws cloudformation execute-change-set --stack-name proposal-orchestrator-host --change-set-name {CS} --region eu-north-1 --profile po-r1
+wait_create           aws cloudformation wait stack-create-complete --stack-name proposal-orchestrator-host --region eu-north-1 --profile po-r1
+stack_record          aws cloudformation describe-stacks --stack-name proposal-orchestrator-host --query Stacks[0].{name:StackName,status:StackStatus,reason:StackStatusReason,capabilities:Capabilities,tags:Tags} --output json --region eu-north-1 --profile po-r1
+stack_events          aws cloudformation describe-stack-events --stack-name proposal-orchestrator-host --query StackEvents[].{time:Timestamp,id:LogicalResourceId,type:ResourceType,status:ResourceStatus,reason:ResourceStatusReason} --output json --region eu-north-1 --profile po-r1
+outputs               aws cloudformation describe-stacks --stack-name proposal-orchestrator-host --query Stacks[0].Outputs --output json --region eu-north-1 --profile po-r1
+ping                  aws ssm describe-instance-information --filters Key=InstanceIds,Values={I} --query InstanceInformationList[0].PingStatus --output text --region eu-north-1 --profile po-r1
+instance_information  aws ssm describe-instance-information --filters Key=InstanceIds,Values={I} --query InstanceInformationList[].{id:InstanceId,ping:PingStatus,platform:PlatformName,version:PlatformVersion,agent:AgentVersion,resourceType:ResourceType} --output json --region eu-north-1 --profile po-r1
+start_instances       aws ec2 start-instances --instance-ids {I} --output json --region eu-north-1 --profile po-r1
+wait_running          aws ec2 wait instance-running --instance-ids {I} --region eu-north-1 --profile po-r1
+stop_instances        aws ec2 stop-instances --instance-ids {I} --output json --region eu-north-1 --profile po-r1
+wait_stopped          aws ec2 wait instance-stopped --instance-ids {I} --region eu-north-1 --profile po-r1
+instance_record       aws ec2 describe-instances --instance-ids {I} --query Reservations[0].Instances[0].{id:InstanceId,state:State.Name,type:InstanceType,vpc:VpcId} --output json --region eu-north-1 --profile po-r1
+volumes               aws ec2 describe-volumes --filters Name=attachment.instance-id,Values={I} --query Volumes[].{id:VolumeId,state:State,type:VolumeType,size:Size} --output json --region eu-north-1 --profile po-r1
+vpc_id                aws cloudformation describe-stacks --stack-name proposal-orchestrator-network --query Stacks[0].Outputs[?OutputKey=='VpcId'].OutputValue | [0] --output text --region eu-north-1 --profile po-r1
+vpc_endpoints         aws ec2 describe-vpc-endpoints --filters Name=vpc-id,Values={VPC} --query VpcEndpoints[?State!='deleted'].{id:VpcEndpointId,type:VpcEndpointType,service:ServiceName,state:State} --output json --region eu-north-1 --profile po-r1
+delete_stack          aws cloudformation delete-stack --stack-name proposal-orchestrator-host --region eu-north-1 --profile po-r1
+wait_delete           aws cloudformation wait stack-delete-complete --stack-name proposal-orchestrator-host --region eu-north-1 --profile po-r1
+stack_after           aws cloudformation describe-stacks --stack-name proposal-orchestrator-host --output json --region eu-north-1 --profile po-r1
+network_interfaces    aws ec2 describe-network-interfaces --filters Name=vpc-id,Values={VPC} --query NetworkInterfaces[].{id:NetworkInterfaceId,type:InterfaceType,status:Status} --output json --region eu-north-1 --profile po-r1
+instances_left        aws ec2 describe-instances --filters Name=instance-state-name,Values=pending,running,stopping,stopped,shutting-down --query Reservations[].Instances[].{id:InstanceId,state:State.Name} --output json --region eu-north-1 --profile po-r1
+volumes_left          aws ec2 describe-volumes --filters Name=tag:project,Values=proposal-orchestrator --query Volumes[].{id:VolumeId,state:State} --output json --region eu-north-1 --profile po-r1
+base_stacks           aws cloudformation describe-stacks --query Stacks[?starts_with(StackName, 'proposal-orchestrator-') && StackName != 'proposal-orchestrator-host'].{name:StackName,status:StackStatus} --output json --region eu-north-1 --profile po-r1
+exit=0

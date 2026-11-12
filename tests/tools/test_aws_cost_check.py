@@ -225,3 +225,17 @@ def test_prices_reports_a_refused_api_region(tmp_path: Path, capsys: pytest.Capt
 def test_budget_file_in_the_repository_holds_no_approved_amount() -> None:
     budget = json.loads((cc.REPO / "deploy" / "aws" / "pricing" / "budget.json").read_text(encoding="utf-8"))
     assert budget["approved_huf"] is None and budget["huf_per_usd"] is None
+
+
+def test_price_file_in_the_repository_loads_and_prices_every_host_profile() -> None:
+    path = cc.REPO / "deploy" / "aws" / "pricing" / "eu-north-1.json"
+    prices = cc.load_prices(path)
+    params = json.loads((cc.REPO / "deploy" / "aws" / "parameters" / "host.json").read_text(encoding="utf-8"))
+    arns = next(p["ParameterValue"] for p in params if p["ParameterKey"] == "InferenceProfileArns").split(",")
+    assert sorted(prices["bedrock"]) == sorted(arn.rsplit("/", 1)[1] for arn in arns)
+    assert prices["interface_endpoints"]["value"] == 6 and prices["root_volume_gb"]["value"] == 8
+    extract = json.loads((cc.REPO / "docs" / "infrastructure_security" / "evidence_v2" / "R14"
+                          / "R14_04_agent-offer-extract.json").read_text(encoding="utf-8"))
+    skus = {item["sku"] for item in extract["items"]}
+    entries = list(prices["prices"].values()) + [s for pair in prices["bedrock"].values() for s in pair.values()]
+    assert all(e["sku"] in skus for e in entries)
