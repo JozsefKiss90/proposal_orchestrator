@@ -24,6 +24,7 @@
 | 2026-11-13 | operator | H01 run 1: every AWS call refused, "session has expired" (exit 255). No evidence counts; no AWS change. The session-preferences file read `absent` from that failure, so the H01 PASS criterion now requires `invalid_document` true for `absent`. H01 to be rerun after `aws login` |
 | 2026-11-13 | operator | H01 run 2: PASS, checked by script. FREE / ACTIVE, credits 199.16 USD; one budget, limit 10.0, spend 0.601 USD; three notifications, all OK; account `797661577394`, `AccountFullAccessRole`; session document absent (`InvalidDocument`, exit 254), so no session logging; host stack does not exist (exit 254); `bundles/` holds only the O5 tarball and its `.sha256`. Next: H02 and H03 at the start of sitting 1 |
 | 2026-11-13 | operator | H02 run 1: `$O` left as the placeholder `<O>`; no hash or size read, `cp_exit=255`, head-object 404. Nothing uploaded; no AWS change. H02 now refuses before any AWS call when `$O` is a placeholder or the archive is not there. To be rerun |
+| 2026-11-13 | operator | H02 run 2: PASS, checked by script. Upload sha256 `406b15dc…5174`, 194,572 bytes, `cp_exit=0`; the object 194,572 bytes, `aws:kms` with the R6 project key, bucket key on, one version. Next: H03 (hourly charges start, under the go) |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
