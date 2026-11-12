@@ -335,9 +335,11 @@ checklist.
 
 **Blocked by:** R11.
 
-- [ ] Each script ran once end to end, with evidence.
-- [ ] The cost check ran once. Every price in it cites its pricing page and date.
-- [ ] The upgrade checklist exists and is marked operator-only.
+Confirmed by the operator 2026-11-12 with deviations R14-D1 and R14-D5 accepted: `evidence_v2/R14/VERIFICATION.md`, decision record `aws-redeployment-r14-operations_2026-11-12`.
+
+- [x] Each script ran once end to end, with evidence. CloudShell steps 10 and 11 rest partly on recovered evidence (R14-D5).
+- [x] The cost check ran once. Every price in it cites its pricing page and date. Prices cite the public AWS price list offer files, because the Price List API was refused (R14-D1).
+- [x] The upgrade checklist exists and is marked operator-only.
 
 ## R12b Full re-evidence and register v2
 

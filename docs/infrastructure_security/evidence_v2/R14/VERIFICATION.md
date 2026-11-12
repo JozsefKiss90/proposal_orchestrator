@@ -7,7 +7,8 @@
 | Decisions | `aws-redeployment-r14-operations_2026-11-12` (R14-D1–D6, F-R14-1–4) |
 | Stacks | `proposal-orchestrator-host`, twice. Creation A: executed 12:12:19, deleted 12:18:29 UTC. Creation B: executed 12:35:46, delete 12:51:33, `RESULT=deleted` 12:55:51 UTC. Two further change sets (step 12 tries 1–2) were never executed |
 | Cost | About 0.44 billable hours in all, at most 0.07 USD at the running rate, against 0.26 USD stated before the go. Credits 199.19 USD at step 01 |
-| Secret scan | Agent over `evidence_v2` after each edit: CLEAN. Operator step 16 after this report |
+| Secret scan | Agent over `evidence_v2` after each edit: CLEAN. Operator step 16: CLEAN for R12b and R14 |
+| Confirmed | By the operator, 2026-11-12, in session: "step 16 is done, deviations are accepted, tick R14" |
 
 Every check below was re-run by the agent on the saved files (`utf-8-sig`), by script.
 
@@ -30,14 +31,14 @@ Every check below was re-run by the agent on the saved files (`utf-8-sig`), by s
 | 13 | CloudShell stop | `R14_13_*` | PASS | As step 09. Unpacked by the agent from the operator's download |
 | 14 | PowerShell start, resume path | `R14_14_*` | PASS | `path=resume`, `confirmed=start`; same `InstanceId` as step 12; `Online`. A first try ran the step 09 command and was refused before any AWS call |
 | 15 | PowerShell teardown | `R14_15_*` | PASS | `confirmed=delete`, `RESULT=deleted`; stack absent; only the S3 gateway; no ENI, instance or volume; `base_stacks_complete=5`, equal to step 02 |
-| 16 | Tests, guard, scans last | `R14_16_*` | Pending | After this report. Expected: `224 passed` (agent run 2026-11-12, after the F-R14-1 and F-R14-2 fixes) |
+| 16 | Tests, guard, scans last | `R14_16_*` | PASS | `224 passed`, as expected after the F-R14-1 and F-R14-2 fixes; old-ID guard `CLEAN`, `exit=0`; secret scan `CLEAN`, `exit=0`, for R12b and R14 |
 
 ## Ticket checklist
 
 | Ticket criterion (`plans/aws_redeployment_tickets.md`, R14) | Status | Evidence |
 |---|---|---|
-| Each script ran once end to end, with evidence | PASS, with two recovered steps (operator to confirm) | PowerShell form: create, stop, resume, teardown (07, 09, 14, 15), all from the script's own files. CloudShell form: check, create, stop (06, 12, 13) from its own files; resume (10) from the console and CloudTrail; teardown (11) issued by the script, after-checks by the recovery block |
-| The cost check ran once. Every price in it cites its pricing page and date | PASS, with R14-D1 (operator to confirm) | `R14_05_cost-check/report.md`: each row cites the AWS price list offer file read and the date 2026-11-12. The Price List API was refused; the offer files are the same price list, read anonymously |
+| Each script ran once end to end, with evidence | PASS, with two recovered steps (R14-D5, accepted by the operator) | PowerShell form: create, stop, resume, teardown (07, 09, 14, 15), all from the script's own files. CloudShell form: check, create, stop (06, 12, 13) from its own files; resume (10) from the console and CloudTrail; teardown (11) issued by the script, after-checks by the recovery block |
+| The cost check ran once. Every price in it cites its pricing page and date | PASS, with R14-D1 (accepted by the operator) | `R14_05_cost-check/report.md`: each row cites the AWS price list offer file read and the date 2026-11-12. The Price List API was refused; the offer files are the same price list, read anonymously |
 | The upgrade checklist exists and is marked operator-only | PASS | `docs/infrastructure_security/aws_od10_upgrade_checklist.md`: "Operator only" in its first line; status "Not started. Blocked by the ELTE approval" |
 
 ## Changes after round 3 (no AWS call)
@@ -58,8 +59,8 @@ Every check below was re-run by the agent on the saved files (`utf-8-sig`), by s
 - [x] Price file and budget file committed; the HUF amount stays `null` (point 6).
 - [x] R12b `VERIFICATION.md` addendum for F7 written.
 - [x] Decision record `aws-redeployment-r14-operations_2026-11-12` drafted.
-- [ ] Step 16 after this report.
-- [ ] Operator confirms R14 (criteria 1 and 2 with their deviations) and F7.
+- [x] Step 16 after this report: PASS.
+- [x] Operator confirms R14 (criteria 1 and 2 with their deviations) and F7.
 
 ## Notes for later tickets
 

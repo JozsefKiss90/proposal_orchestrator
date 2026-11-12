@@ -7,9 +7,9 @@
   "ticket": "R14 of plans/aws_redeployment_tickets.md (operations and cost)",
   "supersedes": "none. Closes the known gap R12b-D9 of aws-redeployment-r12b-reevidence_2026-11-12 (F7).",
   "authority": "Agent-drafted under CLAUDE.md §9.4. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no proposal gate and amends no constitutional rule.",
-  "review_state": "pending_operator_review",
-  "confirmed": null,
-  "decided_by": "R14-D4: the operator in session ('accept F7 as closed, round 3 done'). R14-D1, D2, D3, D5, D6: the agent, reported in session and recorded in RUNLOG.md, for the operator's review with R14.",
+  "review_state": "confirmed",
+  "confirmed": "2026-11-12, by the operator in session: 'step 16 is done, deviations are accepted, tick R14'. Step 16 passed (224 passed; old-ID guard and secret scans CLEAN).",
+  "decided_by": "R14-D4: the operator in session ('accept F7 as closed, round 3 done'). R14-D1, D2, D3, D5, D6: the agent, reported in session and recorded in RUNLOG.md, accepted by the operator with R14 ('step 16 is done, deviations are accepted, tick R14').",
   "decision": "R14 delivers the PowerShell and CloudShell host-lifecycle scripts, the weekly cost check priced from the public AWS price list offer files, and the operator-only OD10 checklist. Both script forms ran against two host creations; F7 is closed.",
   "why": "The ticket asks for scripts run once end to end, a cost check run once with every price cited, and the OD10 checklist. R12b-D9 placed the F7 retest in the next host session, which this ticket created.",
   "inputs": [
@@ -90,7 +90,7 @@
       "declared_status": "Inferred",
       "answer": "Step 10 from the pasted console and CloudTrail StartInstances; step 11 after-checks re-run by a recovery block (prefix R14_11r) once the deletion completed.",
       "reason": "The delete was issued by the script; only its after-checks and both steps' files were lost.",
-      "consequence": "Ticket criterion 1 for the CloudShell form rests partly on recovered evidence; operator to confirm."
+      "consequence": "Ticket criterion 1 for the CloudShell form rests partly on recovered evidence. Accepted by the operator 2026-11-12."
     },
     {
       "id": "R14-D6",
