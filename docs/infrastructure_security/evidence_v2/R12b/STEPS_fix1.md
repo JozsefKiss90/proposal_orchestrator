@@ -45,14 +45,23 @@ Two things to know about this URL:
   name exists (expected), `403` means another account owns it (also fine). `200` would mean this
   account owns it: stop.
 
-Run in **the same PowerShell window** you will use for steps F06–F09, right before F06:
+Run in **the same PowerShell window** you will use for steps F06–F09, right before F06.
+
+*Amended 2026-11-12 after the first F05 run left an empty URL file:* `po-r1` is an `aws login` profile,
+and Python's own read of it did not yield credentials. The block now asks the AWS CLI for the session's
+credentials (`aws configure export-credentials`), hands them to the one Python call through environment
+variables of this window, and removes them on the next line. Nothing is printed or written except the
+URL file. A Python error, if any, shows on screen; it holds no credential.
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\R12b"
 $F7 = Join-Path $env:USERPROFILE "po-f7-url.txt"
 $OB = "po-f7-outside-" + -join ((1..12) | ForEach-Object { "{0:x}" -f (Get-Random -Maximum 16) })
 & { aws s3api head-bucket --profile po-r1 --region eu-north-1 --bucket $OB 2>&1 | Out-Null; "head_bucket_exit=$LASTEXITCODE" }
-py -3.10 -c "import boto3,sys; from botocore.config import Config; s=boto3.Session(profile_name='po-r1').client('s3', region_name='eu-north-1', config=Config(signature_version='s3v4', s3={'addressing_style':'virtual'})); print(s.generate_presigned_url('put_object', Params={'Bucket': sys.argv[1], 'Key': 'f7-negative-test.txt'}, ExpiresIn=1800))" $OB | Out-File -Encoding ascii $F7
+$c = aws configure export-credentials --profile po-r1 --format process | ConvertFrom-Json
+$env:AWS_ACCESS_KEY_ID = $c.AccessKeyId; $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey; $env:AWS_SESSION_TOKEN = $c.SessionToken; $c = $null
+py -3.10 -c "import boto3,sys; from botocore.config import Config; s=boto3.client('s3', region_name='eu-north-1', config=Config(signature_version='s3v4', s3={'addressing_style':'virtual'})); print(s.generate_presigned_url('put_object', Params={'Bucket': sys.argv[1], 'Key': 'f7-negative-test.txt'}, ExpiresIn=1800))" $OB | Out-File -Encoding ascii $F7
+Remove-Item Env:AWS_ACCESS_KEY_ID, Env:AWS_SECRET_ACCESS_KEY, Env:AWS_SESSION_TOKEN
 $u = (Get-Content $F7 -Raw); if ($u) { $u = $u.Trim(); "starts_https=$($u.StartsWith('https://'))  names_eu_north_1=$($u.Contains('.s3.eu-north-1.amazonaws.com/'))  length=$($u.Length)" } else { "url_file_empty=True" }; $u = $null
 & { py -3.10 -m tools.collect_evidence_v2 --ticket R12b --step 09 --profile po-r1 --plan --host-outputs "$E\R12b_outputs.json" --f7-url-file $F7; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R12b_fix1_05b_collector-plan.txt"
 Get-Content "$E\R12b_fix1_05b_collector-plan.txt" | Select-String "f7-presigned-put|REFUSED|^exit="
