@@ -531,3 +531,15 @@ Each entry records the same fields as v1:
 | Evidence Received | `evidence_v2/R14/`: two host creations (12:12–12:18 and 12:35–12:55 UTC), both deleted, nothing left; the cost check with 13 cited prices; the F7 PUT refused with `403 AccessDenied` naming the VPC endpoint policy |
 | Verification Result | Steps 01–15 PASS or with recorded deviation; ticket criteria 1 and 2 PASS with deviations R14-D5 and R14-D1, criterion 3 PASS. Step 16: `224 passed`, old-ID guard and secret scans CLEAN. Operator accepted F7 as closed and confirmed R14 with both deviations. Findings F-R14-1–4 |
 | Next Action | R14 DONE: three criteria ticked. Operator cleans CloudShell (`~/r14`, `~/r14.tar.gz`, the three uploads). Next CloudShell session uploads the fixed script and records new hashes. Frontier: O5 re-freeze, then R15 (CloudShell teardown end to end; input discard at a real terminal) |
+
+### 2026-11-12 — R15: host install and Converse smoke run — verified (step 16 pending)
+
+| Field | Value |
+|---|---|
+| Timestamp | 2026-11-12T17:45:00Z |
+| Control ID | DC-33, DC-34, DC-35: DEFERRED to VERIFIED_PASS. DC-26 re-evidenced |
+| Action Taken | Agent wrote `STEPS.md` (points 1–12) and round 0: `deploy/aws/scripts/host-run.ps1`, six host scripts, the DC-33–35 vars file, 31 tests. Operator accepted points 1–8, ran round 1 (steps 01–05; R15-D1) and, under a recorded go (about 0.60 USD stated, upper bound 2.05 USD), round 2: one host creation, fetch, install, verify, DC-33–35, receipt, the synthetic Converse pass and freeze, CloudShell teardown, CloudTrail lookup. Agent checked every file by script and wrote `VERIFICATION.md` and `msca-dn-an12-host-run-r15_2026-11-12` |
+| Evidence Requested | `R15_01_*`–`R15_15_*` |
+| Evidence Received | `evidence_v2/R15/`: host created 17:00:54, delete issued 17:19:59 UTC, nothing left; bundle sha256 equal to O5 on the host; verify 11 of 11; launcher digest equal to R8; receipt green before and after the pass; 26 `Converse` events through the Bedrock interface endpoint as the runtime role |
+| Verification Result | Steps 01–15 PASS or with recorded deviation (R15-D1–D4). Ticket criteria 1–4 PASS; criterion 5 (decision record) drafted. AN12 criteria 1 and 3 Confirmed on the host; criterion 2 out of scope. Finding F-R15-1 (two throttled calls, retried) |
+| Next Action | Operator: answer R15-D4 (typed-ahead tests), rerun step 15 (R15-D2), run step 16, confirm R15. Then A4 is ticked; frontier H2 V14 (check F-R15-1 first) |

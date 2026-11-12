@@ -1,0 +1,127 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-an12-host-run-r15_2026-11-12",
+  "date": "2026-11-12",
+  "branch": "harness_overhaul",
+  "milestone": "AWS private-network redeployment",
+  "ticket": "R15 of plans/aws_redeployment_tickets.md (host install and Converse smoke run, rescoped 2026-11-11)",
+  "supersedes": "msca-dn-an12-offline-bundle_2026-10-16, as successor for AN12 criteria 1 and 3 and three of its known gaps. Its decisions D1-D4 and rules R1-R8 stand unchanged.",
+  "authority": "Agent-drafted under CLAUDE.md §9.4. Execution aid for infrastructure work (CLAUDE.md §10.2). Closes no proposal gate and amends no constitutional rule.",
+  "review_state": "agent_drafted",
+  "confirmed": null,
+  "decided_by": "Points 1-8: the operator in session ('points 1-8 accepted'). Points 9-12: the agent, open to change on review. The round 2 go: the operator in session ('go for round 2'), recorded before step 06. R15-D1-D4: the agent, recorded in RUNLOG.md, for the operator to accept with R15.",
+  "decision": "The O5 bundle (tag msca-dn-freeze-2026-11-12, revision 17e32d54) installs and verifies on the private host, the production configuration reads through the launcher, and the synthetic Converse blind pass freezes there with a green receipt. AN12 criteria 1 and 3 are measured on the host.",
+  "why": "AN12 left criteria 1 and 3 to the operator's host run. R15 is that run on the redeployed network, with every host command sent by Run Command and returning metadata only.",
+  "inputs": [
+    "docs/infrastructure_security/evidence_v2/R15/STEPS.md, RUNLOG.md, VERIFICATION.md",
+    "docs/infrastructure_security/evidence_v2/R15/R15_06_* to R15_15_*",
+    "docs/tier4_orchestration_state/decision_log/msca-dn-refreeze-o5_2026-11-12.json",
+    "docs/tier4_orchestration_state/decision_log/msca-dn-an12-offline-bundle_2026-10-16.json"
+  ],
+  "criteria": [
+    {
+      "criterion": "AN12 criterion 1: the production configuration on the host",
+      "declared_status": "Confirmed",
+      "basis": "R15_09_verify.json: production_mode true, diagnostic_level metadata, preset BEDROCK_CONVERSE_EU resolves to bedrock_converse, AWS_REGION eu-north-1. R15_10_dc33-35.json: the secret's five key names through runner.host_env, digest equal to R8's."
+    },
+    {
+      "criterion": "AN12 criterion 2: the anonymisation pipeline on the host",
+      "declared_status": "Unresolved",
+      "basis": "Out of scope for R15 (AN12 D1). Not run."
+    },
+    {
+      "criterion": "AN12 criterion 3: the synthetic Converse blind pass freezes on the host with a validated receipt",
+      "declared_status": "Confirmed",
+      "basis": "R15_12_receipt.json and R15_13_assess.json: receipt green before and after; assess_exit 0; one report; two baseline files. R15_15_converse-events.json: all calls as the runtime role on this host, through the Bedrock interface endpoint, eu-north-1, Sonnet 4.6."
+    }
+  ],
+  "closed_gaps": [
+    {
+      "gap": "msca-dn-an12-offline-bundle_2026-10-16: the host's glibc taken as 2.34 (Assumed).",
+      "now": "Measured glibc 2.34 on Amazon Linux 2023; the wheels need 2.28 (R15_09_verify.json).",
+      "declared_status": "Confirmed"
+    },
+    {
+      "gap": "msca-dn-an12-offline-bundle_2026-10-16: deploy/install_host.sh has not run on Linux.",
+      "now": "install_exit 0; 17 SHA256SUMS lines OK; 299 files match the manifest (R15_08_install.json).",
+      "declared_status": "Confirmed"
+    },
+    {
+      "gap": "msca-dn-an12-offline-bundle_2026-10-16: private resolution shows where the name points, not that every call takes that path.",
+      "now": "For this pass, every one of the 26 Converse events carries the Bedrock interface endpoint (R15_15_converse-events.json). The probe still tests one internet endpoint, so the gap stays open for other passes.",
+      "declared_status": "Inferred"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-R15-1",
+      "declared_status": "Confirmed",
+      "finding": "Two of 26 Converse calls drew ThrottlingException (17:14:06 and 17:14:25 UTC). The Converse route is unpaced and allows 6 retries; both were retried and the pass completed with 24 successful calls.",
+      "basis": "R15_15_converse-events.json; harness/judge_factory.py INDEPENDENCE_POLICY.",
+      "next": "Before V14: check the account's Sonnet 4.6 quota and decide whether the Converse route should be paced."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R15-D1",
+      "question": "Steps 01-04 ran before round 0 and before points 1-8 were answered",
+      "answer_kind": "agent_decision",
+      "declared_status": "Inferred",
+      "answer": "Their evidence stands: none of the four uses a round 0 file. 258 passed, 1 skipped is the baseline for step 03's list; step 16 reruns it with the sender's tests.",
+      "reason": "RUNLOG.md note R15-D1."
+    },
+    {
+      "id": "R15-D2",
+      "question": "Step 15 ran 12 minutes 40 seconds after the pass, not 15",
+      "answer_kind": "agent_decision",
+      "declared_status": "Inferred",
+      "answer": "The lookup found 24 successful calls, equal to the checkpoint's 24 responses. The operator reruns step 15 once, overwriting the file; it calls nothing billable.",
+      "reason": "RUNLOG.md note R15-D2."
+    },
+    {
+      "id": "R15-D3",
+      "question": "Two events carry ThrottlingException, against the criterion errorCode null",
+      "answer_kind": "agent_decision",
+      "declared_status": "Inferred",
+      "answer": "DC-26 holds: all 26 events have the stated Region, caller, issuer, endpoint and model. The throttles are a capacity finding (F-R15-1), not a control failure.",
+      "reason": "RUNLOG.md note R15-D3."
+    },
+    {
+      "id": "R15-D4",
+      "question": "The typed-ahead tests at steps 06 and 14",
+      "answer_kind": "operator_pending",
+      "declared_status": "Unresolved",
+      "answer": "Both prompts accepted their word first time. Whether Enter was pressed early is not reported; the operator answers on review.",
+      "reason": "RUNLOG.md note R15-D4."
+    }
+  ],
+  "known_gaps": [
+    {
+      "decision": "R15-D4",
+      "declared_status": "Unresolved",
+      "gap": "The input discard of F-R14-2 is shown at a real terminal only if the operator confirms Enter was pressed early at step 06 or 14."
+    },
+    {
+      "decision": "msca-dn-an12-offline-bundle_2026-10-16",
+      "declared_status": "Unresolved",
+      "gap": "The AN12 gaps not listed under closed_gaps stay as recorded there: the audit package snapshot, the A3 plan, the figure review route, the Converse pass token budget, the probe's single endpoint, and the bundle's test-module import."
+    }
+  ],
+  "not_evidence_of": [
+    "Any proposal content: the pass assessed the synthetic AN3 fixture only. No proposal text was sent.",
+    "AN12 criterion 2 (the anonymisation pipeline on the host).",
+    "The V14 private assessment, which has not run.",
+    "The approved HUF amount: still pending."
+  ],
+  "unblocks_when_recorded": [
+    "H2 V14 on the same bundle, from the deploy bucket's bundles/ prefix"
+  ],
+  "stays_blocked": [
+    "Nothing for V14 or V16 is built from harness_overhaul until V16 is done (O5)."
+  ],
+  "privacy": {
+    "declared_status": "Confirmed",
+    "claim": "No secret value, credential, session token, prompt text, report text or model output in the evidence. The host returned key=value metadata only; the report, checkpoint, logs and receipt stayed on the host and were deleted with it.",
+    "basis": "host-run.ps1 records variable names, never values; the host scripts print metadata only; agent secret scan over R15/ CLEAN."
+  }
+}

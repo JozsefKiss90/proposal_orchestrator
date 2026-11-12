@@ -1,0 +1,22 @@
+﻿{
+    "script":  "docs\\infrastructure_security\\evidence_v2\\R15\\host\\r15_09_verify.sh",
+    "script_sha256":  "45ebd4922323bd5020a55284602a917048c6261e52369465ed07fd1466a5d271",
+    "vars_file":  "",
+    "vars_names":  [
+
+                   ],
+    "instance_id":  "i-063be022b779c59f6",
+    "timeout_seconds":  300,
+    "sent_utc":  "2026-11-12T17:10:48Z",
+    "command_id":  "73f06d22-e3a9-4a73-965a-65c7fab546e1",
+    "finished_utc":  "2026-11-12T17:11:15Z",
+    "status":  "Success",
+    "status_details":  "Success",
+    "responseCode":  0,
+    "execution_start":  "2026-11-12T17:10:51.129Z",
+    "execution_end":  "2026-11-12T17:11:11.129Z",
+    "stdout":  "CHECK=r15-09-verify\nverify_probe=pypi.org:443\nverify_exit=0\nrecord_passed=true\ncheck_files=true\ncheck_interpreter=true\ncheck_glibc=true\ncheck_extraction_pin=true\ncheck_distributions=true\ncheck_production_mode=true\ncheck_diagnostic_level=true\ncheck_transport=true\ncheck_region=true\ncheck_private_endpoint=true\ncheck_no_internet_route=true\nrecord={\"bundle_name\":\"msca-dn-anonymisation-host\",\"checks\":[{\"check\":\"files\",\"detail\":\"all 299 files match the manifest\",\"passed\":true},{\"check\":\"interpreter\",\"detail\":\"Python 3.11.16 on x86_64; the bundle carries 3.11.16 for x86_64\",\"passed\":true},{\"check\":\"glibc\",\"detail\":\"glibc 2.34; the wheels need 2.28\",\"passed\":true},{\"check\":\"extraction_pin\",\"detail\":\"PyMuPDF 1.28.2 with MuPDF 1.28.2, on pin\",\"passed\":true},{\"check\":\"distributions\",\"detail\":\"all 16 pinned distributions installed\",\"passed\":true},{\"check\":\"production_mode\",\"detail\":\"ORCHESTRATOR_PRODUCTION_MODE=true\",\"passed\":true},{\"check\":\"diagnostic_level\",\"detail\":\"ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata\",\"passed\":true},{\"check\":\"transport\",\"detail\":\"preset BEDROCK_CONVERSE_EU resolves to bedrock_converse\",\"passed\":true},{\"check\":\"region\",\"detail\":\"AWS_REGION=eu-north-1; ADR-001 allows [\u0027eu-north-1\u0027, \u0027eu-west-1\u0027, \u0027us-east-1\u0027]\",\"passed\":true},{\"check\":\"private_endpoint\",\"detail\":\"bedrock-runtime.eu-north-1.amazonaws.com resolves to 10.60.0.8\",\"passed\":true},{\"check\":\"no_internet_route\",\"detail\":\"pypi.org:443 unreachable (OSError)\",\"passed\":true}],\"manifest_sha256\":\"04f8218f5c5e715d91e9bcad5efbc654d005c57fd30e0ecc8265de8c0a2319dd\",\"measured\":{\"libc\":[\"glibc\",\"2.34\"],\"machine\":\"x86_64\",\"mupdf\":\"1.28.2\",\"pymupdf\":\"1.28.2\",\"python\":\"3.11.16\"},\"passed\":true,\"record_type\":\"offline_bundle_verification\",\"repository_revision\":\"17e32d54f2bd60c1d69d9a1b6caa8688c34f036e\",\"schema\":\"offline_bundle_verification/1\"}\nRESULT=expected\n",
+    "stderr":  "",
+    "stdout_truncated":  false,
+    "stderr_truncated":  false
+}
