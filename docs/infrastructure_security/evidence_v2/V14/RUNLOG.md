@@ -18,6 +18,7 @@
 | 2026-11-12 | operator | V14-OP6 to V14-OP8 below, in session. Then the operator does the real import and the workstation preflight |
 | 2026-11-12 | operator | V14-F5 answered, OP7 date given, V14-A1 accepted, V14-F3 to be noted for V16, in session. The operator runs W01–W08 next |
 | 2026-11-12 | agent | Route (ii) rehearsed (`REHEARSAL.md` R14–R22): the re-rendered register loads against the frozen baseline. V14-F6 found |
+| 2026-11-12 | operator | W01–W08 in progress. W07 failed closed at the default package budget and passes with `--package-budget <B>`. Recorded as V14-F7; the flag goes on the host preflight, assess and audit lines |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -109,6 +110,15 @@
   read the first comparison against its successor by observation id, by hand, as runbook §6 already does across
   baselines. `review` of the first comparison after the swap was not run; it re-resolves the same references, so it
   is expected to refuse too (Inferred).
+- **V14-F7. The original's package exceeds the default package budget.** At W07 the preflight failed closed, exit 2:
+  `package incomplete under budget 200000` (operator, 2026-11-12). The default is `DEFAULT_PACKAGE_BUDGET`
+  (200,000, in the dev-graph package's own cost unit). The preflight passes with `--package-budget <B>`, where
+  `<B>` is the value the operator reports. The rehearsal did not catch this, because the eleven-page fixture fits
+  under the default. The budget is a ceiling, not a cut: an incomplete package is refused, so the flag drops
+  nothing the blind view permits. It is a package request key (`runner/dev_graph/packages.py`), so `preflight`,
+  `assess` and `audit` must all carry the same value. Those three commands take the flag, while `freeze`,
+  `compare`, `review`, `diff` and the receipt validator do not. Step sheet: W07, H06 and the H08/H08b audits
+  carry `--package-budget <B>`, and W08 reads the preflight made with it.
 
 Measured and found clear:
 
