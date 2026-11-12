@@ -18,7 +18,9 @@
 | 2026-11-12 | operator | V14-OP6 to V14-OP8 below, in session. Then the operator does the real import and the workstation preflight |
 | 2026-11-12 | operator | V14-F5 answered, OP7 date given, V14-A1 accepted, V14-F3 to be noted for V16, in session. The operator runs W01–W08 next |
 | 2026-11-12 | agent | Route (ii) rehearsed (`REHEARSAL.md` R14–R22): the re-rendered register loads against the frozen baseline. V14-F6 found |
-| 2026-11-12 | operator | W01–W08 in progress. W07 failed closed at the default package budget and passes with `--package-budget <B>`. Recorded as V14-F7; the flag goes on the host preflight, assess and audit lines |
+| 2026-11-12 | operator | W07 run 1, default budgets: refused, exit 2, `package incomplete under budget 200000` (V14-F7) |
+| 2026-11-12 | operator | W07 run 2, `--package-budget 400000`: the excellence criterion's input, 34,168, exceeds the 32,768 criterion budget and would go unscored, failing the freeze (V14-F7) |
+| 2026-11-12 | operator | W07 run 3, `--package-budget 400000 --criterion-budget 40000`: two flags remain, tables 250 against the manifest's 275 and 111 word-scan hits, both explained (V14-F8). Pack set and cost lines to follow |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -110,15 +112,31 @@
   read the first comparison against its successor by observation id, by hand, as runbook §6 already does across
   baselines. `review` of the first comparison after the swap was not run; it re-resolves the same references, so it
   is expected to refuse too (Inferred).
-- **V14-F7. The original's package exceeds the default package budget.** At W07 the preflight failed closed, exit 2:
-  `package incomplete under budget 200000` (operator, 2026-11-12). The default is `DEFAULT_PACKAGE_BUDGET`
-  (200,000, in the dev-graph package's own cost unit). The preflight passes with `--package-budget <B>`, where
-  `<B>` is the value the operator reports. The rehearsal did not catch this, because the eleven-page fixture fits
-  under the default. The budget is a ceiling, not a cut: an incomplete package is refused, so the flag drops
-  nothing the blind view permits. It is a package request key (`runner/dev_graph/packages.py`), so `preflight`,
-  `assess` and `audit` must all carry the same value. Those three commands take the flag, while `freeze`,
-  `compare`, `review`, `diff` and the receipt validator do not. Step sheet: W07, H06 and the H08/H08b audits
-  carry `--package-budget <B>`, and W08 reads the preflight made with it.
+- **V14-F7. The original needs two non-default evidence budgets.** Found at W07 (operator, 2026-11-12), over three
+  preflight runs (Settling). Both are budgets, not cuts: under the default, the commands refuse or leave a criterion
+  unscored rather than drop evidence silently.
+  - `--package-budget 400000`. At the default 200,000 the original's package is incomplete and the preflight
+    refuses, exit 2. The budget is a package request key (`runner/dev_graph/packages.py`), so `preflight`, `assess`
+    and `audit` carry the same value.
+  - `--criterion-budget 40000`. At the default 32,768 (`UNCAPPED_DEFAULT_PACK_TOKEN_BUDGET`) the excellence
+    criterion's input, 34,168, does not fit and is reported not scored. The freeze would then refuse
+    (`harness/blind_baseline.py`, unscored criteria). Only `preflight` and `assess` take this flag.
+  - `freeze`, `compare`, `review`, `diff` and the receipt validator take neither flag.
+  - The rehearsal did not catch either, because the eleven-page fixture fits both defaults.
+  - A larger criterion input raises the criterion calls' input tokens. The W08 cost reads the preflight made with
+    both flags, so it includes this.
+- **V14-F8. The preflight's two remaining flags are explained, and neither blocks.** In the code, `assess` checks
+  the preflight's parameters and pack set, not its flags, and the freeze does not read them (Inferred from the code;
+  not run with a flagged preflight).
+  - **Tables: 250 rows rendered and parsed, against 275 in the import manifest.** The operator explains the gap of
+    25 by rows on pages 1–4, which lie outside the declared page map (operator's count: `<rows on pages 1–4>`, to
+    be reported). The map is the original's configuration, so these rows are outside the assessed sections by
+    declaration, not lost by the extraction.
+  - **Word scan: 111 hits.** The scan is the instance-one leak scan (`harness/evidence_preflight.py`), built to
+    keep instance-one names out of a sanitised tree. Here it runs over the private, unsanitised root of the real
+    original, so hits are expected and do not indicate a leak into the assessment. Only the count is recorded.
+    The preflight report lists up to 50 hits by path, line and noun, so it stays private: H09 returns no
+    preflight report, only its whitelisted metadata.
 
 Measured and found clear:
 
