@@ -1,0 +1,344 @@
+{
+  "generated_utc": "2026-11-12T11:46:01Z",
+  "account": "797661577394",
+  "region": "eu-north-1",
+  "plan": {
+    "type": "FREE",
+    "status": "ACTIVE",
+    "credits_remaining_usd": 199.19,
+    "expires": "2027-04-19T09:00:47.635000+00:00"
+  },
+  "budgets": [
+    {
+      "name": "My Monthly Cost Budget",
+      "limit": "10.0",
+      "spend": "0.523"
+    }
+  ],
+  "month_to_date": {
+    "period": "2026-11-01 to 2026-11-12",
+    "usage": {
+      "by_service_usd": {
+        "AWS CloudFormation": 0.0,
+        "AWS CloudTrail": 0.0,
+        "AWS Glue": 0.0,
+        "AWS Key Management Service": 0.359722,
+        "AWS Secrets Manager": 0.145015,
+        "Amazon Simple Storage Service": 0.017625,
+        "Amazon Virtual Private Cloud": 2e-06,
+        "AmazonCloudWatch": 0.0,
+        "Claude Opus 4.6 (Amazon Bedrock Edition)": 0.000269
+      },
+      "total_usd": 0.522633
+    },
+    "credit": {
+      "by_service_usd": {
+        "AWS Key Management Service": -0.359723,
+        "AWS Secrets Manager": -0.145015,
+        "Amazon Simple Storage Service": -0.017625,
+        "Amazon Virtual Private Cloud": -2e-06,
+        "Claude Opus 4.6 (Amazon Bedrock Edition)": -0.000269
+      },
+      "total_usd": -0.522634
+    }
+  },
+  "funding": {
+    "approved_huf": "pending",
+    "approval_status": "pending: the ELTE IK financial office has not approved the reimbursement route (plans/aws_redeployment_handoff_2026-10-21.md, Funding). The figure of about 300,000 HUF is not an approved amount."
+  },
+  "hourly": {
+    "running_hour_usd": 0.154686,
+    "stopped_hour_usd": 0.063916,
+    "host_hour_usd": 0.09077,
+    "endpoints_hour_usd": 0.063,
+    "root_volume_hour_usd": 0.000916
+  },
+  "bedrock_models_seen": [
+    "eu.anthropic.claude-opus-4-6-v1"
+  ],
+  "creations": [
+    {
+      "change_set": "r11-create-01",
+      "start_utc": "2026-11-11T20:12:14Z",
+      "end_utc": "2026-11-11T20:50:13Z",
+      "open": false,
+      "hours": 0.633,
+      "stack_cost_usd_upper": 0.0979,
+      "tokens": {
+        "eu.anthropic.claude-opus-4-6-v1": {
+          "InputTokenCount": 0,
+          "OutputTokenCount": 0
+        }
+      },
+      "token_cost_usd": {
+        "eu.anthropic.claude-opus-4-6-v1": 0.0
+      }
+    },
+    {
+      "change_set": "r11-fix1-create-01",
+      "start_utc": "2026-11-11T21:03:42Z",
+      "end_utc": "2026-11-11T21:09:27Z",
+      "open": false,
+      "hours": 0.096,
+      "stack_cost_usd_upper": 0.0148,
+      "tokens": {
+        "eu.anthropic.claude-opus-4-6-v1": {
+          "InputTokenCount": 14,
+          "OutputTokenCount": 7
+        }
+      },
+      "token_cost_usd": {
+        "eu.anthropic.claude-opus-4-6-v1": 0.000269
+      }
+    },
+    {
+      "change_set": "r11-create-02",
+      "start_utc": "2026-11-11T21:51:19Z",
+      "end_utc": "2026-11-11T21:55:18Z",
+      "open": false,
+      "hours": 0.066,
+      "stack_cost_usd_upper": 0.0102,
+      "tokens": {
+        "eu.anthropic.claude-opus-4-6-v1": {
+          "InputTokenCount": 0,
+          "OutputTokenCount": 0
+        }
+      },
+      "token_cost_usd": {
+        "eu.anthropic.claude-opus-4-6-v1": 0.0
+      }
+    },
+    {
+      "change_set": "r12b-create-01",
+      "start_utc": "2026-11-11T23:36:41Z",
+      "end_utc": "2026-11-11T23:41:22Z",
+      "open": false,
+      "hours": 0.078,
+      "stack_cost_usd_upper": 0.0121,
+      "tokens": {
+        "eu.anthropic.claude-opus-4-6-v1": {
+          "InputTokenCount": 0,
+          "OutputTokenCount": 0
+        }
+      },
+      "token_cost_usd": {
+        "eu.anthropic.claude-opus-4-6-v1": 0.0
+      }
+    },
+    {
+      "change_set": "r12b-create-02",
+      "start_utc": "2026-11-12T00:34:47Z",
+      "end_utc": "2026-11-12T00:42:17Z",
+      "open": false,
+      "hours": 0.125,
+      "stack_cost_usd_upper": 0.0193,
+      "tokens": {
+        "eu.anthropic.claude-opus-4-6-v1": {
+          "InputTokenCount": 14,
+          "OutputTokenCount": 7
+        }
+      },
+      "token_cost_usd": {
+        "eu.anthropic.claude-opus-4-6-v1": 0.000269
+      }
+    }
+  ],
+  "creations_since_utc": "2026-08-14T11:46:01Z",
+  "prices": [
+    {
+      "name": "host_hour",
+      "usd": 0.09077,
+      "unit": "Hrs",
+      "sku": "3CSQPDBUPCZWNZ6M",
+      "usagetype": "EUN1-BoxUsage:c7i-flex.large",
+      "description": "$0.09077 per On Demand Linux c7i-flex.large Instance Hour",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-10",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/20261110173852/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/ec2/pricing/on-demand/",
+      "date_read": "2026-11-12"
+    },
+    {
+      "name": "gp3_gb_month",
+      "usd": 0.0836,
+      "unit": "GB-Mo",
+      "sku": "H33YTQG3Y9XKNSF3",
+      "usagetype": "EUN1-EBS:VolumeUsage.gp3",
+      "description": "$0.0836 per GB-month of General Purpose (gp3) provisioned storage - EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-10",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/20261110173852/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/ebs/pricing/",
+      "date_read": "2026-11-12"
+    },
+    {
+      "name": "endpoint_hour",
+      "usd": 0.0105,
+      "unit": "Hrs",
+      "sku": "RQDW4F29PDT7RYTA",
+      "usagetype": "EUN1-VpcEndpoint-Hours",
+      "description": "$0.01 per VPC Endpoint Hour",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-05",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonVPC/20261105181945/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/privatelink/pricing/",
+      "date_read": "2026-11-12"
+    },
+    {
+      "name": "endpoint_gb",
+      "usd": 0.01,
+      "unit": "GB",
+      "sku": "PUGDDHYKX88JEKYR",
+      "usagetype": "EUN1-VpcEndpoint-Bytes",
+      "description": "$0.01 per GB for upto 1 PB monthly data processed by VPC Endpoints",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-05",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonVPC/20261105181945/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/privatelink/pricing/",
+      "date_read": "2026-11-12",
+      "tier_note": "first of 3 tiers, up to 1048576 GB per month"
+    },
+    {
+      "name": "kms_key_month",
+      "usd": 1.0,
+      "unit": "Keys",
+      "sku": "FJZGZWXK3EGTGQXE",
+      "usagetype": "eu-north-1-KMS-Keys",
+      "description": "$1 per customer managed KMS key version in EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-08",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/awskms/20261108172342/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/kms/pricing/",
+      "date_read": "2026-11-12"
+    },
+    {
+      "name": "kms_request",
+      "usd": 3e-06,
+      "unit": "Requests",
+      "sku": "2S77H5MZU5BVWEXS",
+      "usagetype": "eu-north-1-KMS-Requests",
+      "description": "$0.03 per 10000 KMS requests in EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-08",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/awskms/20261108172342/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/kms/pricing/",
+      "date_read": "2026-11-12"
+    },
+    {
+      "name": "secret_month",
+      "usd": 0.4,
+      "unit": "Secrets",
+      "sku": "CMSG8A9ZU2DMCFPE",
+      "usagetype": "EUN1-AWSSecretsManager-Secrets",
+      "description": "$0.40 per Secret",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-11",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSSecretsManager/20261111195606/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/secrets-manager/pricing/",
+      "date_read": "2026-11-12"
+    },
+    {
+      "name": "logs_ingest_gb",
+      "usd": 0.54,
+      "unit": "GB",
+      "sku": "2WXCZPMH3FF7XAAZ",
+      "usagetype": "EUN1-DataProcessing-Bytes",
+      "description": "$0.54 per GB custom log data ingested in Standard log class - EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-04",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonCloudWatch/20261104213532/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/cloudwatch/pricing/",
+      "date_read": "2026-11-12"
+    },
+    {
+      "name": "logs_storage_gb_month",
+      "usd": 0.028,
+      "unit": "GB-Mo",
+      "sku": "FC3W9RUMP83VDX52",
+      "usagetype": "EUN1-TimedStorage-ByteHrs",
+      "description": "$0.028 per GB-mo of log storage - EU (Stockholm)",
+      "effective_date": "2026-11-01",
+      "publication_date": "2026-11-04",
+      "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonCloudWatch/20261104213532/eu-north-1/index.json",
+      "page_url": "https://aws.amazon.com/cloudwatch/pricing/",
+      "date_read": "2026-11-12"
+    }
+  ],
+  "bedrock_prices": {
+    "eu.anthropic.claude-opus-4-6-v1": {
+      "input": {
+        "usd": 5.5,
+        "unit": "1M tokens",
+        "sku": "7NKGWNR398YVU3CF",
+        "usagetype": "EUN1-MP:EUN1_InputTokenCount-Units",
+        "description": "AWS Marketplace software usage|eu-north-1|Million Input Tokens Regional",
+        "effective_date": "2026-09-01",
+        "publication_date": "2026-11-09",
+        "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrockFoundationModels/20261109224312/eu-north-1/index.json",
+        "page_url": "https://aws.amazon.com/bedrock/pricing/",
+        "date_read": "2026-11-12",
+        "per_tokens": 1000000
+      },
+      "output": {
+        "usd": 27.5,
+        "unit": "1M tokens",
+        "sku": "DZUK32YQGNM9S5QK",
+        "usagetype": "EUN1-MP:EUN1_OutputTokenCount-Units",
+        "description": "AWS Marketplace software usage|eu-north-1|Million Response Tokens Regional",
+        "effective_date": "2026-09-01",
+        "publication_date": "2026-11-09",
+        "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrockFoundationModels/20261109224312/eu-north-1/index.json",
+        "page_url": "https://aws.amazon.com/bedrock/pricing/",
+        "date_read": "2026-11-12",
+        "per_tokens": 1000000
+      }
+    },
+    "eu.anthropic.claude-sonnet-4-6": {
+      "input": {
+        "usd": 3.3,
+        "unit": "1M tokens",
+        "sku": "8PYZ3HZ8YF4WUEJM",
+        "usagetype": "EUN1-MP:EUN1_InputTokenCount-Units",
+        "description": "AWS Marketplace software usage|eu-north-1|Million Input Tokens Regional CRIS",
+        "effective_date": "2026-09-01",
+        "publication_date": "2026-11-09",
+        "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrockFoundationModels/20261109224312/eu-north-1/index.json",
+        "page_url": "https://aws.amazon.com/bedrock/pricing/",
+        "date_read": "2026-11-12",
+        "per_tokens": 1000000
+      },
+      "output": {
+        "usd": 16.5,
+        "unit": "1M tokens",
+        "sku": "MG9KYTFRERE8WVUC",
+        "usagetype": "EUN1-MP:EUN1_OutputTokenCount-Units",
+        "description": "AWS Marketplace software usage|eu-north-1|Million Response Tokens Regional CRIS",
+        "effective_date": "2026-09-01",
+        "publication_date": "2026-11-09",
+        "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrockFoundationModels/20261109224312/eu-north-1/index.json",
+        "page_url": "https://aws.amazon.com/bedrock/pricing/",
+        "date_read": "2026-11-12",
+        "per_tokens": 1000000
+      }
+    }
+  },
+  "assumptions": {
+    "hours_per_month": {
+      "value": 730,
+      "source": "Assumed: the AWS convention of 730 hours per month, as used by the AWS Pricing Calculator; not read from a page in R14"
+    },
+    "root_volume_gb": {
+      "value": 8,
+      "source": "evidence_v2/R11/R11_09_root-volume.json (size 8)"
+    },
+    "interface_endpoints": {
+      "value": 6,
+      "source": "deploy/aws/templates/90-host.yaml (six VpcEndpointType Interface)"
+    }
+  },
+  "notes": [
+    "stack_cost_usd_upper prices every hour of a creation as running; stopped hours cost less.",
+    "Token counts come from the AWS/Bedrock CloudWatch metrics, summed over 5-minute periods that cover the creation.",
+    "The monthly KMS key and secret charges are base costs, not per creation."
+  ]
+}
