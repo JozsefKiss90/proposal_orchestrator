@@ -186,7 +186,7 @@ Get-ChildItem "$E\V14_H01_*" | ForEach-Object { "== $($_.Name)"; Get-Content $_.
 | `V14_H01_plan-state.json` | `ACTIVE`; credits recorded |
 | `V14_H01_budgets.json`, `V14_H01_budget-notifications.json` | One budget, limit `10.0`; three notifications, none in `ALARM` |
 | `V14_H01_caller-identity.json` | Account `797661577394`, role `AccountFullAccessRole` |
-| `V14_H01_session-preferences.json` | `document` `absent`, or present with `s3BucketName` and `cloudWatchLogGroupName` empty and `cloudWatchStreamingEnabled` false or empty (V14-OP4, OP8). Only these fields are saved |
+| `V14_H01_session-preferences.json` | `document` `absent` with `invalid_document` true (any other failure, such as an expired session, is not absence: rerun), or present with `s3BucketName` and `cloudWatchLogGroupName` empty and `cloudWatchStreamingEnabled` false or empty (V14-OP4, OP8). Only these fields are saved |
 | `V14_H01_host-stack-before.txt` | `does not exist`; `exit=254` |
 | `V14_H01_bundles-before.json` | The O5 tarball and its `.sha256` under `bundles/msca-dn-freeze-2026-11-12/`; no `input-…` key |
 
