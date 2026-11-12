@@ -124,13 +124,12 @@ The scripts for these steps are written after W08, before the go. Each returns k
 | H05 | The readiness receipt (runbook §1.1), with `--expect-profile` the historical profile | runbook §1.1 |
 | H06 | Preflight, assess (45 calls), freeze, each with `--repo-root <host private root>`. The checkpoint and provenance stay under that root | OP5, REHEARSAL.md |
 | H07 | End of a sitting: stop the instance; next sitting: start it. Stopped cost 0.063916 USD per hour | OP3, D1 |
-| H08 | After the freeze: upload the ESR record in its own neutral archive by the same route; sha256 `5c9b9c8e…` checked; versions deleted. Audit, compare, review and diff on the host. You write the dispositions and notes in an interactive session | OP1, OP4 |
+| H08 | After the freeze: upload the ESR record in its own neutral archive by the same route; sha256 `5c9b9c8e…` checked; versions deleted. Audit, then the first comparison by route (iii): no `fidelity_to_submitted_original` block, such misses `Inferred`. Review it. You write the dispositions and notes in an interactive session | OP1, OP4, OP9 |
+| H08b | Only for misses whose diagnosis needs `Confirmed`: finish all work that reads the first comparison (F6). On the workstation, write the declaration input and re-render with the W05 line; `--check` first must name the register alone. Ship the register in a second neutral archive (OP1 route, sha256, versions deleted). On the host: the successor audit, successor dispositions (`supersedes` the first), `compare`, `review`; `diff` only among comparisons over the new register | OP9, REHEARSAL.md R14–R22 |
 | H09 | Return to the repository: metadata, numeric scores and spreads only, through a whitelisting script | OP2 |
 | H10 | CloudTrail: the Converse events (as R15 step 15), and the `StartSession` events, which show no document name, so each session used the default document | OP8, DC-26 |
-| H11 | At final teardown only: check the volume for credential material (counts only); snapshot the root volume, encrypted; show it is private (no `createVolumePermission`); tag and record the deletion date you give. Then the R15 step 14 teardown | OP7, D1 |
+| H11 | At final teardown only: check the volume for credential material (counts only); snapshot the root volume, encrypted; show it is private (no `createVolumePermission`); tag it with its deletion date: 2027-03-31 while V16 is unconfirmed, re-tagged to 30 days after V16's confirmation if earlier. Then the R15 step 14 teardown | OP7, D1 |
 
 ## Open before the go
 
-- **V14-F5.** How the register gets its `fidelity_to_submitted_original` declarations (RUNLOG.md).
-- **OP7.** The snapshot's deletion date.
-- **The cost.** From W08.
+- **The cost.** From W08. V14-F5 and the OP7 date are settled (V14-OP9, V14-OP7).

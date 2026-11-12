@@ -1348,6 +1348,12 @@ to accept the frozen 2025 baseline, and no V15 criterion depends on it.
 
 ## V16 — Stage B lane: the 2026 candidate, profile and scoring process
 
+> **Note (V14-F3, 2026-11-12).** At the freeze tag, runbook §8's import line
+> (`py -3.10 -m tools.import_external_proposal --document resubmission_2026 …`) refuses: run as `__main__`, the
+> importer's run-time revision is invisible to the register renderer's second import of the module. Use the
+> in-process form of `docs/infrastructure_security/evidence_v2/V14/STEPS.md` W05 with
+> `--document resubmission_2026`. The fix lands on `harness_overhaul` after V16 (O5).
+
 **Blocked by:** V15.
 
 **What to build.** The revised proposal is assessed as a new candidate under its own applicable profile,

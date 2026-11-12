@@ -6,7 +6,7 @@
 | Run by / on | agent (Claude) / 2026-11-12, workstation, Python 3.10.6, PyMuPDF 1.28.2 |
 | Model calls | None. `assess` ran with `boto3.client` replaced by a scripted Converse client (`rehearsal/trace_run.py --fake-converse`) |
 | AWS calls | None |
-| Proposal content | None. §4 and §5 ran over an invented eleven-page Part B. §6 ran over committed public artifacts, read by the commands only; the agent printed exit codes, hashes, counts and paths |
+| Proposal content | None. §4 and §5 ran over an invented eleven-page Part B. Route (ii) used the ESR record's observation ids only, with synthetic dispositions (`rehearsal/synth_dispositions.py`). §6 ran over committed public artifacts, read by the commands only; the agent printed exit codes, hashes, counts and paths |
 | Scripts | `rehearsal/` (this folder). Traces stayed in the session scratchpad; this record carries what they showed |
 
 ## Trees
@@ -77,6 +77,29 @@ The cost statement assumed 4,000 tokens per call. `workstation/v14_cost.py` uses
 
 - `compare`, `review` and `diff` under the historical profile. They need private dispositions and notes. R8 covers
   their code paths under the 2026 profile. The historical profile adds only the files R6 found (Inferred).
-- The register re-render after the operator edits the declaration input (runbook §6). It runs `tools/` code and
-  re-extracts the PDF, so it can only run on the workstation (V14-F5).
+- The register re-render was rehearsed after the operator's V14-F5 answer: see "Route (ii)" below.
 - The readiness receipt (runbook §1.1) for V14. Its host scripts are written with the host steps.
+
+## Route (ii): the register re-rendered after the freeze
+
+Asked by the operator, 2026-11-12, with the V14-F5 answer. Host side: a copy of the R12 root (unpacked archive,
+frozen baseline, first audit), with the committed ESR record placed at its repository path, as H08 will. Workstation
+side: a copy of the R11 root. The bundle-only tree for every host command; the freeze worktree for the re-render.
+
+| # | Run | Result |
+|---|---|---|
+| R14 | First comparison (route iii): 29 synthetic rows; the miss `ESR-E-01` declared `evidence_preserved_status: Inferred`, no declaration | `compare` exit 1 (advisory flag); E-01 `Inferred` |
+| R15 | Workstation: a declaration input at `private/msca_dn_original/declarations/as_submitted_v1.json` with a `fidelity_to_submitted_original` block for 1.1; importer `--check`, then the in-process import (STEPS.md W05 form) | `--check`: exactly one file would change, the register. The import wrote that one file. Every other file under the root, the document version, the manifest and the candidate included, is byte-identical. The freeze worktree stayed clean |
+| R16 | The new register copied into the host root. Successor dispositions: E-01 `Confirmed`, citing `declared/sub_sections/1.1/fidelity_to_submitted_original`, `supersedes` the first | `compare` exit 1 (the same advisory flag); E-01 `Confirmed`; baseline `b9b85763…` in both comparisons; register `938cca93…` then `e0ccd3b3…`. It ran against the first audit, made over the old register |
+| R17 | Control: the same Confirmed dispositions against the old register | Refused, exit 2: `register pointer 'declared/sub_sections/1.1/fidelity_to_submitted_original': position #1.1 is outside a list of 0` |
+| R18 | A successor audit over the new register | Exit 1 (advisory); `baseline: bound - candidate hash and snapshot id equal the frozen baseline's` |
+| R19 | `compare` again, citing the successor audit | Exit 1; written |
+| R20 | `diff` first comparison → successor | **Refused**, exit 2: `the fidelity register moved after the comparison was written` (V14-F6) |
+| R21 | `diff` between the two comparisons over the new register (R16 → R19) | Exit 0 |
+| R22 | The frozen baseline's two files and the blind report, sha256 before R16 and after R21 | Unchanged |
+
+**Answer.** Yes. A register re-rendered after the freeze loads against the frozen baseline. The re-render changes
+the register alone, so the candidate hash and snapshot id the freeze bound do not move. `compare` binds the
+successor dispositions to the same baseline, and a successor audit reports itself bound. What does not carry
+across the swap is `diff` from the route (iii) comparison, because it re-hashes the register that comparison
+recorded (V14-F6).

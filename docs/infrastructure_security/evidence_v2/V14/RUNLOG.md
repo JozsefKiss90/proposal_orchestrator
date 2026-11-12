@@ -16,6 +16,8 @@
 | 2026-11-12 | operator | V14-OP1 to V14-OP4 below, in session |
 | 2026-11-12 | agent | V14-F1 and V14-F2 measured. Cost statement written (below). No go given |
 | 2026-11-12 | operator | V14-OP6 to V14-OP8 below, in session. Then the operator does the real import and the workstation preflight |
+| 2026-11-12 | operator | V14-F5 answered, OP7 date given, V14-A1 accepted, V14-F3 to be noted for V16, in session. The operator runs W01–W08 next |
+| 2026-11-12 | agent | Route (ii) rehearsed (`REHEARSAL.md` R14–R22): the re-rendered register loads against the frozen baseline. V14-F6 found |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -39,14 +41,21 @@
   operator gives. No IAM change.
 - **V14-OP8. Session logging.** The step that reads the account's session preferences is accepted. Sessions use
   the default document only.
+- **V14-OP9. The register's declarations (answers V14-F5).** Route (iii) for the first comparison: no
+  `fidelity_to_submitted_original` block, so such misses stand `Inferred`. Route (ii) as its successor, only for
+  misses whose diagnosis needs `Confirmed`: declare and re-render on the workstation, ship the register in a second
+  inbound archive by the V14-OP1 route. Not route (i): declaring before packing would put ESR material in the root
+  before the freeze.
+- **V14-OP7, date.** Delete the snapshot 30 days after V16 is confirmed, and no later than 2027-03-31. The
+  snapshot carries that date as a tag. While V16 is unconfirmed the tag reads 2027-03-31; when V16 is confirmed the
+  agent computes the earlier date and the operator re-tags it.
 
 ### Agent decision
 
 - **V14-A1. The archive holds less than the whole private root.** The rehearsal ran the host chain on a root
   without the PDF, the dry-import records and the configuration input: same exits, same pack set (REHEARSAL.md R9,
   R10, R12). So `v14_pack.py` ships the workspace, the register and the supplement, and refuses a PDF or a
-  dry-import record. The original's PDF never reaches the host. Open to change: the operator can ask for the whole
-  root.
+  dry-import record. The original's PDF never reaches the host. **Accepted** by the operator, 2026-11-12.
 
 ### Deviation
 
@@ -79,7 +88,9 @@
   registry lacks the revision declared at run time, so the import refuses: `revision 'as_submitted_v1' belongs to
   no declared document`. It writes `sources.json` first. The test suite calls the importer in-process and never
   sees this. For V14, `STEPS.md` W05 calls the same code in-process, so nothing is built from `harness_overhaul`
-  (O5). The fix belongs to `harness_overhaul` after V16.
+  (O5). The fix belongs to `harness_overhaul` after V16. **Noted for V16** (operator, 2026-11-12): its stage-B
+  import (runbook §8) has the same line, so V16 uses the same in-process form with
+  `--document resubmission_2026`; the note sits on the V16 ticket.
 - **V14-F4. `diff` loads the repository default profile.** It reads `harness/profiles/msca_pf_default.json`, its
   scorecard and its rubrics under `--repo-root`, whatever profile the two comparisons used. Covered by the
   supplement. Whether `diff`'s output depends on that profile is not checked (Unresolved).
@@ -88,7 +99,16 @@
   Re-rendering the register runs `tools/` code and re-extracts the PDF, and the host has neither. To decide before
   the go: (i) declare on the workstation before packing, since the ESR's observation ids are public;
   (ii) re-render on the workstation after reading the comparison, and ship the register in a second inbound
-  archive; or (iii) leave such misses `Inferred`, which `compare` accepts without the block.
+  archive; or (iii) leave such misses `Inferred`, which `compare` accepts without the block. **Answered** by
+  V14-OP9: (iii), then (ii) as successor. Route (ii) rehearsed: REHEARSAL.md R14–R22.
+- **V14-F6. `diff` does not cross a register swap.** `diff` re-hashes the register each comparison recorded. After
+  route (ii) replaces the register in place, the route (iii) comparison no longer matches it, and `diff` from it
+  refuses: `the fidelity register moved after the comparison was written` (REHEARSAL.md R20). `diff` between two
+  comparisons over the new register works (R21). Consequence for the step sheet: finish everything that reads the
+  first comparison (its `review`, and any `diff` among route (iii) comparisons) before the new register goes in, and
+  read the first comparison against its successor by observation id, by hand, as runbook §6 already does across
+  baselines. `review` of the first comparison after the swap was not run; it re-resolves the same references, so it
+  is expected to refuse too (Inferred).
 
 Measured and found clear:
 
