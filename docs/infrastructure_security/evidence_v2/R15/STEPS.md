@@ -35,7 +35,7 @@
 Nothing in round 0 touches the bundle, the tag or `msca-dn-pre-eval`. The scripts run on the host
 against the installed bundle; they are not part of it.
 
-## Points for the operator to settle (answers recorded in `RUNLOG.md` before round 0)
+## Points for the operator to settle (accepted 2026-11-12; recorded in `RUNLOG.md`)
 
 1. **How commands reach the host.** The agent proposes Run Command for every host step, sent by
    `host-run.ps1` from the workstation, as at R11, R12b and R14 step 08. Every output then lands in an
@@ -200,7 +200,7 @@ $T = "tests/test_aws_host_lifecycle_scripts.py tests/runner/test_offline_bundle.
 Get-Content "$E\R15_03_bundle.txt", "$E\R15_03_old-id-guard.txt"; Get-Content "$E\R15_03_pytest.txt" -Tail 1; Get-Content "$E\R15_03_ps-plan.txt" -Tail 3
 ```
 
-The sender's own test file joins `$T` at round 0; the agent states the final list and count then.
+Step 03 ran before round 0 (R15-D1) and gave `258 passed, 1 skipped`. Round 0 added `tests/test_aws_host_run_script.py` (31 tests); the full list gives `289 passed, 1 skipped` (step 16).
 
 | Evidence file | PASS criterion |
 |---|---|
@@ -456,7 +456,7 @@ $raw = $null; $sel = $null
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\R15"
-$T = "<the list the agent states at round 0>".Split(" ")
+$T = "tests/test_aws_host_lifecycle_scripts.py tests/runner/test_offline_bundle.py tests/harness/test_converse_smoke.py tests/test_anonymisation_host_runbook.py tests/tools/test_collect_evidence_v2.py tests/test_evidence_protocol_scaffold.py tests/test_aws_host_run_script.py".Split(" ")
 & { py -3.10 --version; py -3.10 -m pytest -q @T } 2>&1 | Out-File -Encoding utf8 "$E\R15_16_pytest.txt"
 & { py -3.10 -m tools.old_id_guard; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R15_16_old-id-guard.txt"
 & { py -3.10 -m tools.evidence_secret_scan $E; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R15_16_secret-scan.txt"

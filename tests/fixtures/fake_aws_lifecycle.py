@@ -33,8 +33,14 @@ def main(argv: list[str]) -> int:
     if os.path.exists(log_path):
         with open(log_path, encoding="utf-8") as handle:
             seen = sum(1 for line in handle if json.loads(line)["lookup"] == lookup)
+    # A file:// argument is read at call time, as the real CLI reads it (the R15 sender deletes it after).
+    files = {}
+    for arg in args:
+        if arg.startswith("file://") and os.path.isfile(arg[7:]):
+            with open(arg[7:], "rb") as handle:
+                files[arg] = handle.read().decode("utf-8", "replace")
     with open(log_path, "a", encoding="utf-8") as handle:
-        handle.write(json.dumps({"argv": args, "lookup": lookup}) + "\n")
+        handle.write(json.dumps({"argv": args, "lookup": lookup, "files": files}) + "\n")
 
     answers = scenario.get(lookup) or [{"out": "", "rc": 0}]
     answer = answers[min(seen, len(answers) - 1)]
