@@ -33,7 +33,7 @@ from `R12b_outputs.json` (the fix-1 creation); base ids from `R4_outputs.json`â€
 | F09 | F7: `403`, `AccessDenied`, names the VPC endpoint policy | `R12b_09_collector/DC-05_host-f7-presigned-put.json` | **FAIL (inconclusive)** | `http_status=404`, `NoSuchBucket`, `message_names_vpc_endpoint_policy=no`: S3 answered for a bucket that does not exist before the endpoint policy refused. F7 stays open; retest in the next host session (operator, 2026-11-12; R12b-D9) |
 | F10 | Delete; nothing left; base stacks unchanged | `R12b_fix1_10_*` | PASS | `delete exit=0`; stack absent; no ENI, instance or project volume; base stacks equal step 02; URL file removed |
 | F11 | CloudTrail `Converse` event, metadata only (DC-26) | `R12b_fix1_11_*` | PASS | One event at 00:42:02Z, `eu-north-1`, `AssumedRole`, caller the runtime role with the host's session, issuer `RuntimeRoleArn`, `vpcEndpointId` = `BedrockRuntimeEndpointId` of `R12b_outputs.json`, model `eu.anthropic.claude-opus-4-6-v1`, no error; only the listed fields |
-| 12 | Tests, guards, scan last | `R12b_12_*` | Pending | After this report |
+| 12 | Tests, guards, scan last | `R12b_12_*` | Pending | After this report. Expected: `346 passed, 1 skipped` (agent run 2026-11-12; the skip is the symlink case) |
 
 ## DC-39 document review (point 8)
 
