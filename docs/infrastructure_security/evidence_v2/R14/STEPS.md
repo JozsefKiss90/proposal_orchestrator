@@ -19,7 +19,7 @@ are exact.
 
 | File | What it does |
 |---|---|
-| `deploy/aws/scripts/host-lifecycle.ps1` | PowerShell form. `-Action start`, `stop`, `teardown` or `plan`; `-Profile`, `-OutDir`, `-Prefix`. Writes `<Prefix>_<name>` files into `-OutDir` |
+| `deploy/aws/scripts/host-lifecycle.ps1` | PowerShell form. `-Action start`, `stop`, `teardown` or `plan`; `-AwsProfile` (`$Profile` is a reserved PowerShell variable), `-OutDir`, `-Prefix`. Writes `<Prefix>_<name>` files into `-OutDir` |
 | `deploy/aws/scripts/host-lifecycle.sh` | CloudShell form. `start`, `stop`, `teardown` or `check`, then `<outdir> <prefix>`. Same files and checks; no profile (CloudShell uses the console session). Reads `90-host.yaml` and `host.json` from its own folder |
 | `tools/aws_cost_check.py` | `prices` captures unit prices from the AWS Price List API. `report` writes the weekly cost check |
 | `deploy/aws/pricing/eu-north-1.json` | Unit prices, each with its price-list SKU, the public pricing page URL and the date read. Built by the agent from step 04 |
@@ -188,7 +188,7 @@ Get-ChildItem "$E\R14_02_*" | ForEach-Object { "== $($_.Name)"; Get-Content $_.F
 
 ### Step 03 — Workstation checks and both scripts in plan mode (no AWS call)
 
-The plan modes print every command the scripts would run. They call nothing.
+The plan mode prints every AWS command the PowerShell script can run. It calls nothing and writes nothing. The lifecycle tests run both forms against a fake CLI and take about two minutes.
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\R14"
@@ -197,7 +197,7 @@ $E = "docs\infrastructure_security\evidence_v2\R14"
 & { py -3.10 -m tools.old_id_guard; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R14_03_old-id-guard.txt"
 $T = "tests/test_aws_iac_contract.py tests/test_aws_template_guard.py tests/test_aws_host_template.py tests/test_old_id_guard.py tests/test_aws_host_lifecycle_scripts.py tests/tools/test_aws_cost_check.py tests/test_evidence_protocol_scaffold.py".Split(" ")
 & { py -3.10 --version; py -3.10 -m pytest -q @T } 2>&1 | Out-File -Encoding utf8 "$E\R14_03_pytest.txt"
-& { powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action plan -Profile po-r1 -OutDir $E -Prefix R14_03; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R14_03_ps-plan.txt"
+& { powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action plan -AwsProfile po-r1 -OutDir $E -Prefix R14_03; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\R14_03_ps-plan.txt"
 Get-Content "$E\R14_03_cfn-lint.txt", "$E\R14_03_template-guard.txt", "$E\R14_03_old-id-guard.txt"; Get-Content "$E\R14_03_pytest.txt" -Tail 1; Get-Content "$E\R14_03_ps-plan.txt" -Tail 3
 ```
 
@@ -207,7 +207,7 @@ Get-Content "$E\R14_03_cfn-lint.txt", "$E\R14_03_template-guard.txt", "$E\R14_03
 | `R14_03_template-guard.txt` | `CLEAN: 6 template(s): …`; `exit=0` |
 | `R14_03_old-id-guard.txt` | `CLEAN: …`; `exit=0` |
 | `R14_03_pytest.txt` | First line `Python 3.10.…`; last line the count the agent states at the end of round 0; no `failed` or `error` |
-| `R14_03_ps-plan.txt` | Last line `exit=0`; every `aws` line names `--profile po-r1` and `--region eu-north-1`; the stack name is `proposal-orchestrator-host` only; no `delete-stack` of any other stack |
+| `R14_03_ps-plan.txt` | Last line `exit=0`; every `aws` line ends `--region eu-north-1 --profile po-r1`; the one `delete-stack` line names `proposal-orchestrator-host` |
 
 **STOP rule.** Any non-zero exit or failed test: stop.
 
@@ -269,7 +269,7 @@ tar -xzf "$env:USERPROFILE\Downloads\r14.tar.gz" -C $E; Get-Content "$E\R14_06_c
 
 | Evidence file | PASS criterion |
 |---|---|
-| `R14_06_check.txt` | `aws-cli/2.…`; caller account `797661577394`; the SHA-256 of the three uploaded files equals the values the agent states at the end of round 0; `RESULT=ready` |
+| `R14_06_check.txt` | `cli=aws-cli/2.…`; `caller_account=797661577394`; `region=eu-north-1`; `sha256_script`, `sha256_template`, `sha256_parameters` equal the values the agent states at the end of round 0; last line `RESULT=ready` |
 
 **STOP — hand back here (end of round 2).** The agent states the expected cost of round 3 from
 `report.json`: two creations, the planned hours per state and the token use of one F7 check (none).
@@ -283,7 +283,7 @@ You give or withhold the go. The agent records it in `RUNLOG.md` before step 07.
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\R14"
-powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action start -Profile po-r1 -OutDir $E -Prefix R14_07
+powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action start -AwsProfile po-r1 -OutDir $E -Prefix R14_07
 ```
 
 | Evidence file | PASS criterion |
@@ -347,13 +347,14 @@ records it and the operator decides.
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\R14"
-powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action stop -Profile po-r1 -OutDir $E -Prefix R14_09
+powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action stop -AwsProfile po-r1 -OutDir $E -Prefix R14_09
 ```
 
 | Evidence file | PASS criterion |
 |---|---|
 | `R14_09_log.txt` | Start and end UTC; last line `RESULT=stopped` |
-| `R14_09_instance.json` | `state` `stopped`; root volume `in-use` |
+| `R14_09_instance.json` | `state` `stopped` |
+| `R14_09_volumes.json` | One gp3 volume, `in-use` |
 | `R14_09_vpc-endpoints.json` | Seven endpoints `available` (six interface, the S3 gateway): they still cost |
 
 ### Step 10 — Creation A: CloudShell start, resume path
@@ -386,7 +387,9 @@ Download and unpack as in step 06. Write the delete time (UTC) in `RUNLOG.md`.
 |---|---|
 | `R14_11_log.txt` | `confirmed=delete`; last line `RESULT=deleted` |
 | `R14_11_host-stack-after.txt` | `does not exist` |
-| `R14_11_after.json` | No interface endpoint, no endpoint network interface, no instance, no project volume; the five base stacks as `R14_02_base-stacks.json` |
+| `R14_11_after-vpc-endpoints.json` | Only the S3 gateway endpoint |
+| `R14_11_after-network-interfaces.json`, `R14_11_after-instances.json`, `R14_11_after-volumes.json` | `[]` |
+| `R14_11_after-base-stacks.json` | The five base stacks as `R14_02_base-stacks.json`; the log shows `base_stacks_complete=5` |
 
 ### Step 12 — Creation B: CloudShell start, create path (hourly charges start again)
 
@@ -413,7 +416,7 @@ Type `start` when the script asks.
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\R14"
-powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action start -Profile po-r1 -OutDir $E -Prefix R14_14
+powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action start -AwsProfile po-r1 -OutDir $E -Prefix R14_14
 ```
 
 Criteria: as step 10 with `R14_14_*`, and the same `InstanceId` as `R14_12_outputs.json`.
@@ -424,7 +427,7 @@ Type `delete` when the script asks. Write the delete time (UTC) in `RUNLOG.md`.
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\R14"
-powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action teardown -Profile po-r1 -OutDir $E -Prefix R14_15
+powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action teardown -AwsProfile po-r1 -OutDir $E -Prefix R14_15
 ```
 
 Criteria: as step 11 with `R14_15_*`. From here nothing billable by the hour exists.

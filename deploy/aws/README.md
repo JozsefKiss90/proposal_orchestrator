@@ -55,6 +55,19 @@ Checked by `tools/aws_template_guard.py` (and `tests/test_aws_template_guard.py`
   `${AWS::Region}` and `${AWS::AccountId}`.
 - Each template stays under 51,200 bytes, so `--template-body` works without a staging bucket.
 
+## Operating the host stack (R14)
+
+`scripts/host-lifecycle.ps1` (workstation) and `scripts/host-lifecycle.sh` (CloudShell) start, stop and
+tear down stack 6. Both check the change set before anything is created, and wait for a typed word
+before creating, resuming or deleting. Stop leaves the six interface endpoints and the root volume,
+which still cost. Both are pinned by `tests/test_aws_host_lifecycle_scripts.py`; the step sheet is
+`docs/infrastructure_security/evidence_v2/R14/STEPS.md`.
+
+`tools/aws_cost_check.py` is the weekly cost check. It reads unit prices from `pricing/eu-north-1.json`
+(each price cites its pricing page and the date read) and the approved HUF amount from
+`pricing/budget.json` (none until ELTE approves). Leaving the Free plan follows
+`docs/infrastructure_security/aws_od10_upgrade_checklist.md`, operator only.
+
 No old-account id may appear anywhere in this folder. This is checked by `tools/old_id_guard.py`
 (and `tests/test_old_id_guard.py`).
 
