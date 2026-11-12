@@ -1,0 +1,57 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-refreeze-o5_2026-11-12",
+  "date": "2026-11-12",
+  "branch": "msca-dn-pre-eval",
+  "milestone": "Overhaul 2026-11 and MSCA-DN historical validation",
+  "ticket": "O5 of .scratch/overhaul-2026-11/handoff-session-2026-11-11.md §4 (re-freeze, tag, bundle, sha256 record)",
+  "supersedes": "The tag msca-dn-freeze-2026-11-11 (6b1c2658). It stays as history; no bundle is built from it.",
+  "authority": "Agent-drafted under CLAUDE.md §9.4 from the operator's runs in session. Execution aid (CLAUDE.md §10.2). Closes no proposal gate and amends no constitutional rule.",
+  "review_state": "agent_recorded_from_operator_runs",
+  "decided_by": "The operator ran both rounds of .scratch/overhaul-2026-11/O5-refreeze-steps.md on 2026-11-12. The agent checked each result by script.",
+  "decision": "The code for V14 and V16 is frozen at tag msca-dn-freeze-2026-11-12, commit 17e32d54. The offline bundle built from that commit has sha256 9c5351ef709905c391fd82d06ccdacf1a806c255350241c6d88a21b4d0f2132a. From here until V16 is done, nothing for the runs is built from harness_overhaul.",
+  "freeze": {
+    "tag": "msca-dn-freeze-2026-11-12",
+    "tag_type": "annotated",
+    "tag_message": "Re-freeze O5: supersedes msca-dn-freeze-2026-11-11",
+    "commit": "17e32d54f2bd60c1d69d9a1b6caa8688c34f036e",
+    "commit_parents": ["6b1c2658f9c74e3ffa980d650cc25205572720e0", "3e66457c5987b1c3c013940be4605ee7e22b6f26"],
+    "tree": "1562a64b46f908e586a9f28407244dbcfda04431",
+    "tree_equals": "harness_overhaul at 3e66457c (same tree id; git diff --stat between the branches printed nothing, diff_lines=0)",
+    "branch": "msca-dn-pre-eval = 17e32d54 (git merge --no-ff harness_overhaul)"
+  },
+  "suite_and_lane": {
+    "revision": "3e66457c5987b1c3c013940be4605ee7e22b6f26",
+    "suite": "42 failed, 9,763 passed, 87 skipped (.scratch/overhaul-2026-11/suite-o5.txt, UTF-16, untracked)",
+    "suite_check": "Failed node ids compared by script with plans/overhaul/BASELINE.md §5 (the §4 list minus one, 42 ids): none new, none missing.",
+    "lane": "GREEN: 3,729 passed, 0 failed, 0 errors, 17 declared exclusions, 3,746 collected; exit=0 ($HOME\lane-o5.xml)",
+    "tree_after": "git status clean after both runs"
+  },
+  "bundle": {
+    "built_from": "worktree ..\freeze_bundle, detached at the tag; HEAD 17e32d54, git status empty",
+    "command": "py -3.10 -m runner.offline_bundle build --wheels $HOME\o5\wheels --interpreter $HOME\o5\downloads\cpython-3.11.16+20260929-x86_64-unknown-linux-gnu-install_only.tar.gz --out-dir $HOME\o5\out",
+    "tarball": "msca-dn-anonymisation-host.tar.gz (92,413,570 bytes), outside both checkouts",
+    "sha256": "9c5351ef709905c391fd82d06ccdacf1a806c255350241c6d88a21b4d0f2132a",
+    "sha256_check": "Printed by the build, equal to the .sha256 file beside the tarball, and recomputed by the agent.",
+    "manifest_sha256": "04f8218f5c5e715d91e9bcad5efbc654d005c57fd30e0ecc8265de8c0a2319dd (bundle_manifest.json beside the tarball)",
+    "repository_revision": "17e32d54f2bd60c1d69d9a1b6caa8688c34f036e",
+    "file_count": 299,
+    "wheels": 16,
+    "interpreter_sha256": "fbbfd0f2253996486455f44a28c09ac7e2df534b8a4835408d17c99d185b80ec, equal to the pin in deploy/offline_bundle.json"
+  },
+  "deviations": [
+    {
+      "id": "O5-1",
+      "declared_status": "Confirmed",
+      "what": "In round 2, Windows PowerShell read {commit} in `git rev-parse msca-dn-freeze-2026-11-12^{commit}` as a script block. The command printed the tag's first parent (6b1c2658) and then failed on an -encodedCommand argument.",
+      "effect": "None on the freeze. The tag was created before that line. The worktree checked out the tag at 17e32d54, and the agent read the tag's commit with the argument quoted.",
+      "next": "The step sheet quotes the argument."
+    }
+  ],
+  "consequences": [
+    "A4 (R15) uploads this tarball and its .sha256 file and checks the sha256 on the host before installing.",
+    "H3 (V15) names 17e32d54 / msca-dn-freeze-2026-11-12 as the code revision.",
+    "A run-blocking defect is fixed on a branch from the tag. If the fix changes assessment output, V14 is re-run or the reports are marked non-comparable (W05 Q1).",
+    "Records committed to harness_overhaul after the tag (this one included) are not in the bundle and do not change it."
+  ]
+}
