@@ -27,7 +27,7 @@ git switch msca-dn-pre-eval
 git merge --no-ff harness_overhaul -m "Freeze: overhaul O1-O3, H1, R11-R14 for V14/V16"
 git diff --stat harness_overhaul msca-dn-pre-eval; "diff_lines=$((git diff --stat harness_overhaul msca-dn-pre-eval | Measure-Object -Line).Lines)"
 git tag -a msca-dn-freeze-2026-11-12 -m "Re-freeze O5: supersedes msca-dn-freeze-2026-11-11"
-git rev-parse msca-dn-freeze-2026-11-12^{commit}
+git rev-parse 'msca-dn-freeze-2026-11-12^{commit}'
 git switch harness_overhaul
 git worktree add --detach ..\freeze_bundle msca-dn-freeze-2026-11-12
 New-Item -ItemType Directory -Force $HOME\o5\wheels, $HOME\o5\downloads, $HOME\o5\out | Out-Null
@@ -47,3 +47,10 @@ equals the tag's commit and its status is empty. Paste the output.
 Decision-log entry `msca-dn-refreeze-o5_2026-11-12.json`: tag, commit, suite and lane evidence,
 tarball sha256, superseded tag. Tick O5 in the handoff. From then until V16, nothing is built from
 `harness_overhaul`; a run-blocking fix goes on a branch from the tag.
+
+## Result
+
+Both rounds PASS on 2026-11-12. Tag `msca-dn-freeze-2026-11-12` → `17e32d54`; bundle sha256
+`9c5351ef709905c391fd82d06ccdacf1a806c255350241c6d88a21b4d0f2132a`. Record:
+`docs/tier4_orchestration_state/decision_log/msca-dn-refreeze-o5_2026-11-12.json` (deviation O5-1: the
+unquoted `^{commit}` line, fixed above; no effect on the freeze).
