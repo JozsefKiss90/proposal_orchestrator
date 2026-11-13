@@ -305,19 +305,30 @@ ends `RESULT=started`. A started host keeps `/root/v14`. After a start, use `V14
 
 ### H08 — after the freeze: the ESR record, the audit, the first comparison
 
-**H08a. The ESR record, in its own archive.** On the workstation:
+**H08a. The ESR record, in its own archive.** On the workstation: pack, upload, place, delete.
 
 ```powershell
-$E = "docs\infrastructure_security\evidence_v2\V14"; $O = "<O>"
+$E = "docs\infrastructure_security\evidence_v2\V14"; $V2 = "docs\infrastructure_security\evidence_v2"; $O = "<O>"
 if ($O -match '[<>]') { throw "H08a refused: set `$O to your output folder" }
-py -3.10 "$E\workstation\v14_pack_one.py" --freeze C:\Code\proposal_demo\freeze_bundle --esr --out-dir $O --vars-out "$E\host\v14_esr.vars.json"
+$S = "deployws\scripts\host-run.ps1"; $X = "<the latest outputs file>"
+function O($f, $k) { ((Get-Content $f -Raw | ConvertFrom-Json) | Where-Object OutputKey -eq $k).OutputValue }
+$DB = O "$V2\R7\R7_outputs.json" DeployBucketName
+py -3.10 "$E\workstation14_pack_one.py" --freeze C:\Code\proposal_demoreeze_bundle --esr --out-dir $O --vars-out "$E\host14_esr.vars.json" | Out-File -Encoding utf8 "$E\V14_H08a_pack.txt"
+Get-Content "$E\V14_H08a_pack.txt"
+$N = (Get-Content "$E\host14_esr.vars.json" -Raw | ConvertFrom-Json).PO_ARCHIVE
+if (-not $N -or -not (Test-Path -LiteralPath "$O\$N")) { throw "H08a refused: the pack wrote no archive" }
+& { (Get-FileHash "$O\$N" -Algorithm SHA256).Hash.ToLower(); (Get-Item "$O\$N").Length; aws s3 cp "$O\$N" "s3://$DB/bundles/$N" --profile po-r1 --region eu-north-1 --only-show-errors; "cp_exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\V14_H08a_upload.txt"
+aws s3api head-object --profile po-r1 --region eu-north-1 --bucket $DB --key "bundles/$N" --query "{length:ContentLength,sse:ServerSideEncryption,kmsKey:SSEKMSKeyId,bucketKey:BucketKeyEnabled,version:VersionId}" --output json 2>&1 | Out-File -Encoding utf8 "$E\V14_H08a_head.json"
+Get-Content "$E\V14_H08a_upload.txt", "$E\V14_H08a_head.json"
+powershell -NoProfile -ExecutionPolicy Bypass -File $S -AwsProfile po-r1 -Outputs $X -Script "$E\host14_inbound.sh" -VarsFile "$E\host14_esr.vars.json" -TimeoutSeconds 300 -Out "$E\V14_H08a_esr.json"
+& { $vs = aws s3api list-object-versions --profile po-r1 --region eu-north-1 --bucket $DB --prefix "bundles/$N" --query "{v:Versions[].VersionId,d:DeleteMarkers[].VersionId}" --output json | ConvertFrom-Json
+  foreach ($v in @($vs.v) + @($vs.d)) { if ($v) { aws s3api delete-object --profile po-r1 --region eu-north-1 --bucket $DB --key "bundles/$N" --version-id $v --output json | Out-Null; "delete_exit=$LASTEXITCODE" } }
+  aws s3api list-object-versions --profile po-r1 --region eu-north-1 --bucket $DB --prefix "bundles/$N" --query "{versions:length(Versions || ``[]``),markers:length(DeleteMarkers || ``[]``)}" --output json } 2>&1 | Out-File -Encoding utf8 "$E\V14_H08a_delete.txt"
+Get-Content "$E\V14_H08a_delete.txt"
 ```
 
-It prints the archive name and sha256 and `member_sha256=5c9b9c8e9f89f501e30256aaa90b55921ce2c3673b2218fa2c0bcd6b7d54b0a9`.
-Upload it as H02 with `$N` the new name (evidence `V14_H08a_upload.txt`, `V14_H08a_head.json`), send
-`host/v14_inbound.sh` with `-VarsFile "$E\host\v14_esr.vars.json"` (`V14_H08a_esr.json`), then delete its versions
-as in H04 (`V14_H08a_delete.txt`).
-
+**PASS** for `V14_H08a_pack.txt`: `kind=esr`; `member_sha256=5c9b9c8e9f89f501e30256aaa90b55921ce2c3673b2218fa2c0bcd6b7d54b0a9`;
+`RESULT=packed`. For upload and head: as H02, with the archive's own sha256 and size from the pack. For delete: as H04e.
 **PASS** for `V14_H08a_esr.json`: `archive_sha256_matches=yes`; `members=1`; `member_sha256` as above;
 `esr_present_before=no`; `RESULT=expected`.
 
@@ -331,6 +342,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $S -AwsProfile po-r1 -Output
 **PASS:** `esr_present=yes`; `audit_exit` 0 or 1 (1 when it flags, which is advisory); `audit_reports=1`;
 `audit_flags` recorded; `baseline_bound=bound`; `RESULT=expected`.
 
+**H08c-0. The skeleton of the first dispositions, before the interactive sitting.** No model call, no AWS call.
+
+```powershell
+$E = "docs\infrastructure_security\evidence_v2\V14"; $S = "deployws\scripts\host-run.ps1"; $X = "<the latest outputs file>"
+powershell -NoProfile -ExecutionPolicy Bypass -File $S -AwsProfile po-r1 -Outputs $X -Script "$E\host14_h08c_skeleton.sh" -TimeoutSeconds 300 -Out "$E\V14_H08c0_skeleton.json"
+```
+
+**PASS:** `esr_sha256=5c9b9c8e…b0a9`; `template_rows=29`; `ids_equal_esr_in_order=yes`; `freeze_records=1`;
+`baseline_report_sha256` equal to H06's `report_sha256`; `baseline_copy_matches=yes`; `skeleton_rows=29`;
+`skeleton_loads=yes`; `skeleton_mode=600`; `RESULT=expected`. A second run refuses (`dispositions_first.json exists`).
+`compare` refuses the skeleton until every row is filled (`REHEARSAL.md` R33).
+
 **H08c. The first comparison and its review, by route (iii), in an interactive session.** You write the dispositions
 and the notes (V14-OP4). The commands, after `sudo -i`:
 
@@ -342,8 +365,8 @@ R=/root/v14/R; mkdir -p $R/private/msca_dn_original/esr_work
 ls $R/reports/candidates $R/audit/first $R/private/msca_dn_original
 ```
 
-Copy the rows of `$R/docs/tier4_orchestration_state/msca_dn/esr/dispositions_f60ae6e0a2a1_approved.json`, not its
-`esr_record_sha256` (runbook §6), into `$R/private/msca_dn_original/esr_work/dispositions_first.json`, schema 1.2. A
+Fill `$R/private/msca_dn_original/esr_work/dispositions_first.json`, the skeleton H08c-0 wrote (schema 1.2, header
+bound to the ESR record and the H06 baseline, 29 rows with empty judgement fields). Keep its header. A
 miss whose preservation is not declared stands `Inferred`, with no `fidelity_to_submitted_original` pointer
 (V14-OP9). Then:
 
