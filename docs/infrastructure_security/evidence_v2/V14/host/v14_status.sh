@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # V14 status (evidence_v2/V14/STEPS.md H08d): what the private root holds after the
-# interactive §6 work, as metadata. For each file under the run's output directories and the operator's
+# interactive section 6 work, as metadata. For each file under the run's output directories and the operator's
 # dispositions and notes, it prints the root-relative path, the size and the sha256. Never content.
 # Run it after each interactive sitting, so the evidence shows which comparison, review and diff
 # files exist and that none moved afterwards.

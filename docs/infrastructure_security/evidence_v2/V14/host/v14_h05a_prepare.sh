@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# V14 step H05a (evidence_v2/V14/STEPS.md): runbook §5's preflight on the host, then the receipt draft
-# of runbook §1.1. No model call. Every command runs with --repo-root /root/v14/R (REHEARSAL.md R5) and
+# V14 step H05a (evidence_v2/V14/STEPS.md): runbook section 5's preflight on the host, then the receipt draft
+# of runbook section 1.1. No model call. Every command runs with --repo-root /root/v14/R (REHEARSAL.md R5) and
 # the two budgets of V14-F7. The draft is built as harness.commands.converse_smoke builds R15's: the
 # request comes from the judge's own Converse builder, which makes no network call.
 # Writes /root/v14/prepared.json (the exact assess and freeze lines) and /root/v14/receipt_draft.json.

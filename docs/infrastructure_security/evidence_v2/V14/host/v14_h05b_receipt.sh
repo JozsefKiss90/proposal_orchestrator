@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # V14 step H05b (evidence_v2/V14/STEPS.md): fill the receipt's thirteen operator fields with the values
-# of STEPS.md point P2, then validate it as runbook §1.1 says, before the run. No model call.
+# of STEPS.md point P2, then validate it as runbook section 1.1 says, before the run. No model call.
 # The receipt is /root/v14/readiness_receipt.json (mode 600), outside the private root and outside the
 # installed checkout (ticket 13). Prints key=value lines only; the validator's lines name paths, hashes
 # and rule names, never proposal text. The last line is RESULT=expected or RESULT=unexpected.
@@ -66,7 +66,7 @@ doc["processing_route"].update(
     # The operator's wording, given with the go on 2026-11-13 (evidence_v2/V14/RUNLOG.md). Verbatim.
     authority="The operator authorises processing of the Part B text of the 2025 submission by "
               "eu.anthropic.claude-sonnet-4-6 over Bedrock Converse (EU geographic profile, private "
-              "endpoint, invocation logging off) for the V14 blind assessment. This is the operator’s "
+              "endpoint, invocation logging off) for the V14 blind assessment. This is the operator\u2019s "
               "own decision of 2026-11-13, recorded with V14-OP1 to OP9. No consent of any other party "
               "is recorded.",
     processing="the MSCA-DN 2025 original's Part B (a page extract of the portal PDF, declared "

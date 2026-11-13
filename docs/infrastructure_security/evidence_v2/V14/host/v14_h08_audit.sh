@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# V14 steps H08b and H08e-3 (evidence_v2/V14/STEPS.md): runbook §6's audit, after the freeze and after the ESR
+# V14 steps H08b and H08e-3 (evidence_v2/V14/STEPS.md): runbook section 6's audit, after the freeze and after the ESR
 # record is in place. --repo-root the private root and --package-budget 400000 (V14-F7); the import
 # manifest named as the candidate provenance. No model call. The audit report stays on the host.
 # PO_AUDIT_LABEL names the run (first | successor); each writes into its own directory.

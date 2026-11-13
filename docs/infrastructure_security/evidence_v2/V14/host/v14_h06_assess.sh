@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# V14 step H06 (evidence_v2/V14/STEPS.md): runbook §5's assessment and freeze, the only model step.
+# V14 step H06 (evidence_v2/V14/STEPS.md): runbook section 5's assessment and freeze, the only model step.
 # Reads the receipt first and refuses unless it is green; runs the exact assess line H05a recorded in
 # /root/v14/prepared.json (both V14-F7 budgets, --repo-root the private root); freezes; then reads the
-# receipt again against the report (runbook §1.1). With PO_RESUME=yes the same line runs with
+# receipt again against the report (runbook section 1.1). With PO_RESUME=yes the same line runs with
 # --resume in place of --checkpoint, on the same checkpoint path, and nothing else changes (V14-D2).
 # The assess log, the report, the checkpoint, the provenance log and the baseline stay on the host.
 # Prints metadata only: exit codes, call counts, the name, size and sha256 of each baseline file, the
