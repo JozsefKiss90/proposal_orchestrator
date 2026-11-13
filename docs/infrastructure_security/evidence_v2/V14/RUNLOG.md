@@ -37,6 +37,8 @@
 | 2026-11-13 | operator | Sitting 2 end, checked by script. **H08d PASS** (`V14_H08d_status1_fix1.json`, 16:52:40Z): `root_mode=700`, 37 files by path, size and sha256 only. Comparisons `…_0001` `d24dd56d…08ea` and `…_0002` `06fd1a7d…b796`, two `revisions_` files, `review_diff_06fd1a7d5919_0001` (.json, .md); four review files, the two `06fd1a7d5919` hashes equal to those in V14-D3 and a pair for the first comparison (`d24dd56dbcbe`); `count_diffs=0`. `esr_work` holds 12 files: `dispositions_first.json` `2eba3178…313f` (filled, no longer the skeleton), its two equal backups `bd0c15b7…c821`, `dispositions_second.json` `ed323756…052b`, `notes_first.json`, `notes_second.json`, and the operator's working files `h.py`, `digest.txt`, `match.txt`, `match_all.txt`, `false_positives.txt`, `todo.txt`; all stay on the host. Baseline, report, audit and register hashes unchanged. **H09 PASS** (`V14_H09_return_fix1.json`, 16:52:57Z): `reports=1`, `report_sha256` equal to H06's, key=value lines only, no prose; `live_calls=46`, `discarded_draws=1` (on the implementation criterion); cells 10, covered 9 (`imp-magnitude` not covered, 0.55); criteria excellence 4.1 (spread 0.1), impact 3.8 (0.0), implementation 4.1 (0.0); total 80.2 of 100, overall and individual thresholds met. **H07 stop2 PASS** (`_fix1`): stopped at 16:53:50Z after 6 h 23 min running (about 0.99 USD of host time); volume `in-use`, 8 GB. **H10b** (`V14_H10b_start-session.json`, 7 events): 4 sessions by the operator's role at 10:31:33Z, 10:32:15Z, 12:05:58Z and 15:37:45Z, each `target` the H03 instance, `documentName` null, no error; PASS once the operator confirms 4 sessions. 3 more events, see V14-F10 |
 | 2026-11-13 | operator | The operator confirms 4 interactive sessions. **H10b PASS**: 4 events by the operator's role, each targeting the H03 instance, with `documentName` null and no error. V14-F10 still awaits the operator's account of the three refused calls. H11 waits until the operator confirms V14 |
 | 2026-11-13 | agent | At the operator's request: `DIAGNOSIS.md`, the public part of the diagnosis record, drafted from repository-held material only. It holds the criterion deltas (85.8 against 80.2, −5.6), the six categories, the 8 contested strengths of the sanitised lineage against 0 now, and AVC-01 and AVC-02. It names no miss by id (V14-OP2). The sanitised baseline, the approved dispositions and comparison `0003` are unchanged since the tag |
+| 2026-11-13 | operator | Decisions for sitting 3: the six categories and the three questions of `DIAGNOSIS.md` confirmed as drafted, and its list of what returns. H08e not now; decided after the diagnosis. The operator's helper `.scratch/overhaul-2026-11/v14_diag.py` (sha256 `ad713d51…2096`) was written by the operator's separate assistant chat and tested there on the sanitised lineage only, not on host data |
+| 2026-11-13 | agent | Helper reviewed (V14-F11), against the tag's field names. It is kept byte-equal as `host/v14_diag.py` and carried by `host/v14_h08f_install.sh` (gzip + base64, sha256 checked on the host). `host/v14_h08f_return.sh` prints the record's bindings, counts and `comparison_by_disposition` by a fixed vocabulary. Rehearsed on a synthetic root (`REHEARSAL.md` R34). `STEPS.md` H08f written. No AWS call |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -219,6 +221,18 @@
   `AccessDenied`, with no target recorded. They came from a command run on the host, during the operator's fourth
   session. The role has no `ssm:StartSession`, so the refusal is the designed outcome, and no session opened. The
   operator to state what ran.
+- **V14-F11. The diagnosis helper defaults every answer by rule, and two of its automatic answers are proxies.**
+  `init` enters each miss and each criterion delta as `unresolved_cause`, `Assumed`, decided by rule, and each
+  contested strength and AVC sample as `unclear` by rule. `finalize` accepts them, and `hints` turns the rule hints
+  into answers. So H08f-r requires `total.decided_by_rule=0`, and H08f says not to run `hints`. The record has no
+  field for Q1, which goes in each row's note. `q2_quote_in_candidate` is true when the row carries a quote. Those
+  quotes were selected by script (V14-L2), so it does not show that the ESR's point is in the candidate.
+  `q3_criterion_input_complete` reads the criterion input's completeness, which H09 shows true for all three
+  criteria. So it reads yes on every row and does not show that the passage reached the assessor. The worksheet's
+  "closest findings" match by shared words over the criterion samples only. Misses are the rows disposed
+  `not_detected_despite_sufficient_preserved_evidence`: a `partially_observable` row gets no diagnosis, and H08f-r
+  shows whether any exists. `FP-1` is entered as the operator's from the presence of `false_positives.txt`. Files
+  take the shell's umask, so H08f sets `umask 077`. Field names match the tag; the file is ASCII with LF endings.
 
 Measured and found clear:
 

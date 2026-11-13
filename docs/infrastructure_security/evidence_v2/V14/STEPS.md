@@ -406,6 +406,62 @@ sha256 only.
    (V14-F6).
 5. **Status:** H08d.
 
+
+### H08f — the diagnosis, sitting 3 (DIAGNOSIS.md, V14-OP2, V14-OP4)
+
+The operator's helper `host/v14_diag.py` (sha256 `ad713d51…2096`) writes the private diagnosis record. Review
+notes: RUNLOG V14-F11. Order: H07 start3, H08f-0, the interactive part, H08f-r, H08d, H07 stop3, H10b.
+
+**H07 start3.** H07 with prefix `V14_H07_start3`. Then `$X = "$E\V14_H07_start3_outputs.json"`.
+
+**H08f-0. Install the helper (Run Command, no paste).** The script carries the helper as gzip + base64.
+
+```powershell
+$E = "docs\infrastructure_security\evidence_v2\V14"; $S = "deploy\aws\scripts\host-run.ps1"; $X = "$E\V14_H07_start3_outputs.json"
+powershell -NoProfile -ExecutionPolicy Bypass -File $S -AwsProfile po-r1 -Outputs $X -Script "$E\host\v14_h08f_install.sh" -TimeoutSeconds 300 -Out "$E\V14_H08f0_install.json"
+```
+
+**PASS:** `payload_sha256` equal to `expected_sha256`; `installed=… mode=600`; `parses=yes`; `RESULT=expected`.
+
+**H08f. The interactive part.** Open the session as in H08c (default document), then:
+
+```bash
+sudo -i
+umask 077
+P=/opt/msca-dn-anonymisation/python/bin/python3
+cd /root/v14/R/private/msca_dn_original/esr_work
+$P -I v14_diag.py init
+less diagnosis_worksheet.txt
+```
+
+For each row, record your own answer:
+
+- `$P -I v14_diag.py set <ID> <category> [status] "Q1=<yes|no|partial> p.<page>; Q2=<yes|no>; Q3=<yes|no>; <basis>"`.
+  For an unresolved cause, use `unresolved:<a>+<b>`. IDs are the miss ids, `FP-1` and `DELTA-<criterion>`.
+- `$P -I v14_diag.py cs <ESR strength id> <yes|no|unclear>` for the eight contested strengths.
+- `$P -I v14_diag.py avc <AVC-01|AVC-02> <sample> <yes|no|unclear>` for the five implementation samples. The
+  sample numbers are those in section D of the worksheet.
+- `$P -I v14_diag.py status` shows what is left. When no row reads `rule`, run `$P -I v14_diag.py finalize`.
+  Then `exit; exit`.
+
+Do not run `hints`: it records rule hints as answers. Do not run `compare` in this sitting: `init` binds the latest
+comparison, and a new one would need `init --force`, which discards the answers.
+
+**H08f-r. What returns (after the session).**
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File $S -AwsProfile po-r1 -Outputs $X -Script "$E\host\v14_h08f_return.sh" -TimeoutSeconds 300 -Out "$E\V14_H08f_return.json"
+```
+
+**PASS:** `RESULT=expected`; `record_mode=600`; both `binding.*_matches_file=yes`; `binding.report_sha256` equal to
+H06's `f5c99a91…24bd`; `binding_is_latest_comparison=yes`; `comparison_by_disposition_equals_file=yes`;
+`misses_equal_not_detected=yes`; `total.false_positives=1`, `total.deltas=3`, `total.contested=8`, `total.AVC-01=5`,
+`total.AVC-02=5`; `total.decided_by_rule=0`.
+
+**Then:** H08d with out `V14_H08d_status2.json`; H07 stop with prefix `V14_H07_stop3`; and, 15 minutes after the
+session, H10b with out `V14_H10b_start-session2.json`. H10b passes when it shows one more operator event than the
+first H10b: one per new session.
+
 ### H09 — what returns (V14-OP2)
 
 ```powershell

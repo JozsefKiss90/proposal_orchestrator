@@ -1,6 +1,6 @@
 # V14 — diagnosis record, public part
 
-**State:** agent draft, 2026-11-13. Not confirmed by the operator.
+**State:** agent draft, 2026-11-13. The categories, the three questions and the list of what returns are confirmed by the operator (2026-11-13). Sections 1 to 5 are open until H08f.
 
 The agent wrote this from material the repository may hold: the committed ESR record, the H09 return,
 the H08d status, the operator's counts in `RUNLOG.md`, and the sanitised lineage's committed records. The
@@ -33,7 +33,7 @@ lineage. It does not edit them.
 ## Diagnosis categories
 
 The ticket names six. Each divergence takes exactly one, with a status from `CLAUDE.md` section 12.2. The
-working definitions below are the agent's. The operator confirms or changes them.
+definitions below were drafted by the agent and confirmed by the operator on 2026-11-13.
 
 | Category | Use it when |
 |---|---|
