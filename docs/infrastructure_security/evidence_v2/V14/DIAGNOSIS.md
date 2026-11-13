@@ -1,6 +1,6 @@
 # V14 — diagnosis record, public part
 
-**State:** agent draft, 2026-11-13. The categories, the three questions and the list of what returns are confirmed by the operator (2026-11-13). Sections 1 to 5 are open until H08f.
+**State:** recorded, 2026-11-13. The categories, the three questions and the list of what returns are confirmed by the operator. Sections 1 to 5 carry the counts the operator's private record returned in H08f-r (sitting 3). Each divergence has an operator-decided entry; none is decided by rule.
 
 The agent wrote this from material the repository may hold: the committed ESR record, the H09 return,
 the H08d status, the operator's counts in `RUNLOG.md`, and the sanitised lineage's committed records. The
@@ -22,7 +22,7 @@ them.
 | Successor dispositions | `dispositions_second.json`, sha256 `ed323756…052b`, all 29 rows `operator_confirmed` | H08d, operator |
 | Successor comparison | `comparison_f5c99a91adc9_0002.json`, sha256 `06fd1a7d…b796` | H08d |
 | Review of the successor | `operator_review_06fd1a7d5919_0001.md` `eba8d44d…abe3`; `operator_decisions_06fd1a7d5919_0001.md` `8de0425a…0c7e` | H08d (V14-D3) |
-| Private diagnosis record | to be written on the host; sha256 to be returned | sitting 3 |
+| Private diagnosis record | `esr_work/diagnosis_private.json`, 12,098 bytes, mode 600, sha256 `ac7b8eb28d57a30b070c78a497c1109d314575eec227996f79a2c752ef9aa065`, written 21:18:09Z; binds the report `f5c99a91…24bd` and comparison `…_0002` `06fd1a7d…b796` | H08f-r, H08d status2 |
 
 **Preserved unchanged (checked 2026-11-13 against the tag `msca-dn-freeze-2026-11-12`).** The sanitised 74.60
 baseline and its freeze record (`baselines/resolved_fixes_2026-10-06/`), the approved dispositions
@@ -68,7 +68,8 @@ The repository may hold these numbers in full (V14-OP2).
   impact difference.
 - One draw on the implementation criterion was discarded and redrawn (V14-F9). Its thrown text is not a sample.
 
-**Open.** One diagnosis per criterion, from the private reading.
+**Recorded.** All 3 deltas: `unresolved_cause`, `Assumed`, decided by the operator. So no criterion difference is
+attributed to one cause. Which causes each entry names stays in the private record.
 
 ## 2. Misses
 
@@ -80,14 +81,23 @@ The runbook's section 2.1 names the rows that only the original can answer: ESR-
 ESR-E-08, ESR-E-S03, ESR-E-S05, ESR-I-S01, ESR-I-S04, ESR-Q-01, ESR-Q-03, ESR-Q-S02 and ESR-Q-S03. ESR-E-04 was
 `Unresolved` in the sanitised lineage. Whether any of these is among the 13 is private.
 
-**Open.** One private diagnosis per miss.
+**Recorded.** The successor comparison returns 16 detected and 13 not detected, 0 partially observable, 0 not
+assessable and 0 addressed. It equals the comparison file. All 13 misses: `unresolved_cause`, `Assumed`, decided by
+the operator. Which causes each entry names stays in the private record. The operator did not check whether each script-selected quote is relevant (V14-L2), so
+Q2 is not settled for these rows. No miss is attributed to evidence omission or to extraction.
+
+The operator judges that three of the 13 look detected on reading, two of them criticisms (RUNLOG V14-F12). The
+record keeps them as misses. If all three were detections, 19 of 29 observations and 7 of 15 criticisms (0.47)
+would be detected. Carried to V15 as an open question.
 
 ## 3. False positive
 
 One, recorded by the operator: a shortcoming on the implementation criterion in 5 of 5 samples, diagnosed
 `rubric interpretation`.
 
-**Open.** Its basis in the private record. The answer to whether it is AVC-01 or AVC-02 recurring (section 5).
+**Recorded.** `rubric_interpretation`, `Inferred`, decided by the operator; its basis is in the private record.
+Whether it is AVC-01 or AVC-02 recurring: no (Inferred). It is present in 5 of 5 samples, and neither case recurs in
+more than one sample (section 5).
 
 ## 4. Contested strengths
 
@@ -98,7 +108,8 @@ At the tag, a strength row counts as contested only when its `blind_findings` li
 `shortcoming` (`harness/esr_comparison.py`, the `contests` line). So 0 records which findings the dispositions
 link. It is not a measurement that no blind shortcoming sits on a praised point.
 
-**Open.** For each of the 8, whether the H06 baseline holds a shortcoming on the same point.
+**Recorded.** All 8 `unclear`, decided by the operator. So the record does not show, for any of the 8, whether the
+H06 baseline holds a shortcoming on the same point. Status: Unresolved.
 
 ## 5. AVC-01 and AVC-02, at sample level
 
@@ -111,10 +122,30 @@ From `dispositions_f60ae6e0a2a1_approved.json`, `assessor_validation_cases`, and
   verification column. Does the stage-A assessor conflate the two tables against the original? This one needs the
   original.
 
-**Open.** Both, per sample, over the 5 implementation criterion samples of the H06 report.
+**Recorded**, per sample, by the operator:
+
+| Case | Repeated against the original | Not repeated | Unclear |
+|---|---|---|---|
+| AVC-01 | 0 of 5 | 5 of 5 | 0 |
+| AVC-02 | 0 of 5 | 4 of 5 | 1 |
+
+Neither sanitised-lineage case recurs against the original in any sample read as clear.
 
 ## What returns to the repository
 
-Proposed, under V14-OP2 as written: the private record's sha256; per class, the count of each category and
+Confirmed by the operator on 2026-11-13, under V14-OP2 as written: the private record's sha256; per class, the count of each category and
 status; AVC-01 and AVC-02 as counts out of 5; and the successor comparison's summary counts. No id of a miss, no
 text and no quote.
+
+## Returned counts (H08f-r, `V14_H08f_return.json`)
+
+| Class | Category or answer | Status | Decided by |
+|---|---|---|---|
+| Misses (13) | `unresolved_cause` 13 | `Assumed` 13 | operator 13 |
+| False positives (1) | `rubric_interpretation` 1 | `Inferred` 1 | operator 1 |
+| Criterion deltas (3) | `unresolved_cause` 3 | `Assumed` 3 | operator 3 |
+| Contested strengths (8) | `unclear` 8 | | operator 8 |
+| AVC-01 (5 samples) | `no` 5 | | operator 5 |
+| AVC-02 (5 samples) | `no` 4, `unclear` 1 | | operator 5 |
+
+`total.decided_by_rule=0`. The notes, ids and per-row answers stay in the private record.

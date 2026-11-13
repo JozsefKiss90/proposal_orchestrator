@@ -39,6 +39,7 @@
 | 2026-11-13 | agent | At the operator's request: `DIAGNOSIS.md`, the public part of the diagnosis record, drafted from repository-held material only. It holds the criterion deltas (85.8 against 80.2, −5.6), the six categories, the 8 contested strengths of the sanitised lineage against 0 now, and AVC-01 and AVC-02. It names no miss by id (V14-OP2). The sanitised baseline, the approved dispositions and comparison `0003` are unchanged since the tag |
 | 2026-11-13 | operator | Decisions for sitting 3: the six categories and the three questions of `DIAGNOSIS.md` confirmed as drafted, and its list of what returns. H08e not now; decided after the diagnosis. The operator's helper `.scratch/overhaul-2026-11/v14_diag.py` (sha256 `ad713d51…2096`) was written by the operator's separate assistant chat and tested there on the sanitised lineage only, not on host data |
 | 2026-11-13 | agent | Helper reviewed (V14-F11), against the tag's field names. It is kept byte-equal as `host/v14_diag.py` and carried by `host/v14_h08f_install.sh` (gzip + base64, sha256 checked on the host). `host/v14_h08f_return.sh` prints the record's bindings, counts and `comparison_by_disposition` by a fixed vocabulary. Rehearsed on a synthetic root (`REHEARSAL.md` R34). `STEPS.md` H08f written. No AWS call |
+| 2026-11-13 | operator | Sitting 3, checked by script. **H07 start3 PASS**: `path=resume`, instance `stopped` before, start 18:22:50Z, end 18:24:00Z, host `Online`; outputs equal to H03's and start2's. **H08f-0 PASS** (`V14_H08f0_install.json`, 18:38:47Z): script sha256 equal to the committed `host/v14_h08f_install.sh`; payload and installed `v14_diag.py` `ad713d51…2096`, 15,293 bytes, mode 600, `parses=yes`. **H08f** done in the interactive session by the operator, `finalize` at 21:18:09Z. **H08f-r PASS** (`V14_H08f_return.json`, 21:18:25Z): record `diagnosis_private.json`, 12,098 bytes, mode 600, sha256 `ac7b8eb28d57a30b070c78a497c1109d314575eec227996f79a2c752ef9aa065`; report binding `f5c99a91…24bd` and comparison binding `comparison_f5c99a91adc9_0002.json` `06fd1a7d…b796` both match their files; the comparison is the latest; `comparison_by_disposition` equals the file (16 detected, 13 not detected, 0 for the other three); `misses_equal_not_detected=yes`; totals 13, 1, 3, 8, 5, 5; `decided_by_rule=0`; key=value lines only, no observation id. Counts in `DIAGNOSIS.md`. **H08d status2 PASS** (21:18:44Z): `root_mode=700`, 41 files; the 37 of status1 unchanged, plus `v14_diag.py` (`ad713d51…2096`), `diagnosis_worksheet.txt`, `diagnosis_state.json` and `diagnosis_private.json` (`ac7b8eb2…a065`), all in `esr_work`. **H07 stop3 PASS**: stopped at 21:19:52Z after 2 h 57 min running (about 0.46 USD of host time); volume `in-use`, 8 GB. H10b for sitting 3 not yet run. Deviation V14-D4 and finding V14-F12 recorded (below) |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -142,6 +143,13 @@
   to the repository, and the agent has not seen the content. The receipt is not edited: it records the route as
   declared before the run.
 
+- **V14-D4. Session output reached the agent's chat (2026-11-13).** The operator pasted the sitting 3 terminal
+  into this chat. The paste held `v14_diag.py status` twice, so it named each miss by id with its category, and it
+  held the `set` line of one miss, whose note describes blind assessor findings on the implementation criterion.
+  This departs from V14-OP2 (dispositions and finding text stay on the host). The agent wrote none of it to the
+  repository or to memory, and this record names no id and quotes no note. The `finalize` and H08f-r outputs in
+  the same paste hold counts and hashes only.
+
 ## Findings
 
 - **V14-F1. The O5 bundle cannot run runbook §4.** The bundle's roots hold only one file from `tools/`
@@ -233,6 +241,12 @@
   `not_detected_despite_sufficient_preserved_evidence`: a `partially_observable` row gets no diagnosis, and H08f-r
   shows whether any exists. `FP-1` is entered as the operator's from the presence of `false_positives.txt`. Files
   take the shell's umask, so H08f sets `umask 077`. Field names match the tag; the file is ASCII with LF endings.
+- **V14-F12. Up to three misses may be detections (operator, 2026-11-13; carried to V15).** On reading the
+  samples, the operator judges that three rows disposed as misses look detected, two of them criticisms. The
+  record keeps all 13 as misses, each `unresolved_cause`, `Assumed`, and the comparison is not changed. If all
+  three were detections, the counts would read 19 of 29 observations and 7 of 15 criticisms (0.47), against 16 and
+  5 (0.33). The matching that disposed them was by shared words (V14-L2, V14-F11). V15 is to carry this as an open
+  question on the comparison, not as a corrected count.
 
 Measured and found clear:
 
