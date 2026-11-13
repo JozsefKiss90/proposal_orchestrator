@@ -1275,37 +1275,62 @@ enters, then a post-freeze comparison and review.
 
 ### Acceptance criteria
 
-- [ ] The input PDF, governing source documents, runtime and code revision are pinned privately, and
+- [x] The input PDF, governing source documents, runtime and code revision are pinned privately, and
       proposal evidence is kept separate from ESR and review material.
-- [ ] The original is imported as a distinct original document through V07 and V08, with fidelity
+- [x] The original is imported as a distinct original document through V07 and V08, with fidelity
       reviewed against the actual submitted material including figures and the declared appendix
       mapping, and unresolved extraction limitations recorded before assessment.
-- [ ] The V10 historical profile is loaded, and preflight runs with the actual transport, an explicit
+- [x] The V10 historical profile is loaded, and preflight runs with the actual transport, an explicit
       manifest and the declared grounding scope. Both expectation-pack selections and whole-criterion
       inputs are reviewed.
-- [ ] One blind assessment runs under the declared sample plan with response checkpointing. A resume
+- [x] One blind assessment runs under the declared sample plan with response checkpointing. A resume
       replays saved responses rather than redrawing a failed run, and no valid sample is silently
       replaced.
-- [ ] The complete report validates and freezes under the V04 gate before any ESR material enters, with
+- [x] The complete report validates and freezes under the V04 gate before any ESR material enters, with
       actual invocation and isolation evidence and the candidate and profile bindings recorded.
-- [ ] Only then does the ESR enter comparison. Original dispositions and fidelity declarations are
+- [x] Only then does the ESR enter comparison. Original dispositions and fidelity declarations are
       authored to schema, the integrity audit runs with V05 provenance, and every criticism and strength
       classification is reviewed.
-- [ ] Missed findings, false positives, the 8 contested strengths and the criterion deltas are
+- [x] Missed findings, false positives, the 8 contested strengths and the criterion deltas are
       evaluated, with AVC-01 and AVC-02 investigated at sample level.
-- [ ] Each divergence carries a recorded diagnosis — evidence omission, extraction, rubric
+- [x] Each divergence carries a recorded diagnosis — evidence omission, extraction, rubric
       interpretation, assessor error, historical subjectivity or unresolved cause — rather than pursuit
       of a target score.
-- [ ] The sanitised 74.60 baseline, its freeze record, the approved dispositions and the approved
+- [x] The sanitised 74.60 baseline, its freeze record, the approved dispositions and the approved
       comparison are preserved unchanged. The new result is a successor record.
-- [ ] No numerical deduction is inferred for a criticism the ESR does not quantify, and the −11.2
+- [x] No numerical deduction is inferred for a criticism the ESR does not quantify, and the −11.2
       sanitised delta is not carried forward as a predictor.
-- [ ] Within-assessor spreads are reported as repeatability only, never as an accuracy interval or a
+- [x] Within-assessor spreads are reported as repeatability only, never as an accuracy interval or a
       panel of independent reviewers.
 
 **Verification.** The frozen original baseline, the post-freeze comparison, the integrity audit and the
 diagnosis record are the evidence. Claude verifies the deposited bindings; it does not produce the
 assessment.
+
+**Status 2026-11-13.** Closed, eleven of eleven, on the operator's confirmation in session. Evidence:
+`docs/infrastructure_security/evidence_v2/V14/` (`RUNLOG.md`, `DIAGNOSIS.md`, `STEPS.md`). Per criterion:
+
+1. Pinned: revision `17e32d54`, the O5 bundle `9c5351ef…132a`, the input extract `c2caaeaa…e9db`, the model
+   pin and the receipt `75eb46f0…fa91`. The ESR entered in its own archive only after the freeze (H08a).
+2. Imported through V07 and V08: the dry import reconciled by the operator (W03–W05: pages 57 declared and
+   measured, 53 mapped). Limitation V14-L1 (the extract re-renders the portal pages) recorded before H06.
+3. Profile and preflight with `bedrock-converse`, an explicit manifest and the declared scope (H05a); the
+   operator read the preflight report and both budgets (V14-F7, V14-F8).
+4. One blind pass, 45 calls plus one discarded and redrawn draw, named in the report (V14-F9); checkpointed.
+5. Frozen under the V04 gate, 22 of 22 (H06); receipt green before and after; report `f5c99a91…24bd`.
+6. Dispositions authored to schema 1.2 and confirmed by the operator on all 29 rows; audit `fa24f1e1…05c0`.
+7. and 8. Diagnosis record `ac7b8eb2…a065` on the host, counts in `DIAGNOSIS.md`: 13 misses and 3 deltas
+   `unresolved_cause`, `Assumed`; the false positive `rubric_interpretation`, `Inferred`; the 8 contested
+   strengths `unclear`; AVC-01 not repeated in 5 of 5 samples, AVC-02 in 4 of 5 with 1 unclear. None
+   decided by rule.
+9. The sanitised baseline, freeze record, approved dispositions and comparison `0003` unchanged since the tag.
+10. and 11. `DIAGNOSIS.md` §1: no deduction per criticism, −11.2 not carried forward, spreads as repeatability.
+
+Residual, carried to V15: limitations V14-L1, V14-L2 (misses `Assumed`, quotes selected by script) and V14-F12
+(up to three misses may be detections; owner the operator); deviations V14-D3 and V14-D4; finding V14-F10 open
+(three refused `StartSession` calls from the host, no account yet). H08e (route ii) declined, so no miss is
+`Confirmed`. The host is deleted; an encrypted private snapshot is kept until 30 days after V16, at the latest
+2027-03-31.
 
 ## V15 — Milestone acceptance record
 
