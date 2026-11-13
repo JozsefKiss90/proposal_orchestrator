@@ -31,6 +31,8 @@
 | 2026-11-13 | operator | H06 PASS, checked against the PASS row as corrected by V14-F9. Window 08:12:01Z to 08:18:49Z (assess 08:12:07Z to 08:18:37Z, 6.5 minutes). Receipt green before; assess exit 0; one report `blind_96a09b983831_0001.json`, sha256 `f5c99a91…24bd`; one candidate; 46 live calls, 0 replayed, 1 discarded draw (V14-F9); 46 requests; no tool configuration, no child process; `maxTokens` 2048, temperature 0.0; no unscored criterion; checkpoint 48 lines. Freeze exit 0, 22 of 22 checks; baseline `blind_baseline_f5c99a91adc9.json` (equal to the report) and its `.freeze.json` `307d93fe…1add`. Receipt green after, against the report |
 | 2026-11-13 | agent | At the operator's request: `host/v14_h08c_skeleton.sh` (step H08c-0) builds the skeleton of `dispositions_first.json`: schema 1.2, the template's 29 ids (equal to the ESR record's, in order), the header bound to the ESR record `5c9b9c8e…` and to the H06 baseline, judgement fields empty, no template text carried over; metadata out only. Rehearsed (R33). H08a written out as one block. The operator runs H08a, H08b, H10a and H07 stop now; H08c is its own sitting |
 | 2026-11-13 | operator | Sitting 1 end, all checked by script. H08a PASS: pack `kind=esr`, archive `fb7b31e6…5823`, 6,074 bytes, member `5c9b9c8e…b0a9`; upload sha and size match, `cp_exit=0`, `aws:kms` with the project key, bucket key on; inbound 09:58:41Z `archive_sha256_matches=yes`, 1 member, none refused, `esr_present_before=no`, local archive removed; delete then versions 0, markers 0. H08b PASS (10:12:29Z): `esr_present=yes`, `audit_exit=1` (168 advisory flags), 1 audit report `integrity_96a09b983831_0001.json` (`fa24f1e1…e05c0`), `baseline_bound=bound`. H08c-0 PASS (10:15:38Z): template `90484fcb…a9ef` schema 1.2, 29 ids equal to the ESR record's in order; one freeze record; baseline `f5c99a91…24bd`, copy matches; skeleton `9cc17437…d954`, mode 600, 29 rows, loads; judgement fields empty. H10a PASS: 46 Converse events between 08:12:11Z and 08:18:37Z, all `AssumedRole` as the runtime role on the H03 instance, all through the H03 Bedrock runtime endpoint, all `eu.anthropic.claude-sonnet-4-6` in `eu-north-1`, `errorCode` null (46 = 45 + 1 discarded draw, V14-F9). H07 stop1 PASS: stopped at 10:17:00Z after 10 h 16 min running (about 1.59 USD of host time at 0.154686 USD per hour); endpoints and the 8 GB volume remain at 0.063916 USD per hour. The pack checker's first line reads `kind=esr tag=…` on one line; checked by eye. Next: the H08c sitting (H07 start2, H08c, H08d, H10b) |
+| 2026-11-13 | operator | Sitting 2 started. H07 start2 PASS, checked by script: `path=resume`, stack `CREATE_COMPLETE`, instance `stopped` before, start 10:30:43Z, end 10:31:23Z, host `Online`; outputs equal to H03's (hourly charges again from 10:30:43Z) |
+| 2026-11-13 | operator | H08c done in the interactive session, as the operator reports it; no evidence file yet (H08d lists the files). First comparison `comparison_f5c99a91adc9_0001.json`, sha256 `d24dd56d…08ea`: 16 of 29 observations detected, 13 misses; 5 of 15 criticisms detected (0.33); contested strengths 0. Its dispositions: 11 rows read by the operator, 18 drafted by rule. Successor `dispositions_second.json` supersedes the first: all 29 rows `operator_confirmed`, header `operator_reviewed`. From it: `comparison_f5c99a91adc9_0002.json`, `operator_review_06fd1a7d5919_0001.md` (`eba8d44d…abe3`) and `operator_decisions_06fd1a7d5919_0001.md` (`8de0425a…0c7e`). Limitation V14-L2 and deviation V14-D3 recorded (below). One false positive recorded by the operator: the implementation criterion, a shortcoming present in 5 of 5 samples, cause rubric interpretation. The hashes of the host files did not reach the agent; H08d lists them |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -73,6 +75,10 @@
   fonts and text layer can differ from the portal file's pages 105–161. So the extract's hash binds the run to the
   extract, not to the portal file. That the extract is the submitted Part B is the operator's declaration, not a
   measurement.
+- **Limitation V14-L2 (operator, 2026-11-13, accepted and recorded at the operator's request).** In
+  `dispositions_second.json` the 13 misses carry `failure_mode: undetermined`, quotes selected by script, and status
+  `Assumed`. V14-OP9 had them stand `Inferred`; the operator declares `Assumed` instead. The 5 detected criticisms
+  carry quotes selected by script. No row was declared `Confirmed` by route (ii).
 - **The configuration's status note** (as the operator reports it): "Page count, body point size, page map and
   markers reconciled against the PDF by the operator on 2026-11-12, using the dry import's worksheet. The PDF is a
   page extract (Part B only) of the portal's proposal PDF: portal file sha256
@@ -118,6 +124,17 @@
   receipt must name the checkpoint path before the run (runbook §1.1). A resume therefore swaps `--checkpoint` for
   `--resume` on that path and changes nothing else, where the runbook adds `--resume` to a line without either. The
   parser accepts only one of the two. Rehearsed: REHEARSAL.md R27.
+
+- **V14-D3. Two review files left the host (operator decision, 2026-11-13).** The operator copied
+  `operator_review_06fd1a7d5919_0001.md` (sha256 `eba8d44d69d85a63b477dbc81d803f4e1466f4152248a22831e536ea99beabe3`)
+  and `operator_decisions_06fd1a7d5919_0001.md` (sha256
+  `8de0425a1a7033aa8bd9ceeae9798bfe4fc5005cda36dca59d16ecddce380c7e`) to a private folder on the operator's
+  workstation, through the interactive session as gzip + base64 terminal output. The sha256 matched on both sides.
+  This departs from V14-OP2, V14-OP4 and the receipt's `processing_route.export` for these two files. The same
+  terminal output was pasted twice, on 2026-11-13, into a separate assistant chat; the operator states it was not
+  decoded there. That chat is a processor outside the P2 authority, which names Bedrock Converse only. Nothing went
+  to the repository, and the agent has not seen the content. The receipt is not edited: it records the route as
+  declared before the run.
 
 ## Findings
 
