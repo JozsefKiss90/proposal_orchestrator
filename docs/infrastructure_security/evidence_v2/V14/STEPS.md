@@ -282,7 +282,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $S -AwsProfile po-r1 -Output
 
 | Evidence file | PASS criterion |
 |---|---|
-| `V14_H06_assess.json` | `receipt_before_exit=0`; `assess_exit=0`; `report_count=1`; `candidate_count=1`; `live_calls` + `replayed_calls` = 45; `requests` recorded; `tool_config_sent=False`, `child_process=False`; `inference_config` `temperature` 0.0; `unscored_criteria=0`; `freeze_exit=0`; `baseline_files=2`; `freeze_checks_passed=22`; `receipt_after_exit=0`, `receipt check: green`; `RESULT=expected` |
+| `V14_H06_assess.json` | `receipt_before_exit=0`; `assess_exit=0`; `report_count=1`; `candidate_count=1`; `live_calls` + `replayed_calls` = 45 + `discarded_draws` (V14-F9); `requests` recorded; `tool_config_sent=False`, `child_process=False`; `inference_config` `temperature` 0.0; `unscored_criteria=0`; `freeze_exit=0`; `baseline_files=2`; `freeze_checks_passed=22`; `receipt_after_exit=0`, `receipt check: green`; `RESULT=expected` |
 | `V14_H06_window.txt` | Both UTC times |
 
 **If it times out or stops** (`assess_exit` not 0, `report_count=0`, `checkpoint_lines` recorded): run the same

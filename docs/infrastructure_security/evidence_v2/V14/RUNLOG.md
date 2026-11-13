@@ -28,6 +28,7 @@
 | 2026-11-13 | operator | Sitting 1 started. H03 PASS: `path=create`, change set 7 Add, `c7i-flex.large`; **create executed 00:01:24Z** (hourly charges from here), `CREATE_COMPLETE`, host `Online` on try 0, end 00:03:15Z. H04a–d PASS: tarball sha256 `9c5351ef…132a`, 92,413,570 bytes, equal to O5; install 299 files, 17 sums; verify all 11 checks true, manifest `04f8218f…19dd`, revision `17e32d54`, Bedrock runtime on a private address, no internet route; inbound input sha256 matches, 19 members (8/1/10, 1 manifest, 0 ESR), in-app equal 8, root mode 700, local archive removed. H04e not yet run |
 | 2026-11-13 | agent | H05a and H05b refused by the sender before sending: non-ASCII characters (`§` in header comments; the `’` of the P2 wording). Nothing ran on the host. Fixed in all five scripts carrying them (H05a, H05b, H06, H08, status): `§` written as "section", the apostrophe as the Python escape `’`, so the receipt value is unchanged. The rehearsal had run the scripts directly, not through the sender. H05b re-run on the simulated host: green |
 | 2026-11-13 | operator | H04e PASS: one `delete_exit=0`; then versions 0, markers 0 (V14-OP1 holds). H05a PASS: one import manifest; preflight exit 1 with 2 flags (`other`, `word scan`: V14-F8); pack set `sha256:fe975e4b8489`, equal to W07; package complete under 400000, 10 packs; no checkpoint yet; assessor version `bedrock-converse-eu-north-1@2026-11-13`, revision `17e32d54`; rendered request `eu.anthropic.claude-sonnet-4-6`, temperature 0.0, `maxTokens` 2048, no tool configuration, `eu-north-1`; draft `38b9c10c…aed6`. H05b PASS: no placeholders left; receipt `75eb46f0…fa91`, mode 600; check exit 0, `receipt check: green`. Next: H06 |
+| 2026-11-13 | operator | H06 PASS, checked against the PASS row as corrected by V14-F9. Window 08:12:01Z to 08:18:49Z (assess 08:12:07Z to 08:18:37Z, 6.5 minutes). Receipt green before; assess exit 0; one report `blind_96a09b983831_0001.json`, sha256 `f5c99a91…24bd`; one candidate; 46 live calls, 0 replayed, 1 discarded draw (V14-F9); 46 requests; no tool configuration, no child process; `maxTokens` 2048, temperature 0.0; no unscored criterion; checkpoint 48 lines. Freeze exit 0, 22 of 22 checks; baseline `blind_baseline_f5c99a91adc9.json` (equal to the report) and its `.freeze.json` `307d93fe…1add`. Receipt green after, against the report |
 | 2026-11-12 | agent | Rehearsal run (`REHEARSAL.md`): V14-F2 settled by the supplement (`supplement.json`); V14-F3 to V14-F5 found; V14-A1 decided. `STEPS.md`, `workstation/v14_pack.py`, `workstation/v14_cost.py` written. No AWS call, no model call. No go given |
 
 ### Operator decisions
@@ -175,7 +176,7 @@
     both flags, so it includes this.
 - **V14-F8. The preflight's two remaining flags are explained, and neither blocks.** In the code, `assess` checks
   the preflight's parameters and pack set, not its flags, and the freeze does not read them (Inferred from the code;
-  not run with a flagged preflight).
+  confirmed at H06 on 2026-11-13: assess and freeze ran green after this flagged preflight).
   - **Tables: 250 rows rendered and parsed, against 275 in the import manifest.** The operator explains the gap of
     25 by the 25 rows on pages 1–4, which lie outside the declared page map (operator, 2026-11-12). The map is the original's configuration, so these rows are outside the assessed sections by
     declaration, not lost by the extraction.
@@ -184,6 +185,12 @@
     original, so hits are expected and do not indicate a leak into the assessment. Only the count is recorded.
     The preflight report lists up to 50 hits by path, line and noun, so it stays private: H09 returns no
     preflight report, only its whitelisted metadata.
+- **V14-F9. The pass made 46 requests, not 45: one draw was malformed and drawn again.** H06 reports
+  `live_calls=46`, `discarded_draws=1`, `requests=46`. The judge discards a response that does not parse and draws
+  again; the report names each discarded draw on its cell or criterion score, with the parser's reason and the
+  thrown text's sha256 and length (`harness/judge.py` `DiscardedDraw`). The freeze accepted the report (22 of 22).
+  The H06 PASS row had asked for exactly 45; it now reads 45 plus `discarded_draws`. H09 shows which cell or
+  criterion carries the redraw, as a count. Cost: one more call, about 0.06 USD at the planned rate.
 
 Measured and found clear:
 
