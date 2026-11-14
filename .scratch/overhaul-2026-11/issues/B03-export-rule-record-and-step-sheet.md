@@ -1,6 +1,6 @@
 # B03 — The export rule on record, the receipt wording and the step sheet
 
-Status: ready (the operator's wording is filled in at review)
+Status: drafted; awaits the operator's two FILL points (the last criterion)
 Type: task (records; no code)
 Blocked by: None for the draft. B01 and B02 for the final script names and hashes
 Lane: Stage B drafting (MSCA-DN 2026 resubmission), export route
@@ -62,14 +62,14 @@ Written in the V14 `STEPS.md` style: a PowerShell block, what to expect, what to
 
 ## Acceptance criteria
 
-- [ ] The decision record parses as JSON, follows the field set of the lane's first record, and names
+- [x] The decision record parses as JSON, follows the field set of the lane's first record, and names
       B01 and B02's scripts by path.
-- [ ] It names V14-OP2 and V14-OP8 as set aside for this lane only, and V14-OP4 as standing.
-- [ ] The two operator points carry `FILL` markers and no agent-written substitute.
-- [ ] `STEPS.md` names only scripts that exist in the tree, and every AWS line carries
+- [x] It names V14-OP2 and V14-OP8 as set aside for this lane only, and V14-OP4 as standing.
+- [x] The two operator points carry `FILL` markers and no agent-written substitute.
+- [x] `STEPS.md` names only scripts that exist in the tree, and every AWS line carries
       `--profile po-r1 --region eu-north-1`.
-- [ ] SB-T3 states its PASS rule as above, and says it runs no earlier than 15 minutes after a fetch.
-- [ ] No record holds private content. `tools/evidence_secret_scan.py` and `tools/old_id_guard.py` are
+- [x] SB-T3 states its PASS rule as above, and says it runs no earlier than 15 minutes after a fetch.
+- [x] No record holds private content. `tools/evidence_secret_scan.py` and `tools/old_id_guard.py` are
       clean over the `SB` folder.
 - [ ] The operator has read the record and filled or struck both `FILL` points before B04 runs.
 
@@ -92,3 +92,22 @@ Size: one JSON record, two short Markdown files
 - The rest of the lane's step sheet (normalise, packs, drafting, host creation).
 
 ## Comments
+
+- 2026-11-14, agent. Drafted. Evidence per criterion:
+  - JSON: parses; top-level and per-item keys equal the first lane record's (checked by script). `ticket` names the
+    three scripts by path, with the sha256 of each blob at `0d8d7a41`.
+  - E3 sets aside V14-OP2 and V14-OP8 for this lane only; E4 keeps V14-OP4.
+  - E5 and E7 hold `FILL: operator` and nothing else; the receipt's export sentence (STEPS P2) sits between `FILL`
+    lines and leaves the same two parts as `FILL: operator`.
+  - Every path STEPS names exists (checked). Every `aws` line carries `--profile po-r1 --region eu-north-1`.
+  - SB-T3 states the rule and the 15-minute floor. Its counts line was run under PowerShell 5.1 on three invented
+    events (one port-forward, one interactive, one refused call by another role): all six counts correct.
+  - `tools.evidence_secret_scan` over `SB`: CLEAN, exit 0. `tools.old_id_guard`: CLEAN, exit 0.
+  - Review (standards and spec) applied: G1 now Inferred with its chain; E1 "as decided"; the fetch seconds are
+    named as whole-fetch time, not throughput (G4, STEPS); `exit=0` is the reported line, not a record field; the
+    token check excludes the named sha256 fields; SB-T3 counts other callers and leaves refused calls out of
+    `interactive`; B04's SB-T3 file keeps its name `SB_T3_start-session.json`.
+  - Found: G3, the token stays in the account's Run Command history and in the SSM Agent's folder on the host
+    (Inferred; used once, dies with the window). SB-F1, B04's `SB_T1_after.json` and the emptying of `outbound`
+    have no script; STEPS reads them in an interactive session. The operator decides before B04.
+  - Open: the last criterion (the operator's FILL points).

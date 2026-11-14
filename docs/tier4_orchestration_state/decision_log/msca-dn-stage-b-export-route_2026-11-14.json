@@ -1,0 +1,128 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-stage-b-export-route_2026-11-14",
+  "date": "2026-11-14",
+  "branch": "harness_overhaul",
+  "base_commit": "0d8d7a41",
+  "milestone": "MSCA-DN 2026 resubmission, Stage B drafting lane, export route",
+  "ticket": "B03 of .scratch/overhaul-2026-11/issues/ (the export rule on record). It answers the A6 part of gap G2 of msca-dn-stage-b-drafting-lane_2026-11-14, which it follows and does not edit. Scripts: docs/infrastructure_security/evidence_v2/SB/host/sb_outbound_serve.sh (B01, committed sha256 23f938a4bce5e91efa8c706b18b0458eb63f8f7bd7c7c48b6ad198e492279a6e), docs/infrastructure_security/evidence_v2/SB/host/sb_smoke_seed.sh (B01, 1f9574a18a7f21c69ee1e4a5b9c8cde326066734acf82e649d23c42c0c68927a) and docs/infrastructure_security/evidence_v2/SB/workstation/sb_fetch.ps1 (B02, b2ec7e2d1e915a19087c5f2e0190c9641b66cbe762045aa854548aac3426fe5f). Each hash is of the blob at 0d8d7a41. A Windows checkout may turn the .ps1 into CRLF, so its working-copy hash can differ. host-run.ps1 sends a .sh with LF and records that hash in its -Out.",
+  "authority": "Operator instruction, in session on 2026-11-14: the route of tickets B01 to B04. It sets aside V14-OP2 and V14-OP8 for this lane only. It amends no constitutional rule (CLAUDE.md section 14), closes no gate, changes no stack and changes no code pin.",
+  "review_state": "agent_drafted_pending_operator_review",
+  "decided_by": "The operator chose the route in session on 2026-11-14. The agent drafted this record from tickets B01 to B04. Two points (E5 and E7) await the operator's wording.",
+  "decision": "Drafts leave the host as one archive. The host serves it once, on its loopback address, through a Session Manager port-forward session to the operator's workstation. Both sides check the sha256. The host gets no internet route and no S3 write.",
+  "rules": [
+    {
+      "id": "E1",
+      "rule": "The route, as decided. The workstation's sb_fetch.ps1 makes a one-use token and a neutral archive name. It starts sb_outbound_serve.sh on the host by deploy/aws/scripts/host-run.ps1 (Run Command, as root). The host packs /root/sb/outbound into one archive and serves it once at http://127.0.0.1:<port>/<token>/<archive> until one complete GET or the window ends, then deletes it. The workstation fetches through an AWS-StartPortForwardingSession session. No stack changes, no internet route, no S3 write.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14. Tickets B01 and B02; tests/test_stageb_outbound_tunnel.py on the workstation. The live route is B04."
+    },
+    {
+      "id": "E2",
+      "rule": "What proves delivery. The workstation's record: kept true, which needs the sha256 and the size to equal the host's and the host's RESULT=expected. The host's served=yes and RESULT=expected mean every byte was sent, not received. TCP cannot show more, and on Windows a client was seen cut off after the host printed them.",
+      "declared_status": "Confirmed",
+      "basis": "Operator decision 'Narrow the claim', in session, 2026-11-14; B01 comments; commit 0d8d7a41."
+    },
+    {
+      "id": "E3",
+      "rule": "Set aside for this lane only: V14-OP2 (only metadata leaves the host) and V14-OP8 (sessions use the default document only). A port-forward session names the document AWS-StartPortForwardingSession.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14. V14-OP2 and V14-OP8: evidence_v2/V14/RUNLOG.md, Operator decisions."
+    },
+    {
+      "id": "E4",
+      "rule": "V14-OP4 stands. Text is read on the host only in an interactive session, never in Run Command output. The serve script prints key=value metadata only, and no member's name or content.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14; V14-OP4; sb_outbound_serve.sh header."
+    },
+    {
+      "id": "E5",
+      "rule": "What may leave. Only the files the drafting lane writes to /root/sb/outbound/. The kinds of file: FILL: operator.",
+      "declared_status": "Unresolved",
+      "basis": "The folder is fixed by B01. The kinds await the operator's wording."
+    },
+    {
+      "id": "E6",
+      "rule": "Where it lands. A private folder on the operator's workstation, outside every checkout and outside any cloud-synced folder. sb_fetch.ps1 refuses a folder under this repository or inside any git work tree. It does not detect a cloud-synced folder, so that part rests on the operator.",
+      "declared_status": "Confirmed",
+      "basis": "Ticket B03; sb_fetch.ps1 refusals (Inside, InWorkTree)."
+    },
+    {
+      "id": "E7",
+      "rule": "Who may receive the drafts next, and by which channel: FILL: operator.",
+      "declared_status": "Unresolved",
+      "basis": "Awaits the operator's wording."
+    },
+    {
+      "id": "E8",
+      "rule": "What stays as it was. Inbound transfer by V14-OP1. Bedrock invocation logging off. No session preferences document, so no session logging.",
+      "declared_status": "Confirmed",
+      "basis": "Ticket B03; V14-OP1; V14_H01_session-preferences.json."
+    },
+    {
+      "id": "E9",
+      "rule": "Fallback. If B04 fails, the declared session export: gzip and base64 in an interactive session, sha256 on both sides, as V14-D3 did. This time it is declared before the run.",
+      "declared_status": "Confirmed",
+      "basis": "Ticket B03; V14-D3 in evidence_v2/V14/RUNLOG.md."
+    }
+  ],
+  "limits_of_the_override": [
+    {
+      "id": "L1",
+      "rule": "E3 covers this lane only. V14's records stay as they are, and no later lane inherits E3 without its own record.",
+      "declared_status": "Inferred",
+      "basis": "CLAUDE.md section 1: an override applies only for the scope of the instruction that invokes it."
+    },
+    {
+      "id": "L2",
+      "rule": "Not built: the S3 outbound/ route of the reviewed proposal (step 0.6). It would change four base stacks.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14 (ticket B03). The route it would have been is step 0.6 of .scratch/overhaul-2026-11/handoff-stageB-drafting-2026-11-14.md."
+    },
+    {
+      "id": "L3",
+      "rule": "The route carries files out only. It changes no rule of the first lane record: limits L1 to L4 of msca-dn-stage-b-drafting-lane_2026-11-14 stand, and nothing from the archive enters this repository.",
+      "declared_status": "Inferred",
+      "basis": "msca-dn-stage-b-drafting-lane_2026-11-14, L3."
+    }
+  ],
+  "known_gaps": [
+    {
+      "id": "G1",
+      "gap": "The session's content is protected by TLS and is not additionally encrypted with the project key. Inferred from E8: no session preferences document exists (evidence_v2/V14/V14_H01_session-preferences.json), so no KMS key is set for session data.",
+      "owner": "operator",
+      "declared_status": "Inferred"
+    },
+    {
+      "id": "G2",
+      "gap": "CloudTrail records each StartSession with its document name, not what was carried.",
+      "owner": "operator",
+      "declared_status": "Confirmed"
+    },
+    {
+      "id": "G3",
+      "gap": "The token travels as an export line in the Run Command's commands parameter. The account's Run Command history keeps that parameter, and the SSM Agent writes the script under its own folder on the host. The token is used once and dies with the window, so a copy found later opens nothing.",
+      "owner": "operator",
+      "declared_status": "Inferred"
+    },
+    {
+      "id": "G4",
+      "gap": "Not yet shown on a real host: that the operator's role may start a port-forward session, that the SSM Agent reaches a server bound to 127.0.0.1, and how long a whole fetch takes. The fetch record's end_utc minus start_utc includes Run Command start-up, polling and clean-up, so it is not a throughput measure. B04 shows them, on an invented file.",
+      "owner": "operator",
+      "declared_status": "Unresolved"
+    },
+    {
+      "id": "G5",
+      "gap": "The symlink, FIFO and SIGTERM refusals of B01 have run only in tests that skip on Windows. Their first run is on the Linux host.",
+      "owner": "agent",
+      "declared_status": "Unresolved"
+    },
+    {
+      "id": "G6",
+      "gap": "A5 (processing authority for the 2026 inputs) and A7 (the RAISE DN opt-in) of gap G2 of the first lane record stay open. They get their own records.",
+      "owner": "operator",
+      "declared_status": "Unresolved"
+    }
+  ],
+  "private_content": "none: no partner, person, number or passage from the 2026 inputs or from the 2025 original appears in this record"
+}
