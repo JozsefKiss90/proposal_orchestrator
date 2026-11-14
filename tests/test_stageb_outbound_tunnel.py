@@ -647,10 +647,14 @@ def test_the_fetch_script_is_ascii() -> None:
     ("out_exists", "a run never overwrites"), ("dest_missing", "is not a folder"),
     ("dest_in_git", "inside a git work tree"), ("dest_in_repo", "under this repository"),
     ("no_aws", "AWS CLI"), ("no_plugin", "Session Manager plugin"), ("no_instance", "holds no InstanceId"),
-    ("no_serve", "not found")])
+    ("no_serve", "not found"), ("dest_bad_chars", "preflight failed"), ("out_bad_chars", "preflight failed")])
 def test_each_refusal_exits_2_before_any_aws_call(tunnel_tmp, case, why) -> None:
     kw: dict = {}
-    if case == "out_exists":
+    if case == "dest_bad_chars":
+        kw["dest"] = Path("<D>")  # the unfilled placeholder, as pasted at B04
+    elif case == "out_bad_chars":
+        kw["out"] = tunnel_tmp / "<O>.json"
+    elif case == "out_exists":
         kw["out"] = tunnel_tmp / "evidence.json"
         kw["out"].write_text("{}", encoding="utf-8")
     elif case == "dest_missing":

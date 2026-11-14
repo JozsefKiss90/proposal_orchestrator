@@ -70,6 +70,10 @@ $Repo = Full (Join-Path $PSScriptRoot "..\..\..\..\..")
 $HostRun = Join-Path $Repo "deploy\aws\scripts\host-run.ps1"
 if (-not $ServeScript) { $ServeScript = Join-Path $Repo "docs\infrastructure_security\evidence_v2\SB\host\sb_outbound_serve.sh" }
 
+# Under "Continue" a check that throws (a path with characters Windows forbids, for one) skips its if and the
+# refusal with it, so the checks run under "Stop" and any error refuses.
+$ErrorActionPreference = "Stop"
+try {
 if (Test-Path -LiteralPath $Out) { Refuse "$Out exists; a run never overwrites" }
 if (-not (Test-Path -LiteralPath (Split-Path (Full $Out) -Parent) -PathType Container)) { Refuse "the folder of $Out does not exist" }
 if ($HostPort -lt 1024 -or $HostPort -gt 65535) { Refuse "-HostPort must be 1024-65535" }
@@ -94,6 +98,11 @@ $HostJson = Join-Path $Repo "deploy\aws\parameters\host.json"
 if (-not (Test-Path -LiteralPath $HostJson)) { Refuse "host.json not found at $HostJson" }
 $Region = (@((Get-Content -LiteralPath $HostJson -Raw | ConvertFrom-Json) | ForEach-Object { $_ }) | Where-Object { $_.ParameterKey -eq "ExpectedRegion" }).ParameterValue
 if (-not $Region) { Refuse "host.json names no ExpectedRegion" }
+} catch {
+  # The type, not the message: Windows localises the message.
+  Refuse "the preflight failed ($($_.Exception.GetType().Name)); check -Dest, -Out and -Outputs"
+}
+$ErrorActionPreference = "Continue"
 
 function Aws([string[]]$Argv) {
   $all = @($Argv + @("--region", $Region, "--profile", $AwsProfile))

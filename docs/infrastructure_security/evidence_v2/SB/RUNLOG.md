@@ -22,6 +22,9 @@
 | 2026-11-14 | agent | Fixed before SB-T0b: the three `host-lifecycle.ps1` lines of `STEPS.md` (SB-T0b, SB-T4) held a BEL control byte in place of `\a` in `deploy\aws`, so the path did not exist. No other control byte in the SB records or tickets |
 | 2026-11-14 | operator | SB-T0b run. PASS: `path=create`, `7 Add`, `CREATE_COMPLETE`, host `Online`, `RESULT=started`. Create executed 22:48:57Z (start 22:47:37Z); SB-T3 counts from 22:47:37Z. Hourly charges from here |
 | 2026-11-14 | operator | SB-T1a stopped: no Session Manager plugin on the workstation (SB-F4) |
+| 2026-11-14 | operator | Plugin installed (1.2.896.0). SB-T1a PASS; `SB_T1_bundles-before.json` lists the two freeze-bundle objects |
+| 2026-11-14 | operator | SB-T1b seed PASS (`Success`, `seed_bytes=1000000`, `RESULT=expected`, 23:02:59Z). The fetch ran with `-Dest` left as the placeholder `<D>` and failed (SB-F5); record kept as `SB_T1_fetch-failed1.json` |
+| 2026-11-14 | agent | SB-F5 fixed in `sb_fetch.ps1`: the preflight runs under `Stop` and refuses on any error. Two new refusal cases (a `-Dest` and an `-Out` with forbidden characters); `tests/test_stageb_outbound_tunnel.py` 55 passed, 3 skipped. New blob sha256 `26a7722a8fa78d7d9d32735372dbef25eebe9740b477c46835c332ccb7de859e` (LF) |
 
 ### Operator decisions
 
@@ -42,6 +45,15 @@
 - **SB-F4. The preflight did not check the Session Manager plugin.** SB-T0b created the host (22:48:57Z), then SB-T1a
   found `session-manager-plugin` not on PATH and not installed. `sb_fetch.ps1` refuses without it, so nothing ran
   half-way. SB-T0a now checks the plugin before any charge.
+- **SB-F5. `sb_fetch.ps1` did not refuse a `-Dest` with forbidden characters.** Under `$ErrorActionPreference =
+  "Continue"`, `Test-Path` threw on `<D>`, which skipped the `if` and its refusal; `$Dest` then came out empty and
+  the repository and work-tree checks were skipped too. The script went on to AWS calls: it opened port-forward
+  session `…-se7dabq8pp8brzgnfpky34kz9a` (23:03:20Z) and started host-run. An error in the poll then ended the run
+  after 5 seconds, which killed host-run, ended the session (`session_terminated` true) and wrote no archive
+  anywhere; the token stayed out of the console and the record. Whether the serve Run Command reached the host is
+  not recorded (`command_id` null). If it did, its 300-second window ended and it deleted its archive; `smoke.txt`
+  stays in `outbound`, and the rerun packs it. SB-T3 will show one more port-forward event than the fetches kept.
+  Fixed: the preflight now runs under `Stop` and refuses on any error before an AWS call.
 - **SB-F3. B01's symlink, FIFO and SIGTERM refusals have not run.** Their tests skip on Windows. The first run is
   on the Linux host (decision record G5).
 
