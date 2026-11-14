@@ -271,6 +271,10 @@ try {
   } elseif ($Record.host_lines["RESULT"] -eq "expected" -and -not $Record.failure) {
     $Record.failure = "the host sent the archive, but no file arrived"
   }
+} catch {
+  # Inside try a statement error ends the body. Record its type and line, never its message: a web error's
+  # message may hold the URL, and so the token.
+  $Record.failure = "script error $($_.Exception.GetType().Name) at line $($_.InvocationInfo.ScriptLineNumber)"
 } finally {
   EndSession
   if ($HostProc -and -not $HostProc.HasExited) {

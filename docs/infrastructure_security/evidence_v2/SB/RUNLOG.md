@@ -29,6 +29,9 @@
 | 2026-11-14 | agent | SB-F6 fixed: `session_error` field; fake `FAKE_TUNNEL_SESSION=refuse` and one new test; tunnel tests 56 passed, 3 skipped. New blob sha256 `94264254b8e4ae8c0dc2a1872e521dff7c95c130b67734a75664def7e03b09e8` (LF) |
 | 2026-11-14 | operator | Third fetch PASS (23:39:49Z to 23:40:05Z, 16 s whole-fetch): `kept` true, 3064 bytes, sha256 equal, session ended, host `served=yes` `RESULT=expected`. SB-F6 did not recur; its cause stays unknown |
 | 2026-11-14 | operator | SB-T1c PASS: `files=1`, `smoke_sha256` equal to the seed's `seed_sha256` |
+| 2026-11-14 | operator | SB-T1e run before SB-T1d: seed refused correctly (`refused=the outbound folder is not empty`, 23:48:08Z), kept as `SB_T1_seed2-refused1.json`. Its fetch (23:49:14Z) opened a session and ended after 12 s with no host lines and no failure (SB-F7), kept as `SB_T1_fetch2-failed1.json` |
+| 2026-11-14 | operator | SB-T1d PASS: `smoke.txt` removed in an interactive session, `outbound` count `0` |
+| 2026-11-14 | agent | SB-F7: `sb_fetch.ps1` now records an error in its main body as `failure=script error <type> at line <n>` (never the message). No test reproduces the B04 error; tunnel tests 56 passed, 3 skipped. New blob sha256 `3f0b7090f80d58e6dbde8ab5be0a013eda8b96c32ab386df3e146dc3a27b7901` (LF) |
 
 ### Operator decisions
 
@@ -64,6 +67,11 @@
   its 300-second window). The cleanup deleted the session's own output, so the cause is not known; the first fetch's
   session (SB-F5) had opened. Fixed: `sb_fetch.ps1` now keeps the session's last three lines (ASCII, at most 400
   characters) in a `session_error` field and prints them. Record kept as `SB_T1_fetch-failed2.json`.
+- **SB-F7. An error in the fetch's main body was recorded as no failure.** `SB_T1_fetch2-failed1.json`: session
+  opened, run over in 12 s, `command_id` null, `failure` null; the same shape as SB-F5's run. Inside `try`, a
+  statement error ends the body and jumps to the cleanup, which recorded nothing. Not kept, so the cleanup deleted
+  any file that came. The error is unknown. Fixed so far as to name it next time: a `catch` records its type and
+  line. Not reproduced in a test.
 - **SB-F3. B01's symlink, FIFO and SIGTERM refusals have not run.** Their tests skip on Windows. The first run is
   on the Linux host (decision record G5).
 
