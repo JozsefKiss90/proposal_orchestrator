@@ -81,7 +81,11 @@ Get-ChildItem "$E\SB_T0a_*" | ForEach-Object { "== $($_.Name)"; Get-Content $_.F
 | `SB_T0a_session-preferences.json` | `document` `absent` with `invalid_document` true (any other failure, such as an expired session, is not absence: rerun), or present with `s3BucketName` and `cloudWatchLogGroupName` empty and `cloudWatchStreamingEnabled` false or empty (E8) |
 | `SB_T0a_host-stack-before.txt` | `does not exist`; `exit=254` |
 
-**STOP rule.** Session logging configured, a host stack already there, or anything else different: stop and report.
+Also report `plugin=$(session-manager-plugin --version)`. **PASS:** a version number. `sb_fetch.ps1` and every
+interactive session need the plugin on PATH. Not found: install it, open a new PowerShell window, rerun the line.
+
+**STOP rule.** Session logging configured, a host stack already there, no plugin, or anything else different: stop
+and report.
 
 **SB-T0b. Create the host stack.**
 

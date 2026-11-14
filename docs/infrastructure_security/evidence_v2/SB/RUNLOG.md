@@ -20,6 +20,8 @@
 | 2026-11-14 | operator | SB-OP1 below. The agent adds SB-T0 (create the host, after a preflight) and SB-T4 (stop and start) to `STEPS.md`. No AWS call |
 | 2026-11-14 | operator | SB-T0a run. PASS on all three files: account and role as expected; session preferences document absent (`InvalidDocument`); no host stack (`does not exist`, `exit=254`). No charge |
 | 2026-11-14 | agent | Fixed before SB-T0b: the three `host-lifecycle.ps1` lines of `STEPS.md` (SB-T0b, SB-T4) held a BEL control byte in place of `\a` in `deploy\aws`, so the path did not exist. No other control byte in the SB records or tickets |
+| 2026-11-14 | operator | SB-T0b run. PASS: `path=create`, `7 Add`, `CREATE_COMPLETE`, host `Online`, `RESULT=started`. Create executed 22:48:57Z (start 22:47:37Z); SB-T3 counts from 22:47:37Z. Hourly charges from here |
+| 2026-11-14 | operator | SB-T1a stopped: no Session Manager plugin on the workstation (SB-F4) |
 
 ### Operator decisions
 
@@ -37,6 +39,9 @@
 - **SB-F2. `served=yes` is not proof of receipt.** On Windows the B01 drop test saw the client reset after the host
   had sent every byte (3 of 30 runs). The operator narrowed the claim (decision record E2). Whether it happens on
   Linux is shown at B04, if at all.
+- **SB-F4. The preflight did not check the Session Manager plugin.** SB-T0b created the host (22:48:57Z), then SB-T1a
+  found `session-manager-plugin` not on PATH and not installed. `sb_fetch.ps1` refuses without it, so nothing ran
+  half-way. SB-T0a now checks the plugin before any charge.
 - **SB-F3. B01's symlink, FIFO and SIGTERM refusals have not run.** Their tests skip on Windows. The first run is
   on the Linux host (decision record G5).
 
