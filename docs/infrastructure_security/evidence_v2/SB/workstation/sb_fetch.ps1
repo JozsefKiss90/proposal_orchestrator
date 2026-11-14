@@ -128,7 +128,7 @@ $Final = Join-Path $Dest $Archive
 $Record = [ordered]@{
   archive = $Archive; bytes = $null; host_bytes = $null; local_sha256 = $null; host_sha256 = $null
   sha256_match = $false; kept = $false; instance_id = $Instance; command_id = $null; session_id = $null
-  session_terminated = $false
+  session_terminated = $false; session_error = $null
   document_name = $Document; host_port = $HostPort; local_port = $null; window_seconds = $WindowSeconds
   host_status = $null; host_lines = [ordered]@{}; start_utc = (Utc); end_utc = $null; failure = $null
 }
@@ -219,6 +219,14 @@ try {
   $Record.session_id = $SessionId
   if (-not $Ready) {
     $Record.failure = "the session did not open"
+    # The session's own last lines say why; the cleanup deletes its logs. They carry no token: the token
+    # never reaches the session's arguments. ASCII only, at most 400 characters.
+    $Said = @(((Shared $Log.session_err) + "`n" + (Shared $Log.session_out)) -split "`r?`n" |
+      ForEach-Object { ($_ -replace '[^\x20-\x7E]', '').Trim() } | Where-Object { $_ }) | Select-Object -Last 3
+    $Text = ($Said -join " | ")
+    if ($Text.Length -gt 400) { $Text = $Text.Substring(0, 400) }
+    $Record.session_error = $Text
+    Write-Host "session_error=$Text"
   } else {
     Remove-Item -LiteralPath $ParamsFile -Force -ErrorAction SilentlyContinue
     Write-Host "session_id=$SessionId local_port=$LocalPort"

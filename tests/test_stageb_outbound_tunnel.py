@@ -588,6 +588,7 @@ def tunnel_tmp(tmp_path):
 
 
 def _fetch(tmp: Path, files: Optional[dict[str, bytes]] = None, relay: str = "", alter: str = "", delay: str = "",
+           session: str = "",
            shims: tuple[str, ...] = ("aws", "plugin"), instance: Optional[str] = INSTANCE,
            dest: Optional[Path] = None, out: Optional[Path] = None, serve: Optional[Path] = None) -> Fetched:
     work = tmp / "host"
@@ -616,7 +617,7 @@ def _fetch(tmp: Path, files: Optional[dict[str, bytes]] = None, relay: str = "",
     env.update({"PATH": path, "TEMP": str(tmp / "temp"), "TMP": str(tmp / "temp"), "PO_POLL_SECONDS": "1",
                 "FAKE_TUNNEL_DIR": str(tmp / "state"), "FAKE_TUNNEL_BASH": str(BASH),
                 "FAKE_TUNNEL_SB_W": work.as_posix(), "FAKE_TUNNEL_RELAY": relay, "FAKE_TUNNEL_ALTER": alter,
-                "FAKE_TUNNEL_DELAY": delay})
+                "FAKE_TUNNEL_DELAY": delay, "FAKE_TUNNEL_SESSION": session})
     argv = [str(WINDOWS_POWERSHELL), "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", str(FETCH),
             "-AwsProfile", "po-r1", "-Outputs", str(outputs), "-Dest", str(dest), "-Out", str(out),
             "-HostPort", str(_free_port()), "-WindowSeconds", "30"]
@@ -767,3 +768,19 @@ def test_a_tunnel_that_carries_nothing_ends_after_the_window(tunnel_tmp) -> None
     assert f.host_values()["served"] == "no"
     assert f.elapsed >= 30, "the fetch ended before the host's window"
     _assert_cleaned_up(f)
+
+
+@needs_tunnel
+def test_a_session_that_does_not_open_keeps_its_error_line_in_the_record(tunnel_tmp) -> None:
+    # B04: the record said "the session did not open" and the cleanup had deleted the reason.
+    f = _fetch(tunnel_tmp, files={"notes.txt": b"invented notes\n"}, session="refuse")
+    assert f.rc == 1, f.stdout + f.stderr
+    record = f.record()
+    assert record["failure"] == "the session did not open"
+    assert "AccessDeniedException" in record["session_error"]
+    assert "AccessDeniedException" in f.stdout
+    assert f.token() not in json.dumps(record) + f.stdout
+    assert list(f.dest.iterdir()) == []
+    left = [p.name for p in (f.tmp / "temp").iterdir() if p.name.startswith("po-")]
+    assert not left, left
+    assert not _live(f.tmp), _live(f.tmp)

@@ -11,7 +11,8 @@ real CLI reads it. The fake keeps its state in ``FAKE_TUNNEL_DIR``:
 - ``ssm get-command-invocation`` answers ``InProgress`` until ``host.rc`` exists, then that run's status
   and stdout. ``FAKE_TUNNEL_ALTER=sha`` replaces the ``archive_sha256`` value with zeros.
 - ``ssm start-session`` prints a ``SessionId`` as the plugin does and relays each connection on
-  ``127.0.0.1:<localPortNumber>`` to ``127.0.0.1:<portNumber>`` until killed. ``FAKE_TUNNEL_RELAY=none``
+  ``127.0.0.1:<localPortNumber>`` to ``127.0.0.1:<portNumber>`` until killed. ``FAKE_TUNNEL_SESSION=refuse``
+  prints the CLI's error line and exits 254 instead. ``FAKE_TUNNEL_RELAY=none``
   accepts and closes each connection without relaying.
 - ``ssm terminate-session`` answers as the real CLI does.
 
@@ -124,6 +125,10 @@ def relay(client: socket.socket, host_port: int) -> None:
 
 
 def start_session(args: list[str]) -> int:
+    if os.environ.get("FAKE_TUNNEL_SESSION") == "refuse":
+        sys.stderr.write("\nAn error occurred (AccessDeniedException) when calling the StartSession operation: "
+                         "fake refusal\n")
+        return 254
     params = parameters(args)
     host_port, local_port = int(params["portNumber"][0]), int(params["localPortNumber"][0])
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

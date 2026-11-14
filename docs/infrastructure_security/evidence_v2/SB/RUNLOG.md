@@ -25,6 +25,8 @@
 | 2026-11-14 | operator | Plugin installed (1.2.896.0). SB-T1a PASS; `SB_T1_bundles-before.json` lists the two freeze-bundle objects |
 | 2026-11-14 | operator | SB-T1b seed PASS (`Success`, `seed_bytes=1000000`, `RESULT=expected`, 23:02:59Z). The fetch ran with `-Dest` left as the placeholder `<D>` and failed (SB-F5); record kept as `SB_T1_fetch-failed1.json` |
 | 2026-11-14 | agent | SB-F5 fixed in `sb_fetch.ps1`: the preflight runs under `Stop` and refuses on any error. Two new refusal cases (a `-Dest` and an `-Out` with forbidden characters); `tests/test_stageb_outbound_tunnel.py` 55 passed, 3 skipped. New blob sha256 `26a7722a8fa78d7d9d32735372dbef25eebe9740b477c46835c332ccb7de859e` (LF) |
+| 2026-11-14 | operator | Second fetch (23:22:39Z) failed: the session did not open (SB-F6). Record kept as `SB_T1_fetch-failed2.json` |
+| 2026-11-14 | agent | SB-F6 fixed: `session_error` field; fake `FAKE_TUNNEL_SESSION=refuse` and one new test; tunnel tests 56 passed, 3 skipped. New blob sha256 `94264254b8e4ae8c0dc2a1872e521dff7c95c130b67734a75664def7e03b09e8` (LF) |
 
 ### Operator decisions
 
@@ -54,6 +56,12 @@
   not recorded (`command_id` null). If it did, its 300-second window ended and it deleted its archive; `smoke.txt`
   stays in `outbound`, and the rerun packs it. SB-T3 will show one more port-forward event than the fetches kept.
   Fixed: the preflight now runs under `Stop` and refuses on any error before an AWS call.
+- **SB-F6. A session that did not open left no reason.** The second fetch (23:22:39Z, `-Dest` the private folder)
+  ended "the session did not open": no `SessionId` and no "Waiting for connections" within 60 seconds. The host side
+  was sound (`listening=127.0.0.1:8765`, `members=1`, `served=no`, `archive_deleted=yes`, `RESULT=unexpected` after
+  its 300-second window). The cleanup deleted the session's own output, so the cause is not known; the first fetch's
+  session (SB-F5) had opened. Fixed: `sb_fetch.ps1` now keeps the session's last three lines (ASCII, at most 400
+  characters) in a `session_error` field and prints them. Record kept as `SB_T1_fetch-failed2.json`.
 - **SB-F3. B01's symlink, FIFO and SIGTERM refusals have not run.** Their tests skip on Windows. The first run is
   on the Linux host (decision record G5).
 
