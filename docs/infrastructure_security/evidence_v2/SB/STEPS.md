@@ -87,7 +87,7 @@ Get-ChildItem "$E\SB_T0a_*" | ForEach-Object { "== $($_.Name)"; Get-Content $_.F
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\SB"
-powershell -NoProfile -ExecutionPolicy Bypass -File deployws\scripts\host-lifecycle.ps1 -Action start -AwsProfile po-r1 -OutDir $E -Prefix SB_T0
+powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action start -AwsProfile po-r1 -OutDir $E -Prefix SB_T0
 ```
 
 Type `create` when it asks. **PASS:** as V14 H03: `SB_T0_log.txt` ends `RESULT=started` with `path=create`; seven
@@ -176,8 +176,8 @@ after a fix: stop, and use the fallback of decision record E9 for the first draf
 
 ```powershell
 $E = "docs\infrastructure_security\evidence_v2\SB"
-powershell -NoProfile -ExecutionPolicy Bypass -File deployws\scripts\host-lifecycle.ps1 -Action stop -AwsProfile po-r1 -OutDir $E -Prefix SB_T4_stop<N>
-powershell -NoProfile -ExecutionPolicy Bypass -File deployws\scripts\host-lifecycle.ps1 -Action start -AwsProfile po-r1 -OutDir $E -Prefix SB_T4_start<N>
+powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action stop -AwsProfile po-r1 -OutDir $E -Prefix SB_T4_stop<N>
+powershell -NoProfile -ExecutionPolicy Bypass -File deploy\aws\scripts\host-lifecycle.ps1 -Action start -AwsProfile po-r1 -OutDir $E -Prefix SB_T4_start<N>
 ```
 
 Run one line, not both. `<N>` counts the sittings: 1, 2, 3. Stop ends `RESULT=stopped`. Start takes the resume

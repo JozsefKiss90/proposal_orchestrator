@@ -18,6 +18,8 @@
 | 2026-11-14 | agent | B03: the export-route record drafted (`agent_drafted_pending_operator_review`), `STEPS.md` and this log started. Two `FILL` points await the operator: E5 and E7, and with them the receipt's export sentence (STEPS P2). No AWS call |
 | 2026-11-14 | operator | E5 confirmed: every file the lane writes to `outbound`, no narrower list of kinds. E7: the operator only, by the fetch into the private folder; no channel known for anyone else (record G7). Record now `operator_decided`; receipt sentence (STEPS P2) complete |
 | 2026-11-14 | operator | SB-OP1 below. The agent adds SB-T0 (create the host, after a preflight) and SB-T4 (stop and start) to `STEPS.md`. No AWS call |
+| 2026-11-14 | operator | SB-T0a run. PASS on all three files: account and role as expected; session preferences document absent (`InvalidDocument`); no host stack (`does not exist`, `exit=254`). No charge |
+| 2026-11-14 | agent | Fixed before SB-T0b: the three `host-lifecycle.ps1` lines of `STEPS.md` (SB-T0b, SB-T4) held a BEL control byte in place of `\a` in `deploy\aws`, so the path did not exist. No other control byte in the SB records or tickets |
 
 ### Operator decisions
 
