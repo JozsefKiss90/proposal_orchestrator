@@ -5,15 +5,23 @@ reproducible archive, serves it at ``http://127.0.0.1:<PO_PORT>/<PO_TOKEN>/<PO_A
 GET or the end of the window, deletes it and ends. ``sb_smoke_seed.sh`` writes the invented file the live
 smoke (B04) sends. These tests run both scripts under Git Bash with ``SB_W`` and ``SB_PY`` pointing at a
 temporary folder and this Python, over invented files, and skip where Git Bash is absent.
+
+Stage B ticket B02: ``evidence_v2/SB/workstation/sb_fetch.ps1`` starts B01's script by ``host-run.ps1``,
+opens an ``AWS-StartPortForwardingSession`` tunnel, downloads the archive and checks it against the host's
+sha256. Its tests run the real script under Windows PowerShell against ``tests/fixtures/fake_aws_tunnel.py``,
+a shimmed ``aws`` whose ``send-command`` runs B01's real script under Git Bash and whose ``start-session``
+relays loopback ports, and skip where either shell is absent.
 """
 from __future__ import annotations
 
 import hashlib
 import http.client
+import json
 import os
 import queue
 import re
 import secrets
+import shutil
 import signal
 import socket
 import struct
@@ -493,3 +501,247 @@ def test_the_seed_refuses_a_non_empty_folder_and_a_bad_size(tmp_path) -> None:
         empty = tmp_path / f"w{len(bad)}{bad}"
         assert _seed(empty, PO_BYTES=bad).stdout.splitlines()[-1] == "RESULT=unexpected"
         assert not (empty / "outbound").exists() or not any((empty / "outbound").iterdir())
+
+
+# ---------------------------------------------------------------------------
+# B02: the workstation fetches through the tunnel
+# ---------------------------------------------------------------------------
+
+FETCH = REPO / "docs" / "infrastructure_security" / "evidence_v2" / "SB" / "workstation" / "sb_fetch.ps1"
+FAKE_TUNNEL = REPO / "tests" / "fixtures" / "fake_aws_tunnel.py"
+INSTANCE = "i-0123456789abcdef0"
+RECORD_FIELDS = {"archive", "bytes", "local_sha256", "host_sha256", "sha256_match", "instance_id", "command_id",
+                 "session_id", "document_name", "host_port", "local_port", "start_utc", "end_utc", "host_lines"}
+
+WINDOWS_POWERSHELL = shutil.which("powershell")  # 5.1, the version the script is written for; never pwsh
+try:
+    import psutil
+except ImportError:  # the cleanup checks need it; the tunnel tests skip without it
+    psutil = None
+
+needs_tunnel = pytest.mark.skipif(not (WINDOWS_POWERSHELL and BASH and psutil and os.name == "nt"),
+                                  reason="needs Windows PowerShell 5.1, Git Bash and psutil")
+
+
+def _live(tmp: Path) -> list[str]:
+    """Command lines of running processes that name this test's folder."""
+    found = []
+    for proc in psutil.process_iter(["pid", "name"]):
+        if not str(proc.info["name"]).lower().startswith(("python", "py.", "bash", "sh.", "powershell", "cmd", "aws",
+                                                           "session-manager")):
+            continue
+        try:
+            line = " ".join(proc.cmdline() or [])
+        except (psutil.Error, TypeError):
+            continue
+        if str(tmp) in line or tmp.as_posix() in line:
+            found.append(f"{proc.info['pid']}: {line}")
+    return found
+
+
+def _kill_live(tmp: Path) -> None:
+    for entry in _live(tmp):
+        try:
+            psutil.Process(int(entry.split(":", 1)[0])).kill()
+        except psutil.Error:
+            pass
+
+
+class Fetched:
+    def __init__(self, tmp: Path, result: subprocess.CompletedProcess[str], out: Path, dest: Path) -> None:
+        self.tmp, self.out, self.dest = tmp, out, dest
+        self.rc = result.returncode
+        self.stdout, self.stderr = result.stdout, result.stderr
+        self.elapsed = 0.0
+        log = tmp / "state" / "calls.jsonl"
+        self.calls = [json.loads(x) for x in log.read_text(encoding="utf-8").splitlines()] if log.exists() else []
+
+    def ops(self, op: str) -> list[dict]:
+        return [c for c in self.calls if " ".join(c["argv"][:2]) == op]
+
+    def record(self) -> dict:
+        return json.loads(self.out.read_text(encoding="utf-8-sig"))
+
+    def token(self) -> str:
+        sent = (self.tmp / "state" / "host.sh").read_text(encoding="ascii")
+        found = re.search(r"^export PO_TOKEN='([0-9a-f]{64})'$", sent, re.M)
+        assert found, "the host received no token"
+        return found.group(1)
+
+    def host_values(self) -> dict[str, str]:
+        text = (self.tmp / "state" / "host.out").read_text(encoding="ascii")
+        return dict(x.split("=", 1) for x in text.splitlines() if "=" in x)
+
+
+@pytest.fixture
+def tunnel_tmp(tmp_path):
+    yield tmp_path
+    if psutil:
+        _kill_live(tmp_path)
+
+
+def _fetch(tmp: Path, files: Optional[dict[str, bytes]] = None, relay: str = "", alter: str = "",
+           shims: tuple[str, ...] = ("aws", "plugin"), instance: Optional[str] = INSTANCE,
+           dest: Optional[Path] = None, out: Optional[Path] = None, serve: Optional[Path] = None) -> Fetched:
+    work = tmp / "host"
+    (work / "outbound").mkdir(parents=True, exist_ok=True)
+    if files:
+        _outbound(work, files)
+    for name in ("state", "temp", "shims"):
+        (tmp / name).mkdir(exist_ok=True)
+    if "aws" in shims:
+        (tmp / "shims" / "aws.cmd").write_text(f'@"{sys.executable}" "{FAKE_TUNNEL}" %*\r\n', encoding="ascii")
+    if "plugin" in shims:
+        (tmp / "shims" / "session-manager-plugin.cmd").write_text("@exit /b 0\r\n", encoding="ascii")
+    outputs = tmp / "outputs.json"
+    rows = [{"OutputKey": "VpcId", "OutputValue": "vpc-0abc"}]
+    if instance:
+        rows.append({"OutputKey": "InstanceId", "OutputValue": instance})
+    outputs.write_text(json.dumps(rows), encoding="utf-8")
+    if dest is None:
+        dest = tmp / "private"
+        dest.mkdir(exist_ok=True)
+    out = out or tmp / "evidence.json"
+    root = os.environ.get("SystemRoot", r"C:\WINDOWS")
+    path = os.pathsep.join([str(tmp / "shims"), os.path.join(root, "System32"), root,
+                            os.path.join(root, "System32", "WindowsPowerShell", "v1.0")])
+    env = {k: v for k, v in os.environ.items() if not k.startswith(("PO_", "SB_", "FAKE_", "AWS_"))}
+    env.update({"PATH": path, "TEMP": str(tmp / "temp"), "TMP": str(tmp / "temp"), "PO_POLL_SECONDS": "1",
+                "FAKE_TUNNEL_DIR": str(tmp / "state"), "FAKE_TUNNEL_BASH": str(BASH),
+                "FAKE_TUNNEL_SB_W": work.as_posix(), "FAKE_TUNNEL_RELAY": relay, "FAKE_TUNNEL_ALTER": alter})
+    argv = [str(WINDOWS_POWERSHELL), "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", str(FETCH),
+            "-AwsProfile", "po-r1", "-Outputs", str(outputs), "-Dest", str(dest), "-Out", str(out),
+            "-HostPort", str(_free_port()), "-WindowSeconds", "30"]
+    if serve is not None:
+        argv += ["-ServeScript", str(serve)]
+    started = time.monotonic()
+    result = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=300, check=False)
+    fetched = Fetched(tmp, result, out, dest)
+    fetched.elapsed = time.monotonic() - started
+    return fetched
+
+
+def _assert_cleaned_up(f: Fetched) -> None:
+    left = [p.name for p in (f.tmp / "temp").iterdir() if p.name.startswith("po-")]  # not other programs' files
+    assert not left, f"the temp folder still holds {left}"
+    assert not list(f.dest.glob("*.part"))
+    assert len(f.ops("ssm terminate-session")) == 1
+    assert (f.tmp / "state" / "host.rc").exists(), "the host script is still running"
+    assert not _live(f.tmp), _live(f.tmp)
+
+
+def test_the_fetch_script_is_ascii() -> None:
+    FETCH.read_bytes().decode("ascii")
+
+
+@needs_tunnel
+@pytest.mark.parametrize("case, why", [
+    ("out_exists", "a run never overwrites"), ("dest_missing", "is not a folder"),
+    ("dest_in_git", "inside a git work tree"), ("dest_in_repo", "under this repository"),
+    ("no_aws", "AWS CLI"), ("no_plugin", "Session Manager plugin"), ("no_instance", "holds no InstanceId"),
+    ("no_serve", "not found")])
+def test_each_refusal_exits_2_before_any_aws_call(tunnel_tmp, case, why) -> None:
+    kw: dict = {}
+    if case == "out_exists":
+        kw["out"] = tunnel_tmp / "evidence.json"
+        kw["out"].write_text("{}", encoding="utf-8")
+    elif case == "dest_missing":
+        kw["dest"] = tunnel_tmp / "absent"
+    elif case == "dest_in_git":
+        (tunnel_tmp / "wt" / ".git").mkdir(parents=True)
+        kw["dest"] = tunnel_tmp / "wt" / "private"
+        kw["dest"].mkdir()
+    elif case == "dest_in_repo":
+        kw["dest"] = REPO / "tests" / "fixtures"
+    elif case == "no_aws":
+        kw["shims"] = ("plugin",)
+    elif case == "no_plugin":
+        kw["shims"] = ("aws",)
+    elif case == "no_instance":
+        kw["instance"] = None
+    elif case == "no_serve":
+        kw["serve"] = tunnel_tmp / "absent.sh"
+    f = _fetch(tunnel_tmp, files={"notes.txt": b"invented\n"}, **kw)
+    assert f.rc == 2, f.stdout + f.stderr
+    assert f.calls == []
+    assert "REFUSED" in f.stdout and why in f.stdout, f.stdout
+    if case != "out_exists":
+        assert not f.out.exists()
+
+
+@needs_tunnel
+def test_the_happy_path_keeps_the_archive_equal_to_the_hosts(tunnel_tmp) -> None:
+    f = _fetch(tunnel_tmp, files={"B1/section_1_2.md": b"invented draft text\n", "notes.txt": b"invented notes\n"})
+    assert f.rc == 0, f.stdout + f.stderr
+    host = f.host_values()
+    assert host["RESULT"] == "expected"
+    kept = list(f.dest.iterdir())
+    assert len(kept) == 1 and re.fullmatch(r"out-\d{8}-[0-9a-f]{6}\.tar\.gz", kept[0].name)
+    blob = kept[0].read_bytes()
+    assert hashlib.sha256(blob).hexdigest() == host["archive_sha256"]
+    assert len(blob) == int(host["archive_bytes"])
+    assert len(f.ops("ssm send-command")) == 1
+    sessions = f.ops("ssm start-session")
+    assert len(sessions) == 1
+    argv = sessions[0]["argv"]
+    assert argv[argv.index("--document-name") + 1] == "AWS-StartPortForwardingSession"
+    assert argv[argv.index("--target") + 1] == INSTANCE
+    params = json.loads(next(iter(sessions[0]["files"].values())))
+    record = f.record()
+    assert params == {"portNumber": [str(record["host_port"])], "localPortNumber": [str(record["local_port"])]}
+    terminated = f.ops("ssm terminate-session")[0]["argv"]
+    assert terminated[terminated.index("--session-id") + 1] == record["session_id"]
+    _assert_cleaned_up(f)
+
+
+@needs_tunnel
+def test_the_token_appears_nowhere_but_the_host(tunnel_tmp) -> None:
+    f = _fetch(tunnel_tmp, files={"notes.txt": b"invented notes\n"})
+    assert f.rc == 0, f.stdout + f.stderr
+    token = f.token()
+    assert token not in f.out.read_text(encoding="utf-8-sig")
+    assert token not in f.stdout and token not in f.stderr
+
+
+@needs_tunnel
+def test_the_record_carries_the_decided_fields_and_nothing_secret(tunnel_tmp) -> None:
+    f = _fetch(tunnel_tmp, files={"notes.txt": b"invented notes\n"})
+    assert f.rc == 0, f.stdout + f.stderr
+    record = f.record()
+    assert RECORD_FIELDS <= set(record)
+    assert record["sha256_match"] is True and record["session_terminated"] is True
+    assert record["command_id"] and record["session_id"] and record["local_port"]
+    assert record["local_sha256"] == record["host_sha256"] == f.host_values()["archive_sha256"]
+    assert record["instance_id"] == INSTANCE
+    assert record["document_name"] == "AWS-StartPortForwardingSession"
+    assert record["host_lines"]["RESULT"] == "expected"
+    assert re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ", record["start_utc"])
+    assert "token" not in json.dumps(record).lower()
+
+
+@needs_tunnel
+def test_a_host_refusal_keeps_nothing_and_ends_the_session(tunnel_tmp) -> None:
+    f = _fetch(tunnel_tmp, files=None)
+    assert f.rc == 1, f.stdout + f.stderr
+    assert f.host_values()["RESULT"] == "unexpected"
+    assert list(f.dest.iterdir()) == []
+    _assert_cleaned_up(f)
+
+
+@needs_tunnel
+def test_a_different_host_sha256_deletes_the_local_file(tunnel_tmp) -> None:
+    f = _fetch(tunnel_tmp, files={"notes.txt": b"invented notes\n"}, alter="sha")
+    assert f.rc == 1, f.stdout + f.stderr
+    assert list(f.dest.iterdir()) == []
+    assert f.record()["sha256_match"] is False
+    _assert_cleaned_up(f)
+
+
+@needs_tunnel
+def test_a_tunnel_that_carries_nothing_ends_after_the_window(tunnel_tmp) -> None:
+    f = _fetch(tunnel_tmp, files={"notes.txt": b"invented notes\n"}, relay="none")
+    assert f.rc == 1, f.stdout + f.stderr
+    assert list(f.dest.iterdir()) == []
+    assert f.host_values()["served"] == "no"
+    assert f.elapsed >= 30, "the fetch ended before the host's window"
+    _assert_cleaned_up(f)

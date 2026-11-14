@@ -1,0 +1,92 @@
+{
+  "record_type": "decision_record",
+  "id": "msca-dn-stage-b-drafting-lane_2026-11-14",
+  "date": "2026-11-14",
+  "branch": "harness_overhaul",
+  "base_commit": "81c7b982",
+  "milestone": "MSCA-DN 2026 resubmission, Stage B drafting lane",
+  "ticket": "Downstream backlog of plans/msca_dn_historical_validation_tickets.md (V15, V16). Proposal reviewed: .scratch/overhaul-2026-11/handoff-stageB-drafting-2026-11-14.md.",
+  "authority": "Operator instruction, in session on 2026-11-14. O2 is a named override under CLAUDE.md section 1 and section 3, priority 1. It applies to this lane only. It amends no constitutional rule (section 14), closes no gate and changes no code pin.",
+  "review_state": "operator_decided",
+  "decided_by": "The operator, in session on 2026-11-14 (decisions O1 to O5). The agent wrote the limits and the open points, which await the operator's review.",
+  "decision": "A private drafting lane for the 2026 resubmission may start now, outside the DAG. An AI model drafts the scoped Part B sections from the operator's human-approved inputs. Every new fact needs human confirmation. V15 is deferred, not skipped.",
+  "rules": [
+    {
+      "id": "O1",
+      "rule": "V15 is deferred, not skipped. It is drafted in parallel with this lane, and the operator signs it before the pre-evaluation.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14. V16 stays 'Blocked by: V15'."
+    },
+    {
+      "id": "O2",
+      "rule": "Named override, for this lane only, of CLAUDE.md sections 8.4 and 13.4 and of section 7 of plans/msca_dn_pe09_runbook.md: private AI drafting of the scoped Part B sections from the operator's human-approved inputs may start now, outside the DAG. Every new fact needs human confirmation.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14, naming the three rules."
+    },
+    {
+      "id": "O3",
+      "rule": "Drafting model: eu.anthropic.claude-opus-5-5. The assessor pin stays as in V14 (eu.anthropic.claude-sonnet-4-6, P1 of the V14 go).",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14. See G1: the account refused this model on 2026-10-21."
+    },
+    {
+      "id": "O4",
+      "rule": "academic-humanizer is used as a pinned, reviewed rule set in a second pass, with the fact guards.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14."
+    },
+    {
+      "id": "O5",
+      "rule": "The file 'DC drafts 2026.docx' is read-only in this lane.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14."
+    }
+  ],
+  "limits_of_the_override": [
+    {
+      "id": "L1",
+      "rule": "The override covers this lane only. A DAG run is not affected: gate_09 and the Phase 8 block of sections 8.4 and 13.4 stand for every node.",
+      "declared_status": "Inferred",
+      "basis": "CLAUDE.md section 1: an override applies only for the scope of the instruction that invokes it."
+    },
+    {
+      "id": "L2",
+      "rule": "Sections 13.2 and 13.3 are not overridden. The lane invents no call constraint and no project fact. A fact absent from the inputs is marked for confirmation and gets no value.",
+      "declared_status": "Inferred",
+      "basis": "O2 names sections 8.4, 13.4 and runbook section 7 only, and requires human confirmation of every new fact."
+    },
+    {
+      "id": "L3",
+      "rule": "The lane writes nothing to docs/tier5_deliverables and declares no gate passed. Its inputs and drafts stay in the private environment. This repository holds metadata only.",
+      "declared_status": "Inferred",
+      "basis": "O2 ('private', 'outside the DAG'); runbook section 7, second paragraph, which O2 does not set aside."
+    },
+    {
+      "id": "L4",
+      "rule": "The pre-evaluation of the draft is V16. It waits for the signed V15 (O1).",
+      "declared_status": "Confirmed",
+      "basis": "O1; ticket V16."
+    }
+  ],
+  "known_gaps": [
+    {
+      "id": "G1",
+      "gap": "O3 cannot run as given until a re-check. On 2026-10-21 Converse refused eu.anthropic.claude-opus-5-5 for this account with AccessDeniedException, and its applied token quota read 0 (F-R2-1 of aws-redeployment-od7-model-set_2026-10-21; evidence_v2/R2/R2_07_converse-opus-5-5.json, R2_08_quotas-applied.json). The account was still on the Free plan on 2026-11-13 (evidence_v2/V14/V14_H01_plan-state.json). The stack's parameters list Opus 4.6 and Sonnet 4.6 only.",
+      "owner": "operator",
+      "declared_status": "Confirmed"
+    },
+    {
+      "id": "G2",
+      "gap": "Not yet decided: the processing authority for the 2026 inputs, how drafts leave the host, and the RAISE DN opt-in (A5, A6 and A7 of the reviewed proposal).",
+      "owner": "operator",
+      "declared_status": "Unresolved"
+    },
+    {
+      "id": "G3",
+      "gap": "The scoped sections are not yet fixed by a master template. Until one is recorded, 'scoped Part B sections' means the rows the operator approves from the reviewed proposal's section E.",
+      "owner": "operator",
+      "declared_status": "Unresolved"
+    }
+  ],
+  "private_content": "none: no partner, person, number or passage from the 2026 inputs or from the 2025 original appears in this record"
+}
