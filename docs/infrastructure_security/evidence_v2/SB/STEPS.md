@@ -166,7 +166,7 @@ session (no document named), as `root`:
 | SB-T1c, twice | `files=1`; `smoke_sha256` equal to that fetch's `seed_sha256` |
 | SB-T1f | `0`, `0`, `0` |
 | `SB_T1_bundles-*.json` | `Compare-Object` prints nothing |
-| Every `SB_T1_*` file | no 64-hex value outside the named sha256 fields (`seed_sha256`, `archive_sha256`, `host_sha256`, `local_sha256`); the agent checks by script |
+| Every `SB_T1_*` file | no 64-hex value outside the named sha256 fields (`seed_sha256`, `archive_sha256`, `host_sha256`, `local_sha256`, and host-run's `script_sha256`); the agent checks by script |
 
 The agent records each fetch's seconds (`end_utc` minus `start_utc`) in `RUNLOG.md`. They cover the whole fetch, Run
 Command start-up and clean-up included, so they are not a throughput measure. Then SB-T3, no earlier than
