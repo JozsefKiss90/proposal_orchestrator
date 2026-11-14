@@ -214,7 +214,9 @@ try {
     Remove-Item -LiteralPath $ParamsFile -Force -ErrorAction SilentlyContinue
     Write-Host "session_id=$SessionId local_port=$LocalPort"
     $Url = "http://127.0.0.1:$LocalPort/$Token/$Archive"
-    $Deadline = (Get-Date).AddSeconds($WindowSeconds + 60)
+    # The host's window ends when host-run exits; the host may start serving late, so the poll follows host-run.
+    # The deadline only backstops a host-run that outlives its own timeout.
+    $Deadline = $HostProc.StartTime.AddSeconds($WindowSeconds + 180)
     $Got = $false
     while ((Get-Date) -lt $Deadline) {
       DropVars

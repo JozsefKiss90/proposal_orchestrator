@@ -67,24 +67,24 @@ with a shimmed `aws`:
 
 Tests:
 
-- [ ] The script is ASCII.
-- [ ] Each refusal of step 1 exits 2 and the shim records no AWS call.
-- [ ] Happy path: the archive is in `-Dest`, its sha256 equals the host's, exit 0. The shim saw one
+- [x] The script is ASCII.
+- [x] Each refusal of step 1 exits 2 and the shim records no AWS call.
+- [x] Happy path: the archive is in `-Dest`, its sha256 equals the host's, exit 0. The shim saw one
       `send-command`, one `start-session` naming `AWS-StartPortForwardingSession` with both ports, and one
       `terminate-session`.
-- [ ] The token the shim received appears nowhere in `-Out`, in stdout or in stderr.
-- [ ] After any ending, the temp folder holds no vars file and no parameters file, and no child process
+- [x] The token the shim received appears nowhere in `-Out`, in stdout or in stderr.
+- [x] After any ending, the temp folder holds no vars file and no parameters file, and no child process
       of the script is left running.
-- [ ] The host refuses (for example an empty `outbound/`): no file in `-Dest`, exit 1, session terminated.
-- [ ] The host reports a different sha256 (shim alters the line): the local file is deleted, exit 1,
+- [x] The host refuses (for example an empty `outbound/`): no file in `-Dest`, exit 1, session terminated.
+- [x] The host reports a different sha256 (shim alters the line): the local file is deleted, exit 1,
       `sha256_match` false in `-Out`.
-- [ ] The tunnel never carries data (shim relays nothing): exit 1 after the window, no `.part` file left,
+- [x] The tunnel never carries data (shim relays nothing): exit 1 after the window, no `.part` file left,
       session terminated, the host child ended.
-- [ ] `-Out` parses as JSON and carries the fields of the Decisions list.
+- [x] `-Out` parses as JSON and carries the fields of the Decisions list.
 
 Then:
 
-- [ ] The full suite shows no new failure by node id against `plans/overhaul/BASELINE.md`.
+- [x] The full suite shows no new failure by node id against `plans/overhaul/BASELINE.md`.
 
 ## Session brief
 
@@ -115,3 +115,18 @@ Record: none in this ticket (B03 writes the export rule)
 - Any S3, IAM, KMS or endpoint change.
 
 ## Comments
+
+- 2026-11-14, implemented in `8c508e92`; the follow-up commit fixes one flake the first runs showed.
+  Evidence: the Stage B file passed in the full suite on Windows (PowerShell 5.1, Git Bash). The full
+  suite had 42 failures, every one in the baseline list, and none new.
+  - Ticked: every criterion, each by its named test in `tests/test_stageb_outbound_tunnel.py`.
+  - Fixed: the happy path failed 3 times in about 10 runs. The host started serving late, up to 115 s
+    after the session opened, and the fetch stopped polling at window + 60 s. Step 5 polls until the
+    host's window ends, so the poll now follows host-run. A backstop stops it at window + 180 s from
+    host-run's start. `test_a_host_that_starts_serving_late_still_delivers` holds the host back 100 s.
+    It failed on `8c508e92` and passes on the fix.
+  - Fixed: concurrent fake `aws` calls could corrupt the shared `calls.jsonl`. Each call now writes its
+    own file.
+  - Found, not fixed here: B01 can report `served=yes` for a transfer the client did not receive in
+    full (see B01's comment). This script's sha256 check catches that case: the file is deleted and
+    the run exits 1.

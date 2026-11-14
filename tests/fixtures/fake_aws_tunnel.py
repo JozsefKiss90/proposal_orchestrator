@@ -1,11 +1,13 @@
 """A fake AWS CLI for the Stage B tunnel tests (ticket B02).
 
-Every call appends ``{"argv": [...], "files": {...}}`` to ``$FAKE_TUNNEL_DIR/calls.jsonl``; a ``file://``
-argument is read at call time, as the real CLI reads it. The fake keeps its state in ``FAKE_TUNNEL_DIR``:
+Every call writes ``{"argv": [...], "files": {...}}`` to its own file in ``$FAKE_TUNNEL_DIR/calls/``, named
+by time and process id, since several calls run at once; a ``file://`` argument is read at call time, as the
+real CLI reads it. The fake keeps its state in ``FAKE_TUNNEL_DIR``:
 
 - ``ssm send-command`` writes the sent lines to ``host.sh`` and runs them in a detached runner under
   ``FAKE_TUNNEL_BASH`` with ``SB_W=$FAKE_TUNNEL_SB_W`` and ``SB_PY`` this Python, so B01's real script
-  serves. The runner writes ``host.out``, then ``host.rc`` when the script ends.
+  serves. The runner writes ``host.out``, then ``host.rc`` when the script ends. ``FAKE_TUNNEL_DELAY=<s>``
+  holds the script back that long, as a host slow to start would.
 - ``ssm get-command-invocation`` answers ``InProgress`` until ``host.rc`` exists, then that run's status
   and stdout. ``FAKE_TUNNEL_ALTER=sha`` replaces the ``archive_sha256`` value with zeros.
 - ``ssm start-session`` prints a ``SessionId`` as the plugin does and relays each connection on
@@ -24,6 +26,7 @@ import socket
 import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 
 COMMAND_ID = "0b1c2d3e-4f50-6172-8394-a5b6c7d8e9f0"
@@ -59,6 +62,7 @@ def send_command(args: list[str]) -> int:
 
 
 def run_host() -> int:
+    time.sleep(float(os.environ.get("FAKE_TUNNEL_DELAY") or 0))
     env = {k: v for k, v in os.environ.items() if not k.startswith(("PO_", "SB_"))}
     env.update({"SB_W": os.environ["FAKE_TUNNEL_SB_W"], "SB_PY": Path(sys.executable).as_posix()})
     with open(state() / "host.out", "wb") as out:
@@ -142,8 +146,10 @@ def main(argv: list[str]) -> int:
     for a in args:
         if a.startswith("file://") and os.path.isfile(a[7:]):
             files[a] = Path(a[7:]).read_text(encoding="utf-8", errors="replace")
-    with open(state() / "calls.jsonl", "a", encoding="utf-8") as handle:
-        handle.write(json.dumps({"argv": args, "files": files}) + "\n")
+    calls = state() / "calls"
+    calls.mkdir(exist_ok=True)
+    (calls / f"{time.time_ns():020d}-{os.getpid()}.json").write_text(json.dumps({"argv": args, "files": files}),
+                                                                      encoding="utf-8")
     op = " ".join(args[:2])
     if op == "ssm send-command":
         return send_command(args)

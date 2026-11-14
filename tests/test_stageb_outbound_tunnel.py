@@ -553,8 +553,8 @@ class Fetched:
         self.rc = result.returncode
         self.stdout, self.stderr = result.stdout, result.stderr
         self.elapsed = 0.0
-        log = tmp / "state" / "calls.jsonl"
-        self.calls = [json.loads(x) for x in log.read_text(encoding="utf-8").splitlines()] if log.exists() else []
+        log = tmp / "state" / "calls"
+        self.calls = [json.loads(x.read_text(encoding="utf-8")) for x in sorted(log.glob("*.json"))]
 
     def ops(self, op: str) -> list[dict]:
         return [c for c in self.calls if " ".join(c["argv"][:2]) == op]
@@ -580,7 +580,7 @@ def tunnel_tmp(tmp_path):
         _kill_live(tmp_path)
 
 
-def _fetch(tmp: Path, files: Optional[dict[str, bytes]] = None, relay: str = "", alter: str = "",
+def _fetch(tmp: Path, files: Optional[dict[str, bytes]] = None, relay: str = "", alter: str = "", delay: str = "",
            shims: tuple[str, ...] = ("aws", "plugin"), instance: Optional[str] = INSTANCE,
            dest: Optional[Path] = None, out: Optional[Path] = None, serve: Optional[Path] = None) -> Fetched:
     work = tmp / "host"
@@ -608,7 +608,8 @@ def _fetch(tmp: Path, files: Optional[dict[str, bytes]] = None, relay: str = "",
     env = {k: v for k, v in os.environ.items() if not k.startswith(("PO_", "SB_", "FAKE_", "AWS_"))}
     env.update({"PATH": path, "TEMP": str(tmp / "temp"), "TMP": str(tmp / "temp"), "PO_POLL_SECONDS": "1",
                 "FAKE_TUNNEL_DIR": str(tmp / "state"), "FAKE_TUNNEL_BASH": str(BASH),
-                "FAKE_TUNNEL_SB_W": work.as_posix(), "FAKE_TUNNEL_RELAY": relay, "FAKE_TUNNEL_ALTER": alter})
+                "FAKE_TUNNEL_SB_W": work.as_posix(), "FAKE_TUNNEL_RELAY": relay, "FAKE_TUNNEL_ALTER": alter,
+                "FAKE_TUNNEL_DELAY": delay})
     argv = [str(WINDOWS_POWERSHELL), "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", str(FETCH),
             "-AwsProfile", "po-r1", "-Outputs", str(outputs), "-Dest", str(dest), "-Out", str(out),
             "-HostPort", str(_free_port()), "-WindowSeconds", "30"]
@@ -691,6 +692,16 @@ def test_the_happy_path_keeps_the_archive_equal_to_the_hosts(tunnel_tmp) -> None
     assert params == {"portNumber": [str(record["host_port"])], "localPortNumber": [str(record["local_port"])]}
     terminated = f.ops("ssm terminate-session")[0]["argv"]
     assert terminated[terminated.index("--session-id") + 1] == record["session_id"]
+    _assert_cleaned_up(f)
+
+
+@needs_tunnel
+def test_a_host_that_starts_serving_late_still_delivers(tunnel_tmp) -> None:
+    # 100 s is past the window plus 60 s: the poll must follow host-run, not a clock started at the session.
+    f = _fetch(tunnel_tmp, files={"notes.txt": b"invented notes\n"}, delay="100")
+    assert f.rc == 0, f.stdout + f.stderr
+    assert f.host_values()["RESULT"] == "expected"
+    assert f.elapsed >= 100
     _assert_cleaned_up(f)
 
 
