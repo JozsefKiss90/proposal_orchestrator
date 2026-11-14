@@ -7,14 +7,14 @@
 | Run log | `RUNLOG.md` |
 | Who | The operator runs every step. The agent sees only the lines each step says to report, and the evidence files it names |
 | Account / region | `797661577394` / `eu-north-1`. Every AWS command names `--profile po-r1 --region eu-north-1`. `host-run.ps1` and `sb_fetch.ps1` take `-AwsProfile po-r1` and read the region from `deploy/aws/parameters/host.json` |
-| Charges | Every step here needs the lane's host stack, so hourly charges are already running |
-| Scope so far | The tunnel's steps (B03). Later lane tickets add their own steps to this sheet |
+| Charges | SB-T0 creates the lane's host stack and starts hourly charges. Stopped between sittings (SB-T4), the stack still costs about 0.064 USD an hour. Kept for the drafting lane (SB-OP1 in `RUNLOG.md`) |
+| Scope so far | The tunnel's steps (B03) and the lane host's creation and stops (SB-T0, SB-T4). Later lane tickets add their own steps to this sheet |
 
 ## Names used below
 
 | Name | What it is |
 |---|---|
-| `X` | The lane host's stack outputs file, with its `InstanceId` (the lane's host-creation step writes it) |
+| `X` | The lane host's stack outputs file, with its `InstanceId`: `SB_T0_outputs.json`, or after a restart the newest `SB_T4_start<N>_outputs.json` (the instance id does not change) |
 | `D` | The private landing folder: outside every checkout and outside any cloud-synced folder (E6). `sb_fetch.ps1` refuses a folder inside a git work tree; the cloud-sync part rests on you |
 | `<n>` | The fetch number in this lane: 1, 2, 3 and so on. Never reused |
 
@@ -58,6 +58,44 @@ only when its sha256 and size equal the host's (msca-dn-stage-b-export-route_202
 is the only recipient (E7); nothing else leaves the host
 FILL
 ```
+
+## SB-T0 — create the lane's host (hourly charges start)
+
+**SB-T0a. Before any charge: identity, session preferences, no host stack.**
+
+```powershell
+$E = "docs\infrastructure_security\evidence_v2\SB"
+aws sts get-caller-identity --profile po-r1 --region eu-north-1 --output json 2>&1 | Out-File -Encoding utf8 "$E\SB_T0a_caller-identity.json"
+$raw = aws ssm get-document --profile po-r1 --region eu-north-1 --name SSM-SessionManagerRunShell --query Content --output text 2>&1; $rc = $LASTEXITCODE
+if ($rc -ne 0) { $sel = [ordered]@{ document = "absent"; exit = $rc; invalid_document = [bool](($raw | Out-String) -match "InvalidDocument") } }
+else { $in = (($raw | Out-String) | ConvertFrom-Json).inputs
+  $sel = [ordered]@{ document = "present"; s3BucketName = $in.s3BucketName; s3EncryptionEnabled = $in.s3EncryptionEnabled; cloudWatchLogGroupName = $in.cloudWatchLogGroupName; cloudWatchEncryptionEnabled = $in.cloudWatchEncryptionEnabled; cloudWatchStreamingEnabled = $in.cloudWatchStreamingEnabled } }
+ConvertTo-Json -InputObject $sel | Out-File -Encoding utf8 "$E\SB_T0a_session-preferences.json"; $raw = $null; $in = $null
+& { aws cloudformation describe-stacks --profile po-r1 --region eu-north-1 --stack-name proposal-orchestrator-host --output json; "exit=$LASTEXITCODE" } 2>&1 | Out-File -Encoding utf8 "$E\SB_T0a_host-stack-before.txt"
+Get-ChildItem "$E\SB_T0a_*" | ForEach-Object { "== $($_.Name)"; Get-Content $_.FullName }
+```
+
+| Evidence file | PASS criterion |
+|---|---|
+| `SB_T0a_caller-identity.json` | Account `797661577394`, role `AccountFullAccessRole` |
+| `SB_T0a_session-preferences.json` | `document` `absent` with `invalid_document` true (any other failure, such as an expired session, is not absence: rerun), or present with `s3BucketName` and `cloudWatchLogGroupName` empty and `cloudWatchStreamingEnabled` false or empty (E8) |
+| `SB_T0a_host-stack-before.txt` | `does not exist`; `exit=254` |
+
+**STOP rule.** Session logging configured, a host stack already there, or anything else different: stop and report.
+
+**SB-T0b. Create the host stack.**
+
+```powershell
+$E = "docs\infrastructure_security\evidence_v2\SB"
+powershell -NoProfile -ExecutionPolicy Bypass -File deployws\scripts\host-lifecycle.ps1 -Action start -AwsProfile po-r1 -OutDir $E -Prefix SB_T0
+```
+
+Type `create` when it asks. **PASS:** as V14 H03: `SB_T0_log.txt` ends `RESULT=started` with `path=create`; seven
+`Add` changes; `CREATE_COMPLETE`; the host `Online`. **Report:** the last line, and the create time (UTC), which the
+agent writes in `RUNLOG.md`. SB-T3 counts from that time. Then SB-T1 at once.
+
+The host is bare: no bundle, no inputs. The smoke needs none. The serve script uses the system `python3` when the
+bundled interpreter is absent, and prints which one in `interpreter=`.
 
 ## SB-T1 — smoke on an invented file (ticket B04)
 
@@ -115,6 +153,8 @@ session (no document named), as `root`:
 
 **SB-T1h.** Delete the fetched archives and the `check-` folders from `D`.
 
+**SB-T1i.** Stop the host: SB-T4 stop with `<N>` 1. Run SB-T3 15 minutes after the second fetch; it needs no running host.
+
 | Evidence | PASS criterion |
 |---|---|
 | `SB_T1_seed.json`, `SB_T1_seed2.json` | status `Success`; stdout `seed_bytes` 1000000 (then 5000000), `RESULT=expected` |
@@ -131,6 +171,18 @@ Command start-up and clean-up included, so they are not a throughput measure. Th
 **If it fails.** `start-session` refused or the plugin too old: report the error line; the fix is on the
 workstation or in the role. The tunnel opens but no download starts: report the fetch file. Two failed attempts
 after a fix: stop, and use the fallback of decision record E9 for the first drafting run.
+
+## SB-T4 — stop and start between sittings (SB-OP1)
+
+```powershell
+$E = "docs\infrastructure_security\evidence_v2\SB"
+powershell -NoProfile -ExecutionPolicy Bypass -File deployws\scripts\host-lifecycle.ps1 -Action stop -AwsProfile po-r1 -OutDir $E -Prefix SB_T4_stop<N>
+powershell -NoProfile -ExecutionPolicy Bypass -File deployws\scripts\host-lifecycle.ps1 -Action start -AwsProfile po-r1 -OutDir $E -Prefix SB_T4_start<N>
+```
+
+Run one line, not both. `<N>` counts the sittings: 1, 2, 3. Stop ends `RESULT=stopped`. Start takes the resume
+path, asks for `start`, and ends `RESULT=started`; then use `SB_T4_start<N>_outputs.json` as `X`. A started host
+keeps `/root/sb`. **Report:** the last line of the log. Teardown is the drafting lane's own step, when the lane ends.
 
 ## SB-T2 — fetch (every later export)
 

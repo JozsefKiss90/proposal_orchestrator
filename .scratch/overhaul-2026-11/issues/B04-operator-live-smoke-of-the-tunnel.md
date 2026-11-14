@@ -1,6 +1,6 @@
 # B04 — Operator: live smoke of the tunnel, on an invented file
 
-Status: blocked
+Status: ready (B01 to B03 done; SB-T0 creates the host)
 Type: operator step (the agent checks the evidence files afterwards)
 Blocked by: B01, B02, B03, and a running host stack (the lane's host-creation step)
 Lane: Stage B drafting (MSCA-DN 2026 resubmission), export route
@@ -58,3 +58,7 @@ on the host by `sb_smoke_seed.sh`. Hourly charges are already running, because t
 - Changing a stack, a policy or the session preferences.
 
 ## Comments
+
+- 2026-11-14, operator, in session (SB-OP1): the host is created for this ticket by `STEPS.md` SB-T0, and after
+  the smoke it is stopped (SB-T4) and kept for the drafting lane. Order: SB-T0a, SB-T0b, SB-T1a to SB-T1i, then
+  SB-T3 15 minutes after the second fetch. Step 5's `SB_T1_after.json` is read by hand for now (RUNLOG SB-F1).
