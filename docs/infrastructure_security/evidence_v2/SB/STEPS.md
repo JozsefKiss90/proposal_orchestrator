@@ -42,20 +42,20 @@
 
 ### P — points the operator fills before B04
 
-The agent proposes these. You fill or strike each `FILL` point. No step below runs until you have.
+The agent proposed these. The operator gave both on 2026-11-14.
 
-- **P1. The decision record's two open points.** E5 (the kinds of file that may leave) and E7 (who may receive the
-  drafts next, and by which channel). The agent wrote no substitute.
+- **P1. The decision record's two open points. Given 2026-11-14.** E5: every file the lane writes to
+  `/root/sb/outbound/`, no narrower list of kinds. E7: the operator only, by SB-T2 into `D`; no onward channel yet
+  (record G7).
 - **P2. The export sentence of the Stage B receipt** (`processing_route.export`). The lane's receipt step copies
   this sentence verbatim between its `FILL` markers, as P2 was handled at V14 (`V14/host/v14_h05b_receipt.sh`).
-  The two `FILL: operator` parts take your E5 and E7 wording.
 
 ```
 FILL
-the files the drafting lane writes to /root/sb/outbound/ (kinds: FILL: operator), as one archive served once on
-the host's loopback address through a Session Manager port-forward session to a private folder on the operator's
-workstation, kept only when its sha256 and size equal the host's (msca-dn-stage-b-export-route_2026-11-14, E1, E2);
-next recipients and channel: FILL: operator; nothing else leaves the host
+the files the drafting lane writes to /root/sb/outbound/, as one archive served once on the host's loopback
+address through a Session Manager port-forward session to a private folder on the operator's workstation, kept
+only when its sha256 and size equal the host's (msca-dn-stage-b-export-route_2026-11-14, E1, E2, E5); the operator
+is the only recipient (E7); nothing else leaves the host
 FILL
 ```
 

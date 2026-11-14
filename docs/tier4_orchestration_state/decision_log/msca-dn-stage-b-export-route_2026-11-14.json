@@ -7,8 +7,8 @@
   "milestone": "MSCA-DN 2026 resubmission, Stage B drafting lane, export route",
   "ticket": "B03 of .scratch/overhaul-2026-11/issues/ (the export rule on record). It answers the A6 part of gap G2 of msca-dn-stage-b-drafting-lane_2026-11-14, which it follows and does not edit. Scripts: docs/infrastructure_security/evidence_v2/SB/host/sb_outbound_serve.sh (B01, committed sha256 23f938a4bce5e91efa8c706b18b0458eb63f8f7bd7c7c48b6ad198e492279a6e), docs/infrastructure_security/evidence_v2/SB/host/sb_smoke_seed.sh (B01, 1f9574a18a7f21c69ee1e4a5b9c8cde326066734acf82e649d23c42c0c68927a) and docs/infrastructure_security/evidence_v2/SB/workstation/sb_fetch.ps1 (B02, b2ec7e2d1e915a19087c5f2e0190c9641b66cbe762045aa854548aac3426fe5f). Each hash is of the blob at 0d8d7a41. A Windows checkout may turn the .ps1 into CRLF, so its working-copy hash can differ. host-run.ps1 sends a .sh with LF and records that hash in its -Out.",
   "authority": "Operator instruction, in session on 2026-11-14: the route of tickets B01 to B04. It sets aside V14-OP2 and V14-OP8 for this lane only. It amends no constitutional rule (CLAUDE.md section 14), closes no gate, changes no stack and changes no code pin.",
-  "review_state": "agent_drafted_pending_operator_review",
-  "decided_by": "The operator chose the route in session on 2026-11-14. The agent drafted this record from tickets B01 to B04. Two points (E5 and E7) await the operator's wording.",
+  "review_state": "operator_decided",
+  "decided_by": "The operator chose the route in session on 2026-11-14 and gave E5 and E7 in session the same day. The agent drafted the record from tickets B01 to B04 and wrote E5 and E7 from the operator's words, quoted in their bases.",
   "decision": "Drafts leave the host as one archive. The host serves it once, on its loopback address, through a Session Manager port-forward session to the operator's workstation. Both sides check the sha256. The host gets no internet route and no S3 write.",
   "rules": [
     {
@@ -37,9 +37,9 @@
     },
     {
       "id": "E5",
-      "rule": "What may leave. Only the files the drafting lane writes to /root/sb/outbound/. The kinds of file: FILL: operator.",
-      "declared_status": "Unresolved",
-      "basis": "The folder is fixed by B01. The kinds await the operator's wording."
+      "rule": "What may leave. Only the files the drafting lane writes to /root/sb/outbound/. The operator names no narrower list of kinds.",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14: 'E5 is Confirmed'. The folder is fixed by B01."
     },
     {
       "id": "E6",
@@ -49,9 +49,9 @@
     },
     {
       "id": "E7",
-      "rule": "Who may receive the drafts next, and by which channel: FILL: operator.",
-      "declared_status": "Unresolved",
-      "basis": "Awaits the operator's wording."
+      "rule": "Who receives the drafts next, and by which channel. The operator only, by the SB-T2 fetch, with -Dest set to the private folder of E6. The fetch writes the archive there directly, so it needs no download folder and no move. No onward channel to anyone else is decided (G7).",
+      "declared_status": "Confirmed",
+      "basis": "Operator, in session, 2026-11-14: 'I may receive, but I don't know what channels are available. They could be simply downloaded and I will move them in the private folder.' sb_fetch.ps1 writes to -Dest."
     },
     {
       "id": "E8",
@@ -120,6 +120,12 @@
     {
       "id": "G6",
       "gap": "A5 (processing authority for the 2026 inputs) and A7 (the RAISE DN opt-in) of gap G2 of the first lane record stay open. They get their own records.",
+      "owner": "operator",
+      "declared_status": "Unresolved"
+    },
+    {
+      "id": "G7",
+      "gap": "No channel is decided for drafts to go beyond the operator, for example to the consortium. The handoff's A6 says drafts must reach the consortium. That step needs its own record before any draft leaves the private folder.",
       "owner": "operator",
       "declared_status": "Unresolved"
     }

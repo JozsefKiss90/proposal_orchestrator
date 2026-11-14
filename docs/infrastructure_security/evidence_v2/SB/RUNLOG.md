@@ -16,6 +16,7 @@
 | 2026-11-14 | agent | B01 committed (`4d127b95`); B02 committed (`8c508e92`, follow-up `5c0e3b47`). Workstation tests only: `tests/test_stageb_outbound_tunnel.py`. No AWS call |
 | 2026-11-14 | operator | "Narrow the claim": `served=yes` means sent, not received; the workstation's sha256 proves delivery. Committed `0d8d7a41` (SB-F2) |
 | 2026-11-14 | agent | B03: the export-route record drafted (`agent_drafted_pending_operator_review`), `STEPS.md` and this log started. Two `FILL` points await the operator: E5 and E7, and with them the receipt's export sentence (STEPS P2). No AWS call |
+| 2026-11-14 | operator | E5 confirmed: every file the lane writes to `outbound`, no narrower list of kinds. E7: the operator only, by the fetch into the private folder; no channel known for anyone else (record G7). Record now `operator_decided`; receipt sentence (STEPS P2) complete |
 
 ## Findings
 

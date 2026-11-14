@@ -1,6 +1,6 @@
 # B03 — The export rule on record, the receipt wording and the step sheet
 
-Status: drafted; awaits the operator's two FILL points (the last criterion)
+Status: done 2026-11-14 (E5 and E7 given by the operator)
 Type: task (records; no code)
 Blocked by: None for the draft. B01 and B02 for the final script names and hashes
 Lane: Stage B drafting (MSCA-DN 2026 resubmission), export route
@@ -71,7 +71,7 @@ Written in the V14 `STEPS.md` style: a PowerShell block, what to expect, what to
 - [x] SB-T3 states its PASS rule as above, and says it runs no earlier than 15 minutes after a fetch.
 - [x] No record holds private content. `tools/evidence_secret_scan.py` and `tools/old_id_guard.py` are
       clean over the `SB` folder.
-- [ ] The operator has read the record and filled or struck both `FILL` points before B04 runs.
+- [x] The operator has read the record and filled or struck both `FILL` points before B04 runs.
 
 ## Session brief
 
@@ -111,3 +111,7 @@ Size: one JSON record, two short Markdown files
     (Inferred; used once, dies with the window). SB-F1, B04's `SB_T1_after.json` and the emptying of `outbound`
     have no script; STEPS reads them in an interactive session. The operator decides before B04.
   - Open: the last criterion (the operator's FILL points).
+- 2026-11-14, operator, in session. E5: "E5 is Confirmed" (no narrower list of kinds). E7: "I may receive, but I
+  don't know what channels are available. They could be simply downloaded and I will move them in the private
+  folder." Recorded as: the operator only, by SB-T2 with `-Dest` the private folder; onward channel undecided,
+  new gap G7. Record `operator_decided`; the last criterion ticked.
