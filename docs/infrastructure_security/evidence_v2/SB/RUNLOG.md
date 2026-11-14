@@ -28,6 +28,7 @@
 | 2026-11-14 | operator | Second fetch (23:22:39Z) failed: the session did not open (SB-F6). Record kept as `SB_T1_fetch-failed2.json` |
 | 2026-11-14 | agent | SB-F6 fixed: `session_error` field; fake `FAKE_TUNNEL_SESSION=refuse` and one new test; tunnel tests 56 passed, 3 skipped. New blob sha256 `94264254b8e4ae8c0dc2a1872e521dff7c95c130b67734a75664def7e03b09e8` (LF) |
 | 2026-11-14 | operator | Third fetch PASS (23:39:49Z to 23:40:05Z, 16 s whole-fetch): `kept` true, 3064 bytes, sha256 equal, session ended, host `served=yes` `RESULT=expected`. SB-F6 did not recur; its cause stays unknown |
+| 2026-11-14 | operator | SB-T1c PASS: `files=1`, `smoke_sha256` equal to the seed's `seed_sha256` |
 
 ### Operator decisions
 
