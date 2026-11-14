@@ -16,11 +16,12 @@
 # one complete GET or the window's end; delete it. Any other path, token or method gets 404 or 405 with no
 # body and is counted. No request is logged. "Complete" means every byte was sent; a client that drops
 # mid-body fails the send (the send buffer is kept small), which does not count. TCP cannot prove the client
-# read every byte: a drop after the last byte reached the kernel still counts as served. Behind the tunnel
-# the peer is the SSM agent in any case, so the workstation's sha256 check proves a complete fetch (B02).
+# read every byte: a drop after the last byte reached the kernel still counts as served. So served=yes
+# means sent, not received; on Windows a client was seen cut off after it. Behind the tunnel the peer is the
+# SSM agent in any case, so only the workstation's sha256 check proves a complete fetch (B02).
 # The window must end before the Run Command timeout: a SIGKILL leaves the archive, and the next run refuses.
 # Prints key=value lines only, never a member's name or content; a failure prints only the exception's
-# class, as error=. The last line is RESULT=expected (served once, every byte sent, archive deleted) or
+# class, as error=. The last line is RESULT=expected (every byte sent once, archive deleted) or
 # RESULT=unexpected. SB_W and SB_PY override the host paths for the workstation rehearsal only.
 set -u
 export HOME="${HOME:-/root}"

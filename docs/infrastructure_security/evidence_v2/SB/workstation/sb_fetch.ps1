@@ -252,7 +252,7 @@ try {
       $Record.failure = "the local file differs from the host's report"
     }
   } elseif ($Record.host_lines["RESULT"] -eq "expected" -and -not $Record.failure) {
-    $Record.failure = "the host served the archive, but no file arrived"
+    $Record.failure = "the host sent the archive, but no file arrived"
   }
 } finally {
   EndSession

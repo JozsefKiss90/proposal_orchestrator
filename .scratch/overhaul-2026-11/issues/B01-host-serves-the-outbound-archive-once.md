@@ -70,7 +70,8 @@ and `SB_PY` set, over invented files, and skip where `BASH` is absent, as the R1
 - [x] A second GET after a served one is refused at the socket.
 - [x] A wrong token, a wrong name, `/`, HEAD, POST and PUT each get 404 or 405. The server stays up,
       `refused_requests` counts them, and the right GET still works afterwards.
-- [ ] A client that closes mid-body does not end the server, and `served` stays `no` until a full GET.
+- [x] A client that closes mid-body does not end the server, and `served` stays `no` until every byte of a
+      GET is sent. (`served=yes` means sent, not received: operator decision 2026-11-14, see Comments.)
 - [x] Window end without a fetch: `served=no`, `RESULT=unexpected`, archive deleted, exit within the
       window plus 5 seconds.
 - [ ] Each refusal ends `RESULT=unexpected` with nothing listening: missing or short token, bad archive
@@ -126,3 +127,10 @@ Record: none in this ticket (B03 writes the export rule)
   - B02's sha256 check catches it on the workstation (file deleted, exit 1). The host record would
     still be wrong. Not yet known whether Linux behaves the same; the B04 host is the first Linux run.
   - Reproduce: the drop test, or a loop of it, 2 of 20 failed. Before B02 it passed 40 of 40.
+
+- 2026-11-14, operator decision: narrow the claim. `served=yes` and `RESULT=expected` mean every byte
+  was sent, not received; the workstation's sha256 match (B02 `kept`) proves delivery, and B03's record
+  states it. The script header says so. The drop test now accepts a reset on the second read, but
+  still requires `served=yes`, `bytes_sent` equal to `archive_bytes` and `RESULT=expected`, and checks
+  the sha256 whenever the read completes. The reworded criterion is ticked: 20 of 20 drop-test runs,
+  and the Stage B file 53 passed and 3 skipped.

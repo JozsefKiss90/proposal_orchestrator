@@ -25,6 +25,9 @@ inputs or the 2025 original.
 - **The route.** Drafts leave the host as one archive through a Session Manager port-forward session to
   the operator's workstation, served once on the host's loopback address, with a sha256 check on both
   sides (B01, B02). The host gets no internet route and no S3 write. No stack changes.
+- **What proves delivery.** The workstation's record: `kept` true, which needs the sha256 and size to
+  equal the host's. The host's `served=yes` and `RESULT=expected` mean every byte was sent, not received;
+  TCP cannot show more, and on Windows a client was seen cut off after the host printed them (B01).
 - **What it sets aside, for this lane only.** V14-OP2 (only metadata leaves the host) and V14-OP8
   (sessions use the default document only). V14-OP4 stands: text is read on the host only in an
   interactive session, never in Run Command output.
