@@ -37,6 +37,8 @@
 | 2026-11-15 | operator | SB-T1d/SB-T1f first try ran as `ssm-user` without `sudo -i`: `rm` and both `ls` refused (Permission denied), so the two folder counts are void; `ss` count `0` stands. Rerun as root |
 | 2026-11-15 | operator | SB-T1d/SB-T1f PASS as root: `0`, `0`, `0` (no listener on 8765, `outbound` and `export` empty), no error. SB-T1h PASS: archives and `check-` folders deleted, `left=0` |
 | 2026-11-15 | operator | SB-T1i: SB-T4 stop 1, `RESULT=stopped` (00:12:47Z to 00:13:34Z). The host is kept for the drafting lane (SB-OP1) |
+| 2026-11-15 | operator | SB-T3 (from 22:47:37Z): `events=5 port_forward=4 interactive=1 other_caller=0 other_target=0 errors=0`. Every event matched to a run: port-forward 23:03:23Z (SB-F5 run), 23:39:53Z (fetch 1), 23:49:17Z (SB-F7 run), 00:02:14Z (fetch 2); interactive 23:49:39Z (the SB-T1d/f session). SB-F6's run left no event. PASS, with four port-forward events where B04 named two |
+| 2026-11-15 | agent | B04: five of six criteria ticked with evidence; `SB_T1_after.json` awaits the operator (SB-F1). Token check: no unnamed 64-hex value in the 31 `SB_T*` files. Record gap G4 now Confirmed |
 
 ### Operator decisions
 

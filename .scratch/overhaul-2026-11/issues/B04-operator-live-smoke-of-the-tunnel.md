@@ -1,6 +1,6 @@
 # B04 — Operator: live smoke of the tunnel, on an invented file
 
-Status: ready (B01 to B03 done; SB-T0 creates the host)
+Status: done 2026-11-15, one criterion awaiting the operator (SB_T1_after.json, SB-F1)
 Type: operator step (the agent checks the evidence files afterwards)
 Blocked by: B01, B02, B03, and a running host stack (the lane's host-creation step)
 Lane: Stage B drafting (MSCA-DN 2026 resubmission), export route
@@ -33,15 +33,15 @@ on the host by `sb_smoke_seed.sh`. Hourly charges are already running, because t
 
 ## PASS
 
-- [ ] Both fetches: exit 0, `sha256_match` true, `served=yes`, `RESULT=expected`,
+- [x] Both fetches: exit 0, `sha256_match` true, `served=yes`, `RESULT=expected`,
       `listening=127.0.0.1:<port>`, `refused_requests=0`.
 - [ ] `SB_T1_after.json`: nothing listens on the port, and `/root/sb/export` is empty.
-- [ ] The bucket listing is unchanged.
-- [ ] SB-T3: two `StartSession` events with `documentName` `AWS-StartPortForwardingSession`, by the
+- [x] The bucket listing is unchanged.
+- [x] SB-T3: two `StartSession` events with `documentName` `AWS-StartPortForwardingSession`, by the
       operator's role, on the lane's instance, with no error. No such event by any other caller.
-- [ ] The seconds each fetch took are recorded in `RUNLOG.md`, so the lane knows what a real export costs
+- [x] The seconds each fetch took are recorded in `RUNLOG.md`, so the lane knows what a real export costs
       in time.
-- [ ] No evidence file holds the token. The agent checks each file by script.
+- [x] No evidence file holds the token. The agent checks each file by script.
 
 ## If it fails
 
@@ -62,3 +62,20 @@ on the host by `sb_smoke_seed.sh`. Hourly charges are already running, because t
 - 2026-11-14, operator, in session (SB-OP1): the host is created for this ticket by `STEPS.md` SB-T0, and after
   the smoke it is stopped (SB-T4) and kept for the drafting lane. Order: SB-T0a, SB-T0b, SB-T1a to SB-T1i, then
   SB-T3 15 minutes after the second fetch. Step 5's `SB_T1_after.json` is read by hand for now (RUNLOG SB-F1).
+- 2026-11-15, agent. Evidence per criterion (`evidence_v2/SB/RUNLOG.md` has the full account):
+  - Fetches: `SB_T1_fetch.json` and `SB_T1_fetch2.json`, reported `exit=0`, `kept` true, `sha256_match` true,
+    `served=yes`, `RESULT=expected`, `listening=127.0.0.1:8765`, `refused_requests=0`. SB-T1c twice: the unpacked
+    `smoke.txt` equals the seed's sha256 (1,000,000 and 5,000,000 bytes).
+  - `SB_T1_after.json`: not ticked. No script writes it (SB-F1). Read as root in an interactive session instead:
+    `0`, `0`, `0` (no listener on 8765, `outbound` and `export` empty). The operator accepts the reported counts or
+    asks for the script.
+  - Bucket: `Compare-Object` of `SB_T1_bundles-before.json` and `-after.json` printed nothing.
+  - SB-T3: `events=5 port_forward=4 interactive=1 other_caller=0 other_target=0 errors=0`. Four port-forward events,
+    not two: each matches a fetch run that opened a session (23:03:23Z SB-F5's run, 23:39:53Z fetch 1, 23:49:17Z
+    SB-F7's run, 00:02:14Z fetch 2). SB-F6's run left no event. The one interactive event (23:49:39Z) is the session
+    used for SB-T1d and SB-T1f. All by `AccountFullAccessRole`, all on `i-061e2245b580ab5f1`.
+  - Seconds: 16 and 15, whole-fetch (Fetches table).
+  - Token: no 64-hex value outside the named sha256 fields in any of the 31 `SB_T*` files (checked by script).
+  - Found on the way, fixed in `sb_fetch.ps1` with tests: SB-F5 (a bad `-Dest` reached AWS), SB-F6 (a session that
+    did not open left no reason), SB-F7 (a main-body error recorded no failure; cause unknown, now named next time).
+    SB-F4: the preflight now checks the plugin.
