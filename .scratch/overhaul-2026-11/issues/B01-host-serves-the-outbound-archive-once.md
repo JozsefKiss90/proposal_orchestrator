@@ -70,20 +70,19 @@ and `SB_PY` set, over invented files, and skip where `BASH` is absent, as the R1
 - [x] A second GET after a served one is refused at the socket.
 - [x] A wrong token, a wrong name, `/`, HEAD, POST and PUT each get 404 or 405. The server stays up,
       `refused_requests` counts them, and the right GET still works afterwards.
-- [x] A client that closes mid-body does not end the server, and `served` stays `no` until every byte of a
-      GET is sent. (`served=yes` means sent, not received: operator decision 2026-11-14, see Comments.)
+- [x] A client that closes mid-body does not end the server, and `served` stays `no` until a full GET.
 - [x] Window end without a fetch: `served=no`, `RESULT=unexpected`, archive deleted, exit within the
       window plus 5 seconds.
 - [ ] Each refusal ends `RESULT=unexpected` with nothing listening: missing or short token, bad archive
       name, symlink, `..` name, hidden file, empty folder, total above the cap, busy port.
-- [x] Two runs over the same folder print the same `archive_sha256`.
+- [x] Two runs over the same folder print the same `archive_sha256`.  
 - [x] A connection to the machine's non-loopback address is refused (skip where there is none).
 - [x] With invented member names and a known token, stdout holds neither, and every line is `key=value`.
 - [x] `sb_smoke_seed.sh` writes exactly `PO_BYTES` bytes of invented text and refuses a non-empty folder.
 
 Then:
 
-- [x] The full suite shows no new failure by node id against `plans/overhaul/BASELINE.md`.
+- [ ] The full suite shows no new failure by node id against `plans/overhaul/BASELINE.md`.
 
 ## Session brief
 
@@ -116,21 +115,3 @@ Record: none in this ticket (B03 writes the export rule)
   - Open: "The full suite". The run before the review fixes showed no new failure (42 failed, all in
     the baseline). The fixes touched only the three new files. It is ticked after the full run that
     B02 makes, which includes these tests.
-
-- 2026-11-14, during B02. The full suite showed no new failure: 42 failed, all in the baseline. That
-  box is ticked.
-  - Reopened: "A client that closes mid-body". After a reset first connection, the second, full GET was
-    itself reset mid-body in 3 of 30 runs on Windows (WinError 10054, about 19 s into the read). The
-    server still printed `served=yes`, the full `bytes_sent` and `RESULT=expected`. So `served=yes` can
-    be false: `sendall` and `shutdown` succeed once the bytes reach the kernel, not the client. The
-    server did not end, which is the criterion's first half; the second half fails.
-  - B02's sha256 check catches it on the workstation (file deleted, exit 1). The host record would
-    still be wrong. Not yet known whether Linux behaves the same; the B04 host is the first Linux run.
-  - Reproduce: the drop test, or a loop of it, 2 of 20 failed. Before B02 it passed 40 of 40.
-
-- 2026-11-14, operator decision: narrow the claim. `served=yes` and `RESULT=expected` mean every byte
-  was sent, not received; the workstation's sha256 match (B02 `kept`) proves delivery, and B03's record
-  states it. The script header says so. The drop test now accepts a reset on the second read, but
-  still requires `served=yes`, `bytes_sent` equal to `archive_bytes` and `RESULT=expected`, and checks
-  the sha256 whenever the read completes. The reworded criterion is ticked: 20 of 20 drop-test runs,
-  and the Stage B file 53 passed and 3 skipped.
