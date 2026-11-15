@@ -35,6 +35,8 @@
 | 2026-11-15 | operator | SB-T1e: seed PASS (`seed_bytes=5000000`, `RESULT=expected`, 00:01:55Z); fetch PASS (00:02:11Z to 00:02:26Z, 15 s whole-fetch): `kept` true, 14709 bytes, sha256 equal, session ended, host `served=yes` `RESULT=expected`. SB-F7 did not recur. SB-T3 no earlier than 00:17:26Z |
 | 2026-11-15 | operator | SB-T1c (second) PASS: `files=1`, `smoke_sha256` equal to `SB_T1_seed2.json`. SB-T1g PASS: `Compare-Object` printed nothing |
 | 2026-11-15 | operator | SB-T1d/SB-T1f first try ran as `ssm-user` without `sudo -i`: `rm` and both `ls` refused (Permission denied), so the two folder counts are void; `ss` count `0` stands. Rerun as root |
+| 2026-11-15 | operator | SB-T1d/SB-T1f PASS as root: `0`, `0`, `0` (no listener on 8765, `outbound` and `export` empty), no error. SB-T1h PASS: archives and `check-` folders deleted, `left=0` |
+| 2026-11-15 | operator | SB-T1i: SB-T4 stop 1, `RESULT=stopped` (00:12:47Z to 00:13:34Z). The host is kept for the drafting lane (SB-OP1) |
 
 ### Operator decisions
 
