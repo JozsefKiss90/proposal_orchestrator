@@ -32,6 +32,7 @@
 | 2026-11-14 | operator | SB-T1e run before SB-T1d: seed refused correctly (`refused=the outbound folder is not empty`, 23:48:08Z), kept as `SB_T1_seed2-refused1.json`. Its fetch (23:49:14Z) opened a session and ended after 12 s with no host lines and no failure (SB-F7), kept as `SB_T1_fetch2-failed1.json` |
 | 2026-11-14 | operator | SB-T1d PASS: `smoke.txt` removed in an interactive session, `outbound` count `0` |
 | 2026-11-14 | agent | SB-F7: `sb_fetch.ps1` now records an error in its main body as `failure=script error <type> at line <n>` (never the message). No test reproduces the B04 error; tunnel tests 56 passed, 3 skipped. New blob sha256 `3f0b7090f80d58e6dbde8ab5be0a013eda8b96c32ab386df3e146dc3a27b7901` (LF) |
+| 2026-11-15 | operator | SB-T1e: seed PASS (`seed_bytes=5000000`, `RESULT=expected`, 00:01:55Z); fetch PASS (00:02:11Z to 00:02:26Z, 15 s whole-fetch): `kept` true, 14709 bytes, sha256 equal, session ended, host `served=yes` `RESULT=expected`. SB-F7 did not recur. SB-T3 no earlier than 00:17:26Z |
 
 ### Operator decisions
 
@@ -80,3 +81,4 @@
 | `<n>` | When (UTC) | Bytes | Seconds | Result |
 |---|---|---|---|---|
 | SB-T1 1 | 2026-11-14T23:39:49Z | 3064 | 16 | kept, sha256 equal |
+| SB-T1 2 | 2026-11-15T00:02:11Z | 14709 | 15 | kept, sha256 equal |
